@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "Kopiert"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "Details kopieren"
-  },
   "app.action-bar.install.dismiss": {
     "message": "Ausblenden"
   },
@@ -84,7 +81,7 @@
     "message": "Keine Berechtigung zum Schreiben"
   },
   "app.action-bar.install.summary.pack-download-failed": {
-    "message": "Das Pack konnte nicht heruntergeladen werden"
+    "message": "Paket konnte nicht heruntergeladen werden"
   },
   "app.action-bar.install.summary.unexpected-error": {
     "message": "Etwas ist schiefgelaufen"
@@ -1025,14 +1022,44 @@
   "app.java-selector.browse": {
     "message": "Durchsuchen"
   },
+  "app.java-selector.copy-failed-title": {
+    "message": "Pfad konnte nicht kopiert werden"
+  },
+  "app.java-selector.copy-path": {
+    "message": "Pfad kopieren"
+  },
   "app.java-selector.detect": {
     "message": "Erkennen"
+  },
+  "app.java-selector.edit-path": {
+    "message": "Pfad bearbeiten"
+  },
+  "app.java-selector.install-java": {
+    "message": "Java {version} installieren"
   },
   "app.java-selector.installing": {
     "message": "Wird installiert..."
   },
+  "app.java-selector.invalid": {
+    "message": "Ungültig"
+  },
+  "app.java-selector.more-options": {
+    "message": "Weitere Javaoptionen"
+  },
+  "app.java-selector.not-set": {
+    "message": "Kein Java ausgewählt"
+  },
+  "app.java-selector.path-copied-text": {
+    "message": "Der Java-Pfad wurde in deine Zwischenablage kopiert."
+  },
+  "app.java-selector.path-copied-title": {
+    "message": "Pfad kopiert"
+  },
   "app.java-selector.path.placeholder": {
     "message": "/pfad/zu/java"
+  },
+  "app.java-selector.valid": {
+    "message": "Gültig"
   },
   "app.library.actions.label": {
     "message": "Bibliotheksaktionen"
@@ -2951,8 +2978,83 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "App-Daten Backups"
   },
+  "app.settings.resource-management.app-directory.cancel-move": {
+    "message": "Verschieben abbrechen"
+  },
+  "app.settings.resource-management.app-directory.change": {
+    "message": "Verzeichnis ändern"
+  },
+  "app.settings.resource-management.app-directory.change-to-default": {
+    "message": "Auf Standard ändern"
+  },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Hier speichert die Modrinth App Instanzen und andere Dateien. Änderungen werden nach einem Neustart der App wirksam."
+    "message": "Wo die Modrinth App Instanzen und andere Dateien speichert."
+  },
+  "app.settings.resource-management.app-directory.modal.admonition-body": {
+    "message": "Du kannst die Modrinth-App nicht nutzen, während wir deine Daten verschieben. Das kann eine Weile dauern."
+  },
+  "app.settings.resource-management.app-directory.modal.admonition-header": {
+    "message": "Alle deine Dateien werden verschoben"
+  },
+  "app.settings.resource-management.app-directory.modal.choose": {
+    "message": "Ordner auswählen"
+  },
+  "app.settings.resource-management.app-directory.modal.current": {
+    "message": "Aktuell"
+  },
+  "app.settings.resource-management.app-directory.modal.drive-root": {
+    "message": "Wähle einen Ordner statt des obersten Verzeichnisses eines Laufwerks, damit sich deine Dateien nicht mit den anderen Dateien auf dem Laufwerk vermischen."
+  },
+  "app.settings.resource-management.app-directory.modal.header": {
+    "message": "App-Verzeichnis ändern"
+  },
+  "app.settings.resource-management.app-directory.modal.instances-running": {
+    "message": "Schließe alle laufenden Instanzen, bevor du das App-Verzeichnis änderst."
+  },
+  "app.settings.resource-management.app-directory.modal.more-options": {
+    "message": "Weitere Optionen zum Verschieben"
+  },
+  "app.settings.resource-management.app-directory.modal.move-and-restart": {
+    "message": "Verschieben und neu starten"
+  },
+  "app.settings.resource-management.app-directory.modal.move-later": {
+    "message": "Beim nächsten Start verschieben"
+  },
+  "app.settings.resource-management.app-directory.modal.nested": {
+    "message": "Der neue Ordner darf weder in deinem aktuellen App-Verzeichnis liegen noch dieses enthalten."
+  },
+  "app.settings.resource-management.app-directory.modal.new": {
+    "message": "Neu"
+  },
+  "app.settings.resource-management.app-directory.modal.picker-title": {
+    "message": "Neues App-Verzeichnis auswählen"
+  },
+  "app.settings.resource-management.app-directory.more-change-options": {
+    "message": "Weitere Optionen für das Verzeichnis"
+  },
+  "app.settings.resource-management.app-directory.move-now": {
+    "message": "Jetzt verschieben und neu starten"
+  },
+  "app.settings.resource-management.app-directory.open-folder": {
+    "message": "Ordner öffnen"
+  },
+  "app.settings.resource-management.app-directory.open-in-explorer": {
+    "message": "Im Datei-Explorer öffnen"
+  },
+  "app.settings.resource-management.app-directory.open-in-finder": {
+    "message": "Im Finder öffnen"
+  },
+  "app.settings.resource-management.app-directory.path-copied-text": {
+    "message": "Der Pfad zum App-Verzeichnis wurde in deine Zwischenablage kopiert."
+  },
+  "app.settings.resource-management.app-directory.path-copied-title": {
+    "message": "Pfad kopiert"
+  },
+  "app.settings.resource-management.app-directory.path-copy-failed-title": {
+    "message": "Pfad konnte nicht kopiert werden"
+  },
+  "app.settings.resource-management.app-directory.pending": {
+    "message": "Dein App-Verzeichnis wird beim nächsten Start von der Modrinth App nach {path} verschoben."
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "App-Verzeichnis"
@@ -3506,6 +3608,9 @@
   "app.skins.toggle-ears-features-on": {
     "message": "Aktivieren"
   },
+  "app.splash.moving-app-directory": {
+    "message": "Dein App-Verzeichnis wird verschoben..."
+  },
   "app.survey.body": {
     "message": "Könntest du ein paar Fragen zu deiner Erfahrung mit der Modrinth App beantworten?"
   },
@@ -3803,6 +3908,57 @@
   "installation-settings.advanced.title": {
     "message": "Fortgeschritten"
   },
+  "installation-settings.relink-shared-instance.button": {
+    "message": "Geteilte Instanz erneut verknüpfen"
+  },
+  "installation-settings.relink-shared-instance.description": {
+    "message": "Verknüpfe diese Instanz über einen Einladungslink oder eine ID erneut mit der geteilten Instanz, von der diese getrennt wurde."
+  },
+  "installation-settings.relink-shared-instance.modal.already-linked": {
+    "message": "Deine Instanz „{name}“ ist bereits mit dieser geteilten Instanz verknüpft."
+  },
+  "installation-settings.relink-shared-instance.modal.blocked-header": {
+    "message": "Diese Instanz kann nicht erneut verknüpft werden"
+  },
+  "installation-settings.relink-shared-instance.modal.confirm-body": {
+    "message": "Diese Instanz wird wieder zur Quelle der geteilten Instanz. Mitglieder erhalten deine Änderungen, wenn du ein Update sendest."
+  },
+  "installation-settings.relink-shared-instance.modal.description": {
+    "message": "Verknüpfe diese Instanz erneut mit einer geteilten Instanz, welche dir gehört."
+  },
+  "installation-settings.relink-shared-instance.modal.find-button": {
+    "message": "Geteilte Instanz finden"
+  },
+  "installation-settings.relink-shared-instance.modal.header": {
+    "message": "Geteilte Instanz erneut verknüpfen"
+  },
+  "installation-settings.relink-shared-instance.modal.input-label": {
+    "message": "Einladungslink oder ID der geteilten Instanz"
+  },
+  "installation-settings.relink-shared-instance.modal.input-placeholder": {
+    "message": "https://modrinth.com/share/..."
+  },
+  "installation-settings.relink-shared-instance.modal.mismatch-body": {
+    "message": "Diese Instanz verwendet {localLoader} {localGameVersion}, die geteilte Instanz aber {loader} {gameVersion}. Mit deinem nächsten Update wird die geteilte Instanz an diese Instanz angepasst."
+  },
+  "installation-settings.relink-shared-instance.modal.mismatch-header": {
+    "message": "Andere Spiel- oder Loader-Version"
+  },
+  "installation-settings.relink-shared-instance.modal.not-owner": {
+    "message": "Nur der Besitzer kann eine geteilte Instanz erneut verknüpfen. Um als Mitglied ihre Updates zu erhalten, installiere sie erneut aus deiner Bibliothek."
+  },
+  "installation-settings.relink-shared-instance.modal.relink-button": {
+    "message": "Erneut verknüpfen"
+  },
+  "installation-settings.relink-shared-instance.modal.server-managed": {
+    "message": "Diese geteilte Instanz wird von einem Server verwaltet und kann daher nicht erneut verknüpft werden."
+  },
+  "installation-settings.relink-shared-instance.modal.version-summary": {
+    "message": "{loader} {gameVersion} · Version {version}"
+  },
+  "installation-settings.relink-shared-instance.title": {
+    "message": "Geteilte Instanz erneut verknüpfen"
+  },
   "installation-settings.shared-instance.linked-title": {
     "message": "Verknüpfte geteilte Instanz"
   },
@@ -3928,6 +4084,12 @@
   },
   "instance.settings.defaults.open-app-settings": {
     "message": "Standardeinstellungen verwalten"
+  },
+  "instance.settings.reset-setting-to-default": {
+    "message": "{setting} auf Standard zurücksetzen"
+  },
+  "instance.settings.reset-to-default": {
+    "message": "Auf Standard zurücksetzen"
   },
   "instance.settings.sidebar.label.game": {
     "message": "Spiel"
@@ -4128,25 +4290,28 @@
     "message": "Java-Argumente eingeben..."
   },
   "instance.settings.tabs.java.environment-variables": {
-    "message": "Benutzerdefinierte Umgebungsvariablen"
+    "message": "Umgebungsvariablen"
   },
   "instance.settings.tabs.java.hooks": {
     "message": "Hooks"
   },
   "instance.settings.tabs.java.java-arguments": {
-    "message": "Benutzerdefinierte Java-Argumente"
+    "message": "Java-Argumente"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "Benutzerdefinierte Java-Installation"
+    "message": "Java-Installation"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "Benutzerdefinierte Arbeitsspeicherzuweisung"
+    "message": "Arbeitsspeicherzuweisung"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/pfad/zu/java"
   },
   "instance.settings.tabs.java.label": {
     "message": "Java und Arbeitsspeicher"
+  },
+  "instance.settings.tabs.java.recommended-java-version": {
+    "message": "Java {version} wird für die Minecraft-Version dieser Instanz empfohlen."
   },
   "instance.settings.tabs.sharing": {
     "message": "Teilen"
@@ -4240,6 +4405,9 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Breite eingeben..."
+  },
+  "instance.settings.using-defaults": {
+    "message": "Standardwerte werden verwendet"
   },
   "instance.shared-instance.error.title": {
     "message": "Etwas ist schiefgelaufen"

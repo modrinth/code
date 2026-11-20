@@ -950,6 +950,9 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "יש להשלים את מילוי טופס המס"
   },
+  "discover.install.back-to-server": {
+    "message": "חזרה לשרת"
+  },
   "error.collection.404.list_item.1": {
     "message": "ייתכן שהקלדת כתובת URL שגויה של האוסף."
   },
@@ -1099,6 +1102,9 @@
   },
   "hosting-marketing.faq.location": {
     "message": "היכן ממוקמים שרתי האחסון של Modrinth? האם ניתן לבחור אזור?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "השרתים שלנו זמינים כעת ברחבי צפון אמריקה, אירופה, דרום-מזרח אסיה ואוסטרליה, וניתן לבחור ביניהם בעת הרכישה. אזורים נוספים יתווספו בעתיד! אם ברצונך לשנות את האזור שנבחר, יש ליצור קשר עם התמיכה."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "באילו גרסאות של מיינקראפט ובאילו Loaders ניתן להשתמש?"
@@ -1287,7 +1293,7 @@
     "message": "נכשל בניסיון טעינת פרויקטים אקראיים :("
   },
   "landing.feature.follow.description": {
-    "message": "התעדכן/י כל פעם הפקרויקטים האהובים עליך מתעדכנים."
+    "message": "התעדכן/י בכל פעם שהפרויקטים האהובים עליך מתעדכנים."
   },
   "landing.feature.follow.heading": {
     "message": "עקבו אחר פרויקטים שאתם אוהבים"
@@ -1979,6 +1985,15 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.server.region-label": {
+    "message": "אזור"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "בחירת שפות"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "בחירת אזור"
+  },
   "project.versions.title": {
     "message": "גרסאות"
   },
@@ -2242,6 +2257,9 @@
   },
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"
+  },
+  "settings.billing.pyro_subscription.title": {
+    "message": "מנויים לשרתי Modrinth"
   },
   "settings.display.banner.developer-mode.description": {
     "message": "<strong> מצב מפתח </strong> פעיל. זה יאפשר לך להציג את המזהים הפנימיים של דברים שונים ברחבי המודרינץ 'שעשויים להועיל אם אתה מפתח המשתמש בממשק ה- API של Modrinth. לחץ על הלוגו של Modrinth בתחתית העמוד 5 פעמים כדי לעבור את מצב המפתח."

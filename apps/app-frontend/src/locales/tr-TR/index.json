@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "Kopyalandı"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "Detayları kopyala"
-  },
   "app.action-bar.install.dismiss": {
     "message": "Reddet"
   },
@@ -209,11 +206,17 @@
   "app.behavior-settings.hidden-instances.description": {
     "message": "Bu cihazda kitaplığınızdan gizlediğiniz örnekler. Gizlenen örnekler Modrinth hesabınızla senkronize edilmez."
   },
+  "app.behavior-settings.hidden-instances.empty": {
+    "message": "Henüz herhangi bir oturum gizlemedin."
+  },
   "app.behavior-settings.hidden-instances.more-options": {
     "message": "Diğer seçenekler"
   },
   "app.behavior-settings.hidden-instances.not-installed": {
     "message": "Yüklü değil"
+  },
+  "app.behavior-settings.hidden-instances.title": {
+    "message": "Gizli oturumlar"
   },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Minecraft'tan çıkıldığında Modrinth App'i ön plana getirir."
@@ -277,6 +280,9 @@
   },
   "app.browse.project-type.mods": {
     "message": "Modlar"
+  },
+  "app.browse.project-type.plugins": {
+    "message": "Eklentiler"
   },
   "app.browse.project-type.resource-packs": {
     "message": "Kaynak Paketleri"
@@ -356,6 +362,9 @@
   "app.download-manager.eta": {
     "message": "Bu indirme için kalan tahmini süre"
   },
+  "app.download-manager.hide-tasks": {
+    "message": "Görevleri gizle"
+  },
   "app.download-manager.imported-instance": {
     "message": "İçeri aktarılmış kurulum"
   },
@@ -370,6 +379,9 @@
   },
   "app.download-manager.new-instance": {
     "message": "Yeni kurulum"
+  },
+  "app.download-manager.no-tasks": {
+    "message": "Görev yok"
   },
   "app.download-manager.pause": {
     "message": "İndirmeyi duraklat"
@@ -388,6 +400,9 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Paylaşılmış kurulum güncellemesi"
+  },
+  "app.download-manager.show-tasks": {
+    "message": "Görevleri göster"
   },
   "app.download-manager.tasks": {
     "message": "İşlemler"
@@ -629,6 +644,9 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "Değişiklikler henüz paylaşılmadı"
   },
+  "app.instance.admonitions.shared-instance.owner-update-body": {
+    "message": "Başka bir Modrinth App üzerinden bu oturuma güncelleme yükledin. Buradan yönetmeye devam etmek için son değişiklikleri indir."
+  },
   "app.instance.admonitions.shared-instance.owner-update-button": {
     "message": "Güncellemeyi indir"
   },
@@ -643,6 +661,12 @@
   },
   "app.instance.admonitions.shared-instance.removed-label": {
     "message": "Kaldırıldı"
+  },
+  "app.instance.admonitions.shared-instance.restored-body": {
+    "message": "Bu oturum yüklediğin son sürümden geri yüklendi. Diğer oturumundan yüklemediğin ayar değişikliği ya da içerik gibi şeyler dahil edilmedi."
+  },
+  "app.instance.admonitions.shared-instance.restored-header": {
+    "message": "Sadece yüklenmiş içerik indirildi"
   },
   "app.instance.admonitions.shared-instance.review-admonition-header": {
     "message": "Güncellemeyi yayınla"
@@ -752,6 +776,18 @@
   "app.instance.navigation.back-to-instance": {
     "message": "Kuruluma dön"
   },
+  "app.instance.server.offline.description": {
+    "message": "Bu sunucu şu an çevrimdışı. Yine de Minecraft'ı başlatabilirsin ama bağlanamayabilirsin."
+  },
+  "app.instance.server.offline.launch-anyway": {
+    "message": "Yine de başlat"
+  },
+  "app.instance.server.offline.title": {
+    "message": "Sunucu çevrimdışı"
+  },
+  "app.instance.server.status.unknown": {
+    "message": "Durum bilinmiyor"
+  },
   "app.instance.share.empty.description": {
     "message": "Bu instance'ı arkadaşlarınla paylaşabilirsin!"
   },
@@ -761,11 +797,23 @@
   "app.instance.share.empty.invite-friends-button": {
     "message": "Arkadaşlarını davet et"
   },
+  "app.instance.share.invite-friends": {
+    "message": "Arkadaşlarını davet et"
+  },
   "app.instance.share.invite-modal.heading": {
     "message": "Paylaş {name}"
   },
   "app.instance.share.invite-modal.user-limit-reached": {
     "message": "Bu örnek {limit} kullanıcı sınırına ulaştı."
+  },
+  "app.instance.share.limit-reached.description": {
+    "message": "Zaten en fazla {limit} oturum paylaşabilirsin."
+  },
+  "app.instance.share.limit-reached.heading": {
+    "message": "Oturum paylaşım sınırına ulaşıldı"
+  },
+  "app.instance.share.limit-reached.manage-button": {
+    "message": "Paylaşılan oturumları yönet"
   },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "Giriş yapmanız gerekiyor"
@@ -1154,6 +1202,9 @@
   "app.library.group.unknown": {
     "message": "Bilinmeyen grup"
   },
+  "app.library.instance-hidden.text": {
+    "message": "Ayarlar > Davranış bölümünde tekrar görebilirsin."
+  },
   "app.library.instance-hidden.title": {
     "message": "Kütüphaneden gizli"
   },
@@ -1247,11 +1298,23 @@
   "app.library.instance.shared-by": {
     "message": "{name} tarafından paylaşıldı"
   },
+  "app.library.instance.shared-by-owner": {
+    "message": "<owner>{name}</owner> tarafından paylaşıldı"
+  },
   "app.library.instance.shared-by-you": {
     "message": "Paylaştıklarınız"
   },
   "app.library.instance.stop": {
     "message": "Durdur"
+  },
+  "app.library.leave-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {Paylaşılan bu oturuma erişimini kaybedeceksin ve kütüphanenden kaldırılacak. Tekrar katılmak için yeni bir davete ihtiyacın var.} other {Paylaşılan bu oturumlara erişimini kaybedeceksin ve kütüphanenden kaldırılacak. Tekrar katılmak için yeni bir davete ihtiyacın var.}}"
+  },
+  "app.library.leave-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, one {Paylaşılan oturumdan ayrılınıyor} other {Paylaşılan # oturumdan ayrılınıyor}}"
+  },
+  "app.library.leave-shared-instance.modal.header": {
+    "message": "{count, plural, one {Paylaşılan oturumdan ayrıl} other {Paylaşılan # oturumdan ayrıl}}"
   },
   "app.library.search.no-results.title": {
     "message": "Aramanızla eşleşen kurulum yok."
@@ -1270,6 +1333,9 @@
   },
   "app.library.selection.remove-from-group": {
     "message": "Gruptan çıkar"
+  },
+  "app.library.selection.removing-shared-instances": {
+    "message": "Seçili paylaşılan oturumlar kaldırılıyor"
   },
   "app.library.selection.selected-count": {
     "message": "{count} adet seçildi"
@@ -1301,11 +1367,23 @@
   "app.library.title": {
     "message": "Kütüphane"
   },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-body": {
+    "message": "{unpublishCount, plural, one {Sahibi olarak paylaştığın # oturum Modrinth sunucularından silinecek ve onu kullanan insanlar} other {Sahibi olarak paylaştığın # oturum Modrinth sunucularından silinecek ve onu kullanan insanlar}} güncelleme almayı bırakacak. {leaveCount, plural, one {Paylaşılan diğer oturuma erişimini kaybedeceksin ve tekrar katılmak için yeni bir davete ihtiyacın olacak.} other {Paylaşılan diğer # oturuma erişimini kaybedeceksin ve tekrar katılmak için yeni bir davete ihtiyacın olacak.}} Tamamı kütüphanenden kaldırılacak."
+  },
   "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
     "message": "Unpublishing and leaving shared instances"
   },
   "app.library.unpublish-and-leave-shared-instances.modal.header": {
     "message": "Paylaşılan kurulumun paylaşımını kaldır {count} ve bunlardan ayrıl"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {Bu paylaşılan oturumu Modrinth sunucularından silecek. Modrinth App'te kullanan insanlar güncelleme almayı bırakacak ve senin kütüphanenden kaldırılacak.} other {Bu paylaşılan oturumları Modrinth sunucularından silecek. Modrinth App'te kullanan insanlar güncelleme almayı bırakacak ve senin kütüphanenden kaldırılacak.}}"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, one {Paylaşılan oturum paylaşımdan kaldırılıyor} other {Paylaşılan # oturum paylaşımdan kaldırılıyor}}"
+  },
+  "app.library.unpublish-shared-instance.modal.header": {
+    "message": "{count, plural, one {Paylaşılan oturumu paylaşımdam kaldır} other {Paylaşılan # oturumu paylaşımdan kaldır}}"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "Ek bağlam"
@@ -1345,6 +1423,9 @@
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {#mod} other {#mods}}"
+  },
+  "app.modal.install-to-play.owner-install-note": {
+    "message": "Bu en son yüklediğin sürümü indirir. Diğer oturumlarda yaptığın henüz yüklenmemiş değişiklikler dahil edilmeyecek."
   },
   "app.modal.install-to-play.report-description": {
     "message": "Bu formu <rules-link>Kuralları</rules-link> ihlal eden veya <terms-link>Hizmet Şartlarını</terms-link> ihlal eden örnekleri raporlamak için kullanın."
@@ -1405,6 +1486,15 @@
   },
   "app.modal.update-to-play.header": {
     "message": "Oynamak için güncelle"
+  },
+  "app.modal.update-to-play.owner-admonition-header": {
+    "message": "Diğer oturumdan yüklendi"
+  },
+  "app.modal.update-to-play.owner-description": {
+    "message": "Bu değişiklikler başka bir Modrinth App oturumundan yüklendi. Bu oturumdaki yüklenmemiş değişikliklerin üzerine yazılacak."
+  },
+  "app.modal.update-to-play.owner-header": {
+    "message": "Güncelleme mevcut"
   },
   "app.modal.update-to-play.removed": {
     "message": "Silindi"
@@ -1702,6 +1792,12 @@
   },
   "app.screenshots.sort.oldest": {
     "message": "En eski"
+  },
+  "app.server-sharing-update.notification.dismiss": {
+    "message": "Reddet"
+  },
+  "app.server-sharing-update.notification.purchase-description": {
+    "message": "Bir sunucu edin ve arkadaşlarını bu sunucunun yönettiği oyun dünyasında birlikte oynamaya davet et."
   },
   "app.settings.app-version": {
     "message": "Modrinth Uygulaması {version}"
@@ -2759,9 +2855,6 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Uygulama veritabanı yedekleri"
   },
-  "app.settings.resource-management.app-directory.description": {
-    "message": "Modrinth App'in örnekleri ve diğer dosyaları depoladığı yer. Değişiklikler uygulamayı yeniden başlattıktan sonra etki eder."
-  },
   "app.settings.resource-management.app-directory.title": {
     "message": "Uygulama dizini"
   },
@@ -3497,20 +3590,8 @@
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "Java argümanlarını girin..."
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "Özel ortam değişkenleri"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "Bağlar"
-  },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Özel Java argümanları"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Özel Java kurulumu"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "Özel bellek ayırma"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/java/kurulum/yolu"

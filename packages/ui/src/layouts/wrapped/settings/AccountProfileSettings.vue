@@ -109,9 +109,12 @@
 					<div class="flex items-center gap-2">
 						<Input
 							id="username-field"
+							ref="usernameInput"
 							v-model="current.username"
 							class="w-full max-w-md"
 							:error="current.username.length > 39"
+							:readonly="usernameLocked"
+							@focus="onUsernameFocus"
 						/>
 						<span
 							v-if="current.username.length >= 30"
@@ -153,7 +156,7 @@ import {
 	UploadIcon,
 	UserPenIcon,
 } from '@modrinth/assets'
-import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import Avatar from '#ui/components/base/Avatar.vue'
@@ -181,6 +184,7 @@ const props = withDefaults(
 		getAuthenticatedUser: () => Promise<AuthUser>
 		disclaimerPosition?: 'top' | 'bottom'
 		changeUsername?: () => void
+		prepareUsernameChange?: () => Promise<boolean>
 	}>(),
 	{
 		disclaimerPosition: 'top',
@@ -201,6 +205,9 @@ const avatarUrl = ref<string | null>(null)
 const avatarFile = shallowRef<File | null>(null)
 const previewImageUrl = ref<string | null>(null)
 const pendingAvatarDeletion = ref(false)
+const usernameInput = ref<{ focus: () => void; blur: () => void } | null>(null)
+const usernameLocked = ref(props.prepareUsernameChange != null)
+let usernamePrompted = false
 const saving = ref(false)
 const refreshing = ref(false)
 const refreshCooldown = ref(false)
@@ -316,6 +323,23 @@ async function refreshProfile(): Promise<void> {
 function reset(): void {
 	current.value = { ...original.value }
 	resetAvatar()
+}
+
+async function onUsernameFocus(): Promise<void> {
+	if (!props.prepareUsernameChange || !usernameLocked.value || usernamePrompted) return
+	usernamePrompted = true
+	try {
+		const allowed = await props.prepareUsernameChange()
+		if (!allowed) {
+			usernameInput.value?.blur()
+			return
+		}
+		usernameLocked.value = false
+		await nextTick()
+		usernameInput.value?.focus()
+	} finally {
+		usernamePrompted = false
+	}
 }
 
 async function requestSignIn(): Promise<void> {

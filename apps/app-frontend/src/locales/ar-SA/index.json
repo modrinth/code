@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "تم النسخ"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "نسخ التفاصيل"
-  },
   "app.action-bar.install.dismiss": {
     "message": "تجاهل"
   },
@@ -2762,9 +2759,6 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "النسخ الاحتياطية لقاعدة بيانات التطبيق"
   },
-  "app.settings.resource-management.app-directory.description": {
-    "message": "المكان الذي يخزن فيه تطبيق Modrinth النسخ والملفات الأخرى. تسري التغييرات بعد إعادة تشغيل التطبيق."
-  },
   "app.settings.resource-management.app-directory.title": {
     "message": "مجلد التطبيق"
   },
@@ -3896,20 +3890,8 @@
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "أدخل معلمات Java..."
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "متغيرات البيئة المخصصة"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "الخطافات"
-  },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "معلمات Java المخصصة"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "تثبيت Java المخصص"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "تخصيص الذاكرة"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"

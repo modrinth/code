@@ -2459,9 +2459,6 @@
   "settings.social.blocked-users.restriction.friend-requests": {
     "defaultMessage": "Enviar-lhe pedidos de amizade"
   },
-  "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Convidá-lo para gerir um servidor da Modrinth Alojamento."
-  },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "Convidá-lo para instâncias partilhadas"
   },

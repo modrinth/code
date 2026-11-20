@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "コピーしました"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "詳細をコピー"
-  },
   "app.action-bar.install.dismiss": {
     "message": "閉じる"
   },
@@ -647,6 +644,9 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "変更はまだ共有されていません"
   },
+  "app.instance.admonitions.shared-instance.owner-update-body": {
+    "message": "この共有インスタンスは他のModrinth Appから更新がプッシュされました。管理を続けるにはここで最新の変更をダウンロードします。"
+  },
   "app.instance.admonitions.shared-instance.owner-update-button": {
     "message": "アップデートをダウンロード"
   },
@@ -661,6 +661,12 @@
   },
   "app.instance.admonitions.shared-instance.removed-label": {
     "message": "削除されました"
+  },
+  "app.instance.admonitions.shared-instance.restored-body": {
+    "message": "このインスタンスはプッシュされた最新のバージョンから回復されました。まだプッシュしていない他のインストール環境でのコンフィグの変更やコンテンツは含まれません。"
+  },
+  "app.instance.admonitions.shared-instance.restored-header": {
+    "message": "プッシュされたコンテンツのみがダウンロードされました"
   },
   "app.instance.admonitions.shared-instance.review-admonition-header": {
     "message": "アップデートを公開する"
@@ -770,6 +776,9 @@
   "app.instance.navigation.back-to-instance": {
     "message": "インスタンスに戻る"
   },
+  "app.instance.server.offline.description": {
+    "message": "このサーバーは現在オフラインです。Minecraftを起動することもできますが、接続できない可能性があります。"
+  },
   "app.instance.server.offline.launch-anyway": {
     "message": "とにかく起動"
   },
@@ -797,8 +806,14 @@
   "app.instance.share.invite-modal.user-limit-reached": {
     "message": "このインスタンスは上限の{limit}人に達しました。"
   },
+  "app.instance.share.limit-reached.description": {
+    "message": "すでに最大の {limit} 個のインスタンスを共有しています。"
+  },
   "app.instance.share.limit-reached.heading": {
     "message": "共有インスタンスの上限に達しました"
+  },
+  "app.instance.share.limit-reached.manage-button": {
+    "message": "共有インスタンスを管理"
   },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "このページにアクセスするには"
@@ -849,7 +864,7 @@
     "message": "サインイン"
   },
   "app.instance.share.unable-to-connect.description": {
-    "message": "インスタンスの共有は現在ご利用いただけません。しばらくしてからもう一度お試しください"
+    "message": "共有インスタンスは現在ご利用いただけません。しばらくしてからもう一度お試しください"
   },
   "app.instance.share.unable-to-connect.heading": {
     "message": "接続エラー"
@@ -1007,14 +1022,44 @@
   "app.java-selector.browse": {
     "message": "探す"
   },
+  "app.java-selector.copy-failed-title": {
+    "message": "パスのコピーに失敗しました"
+  },
+  "app.java-selector.copy-path": {
+    "message": "パスをコピー"
+  },
   "app.java-selector.detect": {
     "message": "検出"
+  },
+  "app.java-selector.edit-path": {
+    "message": "パスを編集"
+  },
+  "app.java-selector.install-java": {
+    "message": "Java {version} をインストール"
   },
   "app.java-selector.installing": {
     "message": "インストール中…"
   },
+  "app.java-selector.invalid": {
+    "message": "無効"
+  },
+  "app.java-selector.more-options": {
+    "message": "その他のJavaのオプション"
+  },
+  "app.java-selector.not-set": {
+    "message": "Javaが選択されていません"
+  },
+  "app.java-selector.path-copied-text": {
+    "message": "Javaのパスがクリップボードにコピーされました。"
+  },
+  "app.java-selector.path-copied-title": {
+    "message": "パスがコピーされました"
+  },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
+  },
+  "app.java-selector.valid": {
+    "message": "有効"
   },
   "app.library.actions.label": {
     "message": "ライブラリの操作"
@@ -1187,6 +1232,9 @@
   "app.library.group.unknown": {
     "message": "不明なグループ"
   },
+  "app.library.instance-hidden.text": {
+    "message": "設定 > 動作 で再度表示できます。"
+  },
   "app.library.instance-hidden.title": {
     "message": "ライブラリから隠す"
   },
@@ -1289,6 +1337,15 @@
   "app.library.instance.stop": {
     "message": "停止"
   },
+  "app.library.leave-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, =1 {この} other {これらの}}共有インスタンスへのアクセスを失ったためライブラリから削除されます。再度参加するには新しく招待を受ける必要があります。"
+  },
+  "app.library.leave-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, =1 {} other {#件の}}共有インスタンスを解除する"
+  },
+  "app.library.leave-shared-instance.modal.header": {
+    "message": "{count, plural, =1 {} other {#件の}}共有インスタンスを解除しました"
+  },
   "app.library.search.no-results.title": {
     "message": "該当するインスタンスがありません。"
   },
@@ -1340,11 +1397,23 @@
   "app.library.title": {
     "message": "ライブラリ"
   },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-body": {
+    "message": "{unpublishCount, plural, other {あなたが所有する#件の共有インスタンスはModrinthのサーバーから削除され、利用者の}}更新の受け取りが停止されます。\n他の{leaveCount, plural, =1 {} other {#件の}}共有インスタンスへのアクセスを失い、再度参加するには新しく招待を受ける必要があります。これらすべてはライブラリから削除されます。"
+  },
   "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
     "message": "共有インスタンスの公開解除と終了"
   },
   "app.library.unpublish-and-leave-shared-instances.modal.header": {
     "message": "{count} 共有インスタンスを非公開にして終了"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-body": {
+    "message": "これにより{count, plural, =1 {} other {#件の}}共有インスタンスがModrinthのサーバーから削除されます。Modrinth Appでこれを使っている人は更新の受け取りが停止され、あなたのライブラリから削除されます。"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, =1 {} other {#件の}}共有インスタンスの公開を取り消す"
+  },
+  "app.library.unpublish-shared-instance.modal.header": {
+    "message": "{count, plural, =1 {} other {#件の}}共有インスタンスの公開を取り消しました"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "追加のコンテンツ"
@@ -1384,6 +1453,9 @@
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {#個のMod}}"
+  },
+  "app.modal.install-to-play.owner-install-note": {
+    "message": "これによりプッシュした最新バージョンがダウンロードされます。プッシュしていない他のインストール環境での変更は含まれません。"
   },
   "app.modal.install-to-play.report-description": {
     "message": "このフォームを使用して、<rules-link>ルール</rules-link>または<terms-link>利用規約</terms-link>に違反する可能性のある事例を報告してください。"
@@ -1444,6 +1516,12 @@
   },
   "app.modal.update-to-play.header": {
     "message": "更新してプレイ"
+  },
+  "app.modal.update-to-play.owner-admonition-header": {
+    "message": "他のインストール環境からプッシュしました"
+  },
+  "app.modal.update-to-play.owner-description": {
+    "message": "これらの変更は、別のModrinthアプリのインストールからプッシュされました。このインストール環境での共有コンテンツへのプッシュされていない変更は置き換えられます。"
   },
   "app.modal.update-to-play.owner-header": {
     "message": "更新が利用可能"
@@ -1745,11 +1823,20 @@
   "app.screenshots.sort.oldest": {
     "message": "古い順"
   },
+  "app.server-sharing-update.notification.description": {
+    "message": "サーバーによって管理されるインスタンスでプレイするフレンドを招待します。"
+  },
   "app.server-sharing-update.notification.dismiss": {
     "message": "閉じる"
   },
+  "app.server-sharing-update.notification.purchase-description": {
+    "message": "サーバーを入手し、サーバーによって管理されるインスタンスでプレイするフレンドを招待します。"
+  },
   "app.server-sharing-update.notification.view-update": {
     "message": "アップデートを表示"
+  },
+  "app.server-sharing-update.title": {
+    "message": "フレンドとサーバーを共有する"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -1961,6 +2048,12 @@
   "app.settings.game-options.choice.minimum": {
     "message": "最小"
   },
+  "app.settings.game-options.choice.nearby": {
+    "message": "近く"
+  },
+  "app.settings.game-options.choice.never": {
+    "message": "しない"
+  },
   "app.settings.game-options.choice.none": {
     "message": "なし"
   },
@@ -1988,6 +2081,9 @@
   "app.settings.game-options.choice.right": {
     "message": "右手"
   },
+  "app.settings.game-options.choice.short": {
+    "message": "短"
+  },
   "app.settings.game-options.choice.shown": {
     "message": "表示"
   },
@@ -2005,6 +2101,9 @@
   },
   "app.settings.game-options.choice.while-afk": {
     "message": "離席中"
+  },
+  "app.settings.game-options.compatibility.none": {
+    "message": "一部のインスタンスはこの設定を使用できません"
   },
   "app.settings.game-options.compatibility.reason.launcher-controlled": {
     "message": "この設定はModrinthの起動設定によって管理されます。"
@@ -2166,7 +2265,7 @@
     "message": "右マウスボタン"
   },
   "app.settings.game-options.keybind.recording-label": {
-    "message": "{setting}: キーまたはマウスボタンをリッスンしています。このバインディングを解除するには、Escキーを押します。"
+    "message": "{setting}: キーまたはマウスボタンの入力を受け付けています。Escキーを押して解除します。"
   },
   "app.settings.game-options.keybind.scancode": {
     "message": "スキャンコード {code}"
@@ -2174,11 +2273,56 @@
   "app.settings.game-options.keybind.unsupported-status": {
     "message": "その入力は Minecraft では使用できません。別のキーを押してください。"
   },
+  "app.settings.game-options.setting.advanced-opengl.label": {
+    "message": "高度なOpenGL"
+  },
+  "app.settings.game-options.setting.allow-cursor-changes.label": {
+    "message": "カーソルの変更を許可する"
+  },
+  "app.settings.game-options.setting.allow-server-listing.description": {
+    "message": "プレイヤーの名前をサーバー掲載に表示することを許可します。"
+  },
+  "app.settings.game-options.setting.allow-server-listing.label": {
+    "message": "サーバー掲載"
+  },
+  "app.settings.game-options.setting.alternate-blocks.label": {
+    "message": "代替ブロック"
+  },
   "app.settings.game-options.setting.ambient-occlusion.label": {
     "message": "スムーズライティング"
   },
+  "app.settings.game-options.setting.ambient-volume.label": {
+    "message": "環境音"
+  },
+  "app.settings.game-options.setting.anaglyph-3d.label": {
+    "message": "3D アナグリフ"
+  },
+  "app.settings.game-options.setting.anisotropic-filtering.label": {
+    "message": "異方性フィルタリング"
+  },
+  "app.settings.game-options.setting.anisotropy.label": {
+    "message": "異方性"
+  },
+  "app.settings.game-options.setting.attack-indicator.label": {
+    "message": "攻撃力変動の表示"
+  },
+  "app.settings.game-options.setting.auto-jump.description": {
+    "message": "1ブロックの高さの障害物を自動でジャンプします。"
+  },
   "app.settings.game-options.setting.auto-jump.label": {
     "message": "自動ジャンプ"
+  },
+  "app.settings.game-options.setting.auto-suggestions.label": {
+    "message": "コマンドの補完"
+  },
+  "app.settings.game-options.setting.autosave-indicator.label": {
+    "message": "オートセーブの表示"
+  },
+  "app.settings.game-options.setting.biome-blend-radius.description": {
+    "message": "バイオームの色が変化する距離。"
+  },
+  "app.settings.game-options.setting.biome-blend-radius.label": {
+    "message": "バイオームの重なり度合い"
   },
   "app.settings.game-options.setting.blocks-volume.label": {
     "message": "ブロック"
@@ -2192,14 +2336,50 @@
   "app.settings.game-options.setting.cape.label": {
     "message": "マント"
   },
+  "app.settings.game-options.setting.chat-background-only.label": {
+    "message": "チャットの背景のみ"
+  },
+  "app.settings.game-options.setting.chat-colors.label": {
+    "message": "チャットの色"
+  },
+  "app.settings.game-options.setting.chat-delay.label": {
+    "message": "チャットの遅延間隔"
+  },
+  "app.settings.game-options.setting.chat-line-spacing.label": {
+    "message": "チャットの行間"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.description": {
+    "message": "チャットからのリンクを開く前に確認します。"
+  },
   "app.settings.game-options.setting.chat-links-prompt.label": {
     "message": "リンクを開く時に確認の表示"
+  },
+  "app.settings.game-options.setting.chat-links.description": {
+    "message": "チャット内のウェブリンクを開くことを許可します。"
   },
   "app.settings.game-options.setting.chat-links.label": {
     "message": "ウェブリンク"
   },
+  "app.settings.game-options.setting.chat-opacity.description": {
+    "message": "チャットテキストの不透明度。"
+  },
+  "app.settings.game-options.setting.chat-opacity.label": {
+    "message": "チャットの不透明度"
+  },
+  "app.settings.game-options.setting.chat-preview.label": {
+    "message": "チャットのプレビュー"
+  },
+  "app.settings.game-options.setting.chat-scale.label": {
+    "message": "チャットの大きさ"
+  },
+  "app.settings.game-options.setting.chat-visibility.label": {
+    "message": "チャットの表示"
+  },
   "app.settings.game-options.setting.chat-width.label": {
     "message": "幅"
+  },
+  "app.settings.game-options.setting.chunk-fade-time.label": {
+    "message": "チャンクのフェード時間"
   },
   "app.settings.game-options.setting.cloud-range.label": {
     "message": "雲の距離"
@@ -2210,6 +2390,33 @@
   "app.settings.game-options.setting.ctrl-click-right-click.label": {
     "message": "Ctrl+左クリックを右クリックとして扱う"
   },
+  "app.settings.game-options.setting.cutout-leaves.label": {
+    "message": "葉ブロックの透過"
+  },
+  "app.settings.game-options.setting.damage-tilt.label": {
+    "message": "被ダメージ時の画面の揺れ"
+  },
+  "app.settings.game-options.setting.dark-splash.description": {
+    "message": "Mojang Studiosの読み込み画面を赤から黒に変更します。"
+  },
+  "app.settings.game-options.setting.dark-splash.label": {
+    "message": "モノクロのロゴ"
+  },
+  "app.settings.game-options.setting.darkness-pulsing.label": {
+    "message": "暗闇の脈動"
+  },
+  "app.settings.game-options.setting.debug-gui-scale.label": {
+    "message": "デバッグGUIの大きさ"
+  },
+  "app.settings.game-options.setting.directional-audio.label": {
+    "message": "指向性オーディオ"
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.description": {
+    "message": "各マウスホイール入力を単一のスクロールステップとして扱います。"
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.label": {
+    "message": "離散スクロール"
+  },
   "app.settings.game-options.setting.entity-distance.label": {
     "message": "エンティティの描画距離"
   },
@@ -2218,6 +2425,18 @@
   },
   "app.settings.game-options.setting.exclusive-fullscreen.label": {
     "message": "排他的フルスクリーン"
+  },
+  "app.settings.game-options.setting.extra-telemetry.label": {
+    "message": "オプショナルテレメトリー"
+  },
+  "app.settings.game-options.setting.focused-chat-height.label": {
+    "message": "フォーカスされたチャットの高さ"
+  },
+  "app.settings.game-options.setting.force-unicode-font.label": {
+    "message": "Unicodeフォントを強制する"
+  },
+  "app.settings.game-options.setting.fov-effects.label": {
+    "message": "視野"
   },
   "app.settings.game-options.setting.fov.label": {
     "message": "視野"
@@ -2237,14 +2456,74 @@
   "app.settings.game-options.setting.graphics.description": {
     "message": "映像の質とパフォーマンスを設定します。"
   },
+  "app.settings.game-options.setting.graphics.label": {
+    "message": "ビデオ設定"
+  },
+  "app.settings.game-options.setting.gui-scale.description": {
+    "message": "ゲームインターフェイスとHUDのサイズ。"
+  },
   "app.settings.game-options.setting.gui-scale.label": {
     "message": "GUIの大きさ"
+  },
+  "app.settings.game-options.setting.hat.description": {
+    "message": "帽子のスキンレイヤーを表示します。"
   },
   "app.settings.game-options.setting.hat.label": {
     "message": "帽子"
   },
+  "app.settings.game-options.setting.held-item-tooltips.label": {
+    "message": "持っているアイテムのツールチップ"
+  },
+  "app.settings.game-options.setting.hide-lightning-flashes.label": {
+    "message": "稲妻の明滅を非表示にする"
+  },
+  "app.settings.game-options.setting.hide-matched-names.label": {
+    "message": "一致した名前を非表示"
+  },
+  "app.settings.game-options.setting.hide-server-address.label": {
+    "message": "サーバーアドレスを非表示"
+  },
+  "app.settings.game-options.setting.hide-splash-texts.label": {
+    "message": "スプラッシュテキストを隠す"
+  },
+  "app.settings.game-options.setting.high-contrast-outline.label": {
+    "message": "ハイコントラストのブロックのアウトライン表示"
+  },
+  "app.settings.game-options.setting.high-contrast.description": {
+    "message": "インターフェース要素のコントラストを強化します。"
+  },
+  "app.settings.game-options.setting.high-contrast.label": {
+    "message": "ハイコントラスト"
+  },
+  "app.settings.game-options.setting.hostile-volume.label": {
+    "message": "敵対的生物"
+  },
+  "app.settings.game-options.setting.improved-transparency.label": {
+    "message": "透明度の向上"
+  },
+  "app.settings.game-options.setting.in-game-notifications.label": {
+    "message": "ゲーム内通知"
+  },
+  "app.settings.game-options.setting.inactivity-framerate-limit.label": {
+    "message": "フレームレート制限"
+  },
+  "app.settings.game-options.setting.invert-horizontal-mouse.label": {
+    "message": "水平方向のマウスを反転"
+  },
+  "app.settings.game-options.setting.invert-mouse.description": {
+    "message": "マウスの垂直移動を反転します。"
+  },
+  "app.settings.game-options.setting.invert-mouse.label": {
+    "message": "マウスを反転"
+  },
+  "app.settings.game-options.setting.jacket.description": {
+    "message": "上着のスキンレイヤーを表示します。"
+  },
   "app.settings.game-options.setting.jacket.label": {
     "message": "上着"
+  },
+  "app.settings.game-options.setting.japanese-glyph-variants.label": {
+    "message": "日本語用フォント"
   },
   "app.settings.game-options.setting.key-advancements.label": {
     "message": "進捗"
@@ -2273,6 +2552,9 @@
   "app.settings.game-options.setting.key-debug-copy-location.label": {
     "message": "座標のコピー"
   },
+  "app.settings.game-options.setting.key-debug-copy-recreate-command.label": {
+    "message": "再作成コマンドをコピー"
+  },
   "app.settings.game-options.setting.key-debug-crash.label": {
     "message": "デバッグ用クラッシュ"
   },
@@ -2282,14 +2564,23 @@
   "app.settings.game-options.setting.key-debug-dump-version.label": {
     "message": "バージョン情報の出力"
   },
+  "app.settings.game-options.setting.key-debug-focus-pause.label": {
+    "message": "フォーカスが失われた時に一時停止"
+  },
   "app.settings.game-options.setting.key-debug-fps-charts.label": {
     "message": "FPSグラフ"
   },
   "app.settings.game-options.setting.key-debug-hitboxes.label": {
     "message": "当たり判定の表示"
   },
+  "app.settings.game-options.setting.key-debug-improved-transparency.label": {
+    "message": "改善された透明度のデバッグ表示"
+  },
   "app.settings.game-options.setting.key-debug-lightmap-texture.label": {
     "message": "ライトマップテクスチャ"
+  },
+  "app.settings.game-options.setting.key-debug-modifier.label": {
+    "message": "デバッグ編集画面"
   },
   "app.settings.game-options.setting.key-debug-network-charts.label": {
     "message": "ネットワークグラフ"
@@ -2311,6 +2602,9 @@
   },
   "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
     "message": "リソースパックの再読み込み"
+  },
+  "app.settings.game-options.setting.key-debug-spectate.label": {
+    "message": "エンティティを観察"
   },
   "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
     "message": "ゲームモード切り替え画面"
@@ -2360,6 +2654,15 @@
   "app.settings.game-options.setting.key-jump.label": {
     "message": "ジャンプ"
   },
+  "app.settings.game-options.setting.key-left.label": {
+    "message": "左"
+  },
+  "app.settings.game-options.setting.key-load-toolbar.label": {
+    "message": "ツールバの読み込み"
+  },
+  "app.settings.game-options.setting.key-perspective.label": {
+    "message": "視点の切り替え"
+  },
   "app.settings.game-options.setting.key-pick-item.label": {
     "message": "ブロック選択"
   },
@@ -2369,11 +2672,23 @@
   "app.settings.game-options.setting.key-quick-actions.label": {
     "message": "クイックアクション"
   },
+  "app.settings.game-options.setting.key-right.label": {
+    "message": "右"
+  },
+  "app.settings.game-options.setting.key-save-toolbar.label": {
+    "message": "ツールバーを保存"
+  },
   "app.settings.game-options.setting.key-screenshot.label": {
     "message": "スクリーンショットの撮影"
   },
+  "app.settings.game-options.setting.key-smooth-camera.label": {
+    "message": "滑らかなカメラ動作の切り替え"
+  },
   "app.settings.game-options.setting.key-sneak.label": {
     "message": "スニーク"
+  },
+  "app.settings.game-options.setting.key-social-interactions.label": {
+    "message": "社交設定"
   },
   "app.settings.game-options.setting.key-spectator-hotbar.label": {
     "message": "ホットバーから選択"
@@ -2405,6 +2720,15 @@
   "app.settings.game-options.setting.left-sleeve.label": {
     "message": "左袖"
   },
+  "app.settings.game-options.setting.legacy-framerate-limit.label": {
+    "message": "フレームレート上限"
+  },
+  "app.settings.game-options.setting.legacy-view-distance.label": {
+    "message": "描画距離"
+  },
+  "app.settings.game-options.setting.mac-fullscreen-menu.label": {
+    "message": "macOS メニューを全画面表示で表示する"
+  },
   "app.settings.game-options.setting.main-hand.description": {
     "message": "利き手が左右どちらかを選択します。"
   },
@@ -2420,17 +2744,74 @@
   "app.settings.game-options.setting.menu-background-blur.label": {
     "message": "メニュー背景のぼかし具合"
   },
+  "app.settings.game-options.setting.mipmap-levels.description": {
+    "message": "遠くのテクスチャを平滑化します。"
+  },
+  "app.settings.game-options.setting.mipmap-levels.label": {
+    "message": "ミップマップレベル"
+  },
+  "app.settings.game-options.setting.mouse-wheel-sensitivity.label": {
+    "message": "マウスホイール感度"
+  },
+  "app.settings.game-options.setting.music-frequency.label": {
+    "message": "音楽の頻度"
+  },
+  "app.settings.game-options.setting.music-toast.description": {
+    "message": "音楽タイトルがポーズメニューに表示されるか、トーストとして表示されるかを選択します。"
+  },
+  "app.settings.game-options.setting.music-toast.label": {
+    "message": "音楽の通知"
+  },
+  "app.settings.game-options.setting.music-volume.label": {
+    "message": "音楽"
+  },
   "app.settings.game-options.setting.narrator-hotkey.label": {
     "message": "音声読み上げのホットキー"
   },
+  "app.settings.game-options.setting.narrator.description": {
+    "message": "ナレーターが何を読むかを選択します。"
+  },
+  "app.settings.game-options.setting.narrator.label": {
+    "message": "ナレーター"
+  },
   "app.settings.game-options.setting.neutral-volume.label": {
     "message": "友好的Mob"
+  },
+  "app.settings.game-options.setting.notification-time.description": {
+    "message": "トースト通知の表示時間。"
+  },
+  "app.settings.game-options.setting.notification-time.label": {
+    "message": "通知時間"
+  },
+  "app.settings.game-options.setting.operator-items-tab.label": {
+    "message": "管理者用アイテムタブ"
+  },
+  "app.settings.game-options.setting.panorama-speed.label": {
+    "message": "パノラマのスクロール速度"
   },
   "app.settings.game-options.setting.particles.label": {
     "message": "パーティクルの表示"
   },
   "app.settings.game-options.setting.players-volume.label": {
     "message": "プレイヤー"
+  },
+  "app.settings.game-options.setting.prioritize-chunk-updates.label": {
+    "message": "チャンクの更新を優先"
+  },
+  "app.settings.game-options.setting.quit-shortcuts.label": {
+    "message": "終了ショートカット"
+  },
+  "app.settings.game-options.setting.raw-mouse-input.label": {
+    "message": "マウスの生入力"
+  },
+  "app.settings.game-options.setting.realms-notifications.label": {
+    "message": "Realmsの通知"
+  },
+  "app.settings.game-options.setting.record-volume.label": {
+    "message": "ジュークボックス/音符ブロック"
+  },
+  "app.settings.game-options.setting.reduced-debug-info.label": {
+    "message": "デバッグ情報を減らす"
   },
   "app.settings.game-options.setting.render-distance.label": {
     "message": "描画距離"
@@ -2441,8 +2822,80 @@
   "app.settings.game-options.setting.right-sleeve.label": {
     "message": "右袖"
   },
+  "app.settings.game-options.setting.rotate-with-minecart.label": {
+    "message": "トロッコに合わせた視点移動"
+  },
+  "app.settings.game-options.setting.save-chat-drafts.label": {
+    "message": "未送信のチャットを保存"
+  },
+  "app.settings.game-options.setting.screen-effects.label": {
+    "message": "画面効果"
+  },
+  "app.settings.game-options.setting.secure-chat-only.label": {
+    "message": "安全なチャットのみ表示"
+  },
+  "app.settings.game-options.setting.sensitivity.label": {
+    "message": "マウス感度"
+  },
+  "app.settings.game-options.setting.server-textures.label": {
+    "message": "サーバーのテクスチャ"
+  },
+  "app.settings.game-options.setting.share-presence.label": {
+    "message": "オンライン状態を共有"
+  },
+  "app.settings.game-options.setting.simulation-distance.description": {
+    "message": "エンティティが更新され、ブロックと液体にティック処理が行われる距離。"
+  },
   "app.settings.game-options.setting.simulation-distance.label": {
     "message": "演算距離"
+  },
+  "app.settings.game-options.setting.snooper.label": {
+    "message": "スヌーパー"
+  },
+  "app.settings.game-options.setting.sprint-window.label": {
+    "message": "ダッシュ操作の間隔"
+  },
+  "app.settings.game-options.setting.subtitles.description": {
+    "message": "ゲーム内で再生されるサウンドに字幕を表示します。"
+  },
+  "app.settings.game-options.setting.subtitles.label": {
+    "message": "字幕"
+  },
+  "app.settings.game-options.setting.text-background-opacity.label": {
+    "message": "テキストの背景の不透明度"
+  },
+  "app.settings.game-options.setting.texture-filtering.label": {
+    "message": "テクスチャフィルタリング"
+  },
+  "app.settings.game-options.setting.toggle-attack.label": {
+    "message": "攻撃の操作を切り替えにする"
+  },
+  "app.settings.game-options.setting.toggle-crouch.description": {
+    "message": "一度押すとスニークしたままになります。"
+  },
+  "app.settings.game-options.setting.toggle-crouch.label": {
+    "message": "スニークを切り替えにする"
+  },
+  "app.settings.game-options.setting.toggle-sprint.description": {
+    "message": "一度押すと走ったままになります。"
+  },
+  "app.settings.game-options.setting.toggle-sprint.label": {
+    "message": "ダッシュの操作を切り替えにする"
+  },
+  "app.settings.game-options.setting.toggle-use.label": {
+    "message": "使用の操作を切り替えにする"
+  },
+  "app.settings.game-options.setting.touchscreen.label": {
+    "message": "タッチスクリーンモード"
+  },
+  "app.settings.game-options.setting.ui-volume.label": {
+    "message": "UI"
+  },
+  "app.settings.game-options.setting.unfocused-chat-height.label": {
+    "message": "フォーカスされていないチャットの高さ"
+  },
+  "app.settings.game-options.setting.use-vbo.label": {
+    "message": "VBOを使用"
   },
   "app.settings.game-options.setting.view-bobbing.description": {
     "message": "歩行中に画面の揺れを加えます。"
@@ -2450,11 +2903,35 @@
   "app.settings.game-options.setting.view-bobbing.label": {
     "message": "画面の揺れ"
   },
+  "app.settings.game-options.setting.vignette.label": {
+    "message": "ビネット効果"
+  },
   "app.settings.game-options.setting.voice-volume.label": {
     "message": "音声読み上げ／声"
   },
+  "app.settings.game-options.setting.vsync.description": {
+    "message": "画面のズレを防くために、フレームレートをディスプレイのリフレッシュレートに制限します。"
+  },
   "app.settings.game-options.setting.vsync.label": {
     "message": "垂直同期"
+  },
+  "app.settings.game-options.setting.weather-radius.label": {
+    "message": "天候の半径"
+  },
+  "app.settings.game-options.setting.weather-volume.label": {
+    "message": "天候"
+  },
+  "app.settings.game-options.validation.changed-since-opened": {
+    "message": "この設定は他の場所で変更されました。確認して再度お試し下さい。"
+  },
+  "app.settings.game-options.validation.invalid-value": {
+    "message": "有効な値を選択してください。"
+  },
+  "app.settings.game-options.validation.missing-value": {
+    "message": "最初に値を選択してください。"
+  },
+  "app.settings.game-options.validation.no-compatible-instances": {
+    "message": "一部のインスタンスはこの設定を使用できません"
   },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} の場所"
@@ -2501,11 +2978,95 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "アプリデータベースのバックアップ"
   },
+  "app.settings.resource-management.app-directory.cancel-move": {
+    "message": "移動をキャンセル"
+  },
+  "app.settings.resource-management.app-directory.change": {
+    "message": "ディレクトリを変更"
+  },
+  "app.settings.resource-management.app-directory.change-to-default": {
+    "message": "デフォルトに戻す"
+  },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Modrinth Appがインスタンスやその他のファイルを保存する場所です。変更はアプリの再起動後に反映されます。"
+    "message": "Modrinth Appがインスタンスやその他のファイルを保存する場所になります。"
+  },
+  "app.settings.resource-management.app-directory.modal.admonition-body": {
+    "message": "データの移動中はModrinthアプリを使用できません。しばらく時間がかかる場合があります。"
+  },
+  "app.settings.resource-management.app-directory.modal.admonition-header": {
+    "message": "すべてのファイルが移動されます"
+  },
+  "app.settings.resource-management.app-directory.modal.choose": {
+    "message": "フォルダを選択"
+  },
+  "app.settings.resource-management.app-directory.modal.current": {
+    "message": "現在"
+  },
+  "app.settings.resource-management.app-directory.modal.drive-root": {
+    "message": "ドライブの最上位階層ではなくフォルダーを選択してください。そうしなければ他のファイルと混在してしまいます。"
+  },
+  "app.settings.resource-management.app-directory.modal.header": {
+    "message": "アプリのディレクトリを変更"
+  },
+  "app.settings.resource-management.app-directory.modal.instances-running": {
+    "message": "アプリのディレクトリを変更する前に全ての実行中のインスタンスを閉じます。"
+  },
+  "app.settings.resource-management.app-directory.modal.more-options": {
+    "message": "その他の移動オプション"
+  },
+  "app.settings.resource-management.app-directory.modal.move-and-restart": {
+    "message": "移動して再起動"
+  },
+  "app.settings.resource-management.app-directory.modal.move-later": {
+    "message": "次の起動時に移動"
+  },
+  "app.settings.resource-management.app-directory.modal.nested": {
+    "message": "新しいフォルダを現在のアプリのディレクトリ内や、現在のアプリのディレクトリを含むものにすることはできません。"
+  },
+  "app.settings.resource-management.app-directory.modal.new": {
+    "message": "新規"
+  },
+  "app.settings.resource-management.app-directory.modal.picker-title": {
+    "message": "新しいアプリのディレクトリを選択"
+  },
+  "app.settings.resource-management.app-directory.more-change-options": {
+    "message": "その他のディレクトリオプション"
+  },
+  "app.settings.resource-management.app-directory.move-now": {
+    "message": "移動して今すぐ再起動"
+  },
+  "app.settings.resource-management.app-directory.open-folder": {
+    "message": "フォルダーを開く"
+  },
+  "app.settings.resource-management.app-directory.open-in-explorer": {
+    "message": "ファイルエクスプローラーで開く"
+  },
+  "app.settings.resource-management.app-directory.open-in-finder": {
+    "message": "Finderで開く"
+  },
+  "app.settings.resource-management.app-directory.path-copied-text": {
+    "message": "アプリディレクトリのパスがクリップボードにコピーされました。"
+  },
+  "app.settings.resource-management.app-directory.path-copied-title": {
+    "message": "パスがコピーされました"
+  },
+  "app.settings.resource-management.app-directory.path-copy-failed-title": {
+    "message": "パスのコピーに失敗しました"
+  },
+  "app.settings.resource-management.app-directory.pending": {
+    "message": "次回Modrinth Appが開いたときに、アプリディレクトリは {path} に移動します。"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "アプリのディレクトリ"
+  },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Modrinthサポートと共有するためにアプリのログと診断データをZIPファイルにエクスポートします。"
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "デバッグ情報をエクスポート"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "デバッグ情報"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "アプリが同時にダウンロードできるファイル数です。回線が不安定な場合は数値を下げてください。適用にはアプリの再起動が必要です。"
@@ -2519,8 +3080,98 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "最大同時書き込み数"
   },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "今後のインストールのために、この多くの未使用のコンテンツを維持します。より多くを維持すると、ダウンロード時間を節約できます。"
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "未使用のダウンロードを維持"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "計算中"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "未使用を消去"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "未使用のダウンロードコンテンツを削除"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "{size} のディスク領域を解放しました。"
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "消去中…"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "インスタンスをまたいでゲームのインストール、Mod、パックを再利用することで使用領域を節約します。"
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "消去できる未使用コンテンツがありません。"
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "共有済み"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "コンテンツストレージ"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "{size} が保存されています"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "固有"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "未使用"
+  },
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "インスタンスのデフォルト"
+  },
+  "app.settings.sidebar.label.system": {
+    "message": "システム"
+  },
+  "app.settings.synced-options.choose-sync-source.command-history-description": {
+    "message": "コマンド履歴をコピーするインスタンスを選択します。 この履歴は最初の同期にのみ使用され、後で任意のインスタンスから編集できます。"
+  },
+  "app.settings.synced-options.choose-sync-source.command-history-title": {
+    "message": "コマンド履歴のソースを選択"
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
+    "message": "保存されたクリエイティブホットバーをコピーするインスタンスを選択します。 この履歴は最初の同期にのみ使用され、後で任意のインスタンスから編集できます。"
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-title": {
+    "message": "クリエイティブホットバーのソースを選択"
+  },
+  "app.settings.synced-options.choose-sync-source.data-packs-title": {
+    "message": "データパックのソースを選択"
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-description": {
+    "message": "ゲーム設定をコピーするインスタンスを選択します。 この履歴は最初の同期にのみ使用され、後で任意のインスタンスから編集できます。"
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-title": {
+    "message": "ゲーム設定のソースを選択"
+  },
+  "app.settings.synced-options.choose-sync-source.ineligible": {
+    "message": "このインスタンスを同期ソースとして選択することはできません"
+  },
+  "app.settings.synced-options.choose-sync-source.load-error": {
+    "message": "同期ソースを読み込めませんでした。もう一度やり直してください。"
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
+    "message": "マルチプレイサーバーをコピーするインスタンスを選択します。 この履歴は最初の同期にのみ使用され、後で任意のインスタンスから編集できます。"
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-title": {
+    "message": "マルチプレイサーバーのソースを選択"
+  },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "インスタンスが見つかりません"
+  },
+  "app.settings.synced-options.choose-sync-source.resource-packs-title": {
+    "message": "リソースパックのソースを選択"
+  },
+  "app.settings.synced-options.choose-sync-source.retry": {
+    "message": "再試行"
   },
   "app.settings.synced-options.choose-sync-source.search-placeholder": {
     "message": "インスタンスを検索"
@@ -2543,11 +3194,35 @@
   "app.settings.synced-options.creative-hotbars.description": {
     "message": "保存したクリエイティブホットバーを複数のインスタンスで共通して使用できます。"
   },
+  "app.settings.synced-options.data-packs": {
+    "message": "データパックを同期"
+  },
+  "app.settings.synced-options.data-packs.description": {
+    "message": "インスタンスをまたいで共通のデータパックを使用できます"
+  },
+  "app.settings.synced-options.data-packs.none-synced-yet": {
+    "message": "データパックはまだ同期されていません"
+  },
+  "app.settings.synced-options.edit.no-instances": {
+    "message": "同期データを編集する前にインスタンスを追加します。"
+  },
+  "app.settings.synced-options.edit.no-synced-data": {
+    "message": "この設定を編集する前に同期ソースを選択してください。"
+  },
   "app.settings.synced-options.game-settings": {
     "message": "ゲーム設定の同期"
   },
   "app.settings.synced-options.game-settings.button": {
     "message": "ゲーム設定を編集"
+  },
+  "app.settings.synced-options.game-settings.conflict-text": {
+    "message": "最新の設定を読み込んでいます。変更を確認し、もう一度保存してください。"
+  },
+  "app.settings.synced-options.game-settings.conflict-title": {
+    "message": "これらの設定は他の場所で変更されました"
+  },
+  "app.settings.synced-options.game-settings.custom-empty": {
+    "message": "ModrinthがいずれかのインスタンスでModsによって追加された設定を見つけると、ここに表示されます。"
   },
   "app.settings.synced-options.game-settings.description": {
     "message": "ゲーム設定を複数のインスタンスで共通して使用できます。"
@@ -2555,11 +3230,59 @@
   "app.settings.synced-options.game-settings.disable-all": {
     "message": "すべての同期解除"
   },
+  "app.settings.synced-options.game-settings.disabled-tooltip": {
+    "message": "個々の設定を選択する前にゲーム設定の同期を有効にします。"
+  },
+  "app.settings.synced-options.game-settings.empty": {
+    "message": "検索またはフィルターに一致する設定はありません。"
+  },
   "app.settings.synced-options.game-settings.enable-all": {
     "message": "すべて同期"
   },
+  "app.settings.synced-options.game-settings.load-failed": {
+    "message": "ゲーム設定を読み込むことができませんでした。"
+  },
+  "app.settings.synced-options.game-settings.loading": {
+    "message": "設定を読み込んでいます…"
+  },
+  "app.settings.synced-options.game-settings.no-options-to-edit": {
+    "message": "まだ編集するオプションがありません"
+  },
+  "app.settings.synced-options.game-settings.not-being-synced": {
+    "message": "同期していません"
+  },
+  "app.settings.synced-options.game-settings.retry": {
+    "message": "再試行"
+  },
+  "app.settings.synced-options.game-settings.save": {
+    "message": "設定を保存"
+  },
+  "app.settings.synced-options.game-settings.search": {
+    "message": "設定を検索…"
+  },
+  "app.settings.synced-options.game-settings.sync-description": {
+    "message": "同期されたオプションはすべてのインスタンスに適用され、Modパックに含まれる値を上書きします。"
+  },
+  "app.settings.synced-options.game-settings.sync-setting": {
+    "message": "インスタンス間で {setting} を同期"
+  },
+  "app.settings.synced-options.game-settings.sync-title": {
+    "message": "ゲーム設定を同期"
+  },
+  "app.settings.synced-options.game-settings.synced-across-instances": {
+    "message": "インスタンス間で同期"
+  },
+  "app.settings.synced-options.game-settings.title": {
+    "message": "ゲーム設定"
+  },
+  "app.settings.synced-options.game-settings.unsaved-changes": {
+    "message": "保存されていない変更があります。"
+  },
   "app.settings.synced-options.game-settings.unsync-setting": {
     "message": "インスタンス間で {setting} の同期を停止"
+  },
+  "app.settings.synced-options.game-settings.value-mixed": {
+    "message": "インスタンス間で異なる"
   },
   "app.settings.synced-options.game-settings.value-off": {
     "message": "オフ"
@@ -2567,14 +3290,23 @@
   "app.settings.synced-options.game-settings.value-on": {
     "message": "オン"
   },
+  "app.settings.synced-options.game-settings.value-unset": {
+    "message": "値を選択"
+  },
   "app.settings.synced-options.multiplayer-servers": {
-    "message": "マルチプレイヤーサーバーの同期"
+    "message": "マルチプレイサーバーの同期"
   },
   "app.settings.synced-options.multiplayer-servers.address": {
     "message": "サーバーのアドレス"
   },
+  "app.settings.synced-options.multiplayer-servers.copy-address": {
+    "message": "アドレスをコピー"
+  },
+  "app.settings.synced-options.multiplayer-servers.count": {
+    "message": "{count, plural, other {#台のサーバー}}"
+  },
   "app.settings.synced-options.multiplayer-servers.description": {
-    "message": "マルチプレイヤーサーバーを複数のインスタンスで共通して使用できます。"
+    "message": "マルチプレイサーバーを複数のインスタンスで共通して使用できます。"
   },
   "app.settings.synced-options.multiplayer-servers.editor-title": {
     "message": "同期済みサーバーの編集"
@@ -2588,14 +3320,38 @@
   "app.settings.synced-options.multiplayer-servers.filter-online": {
     "message": "オンライン"
   },
+  "app.settings.synced-options.multiplayer-servers.more-options": {
+    "message": "その他のサーバーオプション"
+  },
   "app.settings.synced-options.multiplayer-servers.name": {
     "message": "サーバー名"
+  },
+  "app.settings.synced-options.multiplayer-servers.no-results": {
+    "message": "検索またはフィルターに一致する同期されたサーバーはありません。"
+  },
+  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
+    "message": "サーバーはまだ同期されていません"
+  },
+  "app.settings.synced-options.multiplayer-servers.players-online": {
+    "message": "{count, number}人がオンライン"
+  },
+  "app.settings.synced-options.multiplayer-servers.search": {
+    "message": "{count, number}件の{count, plural, other {同期されたサーバー}}を検索…"
+  },
+  "app.settings.synced-options.multiplayer-servers.status": {
+    "message": "ステータス"
+  },
+  "app.settings.synced-options.packs.disabled": {
+    "message": "共有パックを編集する前に同期を有効にします。"
   },
   "app.settings.synced-options.resource-packs": {
     "message": "リソースパックの同期"
   },
   "app.settings.synced-options.resource-packs.description": {
     "message": "リソースパックを複数のインスタンスで共通して使用できます。"
+  },
+  "app.settings.synced-options.resource-packs.none-synced-yet": {
+    "message": "リソースパックはまだ同期されていません"
   },
   "app.settings.tabs.appearance": {
     "message": "表示設定"
@@ -2606,14 +3362,77 @@
   "app.settings.tabs.features": {
     "message": "機能"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Javaとメモリ"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Javaのインストール設定"
   },
   "app.settings.tabs.language": {
     "message": "言語設定"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "起動フック"
+  },
   "app.settings.tabs.privacy": {
     "message": "プライバシー設定"
+  },
+  "app.settings.tabs.resources": {
+    "message": "リソース"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "同期中"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "トラブルシューティング"
+  },
+  "app.settings.tabs.window": {
+    "message": "ウィンドウ"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "キャッシュを消去"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "アプリのキャッシュを消去しますか？"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "コピーしました"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "広告の詳細をコピー"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "不適切または不適切な広告が表示されていますか？表示中にその詳細をコピーし、 <support>Modrinth Support</support>に送信してください。 私たちはそれを確認し削除いたします。"
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "広告が読み込まれるのを待ち、もう一度やり直してください。"
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "広告が見つかりません"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "広告を報告"
+  },
+  "app.shared-instance-publish.preparing": {
+    "message": "アップデートを準備中…"
+  },
+  "app.shared-instance-publish.pushed": {
+    "message": "更新をプッシュしました"
+  },
+  "app.shared-instance-publish.uploading": {
+    "message": "アップデートをプッシュしています…"
+  },
+  "app.shared-instance.lock-notice.delete-instance": {
+    "message": "インスタンスを削除する"
+  },
+  "app.shared-instance.lock-notice.more-actions": {
+    "message": "その他のインスタンスの操作"
+  },
+  "app.shared-instance.lock-notice.reason": {
+    "message": "理由"
+  },
+  "app.shared-instance.lock-notice.title": {
+    "message": "共有インスタンスはロックされています"
   },
   "app.sidebar.playing-as": {
     "message": "プレイ中のアカウント"
@@ -2789,6 +3608,9 @@
   "app.skins.toggle-ears-features-on": {
     "message": "オンに切り替え"
   },
+  "app.splash.moving-app-directory": {
+    "message": "アプリディレクトリを移動しています…"
+  },
   "app.survey.body": {
     "message": "Modrinth App の使用感についての簡単なアンケートにご協力いただけますか？"
   },
@@ -2803,6 +3625,90 @@
   },
   "app.survey.title": {
     "message": "Modrinthユーザーのみなさん、こんにちは！"
+  },
+  "app.sync-instances-update.choose-source.data-packs": {
+    "message": "データパックをコピーするインスタンスを選択します。 この履歴は最初の同期にのみ使用され、後で任意のインスタンスから編集できます。"
+  },
+  "app.sync-instances-update.choose-source.resource-packs": {
+    "message": "リソースパックをコピーするインスタンスを選択します。 この履歴は最初の同期にのみ使用され、後で任意のインスタンスから編集できます。"
+  },
+  "app.synced-content.change.disable-description": {
+    "message": "すべての同期インスタンス、またはこのインスタンス内でのみ無効にします。ここでのみ無効にすると、このインスタンスのオーバーライドが有効になります。"
+  },
+  "app.synced-content.change.disable-everywhere": {
+    "message": "すべての場所で無効にする"
+  },
+  "app.synced-content.change.disable-everywhere-description": {
+    "message": "すべての同期されたインスタンスでこのコンテンツを無効にします。"
+  },
+  "app.synced-content.change.disable-here": {
+    "message": "ここで無効にする"
+  },
+  "app.synced-content.change.disable-title": {
+    "message": "コンテンツを無効にしますか？"
+  },
+  "app.synced-content.change.enable-description": {
+    "message": "すべての同期インスタンス、またはこのインスタンス内でのみ有効にします。ここでのみ有効にすると、このインスタンスのオーバーライドが有効になります。"
+  },
+  "app.synced-content.change.enable-everywhere": {
+    "message": "すべての場所で有効にする"
+  },
+  "app.synced-content.change.enable-everywhere-description": {
+    "message": "すべての同期されたインスタンスでこのコンテンツを有効にします。"
+  },
+  "app.synced-content.change.enable-here": {
+    "message": "ここで有効にする"
+  },
+  "app.synced-content.change.enable-title": {
+    "message": "コンテンツを有効にしますか？"
+  },
+  "app.synced-content.delete.delete-everywhere": {
+    "message": "すべての場所から削除"
+  },
+  "app.synced-content.delete.delete-here": {
+    "message": "ここで削除"
+  },
+  "app.synced-content.delete.description": {
+    "message": "このコンテンツを削除すると、すべてのインスタンス間で削除されます"
+  },
+  "app.synced-content.delete.mixed": {
+    "message": "選択した同期されていないコンテンツは、このインスタンスからのみ削除されます。"
+  },
+  "app.synced-content.delete.override-description": {
+    "message": "このインスタンスまたはすべての同期インスタンスから削除できます。 このインスタンスからのみ削除するとオーバーライドが有効になり、このインスタンスはこれらのコンテンツタイプの同期された変更を受け取りません。"
+  },
+  "app.synced-content.delete.resource-pack-description": {
+    "message": "{count, plural, =1 {これ} other {これら}}をこのインスタンスまたは全ての同期されたインスタンスから削除できます。{count, plural, =1 {これ} other {これら}}をこのインスタンスからのみ削除するとオーバーライドが有効になり、このインスタンスは同期されたリソースパックの変更を受け取らなくなります。"
+  },
+  "app.synced-content.delete.resource-pack-header": {
+    "message": "{count, plural, =1 {この} other {これらの}}リソースパックは同期されています"
+  },
+  "app.synced-content.desync.description": {
+    "message": "このインスタンスは独自のコピーを保持します。このコンテンツを他のインスタンスに同期させるか、削除しますか？"
+  },
+  "app.synced-content.desync.keep": {
+    "message": "保持"
+  },
+  "app.synced-content.desync.remove": {
+    "message": "削除"
+  },
+  "app.synced-content.desync.title": {
+    "message": "コンテンツの同期を解除"
+  },
+  "app.synced-content.warning.title": {
+    "message": "このコンテンツは同期されています"
+  },
+  "app.synced-packs.data-packs.title": {
+    "message": "同期されたデータパック"
+  },
+  "app.synced-packs.empty": {
+    "message": "インスタンスのコンテンツページからパックを追加して同期を開始します。"
+  },
+  "app.synced-packs.load-failed": {
+    "message": "パックをロードできませんでした。再読み込みしてみてください。"
+  },
+  "app.synced-packs.resource-packs.title": {
+    "message": "同期されたリソースパック"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} のダウンロードが完了しました。今すぐ更新するには再読み込みするか、Modrinth Appを閉じる際に自動更新されます。"
@@ -2852,8 +3758,14 @@
   "app.welcome-screen.import-prompt": {
     "message": "別のランチャーから移行中ですか？"
   },
+  "app.welcome-screen.more-options": {
+    "message": "その他のオプション"
+  },
   "app.welcome-screen.quick-create-hint": {
     "message": "<shortcut>N</shortcut>を押してインスタンスをクイック作成"
+  },
+  "app.welcome-screen.skip": {
+    "message": "スキップ"
   },
   "app.welcome-screen.title": {
     "message": "Modrinthへようこそ"
@@ -2975,11 +3887,83 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>Modrinthアカウントにサインイン</link>して友達を追加し、彼らがプレイしているゲームをチェックしよう！"
   },
+  "hosting.play.account-changed": {
+    "message": "Modrinthアカウントが変更されました。もう一度「サーバーを開始」を押して続行してください。"
+  },
+  "hosting.play.no-address": {
+    "message": "このサーバーにはまだ接続アドレスがありません。"
+  },
+  "hosting.play.not-ready": {
+    "message": "このインスタンスは起動できません。ライブラリのインストール状況を確認してください。"
+  },
+  "hosting.play.update-description": {
+    "message": "参加する前に、このインスタンスをサーバーの最新の共有コンテンツに更新してください。"
+  },
+  "hosting.play.update-to-play": {
+    "message": "更新してプレイ"
+  },
+  "hosting.play.world-changed": {
+    "message": "このワールドはアクティブでないか、共有されていません。サーバーパネルを開き、もう一度「サーバーを開始」をしてください。"
+  },
+  "installation-settings.advanced.title": {
+    "message": "高度"
+  },
+  "installation-settings.relink-shared-instance.button": {
+    "message": "共有インスタンスを再リンク"
+  },
+  "installation-settings.relink-shared-instance.description": {
+    "message": "招待リンクまたは ID を使用して、このインスタンスをリンク解除された共有インスタンスに再接続します。"
+  },
+  "installation-settings.relink-shared-instance.modal.already-linked": {
+    "message": "あなたのインスタンス \"{name}\" は、既にこの共有インスタンスにリンクされています。"
+  },
+  "installation-settings.relink-shared-instance.modal.blocked-header": {
+    "message": "このインスタンスは再リンクできません"
+  },
+  "installation-settings.relink-shared-instance.modal.confirm-body": {
+    "message": "このインスタンスは再び共有インスタンスのソースとなります。更新を公開するとメンバーは変更を受け取ります。"
+  },
+  "installation-settings.relink-shared-instance.modal.description": {
+    "message": "あなたが所有する共有インスタンスにこのインスタンスを再接続します。"
+  },
+  "installation-settings.relink-shared-instance.modal.find-button": {
+    "message": "共有インスタンスを検索"
+  },
+  "installation-settings.relink-shared-instance.modal.header": {
+    "message": "共有インスタンスを再リンク"
+  },
+  "installation-settings.relink-shared-instance.modal.input-label": {
+    "message": "招待リンクまたは共有インスタンスID"
+  },
+  "installation-settings.relink-shared-instance.modal.input-placeholder": {
+    "message": "https://modrinth.com/share/..."
+  },
+  "installation-settings.relink-shared-instance.modal.mismatch-body": {
+    "message": "このインスタンスは {localLoader} {localGameVersion}を使用しますが、共有インスタンスは {loader} {gameVersion}を使用します。 次回の公開は、共有インスタンスをこのインスタンスに一致させるために変更します。"
+  },
+  "installation-settings.relink-shared-instance.modal.mismatch-header": {
+    "message": "異なるゲームまたはローダーバージョン"
+  },
+  "installation-settings.relink-shared-instance.modal.not-owner": {
+    "message": "所有者のみが共有インスタンスを再リンクすることができます。メンバーとして更新を取得するには、ライブラリから再インストールしてください。"
+  },
+  "installation-settings.relink-shared-instance.modal.relink-button": {
+    "message": "再リンク"
+  },
+  "installation-settings.relink-shared-instance.modal.server-managed": {
+    "message": "この共有インスタンスはサーバーによって管理されるため、再リンクすることはできません。"
+  },
+  "installation-settings.relink-shared-instance.modal.version-summary": {
+    "message": "{loader} {gameVersion} · バージョン {version}"
+  },
+  "installation-settings.relink-shared-instance.title": {
+    "message": "共有インスタンスを再リンク"
+  },
   "installation-settings.shared-instance.linked-title": {
     "message": "リンク済の共有インスタンス"
   },
   "installation-settings.shared-instance.unlink-button": {
-    "message": "インスタンスの共有を解除"
+    "message": "共有インスタンスを解除"
   },
   "installation-settings.shared-instance.unlink-description": {
     "message": "このローカルインスタンスを今後の共有アップデートから切断します。"
@@ -3068,6 +4052,9 @@
   "instance.files.adding-files": {
     "message": "ファイルを追加中 ({completed}/{total})"
   },
+  "instance.files.managed-content-read-only": {
+    "message": "コンテンツタブでインストール済みのコンテンツを管理します"
+  },
   "instance.files.save-as": {
     "message": "名前をつけて保存…"
   },
@@ -3095,11 +4082,47 @@
   "instance.server-modal.resource-pack": {
     "message": "リソースパック"
   },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "デフォルト設定を管理する"
+  },
+  "instance.settings.reset-setting-to-default": {
+    "message": "{setting}をデフォルトにリセット"
+  },
+  "instance.settings.reset-to-default": {
+    "message": "デフォルトにリセット"
+  },
+  "instance.settings.sidebar.label.game": {
+    "message": "ゲーム"
+  },
+  "instance.settings.sidebar.label.instance": {
+    "message": "インスタンス"
+  },
+  "instance.settings.synced-options.data-override": {
+    "message": "同期データを編集するには、このオーバーライドをオフにします。"
+  },
   "instance.settings.synced-options.data-packs": {
     "message": "データパックの同期を解除"
   },
+  "instance.settings.synced-options.data-packs.description": {
+    "message": "このインスタンスのデータパックは同期されたパックとは別で保持されます。"
+  },
+  "instance.settings.synced-options.data-packs.disabled": {
+    "message": "アプリの設定でデータパックの同期が無効になっています。"
+  },
+  "instance.settings.synced-options.edit-packs": {
+    "message": "同期されたパックを編集"
+  },
+  "instance.settings.synced-options.packs-override": {
+    "message": "同期されたパックを編集するには、このオーバーライドをオフにします。コンテンツタブで独立したパックを管理できます。"
+  },
   "instance.settings.synced-options.resource-packs": {
     "message": "リソースパックの同期を解除"
+  },
+  "instance.settings.synced-options.resource-packs.description": {
+    "message": "このインスタンスのリソースパックは同期されたパックとは別で保持されます。"
+  },
+  "instance.settings.synced-options.resource-packs.disabled": {
+    "message": "アプリの設定でリソースパックの同期が無効になっています。"
   },
   "instance.settings.tabs.behavior.description": {
     "message": "このインスタンスに表示するタブを選択してください。"
@@ -3136,6 +4159,9 @@
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
     "message": "インストール中に複製することはできません。"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.locked": {
+    "message": "ロックされたインスタンスは複製できません。"
   },
   "instance.settings.tabs.general.duplicate-instance": {
     "message": "インスタンスを複製"
@@ -3190,6 +4216,12 @@
   },
   "instance.settings.tabs.general.update-channel.select": {
     "message": "アップデートチャンネルを選択"
+  },
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "ここでオーバーライドしない限り、インスタンスはデフォルトの起動フックを使用します。"
+  },
+  "instance.settings.tabs.hooks.label": {
+    "message": "起動フック"
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "終了後"
@@ -3248,6 +4280,9 @@
   "instance.settings.tabs.installation.locked": {
     "message": "このインスタンスがロックされている間は、インストール設定を利用できません。"
   },
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "ここでオーバーライドしない限り、インスタンスはデフォルトのJavaとメモリ設定を使用します。"
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "環境変数を入力…"
   },
@@ -3255,22 +4290,28 @@
     "message": "Java引数を入力…"
   },
   "instance.settings.tabs.java.environment-variables": {
-    "message": "カスタム環境変数"
+    "message": "環境変数"
   },
   "instance.settings.tabs.java.hooks": {
     "message": "フック"
   },
   "instance.settings.tabs.java.java-arguments": {
-    "message": "カスタムJava引数"
+    "message": "Javaコマンドライン引数"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "カスタムJavaインストール"
+    "message": "Javaのインストール"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "カスタムメモリ割り当て"
+    "message": "メモリ割り当て"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
+  },
+  "instance.settings.tabs.java.label": {
+    "message": "Javaとメモリ"
+  },
+  "instance.settings.tabs.java.recommended-java-version": {
+    "message": "このインスタンスのMinecraftバージョンにはJava {version} をお勧めします。"
   },
   "instance.settings.tabs.sharing": {
     "message": "共有設定"
@@ -3296,6 +4337,12 @@
   "instance.settings.tabs.synced-options.game-settings": {
     "message": "ゲーム設定の同期を解除"
   },
+  "instance.settings.tabs.synced-options.game-settings.description": {
+    "message": "このインスタンスの options.txt を同期されたコピーとは別に保持します。"
+  },
+  "instance.settings.tabs.synced-options.game-settings.disabled-in-app": {
+    "message": "アプリの設定でゲーム設定の同期が無効になっています。"
+  },
   "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
     "message": "変更される前に置き換えられるバージョンはバックアップされます。"
   },
@@ -3312,19 +4359,25 @@
     "message": "同期を使用"
   },
   "instance.settings.tabs.synced-options.multiplayer-servers": {
-    "message": "マルチプレイヤーサーバーの同期を解除"
+    "message": "マルチプレイサーバーの同期を解除"
   },
   "instance.settings.tabs.synced-options.multiplayer-servers.disabled-in-app": {
-    "message": "アプリの設定でマルチプレイヤーサーバーの同期が無効になっています。"
+    "message": "アプリの設定でマルチプレイサーバーの同期が無効になっています。"
   },
   "instance.settings.tabs.synced-options.multiplayer-servers.override-description": {
-    "message": "このインスタンスのマルチプレイヤーサーバーは同期されたサーバーとは別で保持されます。"
+    "message": "このインスタンスのマルチプレイサーバーは同期されたサーバーとは別で保持されます。"
   },
   "instance.settings.tabs.synced-options.open-app-settings": {
     "message": "同期設定の管理"
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "このインスタンスに対して同期設定を個別に保持するための上書きを有効にします。"
+  },
+  "instance.settings.tabs.syncing": {
+    "message": "同期中"
+  },
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "ここでオーバーライドしない限り、インスタンスはデフォルトのウィンドウ設定を使用します。"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "フルスクリーン"
@@ -3341,6 +4394,9 @@
   "instance.settings.tabs.window.height.enter": {
     "message": "高さを入力…"
   },
+  "instance.settings.tabs.window.label": {
+    "message": "ウィンドウ"
+  },
   "instance.settings.tabs.window.width": {
     "message": "幅"
   },
@@ -3350,14 +4406,32 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "幅を入力…"
   },
+  "instance.settings.using-defaults": {
+    "message": "デフォルトを使用する"
+  },
   "instance.shared-instance.error.title": {
     "message": "問題が発生しました"
+  },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "ファイルタイプが許可されていません"
+  },
+  "instance.shared-instance.limit-reached.text": {
+    "message": "これ以上インスタンスを共有できません。"
+  },
+  "instance.shared-instance.limit-reached.title": {
+    "message": "共有インスタンスの上限に達しました"
   },
   "instance.shared-instance.network-error.text": {
     "message": "共有インスタンス API に接続できません"
   },
   "instance.shared-instance.network-error.title": {
     "message": "ネットワークエラー"
+  },
+  "instance.shared-instance.owner-behind.text": {
+    "message": "別のModrinthアプリから新しいバージョンがプッシュされました。ダウンロードしてからもう一度お試しください。"
+  },
+  "instance.shared-instance.owner-behind.title": {
+    "message": "更新をプッシュできませんでした"
   },
   "instance.shared-instance.owner-tooltip": {
     "message": "このインスタンスの内容は他のユーザーに共有されています。"
@@ -3368,6 +4442,12 @@
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "共有インスタンスへのアクセス権が取り消されました。このインスタンスは引き続き利用可能ですが、リンクは解除され、今後のアップデートは受信されなくなります。"
   },
+  "instance.shared-instance.unavailable.locked-owner-text": {
+    "message": "共有インスタンスはコンテンツモデレーションチームによってロックされました。更新をプッシュしたり、このインスタンスを再共有することはできません。"
+  },
+  "instance.shared-instance.unavailable.locked-owner-title": {
+    "message": "インスタンスは共有できなくなりました"
+  },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "この共有インスタンスはコンテンツモデレーションチームによってロックされました。プライマリインスタンスからのアップデートの受信は停止し、プレイすることもできません。"
   },
@@ -3376,6 +4456,12 @@
   },
   "instance.shared-instance.unavailable.manager-fallback": {
     "message": "インスタンスマネージャー"
+  },
+  "instance.shared-instance.unavailable.not-found-text": {
+    "message": "この共有インスタンスを見つけることができませんでした。インストールされたコンテンツはこの端末に残っています。"
+  },
+  "instance.shared-instance.unavailable.not-found-title": {
+    "message": "共有インスタンスは利用できなくなりました"
   },
   "instance.shared-instance.unavailable.text": {
     "message": "ローカルインスタンスは引き続き利用可能ですが、リンクは解除されており、今後のアップデートは受信されません。"
@@ -3441,7 +4527,7 @@
     "message": "サーバーに直接入ることができるのはMinecraft Alpha 1.0.5以降です"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Minecraft 1.20以降はシングルプレイヤーワールドのみに直接入ることができます"
+    "message": "Minecraft 1.20以降はシングルプレイワールドのみに直接入ることができます"
   },
   "instance.worlds.play_instance": {
     "message": "インスタンスを起動"
@@ -3454,6 +4540,9 @@
   },
   "instance.worlds.shortcut-creation-failed": {
     "message": "ショートカットの作成に失敗しました"
+  },
+  "instance.worlds.synced_server": {
+    "message": "インスタンス間で同期済み"
   },
   "instance.worlds.view_instance": {
     "message": "インスタンスを表示する"
@@ -3545,6 +4634,12 @@
   "onboarding-checklist.title": {
     "message": "はじめる"
   },
+  "project.server.status.offline": {
+    "message": "オフライン"
+  },
+  "project.server.status.online": {
+    "message": "オンライン"
+  },
   "search.filter.locked.instance": {
     "message": "インスタンスによる条件"
   },
@@ -3557,8 +4652,20 @@
   "search.filter.locked.instance.sync": {
     "message": "インスタンスと同期"
   },
+  "search.filter.locked.server": {
+    "message": "サーバーによる条件"
+  },
   "search.filter.locked.server-environment.title": {
     "message": "サーバーインスタンスにはクライアント側Modのみ追加可能"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "ゲームバージョンはサーバーによる条件です"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "ローダーはサーバーによる条件です"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "サーバーと同期"
   },
   "settings.sidebar.label.account": {
     "message": "アカウント"

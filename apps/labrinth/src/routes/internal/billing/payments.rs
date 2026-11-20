@@ -140,6 +140,7 @@ impl AttachedCharge {
 
     pub async fn from_charge_request_type(
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
+        user: &User,
         charge_request_type: ChargeRequestType,
     ) -> Result<Self, ApiError> {
         Ok(match charge_request_type {
@@ -147,6 +148,7 @@ impl AttachedCharge {
                 charge: DBCharge::get(id.into(), exec)
                     .await
                     .internal_context("fetching charge from database")?
+                    .filter(|charge| charge.user_id == user.id.into())
                     .request_context_with(|| {
                         "could not find charge".to_string()
                     })?,

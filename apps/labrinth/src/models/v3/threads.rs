@@ -4,7 +4,7 @@ use crate::models::ids::{
     ImageId, ProjectId, ReportId, ThreadId, ThreadMessageId,
 };
 use crate::models::pats::Scopes;
-use crate::models::projects::ProjectStatus;
+use crate::models::projects::{ApprovalProvenance, ProjectStatus};
 use crate::models::thread_issues::ThreadIssue;
 use crate::models::users::User;
 use ariadne::ids::UserId;
@@ -53,6 +53,8 @@ pub enum MessageBody {
     AutoApproval {
         new_status: ProjectStatus,
         old_status: ProjectStatus,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        provenance: Option<ApprovalProvenance>,
     },
     TechReview {
         verdict: DelphiVerdict,

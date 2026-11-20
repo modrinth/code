@@ -8,6 +8,24 @@
   "app.appearance-settings.native-decorations.title": {
     "defaultMessage": "Sistem pencere çerçevesi"
   },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "defaultMessage": "Değişiklikler henüz paylaşılmadı"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "defaultMessage": "Güncellemeyi yayınla"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "defaultMessage": "Yayınlıyor..."
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "defaultMessage": "İnceleniyor..."
+  },
+  "app.instance.share.members.empty": {
+    "defaultMessage": "Henüz katılan kullanıcı yok"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "defaultMessage": "Filtrelerinizle eşleşen kullanıcı yok."
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Sunucu ayarları yüklenemedi"
   },
@@ -76,6 +94,12 @@
   },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Yeniden abone ol"
+  },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Vergi"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Modrinth Hosting'e Yeniden Abone Ol"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Keydedilen tercihleri uygula"
@@ -148,6 +172,9 @@
   },
   "button.close": {
     "defaultMessage": "Kapat"
+  },
+  "button.confirm": {
+    "defaultMessage": "Onayla"
   },
   "button.continue": {
     "defaultMessage": "Devam"
@@ -238,6 +265,9 @@
   },
   "button.refresh": {
     "defaultMessage": "Yenile"
+  },
+  "button.reinstall-modpack": {
+    "defaultMessage": "Mod paketini yeniden kur"
   },
   "button.remove": {
     "defaultMessage": "Kaldır"
@@ -356,8 +386,14 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, one {item} other {items}}"
   },
+  "content.card.external-file": {
+    "defaultMessage": "Harici dosya"
+  },
   "content.card.frozen": {
     "defaultMessage": "Bu proje, dondurulması kaldırılana kadar mevcut sürümüne kilitlenmiştir."
+  },
+  "content.card.override-file": {
+    "defaultMessage": "Dosyaların üstüne yaz"
   },
   "content.card.select-project": {
     "defaultMessage": "{project} seçin"
@@ -367,6 +403,9 @@
   },
   "content.card.synced": {
     "defaultMessage": "Süreçler arası senkronize edildi"
+  },
+  "content.card.uploaded-file": {
+    "defaultMessage": "Yüklenen dosya"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "{count, plural, one {# projeyi} other {# projeyi}} en yeni uyumlu sürümüne güncellemek istediğinden emin misin? İçeriklerin tek tek güncellenmesi önerilir."
@@ -397,6 +436,18 @@
   },
   "content.confirm-disable.header": {
     "defaultMessage": "{itemType} öğesini sil"
+  },
+  "content.confirm-environment.admonition-title": {
+    "defaultMessage": "Bu içerik uyumsuz olabilir"
+  },
+  "content.confirm-environment.disable-player-title": {
+    "defaultMessage": "Oyuncular için devredışı bırakılsınmı?"
+  },
+  "content.confirm-environment.disable-server-title": {
+    "defaultMessage": "Sunucun için devredışı bırakılsınmı?"
+  },
+  "content.confirm-environment.performance-admonition-title": {
+    "defaultMessage": "Performans uyarısı"
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Sürüm Düşürme} other {Güncelleme}} uyarısı"
@@ -463,6 +514,9 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} eklendi"
+  },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Yapılandırma dosyaları"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Eklendi (bağımlılık)"
@@ -535,6 +589,30 @@
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} güncellendi"
+  },
+  "content.enabled-for.label": {
+    "defaultMessage": "Şunun için etkinleştir"
+  },
+  "content.enabled-for.player": {
+    "defaultMessage": "Oyuncu"
+  },
+  "content.enabled-for.player-only-filter": {
+    "defaultMessage": "Sadece-oyuncu"
+  },
+  "content.enabled-for.please-wait": {
+    "defaultMessage": "Lütfen bekleyin"
+  },
+  "content.enabled-for.server": {
+    "defaultMessage": "Sunucu"
+  },
+  "content.enabled-for.server-and-player": {
+    "defaultMessage": "Sunucu ve oyuncu"
+  },
+  "content.enabled-for.server-only-filter": {
+    "defaultMessage": "Sadece-sunucu"
+  },
+  "content.enabled-for.server-tooltip": {
+    "defaultMessage": "İçeriği sunucun için indir."
   },
   "content.filter.disabled": {
     "defaultMessage": "Devre dışı"
@@ -646,6 +724,9 @@
   },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Sadece istemciye özel içerik"
+  },
+  "content.metadata-filter.warning.compatibility-unknown": {
+    "defaultMessage": "Uyumluluk bilinmiyor"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Uyarılar"
@@ -5842,9 +5923,6 @@
   },
   "settings.social.blocked-users.restriction.friend-requests": {
     "defaultMessage": "Arkadaşlık isteği"
-  },
-  "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Modrinth Hosting sunucusu yönetme daveti."
   },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "Sizi paylaşılan örneklere davet etme"

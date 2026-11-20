@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    UPDATE mods\n                    SET approved_because = CASE\n                            WHEN approved IS NULL THEN $2::jsonb\n                            ELSE approved_because\n                        END,\n                        approved = COALESCE(approved, NOW()),\n                        initial_queued = NULL\n                    WHERE id = $1\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "86f062b5801e9a7e62ab6760e13327713f6116c827a39d451db32804c10e464a"
+}

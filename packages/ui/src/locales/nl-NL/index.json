@@ -6011,9 +6011,6 @@
   "settings.social.blocked-users.restriction.friend-requests": {
     "defaultMessage": "Een vriendschapsverzoek sturen"
   },
-  "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Uitnodigen om een Modrinth Hosting-server te beheren."
-  },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "Uitnodigen voor gedeelde instanties"
   },

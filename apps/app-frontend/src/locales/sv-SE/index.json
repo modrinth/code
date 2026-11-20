@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "Kopierat"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "Kopiera detaljer"
-  },
   "app.action-bar.install.dismiss": {
     "message": "Avvisa"
   },
@@ -206,11 +203,17 @@
   "app.behavior-settings.content.title": {
     "message": "Hem och innehåll"
   },
+  "app.behavior-settings.hidden-instances.empty": {
+    "message": "Du har inte några dolda instanser än."
+  },
   "app.behavior-settings.hidden-instances.more-options": {
     "message": "Fler alternativ"
   },
   "app.behavior-settings.hidden-instances.not-installed": {
     "message": "Inte installerad"
+  },
+  "app.behavior-settings.hidden-instances.title": {
+    "message": "Dolda instanser"
   },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Ta Modrinth-appen till förgrunden när Minecraft avslutas."
@@ -274,6 +277,9 @@
   },
   "app.browse.project-type.mods": {
     "message": "Moddar"
+  },
+  "app.browse.project-type.plugins": {
+    "message": "Plugins"
   },
   "app.browse.project-type.resource-packs": {
     "message": "Resurspaket"
@@ -353,6 +359,9 @@
   "app.download-manager.eta": {
     "message": "Uppskattad tid kvar för den här nedladdningen"
   },
+  "app.download-manager.hide-tasks": {
+    "message": "Göm arbetsuppgifter"
+  },
   "app.download-manager.imported-instance": {
     "message": "Importerad instans"
   },
@@ -367,6 +376,9 @@
   },
   "app.download-manager.new-instance": {
     "message": "Ny instans"
+  },
+  "app.download-manager.no-tasks": {
+    "message": "Inga arbetsuppgifter"
   },
   "app.download-manager.pause": {
     "message": "Pausa installation"
@@ -385,6 +397,9 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Delad instansuppdatering"
+  },
+  "app.download-manager.show-tasks": {
+    "message": "Visa arbetsuppgifter"
   },
   "app.download-manager.tasks": {
     "message": "Uppgifter"
@@ -749,6 +764,9 @@
   "app.instance.navigation.back-to-instance": {
     "message": "Tillbaka till instans"
   },
+  "app.instance.server.offline.launch-anyway": {
+    "message": "Kör ändå"
+  },
   "app.instance.server.offline.title": {
     "message": "Servern är offline"
   },
@@ -772,6 +790,12 @@
   },
   "app.instance.share.invite-modal.user-limit-reached": {
     "message": "Instansen har nått gränsen på {limit} användare."
+  },
+  "app.instance.share.limit-reached.description": {
+    "message": "Du har redan delat upp till gränsen, {limit} av instanser."
+  },
+  "app.instance.share.limit-reached.manage-button": {
+    "message": "Hantera delade instanser"
   },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "Du behöver logga in som"
@@ -980,14 +1004,44 @@
   "app.java-selector.browse": {
     "message": "Bläddra"
   },
+  "app.java-selector.copy-failed-title": {
+    "message": "Kunde inte kopiera sökväg"
+  },
+  "app.java-selector.copy-path": {
+    "message": "Kopiera sökväg"
+  },
   "app.java-selector.detect": {
     "message": "Hitta"
+  },
+  "app.java-selector.edit-path": {
+    "message": "Ändra sökväg"
+  },
+  "app.java-selector.install-java": {
+    "message": "Installera Java {version}"
   },
   "app.java-selector.installing": {
     "message": "Installerar..."
   },
+  "app.java-selector.invalid": {
+    "message": "Ogiltig"
+  },
+  "app.java-selector.more-options": {
+    "message": "Fler javainställningar"
+  },
+  "app.java-selector.not-set": {
+    "message": "Ingen Java vald"
+  },
+  "app.java-selector.path-copied-text": {
+    "message": "Javasökvägen har kopierats till ditt urklipp."
+  },
+  "app.java-selector.path-copied-title": {
+    "message": "Sökväg kopierad"
+  },
   "app.java-selector.path.placeholder": {
     "message": "/sökväg/till/java"
+  },
+  "app.java-selector.valid": {
+    "message": "Giltig"
   },
   "app.library.actions.label": {
     "message": "Biblioteksåtgärder"
@@ -1415,6 +1469,9 @@
   "app.modal.update-to-play.header": {
     "message": "Uppdatera för att spela"
   },
+  "app.modal.update-to-play.owner-header": {
+    "message": "Uppdatering tillgänglig"
+  },
   "app.modal.update-to-play.removed": {
     "message": "Tog bort"
   },
@@ -1708,6 +1765,18 @@
   },
   "app.screenshots.sort.oldest": {
     "message": "Äldst"
+  },
+  "app.server-sharing-update.notification.description": {
+    "message": "Bjud in vänner för att spela med en instans hanterad av din server."
+  },
+  "app.server-sharing-update.notification.dismiss": {
+    "message": "Avfärda"
+  },
+  "app.server-sharing-update.notification.view-update": {
+    "message": "Visa uppdatering"
+  },
+  "app.server-sharing-update.title": {
+    "message": "Dela servrar med vänner"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -2225,6 +2294,9 @@
   "app.settings.game-options.setting.chat-links-prompt.label": {
     "message": "Fråga om länkar"
   },
+  "app.settings.game-options.setting.chat-links.description": {
+    "message": "Tillåt att webblänkar i chatten öppnas."
+  },
   "app.settings.game-options.setting.chat-links.label": {
     "message": "Webblänkar"
   },
@@ -2323,6 +2395,9 @@
   },
   "app.settings.game-options.setting.gui-scale.label": {
     "message": "Gränssnittsskala"
+  },
+  "app.settings.game-options.setting.hat.description": {
+    "message": "Visa hattskinlagret."
   },
   "app.settings.game-options.setting.hat.label": {
     "message": "Hatt"
@@ -2438,8 +2513,17 @@
   "app.settings.game-options.setting.key-debug-profiling-chart.label": {
     "message": "Profileringsdiagram"
   },
+  "app.settings.game-options.setting.key-debug-reload-chunks.label": {
+    "message": "Ladda om datablock"
+  },
+  "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
+    "message": "Ladda om resurspaket"
+  },
   "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
     "message": "Byt spelläge"
+  },
+  "app.settings.game-options.setting.key-drop.label": {
+    "message": "Släpp föremål"
   },
   "app.settings.game-options.setting.key-forward.label": {
     "message": "Gå framåt"
@@ -2678,8 +2762,17 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Säkerhetskopior av appdatabas"
   },
-  "app.settings.resource-management.app-directory.description": {
-    "message": "Var Modrinth App lagrar instanser och andra filer. Ändringar träder i kraft efter appen startas om."
+  "app.settings.resource-management.app-directory.open-folder": {
+    "message": "Öppna mapp"
+  },
+  "app.settings.resource-management.app-directory.open-in-explorer": {
+    "message": "Öppna i filhanteraren"
+  },
+  "app.settings.resource-management.app-directory.path-copied-title": {
+    "message": "Sökväg kopierad"
+  },
+  "app.settings.resource-management.app-directory.path-copy-failed-title": {
+    "message": "Kunde inte kopiera sökväg"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Appmapp"
@@ -2953,6 +3046,12 @@
   },
   "app.shared-instance-publish.uploading": {
     "message": "Skickar ut uppdatering…"
+  },
+  "app.shared-instance.lock-notice.delete-instance": {
+    "message": "Radera instans"
+  },
+  "app.shared-instance.lock-notice.reason": {
+    "message": "Anledning"
   },
   "app.sidebar.playing-as": {
     "message": "Spelar som"
@@ -3245,6 +3344,9 @@
   "app.welcome-screen.quick-create-hint": {
     "message": "Tryck på <shortcut>N</shortcut> för att snabbt skapa en instans"
   },
+  "app.welcome-screen.skip": {
+    "message": "Hoppa över"
+  },
   "app.welcome-screen.title": {
     "message": "Välkommen till Modrinth"
   },
@@ -3358,6 +3460,9 @@
   },
   "friends.sign-in-to-add-friends": {
     "message": "<link>Logga in på ett Modrinth-konto</link> för att lägga till vänner och se vad de spelar!"
+  },
+  "hosting.play.update-to-play": {
+    "message": "Uppdatera för att spela"
   },
   "installation-settings.shared-instance.linked-title": {
     "message": "Länkad delad instans"
@@ -3475,6 +3580,12 @@
   },
   "instance.settings.defaults.open-app-settings": {
     "message": "Hantera standardinställningar"
+  },
+  "instance.settings.reset-setting-to-default": {
+    "message": "Återställ {setting} till standard"
+  },
+  "instance.settings.reset-to-default": {
+    "message": "Återställ till standard"
   },
   "instance.settings.sidebar.label.game": {
     "message": "Spel"
@@ -3639,19 +3750,10 @@
     "message": "Ange Java-argument..."
   },
   "instance.settings.tabs.java.environment-variables": {
-    "message": "Anpassade miljövariabler"
+    "message": "Miljövariabler"
   },
   "instance.settings.tabs.java.hooks": {
     "message": "Hooks"
-  },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Anpassade Java-argument"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Anpassad Java-installation"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "Anpassad minnestilldelning"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/sökväg/till/java"
@@ -3721,6 +3823,9 @@
   },
   "instance.shared-instance.error.title": {
     "message": "Något gick fel"
+  },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "Filtyp inte tillåten"
   },
   "instance.shared-instance.network-error.text": {
     "message": "Kan inte ansluta till den delade instansens API"
@@ -3917,6 +4022,12 @@
   "onboarding-checklist.title": {
     "message": "Kom igång"
   },
+  "project.server.status.offline": {
+    "message": "Offline"
+  },
+  "project.server.status.online": {
+    "message": "Online"
+  },
   "search.filter.locked.instance": {
     "message": "Tillhandahållet av instansen"
   },
@@ -3931,6 +4042,9 @@
   },
   "search.filter.locked.server-environment.title": {
     "message": "Endast klient-sido moddar kan läggas till i serverinstansen"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Synkronisera med server"
   },
   "settings.sidebar.label.account": {
     "message": "Konto"

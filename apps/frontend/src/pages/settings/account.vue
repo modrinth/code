@@ -416,7 +416,7 @@
 					}}</span>
 				</label>
 				<div>
-					<Button @click="$refs.changeEmailModal.show()">
+					<Button @click="openChangeEmail">
 						<template v-if="auth.user.email">
 							<EditIcon />
 							{{ formatMessage(messages.changeEmailButton) }}
@@ -443,17 +443,7 @@
 					</span>
 				</label>
 				<div>
-					<Button
-						@click="
-							() => {
-								oldPassword = ''
-								newPassword = ''
-								confirmNewPassword = ''
-								removePasswordMode = false
-								$refs.managePasswordModal.show()
-							}
-						"
-					>
+					<Button @click="openPasswordModal">
 						<KeyIcon />
 						<template v-if="auth.user.has_password">{{
 							formatMessage(messages.changePasswordButton)
@@ -488,7 +478,7 @@
 					}}</span>
 				</label>
 				<div>
-					<Button @click="$refs.manageProvidersModal.show()">
+					<Button @click="openManageProviders">
 						<SettingsIcon /> {{ formatMessage(messages.manageProvidersButton) }}
 					</Button>
 				</div>
@@ -516,7 +506,7 @@
 		<section id="delete-account" class="universal-card">
 			<h2>{{ formatMessage(messages.deleteAccountSectionTitle) }}</h2>
 			<p>{{ formatMessage(messages.deleteAccountSectionDescription) }}</p>
-			<Button type="colored" color="red" native-type="button" @click="$refs.modal_confirm.show()">
+			<Button type="colored" color="red" native-type="button" @click="openDeleteAccount">
 				<TrashIcon />
 				{{ formatMessage(messages.deleteAccountButton) }}
 			</Button>
@@ -569,7 +559,12 @@ import TwoFactorAuthCodeInput from '~/components/ui/auth/TwoFactorAuthCodeInput.
 import { forgetStoredAccount, isSessionYoung } from '~/composables/accounts.ts'
 import { getAuthUrl, removeAuthProvider } from '~/composables/auth.ts'
 import { useAuthCookie } from '~/composables/auth-cookie.ts'
-import { isReauthCancelled, requestReauth, runPrivileged } from '~/composables/reauth.ts'
+import {
+	ensurePrivileged,
+	isReauthCancelled,
+	requestReauth,
+	runPrivileged,
+} from '~/composables/reauth.ts'
 
 definePageMeta({
 	middleware: 'auth',
@@ -881,7 +876,25 @@ const messages = defineMessages({
 })
 
 const changeEmailModal = ref()
+const manageProvidersModal = ref()
+const modal_confirm = ref()
 const email = ref(auth.value.user.email)
+
+async function openChangeEmail() {
+	if (!(await ensurePrivileged(Boolean(auth.value.user.email)))) return
+	changeEmailModal.value.show()
+}
+
+async function openManageProviders() {
+	if (!(await ensurePrivileged())) return
+	manageProvidersModal.value.show()
+}
+
+async function openDeleteAccount() {
+	if (!(await ensurePrivileged())) return
+	modal_confirm.value.show()
+}
+
 async function saveEmail() {
 	if (!email.value) {
 		return
@@ -942,6 +955,16 @@ const removePasswordMode = ref(false)
 const oldPassword = ref('')
 const newPassword = ref('')
 const confirmNewPassword = ref('')
+
+async function openPasswordModal() {
+	if (!(await ensurePrivileged())) return
+	oldPassword.value = ''
+	newPassword.value = ''
+	confirmNewPassword.value = ''
+	removePasswordMode.value = false
+	managePasswordModal.value.show()
+}
+
 async function savePassword() {
 	if (newPassword.value !== confirmNewPassword.value) {
 		return
@@ -980,6 +1003,7 @@ const twoFactorCodeInput = ref()
 const removeTwoFactorCodeInput = ref()
 const twoFactorSubmitting = ref(false)
 async function showTwoFactorModal() {
+	if (!(await ensurePrivileged())) return
 	twoFactorStep.value = 0
 	twoFactorCode.value = ''
 	twoFactorIncorrect.value = false

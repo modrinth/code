@@ -13,7 +13,10 @@ use crate::database::{PgPool, PgTransaction, models as db_models};
 use crate::models::ids::ProjectId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
-use crate::models::projects::{Project, ProjectStatus, Version};
+use crate::models::projects::{
+    ApprovalProvenance, ApprovalReason, AutoApprovalCause, Project,
+    ProjectStatus, Version,
+};
 use crate::models::thread_issues::{
     ThreadIssueContext, ThreadIssueTarget, ThreadIssueTeamMember,
     ThreadIssueValueState, ThreadIssueVerdict,
@@ -83,6 +86,7 @@ impl SyncedProjectState {
 
     pub(crate) async fn try_auto_approve(
         &mut self,
+        cause: AutoApprovalCause,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<bool, ApiError> {
@@ -90,15 +94,35 @@ impl SyncedProjectState {
             return Ok(false);
         };
         let old_status = self.project.status;
+        let provenance = ApprovalProvenance {
+            trigger: cause,
+            previous_status: old_status,
+            resolved_issue_ids: self
+                .thread_issues
+                .iter()
+                .map(|issue| issue.id.into())
+                .collect(),
+        };
+        let reason =
+            serde_json::to_value(ApprovalReason::Auto(provenance.clone()))
+                .wrap_internal_err(
+                    "serializing project auto-approval reason",
+                )?;
 
         sqlx::query!(
             r#"
 			UPDATE mods
-			SET status = $1, approved = COALESCE(approved, NOW())
+			SET status = $1,
+			    approved_because = CASE
+			        WHEN approved IS NULL THEN $3::jsonb
+			        ELSE approved_because
+			    END,
+			    approved = COALESCE(approved, NOW())
 			WHERE id = $2
 			"#,
             new_status.as_str(),
             self.data.inner.id as DBProjectId,
+            reason,
         )
         .execute(&mut *transaction)
         .await
@@ -111,6 +135,7 @@ impl SyncedProjectState {
             body: MessageBody::AutoApproval {
                 old_status,
                 new_status,
+                provenance: Some(provenance),
             },
             thread_id: self.data.thread_id,
             hide_identity: false,
@@ -199,7 +224,13 @@ pub(crate) async fn sync_project_state(
     if exited_projects.contains(&project_id)
         && state.status() == ProjectStatus::Processing
     {
-        state.try_auto_approve(transaction, redis).await?;
+        state
+            .try_auto_approve(
+                AutoApprovalCause::TechnicalReviewNoDetails,
+                transaction,
+                redis,
+            )
+            .await?;
     }
     Ok(state)
 }
@@ -416,6 +447,7 @@ pub(crate) struct PreparedMutations {
 
 pub(crate) async fn prepare_technical_review_exits(
     project_ids: &[DBProjectId],
+    cause: AutoApprovalCause,
     transaction: &mut PgTransaction<'_>,
     pool: &PgPool,
     redis: &RedisPool,
@@ -429,7 +461,9 @@ pub(crate) async fn prepare_technical_review_exits(
         let mut state =
             load_project_state(project_id, transaction, pool, redis).await?;
         if state.status() == ProjectStatus::Processing {
-            state.try_auto_approve(transaction, redis).await?;
+            state
+                .try_auto_approve(cause.clone(), transaction, redis)
+                .await?;
         }
         states.push(state);
     }
@@ -466,7 +500,13 @@ pub(crate) async fn prepare_mutations(
         if exited_projects.contains(&project_id)
             && state.status() == ProjectStatus::Processing
         {
-            state.try_auto_approve(transaction, redis).await?;
+            state
+                .try_auto_approve(
+                    AutoApprovalCause::TechnicalReviewNoDetails,
+                    transaction,
+                    redis,
+                )
+                .await?;
         }
         states.push(state);
     }
@@ -599,4 +639,85 @@ pub(crate) async fn finalize_project_edit(
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::ids::ThreadIssueId;
+    use ariadne::ids::UserId;
+    use serde_json::json;
+
+    #[test]
+    fn historical_auto_approval_message_has_no_provenance() {
+        let value = json!({
+            "type": "auto_approval",
+            "old_status": "processing",
+            "new_status": "approved"
+        });
+        let message: MessageBody =
+            serde_json::from_value(value.clone()).unwrap();
+        assert!(matches!(
+            &message,
+            MessageBody::AutoApproval {
+                provenance: None,
+                ..
+            }
+        ));
+        assert_eq!(serde_json::to_value(message).unwrap(), value);
+    }
+
+    #[test]
+    fn thread_and_database_share_approval_provenance() {
+        let provenance = ApprovalProvenance {
+            trigger: AutoApprovalCause::Resubmission { user_id: UserId(1) },
+            previous_status: ProjectStatus::Rejected,
+            resolved_issue_ids: vec![ThreadIssueId(2)],
+        };
+        let reason =
+            serde_json::to_value(ApprovalReason::Auto(provenance.clone()))
+                .unwrap();
+        let message = MessageBody::AutoApproval {
+            old_status: ProjectStatus::Rejected,
+            new_status: ProjectStatus::Approved,
+            provenance: Some(provenance),
+        };
+        let value = serde_json::to_value(message).unwrap();
+        assert_eq!(reason["Auto"], value["provenance"]);
+        let round_trip: MessageBody =
+            serde_json::from_value(value.clone()).unwrap();
+        assert_eq!(serde_json::to_value(round_trip).unwrap(), value);
+    }
+
+    #[test]
+    fn manual_approval_reason_serializes_user_id() {
+        assert_eq!(
+            serde_json::to_value(ApprovalReason::ByUser(UserId(1))).unwrap(),
+            json!({ "ByUser": "1" }),
+        );
+    }
+
+    #[test]
+    fn auto_approval_reason_serializes_evidence() {
+        let reason = ApprovalReason::Auto(ApprovalProvenance {
+            trigger: AutoApprovalCause::ModeratorTechnicalReviewPass {
+                user_id: UserId(1),
+            },
+            previous_status: ProjectStatus::Processing,
+            resolved_issue_ids: vec![ThreadIssueId(2)],
+        });
+        assert_eq!(
+            serde_json::to_value(reason).unwrap(),
+            json!({
+                "Auto": {
+                    "trigger": {
+                        "type": "moderator_technical_review_pass",
+                        "user_id": "1"
+                    },
+                    "previous_status": "processing",
+                    "resolved_issue_ids": ["2"]
+                }
+            }),
+        );
+    }
 }

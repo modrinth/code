@@ -12,13 +12,10 @@
     "message": "הסתר הורדות פעילות"
   },
   "app.action-bar.hide-more-running-instances": {
-    "message": "החבא יותר התקנים רצים"
+    "message": "הסתר יותר התקנים רצים"
   },
   "app.action-bar.install.copied-details": {
     "message": "הועתק"
-  },
-  "app.action-bar.install.copy-details": {
-    "message": "העתקת הפרטים"
   },
   "app.action-bar.install.dismiss": {
     "message": "התעלם"
@@ -36,7 +33,7 @@
     "message": "לא יכל לקרוא את חבילת המודים"
   },
   "app.action-bar.install.summary.canceled": {
-    "message": "ביטול"
+    "message": "בוטל"
   },
   "app.action-bar.install.summary.cleanup-incomplete": {
     "message": "ניקיון נכשל"
@@ -66,28 +63,28 @@
     "message": "כשל בהתקנת ג'אווה"
   },
   "app.action-bar.install.summary.loader-setup-failed": {
-    "message": "הגדרת ה-Loader נכשלה."
+    "message": "הגדרת ה-Loader נכשלה"
   },
   "app.action-bar.install.summary.local-data-error": {
-    "message": "לא ניתן היה לעדכן את הנתונים המקומיים."
+    "message": "לא ניתן היה לעדכן את הנתונים המקומיים"
   },
   "app.action-bar.install.summary.minecraft-setup-failed": {
     "message": "הפעלת מיינקראפט נכשלה"
   },
   "app.action-bar.install.summary.modrinth-unreachable": {
-    "message": "לא ניתן להגיע ל"
+    "message": "לא ניתן להגיע ל-Modrinth"
   },
   "app.action-bar.install.summary.no-write-permission": {
     "message": "אין גישה לכתוב"
   },
   "app.action-bar.install.summary.pack-download-failed": {
-    "message": "לא ניתן היה להוריד את החבילה."
+    "message": "לא ניתן היה להוריד את החבילה"
   },
   "app.action-bar.install.summary.unexpected-error": {
     "message": "משהו הלך שגוי"
   },
   "app.action-bar.install.unknown-instance": {
-    "message": "אקסמפלר לא מוכר"
+    "message": "התקנה לא מוכרת"
   },
   "app.action-bar.install.updating-shared-content": {
     "message": "מעדכן תוכן משותף"
@@ -144,7 +141,7 @@
     "message": "הפרטיות שלך ואיך פרסומות תומכות בModrinth"
   },
   "app.appearance-settings.compact-mode.description": {
-    "message": "הצכ התקנות בפריסת שורות קומפקטית."
+    "message": "הצג התקנות בפריסת שורות קומפקטית."
   },
   "app.appearance-settings.compact-mode.title": {
     "message": "מצב קומפקטי"
@@ -168,7 +165,7 @@
     "message": "הקטן אפליקציה"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "הצג את זמן המשחק בכל אקסמפלר."
+    "message": "הצג את זמן המשחק בכל התקנה."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "הצג זמן משחק"
@@ -202,6 +199,9 @@
   },
   "app.behavior-settings.content.title": {
     "message": "בית ותוכן"
+  },
+  "app.behavior-settings.hidden-instances.more-options": {
+    "message": "אפשרויות נוספות"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "הפעלה וניווט"
@@ -1421,6 +1421,12 @@
   "app.screenshots.group.today": {
     "message": "היום"
   },
+  "app.screenshots.group.yesterday": {
+    "message": "אתמול"
+  },
+  "app.screenshots.more-actions": {
+    "message": "פעולות נוספות"
+  },
   "app.screenshots.selection.global-export-filename": {
     "message": "צילומי_מסך.zip"
   },
@@ -1475,6 +1481,12 @@
   "app.settings.game-options.category.chat.label": {
     "message": "צ'אט"
   },
+  "app.settings.game-options.category.language.description": {
+    "message": "שפת משחק"
+  },
+  "app.settings.game-options.category.language.label": {
+    "message": "שפה"
+  },
   "app.settings.game-options.choice.all": {
     "message": "הכל"
   },
@@ -1490,8 +1502,14 @@
   "app.settings.game-options.choice.fast": {
     "message": "מהיר"
   },
+  "app.settings.game-options.choice.hidden": {
+    "message": "מוסתר"
+  },
   "app.settings.game-options.choice.left": {
     "message": "שמאל"
+  },
+  "app.settings.game-options.choice.limited": {
+    "message": "מוגבל"
   },
   "app.settings.game-options.choice.never": {
     "message": "אף פעם"
@@ -1550,6 +1568,9 @@
   "app.settings.game-options.setting.cape.label": {
     "message": "גלימה"
   },
+  "app.settings.game-options.setting.chat-colors.label": {
+    "message": "צבעי צ'אט"
+  },
   "app.settings.game-options.setting.key-jump.label": {
     "message": "קפיצה"
   },
@@ -1586,6 +1607,9 @@
   "app.settings.synced-options.game-settings.value-on": {
     "message": "פעיל"
   },
+  "app.settings.synced-options.multiplayer-servers.address": {
+    "message": "כתובת השרת"
+  },
   "app.settings.tabs.appearance": {
     "message": "מראה"
   },
@@ -1597,6 +1621,9 @@
   },
   "app.settings.tabs.privacy": {
     "message": "פרטיות"
+  },
+  "app.settings.tabs.window": {
+    "message": "חלון"
   },
   "app.skins.apply-button": {
     "message": "החל"
@@ -1729,6 +1756,9 @@
   },
   "friends.sign-in-to-add-friends": {
     "message": "אפשר <link>להתחבר לחשבון Modrinth</link> כדי להוסיף חברים ולראות במה הם משחקים!"
+  },
+  "installation-settings.relink-shared-instance.modal.server-managed": {
+    "message": "ההתקנה הזו מנוהלת על ידי שרת, לכן היא לא יכולה להיות מקושרת מחדש."
   },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "הסר את המופע המשותף הזה מ-Modrinth והפסק לשלוח עדכונים לכל מי שמשתמש בו. המופע המקומי שלך לא יושפע."
@@ -1918,6 +1948,9 @@
   },
   "instance.worlds.a_minecraft_server": {
     "message": "שרת מיינקראפט"
+  },
+  "instance.worlds.actions.label": {
+    "message": "פעולות עולם"
   },
   "instance.worlds.cant_connect": {
     "message": "לא יכול להתחבר אל השרת"
