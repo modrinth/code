@@ -201,8 +201,8 @@ import { computed } from 'vue'
 
 import { libraryInstanceMessages } from '@/features/library/messages'
 import type { GameInstance } from '@/helpers/types'
-import InstanceMetadataItems from '@/pages/instance/components/instance-metadata-items.vue'
-import { formatPlaytime, playtimeMessages } from '@/pages/instance/playtime'
+import InstanceMetadataItems from '@/features/instances/instance-metadata-items.vue'
+import { formatPlaytime, playtimeMessages } from '@/features/instances/playtime'
 import { instanceBrowseHeadingMessage } from '@/platform/adapters/browse/use-instance-browse-target'
 
 import InstanceHeaderServerMetadata from './instance-page-header-server-metadata.vue'

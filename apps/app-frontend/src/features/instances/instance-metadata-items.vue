@@ -42,7 +42,7 @@ import {
 import { computed } from 'vue'
 
 import type { GameInstance } from '@/helpers/types'
-import { formatPlaytime, playtimeMessages } from '@/pages/instance/playtime'
+import { formatPlaytime, playtimeMessages } from '@/features/instances/playtime'
 
 const props = defineProps<{
 	instance: GameInstance

@@ -183,12 +183,13 @@ export function useBrowseViewState(options: BrowseViewStateOptions): BrowseViewS
 			.map((loader) => loader.name),
 	])
 
-	const debouncedParams = refDebounced(requestParams, SEARCH_DEBOUNCE_MS)
+	const request = computed(() => ({ projectType: projectType.value, params: requestParams.value }))
+	const debouncedRequest = refDebounced(request, SEARCH_DEBOUNCE_MS)
 
 	const resultsQuery = useQuery(
 		computed(() => {
-			const type = projectType.value
-			const search = options.searchQuery(debouncedParams.value)
+			const { projectType: type, params } = debouncedRequest.value
+			const search = options.searchQuery(params)
 			return {
 				queryKey: [...search.queryKey, type],
 				queryFn: async (): Promise<TypedSearchResults> => ({
@@ -213,7 +214,7 @@ export function useBrowseViewState(options: BrowseViewStateOptions): BrowseViewS
 		totalHits.value === 0 ? 1 : Math.ceil(totalHits.value / maxResults.value),
 	)
 	const refreshing = computed(
-		() => requestParams.value !== debouncedParams.value || resultsQuery.isFetching.value,
+		() => request.value !== debouncedRequest.value || resultsQuery.isFetching.value,
 	)
 	const loading = computed(
 		() => !currentResults.value && (refreshing.value || resultsQuery.isPending.value),
