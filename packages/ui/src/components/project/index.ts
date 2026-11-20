@@ -1,3 +1,4 @@
+export * from './gallery'
 export * from './server'
 export * from './settings'
 

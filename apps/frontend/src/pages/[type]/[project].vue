@@ -1576,9 +1576,12 @@ const createGalleryItemMutation = useMutation({
 				created: new Date().toISOString(),
 				ordering: ordering ?? old.gallery.length,
 			}
+			const gallery = featured
+				? old.gallery.map((item) => (item.featured ? { ...item, featured: false } : item))
+				: old.gallery
 			return {
 				...old,
-				gallery: [...old.gallery, newItem],
+				gallery: [...gallery, newItem],
 			}
 		})
 
@@ -1626,7 +1629,7 @@ const editGalleryItemMutation = useMutation({
 							ordering: ordering ?? item.ordering,
 						}
 					}
-					return item
+					return featured && item.featured ? { ...item, featured: false } : item
 				}),
 			}
 		})

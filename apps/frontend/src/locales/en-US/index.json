@@ -4643,9 +4643,6 @@
   "project.settings.gallery.banner-description": {
     "message": "You can feature one image on your project to be used as a banner image."
   },
-  "project.settings.gallery.current-image": {
-    "message": "Current image"
-  },
   "project.settings.gallery.date-created": {
     "message": "Date created"
   },
@@ -4667,20 +4664,29 @@
   "project.settings.gallery.image-alt": {
     "message": "gallery-image"
   },
+  "project.settings.gallery.image-title": {
+    "message": "Title"
+  },
+  "project.settings.gallery.invalid-file-description": {
+    "message": "{filename} must be a PNG, JPEG, GIF, or WebP image."
+  },
+  "project.settings.gallery.invalid-file-title": {
+    "message": "Unsupported image type"
+  },
   "project.settings.gallery.next-image": {
     "message": "Next image"
-  },
-  "project.settings.gallery.order": {
-    "message": "Order Index"
-  },
-  "project.settings.gallery.order-placeholder": {
-    "message": "Enter order index..."
   },
   "project.settings.gallery.preview-alt": {
     "message": "gallery-preview"
   },
   "project.settings.gallery.previous-image": {
     "message": "Previous image"
+  },
+  "project.settings.gallery.reorder-error": {
+    "message": "Could not save the gallery order"
+  },
+  "project.settings.gallery.reorder-image": {
+    "message": "Reorder image. Drag or use the arrow keys."
   },
   "project.settings.gallery.replace": {
     "message": "Replace"
@@ -4690,9 +4696,6 @@
   },
   "project.settings.gallery.set-banner": {
     "message": "Set as banner"
-  },
-  "project.settings.gallery.title": {
-    "message": "Title"
   },
   "project.settings.gallery.title-placeholder": {
     "message": "Enter title..."
@@ -4704,13 +4707,13 @@
     "message": "Unset as banner"
   },
   "project.settings.gallery.upload": {
-    "message": "Upload an image"
+    "message": "Upload images"
   },
-  "project.settings.gallery.upload-hint": {
-    "message": "Click to choose an image or drag one onto this page"
+  "project.settings.gallery.upload-progress": {
+    "message": "{current, number} of {total, number}"
   },
   "project.settings.gallery.upload-title": {
-    "message": "Upload gallery image"
+    "message": "Add to gallery"
   },
   "project.settings.license.all-rights": {
     "message": "All Rights Reserved/No License"

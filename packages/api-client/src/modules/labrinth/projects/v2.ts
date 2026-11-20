@@ -217,7 +217,7 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 		id: string,
 		url: string,
 		options: {
-			featured: boolean
+			featured?: boolean
 			title?: string
 			description?: string
 			ordering?: number
@@ -225,8 +225,8 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 	): Promise<void> {
 		const params: Record<string, string> = {
 			url,
-			featured: String(options.featured),
 		}
+		if (options.featured !== undefined) params.featured = String(options.featured)
 		if (options.title) params.title = options.title
 		if (options.description) params.description = options.description
 		if (options.ordering !== undefined) params.ordering = String(options.ordering)

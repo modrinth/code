@@ -8,7 +8,13 @@ import {
 	RightArrowIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonLink, commonMessages, IconButton, useVIntl } from '@modrinth/ui'
+import {
+	ButtonLink,
+	commonMessages,
+	galleryCardMessages,
+	IconButton,
+	useVIntl,
+} from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
 import { computed, useTemplateRef } from 'vue'
 
@@ -45,7 +51,7 @@ useEventListener(ownerDocument, 'keydown', (event) => {
 				class="image"
 				:class="{ 'zoomed-in': zoomedIn }"
 				:src="item.raw_url ? item.raw_url : 'https://cdn.modrinth.com/placeholder-banner.svg'"
-				:alt="item.title ? item.title : formatMessage(messages.imageAlt)"
+				:alt="item.title || formatMessage(galleryCardMessages.imageAlt)"
 				@click.stop
 			/>
 
