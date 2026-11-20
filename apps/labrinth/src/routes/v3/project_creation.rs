@@ -1054,7 +1054,7 @@ async fn project_create_inner(
             &mut *transaction,
         )
         .await
-        .wrap_internal_err("failed to record project creation history")?;
+        .internal_context("failed to record project creation history")?;
         DBUser::clear_project_cache(&[current_user.user.id.into()], redis)
             .await?;
 

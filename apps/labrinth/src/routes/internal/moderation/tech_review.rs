@@ -1303,9 +1303,7 @@ pub async fn submit_report(
                 &mut txn,
             )
             .await
-            .wrap_internal_err(
-                "recording technical review in-review history",
-            )?;
+            .internal_context("recording technical review in-review history")?;
         }
 
         let old_review_outcome =
@@ -1322,7 +1320,7 @@ pub async fn submit_report(
                 &mut txn,
             )
             .await
-            .wrap_internal_err("recording technical review outcome history")?;
+            .internal_context("recording technical review outcome history")?;
         }
 
         ThreadMessageBuilder {

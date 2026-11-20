@@ -381,7 +381,7 @@ impl DBProject {
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err("fetching project history")?;
+        .context("fetching project history")?;
         Ok(rows
             .into_iter()
             .map(|row| ProjectHistoryEntry {
@@ -401,7 +401,7 @@ impl DBProject {
         transaction: &mut PgTransaction<'_>,
     ) -> Result<()> {
         let delta = serde_json::to_value(delta)
-            .wrap_err("serializing project history delta")?;
+            .context("serializing project history delta")?;
         sqlx::query!(
             r#"
             INSERT INTO project_history (project_id, done_by, delta)
@@ -413,7 +413,7 @@ impl DBProject {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("recording project history")?;
+        .context("recording project history")?;
         Ok(())
     }
 
