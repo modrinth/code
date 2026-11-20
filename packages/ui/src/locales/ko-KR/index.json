@@ -680,18 +680,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "이 콘텐츠를 서버에 설치합니다."
   },
-  "content.filter.disabled": {
-    "defaultMessage": "비활성화"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "활성화"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "업데이트"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "경고"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "백업 생성 중..."
   },
@@ -809,14 +797,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "추가 콘텐츠"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "콘텐츠 탐색"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "작업이 완료될 때까지 기다린 후 콘텐츠를 편집하세요."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "{contentType}를 업로드하거나 탐색하여 시작"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "이 모드팩에 추가 콘텐츠 추가"
@@ -838,9 +820,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "필터"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "콘텐츠 불러오는 중..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "콘텐츠를 찾을 수 없습니다."
@@ -877,9 +856,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "오래된순"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "{mode}으로 정렬"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "모두 업데이트"
@@ -2146,9 +2122,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "모드팩 콘텐츠 불러오기 실패"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "버전 불러오기 실패"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "콘텐츠 제거 실패"
@@ -8652,4 +8625,3 @@
     "defaultMessage": "유형"
   }
 }
-

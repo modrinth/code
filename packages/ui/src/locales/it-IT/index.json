@@ -680,18 +680,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Installa il contenuto nel server."
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Disabilitati"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Abilitati"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Aggiornamenti"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Avvisi"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Creando il backup..."
   },
@@ -809,14 +797,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Contenuto aggiuntivo"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Sfoglia i contenuti"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Aspetta che l'operazione giunga al termine prima di modificare i contenuti."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Inizia esplorando o caricando {contentType}"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Aggiungi del contenuto aggiuntivo a questo pacchetto"
@@ -838,9 +820,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtro"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Caricamento contenuti..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Nessun contenuto trovato."
@@ -877,9 +856,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Meno recenti prima"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Ordina per {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Aggiorna tutto"
@@ -2146,9 +2122,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Errore nel caricamento dei contenuti del pacchetto"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Errore nel caricamento delle versioni"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Errore nella rimozione dei contenuti"
@@ -8652,4 +8625,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

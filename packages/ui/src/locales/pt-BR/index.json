@@ -680,18 +680,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Instale este conteúdo no seu servidor."
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Desativado"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Ativado"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Atualizações"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Avisos"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Criando cópia de segurança..."
   },
@@ -809,14 +797,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Conteúdo adicional"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Explorar conteúdo"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Aguarde a conclusão da operação antes de editar o conteúdo."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Explore ou envie {contentType} para começar"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Adicionar conteúdo adicional a este pacote de mods"
@@ -838,9 +820,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtros"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Carregando conteúdo..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Nenhum conteúdo encontrado."
@@ -877,9 +856,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Mais antigos primeiro"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Ordenar por {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Atualizar tudo"
@@ -2146,9 +2122,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Falha ao carregar o conteúdo do pacote de mods"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Falha ao carregar as versões"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Falha ao remover o conteúdo"

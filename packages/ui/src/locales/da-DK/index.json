@@ -320,12 +320,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} opdateret"
   },
-  "content.filter.updates": {
-    "defaultMessage": "Opdateringer"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Advarsler"
-  },
   "content.inline-backup.instance-label": {
     "defaultMessage": "instans"
   },
@@ -343,9 +337,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Ældst først"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sorter efter {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Opdater alle"
@@ -2139,4 +2130,3 @@
     "defaultMessage": "Du har ændringer, der ikke er gemt"
   }
 }
-

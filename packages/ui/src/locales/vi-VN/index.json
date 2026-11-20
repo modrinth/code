@@ -506,18 +506,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} đã được cập nhật"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Đang tắt"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Đang bật"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Cần cập nhật"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Cảnh báo"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Đang tạo bản sao lưu..."
   },
@@ -623,14 +611,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Mod bổ sung"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Thêm mod"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Vui lòng chờ quá trình xử lý hoàn tất trước khi chỉnh sửa nội dung."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Thêm hoặc tải lên {contentType} để bắt đầu"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Thêm mod vào modpack này"
@@ -652,9 +634,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Bộ lọc"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Đang tải nội dung..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Không có nội dung nào được tìm thấy."
@@ -691,9 +670,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Cũ nhất"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sắp xếp theo {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Cập nhật tất cả"
@@ -1864,9 +1840,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Không thể tải nội dung của modpack"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Lỗi load phiên bản"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Không thể xóa nội dung"
@@ -7011,4 +6984,3 @@
     "defaultMessage": "Loại"
   }
 }
-

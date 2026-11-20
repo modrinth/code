@@ -512,18 +512,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} 件更新されました"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "無効化済み"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "有効化済み"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "更新"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "警告"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "バックアップを作成中…"
   },
@@ -629,14 +617,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "追加のコンテンツ"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "コンテンツを探す"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "コンテンツを編集する前に、操作の完了をお待ちください。"
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "{contentType}を検索またはアップロードしてみましょう"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "このModパックに追加コンテンツを導入できます"
@@ -658,9 +640,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "フィルター"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "コンテンツを読み込んでいます…"
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "コンテンツが見つかりませんでした。"
@@ -697,9 +676,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "古い順"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "{mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "すべて更新"
@@ -1870,9 +1846,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Modパックコンテンツの読み込みに失敗しました"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "バージョンの読み込みに失敗しました"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "コンテンツの削除に失敗しました"
@@ -6276,4 +6249,3 @@
     "defaultMessage": "タイプ"
   }
 }
-

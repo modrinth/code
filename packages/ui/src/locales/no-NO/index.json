@@ -389,14 +389,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Yttligere innhold"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Gå gjennom innhold"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Vær så snill å vent til operasjonen er fullført før du redigerer innhold."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Gå gjennom eller last opp {contentType} for å komme i gang"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Legg til yttligere innhold på toppen av denne modpakka"
@@ -421,9 +415,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Eldste først"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sorter etter {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Oppdater alle"
@@ -2724,4 +2715,3 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
-

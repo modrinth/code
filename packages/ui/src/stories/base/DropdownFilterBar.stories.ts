@@ -1,4 +1,4 @@
-import { BoxIcon } from '@modrinth/assets'
+import { BoxIcon, FilterIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
@@ -296,6 +296,37 @@ export const WithFilterIcon: Story = {
 		},
 		categories: defaultCategories,
 		useFilterIcon: true,
+	},
+}
+
+export const IconTrigger: Story = {
+	render: () => ({
+		components: { DropdownFilterBar, FilterIcon },
+		setup() {
+			const selected = ref<Record<string, string[]>>({})
+			return { categories: defaultCategories, selected }
+		},
+		template: /* html */ `
+			<div class="flex flex-wrap items-center justify-end gap-2">
+				<DropdownFilterBar
+					v-model="selected"
+					:categories="categories"
+					:show-label="false"
+					add-label="Filter"
+					add-button-class="!size-10 !p-0 !border-0 !shadow-none"
+					menu-align="end"
+					apply-immediately
+				>
+					<template #add-button>
+						<FilterIcon />
+					</template>
+				</DropdownFilterBar>
+			</div>
+		`,
+	}),
+	args: {
+		modelValue: {},
+		categories: defaultCategories,
 	},
 }
 

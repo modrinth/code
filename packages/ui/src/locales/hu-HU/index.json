@@ -560,18 +560,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} frissítve"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Letiltott"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Engedélyezett"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Frissítések"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Figyelmeztetések"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Biztonsági mentés létrehozása..."
   },
@@ -677,14 +665,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "További tartalom"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Tartalom böngészése"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Kérlek várd meg a művelet befejezését a tartalom szerkesztése előtt."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Böngéssz vagy tölts fel projekteket a kezdéshez"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "További tartalom hozzáadása ehhez a modcsomaghoz"
@@ -706,9 +688,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Szűrő"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Tartalom betöltése..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Nincsen tartalom."
@@ -745,9 +724,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Legrégebbiek elöl"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Rendezés {mode} szerint"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Összes frissítése"
@@ -1906,9 +1882,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "A modcsomag tartalmának betöltése nem sikerült"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "A verziók betöltése nem sikerült"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "A tartalom eltávolítása sikertelen volt"

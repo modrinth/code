@@ -563,18 +563,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} bijgewerkt"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Uitgeschakeld"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Ingeschakeld"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Updates"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Waarschuwingen"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Backup aan het maken..."
   },
@@ -680,14 +668,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Extra inhoud"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Inhoud doorbladeren"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Wacht alsjeblieft tot de bewerking is voltooid voordat je de inhoud bewerkt."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Blader door of upload {contentType} om aan de slag te gaan"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Voeg extra inhoud toe aan dit modpack"
@@ -709,9 +691,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Inhoud aan het laden..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Geen inhoud gevonden."
@@ -748,9 +727,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Oudste eerst"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sorteer op {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Werk alles bij"
@@ -1921,9 +1897,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Het laden van de modpack-inhoud is mislukt"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Het laden van versies is mislukt"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Het verwijderen van inhoud is mislukt"

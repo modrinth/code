@@ -8,3 +8,8 @@ export async function pickDirectory(title: string): Promise<string | null> {
 export function pickFile(): Promise<string | null> {
 	return open({ multiple: false, directory: false })
 }
+
+export async function pickFiles(): Promise<string[]> {
+	const files = await open({ multiple: true })
+	return files ?? []
+}

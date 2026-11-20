@@ -74,6 +74,7 @@
 			</div>
 		</div>
 		<EmptyState
+			:icon="ReceiptTextIcon"
 			v-else
 			:heading="formatMessage(messages.noTransactions)"
 			:description="formatMessage(messages.noTransactionsDesc)"
@@ -86,6 +87,7 @@ import {
 	ArrowUpRightIcon,
 	DownloadIcon,
 	GenericListIcon,
+	ReceiptTextIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
 import {

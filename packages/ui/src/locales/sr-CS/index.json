@@ -506,18 +506,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} ažuiralo"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Onemogućeno"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Omogućeno"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Ažuiranja"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Upozorenja"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Pravljenje backupa..."
   },
@@ -623,14 +611,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Dodatni sadržaj"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Pregledaj sadržaje"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Molimo sačekaj da se operacija završi pre nego što promeniš sadržaj."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Pregledaj ili postavi {contentType} da bi započeo"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Dodaj dodatni sadržaj preko ovog modpacka"
@@ -649,9 +631,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Učitavanje sadržaja..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Nema pronađenog sadržaja."
@@ -688,9 +667,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Najstarije prvo"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortiraj so {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Ažuiraj sve"
@@ -1855,9 +1831,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Nije uspelo učitavanje sadržaja modpacka"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Greška sa učitavanjem verzija"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Greška sa brisanjem sadržaja"
@@ -6174,4 +6147,3 @@
     "defaultMessage": "Tip"
   }
 }
-

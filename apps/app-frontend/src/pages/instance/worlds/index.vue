@@ -106,7 +106,7 @@
 		</div>
 		<EmptyState
 			v-else
-			type="empty-inbox"
+			:icon="WorldIcon"
 			:heading="formatMessage(messages.noWorldsHeading)"
 			:description="formatMessage(messages.noWorldsDescription)"
 		>
@@ -124,7 +124,7 @@
 	</ReadyTransition>
 </template>
 <script setup lang="ts">
-import { CompassIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
+import { CompassIcon, PlusIcon, RefreshCwIcon, SearchIcon, WorldIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import {
 	commonMessages,

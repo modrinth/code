@@ -539,18 +539,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "Aktualizováno {count}"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Vypnutý"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Zapnutý"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Aktualizace"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Varování"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Vytvářim zálohu..."
   },
@@ -653,14 +641,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Dodatečný obsah"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Prozkoumat"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Před úpravou obsahu prosím počkej, až se operace dokončí."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Pro začátek prozkoumej nebo nahraj {contentType}"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Přidejte další obsah k tomuto modpacku"
@@ -679,9 +661,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Třídit podle"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Načítání obsahu..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Nebyl nalezen obsah."
@@ -718,9 +697,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Od nejstarších"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Seřadit {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Aktualizovat vše"
@@ -1822,9 +1798,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Obsah modpacku se nepodařilo načíst"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Verze se nepodařilo načíst"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Obsah se nepodařilo odebrat"
@@ -5115,4 +5088,3 @@
     "defaultMessage": "Typ"
   }
 }
-

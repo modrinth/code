@@ -527,18 +527,6 @@
   "content.enabled-for.player-only-filter": {
     "defaultMessage": "Solo para jugadores"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Deshabilitados"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Habilitados"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Actualizaciones"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Advertencias"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Creando copia de seguridad..."
   },
@@ -644,14 +632,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Contenido adicional"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Explorar el contenido"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Por favor, espere a que finalice la operación antes de editar el contenido."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Explora o sube {contentType} para empezar"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Añade contenido adicional a este modpack"
@@ -673,9 +655,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtro"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Cargando contenido..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "No se ha encontrado ningún contenido."
@@ -712,9 +691,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Más antiguo primero"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Ordenar por {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Actualizar todo"
@@ -1879,9 +1855,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "No se ha podido cargar el contenido del modpack"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "No se han podido cargar las versiones"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "No se ha podido eliminar el contenido"

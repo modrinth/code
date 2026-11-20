@@ -49,6 +49,7 @@
 
 		<SharedInstanceShareEmptyState
 			v-if="unableToConnect"
+			:icon="UnplugIcon"
 			:heading="formatMessage(messages.unableToConnectHeading)"
 			:description="formatMessage(messages.unableToConnectDescription)"
 		/>
@@ -59,6 +60,7 @@
 
 		<SharedInstanceShareEmptyState
 			v-else-if="sharedInstanceActionsLocked"
+			:icon="UserLockIcon"
 			:heading="formatMessage(lockedEmptyHeading)"
 		>
 			<template #description>
@@ -93,6 +95,7 @@
 
 		<SharedInstanceShareEmptyState
 			v-else-if="sharedInstanceLimitReached && !instance.shared_instance"
+			:icon="CircleSlashIcon"
 			:heading="formatMessage(messages.limitReachedHeading)"
 			:description="
 				ownedSharedInstanceLimit.max.value === null
@@ -114,6 +117,7 @@
 		<SharedInstanceShareEmptyState
 			v-else
 			:heading="formatMessage(messages.noFriendsInvitedHeading)"
+			:icon="UsersIcon"
 			:description="formatMessage(messages.noFriendsInvitedDescription)"
 		>
 			<template #actions>
@@ -138,7 +142,16 @@
 </template>
 
 <script setup lang="ts">
-import { LibraryIcon, LogInIcon, SpinnerIcon, UserPlusIcon } from '@modrinth/assets'
+import {
+	CircleSlashIcon,
+	LibraryIcon,
+	LogInIcon,
+	SpinnerIcon,
+	UnplugIcon,
+	UserLockIcon,
+	UserPlusIcon,
+	UsersIcon,
+} from '@modrinth/assets'
 import {
 	Avatar,
 	Button,

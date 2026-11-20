@@ -1,3 +1,4 @@
+export * from './animated-width'
 export * from './debug-logger'
 export * from './dynamic-font-size'
 export * from './file-drop'

@@ -87,7 +87,7 @@
 
 				<EmptyState
 					v-if="completedBackups.length === 0"
-					type="empty-inbox"
+					:icon="DatabaseBackupIcon"
 					:heading="formatMessage(messages.emptyHeading)"
 					:description="formatMessage(messages.emptyDescription)"
 				/>
@@ -174,6 +174,7 @@
 import type { Archon } from '@modrinth/api-client'
 import {
 	CalendarClockIcon,
+	DatabaseBackupIcon,
 	DownloadIcon,
 	IssuesIcon,
 	PlusIcon,

@@ -1,4 +1,6 @@
-import type { ComputedRef, Ref } from 'vue'
+import type { Labrinth } from '@modrinth/api-client'
+import type { Ref } from 'vue'
+import type { RouteLocationRaw } from 'vue-router'
 
 import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import type { UpdateAllSelection } from '#ui/components/modal/update-all-modal/update-all-modal-types'
@@ -6,17 +8,14 @@ import { createContext } from '#ui/providers/create-context'
 
 import type {
 	ContentActionWarning,
-	ContentCardTableItem,
+	ContentConfirmResult,
 	ContentItem,
+	ContentOwner,
+	ContentPermissions,
 	ContentSide,
-	ManagedContentCardData,
+	ContentType,
+	ManagedContent,
 } from '../types'
-
-export interface ManagedContentData {
-	card: ManagedContentCardData
-	disabled?: boolean
-	disabledText?: string
-}
 
 export interface ContentDependencyWarning {
 	items: ContentItem[]
@@ -27,92 +26,56 @@ export interface ContentDependencyWarning {
 }
 
 export interface ContentManagerContext {
-	// Data
-	items: Ref<ContentItem[]> | ComputedRef<ContentItem[]>
-	loading: Ref<boolean>
-	error: Ref<Error | null>
-
-	// Managed content
-	managedContent: Ref<ManagedContentData | null> | ComputedRef<ManagedContentData | null>
-	isPackLocked: Ref<boolean> | ComputedRef<boolean>
-
-	// Guards
-	isBusy: Ref<boolean> | ComputedRef<boolean>
-	busyMessage?: Ref<string | null> | ComputedRef<string | null>
-	disableWhileMutating?: boolean
-	skipNonEssentialWarnings?: Ref<boolean> | ComputedRef<boolean>
-	disableAddContent?: Ref<boolean> | ComputedRef<boolean>
-	disableAddContentTooltip?: string
-
-	// Labelling
-	contentTypeLabel: Ref<string> | ComputedRef<string>
-	currentGameVersion?: Ref<string> | ComputedRef<string>
-	currentLoader?: Ref<string> | ComputedRef<string>
-
-	// Core actions
-	toggleEnabled?: (item: ContentItem) => Promise<void>
-	setEnabledFor?: (item: ContentItem, side: ContentSide, enabled: boolean) => Promise<void>
-	deleteItem: (item: ContentItem) => Promise<void>
+	items: Readonly<Ref<ContentItem[]>>
+	loading: Readonly<Ref<boolean>>
+	error: Readonly<Ref<Error | null>>
 	refresh: () => Promise<void>
-	browse: () => void
-	uploadFiles: () => void
 
-	// Bulk actions (optional — when provided, used instead of one-by-one loops)
-	bulkDeleteItems?: (items: ContentItem[]) => Promise<void>
-	bulkEnableItems?: (items: ContentItem[]) => Promise<void>
-	bulkDisableItems?: (items: ContentItem[]) => Promise<void>
-	canDeleteItem?: (item: ContentItem) => boolean
-	canToggleItem?: (item: ContentItem) => boolean
-	getDeleteWarning?: (items: ContentItem[]) => ContentActionWarning | null
-	getDisableWarning?: (items: ContentItem[]) => ContentActionWarning | null
-	confirmAction?: (action: 'enable' | 'disable', items: ContentItem[]) => Promise<boolean>
-	confirmDeleteItems?: (items: ContentItem[]) => Promise<boolean | undefined>
-	getDeleteDependencyWarning?: (
+	types: Readonly<Ref<ContentType[]>>
+	target: Readonly<Ref<{ kind: 'instance' | 'server'; gameVersion: string; loader: string }>>
+	busy: Readonly<Ref<{ message?: string } | null>>
+
+	permissions: (item: ContentItem) => ContentPermissions
+	canAdd: Readonly<Ref<boolean>>
+	addDeniedReason?: string
+	warn?: (action: 'remove' | 'disable', items: ContentItem[]) => ContentActionWarning | null
+	confirm?: (
+		action: 'enable' | 'disable' | 'remove',
 		items: ContentItem[],
-	) => ContentDependencyWarning | null | Promise<ContentDependencyWarning | null>
+	) => Promise<ContentConfirmResult>
+	skipOptionalConfirms?: Readonly<Ref<boolean>>
 
-	// Update support (optional per-platform)
-	hasUpdateSupport: boolean
-	bulkUpdatesInBackground?: boolean
-	updateItem?: (id: string) => void
-	bulkUpdateSelections?: (
+	setEnabled: (items: ContentItem[], enabled: boolean) => Promise<void>
+	remove: (items: ContentItem[]) => Promise<void>
+	findDependents?: (items: ContentItem[]) => Promise<ContentDependencyWarning | null>
+	setEnabledFor?: (item: ContentItem, side: ContentSide, enabled: boolean) => Promise<void>
+
+	installVersion?: (item: ContentItem, version: Labrinth.Versions.v2.Version) => Promise<void>
+	fetchProjectVersions?: (projectId: string) => Promise<Labrinth.Versions.v2.Version[]>
+	fetchVersion?: (versionId: string) => Promise<Labrinth.Versions.v2.Version>
+	applyUpdates?: (
 		selections: UpdateAllSelection[],
 		onProgress?: (completed: number) => void,
 	) => Promise<void>
+	updatesRunInBackground?: boolean
 
-	// Managed-content actions (optional)
-	runManagedContentPrimaryAction?: (event?: MouseEvent) => void
-	viewManagedContent?: () => void
-	unlinkModpack?: () => void
-	openManagedContentSettings?: () => void
+	browse: (type?: ContentType) => void
+	upload: () => void
 
-	// Switch version (optional)
-	switchVersion?: (item: ContentItem) => void
+	managed: Readonly<Ref<ManagedContent | null>>
 
-	// Per-item overflow menu (optional)
-	getOverflowOptions?: (item: ContentItem) => ButtonMenuOption[]
+	links: {
+		project: (item: ContentItem) => string | RouteLocationRaw | undefined
+		version: (item: ContentItem) => string | RouteLocationRaw | undefined
+		owner: (owner: ContentOwner) => ContentOwner['link']
+	}
+	menu?: (item: ContentItem) => ButtonMenuOption[]
+	share?: (items: ContentItem[], format: 'names' | 'file-names' | 'urls' | 'markdown') => void
+	persistKey?: string
 
-	// Share support (optional — when undefined, share button becomes hidden entirely)
-	shareItems?: (items: ContentItem[], format: 'names' | 'file-names' | 'urls' | 'markdown') => void
-
-	// Stable per-row identity. ContentItem.id can be a content hash, so it is not always unique.
-	getItemId?: (item: ContentItem) => string
-
-	// Bulk operation guard — set by layout, checked by providers to suppress refreshes
-	isBulkOperating?: Ref<boolean>
-
-	// Deletion context (controls modal variant)
-	deletionContext?: 'instance' | 'server'
-	showEnvironmentWarnings?: boolean
-
-	// Table item mapping (link generation differs per platform)
-	mapToTableItem: (item: ContentItem) => ContentCardTableItem
-
-	// Filter persistence key — when set, filter and sort settings are saved/restored via sessionStorage
-	filterPersistKey?: string
-	// Route query param the search box syncs to, so back navigation restores the search
 	searchQueryParam?: string
-	showSharedContentFilter?: Ref<boolean> | ComputedRef<boolean>
+	showSharedContentFilter?: Readonly<Ref<boolean>>
+	disableWhileMutating?: boolean
 }
 
 export const [injectContentManager, provideContentManager] = createContext<ContentManagerContext>(

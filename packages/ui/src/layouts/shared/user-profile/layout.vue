@@ -275,7 +275,7 @@
 
 				<EmptyState
 					v-if="showProjectsEmptyState"
-					type="empty"
+					:icon="BoxesIcon"
 					:heading="formatMessage(messages.profileNoProjectsLabel)"
 					:description="
 						isSelf ? formatMessage(messages.profileNoProjectsAuthDescription) : undefined
@@ -357,7 +357,7 @@
 
 				<EmptyState
 					v-if="showCollectionsEmptyState"
-					type="empty"
+					:icon="LibraryIcon"
 					:heading="formatMessage(messages.profileNoCollectionsLabel)"
 					:description="
 						isSelf ? formatMessage(messages.profileNoCollectionsAuthDescription) : undefined
@@ -413,7 +413,7 @@
 
 	<div v-else class="flex min-h-[24rem] items-center justify-center p-6">
 		<EmptyState
-			type="error"
+			:icon="UserXIcon"
 			:heading="formatMessage(messages.userNotFoundError)"
 			:description="formatMessage(messages.userLoadErrorDescription)"
 		>
@@ -430,6 +430,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	BanIcon,
+	BoxesIcon,
 	BoxIcon,
 	CheckIcon,
 	GlobeIcon,
@@ -437,6 +438,7 @@ import {
 	LinkIcon,
 	LockIcon,
 	SpinnerIcon,
+	UserXIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {

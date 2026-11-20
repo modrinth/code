@@ -1,6 +1,5 @@
-import { useSessionStorage } from '@vueuse/core'
 import type { Ref } from 'vue'
-import { computed, ref, watch } from 'vue'
+import { computed, watch } from 'vue'
 
 import type {
 	DropdownFilterBarCategory,
@@ -159,13 +158,10 @@ const messages = defineMessages({
 
 export function useContentMetadataFilters(
 	items: Ref<ContentItem[]>,
-	persistKey?: string,
+	selectedMetadataFilters: Ref<ContentMetadataFilterValue>,
 	config?: ContentMetadataFilterConfig,
 ) {
 	const { formatMessage } = useVIntl()
-	const selectedMetadataFilters = persistKey
-		? useSessionStorage<ContentMetadataFilterValue>(`content-metadata-filters:${persistKey}`, {})
-		: ref<ContentMetadataFilterValue>({})
 	const savedEnabledFor = selectedMetadataFilters.value.enabled_for
 	if (savedEnabledFor?.some((value) => value === 'server' || value === 'player')) {
 		selectedMetadataFilters.value = {

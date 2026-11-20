@@ -64,17 +64,13 @@
 			<template v-if="lastSearchKind !== 'none'">
 				<template v-if="lookupNeedsInput">
 					<EmptyState
-						type="no-search-result"
+						:icon="HashIcon"
 						:heading="lookupEmptyHeading"
 						:description="lookupEmptyDescription"
 					/>
 				</template>
 				<template v-else>
-					<EmptyState
-						v-if="isLoading"
-						type="no-search-result"
-						heading="Loading external projects..."
-					/>
+					<EmptyState v-if="isLoading" :icon="ClockIcon" heading="Loading external projects..." />
 					<div v-else-if="displayProjects.length > 0" class="mt-4 flex flex-col gap-3">
 						<ExternalProjectLookupCard
 							v-for="project in displayProjects"
@@ -95,12 +91,12 @@
 							</template>
 						</ExternalProjectLookupCard>
 					</div>
-					<EmptyState v-else type="no-search-result" :heading="noResultsHeading" />
+					<EmptyState v-else :icon="PackageSearchIcon" :heading="noResultsHeading" />
 				</template>
 			</template>
 			<EmptyState
 				v-else
-				type="no-search-result"
+				:icon="TextSearchIcon"
 				heading="Enter a search term to get started"
 				description="Type at least 3 characters of a project's title to begin browsing."
 			/>
@@ -109,7 +105,15 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { BinaryIcon, EditIcon, HashIcon, SearchIcon } from '@modrinth/assets'
+import {
+	BinaryIcon,
+	ClockIcon,
+	EditIcon,
+	HashIcon,
+	PackageSearchIcon,
+	SearchIcon,
+	TextSearchIcon,
+} from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import {
 	Combobox,

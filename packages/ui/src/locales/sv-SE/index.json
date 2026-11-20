@@ -569,18 +569,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Installera innehållet på din server."
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Inaktiverat"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Aktiverat"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Uppdateringar"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Varningar"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Skapar säkerhetskopia..."
   },
@@ -686,14 +674,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Ytterligare innehåll"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Utforska innehåll"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Vänta på att operationen klaras innan du redigerar innehåll."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Hitta eller ladda upp {contentType} för att börja"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Lägg till ytterligare innehåll över modpaketet"
@@ -709,9 +691,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Läser in innehåll..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Inget innehåll hittades."
@@ -748,9 +727,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Äldsta först"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortera i {mode} ordning"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Uppdatera alla"
@@ -1891,9 +1867,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Kunde inte ladda modpaketets innehåll"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Kunde inte ladda versionerna"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Kunde inte radera innehållet"
