@@ -97,11 +97,14 @@ impl actix_web::ResponseError for OAuthError {
                 "{}?error={}&error_description={}",
                 redirect_uri,
                 self.error_type.error_name(),
-                self.error_type,
+                urlencoding::encode(&self.error_type.to_string()),
             );
 
             if let Some(state) = self.state.as_ref() {
-                redirect_uri = format!("{redirect_uri}&state={state}");
+                redirect_uri = format!(
+                    "{redirect_uri}&state={}",
+                    urlencoding::encode(state)
+                );
             }
 
             HttpResponse::Ok()
@@ -195,5 +198,52 @@ impl OAuthErrorType {
             Self::AccessDenied => "access_denied",
         }
         .to_string()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use actix_web::ResponseError;
+
+    fn redirect_location(
+        error_type: OAuthErrorType,
+        state: Option<String>,
+    ) -> String {
+        OAuthError {
+            error_type: Box::new(error_type),
+            state,
+            valid_redirect_uri: Some(ValidatedRedirectUri(
+                "https://client.example/callback".to_string(),
+            )),
+        }
+        .error_response()
+        .headers()
+        .get(LOCATION)
+        .expect("error response should redirect")
+        .to_str()
+        .expect("location should be ascii")
+        .to_string()
+    }
+
+    #[test]
+    fn error_redirect_percent_encodes_state() {
+        let location = redirect_location(
+            OAuthErrorType::AccessDenied,
+            Some("a&injected=1#frag".to_string()),
+        );
+
+        assert!(location.contains("&state=a%26injected%3D1%23frag"));
+        assert!(!location.contains("injected=1"));
+    }
+
+    #[test]
+    fn error_redirect_percent_encodes_error_description() {
+        let location = redirect_location(OAuthErrorType::ScopesTooBroad, None);
+
+        assert!(location.contains(
+            "error_description=The%20provided%20scope%20requested%20scopes%20broader"
+        ));
+        assert!(!location.contains(' '));
     }
 }

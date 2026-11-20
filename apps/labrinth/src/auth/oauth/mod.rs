@@ -474,7 +474,7 @@ async fn init_oauth_code_flow(
 
     let mut redirect_params = vec![format!("code={code}")];
     if let Some(state) = state {
-        redirect_params.push(format!("state={state}"));
+        redirect_params.push(format!("state={}", urlencoding::encode(&state)));
     }
 
     let redirect_uri =
