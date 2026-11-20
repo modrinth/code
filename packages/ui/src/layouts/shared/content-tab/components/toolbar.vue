@@ -2,7 +2,7 @@
 import { DownloadIcon, PlusIcon, RefreshCwIcon, SearchIcon, UploadIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import { Button, type ButtonMenuOption, IconButton, SplitButton } from '#ui/components/base/buttons'
+import { type ButtonMenuOption, IconButton, SplitButton } from '#ui/components/base/buttons'
 import type { DropdownFilterBarCategory } from '#ui/components/base/DropdownFilterBar.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -12,6 +12,7 @@ import type { ContentSortMode } from '../composables/content-sort'
 import type { ContentMetadataFilterValue } from '../composables/use-content-metadata-filters'
 import type { ContentType } from '../types'
 import FilterRow from './filter-row.vue'
+import TypeTabs from './type-tabs.vue'
 
 const props = defineProps<{
 	searchPlaceholder: string
@@ -65,6 +66,8 @@ const messages = defineMessages({
 	},
 })
 
+const updateAllLabel = computed(() => formatMessage(messages.updateAll))
+
 const refreshLabel = computed(() =>
 	formatMessage(props.refreshing ? messages.refreshing : commonMessages.refreshButton),
 )
@@ -82,23 +85,14 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 
 <template>
 	<div class="flex flex-col gap-4">
-		<div class="flex items-center gap-2">
-			<Input
-				v-model="search"
-				:icon="SearchIcon"
-				type="text"
-				autocomplete="off"
-				:spellcheck="false"
-				size="medium"
-				wrapper-class="flex-1 min-w-0"
-				clearable
-				:placeholder="searchPlaceholder"
-			/>
+		<div class="flex items-center justify-between gap-2">
+			<TypeTabs v-if="types.length > 1" v-model="type" :types="types" />
 			<SplitButton
 				v-tooltip="addTooltip"
 				type="colored"
 				color="brand"
 				size="lg"
+				class="ml-auto"
 				:options="addOptions"
 				:menu-label="formatMessage(messages.moreAddOptions)"
 				:disabled="addDisabled"
@@ -117,22 +111,38 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 			:filter-categories="filterCategories"
 			:show-date-sort="showDateSort"
 		>
+			<template #leading>
+				<Input
+					v-model="search"
+					:icon="SearchIcon"
+					type="text"
+					autocomplete="off"
+					:spellcheck="false"
+					size="medium"
+					wrapper-class="flex-1 min-w-0"
+					clearable
+					:placeholder="searchPlaceholder"
+				/>
+			</template>
 			<template #actions>
-				<Button
-					v-if="showUpdateAll"
-					v-tooltip="updateAllDisabled ? busyTooltip : undefined"
-					type="quiet"
-					color="green"
-					size="lg"
-					:disabled="updateAllDisabled"
-					class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
-					@click="emit('updateAll')"
-					@mouseenter="emit('prefetchUpdateAll')"
-					@focus="emit('prefetchUpdateAll')"
-				>
-					<DownloadIcon />
-					{{ formatMessage(messages.updateAll) }}
-				</Button>
+				<Transition name="update-all">
+					<div v-if="showUpdateAll" class="flex shrink-0">
+						<IconButton
+							v-tooltip="updateAllDisabled ? busyTooltip : updateAllLabel"
+							type="quiet"
+							color="green"
+							size="lg"
+							:label="updateAllLabel"
+							:disabled="updateAllDisabled"
+							class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+							@click="emit('updateAll')"
+							@mouseenter="emit('prefetchUpdateAll')"
+							@focus="emit('prefetchUpdateAll')"
+						>
+							<DownloadIcon />
+						</IconButton>
+					</div>
+				</Transition>
 				<IconButton
 					v-tooltip="refreshDisabled ? (busyTooltip ?? refreshLabel) : refreshLabel"
 					type="quiet"
@@ -143,7 +153,37 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 				>
 					<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
 				</IconButton>
+				<!-- TODO: grouping
+				<IconButton type="quiet" size="lg" :label="formatMessage(messages.group)">
+					<SquarePlusIcon />
+				</IconButton>
+				-->
 			</template>
 		</FilterRow>
 	</div>
 </template>
+
+<style scoped>
+.update-all-enter-active,
+.update-all-leave-active {
+	overflow: hidden;
+	transition:
+		width 200ms cubic-bezier(0.4, 0, 0.2, 1),
+		margin-left 200ms cubic-bezier(0.4, 0, 0.2, 1),
+		opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.update-all-enter-from,
+.update-all-leave-to {
+	width: 0;
+	margin-left: -0.5rem;
+	opacity: 0;
+}
+
+.update-all-enter-to,
+.update-all-leave-from {
+	width: 2.5rem;
+	margin-left: 0;
+	opacity: 1;
+}
+</style>
