@@ -4,9 +4,14 @@ import {
 	parseServerContentEnvironment,
 	useVIntl,
 } from '@modrinth/ui'
+import type { Ref } from 'vue'
+
+const PLUGIN_LOADERS = ['paper', 'purpur']
 
 /** Project type tabs for the discover pages, filtered to what the current server context allows. */
-export function useDiscoverProjectTypeLinks() {
+export function useDiscoverProjectTypeLinks(
+	serverLoader?: Readonly<Ref<string | null | undefined>>,
+) {
 	const { formatMessage } = useVIntl()
 	const route = useRoute()
 
@@ -16,6 +21,10 @@ export function useDiscoverProjectTypeLinks() {
 			isServerContext.value && ['onboarding', 'reset-server'].includes(String(route.query.from)),
 	)
 	const serverEnvironment = computed(() => parseServerContentEnvironment(route.query.env))
+	const serverSupportsPlugins = computed(() => {
+		const loader = serverLoader?.value?.toLowerCase()
+		return !!loader && PLUGIN_LOADERS.includes(loader)
+	})
 
 	const selectableProjectTypes = [
 		{
@@ -67,6 +76,7 @@ export function useDiscoverProjectTypeLinks() {
 					return ['mods', 'plugins', 'modpacks', 'datapacks'].includes(type.type)
 				}
 				if (!isServerContext.value) return true
+				if (type.type === 'plugins' && !serverSupportsPlugins.value) return false
 				return (
 					!['servers', 'modpacks'].includes(type.type) &&
 					isServerContentEnvironmentProjectType(serverEnvironment.value, type.type.slice(0, -1))

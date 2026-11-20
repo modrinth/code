@@ -7,8 +7,13 @@
 		<slot />
 		<div
 			aria-hidden="true"
-			class="mt-4 h-px bg-surface-4transition-[margin] duration-200 ease-out motion-reduce:transition-none"
+			class="mt-4 h-px bg-surface-4 transition-[margin] duration-200 ease-out motion-reduce:transition-none"
 			:class="{ '-mx-6': isStuck }"
+		/>
+		<div
+			aria-hidden="true"
+			class="pointer-events-none absolute inset-x-0 top-full h-6 bg-gradient-to-b from-surface-1 to-transparent transition-opacity duration-200 motion-reduce:transition-none"
+			:class="isStuck ? 'opacity-100' : 'opacity-0'"
 		/>
 	</div>
 </template>

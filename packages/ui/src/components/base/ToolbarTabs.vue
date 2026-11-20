@@ -16,13 +16,19 @@ const props = defineProps<{
 
 const active = defineModel<T>()
 
-const STAGGER_DELAY = '100ms'
+const SLIDE_DURATION_MS = 200
+const STAGGER_DELAY_MS = 100
+const SLIDE_DURATION = `${SLIDE_DURATION_MS}ms`
+const STAGGER_DELAY = `${STAGGER_DELAY_MS}ms`
 
 const tablist = ref<HTMLElement | null>(null)
 const sliderReady = ref(false)
 const transitionsEnabled = ref(false)
 const slider = ref({ left: 0, top: 0, right: 0, bottom: 0 })
 const sliderDelays = ref({ left: '0ms', top: '0ms', right: '0ms', bottom: '0ms' })
+const sliding = ref(false)
+
+let slideEndTimeout: ReturnType<typeof setTimeout> | undefined
 
 const activeIndex = computed(() => props.tabs.findIndex((tab) => tab.value === active.value))
 
@@ -50,7 +56,10 @@ function positionSlider(animate = true) {
 	const position = getSliderPosition()
 	if (!position) return
 
+	clearTimeout(slideEndTimeout)
+
 	if (!sliderReady.value || !animate) {
+		sliding.value = false
 		transitionsEnabled.value = false
 		slider.value = position
 		sliderReady.value = true
@@ -67,6 +76,8 @@ function positionSlider(animate = true) {
 		bottom: movingUp ? STAGGER_DELAY : '0ms',
 	}
 	slider.value = position
+	sliding.value = true
+	slideEndTimeout = setTimeout(() => (sliding.value = false), SLIDE_DURATION_MS + STAGGER_DELAY_MS)
 }
 
 let resizeObserver: ResizeObserver | undefined
@@ -79,6 +90,7 @@ onMounted(() => {
 
 onUnmounted(() => {
 	resizeObserver?.disconnect()
+	clearTimeout(slideEndTimeout)
 })
 
 watch(activeIndex, async () => {
@@ -87,12 +99,11 @@ watch(activeIndex, async () => {
 })
 
 watch(
-	() => props.tabs,
+	() => props.tabs.map((tab) => `${tab.value}:${tab.label}`).join('|'),
 	async () => {
 		await nextTick()
 		positionSlider(false)
 	},
-	{ deep: true },
 )
 </script>
 
@@ -113,7 +124,7 @@ watch(
 			:aria-selected="active === tab.value"
 			class="toolbar-tab-color no-click-animation relative z-[1] flex h-[34px] shrink-0 items-center whitespace-nowrap rounded-xl border border-solid border-transparent px-3 text-base font-semibold leading-5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
 			:class="[
-				active === tab.value ? 'text-brand' : 'toolbar-tab-hover text-primary',
+				active === tab.value ? 'text-brand' : ['text-primary', { 'toolbar-tab-hover': !sliding }],
 				{ 'toolbar-tab-active': active === tab.value && !sliderReady },
 			]"
 			@click="active = tab.value"
@@ -136,22 +147,26 @@ watch(
 	border-color: color-mix(in srgb, var(--color-brand) 60%, transparent);
 }
 
-.toolbar-tab-hover:hover {
-	background-color: color-mix(in srgb, var(--surface-4) 50%, transparent);
-}
-
 .toolbar-tab-slider-transition {
 	transition:
-		left 200ms cubic-bezier(0.4, 0, 0.2, 1) v-bind('sliderDelays.left'),
-		right 200ms cubic-bezier(0.4, 0, 0.2, 1) v-bind('sliderDelays.right'),
-		top 200ms cubic-bezier(0.4, 0, 0.2, 1) v-bind('sliderDelays.top'),
-		bottom 200ms cubic-bezier(0.4, 0, 0.2, 1) v-bind('sliderDelays.bottom');
+		left v-bind(SLIDE_DURATION) cubic-bezier(0.4, 0, 0.2, 1) v-bind('sliderDelays.left'),
+		right v-bind(SLIDE_DURATION) cubic-bezier(0.4, 0, 0.2, 1) v-bind('sliderDelays.right'),
+		top v-bind(SLIDE_DURATION) cubic-bezier(0.4, 0, 0.2, 1) v-bind('sliderDelays.top'),
+		bottom v-bind(SLIDE_DURATION) cubic-bezier(0.4, 0, 0.2, 1) v-bind('sliderDelays.bottom');
 }
 
 .toolbar-tab-color {
+	transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toolbar-tab-hover {
 	transition:
 		color 150ms cubic-bezier(0.4, 0, 0.2, 1),
 		background-color 100ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toolbar-tab-hover:hover {
+	background-color: color-mix(in srgb, var(--surface-4) 50%, transparent);
 }
 
 .toolbar-tab-color-delayed .toolbar-tab-color {

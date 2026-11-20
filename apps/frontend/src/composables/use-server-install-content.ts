@@ -1,8 +1,10 @@
+import type { AbstractModrinthClient } from '@modrinth/api-client'
 import type { BrowseTarget, ServerSetupModalHandle } from '@modrinth/ui'
 import {
 	injectModrinthClient,
 	injectNotificationManager,
 	resolveServerPlatform,
+	serverDetailQueryOptions,
 	useServerInstall,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -11,6 +13,37 @@ import { computed, ref, watch } from 'vue'
 
 import { useRoute, useRuntimeConfig } from '#app'
 import { queryAsString } from '~/utils/router'
+
+function serverContentQueryOptions(
+	client: AbstractModrinthClient,
+	serverId: string,
+	worldId: string,
+) {
+	return {
+		queryKey: ['content', 'list', serverId] as const,
+		queryFn: () => client.archon.content_v1.getAddons(serverId, worldId),
+		staleTime: 30_000,
+	}
+}
+
+export function useServerInstallContentPrefetch() {
+	const client = injectModrinthClient()
+	const queryClient = useQueryClient()
+	const route = useRoute()
+
+	return async () => {
+		const serverId = queryAsString(route.query.sid)
+		const worldId = queryAsString(route.query.wid)
+		if (!serverId) return
+
+		await Promise.allSettled([
+			queryClient.ensureQueryData(serverDetailQueryOptions(client, serverId)),
+			worldId
+				? queryClient.ensureQueryData(serverContentQueryOptions(client, serverId, worldId))
+				: undefined,
+		])
+	}
+}
 
 export function useServerInstallContent({
 	setupModal,
@@ -26,17 +59,19 @@ export function useServerInstallContent({
 	const worldId = computed(() => queryAsString(route.query.wid) || null)
 	const from = computed(() => queryAsString(route.query.from) || null)
 
-	const { data: serverData } = useQuery({
-		queryKey: computed(() => ['servers', 'detail', serverId.value] as const),
-		queryFn: () => client.archon.servers_v0.get(serverId.value!),
-		enabled: computed(() => !!serverId.value),
-	})
+	const { data: serverData } = useQuery(
+		computed(() => ({
+			...serverDetailQueryOptions(client, serverId.value ?? ''),
+			enabled: !!serverId.value,
+		})),
+	)
 
-	const { data: serverContent, error: serverContentError } = useQuery({
-		queryKey: computed(() => ['content', 'list', serverId.value ?? ''] as const),
-		queryFn: () => client.archon.content_v1.getAddons(serverId.value!, worldId.value!),
-		enabled: computed(() => !!serverId.value && !!worldId.value),
-	})
+	const { data: serverContent, error: serverContentError } = useQuery(
+		computed(() => ({
+			...serverContentQueryOptions(client, serverId.value ?? '', worldId.value ?? ''),
+			enabled: !!serverId.value && !!worldId.value,
+		})),
+	)
 
 	watch(serverContentError, (error) => {
 		if (error) handleError(error)

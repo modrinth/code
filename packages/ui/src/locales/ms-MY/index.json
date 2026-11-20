@@ -389,12 +389,6 @@
   "content.page-layout.please-wait": {
     "defaultMessage": "Sila tunggu"
   },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Paling baharu dahulu"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Paling lama dahulu"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Kemas kini semua"
   },

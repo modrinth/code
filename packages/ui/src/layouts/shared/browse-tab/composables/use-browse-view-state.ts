@@ -151,14 +151,18 @@ export function useBrowseViewState(options: BrowseViewStateOptions): BrowseViewS
 	const maxResultsOptions = computed(
 		() => options.maxResultsOptions?.value ?? DEFAULT_MAX_RESULTS_OPTIONS,
 	)
-	watch(maxResultsOptions, (available) => {
-		if (available.includes(maxResults.value)) return
-		maxResults.value = available.reduce((closest, candidate) =>
-			Math.abs(candidate - maxResults.value) <= Math.abs(closest - maxResults.value)
-				? candidate
-				: closest,
-		)
-	})
+	watch(
+		maxResultsOptions,
+		(available) => {
+			if (available.includes(maxResults.value)) return
+			maxResults.value = available.reduce((closest, candidate) =>
+				Math.abs(candidate - maxResults.value) <= Math.abs(closest - maxResults.value)
+					? candidate
+					: closest,
+			)
+		},
+		{ immediate: true },
+	)
 
 	const layout = computed<'list' | 'grid'>(() => {
 		const mode = options.displayMode?.value ?? 'list'
@@ -251,7 +255,9 @@ export function useBrowseViewState(options: BrowseViewStateOptions): BrowseViewS
 			params,
 			isServerType.value ? serverSearch.createServerPageParams() : projectSearch.createPageParams(),
 		)
-		void router.replace({ path: route.path, query: params })
+		const target = { path: route.path, query: params }
+		if (router.resolve(target).fullPath === route.fullPath) return
+		void router.replace(target)
 	}
 
 	watch(

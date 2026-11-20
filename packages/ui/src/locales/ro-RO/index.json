@@ -584,12 +584,6 @@
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Conținut numai pentru client"
   },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Cele noi mai întâi"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Cele vechi mai întâi"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Actualizează tot"
   },

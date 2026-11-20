@@ -695,18 +695,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Keresés {count, number} {contentType} között..."
   },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Név (A-Z)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Név (Z-A)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Legújabbak elöl"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Legrégebbiek elöl"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Összes frissítése"
   },

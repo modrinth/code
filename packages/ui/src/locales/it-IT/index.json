@@ -827,18 +827,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Cerca tra {count, number} {contentType}..."
   },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Nome (A-Z)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Nome (Z-A)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Più recenti prima"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Meno recenti prima"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Aggiorna tutto"
   },

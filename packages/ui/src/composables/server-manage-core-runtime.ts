@@ -13,8 +13,11 @@ import type { BusyReason, CancelUploadHandler, ServerStats } from '../providers/
 import { defineMessage } from './i18n'
 import { useModrinthServersConsole } from './server-console'
 import {
+	currentSnapshotUptime,
+	mapPowerStateFromStateEvent,
 	retainServerContextRuntime,
 	type ServerContextRuntimeLease,
+	type ServerPowerSnapshot,
 } from './server-context-runtime'
 import { useServerInstallationTracker } from './server-installation-tracker'
 
@@ -69,21 +72,6 @@ const appendGraphData = (dataArray: number[], newValue: number): number[] => {
 
 const STALE_STATS_THRESHOLD_MS = 5000
 const STALE_STATS_PUSH_INTERVAL_MS = 1000
-
-const mapPowerStateFromStateEvent = (
-	data: Archon.Websocket.v0.WSStateEvent,
-): Archon.Websocket.v0.PowerState => {
-	const powerMap: Record<Archon.Websocket.v0.FlattenedPowerState, Archon.Websocket.v0.PowerState> =
-		{
-			not_ready: 'stopped',
-			starting: 'starting',
-			running: 'running',
-			stopping: 'stopping',
-			idle:
-				data.was_oom || (data.exit_code != null && data.exit_code !== 0) ? 'crashed' : 'stopped',
-		}
-	return powerMap[data.power_variant]
-}
 
 export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOptions) {
 	const client = injectModrinthClient()
@@ -219,6 +207,15 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 			stopUptimeTicker()
 			uptimeSeconds.value = 0
 		}
+	}
+
+	const applyPowerSnapshot = (snapshot: ServerPowerSnapshot) => {
+		updatePowerState(snapshot.powerState, snapshot.details)
+		const uptime = currentSnapshotUptime(snapshot)
+		if (uptime <= 0) return
+		stopUptimeTicker()
+		uptimeSeconds.value = uptime
+		startUptimeTicker()
 	}
 
 	const handleLog = (data: Archon.Websocket.v0.WSLogEvent) => {
@@ -359,6 +356,8 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 			]
 			const extraSubscriptions = connectOptions.extraSubscriptions?.(targetServerId) ?? []
 			socketUnsubscribers.value = [...baseSubscriptions, ...extraSubscriptions]
+
+			if (runtimeLease.powerSnapshot.value) applyPowerSnapshot(runtimeLease.powerSnapshot.value)
 
 			modrinthServersConsole.clear()
 			modrinthServersConsole.beginInitialLogHydration()

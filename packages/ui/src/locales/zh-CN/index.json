@@ -824,18 +824,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "搜索到 {count, number}个{contentType}…"
   },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "名称（英文首字母A-Z）"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "名称（英文首字母Z-A）"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "按从新到旧顺序"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "按从旧到新顺序"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "更新所有"
   },

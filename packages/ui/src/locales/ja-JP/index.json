@@ -647,18 +647,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "フォルダ内の{contentType}を検索..."
   },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "名前（A~Z）"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "名前（Z~A）"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "新しい順"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "古い順"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "すべて更新"
   },

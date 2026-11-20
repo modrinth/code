@@ -752,18 +752,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "{count, number} türündeki içerikleri arayın..."
   },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "İsim (A-Z)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "İsim (Z-A)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Önce en yeni"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Önce en eski"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Tümünü güncelle"
   },

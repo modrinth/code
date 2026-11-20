@@ -8,7 +8,7 @@ import Input from '#ui/components/base/inputs/Input.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import type { ContentSortMode } from '../composables/content-sort'
+import type { ContentSortField, ContentSortMode } from '../composables/content-sort'
 import type { ContentMetadataFilterValue } from '../composables/use-content-metadata-filters'
 import type { ContentType } from '../types'
 import FilterRow from './filter-row.vue'
@@ -25,7 +25,7 @@ const props = defineProps<{
 	refreshDisabled: boolean
 	busyTooltip?: string
 	filterCategories: DropdownFilterBarCategory[]
-	showDateSort: boolean
+	sortFields: ContentSortField[]
 }>()
 
 const search = defineModel<string>('search', { required: true })
@@ -109,7 +109,7 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 			v-model:sort="sort"
 			:types="types"
 			:filter-categories="filterCategories"
-			:show-date-sort="showDateSort"
+			:sort-fields="sortFields"
 		>
 			<template #leading>
 				<Input
