@@ -814,15 +814,12 @@ impl DBProjectFlagRun {
     }
 
     pub async fn create(
+        id: ProjectFlagRunId,
         user_id: DBUserId,
-        project_ids: &[DBProjectId],
+        total_projects: usize,
         pool: &PgPool,
     ) -> Result<Self> {
-        let mut project_ids =
-            project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
-        project_ids.sort_unstable();
-        project_ids.dedup();
-        let total_projects = i64::try_from(project_ids.len())
+        let total_projects = i64::try_from(total_projects)
             .context("counting project flag run jobs")?;
         let username = sqlx::query_scalar!(
             r#"SELECT username FROM users WHERE id = $1"#,
@@ -832,7 +829,7 @@ impl DBProjectFlagRun {
         .await
         .context("fetching project flag run starter")?;
         let mut run = Self {
-            id: ProjectFlagRunId(uuid::Uuid::now_v7()),
+            id,
             ruleset_id: None,
             status: ProjectFlagRunStatus::Running,
             total_projects,
@@ -868,17 +865,6 @@ impl DBProjectFlagRun {
         .execute(&mut transaction)
         .await
         .context("creating project flag run")?;
-        sqlx::query!(
-            r#"
-            INSERT INTO project_flag_run_snapshots (run_id, project_ids)
-            VALUES ($1, $2)
-        "#,
-            run.id.0,
-            &project_ids
-        )
-        .execute(&mut transaction)
-        .await
-        .context("persisting project flag run snapshot")?;
         transaction
             .commit()
             .await

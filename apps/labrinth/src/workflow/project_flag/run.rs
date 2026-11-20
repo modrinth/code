@@ -28,7 +28,8 @@ use crate::{
     util::temporal::TemporalClient,
 };
 
-const BATCH_SIZE: i64 = 64;
+const BATCH_SIZE: usize = 64;
+
 const BATCHES_PER_EXECUTION: usize = 100;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -127,15 +128,13 @@ pub fn workflow_id(id: ProjectFlagRunId) -> String {
     format!("project-flag-run:{}", id.0)
 }
 
-pub async fn start(
-    temporal: &TemporalClient,
-    id: ProjectFlagRunId,
-) -> Result<()> {
+pub async fn start(temporal: &TemporalClient, input: RunInput) -> Result<()> {
+    let id = input.id;
     temporal
         .client
         .start_workflow(
             ProjectFlagRunWorkflow::run,
-            RunInput { id, offset: 0 },
+            input,
             WorkflowStartOptions::new(PROJECT_FLAG_TASK_QUEUE, workflow_id(id))
                 .id_conflict_policy(WorkflowIdConflictPolicy::UseExisting)
                 .id_reuse_policy(WorkflowIdReusePolicy::RejectDuplicate)
@@ -158,15 +157,8 @@ impl ProjectFlagRunWorkflow {
         mut input: RunInput,
     ) -> WorkflowResult<()> {
         for _ in 0..BATCHES_PER_EXECUTION {
-            let projects = ctx
-                .execute_activity(
-                    RunActivities::next_batch,
-                    input.clone(),
-                    ActivityOptions::start_to_close_timeout(
-                        Duration::from_secs(60),
-                    ),
-                )
-                .await?;
+            let end = (input.offset + BATCH_SIZE).min(input.projects.len());
+            let projects = input.projects[input.offset..end].to_vec();
             if projects.is_empty() {
                 ctx.execute_activity(
                     RunActivities::finalize,
@@ -178,7 +170,6 @@ impl ProjectFlagRunWorkflow {
                 .await?;
                 return Ok(());
             }
-            let count = projects.len() as i64;
             ctx.execute_activity(
                 RunActivities::evaluate_batch,
                 BatchInput {
@@ -190,8 +181,9 @@ impl ProjectFlagRunWorkflow {
                 )),
             )
             .await?;
-            input.offset += count;
+            input.offset = end;
         }
+        input.discard_completed_projects();
         ctx.continue_as_new(input, ContinueAsNewOptions::default())?;
         Ok(())
     }
@@ -200,7 +192,64 @@ impl ProjectFlagRunWorkflow {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RunInput {
     pub id: ProjectFlagRunId,
-    pub offset: i64,
+    pub projects: Vec<DBProjectId>,
+    pub offset: usize,
+}
+
+impl RunInput {
+    pub fn new(id: ProjectFlagRunId, mut projects: Vec<DBProjectId>) -> Self {
+        projects.sort_unstable_by_key(|id| id.0);
+        projects.dedup_by_key(|id| id.0);
+        Self {
+            id,
+            projects,
+            offset: 0,
+        }
+    }
+
+    fn discard_completed_projects(&mut self) {
+        self.projects.drain(..self.offset);
+        self.offset = 0;
+    }
+}
+
+#[cfg(test)]
+mod run_input_tests {
+    use super::*;
+
+    #[test]
+    fn selection_is_sorted_deduplicated_and_round_trips() {
+        let input = RunInput::new(
+            ProjectFlagRunId(uuid::Uuid::now_v7()),
+            vec![DBProjectId(3), DBProjectId(1), DBProjectId(3)],
+        );
+        let restored: RunInput =
+            serde_json::from_slice(&serde_json::to_vec(&input).unwrap())
+                .unwrap();
+        assert_eq!(restored.id, input.id);
+        assert_eq!(restored.projects, vec![DBProjectId(1), DBProjectId(3)]);
+        assert_eq!(restored.offset, 0);
+    }
+
+    #[test]
+    fn continuation_keeps_only_unprocessed_selection() {
+        let mut input = RunInput::new(
+            ProjectFlagRunId(uuid::Uuid::now_v7()),
+            (0..(BATCH_SIZE * BATCHES_PER_EXECUTION + 1))
+                .map(|id| DBProjectId(id as i64))
+                .collect(),
+        );
+        input.offset = BATCH_SIZE * BATCHES_PER_EXECUTION;
+        input.discard_completed_projects();
+        assert_eq!(
+            input.projects,
+            vec![DBProjectId((BATCH_SIZE * BATCHES_PER_EXECUTION) as i64,)]
+        );
+        assert_eq!(input.offset, 0);
+        input.offset = 1;
+        input.discard_completed_projects();
+        assert!(input.projects.is_empty());
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -216,17 +265,6 @@ pub struct RunActivities {
 
 #[activities]
 impl RunActivities {
-    #[activity]
-    pub async fn next_batch(
-        self: Arc<Self>,
-        _ctx: ActivityContext,
-        input: RunInput,
-    ) -> Result<Vec<DBProjectId>, ActivityError> {
-        self.next(input)
-            .await
-            .map_err(|error| ActivityError::from(anyhow::anyhow!("{error:#}")))
-    }
-
     #[activity]
     pub async fn finalize(
         self: Arc<Self>,
@@ -254,36 +292,6 @@ impl RunActivities {
 }
 
 impl RunActivities {
-    async fn next(&self, input: RunInput) -> Result<Vec<DBProjectId>> {
-        let row = sqlx::query!(
-            r#"
-            SELECT snapshots.project_ids[($2 + 1):($2 + $3)] AS project_ids
-            FROM project_flag_run_snapshots AS snapshots
-            JOIN project_flag_runs AS runs ON runs.id = snapshots.run_id
-            WHERE snapshots.run_id = $1 AND runs.status = 'running'
-        "#,
-            input.id.0,
-            input.offset as i32,
-            BATCH_SIZE as i32
-        )
-        .fetch_optional(&self.pool)
-        .await
-        .context("loading project flag run batch")?;
-        if row.is_none() {
-            let active = sqlx::query_scalar!(r#"SELECT id FROM project_flag_runs WHERE id = $1 AND status = 'running'"#, input.id.0)
-                .fetch_optional(&self.pool).await.context("checking project flag run")?;
-            if active.is_some() {
-                return Err(anyhow!("project flag run snapshot missing"));
-            }
-        }
-        Ok(row
-            .and_then(|row| row.project_ids)
-            .unwrap_or_default()
-            .into_iter()
-            .map(DBProjectId)
-            .collect())
-    }
-
     async fn evaluate(&self, input: BatchInput) -> Result<()> {
         let snapshot = sqlx::query!(r#"
             SELECT rulesets.rules, rulesets.modules FROM project_flag_runs AS runs
@@ -311,36 +319,6 @@ impl RunActivities {
             },
         )
         .await
-    }
-}
-
-/// Resumes durable snapshots after an interrupted API start request.
-pub async fn recover(temporal: &TemporalClient, pool: &PgPool) -> Result<()> {
-    let mut after = uuid::Uuid::nil();
-    loop {
-        let ids = sqlx::query_scalar!(r#"
-            SELECT runs.id FROM project_flag_runs AS runs
-            JOIN project_flag_run_snapshots AS snapshots ON snapshots.run_id = runs.id
-            WHERE runs.status = 'running' AND runs.id > $1 ORDER BY runs.id LIMIT 100
-        "#, after).fetch_all(pool).await.context("loading unfinished project flag runs")?;
-        if ids.is_empty() {
-            return Ok(());
-        }
-        for id in ids {
-            after = id;
-            if let Err(error) = start(temporal, ProjectFlagRunId(id)).await {
-                if matches!(error.downcast_ref::<temporalio_client::errors::WorkflowStartError>(),
-                    Some(temporalio_client::errors::WorkflowStartError::AlreadyStarted { .. })) {
-                    sqlx::query!(r#"
-                        UPDATE project_flag_runs SET status = 'done', completed_at = CURRENT_TIMESTAMP,
-                            error = 'temporal workflow already closed; remaining projects were not evaluated'
-                        WHERE id = $1 AND status = 'running'
-                    "#, id).execute(pool).await.context("recording closed project flag workflow")?;
-                } else {
-                    return Err(error);
-                }
-            }
-        }
     }
 }
 

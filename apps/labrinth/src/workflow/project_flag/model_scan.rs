@@ -2,7 +2,10 @@ use std::{collections::BTreeMap, sync::Arc, time::Duration};
 
 use anyhow::{Context, Result, ensure};
 use base64::{Engine, engine::general_purpose::STANDARD};
-use reqwest::{Client, header::CONTENT_TYPE};
+use reqwest::{
+    Client,
+    header::{ACCEPT, CONTENT_TYPE},
+};
 use secrecy::ExposeSecret;
 use serde::Deserialize;
 use serde_json::{Value, json};
@@ -143,6 +146,7 @@ impl ModelScanner {
             .post(config.endpoint_url.clone())
             .timeout(Duration::from_secs(30))
             .header(CONTENT_TYPE, content_type)
+            .header(ACCEPT, "application/json")
             .body(image.to_vec());
         if let Some(api_key) = &config.api_key {
             request = request.bearer_auth(api_key.expose_secret());
@@ -163,7 +167,7 @@ impl ModelScanner {
             .await
             .context("decoding AiDetect inference response")?;
 
-        validate_probability(response.ai_generated_probability)
+        validate_probability(response.score)
             .context("invalid AiDetect inference probability")
             .map(Some)
     }
@@ -274,7 +278,9 @@ impl ModelScanner {
 
 #[derive(Deserialize)]
 struct AiDetectResponse {
-    ai_generated_probability: f64,
+    /// Smaug's AI-generated probability. Its `flagged` decision is deliberately
+    /// ignored so moderation rules retain control over thresholds.
+    score: f64,
 }
 
 #[derive(Deserialize)]
@@ -341,6 +347,42 @@ mod tests {
 
     fn parse(value: Value, count: usize) -> Result<Vec<f64>> {
         decode_decisions(serde_json::from_value(value)?, count)
+    }
+
+    #[test]
+    fn smaug_score_preserves_probability_independently_of_flagged() {
+        for (score, flagged) in [
+            (0.0002, false),
+            (0.85, true),
+            (0.4, true),
+            (0.0, false),
+            (1.0, true),
+        ] {
+            let response: AiDetectResponse = serde_json::from_value(json!({
+                "classifier": "smaug-ai-image-detector",
+                "score": score,
+                "flagged": flagged,
+            }))
+            .unwrap();
+            assert_eq!(validate_probability(response.score).unwrap(), score);
+        }
+    }
+
+    #[test]
+    fn smaug_rejects_missing_wrong_type_and_out_of_range_scores() {
+        for value in [
+            json!({"flagged": false}),
+            json!({"score": null}),
+            json!({"score": "0.5"}),
+            json!({"ai_generated_probability": 0.5}),
+        ] {
+            assert!(serde_json::from_value::<AiDetectResponse>(value).is_err());
+        }
+        for score in [-0.1, 1.1] {
+            let response: AiDetectResponse =
+                serde_json::from_value(json!({"score": score})).unwrap();
+            assert!(validate_probability(response.score).is_err());
+        }
     }
 
     #[test]

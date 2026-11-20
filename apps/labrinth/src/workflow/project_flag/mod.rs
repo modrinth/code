@@ -105,50 +105,35 @@ impl ReconcileProjectFlagsWorkflow {
     ) -> WorkflowResult<()> {
         loop {
             ctx.state_mut(|state| state.needs_reconcile = false);
-            let input = if ctx.patched("project-flags-deployed-ruleset") {
-                let ruleset_id = ctx
-                    .execute_activity(
-                        ProjectFlagActivities::deployed_ruleset,
-                        (),
-                        ActivityOptions::start_to_close_timeout(
-                            Duration::from_secs(60),
-                        ),
-                    )
-                    .await?;
-                ReconcileRulesInput::Revision {
-                    project_id,
-                    ruleset_id,
-                }
-            } else {
-                ReconcileRulesInput::Legacy(project_id)
+            let ruleset_id = ctx
+                .execute_activity(
+                    ProjectFlagActivities::deployed_ruleset,
+                    (),
+                    ActivityOptions::start_to_close_timeout(
+                        Duration::from_secs(60),
+                    ),
+                )
+                .await?;
+            let input = ReconcileRulesInput {
+                project_id,
+                ruleset_id,
             };
             futures::try_join!(
                 image_scan::scan_project_images(ctx, project_id),
                 text_scan::scan_project_text(ctx, input.clone()),
             )?;
 
-            if ctx.patched("project-flags-transactional-apply") {
-                let applied = ctx
-                    .execute_activity(
-                        ProjectFlagActivities::evaluate_and_apply_rules,
-                        input,
-                        ActivityOptions::start_to_close_timeout(
-                            Duration::from_secs(600),
-                        ),
-                    )
-                    .await?;
-                if !applied {
-                    continue;
-                }
-            } else {
-                ctx.execute_activity(
-                    ProjectFlagActivities::evaluate_rules,
+            let applied = ctx
+                .execute_activity(
+                    ProjectFlagActivities::evaluate_and_apply_rules,
                     input,
                     ActivityOptions::start_to_close_timeout(
                         Duration::from_secs(600),
                     ),
                 )
                 .await?;
+            if !applied {
+                continue;
             }
 
             if !ctx.state(|state| state.needs_reconcile) {
@@ -164,29 +149,18 @@ impl ReconcileProjectFlagsWorkflow {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-#[serde(untagged)]
-pub enum ReconcileRulesInput {
-    Revision {
-        project_id: ProjectId,
-        ruleset_id: Option<uuid::Uuid>,
-    },
-    Legacy(ProjectId),
+pub struct ReconcileRulesInput {
+    project_id: ProjectId,
+    ruleset_id: Option<uuid::Uuid>,
 }
 
 impl ReconcileRulesInput {
     fn project_id(&self) -> ProjectId {
-        match self {
-            Self::Revision { project_id, .. } | Self::Legacy(project_id) => {
-                *project_id
-            }
-        }
+        self.project_id
     }
 
     fn ruleset_id(&self) -> Option<uuid::Uuid> {
-        match self {
-            Self::Revision { ruleset_id, .. } => *ruleset_id,
-            Self::Legacy(_) => None,
-        }
+        self.ruleset_id
     }
 }
 
@@ -210,22 +184,6 @@ impl ProjectFlagActivities {
         .fetch_optional(&self.pool)
         .await
         .map_err(|error| ActivityError::from(anyhow::anyhow!(error)))
-    }
-
-    #[activity]
-    pub async fn evaluate_rules(
-        self: Arc<Self>,
-        _ctx: ActivityContext,
-        input: ReconcileRulesInput,
-    ) -> Result<(), ActivityError> {
-        run_rules::reconcile_rules(
-            &self.engine,
-            &self.pool,
-            input.project_id().into(),
-            input.ruleset_id(),
-        )
-        .await
-        .map_err(|error| ActivityError::from(anyhow::anyhow!("{error:#}")))
     }
 
     #[activity]

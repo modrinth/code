@@ -479,17 +479,18 @@ pub async fn start_run(
     let project_ids = DBProjectFlagRun::queued_project_ids(&pool)
         .await
         .internal_context("fetching queued project IDs")?;
-    let run =
-        DBProjectFlagRun::create(user.user.id.into(), &project_ids, &pool)
-            .await
-            .internal_context("creating project flag run")?;
+    let input =
+        run::RunInput::new(ProjectFlagRunId(uuid::Uuid::now_v7()), project_ids);
 
     let response_pool = pool.clone();
     let run = tokio::spawn(async move {
-        tokio::time::timeout(std::time::Duration::from_secs(30), run::start(&temporal, run.id))
+        let run = DBProjectFlagRun::create(
+            input.id, user.user.id.into(), input.projects.len(), &pool,
+        ).await.internal_context("creating project flag run")?;
+        tokio::time::timeout(std::time::Duration::from_secs(30), run::start(&temporal, input))
             .await
-            .internal_context(format!("timed out confirming project flag run {}; restart the workflow worker to recover persisted work", run.id.0))?
-            .internal_context(format!("starting project flag run {}; restart the workflow worker to recover persisted work", run.id.0))?;
+            .internal_context(format!("timed out confirming project flag run {}; check Temporal workflow {} before starting another run", run.id.0, run::workflow_id(run.id)))?
+            .internal_context(format!("starting project flag run {}; check Temporal workflow {} before starting another run", run.id.0, run::workflow_id(run.id)))?;
         Ok::<_, ApiError>(run)
     }).await.internal_context("joining project flag run start")??;
     let mut responses =

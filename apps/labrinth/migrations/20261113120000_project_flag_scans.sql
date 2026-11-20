@@ -8,10 +8,15 @@ ALTER TABLE project_flag_run_results
     ADD COLUMN num_flags BIGINT NOT NULL CHECK (num_flags >= 0),
     ADD COLUMN proposed_review_outcome TEXT;
 
+-- reusable modules for rule scripts
+
 CREATE TABLE project_flag_modules (
     name VARCHAR(1024) PRIMARY KEY,
     script TEXT NOT NULL
 );
+
+-- cached info from reconciliation workflow activities,
+-- e.g. "are the gallery images AI generated"
 
 CREATE TABLE project_flag_scans (
     scan_kind TEXT NOT NULL,
@@ -22,10 +27,7 @@ CREATE TABLE project_flag_scans (
     PRIMARY KEY (scan_kind, input_hash, model_version)
 );
 
-CREATE TABLE project_flag_run_snapshots (
-    run_id UUID PRIMARY KEY REFERENCES project_flag_runs(id) ON DELETE CASCADE,
-    project_ids BIGINT[] NOT NULL
-);
+-- store which rules and modules were used for which runs
 
 DROP TABLE project_flag_run_pending_jobs;
 
