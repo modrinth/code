@@ -665,21 +665,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Buscar {count, number} {contentType}..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Nombres de archivos"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Compartir"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Enlaces de Markdown"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Enlaces del proyecto"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Nombres de los proyectos"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "Nombre (A-Z)"
   },

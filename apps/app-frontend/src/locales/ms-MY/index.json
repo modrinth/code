@@ -272,12 +272,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} projek telah ditambahkan"
   },
-  "app.instance.mods.share-text": {
-    "message": "Lihat projek-projek yang saya gunakan dalam pek mod saya!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Berkongsi kandungan pek mod"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Berjaya dimuat naik"
   },

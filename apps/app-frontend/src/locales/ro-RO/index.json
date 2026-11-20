@@ -701,12 +701,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} proiecte au fost adăugate"
   },
-  "app.instance.mods.share-text": {
-    "message": "Uită-te la proiectele pe care le folosesc în modpack-ul meu!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Partajare conținut modpack"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Încărcat cu succes"
   },

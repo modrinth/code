@@ -701,21 +701,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "{count, number} {contentType} zoeken..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Bestandsnamen"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Deel"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Link insluiten"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Project links"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Projectnamen"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "Naam (A-Z)"
   },

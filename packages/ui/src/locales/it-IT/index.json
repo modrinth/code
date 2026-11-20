@@ -830,21 +830,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Cerca tra {count, number} {contentType}..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Nomi dei file"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Condividi"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Link markdown"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Link dei progetti"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Nomi dei progetti"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "Nome (A-Z)"
   },

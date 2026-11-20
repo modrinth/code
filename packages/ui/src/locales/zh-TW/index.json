@@ -764,21 +764,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "搜尋 {count, number} 個{contentType}..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "檔案名稱"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "分享"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Markdown 連結"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "專案連結"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "專案名稱"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "名稱（A-Z）"
   },

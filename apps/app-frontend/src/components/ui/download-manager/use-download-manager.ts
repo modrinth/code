@@ -21,6 +21,7 @@ import {
 	type InstallJobSnapshot,
 } from '@/helpers/install'
 import { get_many as getInstances } from '@/helpers/instance'
+import { highlightInFolder } from '@/helpers/utils'
 import {
 	getInstallJobSupportDetails,
 	getInstallJobSupportPasteUrl,
@@ -60,6 +61,7 @@ export interface DownloadManagerJob {
 	iconUrl: string | null
 	text: string
 	taskType?: string
+	revealPath?: string
 	finishedAt?: string
 	progress: number
 	overallProgress: number
@@ -243,26 +245,26 @@ export function useDownloadManager() {
 			id: task.id,
 			kind: 'debug-export',
 			createdAt: task.createdAt,
-			instanceId: null,
+			instanceId: task.instance?.id ?? null,
 			status: task.status,
 			paused: false,
 			canceling: task.canceling,
 			canPause: false,
 			canCancel: task.status === 'running' && task.started && task.stage !== 'finishing',
-			title: formatMessage(debugExportMessages.title),
-			iconUrl: null,
-			taskType: task.filename,
+			title: task.instance?.name ?? formatMessage(debugExportMessages.title),
+			iconUrl: getIconUrl(task.instance?.iconPath),
+			revealPath: task.status === 'succeeded' ? task.path : undefined,
 			text:
 				task.error ??
-				formatMessage(
-					task.status === 'succeeded'
-						? commonMessages.savedLabel
-						: task.status === 'canceled'
-							? debugExportMessages.canceled
-							: task.canceling
-								? debugExportMessages.canceling
-								: debugExportMessages[task.stage],
-				),
+				(task.status === 'succeeded'
+					? (task.path.split(/[/\\]/).pop() ?? task.path)
+					: formatMessage(
+							task.status === 'canceled'
+								? debugExportMessages.canceled
+								: task.canceling
+									? debugExportMessages.canceling
+									: debugExportMessages[task.stage],
+						)),
 			finishedAt: task.finishedAt,
 			progress,
 			overallProgress: task.status === 'succeeded' ? 1 : progress,
@@ -551,6 +553,11 @@ export function useDownloadManager() {
 		return url
 	}
 
+	async function reveal(id: string) {
+		const path = debugInfoExports.value.get(id)?.path
+		if (path) await runAction(id, () => highlightInFolder(path))
+	}
+
 	async function copyDetails(id: string) {
 		await runAction(id, async () => {
 			const publish = sharedInstancePublishes.value.get(id)
@@ -615,5 +622,6 @@ export function useDownloadManager() {
 		dismiss,
 		clearCompleted,
 		copyDetails,
+		reveal,
 	}
 }

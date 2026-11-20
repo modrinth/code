@@ -719,12 +719,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "تمت إضافة {count} مشروع"
   },
-  "app.instance.mods.share-text": {
-    "message": "تحقق من المشاريع التي أستخدمها في المودباك الخاص بي!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "مشاركة محتوى المودباك"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "تم الرفع بنجاح"
   },

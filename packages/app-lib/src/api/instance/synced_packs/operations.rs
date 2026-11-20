@@ -584,7 +584,7 @@ pub async fn upload_synced_pack(
         SyncedPack {
             blob_sha512: Some(sha512),
             migration_error: None,
-            sha1,
+            sha1: sha1.clone(),
             game_versions,
             selected: (project_type == ProjectType::ResourcePack)
                 .then_some(false),
@@ -593,6 +593,7 @@ pub async fn upload_synced_pack(
                 file_name,
                 file_path: String::new(),
                 size,
+                hash: Some(sha1),
                 enabled: true,
                 locked: false,
                 project_type,

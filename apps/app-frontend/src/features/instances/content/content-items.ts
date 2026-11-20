@@ -75,28 +75,3 @@ export function findDependentItems(
 		return dependencies.length > 0 ? [{ item: candidate, dependencies }] : []
 	})
 }
-
-export type ShareFormat = 'names' | 'file-names' | 'urls' | 'markdown'
-
-export function buildShareText(items: ContentItem[], format: ShareFormat) {
-	switch (format) {
-		case 'names':
-			return items.map((item) => item.project?.title ?? item.file_name).join('\n')
-		case 'file-names':
-			return items.map((item) => item.file_name).join('\n')
-		case 'urls':
-			return items
-				.filter((item) => item.project?.slug)
-				.map((item) => `https://modrinth.com/${item.project_type}/${item.project?.slug}`)
-				.join('\n')
-		case 'markdown':
-			return items
-				.map((item) => {
-					const name = item.project?.title ?? item.file_name
-					return item.project?.slug
-						? `[${name}](https://modrinth.com/${item.project_type}/${item.project.slug})`
-						: name
-				})
-				.join('\n')
-	}
-}

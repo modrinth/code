@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	BugIcon,
 	CodeIcon,
 	CoffeeIcon,
 	InfoIcon,
@@ -10,7 +11,6 @@ import {
 	WrenchIcon,
 } from '@modrinth/assets'
 import {
-	Avatar,
 	commonMessages,
 	defineMessage,
 	defineMessages,
@@ -24,7 +24,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
 import { get_project_v3 } from '@/helpers/cache'
-import { get_linked_modpack_info, getInstanceIconUrl } from '@/helpers/instance'
+import { get_linked_modpack_info } from '@/helpers/instance'
 import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
@@ -37,6 +37,7 @@ import { provideInstanceSettings } from './instance-settings-context.ts'
 import JavaSettings from './java-settings.vue'
 import SharingSettings from './sharing-settings/index.vue'
 import SyncedOptionsSettings from './synced-options-settings.vue'
+import TroubleshootingSettings from './troubleshooting/index.vue'
 import WindowSettings from './window-settings.vue'
 
 const { formatMessage } = useVIntl()
@@ -148,6 +149,15 @@ const tabs = computed<TabbedModalTab[]>(() => [
 	},
 	{
 		name: defineMessage({
+			id: 'instance.settings.tabs.troubleshooting',
+			defaultMessage: 'Troubleshooting',
+		}),
+		icon: BugIcon,
+		category: tabCategories.instance,
+		content: TroubleshootingSettings,
+	},
+	{
+		name: defineMessage({
 			id: 'instance.settings.tabs.java.label',
 			defaultMessage: 'Java and memory',
 		}),
@@ -254,12 +264,6 @@ defineExpose({ show, hide })
 		:floating-action-bar-shown="hasUnsavedChanges"
 	>
 		<template #breadcrumb>
-			<Avatar
-				:src="getInstanceIconUrl(instance.icon_path)"
-				size="24px"
-				:tint-by="props.instance.id"
-				pad-transparent-corners
-			/>
 			<span class="truncate">{{ instance.name }}</span>
 		</template>
 		<template #floating-action-bar>

@@ -830,21 +830,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "{count, number}개의 {contentType} 검색..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "파일 이름"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "공유"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "마크다운 링크"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "프로젝트 링크"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "프로젝트 이름"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "이름 (A-Z)"
   },

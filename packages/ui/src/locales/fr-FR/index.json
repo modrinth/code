@@ -743,21 +743,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Rechercher {count, number} {contentType}..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Noms des fichers"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Partager"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Liens markdowns"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Liens de projets"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Noms des projets"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "Nom (A-Z)"
   },

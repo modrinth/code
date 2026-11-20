@@ -70,7 +70,6 @@ export interface ContentManagerContext {
 		owner: (owner: ContentOwner) => ContentOwner['link']
 	}
 	menu?: (item: ContentItem) => ButtonMenuOption[]
-	share?: (items: ContentItem[], format: 'names' | 'file-names' | 'urls' | 'markdown') => void
 	persistKey?: string
 
 	searchQueryParam?: string

@@ -1,6 +1,7 @@
 //! Theseus instance management interface
 
 mod content;
+mod content_list;
 mod export_mrpack;
 mod files;
 pub(crate) use files::InstanceFileWriter;
@@ -30,6 +31,10 @@ pub use self::content::{
     get_install_candidates, get_installed_project_ids,
     get_linked_modpack_content, get_linked_modpack_info, get_projects,
     list_content_sets, refresh_content_updates, sync_content_files,
+};
+pub(crate) use self::content_list::InstanceContentSnapshot;
+pub use self::content_list::{
+    ContentListFormat, ContentListOptions, get_content_list,
 };
 pub use self::export_mrpack::{
     PackExportCandidate, create_mrpack_json, export_mrpack,

@@ -19,6 +19,7 @@ const {
 	dismiss,
 	clearCompleted,
 	copyDetails,
+	reveal,
 } = useDownloadManager()
 const { selectedJob, completing } = useDownloadBarState({
 	activeJobs,
@@ -112,6 +113,7 @@ function close() {
 				@dismiss="dismiss"
 				@clear-completed="clearCompleted"
 				@copy-details="copyDetails"
+				@reveal="reveal"
 				@open="hide"
 				@keydown.esc.stop.prevent="close"
 			/>
