@@ -1,5 +1,10 @@
 <template>
-	<div v-if="count > 1" class="flex items-center gap-1">
+	<div
+		v-if="count > 1"
+		ref="root"
+		class="flex items-center gap-1 tabular-nums"
+		:class="{ '-m-1 justify-end overflow-hidden p-1': animateWidth }"
+	>
 		<template v-if="page > 1">
 			<ButtonLink
 				v-if="linkFunction"
@@ -112,6 +117,7 @@
 import { ChevronLeftIcon, ChevronRightIcon, EllipsisVerticalIcon } from '@modrinth/assets'
 import { type ComponentPublicInstance, computed, ref } from 'vue'
 
+import { useAnimatedWidth } from '#ui/composables/animated-width'
 import { defineMessages, useVIntl } from '#ui/composables/i18n.ts'
 
 import { Button, ButtonLink, IconButton } from './buttons'
@@ -128,12 +134,17 @@ const props = withDefaults(
 		page: number
 		count: number
 		linkFunction?: (page: number) => string | undefined
+		animateWidth?: boolean
 	}>(),
 	{
 		page: 1,
 		count: 1,
+		animateWidth: false,
 	},
 )
+
+const root = ref<HTMLElement | null>(null)
+useAnimatedWidth(root, { enabled: () => props.animateWidth })
 const showPageInput = ref<number | undefined>(undefined)
 const pageInput = ref<number | undefined>(undefined)
 
@@ -143,27 +154,23 @@ const pages = computed(() => {
 	const first = 1
 	const last = props.count
 	const current = props.page
-	const prev = current - 1
-	const next = current + 1
+	const windowStart = current === last ? Math.max(first, current - 1) : current
+	const windowEnd = Math.min(last, windowStart + 1)
 	const gap = '-'
 
-	if (prev > first) {
+	if (windowStart > first) {
 		pages.push(first)
 	}
-	if (prev > first + 1) {
+	if (windowStart > first + 1) {
 		pages.push(gap)
 	}
-	if (prev >= first) {
-		pages.push(prev)
+	for (let page = windowStart; page <= windowEnd; page++) {
+		pages.push(page)
 	}
-	pages.push(current)
-	if (next <= last) {
-		pages.push(next)
-	}
-	if (next < last - 1) {
+	if (windowEnd < last - 1) {
 		pages.push(gap)
 	}
-	if (next < last) {
+	if (windowEnd < last) {
 		pages.push(last)
 	}
 

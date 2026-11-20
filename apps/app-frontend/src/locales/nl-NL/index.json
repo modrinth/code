@@ -293,9 +293,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Het toevoegen van content zou ertoe kunnen leiden dat je deze server niet kan joinen. Alle content die je toevoegt, zal verwijderd worden wanneer de beheerde server-content geüpdatet wordt."
   },
-  "app.browse.server.installing": {
-    "message": "Installeren"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Er zijn geen beschikbare versies die overeenkomen met {compatibilityLabel}. Selecteer toch een versie om te installeren. Afhankelijkheden worden niet automatisch geïnstalleerd."
   },

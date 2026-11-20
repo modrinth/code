@@ -278,9 +278,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "قد تمنعك إضافة محتوى من الانضمام إلى هذا الخادم. ستتم إزالة أي محتوى تضيفه عند تحديث محتوى الخادم المُدار."
   },
-  "app.browse.server.installing": {
-    "message": "جاري التثبيت"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "لا توجد إصدارات متاحة تتوافق مع {compatibilityLabel}. اختر إصدارًا لتثبيته على أي حال. لن يتم تثبيت التبعيات تلقائيًا."
   },

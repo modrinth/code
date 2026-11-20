@@ -245,9 +245,6 @@
   "app.browse.project-type.shaders": {
     "message": "Efek Gambar"
   },
-  "app.browse.server.installing": {
-    "message": "Memasang"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Tidak ada versi tersedia yang cocok untuk {compatibilityLabel}. Anda tetap dapat memilih versi yang akan dipasang. Dependensi tidak akan dipasang secara otomatis."
   },

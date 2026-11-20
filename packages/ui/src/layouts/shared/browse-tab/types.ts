@@ -1,15 +1,46 @@
 import type { Labrinth } from '@modrinth/api-client'
-import type { Component } from 'vue'
+import type { Component, Ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
-export interface BrowseSearchResponse {
-	projectHits: (Labrinth.Search.v3.ResultSearchProject & {
-		installed?: boolean
-		installing?: boolean
-	})[]
-	serverHits: Labrinth.Search.v3.ResultSearchProject[]
-	total_hits: number
-	per_page: number
+export type BrowseHit = Labrinth.Search.v3.ResultSearchProject
+
+export interface BrowseTags {
+	gameVersions: Labrinth.Tags.v2.GameVersion[]
+	loaders: Labrinth.Tags.v2.Loader[]
+	categories: Labrinth.Tags.v2.Category[]
+}
+
+export type BrowseSearchResults = Pick<Labrinth.Search.v3.SearchResults, 'hits' | 'total_hits'>
+
+export interface BrowseSearchQueryOptions {
+	queryKey: readonly unknown[]
+	queryFn: () => Promise<BrowseSearchResults>
+	staleTime?: number
+	networkMode?: 'online' | 'always' | 'offlineFirst'
+}
+
+export type BrowseDisplayMode = 'list' | 'grid' | 'gallery'
+
+export interface BrowseProjectTypeLink {
+	label: string
+	href: string
+	shown?: boolean
+}
+
+export interface BrowseTarget {
+	name: string
+	iconSrc?: string | null
+	tintBy?: string | null
+	isMedal?: boolean
+	serverId?: string | null
+	gameVersion?: string | null
+	loader?: string | null
+	heading?: string
+	warning?: string
+	back: {
+		to: string | RouteLocationRaw
+		label: string
+	}
 }
 
 export interface BrowseSelectedProject {
@@ -18,32 +49,42 @@ export interface BrowseSelectedProject {
 	iconUrl?: string | null
 }
 
-export interface BrowseInstallContext {
-	name: string
-	loader: string
-	gameVersion: string
-	serverId?: string | null
-	upstream?: { project_id?: string | null } | null
-	iconSrc?: string | null
-	isMedal?: boolean
-	backUrl: string | RouteLocationRaw
-	backLabel: string
-	heading: string
-	warning?: string
-	queuedCount?: number
-	queuedLabel?: string
-	clearQueued?: () => void | Promise<void>
-	onBack?: () => boolean | void | Promise<boolean | void>
-	selectedProjects?: BrowseSelectedProject[]
-	isInstallingSelected?: boolean
-	skipNonEssentialWarnings?: boolean
-	installProgress?: {
-		completed: number
-		total: number
-	}
-	clearSelected?: () => void | Promise<void>
-	discardSelectedAndBack?: () => void | Promise<void>
-	installSelected?: () => boolean | void | Promise<boolean | void>
+export interface BrowseSelection {
+	projects: Readonly<Ref<BrowseSelectedProject[]>>
+	installing: Readonly<Ref<boolean>>
+	clear: () => void
+	installAndBack: () => Promise<boolean>
+	discardAndBack: () => Promise<void>
+}
+
+export type BrowseInstallState =
+	| 'idle'
+	| 'selected'
+	| 'selected-dependency'
+	| 'validating'
+	| 'installing'
+	| 'installed'
+
+export interface BrowseInstallCapability {
+	state: (hit: BrowseHit) => BrowseInstallState | null
+	run: (hit: BrowseHit) => void | Promise<void>
+	idleLabel?: (hit: BrowseHit) => string
+	idleIcon?: Component
+}
+
+export interface BrowseToggle {
+	id: string
+	label: string
+	model: Ref<boolean>
+}
+
+export interface BrowseLockedFilterMessages {
+	gameVersion?: string
+	modLoader?: string
+	environment?: string
+	syncButton?: string
+	providedBy?: string
+	gameVersionShaderMessage?: string
 }
 
 export interface CardAction {

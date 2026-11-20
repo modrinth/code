@@ -266,9 +266,6 @@
   "app.browse.project-type.mods": {
     "message": "Mods"
   },
-  "app.browse.server.installing": {
-    "message": "Ini-install"
-  },
   "app.export-modal.description-placeholder": {
     "message": "Ilagay ang paglalarawan ng modpack..."
   },

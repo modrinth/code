@@ -71,9 +71,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Valgte prosjekter er ikke innstallert enda"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Vis:"
-  },
   "button.accept": {
     "defaultMessage": "Aksepter"
   },
@@ -397,12 +394,6 @@
   },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Søk etter {count, number} {contentType}..."
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Nyeste først"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Eldste først"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Oppdater alle"

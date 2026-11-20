@@ -95,9 +95,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "選択中のプロジェクトはまだインストールされていません"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "表示件数："
-  },
   "button.accept": {
     "defaultMessage": "承認"
   },
@@ -649,18 +646,6 @@
   },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "フォルダ内の{contentType}を検索..."
-  },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "名前（A~Z）"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "名前（Z~A）"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "新しい順"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "古い順"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "すべて更新"
@@ -4249,9 +4234,6 @@
   },
   "s.bg": {
     "defaultMessage": "バックグラウンドタスクが実行中です"
-  },
-  "search.filter.dependent_project": {
-    "defaultMessage": "{project} に依存"
   },
   "search.filter.included_content.remove_project.tooltip": {
     "defaultMessage": "プロジェクトを削除"

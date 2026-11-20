@@ -44,9 +44,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "הפרויקטים שנבחרו עוד לא הותקנו"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "לראות:"
-  },
   "button.accept": {
     "defaultMessage": "קבל"
   },

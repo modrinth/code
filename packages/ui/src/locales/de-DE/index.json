@@ -152,9 +152,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Ausgewählte Projekte noch nicht installiert"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Anzeigen:"
-  },
   "button.accept": {
     "defaultMessage": "Akzeptieren"
   },
@@ -829,18 +826,6 @@
   },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Durchsuche {count, number} {contentType}..."
-  },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Name (A-Z)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Name (Z-A)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Neuste zuerst"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Älteste zuerst"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Alle aktualisieren"
@@ -4979,17 +4964,11 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "Erforderlich oder optional"
   },
-  "search.filter.dependent_project": {
-    "defaultMessage": "Abhängig von: {project}"
-  },
   "search.filter.dependent_project.clear": {
     "defaultMessage": "Abhängigkeitsfilter löschen"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Nach einem Projekt suchen..."
-  },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "Ausgeschlossen: {projects}"
   },
   "search.filter.included_content.exclude": {
     "defaultMessage": "Ausschließen"
@@ -5005,9 +4984,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "Inhalt durchsuchen..."
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "Enthält: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filter gesperrt"

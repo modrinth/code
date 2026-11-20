@@ -296,9 +296,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Ajouter du contenu peut vous empêcher de rejoindre le serveur. Tout contenu que vous ajoutez sera retiré quand le contenu géré du serveur sera mis à jour."
   },
-  "app.browse.server.installing": {
-    "message": "Installation en cours"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Aucune version disponible ne correspond à {compatibilityLabel}. Sélectionnez une version pour l'installer malgré tout. Les dépendances ne seront pas installées automatiquement."
   },

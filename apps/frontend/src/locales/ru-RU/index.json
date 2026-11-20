@@ -2228,23 +2228,8 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Заполните налоговую форму"
   },
-  "discover.install.back-to-server": {
-    "message": "Вернуться к серверу"
-  },
-  "discover.install.back-to-setup": {
-    "message": "Вернуться к установке"
-  },
-  "discover.install.cancel-reset": {
-    "message": "Отменить переустановку"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "Отсутствует мир сервера для установки."
-  },
   "discover.install.error.unsupported-content-type": {
     "message": "Контент этого типа нельзя установить на сервер из поиска."
-  },
-  "discover.install.heading.reset-modpack": {
-    "message": "Выбор контента после переустановки"
   },
   "discover.seo.description": {
     "message": "Находите лучшие Minecraft {projectType} на Modrinth с помощью мгновенного и точного поиска. Наши фильтры помогут быстро подобрать подходящие {projectType}."

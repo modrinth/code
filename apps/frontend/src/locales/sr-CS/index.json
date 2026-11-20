@@ -899,12 +899,6 @@
   "dashboard.withdraw.error.paypal-country-mismatch.title": {
     "message": "Nepoklapanje regiona PayPala"
   },
-  "discover.install.back-to-server": {
-    "message": "Nazad na server"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "Nijedan svet servera nije dostupan za instalaciju."
-  },
   "discover.install.error.unsupported-content-type": {
     "message": "Ovaj tip sadržaja se ne može instalirati na server putem usluge pretrage."
   },

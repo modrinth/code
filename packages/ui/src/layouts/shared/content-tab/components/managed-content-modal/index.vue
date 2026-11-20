@@ -159,7 +159,7 @@ const disabledIds = ref(new Set<string>())
 const loading = ref(false)
 const searchQuery = ref('')
 const selectedFilters = ref<string[]>([])
-const { sortMode, sortedItems, hasDateAdded, resetSortMode } = useContentSort(items)
+const { sortMode, sortedItems, sortFields, resetSortMode } = useContentSort(items)
 const showTypeTabs = computed(() => props.filterMode === 'content')
 
 const types = computed<ContentType[]>(() => {
@@ -570,7 +570,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					v-model:sort="sortMode"
 					:types="types"
 					:filter-categories="metadataFilterCategories"
-					:show-date-sort="hasDateAdded"
+					:sort-fields="sortFields"
 					flat
 				>
 					<template v-if="filterMode === 'status'" #leading>

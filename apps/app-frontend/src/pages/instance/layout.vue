@@ -1,7 +1,7 @@
 <template>
 	<div v-if="instance" :class="{ 'flex h-full flex-col': isFixedRender }">
 		<div
-			:class="['p-6 pr-2 pb-4', { 'shrink-0': isFixedRender }]"
+			:class="['p-6 pb-4', { 'shrink-0': isFixedRender }]"
 			@contextmenu.prevent.stop="(event) => handleRightClick(event)"
 		>
 			<ExportModal v-if="!instance.quarantined" ref="exportModal" :instance="instance" />
@@ -56,6 +56,7 @@
 				:minecraft-server="minecraftServer"
 				:can-hide-from-library="canHideInstance"
 				:hidden-from-library="hiddenFromLibrary"
+				:browse-transition="browseTransition"
 				@repair="() => repairInstance()"
 				@stop="() => stopInstance('InstancePage')"
 				@play="() => startInstance('InstancePage')"
@@ -69,9 +70,13 @@
 			/>
 		</div>
 		<div :class="['px-6', { 'shrink-0': isFixedRender }]">
-			<NavTabs :links="tabs" />
+			<Collapsible :collapsed="browseTransition.active" :duration-ms="200" overflow-visible fade>
+				<div class="pb-4">
+					<NavTabs :links="tabs" />
+				</div>
+			</Collapsible>
 			<InstanceAdmonitions
-				class="mt-4"
+				class="mb-4"
 				:instance="instance"
 				:shared-instance-unavailable-reason="sharedInstanceUnavailableReason"
 				:shared-instance-unavailable-manager="sharedInstanceUnavailableManager"
@@ -86,7 +91,7 @@
 				@review-update="reviewSharedInstanceUpdate"
 			/>
 		</div>
-		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
+		<div :class="['px-6 pb-6', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
 			<RouterView v-slot="{ Component }">
 				<template v-if="Component">
 					<Suspense
@@ -117,6 +122,7 @@ import {
 	UserPlusIcon,
 } from '@modrinth/assets'
 import {
+	Collapsible,
 	commonMessages,
 	ConfirmModal,
 	ContextMenu,
@@ -124,6 +130,7 @@ import {
 	injectNotificationManager,
 	NavTabs,
 	useLoadingBarToken,
+	useRouteLinkTransition,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -264,6 +271,7 @@ useQuery(
 	})),
 )
 const instance = computed(() => instanceQuery.data.value)
+const browseTransition = useRouteLinkTransition((route) => route.query.i === instanceId.value)
 
 const {
 	hiddenIds: hiddenInstanceIds,

@@ -134,7 +134,7 @@ export function useMenuKeyboard(options: {
 	panel: Readonly<Ref<HTMLElement | null>>
 	rows: () => { label: string }[]
 	onEscape: () => void
-	onTab?: () => void
+	onTab?: (event: KeyboardEvent) => void
 }) {
 	const navigation = useButtonMenuNavigation(options.panel, topLevelMenuItemSelector)
 	const typeahead = ref('')
@@ -185,7 +185,7 @@ export function useMenuKeyboard(options: {
 				options.onEscape()
 				break
 			case 'Tab':
-				options.onTab?.()
+				options.onTab?.(event)
 				break
 			default:
 				focusTypeaheadMatch(event)

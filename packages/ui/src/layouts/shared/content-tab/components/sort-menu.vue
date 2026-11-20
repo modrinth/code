@@ -1,80 +1,139 @@
 <script setup lang="ts">
 import {
 	ArrowDownAZIcon,
-	ArrowUpDownIcon,
 	ArrowUpZAIcon,
 	ClockArrowDownIcon,
 	ClockArrowUpIcon,
 } from '@modrinth/assets'
-import { type Component, computed } from 'vue'
+import { computed } from 'vue'
 
 import { type ButtonMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import SegmentedControl from '#ui/components/base/SegmentedControl.vue'
+import { defineMessages, type MessageDescriptor, useVIntl } from '#ui/composables/i18n'
 
-import type { ContentSortMode } from '../composables/content-sort'
+import {
+	contentSortDefaultDirections,
+	type ContentSortDirection,
+	type ContentSortField,
+	type ContentSortMode,
+} from '../composables/content-sort'
 
-const props = withDefaults(defineProps<{ showDateOptions?: boolean }>(), {
-	showDateOptions: true,
-})
+const props = defineProps<{ fields: ContentSortField[] }>()
 
 const sortMode = defineModel<ContentSortMode>({ required: true })
 
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	sortAlphabeticalAscending: {
-		id: 'content.page-layout.sort.alphabetical-ascending',
-		defaultMessage: 'Name (A-Z)',
+	fieldName: {
+		id: 'content.page-layout.sort.field.name',
+		defaultMessage: 'Name',
 	},
-	sortAlphabeticalDescending: {
-		id: 'content.page-layout.sort.alphabetical-descending',
-		defaultMessage: 'Name (Z-A)',
+	fieldAuthor: {
+		id: 'content.page-layout.sort.field.author',
+		defaultMessage: 'Author',
 	},
-	sortDateAddedNewest: {
-		id: 'content.page-layout.sort.date-added-newest',
+	fieldUpdated: {
+		id: 'content.page-layout.sort.field.updated',
+		defaultMessage: 'Last updated',
+	},
+	fieldAdded: {
+		id: 'content.page-layout.sort.field.added',
+		defaultMessage: 'Date added',
+	},
+	directionAlphabeticalAscending: {
+		id: 'content.page-layout.sort.direction.alphabetical-ascending',
+		defaultMessage: 'A-Z',
+	},
+	directionAlphabeticalDescending: {
+		id: 'content.page-layout.sort.direction.alphabetical-descending',
+		defaultMessage: 'Z-A',
+	},
+	directionDateDescending: {
+		id: 'content.page-layout.sort.direction.date-descending',
 		defaultMessage: 'Newest first',
 	},
-	sortDateAddedOldest: {
-		id: 'content.page-layout.sort.date-added-oldest',
+	directionDateAscending: {
+		id: 'content.page-layout.sort.direction.date-ascending',
 		defaultMessage: 'Oldest first',
 	},
+	directionLabel: {
+		id: 'content.page-layout.sort.direction.label',
+		defaultMessage: 'Sort direction',
+	},
 	sortByLabel: {
-		id: 'content.page-layout.sort.current',
-		defaultMessage: 'Sort: {mode}',
+		id: 'content.page-layout.sort.current-mode',
+		defaultMessage:
+			'Sort: {field, select, author {Author} updated {Last updated} added {Date added} other {Name}}, {direction, select, za {Z-A} newest {Newest first} oldest {Oldest first} other {A-Z}}',
 	},
 })
 
-const sortLabels: Record<ContentSortMode, () => string> = {
-	'alphabetical-asc': () => formatMessage(messages.sortAlphabeticalAscending),
-	'alphabetical-desc': () => formatMessage(messages.sortAlphabeticalDescending),
-	'date-added-newest': () => formatMessage(messages.sortDateAddedNewest),
-	'date-added-oldest': () => formatMessage(messages.sortDateAddedOldest),
+const fieldLabels: Record<ContentSortField, MessageDescriptor> = {
+	name: messages.fieldName,
+	author: messages.fieldAuthor,
+	updated: messages.fieldUpdated,
+	added: messages.fieldAdded,
 }
 
-const sortIcons = {
-	'alphabetical-asc': ArrowDownAZIcon,
-	'alphabetical-desc': ArrowUpZAIcon,
-	'date-added-newest': ClockArrowDownIcon,
-	'date-added-oldest': ClockArrowUpIcon,
-} satisfies Record<ContentSortMode, Component>
-
-const label = computed(() =>
-	formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode.value]() }),
+const isDateField = computed(
+	() => sortMode.value.field === 'updated' || sortMode.value.field === 'added',
 )
 
-const sortOptions = computed<ButtonMenuOption[]>(() => {
-	const modes: ContentSortMode[] = props.showDateOptions
-		? ['alphabetical-asc', 'alphabetical-desc', 'date-added-newest', 'date-added-oldest']
-		: ['alphabetical-asc', 'alphabetical-desc']
+const directions = computed<ContentSortDirection[]>(() =>
+	isDateField.value ? ['desc', 'asc'] : ['asc', 'desc'],
+)
 
-	return modes.map((mode) => ({
-		id: mode,
-		label: sortLabels[mode](),
-		icon: sortIcons[mode],
-		selected: mode === sortMode.value,
-		action: () => (sortMode.value = mode),
-	}))
+const direction = computed<ContentSortDirection>({
+	get: () => sortMode.value.direction,
+	set: (value) => (sortMode.value = { ...sortMode.value, direction: value }),
 })
+
+function formatDirection(value: ContentSortDirection) {
+	if (isDateField.value) {
+		return formatMessage(
+			value === 'desc' ? messages.directionDateDescending : messages.directionDateAscending,
+		)
+	}
+	return formatMessage(
+		value === 'asc'
+			? messages.directionAlphabeticalAscending
+			: messages.directionAlphabeticalDescending,
+	)
+}
+
+const triggerIcon = computed(() => {
+	const ascending = sortMode.value.direction === 'asc'
+	if (isDateField.value) return ascending ? ClockArrowUpIcon : ClockArrowDownIcon
+	return ascending ? ArrowDownAZIcon : ArrowUpZAIcon
+})
+
+const fieldLabel = computed(() => formatMessage(fieldLabels[sortMode.value.field]))
+
+const directionKey = computed(() => {
+	const descending = sortMode.value.direction === 'desc'
+	if (isDateField.value) return descending ? 'newest' : 'oldest'
+	return descending ? 'za' : 'az'
+})
+
+const label = computed(() =>
+	formatMessage(messages.sortByLabel, {
+		field: sortMode.value.field,
+		direction: directionKey.value,
+	}),
+)
+
+const sortOptions = computed<ButtonMenuOption[]>(() =>
+	props.fields.map((field) => ({
+		id: field,
+		label: formatMessage(fieldLabels[field]),
+		selected: field === sortMode.value.field,
+		remainOpen: true,
+		action: () => {
+			if (field === sortMode.value.field) return
+			sortMode.value = { field, direction: contentSortDefaultDirections[field] }
+		},
+	})),
+)
 </script>
 
 <template>
@@ -85,8 +144,20 @@ const sortOptions = computed<ButtonMenuOption[]>(() => {
 		:options="sortOptions"
 		:icon-only="false"
 		animate-width
+		animate-panel-width
 	>
-		<ArrowUpDownIcon />
-		{{ sortLabels[sortMode]() }}
+		<component :is="triggerIcon" aria-hidden="true" />
+		{{ fieldLabel }}
+		<template #footer>
+			<div role="separator" class="mb-2 mt-1 h-px bg-surface-5" />
+			<SegmentedControl
+				v-model="direction"
+				:items="directions"
+				:neutral-items="directions"
+				:format-label="formatDirection"
+				:aria-label="formatMessage(messages.directionLabel)"
+				full-width
+			/>
+		</template>
 	</TeleportOverflowMenu>
 </template>

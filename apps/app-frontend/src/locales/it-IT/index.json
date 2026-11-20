@@ -296,9 +296,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Aggiungere altri contenuti potrebbe impedirti di accedere al server. Qualsiasi contenuto che aggiungi sarà rimosso quando i contenuti del server saranno aggiornati."
   },
-  "app.browse.server.installing": {
-    "message": "Installazione"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Nessuna versione disponibile soddisfa {compatibilityLabel}. Puoi selezionare una versione da installare comunque. Le dipendenze non verranno scaricate automaticamente."
   },
@@ -3895,9 +3892,6 @@
   },
   "hosting.play.world-changed": {
     "message": "Il mondo non è più attivo o non è stato condiviso. Apri il pannello del server e riclicca Entra nel server."
-  },
-  "installation-settings.advanced.title": {
-    "message": "Avanzate"
   },
   "installation-settings.relink-shared-instance.button": {
     "message": "Ricollega istanza condivisa"

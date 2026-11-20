@@ -149,9 +149,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "你選取的專案尚未安裝"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "每頁顯示："
-  },
   "button.accept": {
     "defaultMessage": "接受"
   },
@@ -763,18 +760,6 @@
   },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "搜尋 {count, number} 個{contentType}..."
-  },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "名稱（A-Z）"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "名稱（Z-A）"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "由新到舊"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "由舊到新"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "更新全部"
@@ -4766,17 +4751,11 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "必須或可選"
   },
-  "search.filter.dependent_project": {
-    "defaultMessage": "相依專案：{project}"
-  },
   "search.filter.dependent_project.clear": {
     "defaultMessage": "清除相依篩選條件"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "搜尋專案..."
-  },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "不包含：{projects}"
   },
   "search.filter.included_content.exclude": {
     "defaultMessage": "排除"
@@ -4792,9 +4771,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "搜尋內容..."
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "包含：{projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "篩選器已鎖定"

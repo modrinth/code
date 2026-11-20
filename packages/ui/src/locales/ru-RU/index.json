@@ -152,9 +152,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Проекты не установлены"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Вид:"
-  },
   "button.accept": {
     "defaultMessage": "Принять"
   },
@@ -796,18 +793,6 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Подождите"
-  },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Название (А–Я)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Название (Я–А)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Сначала новые"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Сначала старые"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Обновить всё"
@@ -4832,17 +4817,11 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "Обязательная, необязательная"
   },
-  "search.filter.dependent_project": {
-    "defaultMessage": "Зависят от {project}"
-  },
   "search.filter.dependent_project.clear": {
     "defaultMessage": "Очистить фильтр зависимости"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Поиск проекта..."
-  },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "Исключать: {projects}"
   },
   "search.filter.included_content.exclude": {
     "defaultMessage": "Исключить"
@@ -4858,9 +4837,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "Поиск контента..."
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "Включать: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Фильтр заблокирован"

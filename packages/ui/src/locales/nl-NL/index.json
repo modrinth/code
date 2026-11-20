@@ -134,9 +134,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Geselecteerde projecten die nog niet zijn geïnstalleerd"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Bekijk:"
-  },
   "button.accept": {
     "defaultMessage": "Accepteer"
   },
@@ -700,18 +697,6 @@
   },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "{count, number} {contentType} zoeken..."
-  },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Naam (A-Z)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Naam (Z-A)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Nieuwste eerst"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Oudste eerst"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Werk alles bij"
@@ -4343,17 +4328,11 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "Vereist of optioneel"
   },
-  "search.filter.dependent_project": {
-    "defaultMessage": "Afhankelijk van {project}"
-  },
   "search.filter.dependent_project.clear": {
     "defaultMessage": "Afhankelijke filter wissen"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Zoek naar een project..."
-  },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "Exclusief: {projects}"
   },
   "search.filter.included_content.exclude": {
     "defaultMessage": "Uitsluiten"
@@ -4369,9 +4348,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "Inhoud zoeken..."
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "Exclusief: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filter vergrendeld"

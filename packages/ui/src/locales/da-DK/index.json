@@ -44,9 +44,6 @@
   "browse.selected-projects-floating-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# projekt valgt} other {# projekter valgt}}"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Vis:"
-  },
   "button.accept": {
     "defaultMessage": "Accepter"
   },
@@ -328,9 +325,6 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Vent venligst"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Ældst først"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Opdater alle"

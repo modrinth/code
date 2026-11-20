@@ -143,9 +143,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Seçili projeler hala indirilmemiş"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Görüntüle:"
-  },
   "button.accept": {
     "defaultMessage": "Kabul Et"
   },
@@ -754,18 +751,6 @@
   },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "{count, number} türündeki içerikleri arayın..."
-  },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "İsim (A-Z)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "İsim (Z-A)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Önce en yeni"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Önce en eski"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Tümünü güncelle"
@@ -4262,17 +4247,11 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "Gerekli veya isteğe bağlı"
   },
-  "search.filter.dependent_project": {
-    "defaultMessage": "Bağımlılık: {project}"
-  },
   "search.filter.dependent_project.clear": {
     "defaultMessage": "Bağımlılık filtresini temizle"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Bir proje ara..."
-  },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "{projects} hariç tutulur"
   },
   "search.filter.included_content.exclude": {
     "defaultMessage": "Hariç tut"
@@ -4288,9 +4267,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "İçerik ara..."
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "{projects} dahil edilir"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filtre kilitli"
