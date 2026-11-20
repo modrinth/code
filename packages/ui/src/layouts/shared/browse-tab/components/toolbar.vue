@@ -225,7 +225,9 @@ const searchPlaceholder = computed(() =>
 						class="!w-[11rem] min-w-max max-w-full flex-grow md:flex-grow-0"
 					>
 						<template #prefix>
-							<span class="font-semibold text-primary">{{ formatMessage(messages.viewPrefix) }}</span>
+							<span class="font-semibold text-primary">{{
+								formatMessage(messages.viewPrefix)
+							}}</span>
 						</template>
 					</Combobox>
 

@@ -17,7 +17,11 @@
 		:browse-content="browseContent"
 	>
 		<template #default="{ onReinstall, onReinstallFailed }">
-			<NuxtPage :route="panelRoute" @reinstall="onReinstall" @reinstall-failed="onReinstallFailed" />
+			<NuxtPage
+				:route="panelRoute"
+				@reinstall="onReinstall"
+				@reinstall-failed="onReinstallFailed"
+			/>
 		</template>
 	</ServersManageRootLayout>
 </template>

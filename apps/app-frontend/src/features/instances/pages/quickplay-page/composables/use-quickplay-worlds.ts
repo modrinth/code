@@ -94,8 +94,8 @@ export function useQuickplayWorlds() {
 		),
 	)
 
-	function updateWorlds(update: (worlds: World[]) => World[]) {
-		queryClient.setQueryData<World[]>(worldsKey.value, (current) => {
+	function updateWorlds(id: string, update: (worlds: World[]) => World[]) {
+		queryClient.setQueryData<World[]>(worldKeys.instance(id), (current) => {
 			if (!current) return current
 			const next = update(current)
 			sortWorlds(next)
@@ -117,15 +117,15 @@ export function useQuickplayWorlds() {
 		{ immediate: true },
 	)
 
-	async function refreshSingleplayerWorld(path: string) {
+	async function refreshSingleplayerWorld(id: string, path: string) {
 		try {
-			const world = await getSingleplayerWorld(instanceId.value, path)
-			updateWorlds((current) => [
+			const world = await getSingleplayerWorld(id, path)
+			updateWorlds(id, (current) => [
 				...current.filter((existing) => existing.type !== 'singleplayer' || existing.path !== path),
 				world,
 			])
 		} catch {
-			await invalidateWorlds()
+			await queryClient.invalidateQueries({ queryKey: worldKeys.instance(id) })
 		}
 	}
 
@@ -135,9 +135,9 @@ export function useQuickplayWorlds() {
 		if (event.event === 'servers_updated') {
 			await invalidateWorlds()
 		} else if (event.event === 'world_updated') {
-			await refreshSingleplayerWorld(event.world)
+			await refreshSingleplayerWorld(event.instance_id, event.world)
 		} else if (event.event === 'server_joined') {
-			updateWorlds((current) =>
+			updateWorlds(event.instance_id, (current) =>
 				current.map((world) =>
 					world.type === 'server' && matchesJoinedServer(world, event.host, event.port)
 						? { ...world, last_played: event.timestamp }
