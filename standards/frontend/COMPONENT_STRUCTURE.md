@@ -4,6 +4,26 @@ For `app-frontend`, choose the feature or shell folder using [Application Struct
 
 These app-specific placement rules do not change the website or shared UI folder structure.
 
+## File Names
+
+Name every standalone component file in PascalCase, matching the component name: `EditServerModal.vue`, `AvatarStack.vue`, `WorldItem.vue`. A standalone component is one that is not split up into a folder of its own. This applies wherever the file lives, including a `components/` folder inside a larger component:
+
+```
+quickplay-page/
+├── index.vue
+├── types.ts
+└── components/
+    ├── AddServerModal.vue
+    ├── EditServerModal.vue
+    └── QuickplayToolbar.vue
+```
+
+Use lowercase kebab-case `.vue` names only for files that are parts of a component folder: the folder's `index.vue` entry point and the role-named pieces beside it, such as `header.vue` or `plot.vue` inside `analytics-chart/`. These files are implementation details of the folder's component, so the folder supplies the public name.
+
+Do not name a standalone component in kebab case. `edit-server-modal.vue` is incorrect; use `EditServerModal.vue`.
+
+Folders, composables, and other TypeScript files always use kebab case: `analytics-chart/`, `use-chart-hover-state.ts`, `types.ts`.
+
 ## Component Folders
 
 Give a component its own folder when it has local helpers, composables, types, or subcomponents. Do not create a folder containing only `index.vue`; keep that component as a named `.vue` file in its parent folder.
@@ -59,7 +79,7 @@ This structure prevents large script blocks that are difficult to review.
 
 ## Local Subcomponent Names
 
-Use short names that describe each local component's role. The parent folder already supplies the component name, so `header.vue` is enough inside `analytics-chart/`:
+Use short lowercase names that describe each local component's role. The parent folder already supplies the component name, so `header.vue` is enough inside `analytics-chart/`:
 
 ```
 analytics-chart/
@@ -69,6 +89,8 @@ analytics-chart/
 ```
 
 Use a more specific name when the role is unclear, such as `date-filter.vue` or `status-filter.vue`. There is no need to repeat the parent name in every filename.
+
+This lowercase form is only for pieces of a component folder. A component in a grouping folder such as `components/` is standalone and uses PascalCase, as described in [File Names](#file-names).
 
 ## Nesting
 
@@ -102,24 +124,24 @@ Deep nesting makes the file tree difficult to scan. It also causes duplicate nam
 
 ## Small Components
 
-Keep small leaf components in single `.vue` files:
+Keep small leaf components in single PascalCase `.vue` files:
 
 ```
 components/
-├── avatar-stack.vue
-├── empty-state.vue
-└── project-status-pill.vue
+├── AvatarStack.vue
+├── EmptyState.vue
+└── ProjectStatusPill.vue
 ```
 
-Move a component into a folder when it gets local helpers, composables, types, or subcomponents. If only `index.vue` remains in a folder, move it back to a named file in the parent folder and update its imports. For example, use `app-shell/route-outlet.vue`, not `app-shell/route-outlet/index.vue`. This rule also applies to large components that have no supporting files.
+Move a component into a folder when it gets local helpers, composables, types, or subcomponents. The folder takes the kebab-case name and the component becomes its `index.vue`. If only `index.vue` remains in a folder, move it back to a PascalCase file in the parent folder and update its imports. For example, use `app-shell/RouteOutlet.vue`, not `app-shell/route-outlet/index.vue`. This rule also applies to large components that have no supporting files.
 
 ## Public and Local Components
 
-For a component with its own folder, use the main `index.vue` as its public entry point. Treat the supporting files as implementation details. A standalone component uses its named `.vue` file as its entry point; it does not need a folder to be public.
+For a component with its own folder, use the main `index.vue` as its public entry point. Treat the supporting files as implementation details. A standalone component uses its PascalCase `.vue` file as its entry point; it does not need a folder to be public.
 
 If another component imports a local subcomponent, use one of these solutions:
 
-- Promote the subcomponent to a standalone named `.vue` file, or give it its own component folder if it has supporting files.
+- Promote the subcomponent to a standalone PascalCase `.vue` file, or give it its own component folder if it has supporting files.
 - Move the subcomponent to the nearest shared component area when it is reusable.
 - Keep it local and pass behavior through the main component.
 

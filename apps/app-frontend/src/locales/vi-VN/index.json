@@ -3377,9 +3377,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Chọn một tùy chọn"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Phiên bản {version} không tương thích"
   },
@@ -3931,12 +3928,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "Bạn muốn giữ máy chủ này trong các bản cài đặt đã đồng bộ khác hay xóa nó khỏi chúng?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Giữ lại"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Xóa"
   },
   "instance.worlds.desync-server.title": {
     "message": "Ngừng đồng bộ máy chủ"

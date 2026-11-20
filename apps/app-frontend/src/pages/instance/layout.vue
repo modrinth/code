@@ -175,7 +175,7 @@ import {
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
-import { start_join_server } from '@/helpers/worlds'
+import { startJoinServer } from '@/platform/app-lib/worlds/commands'
 import { provideInstanceBackup } from '@/providers/instance-backup'
 import { injectServerInstall } from '@/providers/server-install'
 import { useRootBreadcrumb } from '@/shared/breadcrumbs'
@@ -641,7 +641,7 @@ const launchInstance = async (context: string, address?: string) => {
 	loading.value = true
 	try {
 		await instanceLaunch.run(currentInstance.id, async () => {
-			if (address) await start_join_server(currentInstance.id, address)
+			if (address) await startJoinServer(currentInstance.id, address)
 			else await run(currentInstance.id)
 			queryClient.setQueryData(instanceKeys.processes(currentInstance.id), [true])
 		})

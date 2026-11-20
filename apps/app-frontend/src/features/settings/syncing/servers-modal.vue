@@ -29,17 +29,12 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
+import { refreshServerData, refreshServers, type ServerData } from '@/features/servers/server-pings'
+import { getWorldDisplayName, worldNameMatchesQuery } from '@/features/worlds/world-utils'
 import { remove_synced_server, type SyncedServer, update_synced_server } from '@/helpers/instance'
 import { syncedOptionsKeys, syncedServersQueryOptions } from '@/helpers/synced-options'
 import { copyToClipboard } from '@/helpers/utils'
-import {
-	getWorldDisplayName,
-	refreshServerData,
-	refreshServers,
-	type ServerData,
-	type ServerWorld,
-	worldNameMatchesQuery,
-} from '@/helpers/worlds'
+import type { ServerWorld } from '@/platform/app-lib/worlds/types'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()

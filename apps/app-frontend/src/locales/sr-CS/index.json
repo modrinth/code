@@ -815,9 +815,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "primer.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Izaberi opciju"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Nekompatibilna verzija {version}"
   },

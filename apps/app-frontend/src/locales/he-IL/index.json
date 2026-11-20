@@ -1664,9 +1664,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "בחר אופציה"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "גרסה לא תואמת: {version}"
   },
@@ -1942,12 +1939,6 @@
   },
   "instance.worlds.copy_address": {
     "message": "העתק כתובת"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "שמור"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "מחק"
   },
   "instance.worlds.desync_server": {
     "message": "בטל סנכרון"

@@ -18,6 +18,7 @@ import CommandHistoryModal from '@/features/settings/syncing/command-history-mod
 import GameSettingsModal from '@/features/settings/syncing/game-settings-modal/index.vue'
 import SyncedServersModal from '@/features/settings/syncing/servers-modal.vue'
 import SyncedPacksModal from '@/features/settings/syncing/synced-packs-modal.vue'
+import { worldKeys } from '@/features/worlds/queries'
 import { gameSettingsKeys } from '@/helpers/game-options'
 import {
 	get_synced_option_join_preview,
@@ -435,7 +436,7 @@ const mutation = useMutation({
 		}
 		if (variables.option === 'multiplayer_servers') {
 			await queryClient.invalidateQueries({
-				queryKey: instanceKeys.worlds(instance.value.id),
+				queryKey: worldKeys.instance(instance.value.id),
 			})
 		}
 		if (queryClient.isMutating({ mutationKey }) === 1) {

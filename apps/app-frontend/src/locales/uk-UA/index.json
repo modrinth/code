@@ -3749,9 +3749,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Виберіть опцію"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Несумісна версія {version}"
   },
@@ -4456,12 +4453,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "Ви хочете залишити цей сервер в інших синхронізованих примірниках чи ні?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Залишити"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Видалити"
   },
   "instance.worlds.desync-server.title": {
     "message": "Розсинхронізування сервера"

@@ -7,7 +7,7 @@ const value = defineModel<boolean>({ required: true })
 
 const labelMessage = defineMessage({
 	id: 'instance.edit-world.hide-from-home',
-	defaultMessage: `Hide from the Home page`,
+	defaultMessage: 'Hide from the Home page',
 })
 
 const label = computed(() => formatMessage(labelMessage))

@@ -1,11 +1,9 @@
 import { type QueryClient, queryOptions } from '@tanstack/vue-query'
 
-import {
-	get_server_status,
-	normalizeServerAddress,
-	type ProtocolVersion,
-	type ServerStatus,
-} from '@/helpers/worlds'
+import { getServerStatus } from '@/platform/app-lib/worlds/commands'
+import type { ProtocolVersion, ServerStatus } from '@/platform/app-lib/worlds/types'
+
+import { normalizeServerAddress } from './address'
 
 export const SERVER_STATUS_CACHE_MS = 10 * 60 * 1000
 
@@ -33,10 +31,10 @@ export function serverStatusQueryOptions(
 		queryKey: getServerStatusQueryKey(address, protocolVersion),
 		queryFn: async () => {
 			try {
-				return await get_server_status(address, protocolVersion)
+				return await getServerStatus(address, protocolVersion)
 			} catch (error) {
 				if (protocolVersion?.legacy) throw error
-				return await get_server_status(address, { version: 74, legacy: true })
+				return await getServerStatus(address, { version: 74, legacy: true })
 			}
 		},
 		staleTime: 30_000,
@@ -64,7 +62,7 @@ export async function fetchCachedServerStatus(
 ) {
 	return await queryClient.fetchQuery({
 		queryKey: getServerStatusQueryKey(address, protocolVersion),
-		queryFn: () => get_server_status(address, protocolVersion),
+		queryFn: () => getServerStatus(address, protocolVersion),
 		staleTime: SERVER_STATUS_CACHE_MS,
 		gcTime: SERVER_STATUS_CACHE_MS,
 	})

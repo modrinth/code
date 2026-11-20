@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { Combobox, defineMessages, Input, type MessageDescriptor, useVIntl } from '@modrinth/ui'
+import { computed, useId } from 'vue'
 
-import type { ServerPackStatus } from '@/helpers/worlds.ts'
+import type { ServerPackStatus } from '@/platform/app-lib/worlds/types'
 
 const { formatMessage } = useVIntl()
 
-const name = defineModel<string>('name')
-const address = defineModel<string>('address')
-const resourcePack = defineModel<ServerPackStatus>('resourcePack')
-
-const resourcePackOptions: ServerPackStatus[] = ['enabled', 'prompt', 'disabled']
+const name = defineModel<string>('name', { required: true })
+const address = defineModel<string>('address', { required: true })
+const resourcePack = defineModel<ServerPackStatus>('resourcePack', { required: true })
 
 const resourcePackOptionMessages: Record<ServerPackStatus, MessageDescriptor> = defineMessages({
 	enabled: {
@@ -47,51 +46,58 @@ const messages = defineMessages({
 		id: 'app.world.server-modal.placeholder-address',
 		defaultMessage: 'example.modrinth.gg',
 	},
-	selectAnOption: {
-		id: 'app.world.server-modal.select-an-option',
-		defaultMessage: 'Select an option',
-	},
 })
 
-defineExpose({ resourcePackOptions })
+const RESOURCE_PACK_OPTIONS: ServerPackStatus[] = ['enabled', 'prompt', 'disabled']
+
+const resourcePackOptions = computed(() =>
+	RESOURCE_PACK_OPTIONS.map((value) => ({
+		value,
+		label: formatMessage(resourcePackOptionMessages[value]),
+	})),
+)
+
+const id = useId()
+const nameId = `${id}-name`
+const addressId = `${id}-address`
 </script>
+
 <template>
-	<div class="space-y-4 w-full">
-		<label class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">{{ formatMessage(messages.name) }}</span>
+	<div class="flex w-full flex-col gap-4">
+		<div class="flex flex-col gap-2">
+			<label :for="nameId" class="font-semibold text-contrast">
+				{{ formatMessage(messages.name) }}
+			</label>
 			<Input
+				:id="nameId"
 				v-model="name"
 				:placeholder="formatMessage(messages.placeholderName)"
 				autocomplete="off"
 				wrapper-class="w-full"
 			/>
-		</label>
-		<label class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">{{ formatMessage(messages.address) }}</span>
+		</div>
+		<div class="flex flex-col gap-2">
+			<label :for="addressId" class="font-semibold text-contrast">
+				{{ formatMessage(messages.address) }}
+			</label>
 			<Input
+				:id="addressId"
 				v-model="address"
 				:placeholder="formatMessage(messages.placeholderAddress)"
 				autocomplete="off"
+				:spellcheck="false"
 				wrapper-class="w-full"
 			/>
-		</label>
-		<label class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">{{ formatMessage(messages.resourcePack) }}</span>
+		</div>
+		<div class="flex flex-col gap-2">
+			<span class="font-semibold text-contrast">
+				{{ formatMessage(messages.resourcePack) }}
+			</span>
 			<Combobox
 				v-model="resourcePack"
-				:options="
-					resourcePackOptions.map((o) => ({
-						value: o,
-						label: formatMessage(resourcePackOptionMessages[o]),
-					}))
-				"
-				name="Server resource pack"
-				:display-value="
-					resourcePack
-						? formatMessage(resourcePackOptionMessages[resourcePack])
-						: formatMessage(messages.selectAnOption)
-				"
+				:options="resourcePackOptions"
+				:display-value="formatMessage(resourcePackOptionMessages[resourcePack])"
 			/>
-		</label>
+		</div>
 	</div>
 </template>

@@ -3593,9 +3593,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "voorbeeld.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Kies een keuze"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Incompatibele versie{version}"
   },
@@ -4192,12 +4189,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "Wil je deze server in andere gesynchroniseerde instanties houden, of deze uit deze bestanden verwijderen?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Behouden"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Verwijderen"
   },
   "instance.worlds.desync-server.title": {
     "message": "Desync server"

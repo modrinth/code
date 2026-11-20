@@ -3758,9 +3758,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "옵션 선택"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "{version} 버전에 호환되지 않음"
   },
@@ -4465,12 +4462,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "이 서버를 동기화된 다른 인스턴스에서 유지합니까, 아니면 제거합니까?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "유지"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "제거"
   },
   "instance.worlds.desync-server.title": {
     "message": "서버 동기화 해제"

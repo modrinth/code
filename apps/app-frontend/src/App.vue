@@ -170,7 +170,6 @@ import {
 	isNetworkMetered,
 	setRestartAfterPendingUpdate,
 } from '@/helpers/utils.js'
-import { start_join_server, start_join_singleplayer_world } from '@/helpers/worlds.ts'
 import i18n, { setLocale } from '@/i18n.config'
 import {
 	instanceKeys,
@@ -180,6 +179,7 @@ import {
 import { useBrowseRoutePrefetch } from '@/platform/adapters/browse/use-browse-route-prefetch'
 import { createFileDownload } from '@/platform/adapters/file-download'
 import { createIconCache } from '@/platform/adapters/icon-cache'
+import { startJoinServer, startJoinSingleplayerWorld } from '@/platform/app-lib/worlds/commands'
 import { createAppClient } from '@/platform/modrinth-client'
 import {
 	appUpdateState,
@@ -1554,9 +1554,9 @@ async function handleCommand(e) {
 		if (!instance || instance.launch_blocked) return
 
 		if (e.server) {
-			await start_join_server(e.id, e.server).catch(handleError)
+			await startJoinServer(e.id, e.server).catch(handleError)
 		} else if (e.singleplayer_world) {
-			await start_join_singleplayer_world(e.id, e.singleplayer_world).catch(handleError)
+			await startJoinSingleplayerWorld(e.id, e.singleplayer_world).catch(handleError)
 		} else {
 			await run(e.id).catch(handleError)
 		}

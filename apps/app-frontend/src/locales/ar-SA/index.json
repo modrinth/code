@@ -3440,9 +3440,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "(example.modrinth.gg)"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "حدد خيارا"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "إصدار غير مطابق ({version})"
   },
@@ -4006,12 +4003,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "هل تريد الحفاظ على هذا الخادم في النسخ أخرى، أو إزالته منها؟"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "احتفظ"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "إزالة"
   },
   "instance.worlds.desync-server.title": {
     "message": "إلغاء مزامنة الخادم"

@@ -1,7 +1,7 @@
 import type { AbstractModrinthClient } from '@modrinth/api-client'
 import { queryOptions } from '@tanstack/vue-query'
 
-import { get_instance_worlds } from '@/helpers/worlds'
+import { getInstanceWorlds } from '@/platform/app-lib/worlds/commands'
 
 export const linkedServerKeys = {
 	linkedServer: (instanceId: string, sharedInstanceId: string, userId: string | null | undefined) =>
@@ -37,6 +37,6 @@ export function linkedServerQueryOptions(
 export function linkedServerWorldsQueryOptions(instanceId: string) {
 	return queryOptions({
 		queryKey: linkedServerKeys.worlds(instanceId),
-		queryFn: () => get_instance_worlds(instanceId),
+		queryFn: () => getInstanceWorlds(instanceId),
 	})
 }

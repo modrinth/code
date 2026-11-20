@@ -7,8 +7,8 @@ import {
 	list as listInstances,
 } from '@/helpers/instance'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { get_instance_worlds } from '@/helpers/worlds'
 import { instanceKeys } from '@/pages/instance/query-options'
+import { getInstanceWorlds } from '@/platform/app-lib/worlds/commands'
 
 export function browseTagsQueryOptions() {
 	return queryOptions({
@@ -39,7 +39,7 @@ export function installedProjectIdsQueryOptions(instanceId: string, fromWorlds: 
 					.filter((projectId): projectId is string => !!projectId)
 			}
 			if (fromWorlds) {
-				return (await get_instance_worlds(instanceId))
+				return (await getInstanceWorlds(instanceId))
 					.filter((world) => world.type === 'server' && 'project_id' in world && world.project_id)
 					.map((world) => (world as { project_id: string }).project_id)
 			}

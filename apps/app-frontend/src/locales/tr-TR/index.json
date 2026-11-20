@@ -3188,9 +3188,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Bir seçenek seçin"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Uyumsuz sürüm {version}"
   },
@@ -3703,12 +3700,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "Bu sunucuyu diğer senkronize edilmiş kurulumlarda tutmak mı istiyorsunuz, yoksa onları kaldırmak mı?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Sakla"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Kaldır"
   },
   "instance.worlds.desync-server.title": {
     "message": "Sunucunun senkronizasyonu kaldır"

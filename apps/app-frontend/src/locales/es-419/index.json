@@ -3635,9 +3635,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "ejemplo.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Selecciona una opción"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Versión {version} incompatible"
   },
@@ -4258,12 +4255,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "¿Quieres mantener este servidor en otras instancias sincronizadas o eliminarlo de ellas?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Mantener"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Eliminar"
   },
   "instance.worlds.desync-server.title": {
     "message": "Desincronizar server"

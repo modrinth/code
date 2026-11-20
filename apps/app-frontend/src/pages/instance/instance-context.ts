@@ -3,7 +3,7 @@ import { createContext } from '@modrinth/ui'
 import type { ComputedRef, Ref } from 'vue'
 
 import type { GameInstance } from '@/helpers/types'
-import type { ServerStatus } from '@/helpers/worlds'
+import type { ServerStatus } from '@/platform/app-lib/worlds/types'
 
 export interface InstancePageContext {
 	readonly instanceId: ComputedRef<string>
