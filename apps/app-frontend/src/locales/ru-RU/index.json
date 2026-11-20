@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Выбор персонажа в боковой панели"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Показывать вкладку миров в сборках"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Боковая панель"
   },
@@ -901,9 +898,6 @@
   },
   "app.instance.tab.share": {
     "message": "Доступ"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Миры"
   },
   "app.instance.worlds.add-server": {
     "message": "Добавить сервер"
@@ -3713,9 +3707,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Выберите вариант"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Несовместимая версия {version}"
   },
@@ -4057,9 +4048,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "Невозможно скрыть вкладку скриншотов, пока общий раздеь выключен."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Вкладка миров"
   },
   "instance.settings.tabs.general": {
     "message": "Основные"
@@ -4405,12 +4393,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "Сервер синхронизирован в других сборках. Оставить его в них или удалить?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Оставить"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Удалить"
   },
   "instance.worlds.desync-server.title": {
     "message": "Десинхронизация сервера"

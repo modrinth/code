@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Skin-Auswahl in der Seitenleiste anzeigen"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Welten-Tab in Instanzen anzeigen"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Seitenleiste"
   },
@@ -916,9 +913,6 @@
   },
   "app.instance.tab.share": {
     "message": "Teilen"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Welten"
   },
   "app.instance.worlds.add-server": {
     "message": "Server hinzufügen"
@@ -3764,9 +3758,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Wähle eine Option"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Inkompatible Version {version}"
   },
@@ -4124,9 +4115,6 @@
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "Der Screenshots-Tab kann nicht ausgeblendet werden, solange die globale Screenshots-Seite deaktiviert ist."
   },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Welten-Tab anzeigen"
-  },
   "instance.settings.tabs.general": {
     "message": "Allgemein"
   },
@@ -4474,12 +4462,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "Möchtest du diesen Server in anderen synchronisierten Instanzen beibehalten oder ihn dort entfernen?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Behalten"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Entfernen"
   },
   "instance.worlds.desync-server.title": {
     "message": "Server desynchronisieren"

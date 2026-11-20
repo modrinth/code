@@ -362,9 +362,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "הראה בחירת סקין בסרגל צד"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "הראה כפתור עולמות בהתקנים"
-  },
   "app.features-settings.sidebar.title": {
     "message": "סרגל צד"
   },
@@ -757,9 +754,6 @@
   },
   "app.instance.tab.share": {
     "message": "שיתוף"
-  },
-  "app.instance.tab.worlds": {
-    "message": "עולמות"
   },
   "app.instance.worlds.add-server": {
     "message": "הוסף שרת"
@@ -1670,9 +1664,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "בחר אופציה"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "גרסה לא תואמת: {version}"
   },
@@ -1948,12 +1939,6 @@
   },
   "instance.worlds.copy_address": {
     "message": "העתק כתובת"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "שמור"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "מחק"
   },
   "instance.worlds.desync_server": {
     "message": "בטל סנכרון"

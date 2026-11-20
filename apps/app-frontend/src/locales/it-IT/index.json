@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Mostra selettore skin nella barra laterale"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Mostra la scheda Mondi nelle istanze"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Barra laterale"
   },
@@ -916,9 +913,6 @@
   },
   "app.instance.tab.share": {
     "message": "Condivisione"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Mondi"
   },
   "app.instance.worlds.add-server": {
     "message": "Aggiungi server"
@@ -3761,9 +3755,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Seleziona un'opzione"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Versione {version} incompatibile"
   },
@@ -4121,9 +4112,6 @@
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "La scheda Schermate non può essere nascosta quando la funzione è disabilitata dall'app."
   },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Mostra la scheda Mondi"
-  },
   "instance.settings.tabs.general": {
     "message": "Generale"
   },
@@ -4471,12 +4459,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "Desideri mantenere il server nelle istanze sincronizzate o rimuoverlo definitivamente?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Tieni"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Rimuovi"
   },
   "instance.worlds.desync-server.title": {
     "message": "Desincronizza server"

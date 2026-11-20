@@ -122,7 +122,7 @@ export default new createRouter({
 				{
 					path: 'worlds',
 					name: 'InstanceWorlds',
-					component: () => import('@/pages/instance/worlds/index.vue'),
+					component: () => import('@/features/instances/pages/quickplay-page/index.vue'),
 				},
 				{
 					path: 'share',

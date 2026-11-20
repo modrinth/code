@@ -446,9 +446,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Hiển thị trình chọn skin trên thanh bên"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Hiển thị thẻ Thế giới trong các bản cài đặt"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Thanh bên"
   },
@@ -844,9 +841,6 @@
   },
   "app.instance.tab.share": {
     "message": "Chia sẻ"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Thế giới"
   },
   "app.instance.worlds.add-server": {
     "message": "Thêm máy chủ"
@@ -3383,9 +3377,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Chọn một tùy chọn"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Phiên bản {version} không tương thích"
   },
@@ -3658,9 +3649,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "Không thể ẩn thẻ Ảnh chụp màn hình khi trang Ảnh chụp màn hình toàn cục đang bị tắt."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Hiển thị thẻ Thế giới"
   },
   "instance.settings.tabs.general": {
     "message": "Chung"
@@ -3940,12 +3928,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "Bạn muốn giữ máy chủ này trong các bản cài đặt đã đồng bộ khác hay xóa nó khỏi chúng?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Giữ lại"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Xóa"
   },
   "instance.worlds.desync-server.title": {
     "message": "Ngừng đồng bộ máy chủ"

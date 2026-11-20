@@ -461,9 +461,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Toon Skin-selector in zijbalk"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Toon Werelden tabblad in instanties"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Zijbalk"
   },
@@ -889,9 +886,6 @@
   },
   "app.instance.tab.share": {
     "message": "Delen"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Werelden"
   },
   "app.instance.worlds.add-server": {
     "message": "Voeg server toe"
@@ -3599,9 +3593,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "voorbeeld.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Kies een keuze"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Incompatibele versie{version}"
   },
@@ -3883,9 +3874,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "De schermafbeeldingen tab kan niet worden verborgen als de globale schermafbeeldingen pagina is uitgeschakeld."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Bestandentabblad weergeven"
   },
   "instance.settings.tabs.general": {
     "message": "Algemeen"
@@ -4201,12 +4189,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "Wil je deze server in andere gesynchroniseerde instanties houden, of deze uit deze bestanden verwijderen?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Behouden"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Verwijderen"
   },
   "instance.worlds.desync-server.title": {
     "message": "Desync server"

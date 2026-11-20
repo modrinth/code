@@ -281,9 +281,6 @@
   "app.instance.tab.share": {
     "message": "Kongsi"
   },
-  "app.instance.tab.worlds": {
-    "message": "Dunia"
-  },
   "app.instance.worlds.add-server": {
     "message": "Tambah pelayan"
   },
@@ -1613,9 +1610,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Pilih pilihan anda"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Versi tidak serasi: {version}"
   },
@@ -1873,9 +1867,6 @@
   },
   "instance.worlds.copy_address": {
     "message": "Salin alamat"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Kekalkan"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Jangan tunjukkan pada Laman Utama"

@@ -33,8 +33,8 @@ src/
 │   ├── settings/
 │   └── skins/
 │       ├── pages/
-│       │   └── skins-page.vue
-│       ├── skin-preview.vue
+│       │   └── SkinsPage.vue
+│       ├── SkinPreview.vue
 │       └── queries.ts
 ├── shared/
 │   ├── components/
@@ -55,7 +55,7 @@ Within a feature, keep a component's supporting files beside that component. A c
 
 Vue's [guide to extracting composables](https://vuejs.org/guide/reusability/composables.html#extracting-composables-for-code-organization) explains how separating related behavior can make a component easier to read, even when that behavior is not reused.
 
-Desktop route views belong in the feature's `pages/` folder, with their routes registered in `app/router.ts`. For example, the skins route renders `features/skins/pages/skins-page.vue`, with skin previews and queries beside the page folder. A feature used only in the sidebar does not need a page.
+Desktop route views belong in the feature's `pages/` folder, with their routes registered in `app/router.ts`. For example, the skins route renders `features/skins/pages/SkinsPage.vue`, with skin previews and queries beside the page folder. A feature used only in the sidebar does not need a page.
 
 A page can also render an existing layout from `@modrinth/ui`. Keep the route component in its feature and the shared layout in `packages/ui`. The adapters entry in the tree refers to the desktop implementations of the contracts those pages use.
 

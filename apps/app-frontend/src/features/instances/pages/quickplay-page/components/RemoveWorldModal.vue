@@ -8,19 +8,18 @@ import {
 	NewModal,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, ref } from 'vue'
+import { computed, ref, shallowRef } from 'vue'
 
-import { getWorldDisplayName, type World } from '@/helpers/worlds.ts'
+import { getWorldDisplayName } from '@/features/worlds/world-utils'
+import type { World } from '@/platform/app-lib/worlds/types'
 
-const { formatMessage } = useVIntl()
-
-const props = defineProps<{
-	world: World | null
-}>()
+import type { RemoveScope, RemoveWorldValues } from '../types'
 
 const emit = defineEmits<{
-	confirm: [world: World, scope: 'here' | 'all']
+	confirm: [values: RemoveWorldValues]
 }>()
+
+const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	removeServerTitle: {
@@ -76,13 +75,13 @@ const messages = defineMessages({
 	},
 })
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof NewModal> | null>(null)
+const world = shallowRef<World | null>(null)
 
-const isServer = computed(() => props.world?.type === 'server')
+const isServer = computed(() => world.value?.type === 'server')
 const isSyncedServer = computed(
-	() => props.world?.type === 'server' && props.world.source === 'user_synced',
+	() => world.value?.type === 'server' && world.value.source === 'user_synced',
 )
-const isSingleplayer = computed(() => props.world?.type === 'singleplayer')
 const titleMessage = computed(() =>
 	isSyncedServer.value
 		? messages.syncedServerHeader
@@ -108,17 +107,18 @@ const warningBodyMessage = computed(() =>
 			: messages.deleteWorldWarningBody,
 )
 
-function show() {
-	modal.value?.show()
+function show(value: World, event?: MouseEvent) {
+	world.value = value
+	modal.value?.show(event)
 }
 
 function hide() {
 	modal.value?.hide()
 }
 
-function confirm(scope: 'here' | 'all') {
-	if (!props.world) return
-	emit('confirm', props.world, scope)
+function confirm(scope: RemoveScope) {
+	if (!world.value) return
+	emit('confirm', { world: world.value, scope })
 	hide()
 }
 
@@ -130,7 +130,7 @@ defineExpose({ show, hide })
 		ref="modal"
 		:header="formatMessage(titleMessage)"
 		:fade="isSyncedServer ? 'warning' : 'danger'"
-		max-width="560px"
+		width="min(560px, calc(95vw - 10rem))"
 		no-padding
 	>
 		<div class="flex flex-col gap-4 px-6 pt-6">
@@ -139,7 +139,7 @@ defineExpose({ show, hide })
 			</p>
 			<Admonition
 				v-else
-				:type="isSyncedServer ? 'warning' : 'critical'"
+				type="critical"
 				:header="
 					formatMessage(warningHeaderMessage, {
 						name: world ? getWorldDisplayName(world) : '',
@@ -153,7 +153,7 @@ defineExpose({ show, hide })
 		<template #actions>
 			<div class="flex flex-wrap justify-end gap-2">
 				<Button type="outlined" @click="hide">
-					<XIcon />
+					<XIcon aria-hidden="true" />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
 				<template v-if="isSyncedServer">
@@ -166,14 +166,8 @@ defineExpose({ show, hide })
 						{{ formatMessage(messages.removeHere) }}
 					</Button>
 				</template>
-				<Button
-					v-else
-					type="colored"
-					color="red"
-					:disabled="!isServer && !isSingleplayer"
-					@click="confirm('all')"
-				>
-					<TrashIcon />
+				<Button v-else type="colored" color="red" :disabled="!world" @click="confirm('all')">
+					<TrashIcon aria-hidden="true" />
 					{{ formatMessage(actionMessage) }}
 				</Button>
 			</div>

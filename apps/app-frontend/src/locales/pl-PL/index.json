@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Pokaż wybór skórki na pasku bocznym"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Pokaż kartę Światy w instancjach"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Pasek boczny"
   },
@@ -904,9 +901,6 @@
   },
   "app.instance.tab.share": {
     "message": "Udostępnianie"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Światy"
   },
   "app.instance.worlds.add-server": {
     "message": "Dodaj serwer"
@@ -3749,9 +3743,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Wybierz opcję"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Niekompatybilna wersja {version}"
   },
@@ -4057,9 +4048,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "Nie można ukryć karty Zrzuty ekranu, gdy ogólna strona Zrzuty ekranu jest wyłączona."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Pokaż kartę Światy"
   },
   "instance.settings.tabs.general": {
     "message": "Ogólne"
@@ -4390,12 +4378,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "Czy chcesz zachować ten serwer w innych synchronizowanych instancjach, czy go z nich usunąć?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Zachowaj"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Usuń"
   },
   "instance.worlds.desync-server.title": {
     "message": "Wyłącz synchronizację serwera"

@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "在側邊欄顯示外觀選擇工具"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "在實例中顯示「世界」頁籤"
-  },
   "app.features-settings.sidebar.title": {
     "message": "側邊欄"
   },
@@ -901,9 +898,6 @@
   },
   "app.instance.tab.share": {
     "message": "共用"
-  },
-  "app.instance.tab.worlds": {
-    "message": "世界"
   },
   "app.instance.worlds.add-server": {
     "message": "新增伺服器"
@@ -3716,9 +3710,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "選擇選項"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "版本不相容：{version}"
   },
@@ -4033,9 +4024,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "當全域「螢幕擷取畫面」頁面設為關閉時，無法隱藏「螢幕擷取畫面」頁籤。"
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "顯示「世界」頁籤"
   },
   "instance.settings.tabs.general": {
     "message": "一般"
@@ -4369,12 +4357,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "你要在其他已同步的實例中保留這個伺服器，還是一併將它移除？"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "保留"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "移除"
   },
   "instance.worlds.desync-server.title": {
     "message": "取消同步伺服器"

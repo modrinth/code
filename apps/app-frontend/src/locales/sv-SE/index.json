@@ -470,9 +470,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Visa utseendeväljaren i sidofältet"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Visa Världar fliken i instanser"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Sidofält"
   },
@@ -898,9 +895,6 @@
   },
   "app.instance.tab.share": {
     "message": "Dela"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Världar"
   },
   "app.instance.worlds.add-server": {
     "message": "Lägg till server"
@@ -3344,9 +3338,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "exempel.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Välj ett alternativ"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Inkompatibel version {version}"
   },
@@ -3608,9 +3599,6 @@
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "Skärmdumpsfliken kan inte döljas medan den globala skärmdumpssidan är avstängd."
   },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Visa världar-flik"
-  },
   "instance.settings.tabs.general": {
     "message": "Allmänt"
   },
@@ -3865,12 +3853,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "Vill du behålla den här servern i andra synkroniserade instanser eller ta bort den från dem?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Behåll"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Ta bort"
   },
   "instance.worlds.desync-server.title": {
     "message": "Avsynkronisera server"
