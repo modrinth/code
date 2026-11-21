@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { PlusIcon } from '@modrinth/assets'
 import {
+	Button,
 	commonMessages,
 	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
@@ -16,15 +18,18 @@ import {
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString, isAdmin, sortedCategories } from '@modrinth/utils'
-import { computed } from 'vue'
+import { capitalizeString, isAdmin, sortedCategories, TeamMemberPermission } from '@modrinth/utils'
+import { computed, useTemplateRef } from 'vue'
 
+import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
+import { isPermission } from '~/utils/permissions'
 
+import { versionActionMessages } from '../versions/messages'
 import FeaturedTags from './featured-tags.vue'
 import CategoryPicker from './tag-picker.vue'
 import type { Category, CategoryGroup } from './types'
@@ -121,6 +126,16 @@ const formatCategoryName = (categoryName: string) => formatCategory(formatMessag
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 
 const canSelectTags = computed(() => project.value.versions.length > 0 || isServerProject.value)
+const canUploadVersion = computed(() => {
+	const member = currentMember.value
+	return (
+		!!member?.accepted &&
+		(isAdmin(member.user) ||
+			('staffOnly' in member && member.staffOnly === true) ||
+			isPermission(member.permissions, TeamMemberPermission.UPLOAD_VERSION))
+	)
+})
+const createProjectVersionModal = useTemplateRef('create-project-version-modal')
 
 const projectTypes = computed(() => {
 	if (isServerProject.value) {
@@ -367,6 +382,11 @@ const toggleFeatured = (tag: string) => {
 <template>
 	<div>
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
+		<CreateProjectVersionModal
+			v-if="!canSelectTags && currentMember"
+			ref="create-project-version-modal"
+			:enable-drop-area="false"
+		/>
 		<h2 v-if="canSelectTags" class="settings-section-title">
 			{{ formatMessage(commonProjectSettingsMessages.tags) }}
 		</h2>
@@ -375,7 +395,19 @@ const toggleFeatured = (tag: string) => {
 			type="no-documents"
 			:heading="formatMessage(messages.uploadVersionFirstHeading)"
 			:description="formatMessage(commonMessages.uploadVersionsEmptyStateDescription)"
-		/>
+		>
+			<template v-if="currentMember" #actions>
+				<Button
+					type="colored"
+					color="brand"
+					size="lg"
+					:disabled="!canUploadVersion"
+					@click="createProjectVersionModal?.openCreateVersionModal()"
+				>
+					<PlusIcon /> {{ formatMessage(versionActionMessages.create) }}
+				</Button>
+			</template>
+		</EmptyState>
 		<div v-else class="flex flex-col gap-4">
 			<p class="mb-0 mt-0 text-secondary">
 				{{ formatMessage(messages.description, { count: isServerProject ? 18 : 8 }) }}

@@ -33,8 +33,8 @@ import type {
 
 type DisclosureEditorOptions = {
 	projectId: Ref<string>
-	projectTypes: Ref<string[]>
-	canEditDisclosures: Ref<boolean>
+	projectTypes: Ref<string[] | null>
+	canEditDisclosures?: Ref<boolean>
 	hasPermission: Ref<boolean>
 	isActingAsModerator: Ref<boolean>
 	isAdminUser: Ref<boolean>
@@ -44,7 +44,7 @@ type DisclosureEditorOptions = {
 export function useDisclosureEditor({
 	projectId,
 	projectTypes,
-	canEditDisclosures,
+	canEditDisclosures = ref(true),
 	hasPermission,
 	isActingAsModerator,
 	isAdminUser,
@@ -70,10 +70,6 @@ export function useDisclosureEditor({
 		noPermission: {
 			id: 'project.settings.disclosures.save-blocked.no-permission',
 			defaultMessage: `You don't have permission to edit this project's disclosures.`,
-		},
-		uploadVersionFirstHeading: {
-			id: 'project.settings.disclosures.upload-version-first.heading',
-			defaultMessage: 'Upload versions before adding disclosures',
 		},
 	})
 

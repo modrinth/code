@@ -2,6 +2,8 @@
 import { PlusIcon } from '@modrinth/assets'
 import { Button, defineMessages, useVIntl } from '@modrinth/ui'
 
+import { versionActionMessages } from './messages'
+
 const emit = defineEmits<{ create: [] }>()
 const { formatMessage } = useVIntl()
 
@@ -13,10 +15,6 @@ const messages = defineMessages({
 	description: {
 		id: 'project.settings.versions.empty.description',
 		defaultMessage: 'Create your first project version.',
-	},
-	create: {
-		id: 'project.settings.versions.empty.create',
-		defaultMessage: 'Create version',
 	},
 })
 </script>
@@ -82,7 +80,7 @@ const messages = defineMessages({
 			<div>{{ formatMessage(messages.description) }}</div>
 			<br />
 			<Button type="colored" color="green" @click="emit('create')">
-				<PlusIcon /> {{ formatMessage(messages.create) }}
+				<PlusIcon /> {{ formatMessage(versionActionMessages.create) }}
 			</Button>
 		</div>
 	</div>

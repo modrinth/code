@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import {
 	Button,
-	commonMessages,
 	ConfirmLeaveModal,
-	EmptyState,
 	injectProjectPageContext,
 	IntlFormatted,
 	normalizeChildren,
@@ -33,10 +31,12 @@ const flags = useFeatureFlags()
 const queryClient = useQueryClient()
 const editor = useDisclosureEditor({
 	projectId: computed(() => project.value.id),
-	projectTypes: computed(() => projectV3.value?.project_types ?? [project.value.project_type]),
-	canEditDisclosures: computed(
-		() => project.value.versions.length > 0 || projectV3.value?.minecraft_server != null,
-	),
+	projectTypes: computed(() => {
+		if (project.value.versions.length === 0 && projectV3.value?.minecraft_server == null) {
+			return null
+		}
+		return projectV3.value?.project_types ?? [project.value.project_type]
+	}),
 	hasPermission: computed(
 		() =>
 			isAdmin(currentMember.value?.user) ||
@@ -69,7 +69,6 @@ const {
 	save,
 	canSave,
 	saveDisabledReason,
-	canEditDisclosures,
 	disclosuresQuery,
 	saveError,
 	issueAction,
@@ -91,31 +90,29 @@ const { isPending, isError, refetch } = disclosuresQuery
 			]"
 			class="mb-4"
 		/>
-		<template v-if="isPending || isError || canEditDisclosures">
-			<h2 class="settings-section-title">{{ formatMessage(messages.title) }}</h2>
-			<p class="mb-0 mt-2">
-				<IntlFormatted :message-id="messages.description">
-					<template #rules="{ children }">
-						<nuxt-link to="/legal/rules" target="_blank" class="underline hover:text-contrast">
-							<component :is="() => normalizeChildren(children)" />
-						</nuxt-link>
-					</template>
-				</IntlFormatted>
-			</p>
-			<p class="mb-4 mt-2">
-				<IntlFormatted :message-id="messages.description2">
-					<template #faq-link="{ children }">
-						<a
-							href="https://support.modrinth.com/en/articles/16567675#h_29503820b1"
-							target="_blank"
-							class="underline hover:text-contrast"
-						>
-							<component :is="() => normalizeChildren(children)" />
-						</a>
-					</template>
-				</IntlFormatted>
-			</p>
-		</template>
+		<h2 class="settings-section-title">{{ formatMessage(messages.title) }}</h2>
+		<p class="mb-0 mt-2">
+			<IntlFormatted :message-id="messages.description">
+				<template #rules="{ children }">
+					<nuxt-link to="/legal/rules" target="_blank" class="underline hover:text-contrast">
+						<component :is="() => normalizeChildren(children)" />
+					</nuxt-link>
+				</template>
+			</IntlFormatted>
+		</p>
+		<p class="mb-4 mt-2">
+			<IntlFormatted :message-id="messages.description2">
+				<template #faq-link="{ children }">
+					<a
+						href="https://support.modrinth.com/en/articles/16567675#h_29503820b1"
+						target="_blank"
+						class="underline hover:text-contrast"
+					>
+						<component :is="() => normalizeChildren(children)" />
+					</a>
+				</template>
+			</IntlFormatted>
+		</p>
 		<ValidationMessage
 			class="mb-4"
 			:check="[...disclosureValidation, ...disclosureTextValidation]"
@@ -127,12 +124,6 @@ const { isPending, isError, refetch } = disclosuresQuery
 			<p>{{ formatMessage(statusMessages.loadError) }}</p>
 			<Button @click="refetch()">{{ formatMessage(statusMessages.retry) }}</Button>
 		</div>
-		<EmptyState
-			v-else-if="!canEditDisclosures"
-			type="no-documents"
-			:heading="formatMessage(messages.uploadVersionFirstHeading)"
-			:description="formatMessage(commonMessages.uploadVersionsEmptyStateDescription)"
-		/>
 		<template v-else>
 			<DisclosureCards :editor="editor" :project-title="project.title" class="!gap-8" />
 			<div>
