@@ -159,15 +159,8 @@ const emit = defineEmits<{ pinned: [value: boolean] }>()
 type DrawerView = 'moderation' | 'thread'
 const open = ref(false)
 const pinned = ref(false)
-const view = ref<DrawerView>('moderation')
-watch(
-	[showChecklist, view],
-	([visible, selected]) => {
-		if (!visible && selected === 'moderation') view.value = 'thread'
-	},
-	{ immediate: true, flush: 'sync' },
-)
-let openedFrom: DrawerView = 'moderation'
+const selectedView = ref<DrawerView>('moderation')
+const view = computed(() => (showChecklist.value ? selectedView.value : 'thread'))
 const { data: disclosures } = useQuery(
 	computed(() => ({
 		...projectQueryOptions.disclosures(projectV3.value.id, client),
@@ -290,22 +283,22 @@ function onItemClick(event: MouseEvent, path: string, field?: string) {
 	void settingsNavigation.reveal(path.replace(/#.*$/, ''), field)
 }
 
-function show(target: DrawerView) {
-	openedFrom = target === 'moderation' && !showChecklist.value ? 'thread' : target
-	view.value = openedFrom
+function show(target?: DrawerView) {
+	if (target) selectedView.value = target
 	open.value = true
 	nextTick(() => panel.value?.focus())
 }
 
 function close() {
+	const focused = panel.value?.contains(panel.value.ownerDocument.activeElement)
 	open.value = false
-	nextTick(() => launcher.value?.focusTrigger(openedFrom))
+	if (focused) nextTick(() => launcher.value?.focusTrigger())
 }
 watch(
 	() => route.query.moderation,
 	(value) => {
 		if (value) {
-			view.value = value === 'thread' ? 'thread' : 'moderation'
+			selectedView.value = value === 'thread' ? 'thread' : 'moderation'
 			open.value = true
 		}
 	},
@@ -318,18 +311,23 @@ watch(
 	},
 )
 const modalSelector = '[data-modal-root], [aria-modal="true"]'
+const popoverSelector = '[role="menu"], [data-popper-placement], .v-popper__inner'
+
+function onDrawerPointerLeave(event: PointerEvent) {
+	if (event.pointerType !== 'mouse' || !open.value || pinned.value) return
+	if (panel.value?.ownerDocument.querySelector(modalSelector)) return
+	if ((event.relatedTarget as Element | null)?.closest?.(popoverSelector)) return
+
+	close()
+}
+
 onClickOutside(
 	panel,
 	() => {
 		if (!pinned.value) open.value = false
 	},
 	{
-		ignore: [
-			launcher,
-			anchor,
-			modalSelector,
-			'[role="menu"], [data-popper-placement], .v-popper__inner',
-		],
+		ignore: [launcher, anchor, modalSelector, popoverSelector],
 	},
 )
 useEventListener('keydown', (event) => {
@@ -366,256 +364,267 @@ useEventListener('keydown', (event) => {
 			:state="publishingState"
 			:remaining="remaining"
 			controls="project-moderation-drawer"
-			@open="show"
+			@open="show()"
+			@hover="open = true"
 		/>
-		<Transition name="moderation-drawer" appear>
-			<aside
-				v-show="open"
-				id="project-moderation-drawer"
-				ref="panel"
-				tabindex="-1"
-				aria-label="Review and publishing"
-				class="fixed bottom-0 right-0 top-0 z-40 flex w-full max-w-[400px] flex-col border-0 border-l border-solid border-divider bg-surface-3 shadow-xl focus:outline-none"
-			>
-				<header
-					class="flex shrink-0 items-center gap-2 border-0 border-b border-solid border-divider p-4"
+		<div
+			class="fixed bottom-0 right-0 top-0 z-40 w-full max-w-[400px]"
+			:class="open ? 'pointer-events-auto' : 'pointer-events-none'"
+			@pointerleave="onDrawerPointerLeave"
+		>
+			<Transition name="moderation-drawer" appear>
+				<aside
+					v-show="open"
+					id="project-moderation-drawer"
+					ref="panel"
+					tabindex="-1"
+					aria-label="Review and publishing"
+					class="absolute inset-0 flex flex-col overflow-hidden overscroll-y-contain border-0 border-l border-solid border-divider bg-surface-3 shadow-xl focus:outline-none"
 				>
-					<Tabs
-						:value="view"
-						:tabs="views"
-						aria-label="Review views"
-						@update:value="view = $event === 'thread' ? 'thread' : 'moderation'"
+					<header
+						class="flex shrink-0 items-center gap-2 border-0 border-b border-solid border-divider p-4"
+					>
+						<Tabs
+							:value="view"
+							:tabs="views"
+							aria-label="Review views"
+							@update:value="selectedView = $event === 'thread' ? 'thread' : 'moderation'"
+						/>
+						<div class="ml-auto flex shrink-0 items-center gap-2">
+							<IconButton
+								type="quiet"
+								:label="pinned ? 'Unpin panel' : 'Pin panel open'"
+								:aria-pressed="pinned"
+								:class="{ '!bg-bg-green !text-green': pinned }"
+								@click="pinned = !pinned"
+							>
+								<PinIcon />
+							</IconButton>
+							<IconButton type="quiet" label="Close moderation panel" @click="close">
+								<XIcon />
+							</IconButton>
+						</div>
+					</header>
+					<ProjectPublishingBanner
+						v-if="view === 'moderation'"
+						compact
+						:state="publishingState"
+						:remaining="remaining"
+						:completed="completedItems.length"
+						class="mb-1.5 px-5 py-3 pb-1.5"
 					/>
-					<div class="ml-auto flex shrink-0 items-center gap-2">
-						<IconButton
-							type="quiet"
-							:label="pinned ? 'Unpin panel' : 'Pin panel open'"
-							:aria-pressed="pinned"
-							:class="{ '!bg-bg-green !text-green': pinned }"
-							@click="pinned = !pinned"
-						>
-							<PinIcon />
-						</IconButton>
-						<IconButton type="quiet" label="Close moderation panel" @click="close">
-							<XIcon />
-						</IconButton>
-					</div>
-				</header>
-				<ProjectPublishingBanner
-					v-if="view === 'moderation'"
-					compact
-					:state="publishingState"
-					:remaining="remaining"
-					:completed="completedItems.length"
-					class="mb-1.5 px-5 py-3 pb-1.5"
-				/>
-				<OverlayScrollArea v-show="view === 'moderation'" scroll-shadows class="min-w-0 flex-1">
-					<div class="min-w-0 p-3 px-2.5 [overflow-wrap:anywhere]">
-						<ChecklistAccordion
-							v-for="group in groups.filter(
-								(group) => group.items.length || (group.title === 'TODO' && issueItems.length),
-							)"
-							:key="group.title"
-							open-by-default
-							class="mb-4 last:mb-0"
-							button-class="group/checklist-heading m-0 flex w-full cursor-pointer items-center gap-2 border-0 bg-transparent px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-primary"
-						>
-							<template #button="{ open: expanded }">
-								<span
-									class="transition-[filter] duration-150 group-hover/checklist-heading:brightness-125 motion-reduce:transition-none"
-									>{{ group.title }}</span
-								>
-								<span class="rounded-md bg-surface-2 px-1.5 py-0.5">{{
-									group.items.length + (group.title === 'TODO' ? issueItems.length : 0)
-								}}</span
-								><DropdownIcon
-									class="ml-auto size-4 transition-[transform,filter] duration-300 group-hover/checklist-heading:brightness-125 motion-reduce:transition-none"
-									:class="{ '-rotate-90': !expanded }"
-								/>
-							</template>
-							<template v-if="group.title === 'TODO'">
+					<OverlayScrollArea
+						v-show="view === 'moderation'"
+						scroll-shadows
+						class="min-w-0 flex-1 [&_[data-overlayscrollbars-viewport]]:overscroll-y-contain"
+					>
+						<div class="min-w-0 p-3 px-2.5 [overflow-wrap:anywhere]">
+							<ChecklistAccordion
+								v-for="group in groups.filter(
+									(group) => group.items.length || (group.title === 'TODO' && issueItems.length),
+								)"
+								:key="group.title"
+								open-by-default
+								class="mb-4 last:mb-0"
+								button-class="group/checklist-heading m-0 flex w-full cursor-pointer items-center gap-2 border-0 bg-transparent px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-primary"
+							>
+								<template #button="{ open: expanded }">
+									<span
+										class="transition-[filter] duration-150 group-hover/checklist-heading:brightness-125 motion-reduce:transition-none"
+										>{{ group.title }}</span
+									>
+									<span class="rounded-md bg-surface-2 px-1.5 py-0.5">{{
+										group.items.length + (group.title === 'TODO' ? issueItems.length : 0)
+									}}</span
+									><DropdownIcon
+										class="ml-auto size-4 transition-[transform,filter] duration-300 group-hover/checklist-heading:brightness-125 motion-reduce:transition-none"
+										:class="{ '-rotate-90': !expanded }"
+									/>
+								</template>
+								<template v-if="group.title === 'TODO'">
+									<div
+										v-for="issue in issueItems"
+										:key="issue.id"
+										class="group relative flex min-w-0 items-start gap-1.5 rounded-lg px-2.5 py-3"
+										:class="{ 'hover:bg-surface-2': issue.to }"
+									>
+										<TriangleAlertIcon
+											class="mt-0.5 size-4 shrink-0 text-orange"
+											aria-hidden="true"
+										/>
+										<div class="min-w-0 flex-1">
+											<p class="m-0 text-sm font-semibold text-contrast">
+												{{ issue.title }}
+											</p>
+											<p class="mb-0 mt-0.5 text-xs text-orange">
+												{{ formatMessage(messages.requestedByModerator) }}
+											</p>
+											<BasicMarkdownText
+												v-if="issue.description"
+												:text="issue.description"
+												class="mt-1 text-xs leading-relaxed text-secondary"
+											/>
+											<div v-if="!issue.to" class="mt-3 flex justify-end">
+												<Button
+													size="sm"
+													:disabled="!!addressingIssueId || !addressableFacets(issue.source).length"
+													:loading="addressingIssueId === issue.id"
+													@click="markIssueAddressed(issue.source)"
+													>Mark addressed</Button
+												>
+											</div>
+										</div>
+										<ChevronRightIcon
+											v-if="issue.to"
+											class="mt-0.5 size-4 shrink-0 text-secondary opacity-0 transition-opacity group-hover:opacity-100"
+										/>
+										<NuxtLink
+											v-if="issue.to"
+											v-slot="{ href, route: destination }"
+											:to="issue.to"
+											custom
+										>
+											<a
+												:href="href"
+												class="absolute inset-0 rounded-lg focus-visible:outline focus-visible:outline-brand"
+												:aria-label="`View issue: ${issue.title}`"
+												@click="onItemClick($event, destination.fullPath, issue.highlightField)"
+											/>
+										</NuxtLink>
+									</div>
+								</template>
 								<div
-									v-for="issue in issueItems"
-									:key="issue.id"
-									class="group relative flex min-w-0 items-start gap-1.5 rounded-lg px-2.5 py-3"
-									:class="{ 'hover:bg-surface-2': issue.to }"
+									v-for="nag in group.items"
+									:key="nag.id"
+									class="group relative flex items-start gap-2 rounded-lg p-3 px-2.5 transition-colors hover:bg-surface-4"
 								>
-									<TriangleAlertIcon
-										class="mt-0.5 size-4 shrink-0 text-orange"
+									<CircleDashedIcon
+										v-if="nag.severity === 'suggestion'"
 										aria-hidden="true"
+										class="mt-0.5 size-4 shrink-0 text-secondary"
+									/>
+									<component
+										:is="
+											nag.severity === 'required' && nag.category === 'validation'
+												? XCircleIcon
+												: group.icon
+										"
+										v-else
+										class="mt-0.5 size-4 shrink-0"
+										:class="
+											nag.severity === 'required' && nag.category === 'validation'
+												? 'text-red'
+												: group.color
+										"
 									/>
 									<div class="min-w-0 flex-1">
 										<p class="m-0 text-sm font-semibold text-contrast">
-											{{ issue.title }}
+											{{
+												typeof nag.title === 'string'
+													? nag.title
+													: formatMessage(nag.title, nag.values)
+											}}
 										</p>
-										<p class="mb-0 mt-0.5 text-xs text-orange">
-											{{ formatMessage(messages.requestedByModerator) }}
+										<p
+											v-if="
+												nag.category === 'validation' &&
+												(nag.severity === 'required' || nag.severity === 'warning')
+											"
+											class="mb-0 mt-0.5 text-xs text-red"
+										>
+											{{ formatMessage(messages.automaticCheck) }}
 										</p>
-										<BasicMarkdownText
-											v-if="issue.description"
-											:text="issue.description"
-											class="mt-1 text-xs leading-relaxed text-secondary"
-										/>
-										<div v-if="!issue.to" class="mt-3 flex justify-end">
-											<Button
-												size="sm"
-												:disabled="!!addressingIssueId || !addressableFacets(issue.source).length"
-												:loading="addressingIssueId === issue.id"
-												@click="markIssueAddressed(issue.source)"
-												>Mark addressed</Button
-											>
-										</div>
+										<p
+											v-if="typeof nag.description !== 'function'"
+											class="mb-0 mt-1 text-xs leading-relaxed text-secondary"
+										>
+											{{
+												typeof nag.description === 'string'
+													? nag.description
+													: formatMessage(nag.description, nag.values)
+											}}
+										</p>
 									</div>
 									<ChevronRightIcon
-										v-if="issue.to"
 										class="mt-0.5 size-4 shrink-0 text-secondary opacity-0 transition-opacity group-hover:opacity-100"
 									/>
 									<NuxtLink
-										v-if="issue.to"
+										v-if="nag.link"
 										v-slot="{ href, route: destination }"
-										:to="issue.to"
+										:to="settingsDestination(nag.link.path, nag.highlightField)"
 										custom
 									>
 										<a
 											:href="href"
-											class="absolute inset-0 rounded-lg focus-visible:outline focus-visible:outline-brand"
-											:aria-label="`View issue: ${issue.title}`"
-											@click="onItemClick($event, destination.fullPath, issue.highlightField)"
-										/>
+											class="absolute inset-0 rounded-lg text-transparent focus-visible:outline focus-visible:outline-brand"
+											@click="onItemClick($event, destination.fullPath, nag.highlightField)"
+											>{{
+												typeof nag.link.title === 'string'
+													? nag.link.title
+													: formatMessage(nag.link.title)
+											}}</a
+										>
 									</NuxtLink>
 								</div>
-							</template>
-							<div
-								v-for="nag in group.items"
-								:key="nag.id"
-								class="group relative flex items-start gap-2 rounded-lg p-3 px-2.5 transition-colors hover:bg-surface-4"
+							</ChecklistAccordion>
+							<ChecklistAccordion
+								v-if="completedItems.length"
+								button-class="m-0 flex w-full cursor-pointer items-center gap-2 border-0 bg-transparent px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-secondary hover:text-primary"
 							>
-								<CircleDashedIcon
-									v-if="nag.severity === 'suggestion'"
-									aria-hidden="true"
-									class="mt-0.5 size-4 shrink-0 text-secondary"
-								/>
-								<component
-									:is="
-										nag.severity === 'required' && nag.category === 'validation'
-											? XCircleIcon
-											: group.icon
-									"
-									v-else
-									class="mt-0.5 size-4 shrink-0"
-									:class="
-										nag.severity === 'required' && nag.category === 'validation'
-											? 'text-red'
-											: group.color
-									"
-								/>
-								<div class="min-w-0 flex-1">
-									<p class="m-0 text-sm font-semibold text-contrast">
-										{{
-											typeof nag.title === 'string'
-												? nag.title
-												: formatMessage(nag.title, nag.values)
-										}}
-									</p>
-									<p
-										v-if="
-											nag.category === 'validation' &&
-											(nag.severity === 'required' || nag.severity === 'warning')
-										"
-										class="mb-0 mt-0.5 text-xs text-red"
-									>
-										{{ formatMessage(messages.automaticCheck) }}
-									</p>
-									<p
-										v-if="typeof nag.description !== 'function'"
-										class="mb-0 mt-1 text-xs leading-relaxed text-secondary"
-									>
-										{{
-											typeof nag.description === 'string'
-												? nag.description
-												: formatMessage(nag.description, nag.values)
-										}}
-									</p>
-								</div>
-								<ChevronRightIcon
-									class="mt-0.5 size-4 shrink-0 text-secondary opacity-0 transition-opacity group-hover:opacity-100"
-								/>
-								<NuxtLink
-									v-if="nag.link"
-									v-slot="{ href, route: destination }"
-									:to="settingsDestination(nag.link.path, nag.highlightField)"
-									custom
-								>
-									<a
-										:href="href"
-										class="absolute inset-0 rounded-lg text-transparent focus-visible:outline focus-visible:outline-brand"
-										@click="onItemClick($event, destination.fullPath, nag.highlightField)"
-										>{{
-											typeof nag.link.title === 'string'
-												? nag.link.title
-												: formatMessage(nag.link.title)
-										}}</a
-									>
-								</NuxtLink>
-							</div>
-						</ChecklistAccordion>
-						<ChecklistAccordion
-							v-if="completedItems.length"
-							button-class="m-0 flex w-full cursor-pointer items-center gap-2 border-0 bg-transparent px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-secondary hover:text-primary"
-						>
-							<template #button="{ open: expanded }">
-								{{ formatMessage(messages.completed) }}
-								<span>{{ completedItems.length }}</span>
-								<DropdownIcon
-									aria-hidden="true"
-									class="ml-auto size-4 transition-transform duration-300 motion-reduce:transition-none"
-									:class="{ '-rotate-90': !expanded }"
-								/>
-							</template>
-							<ul class="m-0 list-none p-0">
-								<li
-									v-for="item in completedItems"
-									:key="item.id"
-									class="flex items-center gap-3 px-2.5 py-2.5 text-sm font-semibold text-secondary"
-								>
-									<span
-										class="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-green text-[var(--color-accent-contrast)]"
+								<template #button="{ open: expanded }">
+									{{ formatMessage(messages.completed) }}
+									<span>{{ completedItems.length }}</span>
+									<DropdownIcon
 										aria-hidden="true"
+										class="ml-auto size-4 transition-transform duration-300 motion-reduce:transition-none"
+										:class="{ '-rotate-90': !expanded }"
+									/>
+								</template>
+								<ul class="m-0 list-none p-0">
+									<li
+										v-for="item in completedItems"
+										:key="item.id"
+										class="flex items-center gap-3 px-2.5 py-2.5 text-sm font-semibold text-secondary"
 									>
-										<CheckIcon class="size-3" />
-									</span>
-									{{ item.title }}
-								</li>
-							</ul>
-						</ChecklistAccordion>
-					</div>
-				</OverlayScrollArea>
-				<div
-					v-show="view === 'thread' && open"
-					class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
-				>
-					<Suspense>
-						<KeepAlive>
-							<ProjectModerationContent v-if="view === 'thread' && open" view="thread" />
-						</KeepAlive>
-					</Suspense>
-				</div>
-				<div
-					v-if="view === 'moderation' && (project.status === 'draft' || rejected)"
-					class="border-0 border-t border-solid border-divider p-4"
-				>
+										<span
+											class="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-green text-[var(--color-accent-contrast)]"
+											aria-hidden="true"
+										>
+											<CheckIcon class="size-3" />
+										</span>
+										{{ item.title }}
+									</li>
+								</ul>
+							</ChecklistAccordion>
+						</div>
+					</OverlayScrollArea>
 					<div
-						v-tooltip="
-							!canSubmit && remaining ? 'Complete the required items to continue.' : undefined
-						"
+						v-show="view === 'thread' && open"
+						class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
 					>
-						<Button class="w-full" :disabled="!canSubmit" @click="setProcessing"
-							><SendIcon />{{ rejected ? 'Resubmit for review' : 'Submit for review' }}</Button
-						>
+						<Suspense>
+							<KeepAlive>
+								<ProjectModerationContent v-if="view === 'thread' && open" view="thread" />
+							</KeepAlive>
+						</Suspense>
 					</div>
-				</div>
-			</aside>
-		</Transition>
+					<div
+						v-if="view === 'moderation' && (project.status === 'draft' || rejected)"
+						class="border-0 border-t border-solid border-divider p-4"
+					>
+						<div
+							v-tooltip="
+								!canSubmit && remaining ? 'Complete the required items to continue.' : undefined
+							"
+						>
+							<Button class="w-full" :disabled="!canSubmit" @click="setProcessing"
+								><SendIcon />{{ rejected ? 'Resubmit for review' : 'Submit for review' }}</Button
+							>
+						</div>
+					</div>
+				</aside>
+			</Transition>
+		</div>
 	</Teleport>
 </template>
 

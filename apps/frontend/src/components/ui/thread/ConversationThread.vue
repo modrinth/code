@@ -156,7 +156,7 @@
 				ref="messageViewport"
 				class="flex flex-col pt-2"
 				:class="{
-					'min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden [overflow-wrap:anywhere]':
+					'min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-y-contain [overflow-wrap:anywhere]':
 						compact,
 				}"
 			>
@@ -176,7 +176,7 @@
 			</div>
 			<div
 				v-else-if="compact"
-				class="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 overflow-y-auto px-6 py-12 text-center"
+				class="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 overflow-y-auto overscroll-y-contain px-6 py-12 text-center"
 			>
 				<div
 					class="mb-1 flex size-12 items-center justify-center rounded-2xl bg-surface-2 text-secondary"

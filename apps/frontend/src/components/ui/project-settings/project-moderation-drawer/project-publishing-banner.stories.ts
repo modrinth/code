@@ -58,7 +58,7 @@ export const AllStates: Story = {
 							Shown at top of moderation drawer in checklist tab
 						</p>
 					</div>
-					<h2 class="m-0 text-right text-base font-semibold text-contrast">Drawer buttons</h2>
+				<h2 class="m-0 text-right text-base font-semibold text-contrast">Drawer launcher</h2>
 				</div>
 				<div
 					v-for="example in examples"
