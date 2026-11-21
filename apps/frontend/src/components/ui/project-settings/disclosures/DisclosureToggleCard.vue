@@ -126,13 +126,13 @@ function setLockStatus(status: DisclosureLockStatus) {
 					class="relative isolate flex cursor-pointer select-none list-none items-center gap-2 px-4 py-3 font-medium text-primary before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-surface-3 before:transition-[filter] before:duration-150 before:content-[''] hover:before:[filter:brightness(1.15)] focus-visible:-outline-offset-2 motion-reduce:before:transition-none [&::-webkit-details-marker]:hidden"
 				>
 					<InfoIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
-					<span class="min-w-0 flex-1">{{ guidanceTitle }}</span>
+					<span class="min-w-0 flex-1 pt-0.5">{{ guidanceTitle }}</span>
 					<DropdownIcon
 						class="size-5 shrink-0 text-secondary group-open/guidance:rotate-180"
 						aria-hidden="true"
 					/>
 				</summary>
-				<div class="flex flex-col gap-3 px-4 pb-4 pt-px leading-normal text-secondary [&>p]:m-0">
+				<div class="flex flex-col gap-3 px-4 pb-4 leading-normal text-secondary [&>p]:m-0">
 					<slot />
 				</div>
 			</details>
