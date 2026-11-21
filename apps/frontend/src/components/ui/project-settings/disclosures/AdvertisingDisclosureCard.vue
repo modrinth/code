@@ -35,6 +35,10 @@ const messages = defineMessages({
 		id: 'project.settings.disclosures.advertising.description.2',
 		defaultMessage: `This does not pertain to unobtrusive promotion of relevant content with no direct monetary value (such as a link to a Modrinth profile in your own configuration menu), and does not pertain to advertisements in the project page such as sponsored banners in the description.`,
 	},
+	guidanceTitle: {
+		id: 'project.settings.disclosures.advertising.guidance-title',
+		defaultMessage: 'When should I disclose advertisements?',
+	},
 	notePlaceholder: {
 		id: 'project.settings.disclosures.advertising.note-placeholder',
 		defaultMessage: 'e.g. Adds the Modrinth SMP server to your server list automatically.',
@@ -48,10 +52,11 @@ const messages = defineMessages({
 		v-model="model.enabled"
 		:icon="MegaphoneIcon"
 		:title="props.title ?? formatMessage(messages.title)"
+		:description="formatMessage(messages.description1)"
+		:guidance-title="formatMessage(messages.guidanceTitle)"
 		info-link="https://support.modrinth.com/en/articles/16567675#h_d486036510"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
-		<p>{{ formatMessage(messages.description1) }}</p>
 		<p>
 			<IntlFormatted :message-id="messages.description2">
 				<template #italic="{ children }">

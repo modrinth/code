@@ -22,37 +22,48 @@ function toggle() {
 </script>
 
 <template>
-	<SmartClickable
+	<div
 		class="flex w-full flex-col overflow-clip rounded-2xl border border-solid border-surface-4 bg-surface-3"
-		:disabled="isToggleLocked"
 	>
-		<template #clickable>
-			<button
-				aria-hidden="true"
-				tabindex="-1"
+		<div
+			class="relative isolate before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-surface-3 before:transition-[filter] before:duration-150 before:content-[''] motion-reduce:before:transition-none"
+			:class="{ 'hover:before:[filter:brightness(1.15)]': !isToggleLocked }"
+		>
+			<SmartClickable
+				class="grid w-full grid-cols-[1fr_auto] items-center gap-6 p-4"
 				:disabled="isToggleLocked"
-				class="flex h-full w-full"
-				:class="isToggleLocked ? 'cursor-not-allowed' : 'cursor-pointer'"
-				@click="toggle"
-			/>
-		</template>
-		<div class="grid w-full grid-cols-[1fr_auto] items-center gap-6 p-4">
-			<div>
-				<slot :toggle-id="toggleId" />
-			</div>
-			<div>
-				<slot name="toggle" :disabled="isToggleLocked">
-					<Toggle
-						:id="toggleId"
-						v-model="value"
+			>
+				<template #clickable>
+					<button
+						type="button"
+						aria-hidden="true"
+						tabindex="-1"
 						:disabled="isToggleLocked"
-						class="smart-clickable:allow-pointer-events"
+						class="m-0 flex h-full w-full border-0 bg-transparent p-0"
+						:class="isToggleLocked ? 'cursor-not-allowed' : 'cursor-pointer'"
+						@click="toggle"
 					/>
-				</slot>
-			</div>
+				</template>
+				<div>
+					<slot :toggle-id="toggleId" />
+				</div>
+				<div>
+					<slot name="toggle" :disabled="isToggleLocked">
+						<Toggle
+							:id="toggleId"
+							v-model="value"
+							:disabled="isToggleLocked"
+							class="smart-clickable:allow-pointer-events"
+						/>
+					</slot>
+				</div>
+			</SmartClickable>
+		</div>
+		<div v-if="$slots['after-summary']" class="border-0 border-t border-solid border-surface-4">
+			<slot name="after-summary" />
 		</div>
 		<Transition name="toggle-card-content">
-			<div v-if="value && $slots.expanded" class="smart-clickable:allow-pointer-events">
+			<div v-if="value && $slots.expanded">
 				<div>
 					<div class="border-0 border-t border-solid border-surface-4 bg-surface-2 p-4">
 						<slot name="expanded" />
@@ -62,11 +73,11 @@ function toggle() {
 		</Transition>
 		<div
 			v-if="$slots.footer"
-			class="smart-clickable:allow-pointer-events border-0 border-t bg-surface-3 border-solid border-surface-4 px-4 py-3"
+			class="border-0 border-t bg-surface-3 border-solid border-surface-4 px-4 py-3"
 		>
 			<slot name="footer" />
 		</div>
-	</SmartClickable>
+	</div>
 </template>
 <style scoped>
 .toggle-card-content-enter-active,

@@ -40,6 +40,10 @@ const messages = defineMessages({
 		id: 'project.settings.disclosures.ai.description.2',
 		defaultMessage: `It is important to be honest if generative AI has played a significant role in the production or publishing of this content. An easy way to think about this is if you would consider AI a co-author of the project, you should disclose it here.`,
 	},
+	guidanceTitle: {
+		id: 'project.settings.disclosures.ai.guidance-title',
+		defaultMessage: 'When should I disclose AI use?',
+	},
 	stillUnsure: {
 		id: 'project.settings.disclosures.ai.still-unsure',
 		defaultMessage:
@@ -81,19 +85,24 @@ function setUse(use: AiUsage, enabled: boolean) {
 		:icon="SparklesIcon"
 		:title="props.title ?? formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
-		info-link="https://support.modrinth.com/en/articles/16567675#h_ec72dfca13"
+		:guidance-title="formatMessage(messages.guidanceTitle)"
+		:info-link="
+			variant === 'review'
+				? 'https://support.modrinth.com/en/articles/16567675#h_ec72dfca13'
+				: undefined
+		"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<p>
 			{{ formatMessage(messages.description2) }}
 		</p>
-		<p class="text-secondary">
+		<p>
 			<IntlFormatted :message-id="messages.stillUnsure">
 				<template #faq-link="{ children }">
 					<a
 						href="https://support.modrinth.com/en/articles/16551575"
 						target="_blank"
-						class="smart-clickable:allow-pointer-events underline hover:text-primary"
+						class="smart-clickable:allow-pointer-events text-blue hover:underline focus-visible:underline"
 					>
 						<component :is="() => normalizeChildren(children)" />
 					</a>
@@ -102,7 +111,7 @@ function setUse(use: AiUsage, enabled: boolean) {
 					<nuxt-link
 						to="/legal/rules#generative-ai"
 						target="_blank"
-						class="smart-clickable:allow-pointer-events underline hover:text-primary"
+						class="smart-clickable:allow-pointer-events text-blue hover:underline focus-visible:underline"
 					>
 						<component :is="() => normalizeChildren(children)" />
 					</nuxt-link>

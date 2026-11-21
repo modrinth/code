@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { UnknownIcon } from '@modrinth/assets'
+import { DropdownIcon, InfoIcon, UnknownIcon } from '@modrinth/assets'
 import {
 	defineMessages,
 	IntlFormatted,
@@ -25,6 +25,7 @@ const props = defineProps<
 		title: string
 		icon?: Component
 		description?: string
+		guidanceTitle?: string
 		infoLink?: string
 	}
 >()
@@ -36,6 +37,9 @@ const emit = defineEmits<{
 const enabled = defineModel<boolean>({ required: true })
 
 const resolvedLockStatus = computed(() => props.lockStatus ?? 'unlocked')
+const showGuidance = computed(
+	() => props.variant !== 'review' && !props.hideDescription && !!props.guidanceTitle,
+)
 
 const messages = defineMessages({
 	cannotDisableWarning: {
@@ -101,7 +105,7 @@ function setLockStatus(status: DisclosureLockStatus) {
 		:title="title"
 		:description="hideDescription ? undefined : description"
 	>
-		<template v-if="!hideDescription && $slots.default" #default>
+		<template v-if="!hideDescription && !showGuidance && $slots.default" #default>
 			<slot />
 		</template>
 		<template #title-suffix>
@@ -115,6 +119,23 @@ function setLockStatus(status: DisclosureLockStatus) {
 			>
 				<UnknownIcon class="size-5" />
 			</a>
+		</template>
+		<template v-if="showGuidance && $slots.default" #after-summary>
+			<details class="disclosure-guidance group/guidance">
+				<summary
+					class="relative isolate flex cursor-pointer select-none list-none items-center gap-2 px-4 py-3 font-medium text-primary before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-surface-3 before:transition-[filter] before:duration-150 before:content-[''] hover:before:[filter:brightness(1.15)] focus-visible:-outline-offset-2 motion-reduce:before:transition-none [&::-webkit-details-marker]:hidden"
+				>
+					<InfoIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
+					<span class="min-w-0 flex-1">{{ guidanceTitle }}</span>
+					<DropdownIcon
+						class="size-5 shrink-0 text-secondary group-open/guidance:rotate-180"
+						aria-hidden="true"
+					/>
+				</summary>
+				<div class="flex flex-col gap-3 px-4 pb-4 pt-px leading-normal text-secondary [&>p]:m-0">
+					<slot />
+				</div>
+			</details>
 		</template>
 		<template v-if="$slots.expanded" #expanded>
 			<slot name="expanded" />
@@ -170,3 +191,21 @@ function setLockStatus(status: DisclosureLockStatus) {
 		</template>
 	</component>
 </template>
+
+<style scoped>
+@media (prefers-reduced-motion: no-preference) {
+	@supports (interpolate-size: allow-keywords) and selector(details::details-content) {
+		.disclosure-guidance::details-content {
+			block-size: 0;
+			overflow: clip;
+			transition:
+				block-size 200ms ease-in-out,
+				content-visibility 200ms allow-discrete;
+		}
+
+		.disclosure-guidance[open]::details-content {
+			block-size: auto;
+		}
+	}
+}
+</style>

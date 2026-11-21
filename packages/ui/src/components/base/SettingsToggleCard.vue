@@ -27,6 +27,9 @@ const enabled = defineModel<boolean>({ required: true })
 			<p v-if="description">{{ description }}</p>
 			<slot />
 		</div>
+		<template v-if="$slots['after-summary']" #after-summary>
+			<slot name="after-summary" />
+		</template>
 		<template v-if="$slots.expanded" #expanded>
 			<div class="flex flex-col gap-4">
 				<slot name="expanded" />

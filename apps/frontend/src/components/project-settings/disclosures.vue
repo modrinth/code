@@ -91,22 +91,25 @@ const { isPending, isError, refetch } = disclosuresQuery
 			class="mb-4"
 		/>
 		<h2 class="settings-section-title">{{ formatMessage(messages.title) }}</h2>
-		<p class="mb-0 mt-2">
+		<p class="mb-4 mt-2">
 			<IntlFormatted :message-id="messages.description">
 				<template #rules="{ children }">
-					<nuxt-link to="/legal/rules" target="_blank" class="underline hover:text-contrast">
+					<nuxt-link
+						to="/legal/rules"
+						target="_blank"
+						class="text-blue hover:underline focus-visible:underline"
+					>
 						<component :is="() => normalizeChildren(children)" />
 					</nuxt-link>
 				</template>
 			</IntlFormatted>
-		</p>
-		<p class="mb-4 mt-2">
+			{{ ' ' }}
 			<IntlFormatted :message-id="messages.description2">
 				<template #faq-link="{ children }">
 					<a
 						href="https://support.modrinth.com/en/articles/16567675#h_29503820b1"
 						target="_blank"
-						class="underline hover:text-contrast"
+						class="text-blue hover:underline focus-visible:underline"
 					>
 						<component :is="() => normalizeChildren(children)" />
 					</a>
@@ -125,7 +128,7 @@ const { isPending, isError, refetch } = disclosuresQuery
 			<Button @click="refetch()">{{ formatMessage(statusMessages.retry) }}</Button>
 		</div>
 		<template v-else>
-			<DisclosureCards :editor="editor" :project-title="project.title" class="!gap-8" />
+			<DisclosureCards :editor="editor" :project-title="project.title" />
 			<div>
 				<p v-if="saveError" role="alert" class="text-red">
 					{{ formatMessage(statusMessages.saveError) }}

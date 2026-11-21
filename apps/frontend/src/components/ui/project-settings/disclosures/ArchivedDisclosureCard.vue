@@ -41,6 +41,10 @@ const messages = defineMessages({
 		defaultMessage:
 			'Archived projects remain discoverable when their visibility is set to Public. If you wish to de-list your project, set its visibility to Unlisted.',
 	},
+	guidanceTitle: {
+		id: 'project.settings.disclosures.archived.guidance-title',
+		defaultMessage: 'What happens when I archive my project?',
+	},
 	notePlaceholder: {
 		id: 'project.settings.disclosures.archived.note-placeholder',
 		defaultMessage: `e.g. I don't have time to maintain this project anymore, feel free to fork it!`,
@@ -58,10 +62,11 @@ const messages = defineMessages({
 		v-model="model.enabled"
 		:icon="ArchiveIcon"
 		:title="props.title ?? formatMessage(messages.title)"
+		:description="formatMessage(messages.description1)"
+		:guidance-title="formatMessage(messages.guidanceTitle)"
 		info-link="https://support.modrinth.com/en/articles/16567675#h_76b62c699c"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
-		<p>{{ formatMessage(messages.description1) }}</p>
 		<p>{{ formatMessage(messages.description2) }}</p>
 		<template #expanded>
 			<DisclosureExplanation
