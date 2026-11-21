@@ -5,7 +5,7 @@ use crate::{
     auth::get_user_from_headers,
     database::{
         ReadOnlyPgPool,
-        models::project_flag_item::{DBProjectFlag, ProjectFlag},
+        models::project_flag_item::{DBProjectFlag, PersistedProjectFlag},
     },
     models::{ids::ProjectId, pats::Scopes},
     queue::{
@@ -22,7 +22,7 @@ use crate::{
     tag = "moderation",
     security(("bearer_auth" = [])),
     params(("id" = ProjectId, Path)),
-    responses((status = OK, body = [ProjectFlag]), (status = NOT_FOUND))
+    responses((status = OK, body = [PersistedProjectFlag]), (status = NOT_FOUND))
 )]
 #[get("/project/{id}")]
 pub async fn get_project_flags(
@@ -31,7 +31,7 @@ pub async fn get_project_flags(
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<Vec<ProjectFlag>>, ApiError> {
+) -> Result<web::Json<Vec<PersistedProjectFlag>>, ApiError> {
     get_user_from_headers(
         &req,
         &***ro_pool,

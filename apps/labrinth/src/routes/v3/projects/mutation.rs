@@ -60,6 +60,7 @@ pub(crate) struct SyncedProjectState {
     thread_issues: Vec<DBThreadIssue>,
     has_required_nags: bool,
     has_outstanding_technical_review: bool,
+    project_flag_count: i64,
 }
 
 impl SyncedProjectState {
@@ -73,6 +74,7 @@ impl SyncedProjectState {
 
     fn can_auto_approve(&self) -> bool {
         !self.has_required_nags
+            && self.project_flag_count == 0
             && !self.has_outstanding_technical_review
             && !self.thread_issues.is_empty()
             && self
@@ -481,6 +483,11 @@ async fn load_project_state_with_options(
         .internal_context("fetching project thread issue verdicts")?
     };
 
+    let project_flag_count = sqlx::query_scalar!(
+        r#"SELECT COUNT(*) AS "count!" FROM project_flags WHERE project_id = $1 AND (active OR (what->>'retain_when_resolved')::bool = TRUE)"#,
+        project_id.0,
+    ).fetch_one(&mut *transaction).await
+        .internal_context("counting project flag violations")?;
     Ok(SyncedProjectState {
         data,
         project,
@@ -490,6 +497,7 @@ async fn load_project_state_with_options(
         thread_issues,
         has_required_nags,
         has_outstanding_technical_review,
+        project_flag_count,
     })
 }
 
@@ -520,6 +528,7 @@ pub(crate) async fn apply_project_flag_reconciliation(
     pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<(), ApiError> {
+    use db_models::project_flag_item::ProjectFlag;
     use std::collections::BTreeMap;
 
     let project_id = DBProjectId::from(context.project.id);
@@ -625,9 +634,7 @@ pub(crate) async fn apply_project_flag_reconciliation(
         &(&state.project, &versions),
         &(&context.project, &context.versions),
     )?;
-    let desired = crate::workflow::project_flag::run_rules::determine_project_review_outcome(
-        state.in_review(), result.rules.values(), false,
-    );
+
     let mut changed = sqlx::query!(
         r#"UPDATE project_flags SET active = FALSE WHERE project_id = $1 AND active AND NOT ((what->>'key') = ANY($2::text[]))"#,
         project_id.0, &flags.keys().cloned().collect::<Vec<_>>(),
@@ -647,6 +654,25 @@ pub(crate) async fn apply_project_flag_reconciliation(
         ).execute(&mut transaction).await
             .internal_context("upserting reconciled project flag")?.rows_affected() > 0;
     }
+    let persisted = sqlx::query!(
+        r#"SELECT what AS "what!: sqlx::types::Json<ProjectFlag>"
+        FROM project_flags
+        WHERE project_id = $1 AND (active OR (what->>'retain_when_resolved')::bool = TRUE)
+        ORDER BY what->>'key', id"#,
+        project_id.0,
+    )
+    .fetch_all(&mut transaction)
+    .await
+    .internal_context("loading reconciled project violations")?;
+    state.project_flag_count = persisted.len() as i64;
+    let effective_rule = db_models::project_flag_item::ProjectFlagRuleResult {
+        flags: persisted.into_iter().map(|row| row.what.0).collect(),
+        log: Vec::new(),
+        error: None,
+    };
+    let desired = crate::workflow::project_flag::run_rules::determine_project_review_outcome(
+        state.in_review(), [&effective_rule], false,
+    );
     let outcome = desired.filter(|outcome| {
         *outcome != ProjectReviewOutcome::Approved || state.can_auto_approve()
     });
@@ -850,7 +876,7 @@ impl PreparedMutations {
     ) -> Result<(), ApiError> {
         self.commit_without_reconciliation(transaction, redis)
             .await?;
-        for state in &self.states {
+        for state in self.states.iter().filter(|state| state.in_review()) {
             crate::workflow::project_flag::reconcile_project_flags(
                 temporal,
                 state.data.inner.id.into(),
@@ -948,12 +974,14 @@ pub(crate) async fn finalize_project_edit(
         .internal_context("clearing previous project slug cache")?;
     }
 
-    crate::workflow::project_flag::reconcile_project_flags(
-        temporal,
-        project_id.into(),
-    )
-    .await
-    .internal_context("dispatching project flag reconciliation")?;
+    if state.in_review() {
+        crate::workflow::project_flag::reconcile_project_flags(
+            temporal,
+            project_id.into(),
+        )
+        .await
+        .internal_context("dispatching project flag reconciliation")?;
+    }
 
     Ok(state.project.is_searchable())
 }

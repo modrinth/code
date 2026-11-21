@@ -103,8 +103,8 @@
 					>?
 				</p>
 				<p class="m-0 text-secondary">
-					This permanently deletes the run, its results, and its inactive project flags. Active
-					flags are preserved and detached from the run. This cannot be undone.
+					This permanently deletes the run, its results, and its unretained inactive project flags.
+					Active and retained flags are preserved and detached from the run. This cannot be undone.
 				</p>
 				<p v-if="deleteError" role="alert" class="m-0 text-red">
 					Could not delete the run: {{ errorMessage(deleteError) }}
@@ -171,7 +171,7 @@
 					<dd class="m-0">{{ selectedRun.num_scanned }}</dd>
 					<dt class="font-semibold text-contrast">Flagged</dt>
 					<dd class="m-0">{{ selectedRun.num_flagged }}</dd>
-					<dt class="font-semibold text-contrast">Total flags emitted</dt>
+					<dt class="font-semibold text-contrast">Total flag violations</dt>
 					<dd class="m-0">{{ selectedRun.num_flags }}</dd>
 					<dt class="font-semibold text-contrast">Would be approved (no flags)</dt>
 					<dd class="m-0">{{ selectedRun.num_no_flags }}</dd>
@@ -276,7 +276,7 @@
 								formatProposedReviewOutcome(row.proposed_review_outcome)
 							}}</span>
 							<span class="text-sm text-secondary"
-								>{{ row.flags.length }} {{ row.flags.length === 1 ? 'flag' : 'flags' }}</span
+								>{{ row.num_flags }} {{ row.num_flags === 1 ? 'violation' : 'violations' }}</span
 							>
 							<span v-if="row.error !== null" class="text-sm text-red">Error</span>
 						</summary>
@@ -294,7 +294,14 @@
 							<p class="m-0 font-semibold text-contrast">
 								Preview: {{ formatProposedReviewOutcome(row.proposed_review_outcome) }}
 							</p>
-							<p v-if="row.flags.length === 0" class="m-0 text-secondary">No flags found.</p>
+							<p v-if="row.num_flags === 0" class="m-0 text-secondary">No flags found.</p>
+														<p
+															v-if="row.num_flags > new Set(row.flags.map((entry) => entry.flag.key)).size"
+															class="m-0 text-secondary"
+														>
+															Resolved · Retained violations are included in this count. They are no longer
+															current but are retained by their rules and block automatic approval.
+														</p>
 							<article
 								v-for="entry in row.flags"
 								:key="`${entry.ruleId}:${entry.index}`"

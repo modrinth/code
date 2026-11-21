@@ -3,6 +3,7 @@ import type {
 	CreateProjectFlagRuleRequest,
 	ListProjectFlagModulesParams,
 	ProjectFlagModule,
+	PersistedProjectFlag,
 	SaveProjectFlagModuleRequest,
 	EvalProjectFlagRuleRequest,
 	ListProjectFlagRulesParams,
@@ -81,6 +82,13 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 				version: 'internal',
 				method: 'GET',
 			},
+		)
+	}
+
+	public async getProjectFlags(projectId: string): Promise<PersistedProjectFlag[]> {
+		return this.client.request<PersistedProjectFlag[]>(
+			`/moderation/project-flag/project/${encodeURIComponent(projectId)}`,
+			{ api: 'labrinth', version: 'internal', method: 'GET' },
 		)
 	}
 

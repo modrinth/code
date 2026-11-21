@@ -363,7 +363,8 @@ pub struct ProjectFlag {
     #[serde(default)]
     pub flag_outcome: FlagOutcome,
     #[serde(default)]
-    pub retain_if_inactive: bool,
+    /// Keeps this violation blocking automatic approval after it stops being emitted.
+    pub retain_when_resolved: bool,
     #[serde(flatten)]
     pub value: serde_json::Value,
 }
@@ -397,17 +398,25 @@ pub struct DBProjectFlagRunResult {
     pub error: Option<String>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct PersistedProjectFlag {
+    #[serde(flatten)]
+    pub flag: ProjectFlag,
+    /// False means no longer current; retained flags still count as violations.
+    pub active: bool,
+}
+
 impl DBProjectFlag {
     pub async fn get_project_flags(
         project_id: DBProjectId,
         pool: &ReadOnlyPgPool,
-    ) -> Result<Option<Vec<ProjectFlag>>> {
+    ) -> Result<Option<Vec<PersistedProjectFlag>>> {
         let rows = sqlx::query!(
             r#"
-            SELECT flags.what AS "what?: sqlx::types::Json<ProjectFlag>"
+            SELECT CASE WHEN flags.id IS NOT NULL THEN flags.what || jsonb_build_object('active', flags.active) END AS "what?: sqlx::types::Json<PersistedProjectFlag>"
             FROM mods AS projects
             LEFT JOIN project_flags AS flags ON flags.project_id = projects.id
-                AND (flags.active OR (flags.what->>'retain_if_inactive')::bool = TRUE)
+                AND (flags.active OR (flags.what->>'retain_when_resolved')::bool = TRUE)
             WHERE projects.id = $1
             ORDER BY flags.what->>'key', flags.id
             "#,
@@ -643,14 +652,14 @@ impl DBProjectFlagRunResult {
                 standalone_results.push(result);
             }
         }
-        let results = run_results
-            .into_values()
-            .chain(standalone_results)
-            .map(|result| ResultPayload {
-                id: uuid::Uuid::now_v7(),
-                result,
-            })
-            .collect::<Vec<_>>();
+        let results =
+            run_results
+                .into_values()
+                .chain(standalone_results)
+                .map(|result| ResultPayload {
+                    id: uuid::Uuid::now_v7(),
+                    result,
+                });
         let mut transaction = pool
             .begin()
             .await
@@ -673,7 +682,7 @@ impl DBProjectFlagRunResult {
             SELECT id FROM mods
             WHERE id = ANY($1)
             ORDER BY id
-            FOR KEY SHARE
+            FOR UPDATE
             "#,
             &project_ids,
         )
@@ -681,7 +690,6 @@ impl DBProjectFlagRunResult {
         .await
         .context("locking projects for project flag results")?;
         let results = results
-            .into_iter()
             .filter(|payload| {
                 surviving_projects
                     .binary_search(&payload.result.project_id.0)
@@ -695,9 +703,26 @@ impl DBProjectFlagRunResult {
             INSERT INTO project_flag_run_results
                 (id, run_id, project_id, rule_results, num_flags, error, proposed_review_outcome)
             SELECT results.id, results.run_id, results.project_id, results.rule_results,
-                (SELECT COALESCE(SUM(jsonb_array_length(rule.value->'flags')), 0)::BIGINT
-                    FROM jsonb_each(results.rule_results) AS rule),
-                results.error, results.proposed_review_outcome
+                (SELECT COUNT(DISTINCT flag->>'key') FROM (
+                    SELECT flag FROM jsonb_each(results.rule_results) AS rule,
+                        LATERAL jsonb_array_elements(rule.value->'flags') AS flag
+                    UNION ALL
+                    SELECT what FROM project_flags
+                    WHERE project_id = results.project_id
+                        AND (what->>'retain_when_resolved')::bool = TRUE
+                ) AS effective_flags),
+                results.error, CASE
+                    WHEN results.proposed_review_outcome = 'approved' AND EXISTS (
+                        SELECT 1 FROM project_flags AS retained
+                        WHERE retained.project_id = results.project_id
+                            AND (retained.what->>'retain_when_resolved')::bool = TRUE
+                            AND NOT EXISTS (
+                                SELECT 1 FROM jsonb_each(results.rule_results) AS rule,
+                                    LATERAL jsonb_array_elements(rule.value->'flags') AS flag
+                                WHERE flag->>'key' = retained.what->>'key'
+                            )
+                    ) THEN NULL
+                    ELSE results.proposed_review_outcome END
             FROM jsonb_to_recordset($1) AS results(
                 id UUID, run_id UUID, project_id BIGINT, rule_results JSONB, error TEXT,
                 proposed_review_outcome TEXT
@@ -784,9 +809,9 @@ impl DBProjectFlagRun {
         .await
         .context("locking projects for run deletion")?;
         sqlx::query!(
-            r#"UPDATE project_flags SET run_id = NULL WHERE run_id = $1 AND active"#,
+            r#"UPDATE project_flags SET run_id = NULL WHERE run_id = $1 AND (active OR (what->>'retain_when_resolved')::bool = TRUE)"#,
             id.0,
-        ).execute(&mut transaction).await.context("detaching active project flags")?;
+        ).execute(&mut transaction).await.context("detaching current and retained project flags")?;
         let result = sqlx::query!(
             r#"
             DELETE FROM project_flag_runs

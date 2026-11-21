@@ -105,6 +105,18 @@ impl ReconcileProjectFlagsWorkflow {
     ) -> WorkflowResult<()> {
         loop {
             ctx.state_mut(|state| state.needs_reconcile = false);
+            let in_review = ctx
+                .execute_activity(
+                    ProjectFlagActivities::project_in_review,
+                    project_id,
+                    ActivityOptions::start_to_close_timeout(
+                        Duration::from_secs(60),
+                    ),
+                )
+                .await?;
+            if !in_review {
+                return Ok(());
+            }
             let ruleset_id = ctx
                 .execute_activity(
                     ProjectFlagActivities::deployed_ruleset,
@@ -164,6 +176,62 @@ impl ReconcileRulesInput {
     }
 }
 
+/// Reads the primary database so queued automatic work never trusts cached review state.
+async fn project_in_review(
+    pool: &PgPool,
+    project_id: ProjectId,
+) -> Result<bool> {
+    let id = crate::database::models::DBProjectId::from(project_id);
+    let in_review = sqlx::query_scalar!(
+        r#"SELECT in_review FROM mods WHERE id = $1"#,
+        id.0,
+    )
+    .fetch_optional(pool)
+    .await
+    .context("checking project review state for automatic reconciliation")?;
+    Ok(in_review == Some(true))
+}
+
+#[cfg(test)]
+mod review_state_tests {
+    use super::*;
+    use crate::{
+        database::models::DBProjectId,
+        test::{
+            api_v3::ApiV3,
+            environment::{TestEnvironment, with_test_environment},
+        },
+    };
+
+    #[actix_rt::test]
+    async fn automatic_reconciliation_requires_current_review_membership() {
+        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+            let project_id = env.dummy.project_alpha.project_id_parsed;
+            let id = DBProjectId::from(project_id);
+            for in_review in [false, true, false, true] {
+                sqlx::query!(
+                    r#"UPDATE mods SET in_review = $2 WHERE id = $1"#,
+                    id.0,
+                    in_review,
+                )
+                .execute(&env.db.pool)
+                .await
+                .unwrap();
+                assert_eq!(
+                    project_in_review(&env.db.pool, project_id).await.unwrap(),
+                    in_review,
+                );
+            }
+            assert!(
+                !project_in_review(&env.db.pool, DBProjectId(0).into())
+                    .await
+                    .unwrap()
+            );
+        })
+        .await;
+    }
+}
+
 pub struct ProjectFlagActivities {
     pub scanner: ModelScanner,
     pub pool: PgPool,
@@ -172,6 +240,15 @@ pub struct ProjectFlagActivities {
 
 #[activities]
 impl ProjectFlagActivities {
+    #[activity]
+    pub async fn project_in_review(
+        self: Arc<Self>,
+        _ctx: ActivityContext,
+        project_id: ProjectId,
+    ) -> Result<bool, ActivityError> {
+        Ok(project_in_review(&self.pool, project_id).await?)
+    }
+
     #[activity]
     pub async fn deployed_ruleset(
         self: Arc<Self>,
@@ -218,6 +295,9 @@ impl ProjectFlagActivities {
         _ctx: ActivityContext,
         input: ImageScanInput,
     ) -> Result<ImageScanResult, ActivityError> {
+        if !project_in_review(&self.pool, input.project_id).await? {
+            return Ok(ImageScanResult::default());
+        }
         scan_image(&self.scanner, &self.pool, input)
             .await
             .map_err(image_scan_activity_error)
@@ -229,7 +309,9 @@ impl ProjectFlagActivities {
         _ctx: ActivityContext,
         input: ReconcileRulesInput,
     ) -> Result<Option<ProjectTextScan>, ActivityError> {
-        if self.scanner.decision_model_version()?.is_none() {
+        if !project_in_review(&self.pool, input.project_id()).await?
+            || self.scanner.decision_model_version()?.is_none()
+        {
             return Ok(None);
         }
         Ok(text_scan::project_text(&self.pool, input).await?)
@@ -244,6 +326,9 @@ impl ProjectFlagActivities {
         Option<std::collections::BTreeMap<String, TextScanResult>>,
         ActivityError,
     > {
+        if !project_in_review(&self.pool, input.project_id).await? {
+            return Ok(None);
+        }
         text_scan::scan_text(&self.scanner, &self.pool, input)
             .await
             .map_err(image_scan_activity_error)
@@ -255,6 +340,9 @@ impl ProjectFlagActivities {
         _ctx: ActivityContext,
         project_id: ProjectId,
     ) -> Result<Vec<ImageScanInput>, ActivityError> {
+        if !project_in_review(&self.pool, project_id).await? {
+            return Ok(Vec::new());
+        }
         Ok(image_scan::project_images(&self.pool, project_id).await?)
     }
 }

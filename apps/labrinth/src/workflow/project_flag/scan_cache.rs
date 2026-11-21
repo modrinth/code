@@ -31,7 +31,7 @@ impl std::fmt::Display for ProjectFlagScanKind {
 }
 
 /// Bump when evaluator semantics change without a context/rule/module change.
-pub(super) const RULES_CACHE_VERSION: i64 = 4;
+pub(super) const RULES_CACHE_VERSION: i64 = 5;
 
 /// Canonicalizes every JSON object, including nested maps in rule parameters
 /// and context, while preserving array order visible to scripts.

@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT num_flags, proposed_review_outcome FROM project_flag_run_results WHERE project_id = $1 ORDER BY evaluated_at DESC, id DESC LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "num_flags",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_flag_run_results",
+            "name": "num_flags"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "proposed_review_outcome",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "project_flag_run_results",
+            "name": "proposed_review_outcome"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      true
+    ]
+  },
+  "hash": "8aa325d7d72d9dbeb40575519ea508a0a049bea122173e63bcda309a2a1cba7d"
+}

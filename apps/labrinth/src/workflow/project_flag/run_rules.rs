@@ -31,6 +31,9 @@ pub(super) async fn reconcile_rules(
     project_id: DBProjectId,
     ruleset_id: Option<uuid::Uuid>,
 ) -> Result<()> {
+    if !super::project_in_review(pool, project_id.into()).await? {
+        return Ok(());
+    }
     let Some(ruleset_id) = ruleset_id else {
         return Ok(());
     };
@@ -407,7 +410,7 @@ mod tests {
                     key: "test".into(),
                     reason: None,
                     flag_outcome: *outcome,
-                    retain_if_inactive: false,
+                    retain_when_resolved: false,
                     value: serde_json::json!({}),
                 })
                 .collect(),
@@ -468,6 +471,35 @@ mod tests {
         assert_eq!(determine_project_review_outcome(true, &rules, false), None);
         let rules = [rule(&[], true), rule(&[Withheld], false)];
         assert_eq!(determine_project_review_outcome(true, &rules, false), None);
+    }
+
+    #[test]
+    fn resolved_retained_flags_preserve_evidence_and_block_approval() {
+        use crate::database::models::project_flag_item::PersistedProjectFlag;
+        for (outcome, expected) in [
+            (FlagOutcome::ManualReview, None),
+            (FlagOutcome::Withheld, Some(ProjectReviewOutcome::Withheld)),
+        ] {
+            let original = serde_json::json!({
+                "key": "retained", "reason": "original reason",
+                "flag_outcome": outcome, "retain_when_resolved": true,
+                "evidence": {"file": "original.jar"}, "active": false,
+            });
+            let resolved: PersistedProjectFlag =
+                serde_json::from_value(original.clone()).unwrap();
+            assert!(!resolved.active);
+            assert!(resolved.flag.retain_when_resolved);
+            assert_eq!(serde_json::to_value(&resolved).unwrap(), original);
+            let effective = ProjectFlagRuleResult {
+                flags: vec![resolved.flag],
+                log: Vec::new(),
+                error: None,
+            };
+            assert_eq!(
+                determine_project_review_outcome(true, [&effective], false),
+                expected
+            );
+        }
     }
 
     #[test]

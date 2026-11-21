@@ -64,8 +64,12 @@ export interface ProjectFlag {
 	key: string
 	flag_outcome: FlagOutcome
 	reason: string | null
-	retain_if_inactive: boolean
+	retain_when_resolved: boolean
 	[field: string]: ProjectFlagValue
+}
+
+export interface PersistedProjectFlag extends ProjectFlag {
+	active: boolean
 }
 
 export interface ProjectFlagRunActivity {
@@ -94,7 +98,7 @@ export interface ProjectFlagRun {
 	num_scanned: number
 	/** Successfully evaluated projects with at least one flag. */
 	num_flagged: number
-	/** Total emitted flags, including partial results from failed evaluations. */
+	/** Distinct flag violations, including retained flags and partial results from failed evaluations. */
 	num_flags: number
 	/** Successfully evaluated projects with no flags (would be approved). */
 	num_no_flags: number
@@ -123,7 +127,7 @@ export interface ProjectFlagRunResult {
 		icon_url: string | null
 	}
 	rules: Record<string, ProjectFlagRuleResult & { name: string | null }>
-	/** Flags emitted across all rules, including results with errors. */
+	/** Distinct emitted and retained flag violations, including results with errors. */
 	num_flags: number
 	proposed_review_outcome: Labrinth.Projects.v3.ProjectReviewOutcome | null
 	error: string | null

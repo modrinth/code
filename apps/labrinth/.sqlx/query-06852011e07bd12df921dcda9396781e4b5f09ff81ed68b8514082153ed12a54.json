@@ -94,7 +94,13 @@
       {
         "ordinal": 8,
         "name": "proposed_review_outcome",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "project_flag_run_results",
+            "name": "proposed_review_outcome"
+          }
+        }
       }
     ],
     "parameters": {
