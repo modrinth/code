@@ -117,15 +117,28 @@
 			:proceed-label="formatMessage(commonMessages.deleteLabel)"
 			@proceed="deleteGalleryImage"
 		/>
-		<GalleryImageViewer
-			v-if="expandedGalleryItem != null"
-			v-model:zoomed-in="zoomedIn"
-			:item="expandedGalleryItem"
-			:has-multiple-images="filteredGallery.length > 1"
-			@close="expandedGalleryItem = null"
-			@previous="previousImage"
-			@next="nextImage"
-		/>
+		<ImageViewerEditor ref="galleryViewer" :items="galleryViewerItems" editor="disabled">
+			<template v-if="canEditGallery" #actions="{ index }">
+				<IconButton
+					v-tooltip="formatMessage(commonMessages.editButton)"
+					type="quiet"
+					:label="formatMessage(commonMessages.editButton)"
+					:disabled="galleryActionsBusy || !filteredGallery[index]?.url"
+					@click="openGalleryEditor(index)"
+				>
+					<EditIcon aria-hidden="true" />
+				</IconButton>
+				<IconButton
+					v-tooltip="formatMessage(commonMessages.deleteLabel)"
+					type="quiet"
+					:label="formatMessage(commonMessages.deleteLabel)"
+					:disabled="galleryActionsBusy || !filteredGallery[index]?.url"
+					@click="confirmGalleryRemoval(filteredGallery[index]?.url)"
+				>
+					<TrashIcon aria-hidden="true" />
+				</IconButton>
+			</template>
+		</ImageViewerEditor>
 		<div v-if="filteredGallery.length" class="@container">
 			<GalleryGrid
 				v-model:reordering="galleryReordering"
@@ -173,7 +186,7 @@
 </template>
 
 <script setup>
-import { PlusIcon, SaveIcon, UploadIcon, XIcon } from '@modrinth/assets'
+import { EditIcon, PlusIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import {
 	Button,
 	commonMessages,
@@ -183,6 +196,9 @@ import {
 	EmptyState,
 	FileButton,
 	GalleryImageFields,
+	galleryCardMessages,
+	IconButton,
+	ImageViewerEditor,
 	injectNotificationManager,
 	injectProjectPageContext,
 	NewModal as Modal,
@@ -201,7 +217,6 @@ import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { isPermission } from '~/utils/permissions.ts'
 
-import GalleryImageViewer from './image-viewer.vue'
 import { messages } from './messages'
 
 const { data: globals } = useGlobals()
@@ -232,9 +247,7 @@ const aiImageWarningModal = ref(null)
 const modal_edit_item = ref(null)
 const modal_confirm = ref(null)
 
-const expandedGalleryItem = ref(null)
-const expandedGalleryIndex = ref(0)
-const zoomedIn = ref(false)
+const galleryViewer = useTemplateRef('galleryViewer')
 
 const deleteImageUrl = ref(null)
 const isDeletingImage = ref(false)
@@ -260,6 +273,15 @@ const acceptedFileTypes = acceptFileTypes.split(',')
 
 const filteredGallery = computed(
 	() => project.value.gallery?.filter((img) => img.title !== MC_SERVER_BANNER_NAME) ?? [],
+)
+const galleryViewerItems = computed(() =>
+	filteredGallery.value.map((image) => ({
+		id: image.url || image.created,
+		src: image.raw_url || image.url || 'https://cdn.modrinth.com/placeholder-banner.svg',
+		alt: image.title || formatMessage(galleryCardMessages.imageAlt),
+		title: image.title,
+		description: image.description,
+	})),
 )
 const nextGalleryOrdering = computed(
 	() => Math.max(-1, ...filteredGallery.value.map((image) => image.ordering)) + 1,
@@ -294,26 +316,8 @@ const saveValidation = useProjectSaveValidation(() => ({
 }))
 const canSaveGalleryFields = computed(() => !saveValidation.hasErrors.value)
 
-const nextImage = () => {
-	expandedGalleryIndex.value++
-	if (expandedGalleryIndex.value >= filteredGallery.value.length) {
-		expandedGalleryIndex.value = 0
-	}
-	expandedGalleryItem.value = filteredGallery.value[expandedGalleryIndex.value]
-}
-
-const previousImage = () => {
-	expandedGalleryIndex.value--
-	if (expandedGalleryIndex.value < 0) {
-		expandedGalleryIndex.value = filteredGallery.value.length - 1
-	}
-	expandedGalleryItem.value = filteredGallery.value[expandedGalleryIndex.value]
-}
-
-const expandImage = (index) => {
-	expandedGalleryItem.value = filteredGallery.value[index]
-	expandedGalleryIndex.value = index
-	zoomedIn.value = false
+function expandImage(index) {
+	galleryViewer.value?.show(index)
 }
 
 const resetEdit = () => {
@@ -328,6 +332,8 @@ const resetEdit = () => {
 
 function openGalleryEditor(index) {
 	const item = filteredGallery.value[index]
+	if (!canEditGallery.value || galleryActionsBusy.value || !item?.url) return
+	galleryViewer.value?.hide()
 	resetEdit()
 	editIndex.value = index
 	editTitle.value = item.title ?? ''
@@ -337,6 +343,8 @@ function openGalleryEditor(index) {
 }
 
 function confirmGalleryRemoval(url) {
+	if (!canEditGallery.value || galleryActionsBusy.value || !url) return
+	galleryViewer.value?.hide()
 	deleteImageUrl.value = url
 	modal_confirm.value?.show()
 }

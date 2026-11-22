@@ -49,48 +49,50 @@ const formatDate = useFormatDateTime({ year: 'numeric', month: 'long', day: 'num
 				<span class="sr-only">{{ formatMessage(galleryEditorMessages.banner) }}</span>
 			</span>
 		</button>
-		<div class="flex flex-col gap-3 px-3 pt-3 [overflow-wrap:anywhere] empty:hidden">
-			<div v-if="image.title || image.description" class="flex flex-col gap-1">
-				<component
-					:is="heading ?? 'h3'"
-					v-if="image.title"
-					class="m-0 text-base font-semibold text-contrast"
-				>
-					{{ image.title }}
-				</component>
-				<p v-if="image.description" class="m-0 text-sm text-secondary">
-					{{ image.description }}
-				</p>
+		<footer class="flex flex-1 flex-col gap-0.5 px-3 pt-2 pb-2">
+			<div class="flex flex-col gap-3 [overflow-wrap:anywhere] empty:hidden pt-1">
+				<div v-if="image.title || image.description" class="flex flex-col gap-1">
+					<component
+						:is="heading ?? 'h3'"
+						v-if="image.title"
+						class="m-0 text-base font-semibold text-contrast"
+					>
+						{{ image.title }}
+					</component>
+					<p v-if="image.description" class="m-0 text-sm text-secondary">
+						{{ image.description }}
+					</p>
+				</div>
+				<slot name="details" />
 			</div>
-			<slot name="details" />
-		</div>
-		<footer class="mt-auto flex flex-wrap items-center gap-2 px-3 py-2.5 pt-1.5">
-			<div class="flex min-h-8 items-center gap-1 text-sm text-secondary relative top-px">
-				<CalendarIcon aria-hidden="true" class="size-4 shrink-0 mb-px" />
-				<span class="sr-only">{{ formatMessage(galleryCardMessages.dateCreated) }}</span>
-				{{ formatDate(image.created) }}
-			</div>
-			<div v-if="editable" class="ml-auto flex shrink-0 gap-0.5">
-				<IconButton
-					v-tooltip="formatMessage(commonMessages.editButton)"
-					type="quiet"
-					size="sm"
-					:label="formatMessage(commonMessages.editButton)"
-					:disabled="actionsDisabled"
-					@click="emit('edit')"
-				>
-					<EditIcon aria-hidden="true" />
-				</IconButton>
-				<IconButton
-					v-tooltip="formatMessage(commonMessages.removeButton)"
-					type="quiet"
-					size="sm"
-					:label="formatMessage(commonMessages.removeButton)"
-					:disabled="actionsDisabled"
-					@click="emit('remove')"
-				>
-					<TrashIcon aria-hidden="true" />
-				</IconButton>
+			<div class="mt-auto flex flex-wrap items-center gap-2 min-h-8">
+				<div class="flex min-h-8 items-center gap-1 text-sm text-secondary relative top-px">
+					<CalendarIcon aria-hidden="true" class="size-4 shrink-0 mb-px" />
+					<span class="sr-only">{{ formatMessage(galleryCardMessages.dateCreated) }}</span>
+					{{ formatDate(image.created) }}
+				</div>
+				<div v-if="editable" class="ml-auto flex shrink-0 gap-0.5">
+					<IconButton
+						v-tooltip="formatMessage(commonMessages.editButton)"
+						type="quiet"
+						size="sm"
+						:label="formatMessage(commonMessages.editButton)"
+						:disabled="actionsDisabled"
+						@click="emit('edit')"
+					>
+						<EditIcon aria-hidden="true" />
+					</IconButton>
+					<IconButton
+						v-tooltip="formatMessage(commonMessages.removeButton)"
+						type="quiet"
+						size="sm"
+						:label="formatMessage(commonMessages.removeButton)"
+						:disabled="actionsDisabled"
+						@click="emit('remove')"
+					>
+						<TrashIcon aria-hidden="true" />
+					</IconButton>
+				</div>
 			</div>
 		</footer>
 	</article>

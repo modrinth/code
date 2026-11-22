@@ -1,8 +1,20 @@
 <template>
 	<div class="mb-3 flex flex-col gap-3">
-		<div class="flex flex-wrap justify-between gap-2">
+		<div
+			class="flex flex-wrap justify-between gap-x-2"
+			:class="$slots.heading ? 'gap-y-3' : 'gap-y-2'"
+		>
+			<div
+				v-if="$slots.heading"
+				class="versions-heading flex min-w-0 items-center"
+				:class="openModal ? 'flex-1' : 'basis-full'"
+			>
+				<slot name="heading" />
+			</div>
+
 			<VersionFilterControl
 				ref="versionFilters"
+				class="version-filters"
 				:versions="normalizedVersions"
 				:game-versions="gameVersions"
 				:base-id="`${baseId}-filter`"
@@ -796,6 +808,10 @@ const messages = defineMessages({
 </script>
 
 <style scoped>
+.versions-heading:has(+ .version-filters) {
+	flex-basis: 100%;
+}
+
 :deep(.version-row-link:hover:not(:has([data-no-row-click]:hover))),
 :deep(.version-row-link:hover:not(:has([data-no-row-click]:hover)) + .table-row-below),
 :deep(.version-row-link:has(+ .table-row-below:hover)),

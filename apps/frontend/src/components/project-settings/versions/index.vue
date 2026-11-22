@@ -1,8 +1,5 @@
 <template>
 	<div data-project-field="versions" data-project-field-scroll-only>
-		<h2 v-if="versions?.length" class="settings-section-title">
-			{{ formatMessage(commonProjectSettingsMessages.versions) }}
-		</h2>
 		<ProjectIssueCard location="versions" class="mb-4" />
 		<CreateProjectVersionModal
 			v-if="currentMember"
@@ -71,6 +68,11 @@
 			"
 			:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
 		>
+			<template #heading>
+				<h2 class="settings-section-title !mb-0">
+					{{ formatMessage(commonProjectSettingsMessages.versions) }}
+				</h2>
+			</template>
 			<template #version-issue="{ version }">
 				<ProjectIssueCard target="version" :version-id="version.id" />
 			</template>

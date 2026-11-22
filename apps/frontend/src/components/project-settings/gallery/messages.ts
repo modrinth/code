@@ -26,12 +26,6 @@ export const messages = defineMessages({
 		id: 'project.settings.gallery.empty-heading',
 		defaultMessage: 'No gallery images yet',
 	},
-	toggleZoom: { id: 'project.settings.gallery.toggle-zoom', defaultMessage: 'Toggle zoom' },
-	previousImage: {
-		id: 'project.settings.gallery.previous-image',
-		defaultMessage: 'Previous image',
-	},
-	nextImage: { id: 'project.settings.gallery.next-image', defaultMessage: 'Next image' },
 	upload: { id: 'project.settings.gallery.upload', defaultMessage: 'Upload images' },
 	deleteTitle: {
 		id: 'project.settings.gallery.delete-title',
