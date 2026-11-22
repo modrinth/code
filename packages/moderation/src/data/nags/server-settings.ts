@@ -56,6 +56,7 @@ const messages = defineMessages({
 
 export const serverSettingNags = {
 	'add-java-address': {
+		category: 'setup-step',
 		title: messages.addressTitle,
 		description: messages.address,
 		highlightField: 'java-address',
@@ -68,6 +69,7 @@ export const serverSettingNags = {
 		destination: 'server',
 	},
 	'select-compatibility': {
+		category: 'setup-step',
 		title: messages.compatibilityTitle,
 		description: messages.compatibility,
 		highlightField: 'server-compatibility',
@@ -80,6 +82,7 @@ export const serverSettingNags = {
 		destination: 'server',
 	},
 	'select-country': {
+		category: 'setup-step',
 		title: messages.countryTitle,
 		description: messages.country,
 		highlightField: 'server-region',
