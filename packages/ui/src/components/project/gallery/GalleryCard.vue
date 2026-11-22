@@ -31,14 +31,14 @@ const formatDate = useFormatDateTime({ year: 'numeric', month: 'long', day: 'num
 		<slot name="thumbnail-overlay" />
 		<button
 			type="button"
-			class="block w-full cursor-pointer rounded-t-2xl border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+			class="custom-focus-indicator group/preview block w-full cursor-pointer rounded-t-2xl border-0 bg-transparent p-0 focus-visible:outline-none"
 			@click="emit('preview')"
 		>
 			<FullImage
 				:src="image.url || 'https://cdn.modrinth.com/placeholder-banner.svg'"
 				:raw-src="image.raw_url"
 				:alt="image.title || formatMessage(galleryCardMessages.imageAlt)"
-				class="block aspect-video w-full rounded-t-2xl object-cover transition-[filter] hover:brightness-75"
+				class="block aspect-video w-full rounded-t-2xl object-cover transition-[filter] hover:brightness-75 group-focus-visible/preview:brightness-75"
 			/>
 			<span
 				v-if="image.featured"

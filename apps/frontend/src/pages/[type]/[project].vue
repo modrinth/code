@@ -1332,8 +1332,7 @@ function loadDependencies() {
 // This allows showing/hiding UI elements without loading full version data
 const hasVersions = computed(() => (project.value?.versions?.length ?? 0) > 0)
 
-async function invalidateProject() {
-	const id = projectId.value
+async function invalidateProject(id = projectId.value) {
 	if (!id) {
 		return
 	}
@@ -1341,8 +1340,9 @@ async function invalidateProject() {
 	await queryClient.invalidateQueries({ queryKey: ['project', 'v3', id] })
 	// Prefix match — invalidates members, versions, dependencies, organization
 	await queryClient.invalidateQueries({ queryKey: ['project', id] })
-	if (projectRaw.value?.thread_id) {
-		await queryClient.invalidateQueries({ queryKey: ['thread', projectRaw.value.thread_id] })
+	const threadId = queryClient.getQueryData(['project', 'v2', id])?.thread_id
+	if (threadId) {
+		await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
 	}
 }
 
@@ -1595,8 +1595,8 @@ const createGalleryItemMutation = useMutation({
 		addProjectMutationErrorNotification(err)
 	},
 
-	onSettled: async () => {
-		await invalidateProject()
+	onSettled: async (_, __, { projectId }) => {
+		await invalidateProject(projectId)
 	},
 })
 
@@ -2291,33 +2291,32 @@ async function patchIcon(icon) {
 	})
 }
 
-async function createGalleryItem(
-	file,
-	title,
-	description,
-	featured,
-	ordering,
-	throwOnError = false,
-) {
-	startLoading()
+let galleryUploadQueue = Promise.resolve()
 
-	return new Promise((resolve, reject) => {
-		createGalleryItemMutation.mutate(
-			{
-				projectId: project.value.id,
+async function createGalleryItem(file, title, description, featured, ordering, throwOnError = false) {
+	const projectId = project.value.id
+	const upload = galleryUploadQueue.then(async () => {
+		startLoading()
+		try {
+			const gallery = queryClient.getQueryData(['project', 'v2', projectId])?.gallery ?? []
+			await createGalleryItemMutation.mutateAsync({
+				projectId,
 				file,
 				title,
 				description,
 				featured,
-				ordering,
-			},
-			{
-				onSuccess: () => resolve(true),
-				onError: (error) => (throwOnError ? reject(error) : resolve(false)),
-				onSettled: () => stopLoading(),
-			},
-		)
+				ordering: ordering ?? Math.max(-1, ...gallery.map((image) => image.ordering)) + 1,
+			})
+			return true
+		} catch (error) {
+			if (throwOnError) throw error
+			return false
+		} finally {
+			stopLoading()
+		}
 	})
+	galleryUploadQueue = upload.then(() => {}, () => {})
+	return upload
 }
 
 async function editGalleryItem(

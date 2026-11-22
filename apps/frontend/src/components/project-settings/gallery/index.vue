@@ -26,7 +26,10 @@
 		<Modal
 			ref="modal_edit_item"
 			:disable-close="shouldPreventActions"
+			:close-label="isBatchUpload ? formatMessage(messages.skipImage) : undefined"
+			:before-hide="skipCurrentUpload"
 			:on-show="() => (isGalleryModalOpen = true)"
+			:on-hide="() => (shouldPreventActions = true)"
 			:on-after-hide="resetGalleryModal"
 		>
 			<template #title>
@@ -38,7 +41,7 @@
 					}}
 				</span>
 				<span
-					v-if="editIndex === -1 && uploadFiles.length > 1"
+					v-if="isBatchUpload"
 					class="shrink-0 text-sm font-medium text-secondary"
 					aria-live="polite"
 				>
@@ -83,7 +86,7 @@
 				<div class="flex flex-wrap justify-end gap-2">
 					<Button type="outlined" :disabled="shouldPreventActions" @click="modal_edit_item.hide()">
 						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
+						{{ formatMessage(isBatchUpload ? messages.skipImage : commonMessages.cancelButton) }}
 					</Button>
 					<Button
 						v-if="editIndex === -1"
@@ -93,7 +96,7 @@
 						@click="createGalleryItem"
 					>
 						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.addImage) }}
+						{{ formatMessage(messages.uploadTitle) }}
 					</Button>
 					<Button
 						v-else
@@ -267,6 +270,8 @@ const isPreparingUpload = ref(false)
 const isGalleryModalOpen = ref(false)
 const uploadFiles = shallowRef([])
 const uploadIndex = ref(0)
+const isBatchUpload = computed(() => uploadFiles.value.length > 1)
+const pendingBatchUploads = ref(0)
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
 const acceptFileTypes = 'image/png,image/jpeg,image/gif,image/webp,.png,.jpg,.jpeg,.gif,.webp'
 const acceptedFileTypes = acceptFileTypes.split(',')
@@ -287,7 +292,11 @@ const nextGalleryOrdering = computed(
 	() => Math.max(-1, ...filteredGallery.value.map((image) => image.ordering)) + 1,
 )
 const galleryEditingBusy = computed(
-	() => isPreparingUpload.value || isGalleryModalOpen.value || isDeletingImage.value,
+	() =>
+		isPreparingUpload.value ||
+		isGalleryModalOpen.value ||
+		isDeletingImage.value ||
+		pendingBatchUploads.value > 0,
 )
 const galleryReordering = ref(false)
 const galleryActionsBusy = computed(() => galleryEditingBusy.value || galleryReordering.value)
@@ -351,6 +360,7 @@ function confirmGalleryRemoval(url) {
 
 function resetGalleryModal() {
 	isGalleryModalOpen.value = false
+	shouldPreventActions.value = false
 	uploadFiles.value = []
 	uploadIndex.value = 0
 	resetEdit()
@@ -360,6 +370,13 @@ function showUploadStep(index) {
 	resetEdit()
 	uploadIndex.value = index
 	setEditFile(uploadFiles.value[index])
+}
+
+function skipCurrentUpload() {
+	const nextIndex = uploadIndex.value + 1
+	if (nextIndex >= uploadFiles.value.length) return true
+	showUploadStep(nextIndex)
+	return false
 }
 
 function validateGalleryFile(file) {
@@ -427,6 +444,20 @@ const createGalleryItem = async () => {
 		shouldPreventActions.value
 	)
 		return
+
+	if (isBatchUpload.value) {
+		pendingBatchUploads.value += 1
+		const upload = createGalleryItemMutation(
+			editFile.value,
+			editTitle.value || undefined,
+			editDescription.value || undefined,
+			editFeatured.value,
+		)
+		modal_edit_item.value?.hide()
+		await upload.finally(() => (pendingBatchUploads.value -= 1))
+		return
+	}
+
 	shouldPreventActions.value = true
 
 	const submittedState = saveValidation.snapshot()
@@ -441,10 +472,6 @@ const createGalleryItem = async () => {
 		)
 
 		if (!success) return
-		if (uploadIndex.value + 1 < uploadFiles.value.length) {
-			showUploadStep(uploadIndex.value + 1)
-			return
-		}
 		saveValidation.clear()
 	} catch (error) {
 		if (!saveValidation.capture(error, submittedState)) throw error

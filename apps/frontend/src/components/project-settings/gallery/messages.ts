@@ -9,6 +9,10 @@ export const messages = defineMessages({
 		id: 'project.settings.gallery.upload-progress',
 		defaultMessage: '{current, number} of {total, number}',
 	},
+	skipImage: {
+		id: 'project.settings.gallery.skip-image',
+		defaultMessage: 'Skip image',
+	},
 	invalidFileTitle: {
 		id: 'project.settings.gallery.invalid-file-title',
 		defaultMessage: 'Unsupported image type',
@@ -35,5 +39,4 @@ export const messages = defineMessages({
 		id: 'project.settings.gallery.delete-description',
 		defaultMessage: 'This will remove this gallery image forever (like really forever).',
 	},
-	addImage: { id: 'project.settings.gallery.add-image', defaultMessage: 'Add gallery image' },
 })
