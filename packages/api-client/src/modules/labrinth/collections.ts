@@ -7,6 +7,35 @@ export class LabrinthCollectionsModule extends AbstractModule {
 	}
 
 	/**
+	 * Create a collection (v3).
+	 *
+	 * Staff with moderation write access may set `user_id` to create the
+	 * collection on another user's account.
+	 *
+	 * @param data - Collection creation data
+	 * @returns Promise resolving to the created collection
+	 *
+	 * @example
+	 * ```typescript
+	 * const collection = await client.labrinth.collections.create({
+	 *   name: 'Featured projects',
+	 *   description: 'Projects featured on the home page',
+	 *   user_id: 'AANobbMI',
+	 * })
+	 * ```
+	 */
+	public async create(
+		data: Labrinth.Collections.CreateCollectionRequest,
+	): Promise<Labrinth.Collections.Collection> {
+		return this.client.request<Labrinth.Collections.Collection>(`/collection`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'POST',
+			body: data,
+		})
+	}
+
+	/**
 	 * Get a collection by ID (v3)
 	 *
 	 * @param id - Collection ID

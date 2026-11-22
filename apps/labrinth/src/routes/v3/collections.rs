@@ -5,7 +5,7 @@ use crate::auth::{
 use crate::database;
 use crate::database::PgPool;
 use crate::database::models::{
-    collection_item, generate_collection_id, project_item,
+    DBUser, collection_item, generate_collection_id, project_item,
 };
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::collections::{Collection, CollectionStatus};
@@ -24,7 +24,7 @@ use crate::util::validate::validation_errors_to_string;
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use anyhow::anyhow;
-use ariadne::ids::base62_impl::parse_base62;
+use ariadne::ids::{UserId, base62_impl::parse_base62};
 use chrono::Utc;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -56,6 +56,11 @@ pub struct CollectionCreateData {
     #[serde(default = "Vec::new")]
     /// A list of initial projects to use with the created collection
     pub projects: Vec<String>,
+    #[serde(default)]
+    /// The owner of the collection.
+    ///
+    /// MODERATION_WRITE scope may set this to another user's ID. When omitted, the authenticated user owns the collection.
+    pub user_id: Option<UserId>,
 }
 
 #[utoipa::path(tag = "collections", responses((status = OK)))]
@@ -81,8 +86,20 @@ pub async fn collection_create(
 
     require_verified_email(&current_user.user)?;
 
-    let limits =
-        UserLimits::get_for_collections(&current_user, &client).await?;
+    let owner_id = collection_owner_id(
+        &current_user,
+        collection_create_data.user_id,
+        &client,
+        &redis,
+    )
+    .await?;
+
+    let limits = UserLimits::get_for_collections_owned_by(
+        owner_id,
+        &current_user,
+        &client,
+    )
+    .await?;
     if limits.current >= limits.max {
         return Err(CreateError::LimitReached);
     }
@@ -117,7 +134,7 @@ pub async fn collection_create(
 
     let collection_builder_actual = collection_item::CollectionBuilder {
         collection_id: collection_id.into(),
-        user_id: current_user.user.id.into(),
+        user_id: owner_id,
         name: collection_create_data.name,
         description: collection_create_data.description,
         status: CollectionStatus::Listed,
@@ -684,6 +701,37 @@ pub async fn collection_delete(
     } else {
         Err(ApiError::NotFound(anyhow!("resource not found")))
     }
+}
+
+async fn collection_owner_id(
+    current_user: &crate::auth::UserWithScopes,
+    requested_owner: Option<UserId>,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<database::models::DBUserId, CreateError> {
+    let Some(requested_owner) = requested_owner else {
+        return Ok(current_user.user.id.into());
+    };
+
+    if requested_owner == current_user.user.id {
+        return Ok(current_user.user.id.into());
+    }
+
+    if !current_user.scopes.contains(Scopes::MODERATION_WRITE) {
+        return Err(CreateError::CustomAuthenticationError(
+            "you do not have permission to create a collection for another user"
+                .to_string(),
+        ));
+    }
+
+    let owner = DBUser::get_id(requested_owner.into(), pool, redis)
+        .await
+        .internal_context("fetching collection owner")?
+        .request_context_with(|| {
+            anyhow!("the specified user `{requested_owner}` does not exist")
+        })?;
+
+    Ok(owner.id)
 }
 
 fn can_modify_collection(
