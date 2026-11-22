@@ -310,15 +310,33 @@ const showVersionsCheckbox = computed(() => {
 	return false
 })
 
+// Game version tags are ordered newest first. Sorting the version strings directly would put
+// 1.21.10 and 1.21.11 between 1.21.1 and 1.21.2.
+const gameVersionOrder = computed(() => {
+	const order = new Map<string, number>()
+
+	for (const [index, gameVersion] of (tags.value.gameVersions ?? []).entries()) {
+		order.set(gameVersion.version, index)
+	}
+
+	return order
+})
+
 const filteredGameVersions = computed(() => {
+	const order = gameVersionOrder.value
+
 	return props.project.game_versions
 		.filter(
 			(x) =>
 				(versionFilter.value && x.includes(versionFilter.value)) ||
 				(!versionFilter.value && (showAllVersions.value || isReleaseGameVersion(x))),
 		)
-		.slice()
-		.reverse()
+		.sort((a, b) => {
+			const aRank = order.get(a) ?? Number.MAX_SAFE_INTEGER
+			const bRank = order.get(b) ?? Number.MAX_SAFE_INTEGER
+
+			return aRank - bRank
+		})
 })
 
 const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
