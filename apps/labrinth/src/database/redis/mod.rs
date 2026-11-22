@@ -210,6 +210,7 @@ mod tests {
             thread_id: DBThreadId(1),
             minecraft_mod_metadata: None,
             components: exp::ProjectQuery::default(),
+            featured_in: Vec::new(),
         };
         postcard_round_trip(&project);
         let response = crate::models::projects::Project::from(project.clone());

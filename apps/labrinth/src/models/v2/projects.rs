@@ -3,7 +3,9 @@ use std::convert::TryFrom;
 use super::super::ids::OrganizationId;
 use crate::database::models::version_item;
 use crate::models::exp::minecraft::Environment;
-use crate::models::ids::{ProjectId, TeamId, ThreadId, VersionId};
+use crate::models::ids::{
+    CollectionId, ProjectId, TeamId, ThreadId, VersionId,
+};
 use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
     Dependency, License, Link, Loader, ModeratorMessage, MonetizationStatus,
@@ -129,6 +131,9 @@ pub struct LegacyProject {
     pub color: Option<u32>,
     pub thread_id: ThreadId,
     pub monetization_status: MonetizationStatus,
+    /// Listed collections with the `featured` flag that include this project.
+    #[serde(default)]
+    pub featured_in: Vec<CollectionId>,
 }
 
 impl LegacyProject {
@@ -290,6 +295,7 @@ impl LegacyProject {
             color: data.color,
             thread_id: data.thread_id,
             monetization_status: data.monetization_status,
+            featured_in: data.featured_in,
             client_side,
             server_side,
             game_versions,

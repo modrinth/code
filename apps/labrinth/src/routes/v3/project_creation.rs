@@ -1174,6 +1174,7 @@ async fn project_create_inner(
                 .collect(),
             gallery: gallery_urls,
             color: project_builder.color,
+            featured_in: Vec::new(),
             thread_id: thread_id.into(),
             monetization_status: MonetizationStatus::Monetized,
             // New projects are considered reviewed with respect to side types migrations

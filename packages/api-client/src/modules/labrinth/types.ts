@@ -979,6 +979,7 @@ export namespace Labrinth {
 				color?: number
 				thread_id: string
 				monetization_status: MonetizationStatus
+				featured_in: string[]
 			}
 
 			export type ProjectCheckResponse = {
@@ -1211,6 +1212,7 @@ export namespace Labrinth {
 				thread_id: string
 				monetization_status: v2.MonetizationStatus
 				side_types_migration_review_status: 'reviewed' | 'pending'
+				featured_in: string[]
 				environment?: Environment[]
 
 				minecraft_server?: MinecraftServer | null
@@ -2641,6 +2643,11 @@ export namespace Labrinth {
 	export namespace Collections {
 		export type CollectionStatus = 'listed' | 'unlisted' | 'private' | 'rejected' | 'unknown'
 
+		export enum CollectionFlag {
+			Featured = 1 << 0,
+			Potw = 1 << 1,
+		}
+
 		export type Collection = {
 			id: string
 			user: string
@@ -2650,6 +2657,7 @@ export namespace Labrinth {
 			raw_icon_url: string | null
 			color: number | null
 			status: CollectionStatus
+			collection_flags: number
 			created: string
 			updated: string
 			projects: string[]
@@ -2661,6 +2669,8 @@ export namespace Labrinth {
 			projects?: string[]
 			// allows staff to create collections for other users
 			user_id?: string
+			// staff only
+			collection_flags?: number
 		}
 
 		export type EditCollectionRequest = {
@@ -2668,6 +2678,8 @@ export namespace Labrinth {
 			description?: string | null
 			status?: CollectionStatus
 			new_projects?: string[]
+			// staff only
+			collection_flags?: number
 		}
 	}
 

@@ -1440,7 +1440,13 @@ pub async fn user_delete(
         .await
         .internal_context("failed to commit transaction")?;
 
-    if result.is_some() {
+    if let Some(refresh_projects) = result {
+        crate::database::models::DBProject::clear_many_caches(
+            &refresh_projects,
+            &redis,
+        )
+        .await
+        .internal_context("clearing featured project caches")?;
         Ok(())
     } else {
         Err(ApiError::NotFound(anyhow!("resource not found")))

@@ -1,0 +1,37 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT cm.mod_id,\n                        ARRAY_AGG(DISTINCT c.id) filter (where c.id is not null) collection_ids\n                    FROM collections_mods cm\n                    INNER JOIN collections c ON c.id = cm.collection_id\n                    WHERE cm.mod_id = ANY($1)\n                        AND c.status = $2\n                        AND (c.flags & $3) = $3\n                    GROUP BY cm.mod_id\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "mod_id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "collections_mods",
+            "name": "mod_id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "collection_ids",
+        "type_info": "Int8Array",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "ab7ea223acc0e6fa25b3f370fab0bc4a5b53c52d5a24da0594ff63d5df90e688"
+}

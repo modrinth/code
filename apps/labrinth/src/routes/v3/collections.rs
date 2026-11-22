@@ -8,7 +8,9 @@ use crate::database::models::{
     DBUser, collection_item, generate_collection_id, project_item,
 };
 use crate::file_hosting::{FileHost, FileHostPublicity};
-use crate::models::collections::{Collection, CollectionStatus};
+use crate::models::collections::{
+    Collection, CollectionFlags, CollectionStatus,
+};
 use crate::models::ids::{CollectionId, ProjectId};
 use crate::models::pats::Scopes;
 use crate::models::v3::user_limits::UserLimits;
@@ -61,6 +63,9 @@ pub struct CollectionCreateData {
     ///
     /// MODERATION_WRITE scope may set this to another user's ID. When omitted, the authenticated user owns the collection.
     pub user_id: Option<UserId>,
+    #[serde(default)]
+    /// MODERATION_WRITE-only bitfield. `1` is featured, `2` is potw. Omitted flags are empty.
+    pub collection_flags: Option<CollectionFlags>,
 }
 
 #[utoipa::path(tag = "collections", responses((status = OK)))]
@@ -108,6 +113,16 @@ pub async fn collection_create(
         CreateError::InvalidInput(validation_errors_to_string(err, None))
     })?;
 
+    let collection_flags =
+        collection_create_data.collection_flags.unwrap_or_default();
+    if !collection_flags.is_empty()
+        && !current_user.scopes.contains(Scopes::MODERATION_WRITE)
+    {
+        return Err(CreateError::CustomAuthenticationError(
+            "you do not have permission to set collection flags".to_string(),
+        ));
+    }
+
     crate::routes::resolve_body_refs(
         collection_create_data.projects.iter_mut().collect(),
         &Some(current_user.clone()),
@@ -138,6 +153,7 @@ pub async fn collection_create(
         name: collection_create_data.name,
         description: collection_create_data.description,
         status: CollectionStatus::Listed,
+        flags: collection_flags,
         projects: initial_project_ids
             .iter()
             .copied()
@@ -160,9 +176,22 @@ pub async fn collection_create(
         raw_icon_url: None,
         color: None,
         status: collection_builder.status,
+        collection_flags: collection_builder.flags,
         projects: initial_project_ids,
     };
     transaction.commit().await?;
+
+    let refresh_projects = featured_project_cache_ids(
+        CollectionStatus::Private,
+        CollectionFlags::empty(),
+        &[],
+        collection_builder.status,
+        collection_builder.flags,
+        &collection_builder.projects,
+    );
+    database::models::DBProject::clear_many_caches(&refresh_projects, &redis)
+        .await
+        .internal_context("clearing featured project caches")?;
 
     Ok(HttpResponse::Ok().json(response))
 }
@@ -273,6 +302,8 @@ pub struct EditCollection {
     pub status: Option<CollectionStatus>,
     #[validate(length(max = 1024))]
     pub new_projects: Option<Vec<String>>,
+    #[serde(default)]
+    pub collection_flags: Option<CollectionFlags>,
 }
 
 #[utoipa::path(tag = "collections", responses((status = NO_CONTENT)))]
@@ -324,7 +355,17 @@ pub async fn collection_edit(
             return Ok(HttpResponse::Unauthorized().body(""));
         }
 
+        if let Some(flags) = new_collection.collection_flags
+            && flags != collection_item.flags
+            && !user.scopes.contains(Scopes::MODERATION_WRITE)
+        {
+            return Err(ApiError::Auth(anyhow!(
+                "you do not have permission to set collection flags"
+            )));
+        }
+
         let id = collection_item.id;
+        let mut next_projects = collection_item.projects.clone();
 
         let mut transaction = pool
             .begin()
@@ -385,6 +426,23 @@ pub async fn collection_edit(
             .internal_context("querying database for `collection_edit`")?;
         }
 
+        if let Some(flags) = new_collection.collection_flags
+            && flags != collection_item.flags
+        {
+            sqlx::query!(
+                "
+                UPDATE collections
+                SET flags = $1
+                WHERE (id = $2)
+                ",
+                flags.to_db(),
+                id as database::models::ids::DBCollectionId,
+            )
+            .execute(&mut transaction)
+            .await
+            .internal_context("querying database for `collection_edit`")?;
+        }
+
         if let Some(new_project_ids) = &new_collection.new_projects {
             // Delete all existing projects
             sqlx::query!(
@@ -416,6 +474,11 @@ pub async fn collection_edit(
                 })?;
                 validated_project_ids.push(project.inner.id.0);
             }
+            next_projects = validated_project_ids
+                .iter()
+                .copied()
+                .map(database::models::DBProjectId)
+                .collect();
             // Insert- don't throw an error if it already exists
             sqlx::query!(
                 "
@@ -443,6 +506,17 @@ pub async fn collection_edit(
             .internal_context("querying database for `collection_edit`")?;
         }
 
+        let refresh_projects = featured_project_cache_ids(
+            collection_item.status,
+            collection_item.flags,
+            &collection_item.projects,
+            new_collection.status.unwrap_or(collection_item.status),
+            new_collection
+                .collection_flags
+                .unwrap_or(collection_item.flags),
+            &next_projects,
+        );
+
         transaction
             .commit()
             .await
@@ -450,6 +524,12 @@ pub async fn collection_edit(
         database::models::DBCollection::clear_cache(collection_item.id, &redis)
             .await
             .internal_context("clearing cached data from Redis")?;
+        database::models::DBProject::clear_many_caches(
+            &refresh_projects,
+            &redis,
+        )
+        .await
+        .internal_context("clearing featured project caches")?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
@@ -696,7 +776,13 @@ pub async fn collection_delete(
         .await
         .internal_context("clearing cached data from Redis")?;
 
-    if result.is_some() {
+    if let Some(refresh_projects) = result {
+        database::models::DBProject::clear_many_caches(
+            &refresh_projects,
+            &redis,
+        )
+        .await
+        .internal_context("clearing featured project caches")?;
         Ok(HttpResponse::NoContent().body(""))
     } else {
         Err(ApiError::NotFound(anyhow!("resource not found")))
@@ -732,6 +818,43 @@ async fn collection_owner_id(
         })?;
 
     Ok(owner.id)
+}
+
+fn featured_project_cache_ids(
+    before_status: CollectionStatus,
+    before_flags: CollectionFlags,
+    before_projects: &[database::models::DBProjectId],
+    after_status: CollectionStatus,
+    after_flags: CollectionFlags,
+    after_projects: &[database::models::DBProjectId],
+) -> Vec<database::models::DBProjectId> {
+    let before_public = crate::models::collections::is_public_featured(
+        before_status,
+        before_flags,
+    );
+    let after_public = crate::models::collections::is_public_featured(
+        after_status,
+        after_flags,
+    );
+    if !before_public && !after_public {
+        return Vec::new();
+    }
+
+    let featured_changed = before_flags.contains(CollectionFlags::FEATURED)
+        != after_flags.contains(CollectionFlags::FEATURED);
+    let status_changed = before_status != after_status;
+    let mut before_sorted = before_projects.to_vec();
+    let mut after_sorted = after_projects.to_vec();
+    before_sorted.sort_by_key(|id| id.0);
+    after_sorted.sort_by_key(|id| id.0);
+    if !featured_changed && !status_changed && before_sorted == after_sorted {
+        return Vec::new();
+    }
+
+    before_sorted.append(&mut after_sorted);
+    before_sorted.sort_by_key(|id| id.0);
+    before_sorted.dedup();
+    before_sorted
 }
 
 fn can_modify_collection(

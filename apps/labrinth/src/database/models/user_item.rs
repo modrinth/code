@@ -723,7 +723,7 @@ impl DBUser {
         id: DBUserId,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
-    ) -> Result<Option<()>> {
+    ) -> Result<Option<Vec<DBProjectId>>> {
         let user = Self::get_id(id, &mut *transaction, redis)
             .await
             .context("failed to get user by ID")?;
@@ -980,10 +980,18 @@ impl DBUser {
             .await
             .context("failed to fetch user collections")?;
 
+            let mut featured_projects = Vec::new();
             for collection_id in user_collections {
-                models::DBCollection::remove(collection_id, transaction, redis)
-                    .await
-                    .context("failed to remove collection")?;
+                if let Some(projects) = models::DBCollection::remove(
+                    collection_id,
+                    transaction,
+                    redis,
+                )
+                .await
+                .context("failed to remove collection")?
+                {
+                    featured_projects.extend(projects);
+                }
             }
 
             let report_threads = sqlx::query!(
@@ -1371,7 +1379,7 @@ impl DBUser {
             .await
             .context("failed to delete moderation_locks")?;
 
-            Ok(Some(()))
+            Ok(Some(featured_projects))
         } else {
             Ok(None)
         }
