@@ -18,6 +18,14 @@ export const messages = defineMessages({
 		defaultMessage: '{filename} must be a PNG, JPEG, GIF, or WebP image.',
 	},
 	editTitle: { id: 'project.settings.gallery.edit-title', defaultMessage: 'Edit gallery item' },
+	emptyDescription: {
+		id: 'project.settings.gallery.empty-description',
+		defaultMessage: 'Upload your first gallery image.',
+	},
+	emptyHeading: {
+		id: 'project.settings.gallery.empty-heading',
+		defaultMessage: 'No gallery images yet',
+	},
 	toggleZoom: { id: 'project.settings.gallery.toggle-zoom', defaultMessage: 'Toggle zoom' },
 	previousImage: {
 		id: 'project.settings.gallery.previous-image',

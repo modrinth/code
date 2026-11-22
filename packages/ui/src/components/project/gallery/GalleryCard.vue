@@ -65,8 +65,8 @@ const formatDate = useFormatDateTime({ year: 'numeric', month: 'long', day: 'num
 			<slot name="details" />
 		</div>
 		<footer class="mt-auto flex flex-wrap items-center gap-2 px-3 py-2.5 pt-1.5">
-			<div class="flex min-h-8 items-center gap-2 text-sm text-secondary">
-				<CalendarIcon aria-hidden="true" class="size-4 shrink-0" />
+			<div class="flex min-h-8 items-center gap-1 text-sm text-secondary relative top-px">
+				<CalendarIcon aria-hidden="true" class="size-4 shrink-0 mb-px" />
 				<span class="sr-only">{{ formatMessage(galleryCardMessages.dateCreated) }}</span>
 				{{ formatDate(image.created) }}
 			</div>

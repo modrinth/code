@@ -4652,6 +4652,12 @@
   "project.settings.gallery.edit-title": {
     "message": "Edit gallery item"
   },
+  "project.settings.gallery.empty-description": {
+    "message": "Upload your first gallery image."
+  },
+  "project.settings.gallery.empty-heading": {
+    "message": "No gallery images yet"
+  },
   "project.settings.gallery.invalid-file-description": {
     "message": "{filename} must be a PNG, JPEG, GIF, or WebP image."
   },

@@ -7,7 +7,7 @@
 				{{ formatMessage(commonProjectSettingsMessages.gallery) }}
 			</h2>
 			<FileButton
-				v-if="currentMember"
+				v-if="currentMember && filteredGallery.length"
 				type="colored"
 				color="brand"
 				:max-size="globals?.max_gallery_image_size"
@@ -56,11 +56,7 @@
 					v-model:description="editDescription"
 					v-model:featured="editFeatured"
 					:preview-src="previewImage || filteredGallery[editIndex]?.url"
-					:filename="editFile?.name"
 					:accept="acceptFileTypes"
-					:max-size="globals?.max_gallery_image_size"
-					:replace-disabled="!canUploadGallery || shouldPreventActions"
-					@replace="replaceEditFile"
 				>
 					<template #title-feedback>
 						<ValidationMessage
@@ -130,7 +126,7 @@
 			@previous="previousImage"
 			@next="nextImage"
 		/>
-		<div class="@container">
+		<div v-if="filteredGallery.length" class="@container">
 			<GalleryGrid
 				v-model:reordering="galleryReordering"
 				:project-id="project.id"
@@ -151,6 +147,28 @@
 				</template>
 			</GalleryGrid>
 		</div>
+		<EmptyState
+			v-else
+			type="no-images"
+			:heading="formatMessage(messages.emptyHeading)"
+			:description="canUploadGallery ? formatMessage(messages.emptyDescription) : undefined"
+			class="py-10"
+		>
+			<template v-if="canUploadGallery" #actions>
+				<FileButton
+					type="colored"
+					color="green"
+					:max-size="globals?.max_gallery_image_size"
+					:accept="acceptFileTypes"
+					multiple
+					:prompt="formatMessage(messages.upload)"
+					:disabled="galleryActionsBusy"
+					@change="handleFiles"
+				>
+					<UploadIcon aria-hidden="true" />
+				</FileButton>
+			</template>
+		</EmptyState>
 	</div>
 </template>
 
@@ -162,6 +180,7 @@ import {
 	commonProjectSettingsMessages,
 	ConfirmModal,
 	DropArea,
+	EmptyState,
 	FileButton,
 	GalleryImageFields,
 	injectNotificationManager,
@@ -379,27 +398,6 @@ const handleFiles = async (files) => {
 		if (rejectedAiImage) aiImageWarningModal.value?.show()
 	} finally {
 		isPreparingUpload.value = false
-	}
-}
-
-const replaceEditFile = async ([file]) => {
-	if (
-		!file ||
-		!canUploadGallery.value ||
-		shouldPreventActions.value ||
-		!validateGalleryFile(file)
-	) {
-		return
-	}
-	shouldPreventActions.value = true
-	try {
-		if (await fileDeclaresAi(file)) {
-			aiImageWarningModal.value?.show()
-			return
-		}
-		if (canUploadGallery.value) setEditFile(file)
-	} finally {
-		shouldPreventActions.value = false
 	}
 }
 
