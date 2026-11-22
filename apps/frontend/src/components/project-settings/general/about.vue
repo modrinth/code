@@ -68,56 +68,133 @@
 				</template>
 			</Field>
 
-			<Field id="project-settings-field-icon" data-project-field="icon" class="max-w-[600px]">
-				<template #label>
-					Icon <span class="font-normal text-secondary">(optional)</span>
-				</template>
-				<template #default="{ labelId }">
-					<div class="input-group !items-start" role="group" :aria-labelledby="labelId">
-						<Avatar
-							:src="deletedIcon ? null : previewImage ? previewImage : project.icon_url"
-							:alt="project.name"
-							size="md"
-							class="project__icon"
-						/>
-						<div class="flex flex-col gap-2">
-							<FileButton
-								id="project-icon"
-								:max-size="globals?.max_project_icon_size"
-								accept="image/png,image/jpeg,image/gif,image/webp"
-								class="button-like choose-image"
-								:prompt="formatMessage(commonProjectSettingsMessages.upload)"
-								:disabled="!globals?.max_project_icon_size || !hasPermission"
-								@change="showPreviewImage"
-							>
-								<UploadIcon aria-hidden="true" />
-							</FileButton>
-							<Button
-								v-if="!deletedIcon && (previewImage || project.icon_url)"
-								:disabled="!hasPermission"
-								@click="markIconForDeletion"
-							>
-								<TrashIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.removeButton) }}
-							</Button>
+			<div class="flex max-w-[600px] flex-wrap items-start gap-x-8 gap-y-6">
+				<Field
+					id="project-settings-field-icon"
+					data-project-field="icon"
+					:class="isServerProject ? 'min-w-32' : 'w-full'"
+				>
+					<template #label>
+						Icon <span class="font-normal text-secondary">(optional)</span>
+					</template>
+					<template #default="{ labelId }">
+						<div
+							class="flex flex-wrap items-start gap-2"
+							:class="{ 'flex-col': isServerProject }"
+							role="group"
+							:aria-labelledby="labelId"
+						>
+							<Avatar :src="iconSrc" :alt="project.name" size="108px" class="project__icon" />
+							<div class="max-w-full">
+								<div class="flex items-center gap-2">
+									<FileButton
+										id="project-icon"
+										:max-size="globals?.max_project_icon_size"
+										accept="image/png,image/jpeg,image/gif,image/webp"
+										class="button-like choose-image"
+										:prompt="formatMessage(commonProjectSettingsMessages.upload)"
+										:disabled="!globals?.max_project_icon_size || !hasPermission"
+										@change="showPreviewImage"
+									>
+										<UploadIcon aria-hidden="true" />
+									</FileButton>
+									<IconButton
+										v-if="iconSrc"
+										class="shrink-0"
+										:label="removeIconLabel"
+										:circular="false"
+										:disabled="!hasPermission"
+										@click="markIconForDeletion"
+									>
+										<TrashIcon aria-hidden="true" />
+									</IconButton>
+								</div>
+								<div class="mt-2 text-sm text-secondary">Square, 512 px</div>
+							</div>
 						</div>
+					</template>
+					<template #bottom>
+						<ValidationMessage
+							:check="iconValidation"
+							:project-field="false"
+							:current-field="Boolean(icon || deletedIcon)"
+							class="mt-2"
+						/>
+						<ValidationMessage :check="saveValidation.forField('icon')" class="mt-2" />
+						<ProjectIssueCard
+							:target="['modify_icon', 'remove_icon']"
+							:field-action="iconIssueAction"
+							class="mt-2"
+						/>
+					</template>
+				</Field>
+
+				<Field v-if="isServerProject" class="w-[324px] max-w-full">
+					<template #label>
+						Banner <span class="font-normal text-secondary">(optional)</span>
+					</template>
+					<label
+						class="relative flex h-[108px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl"
+						:class="{ 'border-2 border-dashed border-surface-5 bg-surface-2': !bannerSrc }"
+					>
+						<img
+							v-if="bannerSrc"
+							:src="bannerSrc"
+							alt="Banner preview"
+							class="absolute inset-0 h-full w-full object-contain"
+						/>
+						<ImageIcon v-else aria-hidden="true" class="h-8 w-8 text-secondary" />
+						<input
+							type="file"
+							accept="image/png,image/jpeg,image/gif,image/webp"
+							class="hidden"
+							:disabled="!globals?.max_gallery_image_size || !hasPermission"
+							@change="
+								(e) => {
+									const input = e.target
+									if (input.files?.length) {
+										if (
+											globals?.max_gallery_image_size &&
+											fileIsValid(
+												input.files[0],
+												{
+													maxSize: globals.max_gallery_image_size,
+													alertOnInvalid: true,
+												},
+												formatBytes,
+											)
+										)
+											showBannerPreview(Array.from(input.files))
+									}
+								}
+							"
+						/>
+					</label>
+					<div class="mt-2 flex items-center gap-2">
+						<FileButton
+							:max-size="globals?.max_gallery_image_size"
+							accept="image/png,image/jpeg,image/gif,image/webp"
+							class="button-like"
+							prompt="Upload banner"
+							:disabled="!globals?.max_gallery_image_size || !hasPermission"
+							@change="showBannerPreview"
+						>
+							<UploadIcon aria-hidden="true" />
+						</FileButton>
+						<IconButton
+							v-if="bannerSrc"
+							class="shrink-0"
+							label="Remove banner"
+							:circular="false"
+							:disabled="!hasPermission"
+							@click="markBannerForDeletion"
+						>
+							<TrashIcon aria-hidden="true" />
+						</IconButton>
 					</div>
-				</template>
-				<template #bottom>
-					<ValidationMessage
-						:check="iconValidation"
-						:project-field="false"
-						:current-field="Boolean(icon || deletedIcon)"
-						class="mt-2"
-					/>
-					<ValidationMessage :check="saveValidation.forField('icon')" class="mt-2" />
-					<ProjectIssueCard
-						:target="['modify_icon', 'remove_icon']"
-						:field-action="iconIssueAction"
-						class="mt-2"
-					/>
-				</template>
-			</Field>
+					<div class="mt-2 text-sm text-secondary">3:1, 1920 × 640 px</div>
+				</Field>
+			</div>
 
 			<Field
 				id="project-settings-field-slug"
@@ -153,86 +230,6 @@
 					/>
 				</template>
 			</Field>
-
-			<!-- Server Project Settings -->
-			<template v-if="isServerProject">
-				<!-- Banner -->
-				<div class="max-w-[600px]">
-					<label class="block w-fit">
-						<span class="label__title"
-							>Banner <span class="font-normal text-secondary">(optional)</span></span
-						>
-					</label>
-					<div class="mt-2">
-						<label
-							class="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-dashed border-surface-5 transition-colors"
-							:class="
-								!deletedBanner && (bannerPreview || bannerGalleryImage?.url)
-									? 'border-none'
-									: 'aspect-[468/60] border-2 bg-surface-2'
-							"
-						>
-							<div
-								v-if="!deletedBanner && (bannerPreview || bannerGalleryImage?.url)"
-								class="relative h-full w-full overflow-hidden rounded-2xl"
-							>
-								<img
-									:src="bannerPreview || bannerGalleryImage?.url"
-									alt="Banner preview"
-									class="h-full w-full object-cover"
-								/>
-							</div>
-							<ImageIcon v-else aria-hidden="true" class="h-8 w-8 text-secondary" />
-							<input
-								type="file"
-								accept="image/png,image/jpeg,image/gif,image/webp"
-								class="hidden"
-								:disabled="!globals?.max_gallery_image_size || !hasPermission"
-								@change="
-									(e) => {
-										const input = e.target
-										if (input.files?.length) {
-											if (
-												globals?.max_gallery_image_size &&
-												fileIsValid(
-													input.files[0],
-													{
-														maxSize: globals.max_gallery_image_size,
-														alertOnInvalid: true,
-													},
-													formatBytes,
-												)
-											)
-												showBannerPreview(Array.from(input.files))
-										}
-									}
-								"
-							/>
-						</label>
-					</div>
-					<div class="mt-2 flex items-center gap-2">
-						<FileButton
-							:max-size="globals?.max_gallery_image_size"
-							accept="image/png,image/jpeg,image/gif,image/webp"
-							class="button-like"
-							prompt="Upload banner"
-							:disabled="!globals?.max_gallery_image_size || !hasPermission"
-							@change="showBannerPreview"
-						>
-							<UploadIcon aria-hidden="true" />
-						</FileButton>
-						<Button
-							v-if="!deletedBanner && (bannerPreview || bannerGalleryImage?.url)"
-							:disabled="!hasPermission"
-							@click="markBannerForDeletion"
-						>
-							<TrashIcon aria-hidden="true" />
-							Remove banner
-						</Button>
-					</div>
-					<div class="mt-2 text-secondary">Gif, 468×60px recommended.</div>
-				</div>
-			</template>
 
 			<Field id="visibility" label="Visibility" class="w-full">
 				<template #default="{ labelId }">
@@ -272,11 +269,11 @@
 import { GlobeIcon, ImageIcon, LinkIcon, LockIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	Button,
 	commonMessages,
 	commonProjectSettingsMessages,
 	Field,
 	FileButton,
+	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
@@ -345,6 +342,10 @@ const { suggestions: slugSuggestions } = useProjectSlugSuggestions({
 const icon = ref(null)
 const previewImage = ref(null)
 const deletedIcon = ref(false)
+const iconSrc = computed(() =>
+	deletedIcon.value ? null : (previewImage.value ?? project.value.icon_url),
+)
+const removeIconLabel = computed(() => formatMessage(commonMessages.removeButton))
 const visibility = ref(
 	tags.value.approvedStatuses.includes(project.value.status)
 		? project.value.status
@@ -364,6 +365,9 @@ const deletedBanner = ref(false)
 const bannerFile = ref(null)
 const bannerGalleryImage = computed(() =>
 	project.value.gallery?.find((img) => img.name === MC_SERVER_BANNER_NAME),
+)
+const bannerSrc = computed(() =>
+	deletedBanner.value ? null : (bannerPreview.value ?? bannerGalleryImage.value?.url),
 )
 const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
 const hasPermission = computed(() => {
