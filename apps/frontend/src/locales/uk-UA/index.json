@@ -4331,9 +4331,6 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Містить телеметрію"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Завантажте версії, перш ніж додавати застороги"
-  },
   "project.settings.editing-project": {
     "message": "Редагування проєкту"
   },

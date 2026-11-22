@@ -2,12 +2,11 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { CalendarIcon, EditIcon, StarIcon, TrashIcon } from '@modrinth/assets'
 
-import IconButton from '../../base/buttons/IconButton.vue'
-import FullImage from '../../base/FullImage.vue'
 import { useFormatDateTime } from '../../../composables/format-date-time'
 import { useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils/common-messages'
-
+import IconButton from '../../base/buttons/IconButton.vue'
+import FullImage from '../../base/FullImage.vue'
 import { galleryCardMessages, galleryEditorMessages } from './messages'
 
 defineProps<{

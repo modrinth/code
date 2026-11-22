@@ -4304,9 +4304,6 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "원격 측정 포함"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "고지 사항을 추가하기 전에 버전을 업로드하세요"
-  },
   "project.settings.editing-project": {
     "message": "{projectType} 프로젝트 수정 중"
   },

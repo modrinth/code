@@ -4334,9 +4334,6 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Contém telemetria"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Enviar versões antes de adicionar avisos de conteúdo"
-  },
   "project.settings.editing-project": {
     "message": "Editando projeto {projectType}"
   },

@@ -8,13 +8,7 @@ import {
 	RightArrowIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	ButtonLink,
-	commonMessages,
-	galleryCardMessages,
-	IconButton,
-	useVIntl,
-} from '@modrinth/ui'
+import { ButtonLink, commonMessages, galleryCardMessages, IconButton, useVIntl } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
 import { computed, useTemplateRef } from 'vue'
 

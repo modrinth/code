@@ -4037,9 +4037,6 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Bevat telemetrie"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Versies uploaden voor het toevoegen van onthullingen"
-  },
   "project.settings.editing-project": {
     "message": "{projectType} project bewerken"
   },

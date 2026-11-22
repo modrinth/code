@@ -4304,9 +4304,6 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "包含遙測系統"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "請先上傳版本再新增揭露資訊"
-  },
   "project.settings.editing-project": {
     "message": "正在編輯{projectType}專案"
   },

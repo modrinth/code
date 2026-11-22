@@ -3704,9 +3704,6 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Innehåller telemetri"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Ladda upp versioner innan du lägger till upplysningar"
-  },
   "project.settings.editing-project": {
     "message": "Ändrar {projectType}projekt"
   },

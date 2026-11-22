@@ -4334,9 +4334,6 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "包含遥测功能"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "在添加披露前上传版本"
-  },
   "project.settings.editing-project": {
     "message": "编辑 {projectType} 项目"
   },

@@ -4319,9 +4319,6 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Есть телеметрия"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Загрузите версии перед настройкой маркировки"
-  },
   "project.settings.editing-project": {
     "message": "Редактирование проекта {projectType}"
   },

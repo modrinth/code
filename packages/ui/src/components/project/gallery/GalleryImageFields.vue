@@ -2,12 +2,11 @@
 import { ImageIcon, StarIcon, TransferIcon } from '@modrinth/assets'
 import { useId } from 'vue'
 
+import { useVIntl } from '../../../composables/i18n'
 import Button from '../../base/buttons/Button.vue'
 import FileButton from '../../base/buttons/FileButton.vue'
 import Input from '../../base/inputs/Input.vue'
 import Textarea from '../../base/inputs/Textarea.vue'
-import { useVIntl } from '../../../composables/i18n'
-
 import { galleryEditorMessages as messages } from './messages'
 
 defineProps<{

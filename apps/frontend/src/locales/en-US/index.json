@@ -4439,6 +4439,9 @@
   "project.settings.disclosures.advertising.description.2": {
     "message": "This does not pertain to unobtrusive promotion of relevant content with no direct monetary value (such as a link to a Modrinth profile in your own configuration menu), and does not pertain to advertisements in the project page such as sponsored banners in the description."
   },
+  "project.settings.disclosures.advertising.guidance-title": {
+    "message": "When should I disclose advertisements?"
+  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "e.g. Adds the Modrinth SMP server to your server list automatically."
   },
@@ -4460,6 +4463,9 @@
   "project.settings.disclosures.ai.description.2": {
     "message": "It is important to be honest if generative AI has played a significant role in the production or publishing of this content. An easy way to think about this is if you would consider AI a co-author of the project, you should disclose it here."
   },
+  "project.settings.disclosures.ai.guidance-title": {
+    "message": "When should I disclose AI use?"
+  },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "e.g. The Chinese and Arabic translations are AI-generated."
   },
@@ -4480,6 +4486,9 @@
   },
   "project.settings.disclosures.archived.description.2": {
     "message": "Archived projects remain discoverable when their visibility is set to Public. If you wish to de-list your project, set its visibility to Unlisted."
+  },
+  "project.settings.disclosures.archived.guidance-title": {
+    "message": "What happens when I archive my project?"
   },
   "project.settings.disclosures.archived.note-placeholder": {
     "message": "e.g. I don't have time to maintain this project anymore, feel free to fork it!"
@@ -4616,9 +4625,6 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Contains telemetry"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Upload versions before adding disclosures"
-  },
   "project.settings.editing-generic-project": {
     "message": "Editing project"
   },
@@ -4637,35 +4643,14 @@
   "project.settings.gallery.add-image": {
     "message": "Add gallery image"
   },
-  "project.settings.gallery.banner": {
-    "message": "Banner image"
-  },
-  "project.settings.gallery.banner-description": {
-    "message": "You can feature one image on your project to be used as a banner image."
-  },
-  "project.settings.gallery.date-created": {
-    "message": "Date created"
-  },
   "project.settings.gallery.delete-description": {
     "message": "This will remove this gallery image forever (like really forever)."
   },
   "project.settings.gallery.delete-title": {
     "message": "Are you sure you want to delete this gallery image?"
   },
-  "project.settings.gallery.description": {
-    "message": "Description"
-  },
-  "project.settings.gallery.description-placeholder": {
-    "message": "Enter description..."
-  },
   "project.settings.gallery.edit-title": {
     "message": "Edit gallery item"
-  },
-  "project.settings.gallery.image-alt": {
-    "message": "gallery-image"
-  },
-  "project.settings.gallery.image-title": {
-    "message": "Title"
   },
   "project.settings.gallery.invalid-file-description": {
     "message": "{filename} must be a PNG, JPEG, GIF, or WebP image."
@@ -4676,9 +4661,6 @@
   "project.settings.gallery.next-image": {
     "message": "Next image"
   },
-  "project.settings.gallery.preview-alt": {
-    "message": "gallery-preview"
-  },
   "project.settings.gallery.previous-image": {
     "message": "Previous image"
   },
@@ -4688,23 +4670,8 @@
   "project.settings.gallery.reorder-image": {
     "message": "Reorder image. Drag or use the arrow keys."
   },
-  "project.settings.gallery.replace": {
-    "message": "Replace"
-  },
-  "project.settings.gallery.replace-image": {
-    "message": "Replace image"
-  },
-  "project.settings.gallery.set-banner": {
-    "message": "Set as banner"
-  },
-  "project.settings.gallery.title-placeholder": {
-    "message": "Enter title..."
-  },
   "project.settings.gallery.toggle-zoom": {
     "message": "Toggle zoom"
-  },
-  "project.settings.gallery.unset-banner": {
-    "message": "Unset as banner"
   },
   "project.settings.gallery.upload": {
     "message": "Upload images"
@@ -5348,8 +5315,8 @@
   "project.settings.review.completed.write-summary": {
     "message": "Write a summary"
   },
-  "project.settings.review.open-checklist": {
-    "message": "Open review checklist ({count, plural, one {# item remaining} other {# items remaining}})"
+  "project.settings.review.open-drawer": {
+    "message": "Open moderation drawer{count, plural, =0 {} one { (# checklist item remaining)} other { (# checklist items remaining)}}"
   },
   "project.settings.review.open-thread": {
     "message": "Open moderation thread"

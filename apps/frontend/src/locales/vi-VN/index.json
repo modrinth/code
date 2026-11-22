@@ -4010,9 +4010,6 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Có thu thập dữ liệu đo từ xa"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Tải phiên bản lên trước khi thêm mục công bố"
-  },
   "project.settings.editing-project": {
     "message": "Đang chỉnh sửa dự án {projectType}"
   },

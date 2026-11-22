@@ -4328,9 +4328,6 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "テレメトリーを含む"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "開示情報を追加する前にバージョンをアップロードしてください"
-  },
   "project.settings.editing-project": {
     "message": "{projectType}のプロジェクトを編集中"
   },

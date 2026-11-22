@@ -4016,9 +4016,6 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Telemetriát tartalmaz"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Tölts fel verziókat a tartalmi nyilatkozatok hozzáadása előtt"
-  },
   "project.settings.editing-project": {
     "message": "Projekt szerkesztése"
   },

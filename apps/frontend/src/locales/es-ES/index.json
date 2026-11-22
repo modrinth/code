@@ -4115,9 +4115,6 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Contiene telemetría"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Sube versiones antes de añadir divulgaciones"
-  },
   "project.settings.editing-project": {
     "message": "Editando un proyecto de {projectType}"
   },
