@@ -7,7 +7,7 @@ export const scopeMessages = defineMessages({
 	},
 	userReadEmailDescription: {
 		id: 'scopes.userReadEmail.description',
-		defaultMessage: 'Read your email',
+		defaultMessage: 'Read your email address',
 	},
 	userReadLabel: {
 		id: 'scopes.userRead.label',
