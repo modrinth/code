@@ -4629,7 +4629,7 @@
     "message": "服务器在线！"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "如果有 <srv-tooltip>[SRV 记录]</srv-tooltip>，你就不必添加端口号。如果没有上述记录，且端口号不是 25565，你可以将端口号以形如 :12345 的格式包含进地址内"
+    "message": "如果有 <srv-tooltip>SRV 记录</srv-tooltip>，你就不必添加端口号。如果没有上述记录，且端口号不是 25565，你可以将端口号以形如 :12345 的格式包含进地址内"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "你在此处输入的地址可能拥有 DNS SRV 记录 _minecraft._tcp.(你的域名)，指向你的 Minecraft 服务器地址和端口。"

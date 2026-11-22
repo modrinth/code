@@ -4599,7 +4599,7 @@
     "message": "伺服器已上線！"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "如果你有設定 <srv-tooltip>[SRV 紀錄]</srv-tooltip>，則不需要新增連接埠。否則，如果你的連接埠不是 25565，你可以附加上連接埠，例如 :12345"
+    "message": "如果你有設定 <srv-tooltip>SRV 紀錄</srv-tooltip>，則不需要新增連接埠。否則，如果你的連接埠不是 25565，你可以附加上連接埠，例如 :12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "你在這裡輸入的位址可能有 DNS SRV 紀錄 _minecraft._tcp.(你的網域)，指向你的 Minecraft 伺服器位址和連接埠。"

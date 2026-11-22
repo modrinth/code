@@ -4176,7 +4176,7 @@
     "message": "Server is online!"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "Als je <srv-tooltip>[SRV-records]</srv-tooltip> hebt, hoef je geen poort toe te voegen. Als je daarentegen een poort hebt die niet 25565 is, kun je deze als volgt toevoegen: :12345"
+    "message": "Als je <srv-tooltip>SRV-records</srv-tooltip> hebt, hoef je geen poort toe te voegen. Als je daarentegen een poort hebt die niet 25565 is, kun je deze als volgt toevoegen: :12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "Het adres dat je hier invoert, kan DNS SRV-records bevatten, zoals _minecraft._tcp.(jouw domein), die verwijzen naar het adres en de poort van je Minecraft-server."

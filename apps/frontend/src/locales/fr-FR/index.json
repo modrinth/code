@@ -4542,7 +4542,7 @@
     "message": "Le serveur est en ligne !"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "Si vous avez des <srv-tooltip>[enregistrements SRV]</srv-tooltip>, vous n’avez pas besoin d’ajouter de port. Sinon, si vous avez un port qui n’est pas 25565, vous pouvez l’inclure sous la forme :12345"
+    "message": "Si vous avez des <srv-tooltip>enregistrements SRV</srv-tooltip>, vous n’avez pas besoin d’ajouter de port. Sinon, si vous avez un port qui n’est pas 25565, vous pouvez l’inclure sous la forme :12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "L’adresse que vous saisissez ici peut avoir des enregistrements DNS SRV _minecraft._tcp.(votre domaine) qui redirigent vers l’adresse et le port de votre serveur Minecraft."

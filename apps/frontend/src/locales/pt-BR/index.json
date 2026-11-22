@@ -4629,7 +4629,7 @@
     "message": "O servidor está online!"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "Se você tiver <srv-tooltip>[registros SRV]</srv-tooltip>, não precisará adicionar uma porta. Caso contrário, se você tiver uma porta que não seja 25565, poderá incluí-la como :12345"
+    "message": "Se você tiver <srv-tooltip>registros SRV</srv-tooltip>, não precisará adicionar uma porta. Caso contrário, se você tiver uma porta que não seja 25565, poderá incluí-la como :12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "O endereço que você inserir aqui pode ter registros DNS SRV _minecraft._tcp.(seu domínio) que apontam para o endereço e porta do seu servidor Minecraft."

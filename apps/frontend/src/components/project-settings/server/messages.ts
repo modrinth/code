@@ -53,7 +53,7 @@ export const messages = defineMessages({
 	srvRecordsHint: {
 		id: 'project.settings.server.srv-records-hint',
 		defaultMessage:
-			"If you have <srv-tooltip>[SRV records]</srv-tooltip>, you do not need to add a port. Otherwise if you have a port which isn't 25565, you can include it as :12345",
+			"If you have <srv-tooltip>SRV records</srv-tooltip>, you do not need to add a port. Otherwise if you have a port which isn't 25565, you can include it as :12345",
 	},
 	srvRecordsTooltip: {
 		id: 'project.settings.server.srv-records-tooltip',

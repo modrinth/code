@@ -4629,7 +4629,7 @@
     "message": "Il server è in linea!"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "Se hai un <srv-tooltip>[record SRV]</srv-tooltip>, non è necessario inserire una porta. Altrimenti, se non è 25565, puoi includerla come :12345"
+    "message": "Se hai un <srv-tooltip>record SRV</srv-tooltip>, non è necessario inserire una porta. Altrimenti, se non è 25565, puoi includerla come :12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "L'indirizzo che inserisci dovrebbe avere un record SRV DNS _minecraft._tcp.(tuo dominio) che punta all'indirizzo e alla porta del server Minecraft."

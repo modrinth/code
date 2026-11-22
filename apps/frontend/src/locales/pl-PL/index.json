@@ -4527,7 +4527,7 @@
     "message": "Serwer jest online!"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "Jeśli masz <srv-tooltip>[rekordy SRV]</srv-tooltip>, nie musisz dodawać portu. W przeciwnym razie, jeśli masz port, który nie ma 25565, możesz go dodać jako :12345"
+    "message": "Jeśli masz <srv-tooltip>rekordy SRV</srv-tooltip>, nie musisz dodawać portu. W przeciwnym razie, jeśli masz port, który nie ma 25565, możesz go dodać jako :12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "Podany tutaj adres może mieć rekordy DNS SRV _minecraft._tcp.(domena), które wskazują adres i port serwera Minecraft."

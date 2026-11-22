@@ -4626,7 +4626,7 @@
     "message": "Сервер у мережі!"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "Якщо ви маєте <srv-tooltip>[записи SRV]</srv-tooltip>, вам не потрібно додавати порт. В іншому випадку, якщо ваш порт не 25565, ви можете додати його як :12345"
+    "message": "Якщо ви маєте <srv-tooltip>записи SRV</srv-tooltip>, вам не потрібно додавати порт. В іншому випадку, якщо ваш порт не 25565, ви можете додати його як :12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "Уведена адреса може містити записи DNS SRV _minecraft._tcp.(ваш домен), який указує на вашу адресу сервера Minecraft та порт."

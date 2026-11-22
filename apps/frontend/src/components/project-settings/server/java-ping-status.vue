@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { InfoIcon, RefreshCwIcon, SpinnerIcon } from '@modrinth/assets'
+import { RefreshCwIcon, SpinnerIcon } from '@modrinth/assets'
 import { IconButton, IntlFormatted, normalizeChildren, useVIntl } from '@modrinth/ui'
 
 import { messages } from './messages'
@@ -66,13 +66,14 @@ const { formatMessage } = useVIntl()
 	</div>
 	<div v-else class="mt-2 text-sm">
 		<IntlFormatted :message-id="messages.srvRecordsHint">
-			<template #srv-tooltip="{ children }"
-				><component :is="() => normalizeChildren(children)" /><InfoIcon
-					v-tooltip="{
-						content: formatMessage(messages.srvRecordsTooltip),
-						popperClass: 'max-w-xs',
-					}"
-			/></template>
+			<template #srv-tooltip="{ children }">
+				<span
+					v-tooltip="{ text: formatMessage(messages.srvRecordsTooltip), class: 'max-w-xs' }"
+					class="cursor-help underline decoration-dotted underline-offset-2"
+				>
+					<component :is="() => normalizeChildren(children)" />
+				</span>
+			</template>
 		</IntlFormatted>
 	</div>
 </template>

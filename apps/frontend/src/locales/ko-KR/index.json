@@ -4599,7 +4599,7 @@
     "message": "서버 접속!"
   },
   "project.settings.server.srv-records-hint": {
-    "message": " <srv-tooltip>[SRV 레코드]</srv-tooltip>가 있는 경우 포트를 추가할 필요가 없습니다. 그렇지 않고 포트가 25565가 아니라면 :12345처럼 포함할 수 있습니다."
+    "message": " <srv-tooltip>SRV 레코드</srv-tooltip>가 있는 경우 포트를 추가할 필요가 없습니다. 그렇지 않고 포트가 25565가 아니라면 :12345처럼 포함할 수 있습니다."
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "여기 입력한 주소에는 DNS SRV 레코드 _minecraft._tcp.(도메인)이 있을 수 있으며, 이는 Minecraft 서버 주소와 포트를 가리킵니다."

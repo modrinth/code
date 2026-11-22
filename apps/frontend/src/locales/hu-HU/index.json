@@ -4287,7 +4287,7 @@
     "message": "A szerver elérhető!"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "Ha rendelkezel <srv-tooltip>[SRV-rekordokkal]</srv-tooltip>, akkor nem kell portot hozzáadnod. Ellenkező esetben, ha a port száma nem 25565, akkor azt a következő formában adhatod meg: :12345"
+    "message": "Ha rendelkezel <srv-tooltip>SRV-rekordokkal</srv-tooltip>, akkor nem kell portot hozzáadnod. Ellenkező esetben, ha a port száma nem 25565, akkor azt a következő formában adhatod meg: :12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "Az itt megadott címhez tartozhatnak olyan DNS SRV-bejegyzések, mint például _minecraft._tcp.(a domainod), amelyek a Minecraft-szerver címére és portjára mutatnak."

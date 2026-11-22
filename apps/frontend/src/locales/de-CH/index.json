@@ -4629,7 +4629,7 @@
     "message": "Server ist online!"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "Falls du <srv-tooltip>[SRV-Einträge]</srv-tooltip> hast, musst du keinen Port hinzufügen. Wenn du hingegen einen Port hast, der nicht 25565 ist, kannst du ihn wie folgt angeben: :12345"
+    "message": "Falls du <srv-tooltip>SRV-Einträge</srv-tooltip> hast, musst du keinen Port hinzufügen. Wenn du hingegen einen Port hast, der nicht 25565 ist, kannst du ihn wie folgt angeben: :12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "Die Adresse, die du hier eingibst, verfügt möglicherweise über DNS-SRV-Einträge vom Typ _minecraft._tcp.(deine Domain), die auf die Adresse und den Port deines Minecraft-Servers verweisen."

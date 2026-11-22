@@ -4281,7 +4281,7 @@
     "message": "Máy chủ đang trực tuyến!"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "Nếu bạn có <srv-tooltip>[bản ghi SRV]</srv-tooltip>, bạn không cần thêm cổng. Nếu không và bạn dùng cổng khác 25565, có thể thêm theo dạng :12345"
+    "message": "Nếu bạn có <srv-tooltip>bản ghi SRV</srv-tooltip>, bạn không cần thêm cổng. Nếu không và bạn dùng cổng khác 25565, có thể thêm theo dạng :12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "Địa chỉ bạn nhập tại đây có thể có bản ghi DNS SRV _minecraft._tcp.(tên miền của bạn) trỏ tới địa chỉ và cổng máy chủ Minecraft."
