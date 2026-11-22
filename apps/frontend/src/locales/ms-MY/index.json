@@ -2978,9 +2978,6 @@
   "project.settings.server.languages-label": {
     "message": "Bahasa"
   },
-  "project.settings.server.optional-label": {
-    "message": "pilihan"
-  },
   "project.settings.server.region-label": {
     "message": "Rantau"
   },

@@ -4352,9 +4352,6 @@
   "project.settings.license.name": {
     "message": "Nome da licença"
   },
-  "project.settings.license.optional-label": {
-    "message": "opcional"
-  },
   "project.settings.license.optional-url": {
     "message": "URL da licença (opcional)"
   },
@@ -4591,9 +4588,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "Latência: {latency}ms"
-  },
-  "project.settings.server.optional-label": {
-    "message": "opcional"
   },
   "project.settings.server.ping-failed-message": {
     "message": "Não conseguimos alcançar este servidor. Ele pode estar bloqueado pelo seu provedor (ou hospedagem), então tente atualizar a página algumas vezes. Se ele ainda não responder, por favor, <support-link>contate o suporte</support-link>."

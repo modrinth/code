@@ -5,139 +5,135 @@
 		<h2 class="settings-section-title">{{ formatMessage(messages.serverDetailsHeading) }}</h2>
 		<section class="universal-card settings-content-card flex flex-col gap-8">
 			<div class="flex flex-col gap-6">
-				<!-- Region -->
-				<div data-project-field="server-region" class="max-w-[600px]">
-					<label for="server-region" class="w-fit">
-						<span class="label__title">{{ formatMessage(messages.regionLabel) }}</span>
-					</label>
+				<Field
+					:label="formatMessage(messages.regionLabel)"
+					input-id="server-region"
+					data-project-field="server-region"
+					class="max-w-[600px]"
+				>
 					<Combobox
-						id="server-region"
 						v-model="region"
 						:options="regionOptions"
 						searchable
+						:search-input-attrs="{ id: 'server-region' }"
 						:placeholder="formatMessage(messages.selectRegionPlaceholder)"
 						:disabled="!hasPermission"
 					/>
-					<ValidationMessage
-						:check="regionValidation"
-						:project-field="projectV3?.minecraft_server?.region ?? ''"
-						:current-field="region"
-						class="mt-2"
-					/>
-					<ValidationMessage :check="saveValidation.forField('server-region')" class="mt-2" />
-				</div>
+					<template #bottom>
+						<ValidationMessage
+							:check="regionValidation"
+							:project-field="projectV3?.minecraft_server?.region ?? ''"
+							:current-field="region"
+							class="mt-2"
+						/>
+						<ValidationMessage :check="saveValidation.forField('server-region')" class="mt-2" />
+					</template>
+				</Field>
 
-				<!-- Language -->
-				<div data-project-field="server-languages" class="max-w-[600px]">
-					<label for="server-language" class="block w-fit">
-						<span class="label__title"
-							>{{ formatMessage(messages.languagesLabel) }}
-							<span class="font-normal text-secondary"
-								>({{ formatMessage(messages.optionalLabel) }})</span
-							></span
-						>
-					</label>
-					<MultiSelect
-						id="server-language"
-						v-model="languages"
-						:options="languageOptions"
-						searchable
-						include-select-all-option
-						:max-tag-rows="2"
-						:placeholder="formatMessage(messages.selectLanguagesPlaceholder)"
+				<Field
+					:label="formatMessage(messages.languagesLabel)"
+					label-optional
+					data-project-field="server-languages"
+					class="max-w-[600px]"
+				>
+					<template #default="{ labelId }">
+						<div role="group" :aria-labelledby="labelId">
+							<MultiSelect
+								id="server-language"
+								v-model="languages"
+								:options="languageOptions"
+								searchable
+								include-select-all-option
+								:max-tag-rows="2"
+								:placeholder="formatMessage(messages.selectLanguagesPlaceholder)"
+								:disabled="!hasPermission"
+							/>
+						</div>
+					</template>
+					<template #bottom>
+						<ValidationMessage
+							:check="languageValidation"
+							:project-field="
+								JSON.stringify([...(projectV3?.minecraft_server?.languages ?? [])].sort())
+							"
+							:current-field="JSON.stringify([...languages].sort())"
+							class="mt-2"
+						/>
+						<ValidationMessage :check="saveValidation.forField('server-languages')" class="mt-2" />
+						<ProjectIssueCard
+							target="modify_server_languages"
+							:field-action="languagesIssueAction"
+							class="mt-2"
+						/>
+					</template>
+				</Field>
+
+				<Field
+					:label="formatMessage(messages.javaAddressLabel)"
+					input-id="java-address"
+					data-project-field="java-address"
+					class="max-w-[600px]"
+				>
+					<Input
+						id="java-address"
+						v-model="javaAddress"
+						:placeholder="formatMessage(messages.enterAddressPlaceholder)"
 						:disabled="!hasPermission"
-					/>
-					<ValidationMessage
-						:check="languageValidation"
-						:project-field="
-							JSON.stringify([...(projectV3?.minecraft_server?.languages ?? [])].sort())
-						"
-						:current-field="JSON.stringify([...languages].sort())"
-						class="mt-2"
-					/>
-					<ValidationMessage :check="saveValidation.forField('server-languages')" class="mt-2" />
-					<ProjectIssueCard
-						target="modify_server_languages"
-						:field-action="languagesIssueAction"
-						class="mt-2"
-					/>
-				</div>
-
-				<!-- Java Address -->
-				<div data-project-field="java-address" class="max-w-[600px]">
-					<div class="flex items-center justify-between">
-						<label for="java-address" class="block w-fit">
-							<span class="label__title !m-0 !text-contrast">{{
-								formatMessage(messages.javaAddressLabel)
-							}}</span>
-						</label>
-					</div>
-					<div
-						class="mt-2 flex items-center gap-2 text-sm"
+						wrapper-class="w-full"
+						autocomplete="off"
 						@focusout="
 							() => {
 								if (!lastPingAddressChanged && javaPingResult) return
 								pingJavaServer()
 							}
 						"
-					>
-						<Input
-							id="java-address"
-							v-model="javaAddress"
-							:placeholder="formatMessage(messages.enterAddressPlaceholder)"
-							:disabled="!hasPermission"
-							wrapper-class="flex-grow"
-							autocomplete="off"
+					/>
+					<template #bottom>
+						<JavaPingStatus
+							:java-address="javaAddress"
+							:java-ping-loading="javaPingLoading"
+							:java-ping-result="javaPingResult"
+							@refresh="pingJavaServer"
 						/>
-					</div>
-					<JavaPingStatus
-						:java-address="javaAddress"
-						:java-ping-loading="javaPingLoading"
-						:java-ping-result="javaPingResult"
-						@refresh="pingJavaServer"
-					/>
-					<ValidationMessage
-						:check="javaAddressValidation"
-						:project-field="projectV3?.minecraft_java_server?.address ?? ''"
-						:current-field="javaAddress.trim()"
-						class="mt-2"
-					/>
-					<ValidationMessage :check="saveValidation.forField('java-address')" class="mt-2" />
-					<ProjectIssueCard
-						target="modify_server_address"
-						platform="minecraft_java"
-						:field-action="javaAddressIssueAction"
-						class="mt-2"
-					/>
-				</div>
+						<ValidationMessage
+							:check="javaAddressValidation"
+							:project-field="projectV3?.minecraft_java_server?.address ?? ''"
+							:current-field="javaAddress.trim()"
+							class="mt-2"
+						/>
+						<ValidationMessage :check="saveValidation.forField('java-address')" class="mt-2" />
+						<ProjectIssueCard
+							target="modify_server_address"
+							platform="minecraft_java"
+							:field-action="javaAddressIssueAction"
+							class="mt-2"
+						/>
+					</template>
+				</Field>
 
-				<!-- Bedrock Address -->
-				<div class="max-w-[600px]">
-					<label for="bedrock-address" class="block w-fit">
-						<span class="label__title !text-contrast"
-							>{{ formatMessage(messages.bedrockAddressLabel) }}
-							<span class="font-normal text-secondary"
-								>({{ formatMessage(messages.optionalLabel) }})</span
-							>
-						</span>
-					</label>
-					<div class="mt-2 flex items-center gap-2">
-						<Input
-							id="bedrock-address"
-							v-model="bedrockAddress"
-							:placeholder="formatMessage(messages.enterAddressPlaceholder)"
-							:disabled="!hasPermission"
-							wrapper-class="flex-grow"
-							autocomplete="off"
-						/>
-					</div>
-					<ProjectIssueCard
-						target="modify_server_address"
-						platform="minecraft_bedrock"
-						:field-action="bedrockAddressIssueAction"
-						class="mt-2"
+				<Field
+					:label="formatMessage(messages.bedrockAddressLabel)"
+					input-id="bedrock-address"
+					label-optional
+					class="max-w-[600px]"
+				>
+					<Input
+						id="bedrock-address"
+						v-model="bedrockAddress"
+						:placeholder="formatMessage(messages.enterAddressPlaceholder)"
+						:disabled="!hasPermission"
+						wrapper-class="w-full"
+						autocomplete="off"
 					/>
-				</div>
+					<template #bottom>
+						<ProjectIssueCard
+							target="modify_server_address"
+							platform="minecraft_bedrock"
+							:field-action="bedrockAddressIssueAction"
+							class="mt-2"
+						/>
+					</template>
+				</Field>
 			</div>
 			<div data-project-field="server-compatibility">
 				<CompatibilityCard
@@ -176,6 +172,7 @@
 import {
 	Combobox,
 	ConfirmLeaveModal,
+	Field,
 	injectNotificationManager,
 	injectProjectPageContext,
 	Input,

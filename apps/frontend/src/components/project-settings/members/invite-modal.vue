@@ -4,6 +4,7 @@ import { ArrowLeftIcon, RightArrowIcon, UserPlusIcon } from '@modrinth/assets'
 import {
 	commonMessages,
 	defineMessages,
+	Field,
 	injectModrinthClient,
 	Input,
 	MultiStageModal,
@@ -254,19 +255,17 @@ defineExpose({ show })
 	</DefineUsernameStage>
 	<DefineAccessStage>
 		<form class="flex flex-col gap-6" @submit.prevent="submit">
-			<div class="flex flex-col gap-2">
-				<label :for="`${id}-role`" class="font-semibold text-contrast">
-					{{ formatMessage(messages.role) }}
-				</label>
+			<Field :label="formatMessage(messages.role)" :input-id="`${id}-role`">
 				<Input
 					:id="`${id}-role`"
 					ref="roleInput"
 					v-model="role"
 					:maxlength="32"
+					wrapper-class="w-full"
 					:disabled="!canInvite || inviting"
 					@focus="selectDefaultRole"
 				/>
-			</div>
+			</Field>
 			<ProjectAccessPicker
 				v-if="accessOptions"
 				v-model="permissions"

@@ -4736,9 +4736,6 @@
   "project.settings.license.none-type-description": {
     "message": "You reserve all rights to your work unless you explicitly grant them."
   },
-  "project.settings.license.optional-label": {
-    "message": "optional"
-  },
   "project.settings.license.optional-url": {
     "message": "License URL (optional)"
   },
@@ -5341,9 +5338,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "Latency: {latency}ms"
-  },
-  "project.settings.server.optional-label": {
-    "message": "optional"
   },
   "project.settings.server.ping-failed-message": {
     "message": "We couldn't ping this server. It may be blocked by your host so try refreshing a few times. If it still doesn't respond please <support-link>contact support</support-link>."

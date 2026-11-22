@@ -3710,9 +3710,6 @@
   "project.settings.license.name": {
     "message": "Licensnamn"
   },
-  "project.settings.license.optional-label": {
-    "message": "valfritt"
-  },
   "project.settings.license.optional-url": {
     "message": "Licens-URL (valfritt)"
   },
@@ -3868,9 +3865,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "Fördröjning: {latency} ms"
-  },
-  "project.settings.server.optional-label": {
-    "message": "valfri"
   },
   "project.settings.server.refresh-ping-tooltip": {
     "message": "Uppdatera ping"

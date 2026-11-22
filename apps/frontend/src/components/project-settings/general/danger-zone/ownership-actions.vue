@@ -4,6 +4,7 @@ import {
 	Combobox,
 	ConfirmModal,
 	defineMessages,
+	Field,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
@@ -210,17 +211,16 @@ function confirmRemoveFromOrganization() {
 				<p v-if="organization" class="m-0 text-secondary">
 					This project is managed by {{ organization.name }}.
 				</p>
-				<label for="project-transfer-target" class="font-semibold text-contrast"
-					>Member or organization</label
-				>
-				<Combobox
-					id="project-transfer-target"
-					v-model="selectedTarget"
-					:options="targets"
-					searchable
-					placeholder="Select a member or organization"
-					:disabled="transfer.isPending.value"
-				/>
+				<Field label="Member or organization" input-id="project-transfer-target">
+					<Combobox
+						v-model="selectedTarget"
+						:options="targets"
+						searchable
+						:search-input-attrs="{ id: 'project-transfer-target' }"
+						placeholder="Select a member or organization"
+						:disabled="transfer.isPending.value"
+					/>
+				</Field>
 				<p v-if="!targets.length && !isError" class="m-0 text-secondary">
 					Invite a member from the Members page or create an organization before transferring
 					ownership.

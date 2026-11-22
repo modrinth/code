@@ -3485,9 +3485,6 @@
   "project.settings.server.java-address-label": {
     "message": "عنوان جافا"
   },
-  "project.settings.server.optional-label": {
-    "message": "اختياري"
-  },
   "project.settings.server.region-label": {
     "message": "منطقة"
   },

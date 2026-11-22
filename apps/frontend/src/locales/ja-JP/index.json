@@ -4337,9 +4337,6 @@
   "project.settings.license.name": {
     "message": "ライセンス名"
   },
-  "project.settings.license.optional-label": {
-    "message": "任意"
-  },
   "project.settings.license.title": {
     "message": "ライセンス"
   },

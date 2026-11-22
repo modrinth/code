@@ -5,8 +5,8 @@ import {
 	ButtonLink,
 	commonMessages,
 	defineMessages,
+	Field,
 	Input,
-	SettingsFormGroup,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, toRaw, useId, watch } from 'vue'
@@ -159,9 +159,9 @@ function setOptionalField(
 						{{ formatMessage(commonMessages.removeButton) }}
 					</Button>
 				</div>
-				<SettingsFormGroup
-					:title="formatMessage(messages.nameLabel)"
-					:title-for="`derivative-name-${id}`"
+				<Field
+					:label="formatMessage(messages.nameLabel)"
+					:input-id="`derivative-name-${id}`"
 					class="max-w-[40rem]"
 				>
 					<Input
@@ -169,6 +169,7 @@ function setOptionalField(
 						:model-value="source.label"
 						:disabled="disabled"
 						:placeholder="formatMessage(messages.namePlaceholder)"
+						wrapper-class="w-full"
 						@update:model-value="
 							(value) =>
 								updateSource(index, {
@@ -176,13 +177,13 @@ function setOptionalField(
 								})
 						"
 					/>
-				</SettingsFormGroup>
-				<SettingsFormGroup
-					:title="formatMessage(messages.linkLabel)"
-					:title-for="`derivative-link-${id}`"
+				</Field>
+				<Field
+					:label="formatMessage(messages.linkLabel)"
+					:input-id="`derivative-link-${id}`"
 					class="max-w-[40rem]"
 				>
-					<template #title-right>
+					<template #right>
 						<ButtonLink
 							v-if="source.link"
 							:href="/^https?:\/\//i.test(source.link) ? source.link : `https://${source.link}`"
@@ -201,9 +202,10 @@ function setOptionalField(
 						type="url"
 						:disabled="disabled"
 						:placeholder="formatMessage(messages.linkPlaceholder)"
+						wrapper-class="w-full"
 						@update:model-value="(value) => setOptionalField(index, 'link', value)"
 					/>
-				</SettingsFormGroup>
+				</Field>
 				<DisclosureExplanation
 					:title="formatMessage(messages.noteLabel)"
 					:title-for="`derivative-note-${id}`"

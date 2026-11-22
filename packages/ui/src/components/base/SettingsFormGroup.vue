@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { defineMessage, useVIntl } from '../../composables/i18n'
+import { useVIntl } from '../../composables/i18n'
+import { commonMessages } from '../../utils/common-messages'
+
 const { formatMessage } = useVIntl()
 
 withDefaults(
@@ -13,11 +15,6 @@ withDefaults(
 		optional: false,
 	},
 )
-
-const optionalMessage = defineMessage({
-	id: 'settings.form.group.optional',
-	defaultMessage: '(optional)',
-})
 </script>
 
 <template>
@@ -34,13 +31,13 @@ const optionalMessage = defineMessage({
 				>
 					{{ title }}
 					<span v-if="optional" class="text-secondary font-normal">
-						{{ formatMessage(optionalMessage) }}
+						{{ formatMessage(commonMessages.optionalFieldLabel) }}
 					</span>
 				</label>
 				<p v-else-if="title" class="m-0 leading-normal text-contrast font-semibold">
 					{{ title }}
 					<span v-if="optional" class="text-secondary font-normal">
-						{{ formatMessage(optionalMessage) }}
+						{{ formatMessage(commonMessages.optionalFieldLabel) }}
 					</span>
 				</p>
 				<slot name="title" />

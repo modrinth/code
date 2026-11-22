@@ -4292,9 +4292,6 @@
   "project.settings.license.name": {
     "message": "Nom de la licence"
   },
-  "project.settings.license.optional-label": {
-    "message": "facultatif"
-  },
   "project.settings.license.optional-url": {
     "message": "URL de la licence (optionnel)"
   },
@@ -4504,9 +4501,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "Latence : {latency} ms"
-  },
-  "project.settings.server.optional-label": {
-    "message": "optionnel"
   },
   "project.settings.server.ping-failed-message": {
     "message": "Nous n'avons pas pu ping ce serveur. Il peut être bloqué par votre hôte donc essayez de rafraîchir quelques fois. S'il ne répond toujours pas veuillez <support-link>contacter le support</support-link>."

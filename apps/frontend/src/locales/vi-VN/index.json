@@ -4025,9 +4025,6 @@
   "project.settings.license.name": {
     "message": "Tên giấy phép"
   },
-  "project.settings.license.optional-label": {
-    "message": "tùy chọn"
-  },
   "project.settings.license.title": {
     "message": "Giấy phép"
   },
@@ -4243,9 +4240,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "Độ trễ: {latency}ms"
-  },
-  "project.settings.server.optional-label": {
-    "message": "tùy chọn"
   },
   "project.settings.server.ping-failed-message": {
     "message": "Chúng tôi không thể ping máy chủ này. Có thể nhà cung cấp dịch vụ của bạn đang chặn ping, vì vậy hãy thử làm mới vài lần. Nếu máy chủ vẫn không phản hồi, vui lòng <support-link>liên hệ hỗ trợ</support-link>."

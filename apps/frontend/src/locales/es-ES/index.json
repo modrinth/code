@@ -4343,9 +4343,6 @@
   "project.settings.server.latency-label": {
     "message": "Latencia: {latency}ms"
   },
-  "project.settings.server.optional-label": {
-    "message": "opcional"
-  },
   "project.settings.server.ping-failed-message": {
     "message": "No le pudimos hacer ping a este servidor. Puede estar bloqueado por tu host. Vuelve a reintentar unas cuantas veces, Si aún no responde, por favor <support-link>contacta al soporte</support-link>."
   },

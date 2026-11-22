@@ -4,6 +4,7 @@ import {
 	Button,
 	commonMessages,
 	defineMessages,
+	Field,
 	Input,
 	IntlFormatted,
 	NewModal,
@@ -202,48 +203,51 @@ defineExpose({ show, hide: () => modal.value?.hide() })
 				/>
 			</div>
 
-			<div class="flex flex-col gap-2">
-				<div class="flex flex-wrap items-baseline justify-between gap-x-2">
-					<label :for="`${id}-role`" class="text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.role) }}
-					</label>
+			<Field :label="formatMessage(messages.role)" :input-id="`${id}-role`">
+				<template #right>
 					<span class="text-sm tabular-nums text-secondary">
 						{{ formatMessage(messages.roleCount, { count: draft.role.length, limit: roleLimit }) }}
 					</span>
-				</div>
+				</template>
 				<Input
 					:id="`${id}-role`"
 					ref="roleInput"
 					:model-value="draft.role"
 					:maxlength="roleLimit"
+					wrapper-class="w-full"
 					:disabled="!canEditFields"
 					:aria-describedby="`${id}-role-description`"
 					@update:model-value="draft.role = String($event ?? '')"
 				/>
-				<p :id="`${id}-role-description`" class="m-0 text-sm text-secondary">
-					{{
-						formatMessage(
-							organization ? messages.organizationRoleDescription : messages.roleDescription,
-						)
-					}}
-				</p>
-				<ProjectIssueCard
-					v-if="!organization"
-					target="modify_team_member_role"
-					:user-id="draft.user.id"
-				/>
-			</div>
+				<template #bottom>
+					<p :id="`${id}-role-description`" class="mb-0 mt-2 text-sm text-secondary">
+						{{
+							formatMessage(
+								organization ? messages.organizationRoleDescription : messages.roleDescription,
+							)
+						}}
+					</p>
+					<ProjectIssueCard
+						v-if="!organization"
+						target="modify_team_member_role"
+						:user-id="draft.user.id"
+						class="mt-2"
+					/>
+				</template>
+			</Field>
 
-			<div v-if="showPayoutWeight" class="flex flex-col gap-2">
-				<label :for="`${id}-payout-weight`" class="text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.payoutWeight) }}
-				</label>
+			<Field
+				v-if="showPayoutWeight"
+				:label="formatMessage(messages.payoutWeight)"
+				:input-id="`${id}-payout-weight`"
+			>
 				<Input
 					:id="`${id}-payout-weight`"
 					:model-value="draft.payouts_split ?? undefined"
 					type="number"
 					:min="0"
 					:max="maxPayoutWeight"
+					wrapper-class="w-full"
 					:disabled="!canEditFields"
 					:error="invalidPayoutWeight"
 					:aria-describedby="`${id}-payout-weight-description`"
@@ -251,14 +255,16 @@ defineExpose({ show, hide: () => modal.value?.hide() })
 						draft.payouts_split = typeof $event === 'number' ? $event : undefined
 					"
 				/>
-				<p :id="`${id}-payout-weight-description`" class="m-0 text-sm text-secondary">
-					{{
-						invalidPayoutWeight
-							? formatMessage(messages.invalidPayoutWeight, { max: maxPayoutWeight })
-							: formatMessage(messages.payoutWeightDescription)
-					}}
-				</p>
-			</div>
+				<template #bottom>
+					<p :id="`${id}-payout-weight-description`" class="mb-0 mt-2 text-sm text-secondary">
+						{{
+							invalidPayoutWeight
+								? formatMessage(messages.invalidPayoutWeight, { max: maxPayoutWeight })
+								: formatMessage(messages.payoutWeightDescription)
+						}}
+					</p>
+				</template>
+			</Field>
 
 			<div
 				v-if="draft.is_owner || (!organization && draft.permissions == null)"

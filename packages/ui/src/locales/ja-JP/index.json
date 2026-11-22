@@ -5582,6 +5582,9 @@
   "settings.feature-flags.title": {
     "defaultMessage": "機能フラグ"
   },
+  "settings.form.group.optional": {
+    "defaultMessage": "(任意)"
+  },
   "settings.language.categories.default": {
     "defaultMessage": "一般的な言語"
   },

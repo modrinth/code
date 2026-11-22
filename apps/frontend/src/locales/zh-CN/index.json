@@ -4352,9 +4352,6 @@
   "project.settings.license.name": {
     "message": "许可证名称"
   },
-  "project.settings.license.optional-label": {
-    "message": "可选"
-  },
   "project.settings.license.optional-url": {
     "message": "许可证URL(可选)"
   },
@@ -4591,9 +4588,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "延迟：{latency}ms"
-  },
-  "project.settings.server.optional-label": {
-    "message": "可选"
   },
   "project.settings.server.ping-failed-message": {
     "message": "我们无法对该服务器进行 Ping 测试。该服务器可能正被你的主机阻止连接，因此可以尝试刷新几次，如果仍无回应，请<support-link>联系客服</support-link>。"

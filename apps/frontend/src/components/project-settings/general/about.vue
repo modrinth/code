@@ -71,12 +71,11 @@
 			<div class="flex max-w-[600px] flex-wrap items-start gap-x-8 gap-y-6">
 				<Field
 					id="project-settings-field-icon"
+					label="Icon"
+					label-optional
 					data-project-field="icon"
 					:class="isServerProject ? 'min-w-32' : 'w-full'"
 				>
-					<template #label>
-						Icon <span class="font-normal text-secondary">(optional)</span>
-					</template>
 					<template #default="{ labelId }">
 						<div
 							class="flex flex-wrap items-start gap-2"
@@ -129,10 +128,7 @@
 					</template>
 				</Field>
 
-				<Field v-if="isServerProject" class="w-[324px] max-w-full">
-					<template #label>
-						Banner <span class="font-normal text-secondary">(optional)</span>
-					</template>
+				<Field v-if="isServerProject" label="Banner" label-optional class="w-[324px] max-w-full">
 					<label
 						class="relative flex h-[108px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl"
 						:class="{ 'border-2 border-dashed border-surface-5 bg-surface-2': !bannerSrc }"

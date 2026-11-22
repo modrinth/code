@@ -5,32 +5,32 @@
 			<div class="font-semibold text-contrast">Select modpack</div>
 
 			<div class="flex flex-col gap-6 rounded-2xl border border-solid border-surface-5 p-4">
-				<div class="flex flex-col gap-2">
-					<label class="font-semibold text-contrast">Project</label>
+				<Field label="Project" input-id="compatibility-modpack-project">
 					<ProjectCombobox
 						v-model="selectedProjectId"
 						:project-types="['modpack']"
 						:exclude-project-ids="[currentProjectId]"
 						placeholder="Select modpack"
 						search-placeholder="Search by name or paste ID..."
+						:search-input-attrs="{ id: 'compatibility-modpack-project' }"
 						loading-message="Loading..."
 						no-results-message="No results found"
 						include-user-unlisted-projects
 						:user-id="auth?.user?.id"
 					/>
-				</div>
+				</Field>
 
-				<div v-if="selectedProjectId" class="flex flex-col gap-2">
-					<label class="font-semibold text-contrast">Version</label>
+				<Field v-if="selectedProjectId" label="Version" input-id="compatibility-modpack-version">
 					<Combobox
 						v-model="selectedVersionId"
 						placeholder="Select version"
 						:options="versionOptions"
 						:searchable="true"
+						:search-input-attrs="{ id: 'compatibility-modpack-version' }"
 						search-placeholder="Search versions..."
 						:no-options-message="versionsLoading ? 'Loading...' : 'No results found'"
 					/>
-				</div>
+				</Field>
 			</div>
 			<div v-if="selectedVersion" class="flex flex-col gap-4 rounded-2xl bg-surface-2 p-4">
 				<div class="flex items-center justify-between">
@@ -67,6 +67,7 @@
 import { getLoaderIcon } from '@modrinth/assets'
 import {
 	Combobox,
+	Field,
 	FormattedTag,
 	injectModrinthClient,
 	injectNotificationManager,

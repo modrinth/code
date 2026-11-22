@@ -4259,9 +4259,6 @@
   "project.settings.license.name": {
     "message": "Nazwa licencji"
   },
-  "project.settings.license.optional-label": {
-    "message": "opcjonalne"
-  },
   "project.settings.license.optional-url": {
     "message": "Adres URL licencji (opcjonalne)"
   },
@@ -4489,9 +4486,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "Opóźnienie: {latency}ms"
-  },
-  "project.settings.server.optional-label": {
-    "message": "opcjonalne"
   },
   "project.settings.server.ping-failed-message": {
     "message": "Nie mogliśmy pingować tego serwera. Może on być zablokowany przez twój host, więc spróbuj odświeżyć kilka razy. Jeśli nadal nie odpowiada, proszę <support-link>skontaktuj się z pomocą techniczną</support-link>."

@@ -4,6 +4,10 @@ import { capitalizeString } from '@modrinth/utils'
 import { defineMessage, defineMessages, type MessageDescriptor } from '../composables/i18n'
 
 export const commonMessages = defineMessages({
+	optionalFieldLabel: {
+		id: 'settings.form.group.optional',
+		defaultMessage: '(optional)',
+	},
 	acceptButton: {
 		id: 'button.accept',
 		defaultMessage: 'Accept',

@@ -38,7 +38,7 @@
 					>
 					<input
 						v-bind="mergeProps(controlAttrs(), inputAttrs ?? {})"
-						:id="id"
+						:id="id ?? inputAttrs?.id"
 						ref="inputRef"
 						:type="type"
 						:value="model"

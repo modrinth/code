@@ -4025,9 +4025,6 @@
   "project.settings.license.custom": {
     "message": "Özel"
   },
-  "project.settings.license.optional-label": {
-    "message": "isteğe bağlı"
-  },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Aşağıdaki tüm dosyaları yeniden dağıtma izniniz olduğunu kanıtlayın. Tamamlandıktan sonra, bekletilen sürümler otomatik olarak yayınlanacaktır."
   },
@@ -4138,9 +4135,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "Gecikme: {latency}ms"
-  },
-  "project.settings.server.optional-label": {
-    "message": "isteğe bağlı"
   },
   "project.settings.server.ping-failed-message": {
     "message": "Bu sunucuya ping atamadık. Barındırma sağlayıcınız tarafından engellenmiş olabilir, bu nedenle birkaç kez daha deneyin. Hala yanıt vermiyorsa lütfen <support-link>destek ile iletişime geçin</support-link>."

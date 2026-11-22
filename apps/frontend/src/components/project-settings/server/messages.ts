@@ -17,10 +17,6 @@ export const messages = defineMessages({
 		id: 'project.settings.server.languages-label',
 		defaultMessage: 'Languages',
 	},
-	optionalLabel: {
-		id: 'project.settings.server.optional-label',
-		defaultMessage: 'optional',
-	},
 	selectLanguagesPlaceholder: {
 		id: 'project.settings.server.select-languages-placeholder',
 		defaultMessage: 'Select languages',

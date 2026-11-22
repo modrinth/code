@@ -4349,9 +4349,6 @@
   "project.settings.license.name": {
     "message": "Назва ліцензії"
   },
-  "project.settings.license.optional-label": {
-    "message": "необов’язково"
-  },
   "project.settings.license.optional-url": {
     "message": "URL ліцензії (необовʼязково)"
   },
@@ -4588,9 +4585,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "Затримка: {latency} мс"
-  },
-  "project.settings.server.optional-label": {
-    "message": "необов’язково"
   },
   "project.settings.server.ping-failed-message": {
     "message": "Ми не змогли звʼязатися із цим сервером. Його міг заблокувати ваш гост, тому спробуйте перезавантажити його кілька разів. Якщо це не працює, <support-link>зверніться до підтримки</support-link>."

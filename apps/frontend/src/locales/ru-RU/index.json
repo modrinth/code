@@ -4337,9 +4337,6 @@
   "project.settings.license.name": {
     "message": "Название лицензии"
   },
-  "project.settings.license.optional-label": {
-    "message": "необязательно"
-  },
   "project.settings.license.optional-url": {
     "message": "Ссылка на лицензию (необязательно)"
   },
@@ -4576,9 +4573,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "Задержка: {latency} мс"
-  },
-  "project.settings.server.optional-label": {
-    "message": "необязательно"
   },
   "project.settings.server.ping-failed-message": {
     "message": "Мы не могли связаться с этим сервером. Он может быть заблокирован вашим хостом, так что попробуйте перезагрузить его несколько раз. Если он все еще не отвечает, пожалуйста <support-link>свяжитесь с поддержкой</support-link>."

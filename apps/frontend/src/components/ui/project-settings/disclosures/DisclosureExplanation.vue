@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SettingsFormGroup, Textarea } from '@modrinth/ui'
+import { Field, Textarea } from '@modrinth/ui'
 import { useId } from 'vue'
 
 defineProps<{
@@ -16,7 +16,7 @@ const inputId = useId()
 </script>
 
 <template>
-	<SettingsFormGroup :title="title" :title-for="titleFor ?? inputId" :optional="optional">
+	<Field :label="title" :input-id="titleFor ?? inputId" :label-optional="optional">
 		<Textarea
 			:id="titleFor ?? inputId"
 			v-model="model"
@@ -26,5 +26,5 @@ const inputId = useId()
 			:disabled="disabled"
 			:placeholder="placeholder"
 		/>
-	</SettingsFormGroup>
+	</Field>
 </template>

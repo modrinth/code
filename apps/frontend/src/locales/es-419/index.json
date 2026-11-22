@@ -4160,9 +4160,6 @@
   "project.settings.license.name": {
     "message": "Nombre de la licencia"
   },
-  "project.settings.license.optional-label": {
-    "message": "opcional"
-  },
   "project.settings.license.title": {
     "message": "Licencia"
   },
@@ -4378,9 +4375,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "Latencia: {latency}ms"
-  },
-  "project.settings.server.optional-label": {
-    "message": "opcional"
   },
   "project.settings.server.ping-failed-message": {
     "message": "No pudimos pingear a este servidor. Puede estar bloqueado por tu host, así que vuelve a reintentar unas cuantas veces. Si todavía no responde, por favor <support-link>contacte a soporte</support-link>."

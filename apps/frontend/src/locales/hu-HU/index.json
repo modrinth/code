@@ -4031,9 +4031,6 @@
   "project.settings.license.name": {
     "message": "A licenc neve"
   },
-  "project.settings.license.optional-label": {
-    "message": "opcionális"
-  },
   "project.settings.license.title": {
     "message": "Licenc"
   },
@@ -4249,9 +4246,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "Késleltetés: {latency} ms"
-  },
-  "project.settings.server.optional-label": {
-    "message": "opcionális"
   },
   "project.settings.server.ping-failed-message": {
     "message": "Nem sikerült pingelnünk ezt a szervert. Lehet, hogy a szolgáltatód blokkolja, ezért próbáld meg néhányszor frissíteni az oldalt. Ha továbbra sem válaszol, kérjük, <support-link>fordulj az ügyfélszolgálathoz</support-link>."

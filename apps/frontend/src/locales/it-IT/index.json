@@ -4352,9 +4352,6 @@
   "project.settings.license.name": {
     "message": "Nome della licenza"
   },
-  "project.settings.license.optional-label": {
-    "message": "opzionale"
-  },
   "project.settings.license.optional-url": {
     "message": "URL della licenza (opzionale)"
   },
@@ -4591,9 +4588,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "Latenza: {latency} ms"
-  },
-  "project.settings.server.optional-label": {
-    "message": "opzionale"
   },
   "project.settings.server.ping-failed-message": {
     "message": "Non siamo riusciti a raggiungere il server. Riprova più tardi o ricarica più volte. Se ancora non risponde, <support-link>contatta il supporto</support-link>."

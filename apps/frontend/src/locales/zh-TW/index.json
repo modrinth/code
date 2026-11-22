@@ -4322,9 +4322,6 @@
   "project.settings.license.name": {
     "message": "授權條款名稱"
   },
-  "project.settings.license.optional-label": {
-    "message": "可選"
-  },
   "project.settings.license.optional-url": {
     "message": "授權條款網址（可選）"
   },
@@ -4561,9 +4558,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "延遲：{latency} 毫秒"
-  },
-  "project.settings.server.optional-label": {
-    "message": "可選"
   },
   "project.settings.server.ping-failed-message": {
     "message": "我們無法對伺服器進行 Ping 測試。該伺服器可能已被你的主機封鎖。請嘗試重新整理頁面幾次，如果還是沒有回應，請<support-link>聯絡客服</support-link>。"

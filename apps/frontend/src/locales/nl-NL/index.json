@@ -4139,9 +4139,6 @@
   "project.settings.server.latency-label": {
     "message": "Vertraging: {latency} ms"
   },
-  "project.settings.server.optional-label": {
-    "message": "optioneel"
-  },
   "project.settings.server.ping-failed-message": {
     "message": "We konden deze server niet pingen. Mogelijk wordt deze door je provider geblokkeerd, dus probeer het een paar keer opnieuw. Als de server nog steeds niet reageert, neem dan <support-link>contact op met de klantenservice</support-link>."
   },

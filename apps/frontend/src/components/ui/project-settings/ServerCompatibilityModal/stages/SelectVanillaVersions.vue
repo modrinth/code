@@ -2,37 +2,44 @@
 	<div class="flex w-full flex-col gap-6">
 		<DataLossWarningBanner />
 		<div class="flex w-full flex-col gap-4">
-			<label>
-				<span class="label__title">Supported MC versions</span>
-				<McVersionPicker v-model="supportedGameVersions" no-header :game-versions="gameVersions" />
-			</label>
-			<div>
-				<label>
-					<span class="label__title">Recommended MC version</span>
-					<Combobox
-						v-model="recommendedGameVersion"
-						v-tooltip="
-							!recommendedOptions.length
-								? 'Set supported versions before selecting the recommended version'
-								: undefined
-						"
-						:options="recommendedOptions"
-						searchable
-						:display-name="(val: string) => val"
-						placeholder="Select version"
-						:disabled="!recommendedOptions.length"
+			<Field label="Supported MC versions">
+				<template #default="{ labelId }">
+					<McVersionPicker
+						v-model="supportedGameVersions"
+						no-header
+						:game-versions="gameVersions"
+						role="group"
+						:aria-labelledby="labelId"
 					/>
-					<div class="mt-2 text-secondary">
+				</template>
+			</Field>
+			<Field label="Recommended MC version" input-id="compatibility-recommended-version">
+				<Combobox
+					v-model="recommendedGameVersion"
+					v-tooltip="
+						!recommendedOptions.length
+							? 'Set supported versions before selecting the recommended version'
+							: undefined
+					"
+					:options="recommendedOptions"
+					searchable
+					:search-input-attrs="{ id: 'compatibility-recommended-version' }"
+					:display-name="(val: string) => val"
+					placeholder="Select version"
+					:disabled="!recommendedOptions.length"
+				/>
+				<template #bottom>
+					<p class="mb-0 mt-2 text-sm text-secondary">
 						Players joining the server from the Modrinth App will connect using this version.
-					</div>
-				</label>
-			</div>
+					</p>
+				</template>
+			</Field>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { Combobox } from '@modrinth/ui'
+import { Combobox, Field } from '@modrinth/ui'
 import { computed, watch } from 'vue'
 
 import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'

@@ -6,6 +6,7 @@ import {
 	commonMessages,
 	defineMessages,
 	disclosureTelemetryConsentMessages,
+	Field,
 	IconButton,
 	Input,
 	SettingsFormGroup,
@@ -94,16 +95,19 @@ function removeEntry(index: number) {
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<template #expanded>
-			<SettingsFormGroup :title="formatMessage(messages.consentDescription)">
-				<Chips
-					v-model="model.consent"
-					:items="CONSENT_MODELS"
-					:capitalize="false"
-					:format-label="
-						(item: TelemetryConsent) => formatMessage(disclosureTelemetryConsentMessages[item])
-					"
-				/>
-			</SettingsFormGroup>
+			<Field :label="formatMessage(messages.consentDescription)">
+				<template #default="{ labelId }">
+					<Chips
+						v-model="model.consent"
+						:items="CONSENT_MODELS"
+						:aria-labelledby="labelId"
+						:capitalize="false"
+						:format-label="
+							(item: TelemetryConsent) => formatMessage(disclosureTelemetryConsentMessages[item])
+						"
+					/>
+				</template>
+			</Field>
 			<SettingsFormGroup
 				:title="formatMessage(messages.dataLabel)"
 				:description="formatMessage(messages.dataDescription)"

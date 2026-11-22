@@ -5,6 +5,7 @@ import { useId } from 'vue'
 import { useVIntl } from '../../../composables/i18n'
 import Button from '../../base/buttons/Button.vue'
 import FileButton from '../../base/buttons/FileButton.vue'
+import Field from '../../base/inputs/Field.vue'
 import Input from '../../base/inputs/Input.vue'
 import Textarea from '../../base/inputs/Textarea.vue'
 import { galleryEditorMessages as messages } from './messages'
@@ -51,34 +52,33 @@ const bannerDescriptionId = useId()
 				:alt="formatMessage(messages.previewAlt)"
 			/>
 		</div>
-		<div class="flex flex-col gap-2">
-			<label :for="titleId" class="w-fit font-semibold text-contrast">
-				{{ formatMessage(messages.imageTitle) }}
-			</label>
+		<Field :label="formatMessage(messages.imageTitle)" :input-id="titleId">
 			<Input
 				:id="titleId"
 				v-model="title"
 				:maxlength="64"
 				:placeholder="formatMessage(messages.titlePlaceholder)"
+				wrapper-class="w-full"
 			/>
-			<div v-if="$slots['title-feedback']" class="flex flex-col gap-2 empty:hidden">
-				<slot name="title-feedback" />
-			</div>
-		</div>
-		<div class="flex flex-col gap-2">
-			<label :for="descriptionId" class="w-fit font-semibold text-contrast">
-				{{ formatMessage(messages.description) }}
-			</label>
+			<template #bottom>
+				<div v-if="$slots['title-feedback']" class="mt-2 flex flex-col gap-2 empty:hidden">
+					<slot name="title-feedback" />
+				</div>
+			</template>
+		</Field>
+		<Field :label="formatMessage(messages.description)" :input-id="descriptionId">
 			<Textarea
 				:id="descriptionId"
 				v-model="description"
 				:maxlength="255"
 				:placeholder="formatMessage(messages.descriptionPlaceholder)"
 			/>
-			<div v-if="$slots['description-feedback']" class="flex flex-col gap-2 empty:hidden">
-				<slot name="description-feedback" />
-			</div>
-		</div>
+			<template #bottom>
+				<div v-if="$slots['description-feedback']" class="mt-2 flex flex-col gap-2 empty:hidden">
+					<slot name="description-feedback" />
+				</div>
+			</template>
+		</Field>
 		<div class="flex flex-col gap-2">
 			<div class="flex flex-col gap-1">
 				<p class="m-0 font-semibold text-contrast">{{ formatMessage(messages.banner) }}</p>

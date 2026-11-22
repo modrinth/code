@@ -8,6 +8,9 @@
 				class="font-semibold text-contrast"
 			>
 				<slot name="label">{{ label }}</slot>
+				<span v-if="labelOptional" class="font-normal text-secondary">
+					{{ ' ' }}<IntlFormatted :message-id="commonMessages.optionalFieldLabel" />
+				</span>
 			</component>
 			<slot name="right" />
 		</div>
@@ -19,8 +22,12 @@
 <script setup lang="ts">
 import { useId } from 'vue'
 
+import { commonMessages } from '../../../utils/common-messages'
+import IntlFormatted from '../IntlFormatted.vue'
+
 defineProps<{
 	label?: string
+	labelOptional?: boolean
 	inputId?: string
 }>()
 

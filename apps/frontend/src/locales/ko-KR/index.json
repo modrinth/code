@@ -4322,9 +4322,6 @@
   "project.settings.license.name": {
     "message": "라이선스 이름"
   },
-  "project.settings.license.optional-label": {
-    "message": "선택"
-  },
   "project.settings.license.optional-url": {
     "message": "라이선스 URL(선택)"
   },
@@ -4561,9 +4558,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "응답 지연: {latency}ms"
-  },
-  "project.settings.server.optional-label": {
-    "message": "옵션"
   },
   "project.settings.server.ping-failed-message": {
     "message": "이 서버에 ping을 보낼 수 없습니다. 호스트에서 차단되었을 수 있으니 몇 번 새로고침해 보세요. 그래도 응답하지 않으면 <support-link>지원팀에 문의해 주세요.</support-link>."

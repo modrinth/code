@@ -32,3 +32,8 @@ export const WithCharacterCountAndHelp: StoryObj<typeof meta> = {
 		`,
 	}),
 }
+
+export const WithOptionalLabel: StoryObj<typeof meta> = {
+	...WithCharacterCountAndHelp,
+	args: { labelOptional: true },
+}

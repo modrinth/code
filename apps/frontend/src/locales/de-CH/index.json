@@ -4352,9 +4352,6 @@
   "project.settings.license.name": {
     "message": "Lizenzname"
   },
-  "project.settings.license.optional-label": {
-    "message": "Optional"
-  },
   "project.settings.license.optional-url": {
     "message": "Lizenz-URL (optional)"
   },
@@ -4591,9 +4588,6 @@
   },
   "project.settings.server.latency-label": {
     "message": "Latenz: {latency}ms"
-  },
-  "project.settings.server.optional-label": {
-    "message": "Optional"
   },
   "project.settings.server.ping-failed-message": {
     "message": "Wir konnten den Server nicht anpingen. Möglicherweise wird er von deinem Host blockiert. Versuche, den Vorgang mehrmals zu aktualisieren. Sollte der Server weiterhin nicht antworten, <support-link>kontaktiere bitte den Support</support-link>."

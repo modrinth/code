@@ -8,57 +8,63 @@
 				class="-mb-2 max-w-[600px]"
 			/>
 
-			<fieldset class="m-0 flex min-w-0 flex-col gap-2 border-0 p-0">
-				<legend class="mb-2 font-semibold text-contrast">
-					{{ formatMessage(messages.licenseType) }}
-				</legend>
-				<div class="grid grid-cols-1 gap-2 sm:grid-cols-[repeat(3,minmax(0,250px))]">
-					<RadioCard
-						v-for="option in licenseTypes"
-						:key="option.value"
-						v-model="licenseType"
-						name="project-license-type"
-						max-width="250px"
-						:value="option.value"
-						:label="formatMessage(option.label)"
-						:description="formatMessage(option.description)"
-						:icon="option.icon"
-						:disabled="saving || !hasPermission"
+			<Field :label="formatMessage(messages.licenseType)">
+				<template #default="{ labelId }">
+					<div
+						role="radiogroup"
+						:aria-labelledby="labelId"
+						class="grid grid-cols-1 gap-2 sm:grid-cols-[repeat(3,minmax(0,250px))]"
+					>
+						<RadioCard
+							v-for="option in licenseTypes"
+							:key="option.value"
+							v-model="licenseType"
+							name="project-license-type"
+							max-width="250px"
+							:value="option.value"
+							:label="formatMessage(option.label)"
+							:description="formatMessage(option.description)"
+							:icon="option.icon"
+							:disabled="saving || !hasPermission"
+						/>
+					</div>
+				</template>
+				<template #bottom>
+					<ValidationMessage
+						v-if="licenseType === ''"
+						:check="licenseSelectionValidation"
+						:project-field="project.license.id"
+						:current-field="licenseId"
+						class="mt-2 max-w-[600px]"
 					/>
-				</div>
-				<ValidationMessage
-					v-if="licenseType === ''"
-					:check="licenseSelectionValidation"
-					:project-field="project.license.id"
-					:current-field="licenseId"
-					class="max-w-[600px]"
+				</template>
+			</Field>
+			<Field
+				v-if="licenseType === 'standard'"
+				:label="formatMessage(messages.select)"
+				input-id="license-multiselect"
+				class="max-w-[600px]"
+			>
+				<Combobox
+					v-model="selectedLicense"
+					:options="licenseOptions"
+					:search-options="
+						allLicenseOptions.filter(
+							(option) => option.value && option.value !== 'All-Rights-Reserved',
+						)
+					"
+					:display-value="licenseDisplayName(current.license) || undefined"
+					:placeholder="formatMessage(messages.selectPlaceholder)"
+					:search-placeholder="formatMessage(messages.selectPlaceholder)"
+					:searchable="true"
+					:search-input-attrs="{ id: 'license-multiselect' }"
+					sync-with-selection
+					select-search-text-on-focus
+					:disabled="saving || !hasPermission"
+					trigger-type="base"
+					class="w-full max-w-[600px]"
 				/>
-			</fieldset>
-			<div v-if="licenseType === 'standard'" class="flex min-w-0 max-w-[600px] flex-col gap-2">
-				<label for="license-multiselect" class="w-fit text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.select) }}
-				</label>
-
-				<div class="flex min-w-0 flex-col gap-1.5">
-					<Combobox
-						id="license-multiselect"
-						v-model="selectedLicense"
-						:options="licenseOptions"
-						:search-options="
-							allLicenseOptions.filter(
-								(option) => option.value && option.value !== 'All-Rights-Reserved',
-							)
-						"
-						:display-value="licenseDisplayName(current.license) || undefined"
-						:placeholder="formatMessage(messages.selectPlaceholder)"
-						:search-placeholder="formatMessage(messages.selectPlaceholder)"
-						:searchable="true"
-						sync-with-selection
-						select-search-text-on-focus
-						:disabled="saving || !hasPermission"
-						trigger-type="base"
-						class="w-full max-w-[600px]"
-					/>
+				<template #bottom>
 					<ValidationMessage
 						:check="licenseSelectionValidation"
 						:project-field="project.license.id"
@@ -72,8 +78,8 @@
 						]"
 						class="mt-2"
 					/>
-				</div>
-			</div>
+				</template>
+			</Field>
 
 			<div v-if="current.license.requiresOnlyOrLater" class="flex min-w-0 flex-col gap-2">
 				<Checkbox
@@ -89,25 +95,23 @@
 				</p>
 			</div>
 
-			<div
+			<Field
 				v-if="current.license.friendly === 'Custom'"
-				class="flex min-w-0 max-w-[600px] flex-col gap-2"
+				:label="formatMessage(messages.name)"
+				input-id="license-name"
+				class="max-w-[600px]"
 			>
-				<label for="license-name" class="w-fit text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.name) }}
-				</label>
-
-				<div class="flex min-w-0 flex-col gap-2">
-					<Input
-						id="license-name"
-						v-model="current.license.short"
-						wrapper-class="w-full"
-						:maxlength="128"
-						:placeholder="formatMessage(messages.namePlaceholder)"
-						required
-						:disabled="saving || !hasPermission"
-					/>
-					<ValidationMessage :check="customNameMessage" />
+				<Input
+					id="license-name"
+					v-model="current.license.short"
+					wrapper-class="w-full"
+					:maxlength="128"
+					:placeholder="formatMessage(messages.namePlaceholder)"
+					required
+					:disabled="saving || !hasPermission"
+				/>
+				<template #bottom>
+					<ValidationMessage :check="customNameMessage" class="mt-2" />
 					<ValidationMessage
 						:check="
 							saveValidation
@@ -115,8 +119,8 @@
 								.filter((message) => message.values?.missingName)
 						"
 					/>
-				</div>
-			</div>
+				</template>
+			</Field>
 
 			<div
 				v-if="current.license.friendly"
@@ -130,20 +134,15 @@
 					:disabled="saving || !hasPermission"
 					:label="formatMessage(messages.linkOwnCopy)"
 				/>
-				<label v-else for="license-url" class="w-fit text-lg font-semibold text-contrast">
-					{{ formatMessage(licenseUrlMessages.url) }}
-					<span v-if="licenseType === 'none'" class="font-normal text-secondary">
-						({{ formatMessage(messages.optionalLabel) }})
-					</span>
-				</label>
-
-				<div
+				<Field
 					v-if="licenseType !== 'standard' || current.useStandardLicenseUrl"
-					class="flex min-w-0 flex-col gap-2"
+					:label="formatMessage(licenseUrlMessages.url)"
+					input-id="license-url"
+					:label-optional="licenseType === 'none'"
 				>
-					<label v-if="licenseType === 'standard'" for="license-url" class="sr-only">
-						{{ formatMessage(licenseUrlMessages.url) }}
-					</label>
+					<template v-if="licenseType === 'standard'" #label>
+						<span class="sr-only">{{ formatMessage(licenseUrlMessages.url) }}</span>
+					</template>
 					<Input
 						id="license-url"
 						v-model="current.licenseUrl"
@@ -158,38 +157,40 @@
 						:disabled="saving || !hasPermission || licenseId === 'LicenseRef-Unknown'"
 						wrapper-class="w-full"
 					/>
-					<p v-if="licenseType !== 'standard'" class="m-0 text-base text-secondary">
-						{{
-							formatMessage(
-								current.license.friendly === 'Custom'
-									? licenseUrlMessages.customUrlDescription
-									: licenseUrlMessages.urlDescription,
-							)
-						}}
-					</p>
-					<ValidationMessage :check="customUrlMessage" />
-					<ValidationMessage
-						:check="
-							saveValidation
-								.forField('custom-license', 'license')
-								.filter((message) => message.values?.missingUrl)
-						"
-					/>
-					<ValidationMessage
-						:check="customLicenseValidation"
-						:project-field="project.license.id"
-						:current-field="licenseId"
-					/>
-					<ValidationMessage
-						:check="effectiveLicenseCheck"
-						:project-field="project.license.url ?? ''"
-						:current-field="current.licenseUrl"
-					/>
-					<ValidationMessage
-						:check="saveValidation.forField('license-url', 'license')"
-						class="mt-2"
-					/>
-				</div>
+					<template #bottom>
+						<p v-if="licenseType !== 'standard'" class="mb-0 mt-2 text-sm text-secondary">
+							{{
+								formatMessage(
+									current.license.friendly === 'Custom'
+										? licenseUrlMessages.customUrlDescription
+										: licenseUrlMessages.urlDescription,
+								)
+							}}
+						</p>
+						<ValidationMessage :check="customUrlMessage" class="mt-2" />
+						<ValidationMessage
+							:check="
+								saveValidation
+									.forField('custom-license', 'license')
+									.filter((message) => message.values?.missingUrl)
+							"
+						/>
+						<ValidationMessage
+							:check="customLicenseValidation"
+							:project-field="project.license.id"
+							:current-field="licenseId"
+						/>
+						<ValidationMessage
+							:check="effectiveLicenseCheck"
+							:project-field="project.license.url ?? ''"
+							:current-field="current.licenseUrl"
+						/>
+						<ValidationMessage
+							:check="saveValidation.forField('license-url', 'license')"
+							class="mt-2"
+						/>
+					</template>
+				</Field>
 			</div>
 			<ValidationMessage
 				:check="
@@ -318,6 +319,7 @@ import {
 	Combobox,
 	type ComboboxOption,
 	defineMessages,
+	Field,
 	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -465,10 +467,6 @@ const messages = defineMessages({
 	urlPlaceholder: {
 		id: 'project.settings.license.example-url-placeholder',
 		defaultMessage: 'https://example.com/license.txt',
-	},
-	optionalLabel: {
-		id: 'project.settings.license.optional-label',
-		defaultMessage: 'optional',
 	},
 	name: { id: 'project.settings.license.name', defaultMessage: 'License name' },
 	namePlaceholder: {
