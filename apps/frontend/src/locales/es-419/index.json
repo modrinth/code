@@ -1424,9 +1424,6 @@
   "create.project.organization-icon-alt": {
     "message": "Ícono de {name}"
   },
-  "create.project.owner-description": {
-    "message": "Establécete como propietario del proyecto a ti o a una organización de la que seas miembro."
-  },
   "create.project.owner-label": {
     "message": "Propietario"
   },
@@ -1444,15 +1441,6 @@
   },
   "create.project.title": {
     "message": "Creando un proyecto"
-  },
-  "create.project.type-label": {
-    "message": "Tipo"
-  },
-  "create.project.type-project": {
-    "message": "Proyecto"
-  },
-  "create.project.type-server": {
-    "message": "Servidor"
   },
   "create.project.unknown-user": {
     "message": "Usuario desconocido"

@@ -1415,9 +1415,6 @@
   "create.project.organization-icon-alt": {
     "message": "Biểu tượng của {name}"
   },
-  "create.project.owner-description": {
-    "message": "Chọn chính bạn hoặc tổ chức của bạn làm chủ sở hữu dự án."
-  },
   "create.project.owner-label": {
     "message": "Chủ sở hữu"
   },
@@ -1435,15 +1432,6 @@
   },
   "create.project.title": {
     "message": "Đang tạo dự án"
-  },
-  "create.project.type-label": {
-    "message": "Loại"
-  },
-  "create.project.type-project": {
-    "message": "Dự án"
-  },
-  "create.project.type-server": {
-    "message": "Máy chủ"
   },
   "create.project.unknown-user": {
     "message": "Người dùng không xác định"

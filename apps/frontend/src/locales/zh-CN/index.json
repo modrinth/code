@@ -1448,9 +1448,6 @@
   "create.project.organization-icon-alt": {
     "message": "{name} 图标"
   },
-  "create.project.owner-description": {
-    "message": "将项目所有者设置为你自己或你所属的组织。"
-  },
   "create.project.owner-label": {
     "message": "所有者"
   },
@@ -1468,15 +1465,6 @@
   },
   "create.project.title": {
     "message": "创建项目"
-  },
-  "create.project.type-label": {
-    "message": "类型"
-  },
-  "create.project.type-project": {
-    "message": "项目"
-  },
-  "create.project.type-server": {
-    "message": "服务器"
   },
   "create.project.unknown-user": {
     "message": "未知用户"

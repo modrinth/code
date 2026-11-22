@@ -1421,9 +1421,6 @@
   "create.project.organization-icon-alt": {
     "message": "{name} ikon"
   },
-  "create.project.owner-description": {
-    "message": "Állítsd be a projekt tulajdonosát saját magadra vagy egy olyan szervezetre, amelynek tagja vagy."
-  },
   "create.project.owner-label": {
     "message": "Tulajdonos"
   },
@@ -1441,15 +1438,6 @@
   },
   "create.project.title": {
     "message": "Projekt létrehozása"
-  },
-  "create.project.type-label": {
-    "message": "Típus"
-  },
-  "create.project.type-project": {
-    "message": "Projekt"
-  },
-  "create.project.type-server": {
-    "message": "Szerver"
   },
   "create.project.unknown-user": {
     "message": "Ismeretlen felhasználó"

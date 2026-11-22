@@ -1259,15 +1259,6 @@
   "create.project.title": {
     "message": "Vytvořit projekt"
   },
-  "create.project.type-label": {
-    "message": "Typ"
-  },
-  "create.project.type-project": {
-    "message": "Projekt"
-  },
-  "create.project.type-server": {
-    "message": "Server"
-  },
   "create.project.unknown-user": {
     "message": "Neznámý uživatel"
   },

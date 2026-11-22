@@ -1169,9 +1169,6 @@
   "create.project.name-placeholder": {
     "message": "Insere o nome do projeto..."
   },
-  "create.project.owner-description": {
-    "message": "Define-te como dono do projeto ou uma organização da qual faças parte."
-  },
   "create.project.owner-label": {
     "message": "Dono"
   },
@@ -1189,15 +1186,6 @@
   },
   "create.project.title": {
     "message": "Criar um projeto"
-  },
-  "create.project.type-label": {
-    "message": "Tipo"
-  },
-  "create.project.type-project": {
-    "message": "Projeto"
-  },
-  "create.project.type-server": {
-    "message": "Servidor"
   },
   "create.project.url-label": {
     "message": "URL"

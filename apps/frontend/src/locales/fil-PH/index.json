@@ -557,9 +557,6 @@
   "create.project.name-placeholder": {
     "message": "Ilagay ang pangalan ng proyekto..."
   },
-  "create.project.owner-description": {
-    "message": "Itatakda kang may-ari ng proyekto o ng organisasyong sinalihan mo."
-  },
   "create.project.owner-label": {
     "message": "May-ari"
   },
@@ -577,15 +574,6 @@
   },
   "create.project.title": {
     "message": "Naglilikha ng proyekto"
-  },
-  "create.project.type-label": {
-    "message": "Uri"
-  },
-  "create.project.type-project": {
-    "message": "Proyekto"
-  },
-  "create.project.type-server": {
-    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"

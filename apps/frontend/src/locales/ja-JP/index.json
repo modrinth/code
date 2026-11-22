@@ -1448,9 +1448,6 @@
   "create.project.organization-icon-alt": {
     "message": "{name}アイコン"
   },
-  "create.project.owner-description": {
-    "message": "プロジェクトオーナーを自分自身または自身が所属している組織に設定してください。"
-  },
   "create.project.owner-label": {
     "message": "オーナー"
   },
@@ -1468,15 +1465,6 @@
   },
   "create.project.title": {
     "message": "プロジェクトを作成"
-  },
-  "create.project.type-label": {
-    "message": "タイプ"
-  },
-  "create.project.type-project": {
-    "message": "プロジェクト"
-  },
-  "create.project.type-server": {
-    "message": "サーバー"
   },
   "create.project.unknown-user": {
     "message": "不明なユーザー"

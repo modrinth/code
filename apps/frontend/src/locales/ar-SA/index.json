@@ -1331,9 +1331,6 @@
   "create.project.organization-icon-alt": {
     "message": "أيقونة {name}"
   },
-  "create.project.owner-description": {
-    "message": "عين مالك المشروع كنفسك أو كمنظمة أنت عضو منها."
-  },
   "create.project.owner-label": {
     "message": "المالك"
   },
@@ -1351,15 +1348,6 @@
   },
   "create.project.title": {
     "message": "إنشاء مشروع"
-  },
-  "create.project.type-label": {
-    "message": "النوع"
-  },
-  "create.project.type-project": {
-    "message": "مشروع"
-  },
-  "create.project.type-server": {
-    "message": "خادم"
   },
   "create.project.unknown-user": {
     "message": "مستخدم غير معروف"

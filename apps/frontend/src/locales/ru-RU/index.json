@@ -1442,9 +1442,6 @@
   "create.project.organization-icon-alt": {
     "message": "Иконка {name}"
   },
-  "create.project.owner-description": {
-    "message": "Укажите себя или организацию, в которой состоите."
-  },
   "create.project.owner-label": {
     "message": "Владелец"
   },
@@ -1462,15 +1459,6 @@
   },
   "create.project.title": {
     "message": "Создание проекта"
-  },
-  "create.project.type-label": {
-    "message": "Тип"
-  },
-  "create.project.type-project": {
-    "message": "Проект"
-  },
-  "create.project.type-server": {
-    "message": "Сервер"
   },
   "create.project.unknown-user": {
     "message": "Неизвестный пользователь"

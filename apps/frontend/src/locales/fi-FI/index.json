@@ -461,9 +461,6 @@
   "create.project.name-placeholder": {
     "message": "Syötä projektin nimi..."
   },
-  "create.project.owner-description": {
-    "message": "Aseta projektin omistajaksesi itsesi tai organisaatio johon kuulut."
-  },
   "create.project.owner-label": {
     "message": "Omistaja"
   },
@@ -481,15 +478,6 @@
   },
   "create.project.title": {
     "message": "Luodaan projektia..."
-  },
-  "create.project.type-label": {
-    "message": "Tyyppi"
-  },
-  "create.project.type-project": {
-    "message": "Projekti"
-  },
-  "create.project.type-server": {
-    "message": "Palvelin"
   },
   "create.project.url-label": {
     "message": "URL"

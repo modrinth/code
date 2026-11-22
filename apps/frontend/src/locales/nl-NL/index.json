@@ -1427,9 +1427,6 @@
   "create.project.organization-icon-alt": {
     "message": "{name} pictogram"
   },
-  "create.project.owner-description": {
-    "message": "Stel de project eigenaar in als jezelf of een organisatie waar je lid van bent."
-  },
   "create.project.owner-label": {
     "message": "Eigenaar"
   },
@@ -1447,15 +1444,6 @@
   },
   "create.project.title": {
     "message": "Een project aanmaken"
-  },
-  "create.project.type-label": {
-    "message": "Type"
-  },
-  "create.project.type-project": {
-    "message": "Project"
-  },
-  "create.project.type-server": {
-    "message": "Server"
   },
   "create.project.unknown-user": {
     "message": "Onbekende gebruiker"

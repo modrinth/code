@@ -1448,9 +1448,6 @@
   "create.project.organization-icon-alt": {
     "message": "{name} 圖示"
   },
-  "create.project.owner-description": {
-    "message": "請將專案擁有者設為你自己，或是你所屬的組織。"
-  },
   "create.project.owner-label": {
     "message": "擁有者"
   },
@@ -1468,15 +1465,6 @@
   },
   "create.project.title": {
     "message": "建立專案"
-  },
-  "create.project.type-label": {
-    "message": "類型"
-  },
-  "create.project.type-project": {
-    "message": "專案"
-  },
-  "create.project.type-server": {
-    "message": "伺服器"
   },
   "create.project.unknown-user": {
     "message": "未知使用者"

@@ -893,9 +893,6 @@
   "create.project.name-placeholder": {
     "message": "Skriv inn prosjektnavn..."
   },
-  "create.project.owner-description": {
-    "message": "Sett prosjekteieren som deg sjøl eller ei organisering du er medlem av."
-  },
   "create.project.owner-label": {
     "message": "Eier"
   },
@@ -913,15 +910,6 @@
   },
   "create.project.title": {
     "message": "Lag et prosjekt"
-  },
-  "create.project.type-label": {
-    "message": "Type"
-  },
-  "create.project.type-project": {
-    "message": "Prosjekt"
-  },
-  "create.project.type-server": {
-    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"

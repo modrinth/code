@@ -1361,9 +1361,6 @@
   "create.project.organization-icon-alt": {
     "message": "{name} ikon"
   },
-  "create.project.owner-description": {
-    "message": "Sätt projektägaren som dig själv eller en organisation du är medlem i."
-  },
   "create.project.owner-label": {
     "message": "Ägare"
   },
@@ -1381,15 +1378,6 @@
   },
   "create.project.title": {
     "message": "Skapar ett projekt"
-  },
-  "create.project.type-label": {
-    "message": "Typ"
-  },
-  "create.project.type-project": {
-    "message": "Projekt"
-  },
-  "create.project.type-server": {
-    "message": "Server"
   },
   "create.project.unknown-user": {
     "message": "Okänd användare"

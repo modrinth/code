@@ -473,9 +473,6 @@
   "create.project.name-placeholder": {
     "message": "הכנס שם פרויקט..."
   },
-  "create.project.owner-description": {
-    "message": "הגדר את בעלי הפרויקט כעצמך או כארגון שבו אתה חבר."
-  },
   "create.project.owner-label": {
     "message": "בעלים"
   },
@@ -493,15 +490,6 @@
   },
   "create.project.title": {
     "message": "יוצר פרויקט"
-  },
-  "create.project.type-label": {
-    "message": "סוג"
-  },
-  "create.project.type-project": {
-    "message": "פרויקט"
-  },
-  "create.project.type-server": {
-    "message": "שרת"
   },
   "create.project.url-label": {
     "message": "URL"

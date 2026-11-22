@@ -701,9 +701,6 @@
   "create.project.name-placeholder": {
     "message": "Masukkan nama proyek..."
   },
-  "create.project.owner-description": {
-    "message": "Buat diri Anda atau organisasi yang Anda sertai sebagai pemilik proyek."
-  },
   "create.project.owner-label": {
     "message": "Pemilik"
   },
@@ -721,15 +718,6 @@
   },
   "create.project.title": {
     "message": "Membuat proyek"
-  },
-  "create.project.type-label": {
-    "message": "Jenis"
-  },
-  "create.project.type-project": {
-    "message": "Proyek"
-  },
-  "create.project.type-server": {
-    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"

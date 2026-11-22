@@ -935,9 +935,6 @@
   "create.project.organization-icon-alt": {
     "message": "{name} Ikon"
   },
-  "create.project.owner-description": {
-    "message": "Det projekt ejeren som dig selv eller en organisation du medlem af."
-  },
   "create.project.owner-label": {
     "message": "Ejer"
   },
@@ -955,15 +952,6 @@
   },
   "create.project.title": {
     "message": "Opretter et projekt"
-  },
-  "create.project.type-label": {
-    "message": "Type"
-  },
-  "create.project.type-project": {
-    "message": "Projekt"
-  },
-  "create.project.type-server": {
-    "message": "Server"
   },
   "create.project.unknown-user": {
     "message": "Ukendt bruger"

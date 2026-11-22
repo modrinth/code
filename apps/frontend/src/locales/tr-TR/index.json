@@ -1424,9 +1424,6 @@
   "create.project.organization-icon-alt": {
     "message": "{name} İkon"
   },
-  "create.project.owner-description": {
-    "message": "Proje sahibini kendin ya da üyesi olduğun bir organizasyon olarak ayarla."
-  },
   "create.project.owner-label": {
     "message": "Sahip"
   },
@@ -1444,15 +1441,6 @@
   },
   "create.project.title": {
     "message": "Proje oluştur"
-  },
-  "create.project.type-label": {
-    "message": "Tür"
-  },
-  "create.project.type-project": {
-    "message": "Proje"
-  },
-  "create.project.type-server": {
-    "message": "Sunucu"
   },
   "create.project.unknown-user": {
     "message": "Bilinmeyen kullanıcı"

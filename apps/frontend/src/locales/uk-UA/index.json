@@ -1445,9 +1445,6 @@
   "create.project.organization-icon-alt": {
     "message": "Значок {name}"
   },
-  "create.project.owner-description": {
-    "message": "Установіть власника проєкту як себе чи організацію, членом якої ви є."
-  },
   "create.project.owner-label": {
     "message": "Власник"
   },
@@ -1465,15 +1462,6 @@
   },
   "create.project.title": {
     "message": "Створення проєкту"
-  },
-  "create.project.type-label": {
-    "message": "Тип"
-  },
-  "create.project.type-project": {
-    "message": "Проєкт"
-  },
-  "create.project.type-server": {
-    "message": "Сервер"
   },
   "create.project.unknown-user": {
     "message": "Невідомий користувач"

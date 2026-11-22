@@ -3,9 +3,11 @@
 		<Button
 			v-for="item in items"
 			:key="formatLabel(item)"
-			v-tooltip="isDisabled(item) ? disabledTooltip : undefined"
+			v-tooltip="isDisabled(item) ? disabledTooltip : formatTooltip?.(item)"
 			role="radio"
 			:aria-checked="selected === item"
+			:aria-label="formatTooltip ? formatLabel(item) : undefined"
+			:aria-description="formatTooltip?.(item)"
 			:disabled="isDisabled(item)"
 			class="btn !brightness-100 hover:!brightness-125"
 			:class="{
@@ -34,6 +36,7 @@ const props = withDefaults(
 	defineProps<{
 		items: T[]
 		formatLabel?: (item: T) => string
+		formatTooltip?: (item: T) => string
 		neverEmpty?: boolean
 		capitalize?: boolean
 		size?: 'standard' | 'small'

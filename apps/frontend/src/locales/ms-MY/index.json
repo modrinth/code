@@ -1010,9 +1010,6 @@
   "create.project.organization-icon-alt": {
     "message": "Ikon {name}"
   },
-  "create.project.owner-description": {
-    "message": "Tetapkan pemilik projek sebagai diri anda atau organisasi yang anda sertai."
-  },
   "create.project.owner-label": {
     "message": "Pemilik"
   },
@@ -1030,15 +1027,6 @@
   },
   "create.project.title": {
     "message": "Mencipta sebuah projek"
-  },
-  "create.project.type-label": {
-    "message": "Jenis"
-  },
-  "create.project.type-project": {
-    "message": "Projek"
-  },
-  "create.project.type-server": {
-    "message": "Pelayan"
   },
   "create.project.url-label": {
     "message": "URL"

@@ -24,6 +24,13 @@ export const Small: Story = {
 	},
 }
 
+export const WithTooltips: Story = {
+	args: {
+		items: ['Option 1', 'Option 2', 'Option 3'],
+		formatTooltip: (item) => `Description for ${item}`,
+	},
+}
+
 export const AllowEmpty: Story = {
 	args: {
 		items: ['Option 1', 'Option 2', 'Option 3'],

@@ -1430,9 +1430,6 @@
   "create.project.organization-icon-alt": {
     "message": "{name} 아이콘"
   },
-  "create.project.owner-description": {
-    "message": "프로젝트 소유자를 자신 또는 소속된 조직으로 설정하세요."
-  },
   "create.project.owner-label": {
     "message": "소유자"
   },
@@ -1450,15 +1447,6 @@
   },
   "create.project.title": {
     "message": "프로젝트 생성"
-  },
-  "create.project.type-label": {
-    "message": "유형"
-  },
-  "create.project.type-project": {
-    "message": "프로젝트"
-  },
-  "create.project.type-server": {
-    "message": "서버"
   },
   "create.project.unknown-user": {
     "message": "알려지지 않은 사용자"

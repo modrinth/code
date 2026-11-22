@@ -698,15 +698,6 @@
   "create.project.title": {
     "message": "สร้างโปรเจ็ก"
   },
-  "create.project.type-label": {
-    "message": "ประเภท"
-  },
-  "create.project.type-project": {
-    "message": "โปรเจกต์"
-  },
-  "create.project.type-server": {
-    "message": "เซิร์ฟเวอร์"
-  },
   "create.project.url-label": {
     "message": "URL"
   },

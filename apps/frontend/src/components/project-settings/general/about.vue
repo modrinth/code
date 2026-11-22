@@ -51,7 +51,7 @@
 				/>
 				<template #bottom>
 					<p class="mb-0 mt-2 text-sm text-secondary">
-						One sentence shown under your name in search results.
+						{{ formatMessage(projectSummaryHelp) }}
 					</p>
 					<ValidationMessage
 						:check="summaryValidation"
@@ -257,7 +257,7 @@
 						v-if="!tags.approvedStatuses.includes(project.status)"
 						class="mb-0 mt-2 text-sm text-secondary"
 					>
-						Takes effect once approved. Until then, only members can see the project.
+						{{ formatMessage(projectVisibilityApprovalHelp) }}
 					</p>
 				</template>
 			</Field>
@@ -299,6 +299,7 @@ import {
 } from '~/composables/project-slug-suggestions'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
+import { projectSummaryHelp, projectVisibilityApprovalHelp } from '~/utils/project-messages'
 
 const props = defineProps({ pageSaving: Boolean })
 
