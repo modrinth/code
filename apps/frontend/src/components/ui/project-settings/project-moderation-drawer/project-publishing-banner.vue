@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronRightIcon, Clock4Icon, SendIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import { Admonition, Button, defineMessage, IconButton, useVIntl } from '@modrinth/ui'
+import { Admonition, Button, defineMessage, IconButton, IntlFormatted, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import {
@@ -26,6 +26,29 @@ const { formatMessage } = useVIntl()
 const dismissLabel = defineMessage({
 	id: 'project.publishing.dismiss-banner',
 	defaultMessage: 'Dismiss publishing banner',
+})
+const underReviewIntro = defineMessage({
+	id: 'project.moderation.admonition.under-review.body.1',
+	defaultMessage: "Your project is in queue to be reviewed by Modrinth's moderation team.",
+})
+const underReviewChecks = defineMessage({
+	id: 'project.moderation.admonition.under-review.body.2',
+	defaultMessage:
+		"Your project will be scanned and then reviewed by human moderators to ensure it meets Modrinth's <rules-link>Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>.",
+})
+const underReviewEdits = defineMessage({
+	id: 'project.moderation.admonition.under-review.body.3',
+	defaultMessage: "You can still modify your project, it won't affect your position in the queue.",
+})
+const underReviewTiming = defineMessage({
+	id: 'project.moderation.admonition.under-review.body.4.alt-week',
+	defaultMessage:
+		'We aim to review submissions within a week, but some projects may face delays. This does not reflect an issue with your submission.',
+})
+const underReviewThanks = defineMessage({
+	id: 'project.moderation.admonition.under-review.body.5',
+	defaultMessage:
+		'<emphasis>We appreciate your patience while our moderators work hard to keep Modrinth safe, and look forward to helping you share your content! 💚</emphasis>',
 })
 const submitAction = computed(() => {
 	switch (props.state) {
@@ -105,14 +128,10 @@ const copy = computed(() => {
 		case 'review':
 			return {
 				title: defineMessage({
-					id: 'project.publishing.review.title',
+					id: 'project.moderation.admonition.under-review.header',
 					defaultMessage: 'Project under review',
 				}),
-				body: defineMessage({
-					id: 'project.publishing.review.body',
-					defaultMessage:
-						'The content moderation team is reviewing your project. Most reviews take under a week. You can still make changes without losing your place in the queue.',
-				}),
+				body: undefined,
 			}
 		case 'approved':
 		case 'unlisted':
@@ -238,8 +257,36 @@ const checklistProgressLabel = defineMessage({
 		v-else
 		:type="tone"
 		:header="formatMessage(copy.title, { count: remaining })"
-		:body="formatMessage(copy.body)"
+		:body="copy.body && formatMessage(copy.body)"
 	>
+		<template v-if="state === 'review'" #default>
+			<p class="m-0">{{ formatMessage(underReviewIntro) }}</p>
+			<ul class="mb-0 mt-2 flex list-disc flex-col gap-1 pl-4 leading-normal">
+				<li>
+					<IntlFormatted :message-id="underReviewChecks">
+						<template #rules-link="{ children }">
+							<NuxtLink to="/legal/rules" class="text-link" target="_blank">
+								<component :is="() => children" />
+							</NuxtLink>
+						</template>
+						<template #terms-link="{ children }">
+							<NuxtLink to="/legal/terms" class="text-link" target="_blank">
+								<component :is="() => children" />
+							</NuxtLink>
+						</template>
+					</IntlFormatted>
+				</li>
+				<li>{{ formatMessage(underReviewEdits) }}</li>
+				<li>{{ formatMessage(underReviewTiming) }}</li>
+			</ul>
+			<p class="mb-0 mt-2">
+				<IntlFormatted :message-id="underReviewThanks">
+					<template #emphasis="{ children }">
+						<span class="font-semibold"><component :is="() => children" /></span>
+					</template>
+				</IntlFormatted>
+			</p>
+		</template>
 		<template v-if="state === 'checking' || state === 'review'" #icon="{ iconClass }">
 			<SpinnerIcon
 				v-if="state === 'checking'"

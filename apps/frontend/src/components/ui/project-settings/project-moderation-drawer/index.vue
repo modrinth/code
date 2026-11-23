@@ -234,11 +234,7 @@ const completedItems = computed(() => {
 	const hasVersions = data.versions.length > 0
 	const candidates = [
 		['select-license', !isServer && !!data.license.id, messages.chooseLicense],
-		[
-			'add-description',
-			!!data.description.trim() && !outstanding.has('description-too-short'),
-			messages.writeDescription,
-		],
+		['add-description', !!data.description.trim(), messages.writeDescription],
 		['upload-version', !isServer && hasVersions],
 		['add-icon', !!data.icon_url],
 		['feature-gallery-image', !isServer && data.gallery.some((image) => image.featured)],

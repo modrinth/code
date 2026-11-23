@@ -107,7 +107,6 @@ export const descriptionNags = {
 		destination: 'description',
 	},
 	'description-too-short': {
-		category: 'setup-step',
 		title: messages.shortTitle,
 		description: messages.short,
 		highlightField: 'description',

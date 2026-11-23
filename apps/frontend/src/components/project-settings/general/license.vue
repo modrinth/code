@@ -63,7 +63,7 @@
 					:disabled="saving || !hasPermission"
 					trigger-type="base"
 					:show-chevron="false"
-					class="w-full max-w-[600px]"
+					class="w-full max-w-[384px]"
 				/>
 				<template #bottom>
 					<ValidationMessage
@@ -168,7 +168,6 @@
 								)
 							}}
 						</p>
-						<ValidationMessage :check="customUrlMessage" class="mt-2" />
 						<ValidationMessage
 							:check="
 								saveValidation
@@ -474,17 +473,9 @@ const messages = defineMessages({
 		id: 'project.settings.license.full-name-placeholder',
 		defaultMessage: 'Full name of license',
 	},
-	missingName: {
-		id: 'project.settings.license.custom-name-required',
-		defaultMessage: 'Enter a name for your custom license.',
-	},
 	invalidName: {
 		id: 'project.settings.license.custom-name-invalid',
 		defaultMessage: 'Custom license names can only contain letters, numbers, periods, and hyphens.',
-	},
-	missingUrl: {
-		id: 'project.settings.license.missing-url',
-		defaultMessage: 'Enter a URL to the full text of your custom license.',
 	},
 	updated: {
 		id: 'project.settings.license.updated',
@@ -671,13 +662,6 @@ const missingCustomUrl = computed(
 const customNameMessage = computed(() =>
 	invalidCustomName.value
 		? { severity: 'error' as const, message: messages.invalidName }
-		: project.value.status === 'processing' && missingCustomName.value
-			? { severity: 'error' as const, message: messages.missingName }
-			: null,
-)
-const customUrlMessage = computed(() =>
-	project.value.status === 'processing' && missingCustomUrl.value
-		? { severity: 'error' as const, message: messages.missingUrl }
 		: null,
 )
 const canSave = computed(

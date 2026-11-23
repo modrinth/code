@@ -4214,6 +4214,24 @@
   "project.install-context.back-to-discover": {
     "message": "Back to discover"
   },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "Your project is in queue to be reviewed by Modrinth's moderation team."
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "Your project will be scanned and then reviewed by human moderators to ensure it meets Modrinth's <rules-link>Content Rules</rules-link> and <terms-link>Terms of Use</terms-link>."
+  },
+  "project.moderation.admonition.under-review.body.3": {
+    "message": "You can still modify your project, it won't affect your position in the queue."
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "We aim to review submissions within a week, but some projects may face delays. This does not reflect an issue with your submission."
+  },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>We appreciate your patience while our moderators work hard to keep Modrinth safe, and look forward to helping you share your content! 💚</emphasis>"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "Project under review"
+  },
   "project.moderation.error.unauthorized": {
     "message": "Unauthorized"
   },
@@ -4325,14 +4343,8 @@
   "project.publishing.resubmit.title": {
     "message": "Ready to resubmit"
   },
-  "project.publishing.review.body": {
-    "message": "The content moderation team is reviewing your project. Most reviews take under a week. You can still make changes without losing your place in the queue."
-  },
   "project.publishing.review.summary": {
     "message": "Moderators are reviewing your project. Most reviews take under a week. If anything else needs changing, we’ll message you in the thread."
-  },
-  "project.publishing.review.title": {
-    "message": "Project under review"
   },
   "project.publishing.todo.body": {
     "message": "Complete these items to submit your project for review."
@@ -4688,9 +4700,6 @@
   "project.settings.license.custom-name-invalid": {
     "message": "Custom license names can only contain letters, numbers, periods, and hyphens."
   },
-  "project.settings.license.custom-name-required": {
-    "message": "Enter a name for your custom license."
-  },
   "project.settings.license.custom-type": {
     "message": "Custom license"
   },
@@ -4717,9 +4726,6 @@
   },
   "project.settings.license.link-own-copy": {
     "message": "Use a link to the license instead of the license text below."
-  },
-  "project.settings.license.missing-url": {
-    "message": "Enter a URL to the full text of your custom license."
   },
   "project.settings.license.name": {
     "message": "License name"
