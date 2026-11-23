@@ -306,9 +306,9 @@ const showModules = computed(() => route.query.tab === 'modules')
 const showRules = computed(() => !showRuns.value && !showModules.value)
 const runsView = useTemplateRef<InstanceType<typeof ProjectFlagRuns>>('runsView')
 const tabs = [
-	{ label: 'Rules (staging)', href: '', icon: TagCategoryFlagIcon },
+	{ label: 'Rules', href: '', icon: TagCategoryFlagIcon },
 	{ label: 'Runs', href: 'runs', icon: HistoryIcon },
-	{ label: 'Modules (staging)', href: 'modules', icon: BoxIcon },
+	{ label: 'Modules', href: 'modules', icon: BoxIcon },
 ]
 
 const client = injectModrinthClient()

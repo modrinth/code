@@ -2456,6 +2456,23 @@ export namespace Labrinth {
 
 	export namespace Moderation {
 		export namespace Internal {
+			export type AutoApprovalDiagnostics = {
+				/** Current checks only, not evidence of a successful scan or inference run. */
+				can_auto_approve: boolean
+				eligible_by_checks: boolean
+				in_review: boolean
+				outstanding_technical_review: boolean
+				blockers: (
+					| 'not_in_review'
+					| 'required_nags'
+					| 'project_flags'
+					| 'outstanding_technical_review'
+					| 'unresolved_thread_issues'
+				)[]
+				required_nags: Projects.v3.ProjectNag[]
+				project_flags: { key: string; active: boolean; retain_when_resolved: boolean }[]
+				unresolved_thread_issues: { id: string; status: Threads.v3.ThreadIssueVerdict }[]
+			}
 			export type Ownership =
 				| {
 						kind: 'user'

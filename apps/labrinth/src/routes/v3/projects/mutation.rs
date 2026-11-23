@@ -51,6 +51,41 @@ pub(crate) fn legacy_status(
     }
 }
 
+fn auto_approval_checks_pass(
+    no_required_nags: bool,
+    no_project_flags: bool,
+    no_technical_review: bool,
+    all_issues_resolved: bool,
+) -> bool {
+    no_required_nags
+        && no_project_flags
+        && no_technical_review
+        && all_issues_resolved
+}
+
+#[cfg(test)]
+#[test]
+fn auto_approval_requires_every_check_but_not_any_issues() {
+    for mask in 0_u8..16 {
+        assert_eq!(
+            auto_approval_checks_pass(
+                mask & 1 == 0,
+                mask & 2 == 0,
+                mask & 4 == 0,
+                mask & 8 == 0,
+            ),
+            mask == 0,
+        );
+    }
+    assert!(auto_approval_checks_pass(
+        true,
+        true,
+        true,
+        std::iter::empty::<ThreadIssueVerdict>()
+            .all(|verdict| verdict == ThreadIssueVerdict::Resolved),
+    ));
+}
+
 pub(crate) struct SyncedProjectState {
     data: ProjectQueryResult,
     project: Project,
@@ -58,7 +93,7 @@ pub(crate) struct SyncedProjectState {
     disclosures: Vec<crate::models::disclosures::ProjectDisclosure>,
     team_members: Vec<ThreadIssueTeamMember>,
     thread_issues: Vec<DBThreadIssue>,
-    has_required_nags: bool,
+    required_nags: Vec<crate::validate::project::ProjectNag>,
     has_outstanding_technical_review: bool,
     project_flag_count: i64,
 }
@@ -73,14 +108,14 @@ impl SyncedProjectState {
     }
 
     fn can_auto_approve(&self) -> bool {
-        !self.has_required_nags
-            && self.project_flag_count == 0
-            && !self.has_outstanding_technical_review
-            && !self.thread_issues.is_empty()
-            && self
-                .thread_issues
+        auto_approval_checks_pass(
+            self.required_nags.is_empty(),
+            self.project_flag_count == 0,
+            !self.has_outstanding_technical_review,
+            self.thread_issues
                 .iter()
-                .all(|issue| issue.verdict == ThreadIssueVerdict::Resolved)
+                .all(|issue| issue.verdict == ThreadIssueVerdict::Resolved),
+        )
     }
 
     async fn verify_facets(
@@ -452,7 +487,7 @@ async fn load_project_state_with_options(
         role: member.role,
     })
     .collect::<Vec<_>>();
-    let has_required_nags = validate_project(
+    let required_nags = validate_project(
         project.clone(),
         versions.clone(),
         available_categories,
@@ -461,8 +496,9 @@ async fn load_project_state_with_options(
         redis,
     )
     .await?
-    .iter()
-    .any(|nag| nag.severity == ProjectNagSeverity::Required);
+    .into_iter()
+    .filter(|nag| nag.severity == ProjectNagSeverity::Required)
+    .collect();
 
     let context = ThreadIssueContext {
         project: &project,
@@ -495,9 +531,136 @@ async fn load_project_state_with_options(
         disclosures,
         team_members,
         thread_issues,
-        has_required_nags,
+        required_nags,
         has_outstanding_technical_review,
         project_flag_count,
+    })
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub struct AutoApprovalDiagnostics {
+    /// Current checks only; not evidence of a successful scan, deployed ruleset, or inference run.
+    pub can_auto_approve: bool,
+    pub eligible_by_checks: bool,
+    pub in_review: bool,
+    pub outstanding_technical_review: bool,
+    pub blockers: Vec<AutoApprovalBlocker>,
+    pub required_nags: Vec<crate::validate::project::ProjectNag>,
+    pub project_flags: Vec<AutoApprovalFlag>,
+    pub unresolved_thread_issues: Vec<AutoApprovalIssue>,
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum AutoApprovalBlocker {
+    NotInReview,
+    RequiredNags,
+    ProjectFlags,
+    OutstandingTechnicalReview,
+    UnresolvedThreadIssues,
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub struct AutoApprovalFlag {
+    pub key: String,
+    pub active: bool,
+    pub retain_when_resolved: bool,
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub struct AutoApprovalIssue {
+    pub id: crate::models::ids::ThreadIssueId,
+    pub status: ThreadIssueVerdict,
+}
+
+pub(crate) async fn auto_approval_diagnostics(
+    project_id: DBProjectId,
+    pool: &crate::database::ReadOnlyPgPool,
+    redis: &RedisPool,
+) -> Result<AutoApprovalDiagnostics, ApiError> {
+    let mut transaction = pool
+        .begin()
+        .await
+        .internal_context("starting read-only eligibility transaction")?;
+    sqlx::Executor::execute(
+        &mut transaction,
+        "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY",
+    )
+    .await
+    .internal_context("enforcing read-only eligibility transaction")?;
+    let queued_projects = sqlx::query_scalar!(
+        r#"
+		SELECT project_id AS "project_id!: DBProjectId"
+		FROM delphi_tech_review_queue
+		WHERE project_id = ANY($1::bigint[])
+		"#,
+        &[project_id.0],
+    )
+    .fetch_all(&mut transaction)
+    .await
+    .internal_context("fetching technical review membership")?;
+    let state = load_project_state_with_options(
+        project_id,
+        queued_projects.contains(&project_id),
+        false,
+        &mut transaction,
+        pool,
+        redis,
+    )
+    .await?;
+    let flags = db_models::project_flag_item::DBProjectFlag::get_project_flags_with_executor(
+        project_id, &mut transaction,
+    )
+    .await
+    .internal_context("fetching project flags")?
+    .not_found_context("project not found")?;
+    let eligible_by_checks = state.can_auto_approve();
+    let in_review = state.in_review();
+    let mut blockers = Vec::new();
+    if !in_review {
+        blockers.push(AutoApprovalBlocker::NotInReview);
+    }
+    if !state.required_nags.is_empty() {
+        blockers.push(AutoApprovalBlocker::RequiredNags);
+    }
+    if state.project_flag_count != 0 {
+        blockers.push(AutoApprovalBlocker::ProjectFlags);
+    }
+    if state.has_outstanding_technical_review {
+        blockers.push(AutoApprovalBlocker::OutstandingTechnicalReview);
+    }
+    let unresolved_thread_issues = state
+        .thread_issues
+        .iter()
+        .filter(|issue| issue.verdict != ThreadIssueVerdict::Resolved)
+        .map(|issue| AutoApprovalIssue {
+            id: issue.id.into(),
+            status: issue.verdict,
+        })
+        .collect::<Vec<_>>();
+    if !unresolved_thread_issues.is_empty() {
+        blockers.push(AutoApprovalBlocker::UnresolvedThreadIssues);
+    }
+    transaction
+        .rollback()
+        .await
+        .internal_context("closing read-only eligibility transaction")?;
+    Ok(AutoApprovalDiagnostics {
+        can_auto_approve: in_review && eligible_by_checks,
+        eligible_by_checks,
+        in_review,
+        outstanding_technical_review: state.has_outstanding_technical_review,
+        blockers,
+        required_nags: state.required_nags,
+        project_flags: flags
+            .into_iter()
+            .map(|flag| AutoApprovalFlag {
+                key: flag.flag.key,
+                active: flag.active,
+                retain_when_resolved: flag.flag.retain_when_resolved,
+            })
+            .collect(),
+        unresolved_thread_issues,
     })
 }
 
@@ -855,7 +1018,7 @@ pub(crate) async fn prepare_mutations(
         .is_some_and(|user| !user.scopes.contains(Scopes::MODERATION_WRITE))
     {
         for state in &states {
-            if state.project.in_review && state.has_required_nags {
+            if state.project.in_review && !state.required_nags.is_empty() {
                 return Err(ApiError::Request(anyhow!(
                     "project cannot have required validation nags while in review"
                 )));
@@ -938,7 +1101,7 @@ pub(crate) async fn finalize_project_edit(
         || entered_approved_state)
         && !project_editor
             .is_some_and(|user| user.scopes.contains(Scopes::MODERATION_WRITE))
-        && state.has_required_nags
+        && !state.required_nags.is_empty()
     {
         return Err(ApiError::Request(anyhow!(
             "project must have no required validation nags before or during review or approval"

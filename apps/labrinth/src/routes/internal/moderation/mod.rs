@@ -39,6 +39,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.configure(user_restrictions::config)
         .configure(copyright_archives::config)
         .service(get_projects)
+        .service(get_project_auto_approve)
         .service(get_project_ids)
         .service(get_project_meta)
         .service(set_project_meta)
@@ -61,6 +62,49 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(
             web::scope("/external-license").configure(external_license::config),
         );
+}
+
+/// Explain current automatic approval checks without scanning or changing project state.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    params(("id" = ProjectId, Path)),
+    responses((status = OK, body = crate::routes::v3::projects::mutation::AutoApprovalDiagnostics), (status = NOT_FOUND))
+)]
+#[get("/project-auto-approve/{id}")]
+pub async fn get_project_auto_approve(
+    req: HttpRequest,
+    path: web::Path<String>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<
+    web::Json<crate::routes::v3::projects::mutation::AutoApprovalDiagnostics>,
+    ApiError,
+> {
+    get_user_from_headers(
+        &req,
+        &***ro_pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
+    )
+    .await
+    .auth_context("authenticating moderator")?;
+    let project_id = serde_json::from_value::<ProjectId>(
+        serde_json::Value::String(path.into_inner()),
+    )
+    .ok()
+    .not_found_context("project not found")?;
+    Ok(web::Json(
+        crate::routes::v3::projects::mutation::auto_approval_diagnostics(
+            project_id.into(),
+            &ro_pool,
+            &redis,
+        )
+        .await?,
+    ))
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]

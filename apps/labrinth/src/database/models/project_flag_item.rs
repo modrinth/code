@@ -469,6 +469,13 @@ impl DBProjectFlag {
         project_id: DBProjectId,
         pool: &ReadOnlyPgPool,
     ) -> Result<Option<Vec<PersistedProjectFlag>>> {
+        Self::get_project_flags_with_executor(project_id, &**pool).await
+    }
+
+    pub(crate) async fn get_project_flags_with_executor<'e>(
+        project_id: DBProjectId,
+        executor: impl sqlx::Executor<'e, Database = sqlx::Postgres>,
+    ) -> Result<Option<Vec<PersistedProjectFlag>>> {
         let rows = sqlx::query!(
             r#"
             SELECT CASE WHEN flags.id IS NOT NULL THEN flags.what || jsonb_build_object('active', flags.active) END AS "what?: sqlx::types::Json<PersistedProjectFlag>"
@@ -480,7 +487,7 @@ impl DBProjectFlag {
             "#,
             project_id.0,
         )
-        .fetch_all(&**pool)
+        .fetch_all(executor)
         .await
         .context("fetching project flags")?;
 

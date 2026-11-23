@@ -105,6 +105,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		pats::edit_pat,
 		pats::delete_pat,
 
+        moderation::get_project_auto_approve,
 		moderation::project_flag::module::list_modules,
 		moderation::project_flag::module::get_module,
 		moderation::project_flag::module::create_module,
