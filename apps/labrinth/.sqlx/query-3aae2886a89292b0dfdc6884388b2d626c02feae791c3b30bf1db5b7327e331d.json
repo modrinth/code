@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT projects.id, projects.name AS title, projects.slug, projects.icon_url,\n                results.rule_results AS \"rules: sqlx::types::Json<RuleResults>\",\n                results.num_flags, results.error, results.evaluated_at, results.proposed_review_outcome\n            FROM project_flag_run_results AS results\n            INNER JOIN mods AS projects ON projects.id = results.project_id\n            WHERE results.run_id = $1\n            ORDER BY results.project_id\n            LIMIT $2 OFFSET $3\n            ",
+  "query": "\n            SELECT projects.id, projects.name AS title, projects.slug, projects.icon_url,\n                results.rule_results AS \"rules: sqlx::types::Json<RuleResults>\",\n                results.num_flags, results.error, results.evaluated_at, results.proposed_review_outcome,\n                results.effective_flags AS \"effective_flags: sqlx::types::Json<Vec<PersistedProjectFlag>>\"\n            FROM project_flag_run_results AS results\n            INNER JOIN mods AS projects ON projects.id = results.project_id\n            WHERE results.run_id = $1\n            ORDER BY results.project_id\n            LIMIT $2 OFFSET $3\n            ",
   "describe": {
     "columns": [
       {
@@ -101,6 +101,17 @@
             "name": "proposed_review_outcome"
           }
         }
+      },
+      {
+        "ordinal": 9,
+        "name": "effective_flags: sqlx::types::Json<Vec<PersistedProjectFlag>>",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_flag_run_results",
+            "name": "effective_flags"
+          }
+        }
       }
     ],
     "parameters": {
@@ -119,8 +130,9 @@
       false,
       true,
       false,
-      true
+      true,
+      false
     ]
   },
-  "hash": "06852011e07bd12df921dcda9396781e4b5f09ff81ed68b8514082153ed12a54"
+  "hash": "3aae2886a89292b0dfdc6884388b2d626c02feae791c3b30bf1db5b7327e331d"
 }

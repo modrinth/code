@@ -10,8 +10,8 @@ use crate::{
         models::{
             DBProjectFlagRuleId, DBProjectId, ProjectFlagRunId,
             project_flag_item::{
-                DBProjectFlagRunResult, FlagOutcome, PatternName,
-                ProjectFlagRuleResult, project_flag_ruleset_snapshot,
+                DBProjectFlagRunResult, PatternName, ProjectFlagRuleResult,
+                project_flag_ruleset_snapshot,
             },
         },
     },
@@ -372,42 +372,35 @@ pub(crate) fn determine_project_review_outcome<'a>(
     rules: impl IntoIterator<Item = &'a ProjectFlagRuleResult>,
     has_error: bool,
 ) -> Option<ProjectReviewOutcome> {
-    if !in_review || has_error {
-        return None;
-    }
-    let mut proposed = Some(ProjectReviewOutcome::Approved);
-    for rule in rules {
-        if rule.error.is_some() {
-            return None;
-        }
-        for flag in &rule.flags {
-            match flag.flag_outcome {
-                FlagOutcome::Withheld => {
-                    proposed = Some(ProjectReviewOutcome::Withheld)
-                }
-                FlagOutcome::ManualReview
-                    if proposed != Some(ProjectReviewOutcome::Withheld) =>
-                {
-                    proposed = None;
-                }
-                FlagOutcome::ManualReview => {}
-            }
-        }
-    }
-    proposed
+    use crate::database::models::project_flag_item::{
+        effective_project_flag_outcome, effective_project_flags,
+    };
+    let rules = rules.into_iter().collect::<Vec<_>>();
+    let effective = effective_project_flags(
+        rules.iter().flat_map(|rule| &rule.flags),
+        std::iter::empty(),
+    );
+    effective_project_flag_outcome(
+        in_review,
+        &effective,
+        has_error || rules.iter().any(|rule| rule.error.is_some()),
+    )
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::database::models::project_flag_item::ProjectFlag;
+    use crate::database::models::project_flag_item::{
+        FlagOutcome, ProjectFlag,
+    };
 
     fn rule(outcomes: &[FlagOutcome], error: bool) -> ProjectFlagRuleResult {
         ProjectFlagRuleResult {
             flags: outcomes
                 .iter()
-                .map(|outcome| ProjectFlag {
-                    key: "test".into(),
+                .enumerate()
+                .map(|(index, outcome)| ProjectFlag {
+                    key: format!("test-{index}"),
                     reason: None,
                     flag_outcome: *outcome,
                     retain_when_resolved: false,
@@ -500,6 +493,68 @@ mod tests {
                 expected
             );
         }
+    }
+
+    #[test]
+    fn effective_violations_merge_current_evidence_and_sticky_retention() {
+        use crate::database::models::project_flag_item::{
+            effective_project_flag_outcome, effective_project_flags,
+        };
+        let retained: ProjectFlag = serde_json::from_value(serde_json::json!({
+            "key": "same", "reason": "original", "flag_outcome": "withheld",
+            "retain_when_resolved": true, "evidence": {"file": "original.jar"},
+        }))
+        .unwrap();
+        let mut current = retained.clone();
+        current.reason = Some("current".into());
+        current.flag_outcome = FlagOutcome::ManualReview;
+        current.retain_when_resolved = false;
+        current.value =
+            serde_json::json!({"evidence": {"file": "current.jar"}});
+        let effective =
+            effective_project_flags([&current, &current], [&retained]);
+        assert_eq!(effective.len(), 1);
+        assert!(effective[0].active);
+        assert!(effective[0].flag.retain_when_resolved);
+        assert_eq!(effective[0].flag.reason, current.reason);
+        assert_eq!(effective[0].flag.value, current.value);
+        assert_eq!(
+            effective_project_flag_outcome(true, &effective, false),
+            None
+        );
+        let resolved = effective_project_flags([], [&effective[0].flag]);
+        assert!(!resolved[0].active);
+        assert_eq!(resolved[0].flag.value, current.value);
+        let resolved_original = effective_project_flags([], [&retained]);
+        assert_eq!(resolved_original[0].flag.value, retained.value);
+        assert_eq!(
+            effective_project_flag_outcome(true, &resolved_original, false),
+            Some(ProjectReviewOutcome::Withheld)
+        );
+        assert_eq!(
+            effective_project_flag_outcome(true, &resolved_original, true),
+            None
+        );
+        assert_eq!(
+            effective_project_flag_outcome(false, &resolved_original, false),
+            None
+        );
+        let combined =
+            effective_project_flags([&current], [&retained, &retained]);
+        assert_eq!(combined.len(), 1);
+        let mut other = retained.clone();
+        other.key = "other".into();
+        let combined = effective_project_flags([&current], [&retained, &other]);
+        assert_eq!(
+            effective_project_flag_outcome(true, &combined, false),
+            Some(ProjectReviewOutcome::Withheld)
+        );
+        let expired = effective_project_flags([], [&current]);
+        assert!(expired.is_empty());
+        assert_eq!(
+            effective_project_flag_outcome(true, &expired, false),
+            Some(ProjectReviewOutcome::Approved)
+        );
     }
 
     #[test]

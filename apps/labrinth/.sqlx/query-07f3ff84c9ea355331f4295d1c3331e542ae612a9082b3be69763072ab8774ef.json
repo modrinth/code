@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT ruleset_id FROM project_flag_runs WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "ruleset_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "ruleset_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "07f3ff84c9ea355331f4295d1c3331e542ae612a9082b3be69763072ab8774ef"
+}

@@ -6,7 +6,8 @@ ALTER TABLE project_flag_run_results
 
 ALTER TABLE project_flag_run_results
     ADD COLUMN num_flags BIGINT NOT NULL CHECK (num_flags >= 0),
-    ADD COLUMN proposed_review_outcome TEXT;
+    ADD COLUMN proposed_review_outcome TEXT,
+    ADD COLUMN effective_flags JSONB NOT NULL DEFAULT '[]'::jsonb;
 
 -- reusable modules for rule scripts
 

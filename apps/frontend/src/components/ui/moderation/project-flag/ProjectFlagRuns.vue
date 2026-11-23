@@ -295,22 +295,22 @@
 								Preview: {{ formatProposedReviewOutcome(row.proposed_review_outcome) }}
 							</p>
 							<p v-if="row.num_flags === 0" class="m-0 text-secondary">No flags found.</p>
-														<p
-															v-if="row.num_flags > new Set(row.flags.map((entry) => entry.flag.key)).size"
-															class="m-0 text-secondary"
-														>
-															Resolved · Retained violations are included in this count. They are no longer
-															current but are retained by their rules and block automatic approval.
-														</p>
+							<p v-if="row.flags.some((entry) => !entry.flag.active)" class="m-0 text-secondary">
+								Resolved retained violations preserve their original evidence and still affect the
+								outcome.
+							</p>
 							<article
 								v-for="entry in row.flags"
-								:key="`${entry.ruleId}:${entry.index}`"
+								:key="entry.flag.key"
 								class="flex min-w-0 flex-col gap-2 rounded-lg bg-surface-3 p-3"
 							>
 								<div class="flex flex-wrap items-center justify-between gap-2">
 									<h3 class="m-0 break-all text-base font-semibold text-contrast">
 										{{ entry.flag.key }}
 									</h3>
+									<span class="text-sm font-semibold text-contrast">
+										{{ entry.flag.active ? 'Current' : 'Resolved · Retained' }}
+									</span>
 									<span class="break-all text-sm text-secondary">{{ entry.ruleName }}</span>
 								</div>
 								<div
@@ -560,14 +560,14 @@ const resultRows = computed(
 					return rule ? `${rule.name ?? 'Deleted rule'} (${ruleId}): ` : prefix
 				}) ?? null,
 			projectId: result.project.id,
-			flags: Object.entries(result.rules).flatMap(([ruleId, rule]) =>
-				rule.flags.map((flag, index) => ({
-					ruleId,
-					ruleName: rule.name ?? 'Deleted rule',
-					flag,
-					index,
-				})),
-			),
+			flags: result.effective_flags.map((flag) => ({
+				flag,
+				ruleName: flag.active
+					? (Object.values(result.rules).find((rule) =>
+							rule.flags.some((current) => current.key === flag.key),
+						)?.name ?? 'Deleted rule')
+					: 'Retained evidence',
+			})),
 			diagnostics: Object.entries(result.rules)
 				.filter(([, rule]) => rule.error !== null || rule.log.length > 0)
 				.map(([ruleId, rule]) => ({ ruleId, rule })),

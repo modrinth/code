@@ -452,6 +452,50 @@ pub async fn list_runs(
     ))
 }
 
+async fn initialized_run(
+    id: ProjectFlagRunId,
+    pool: &PgPool,
+) -> Result<Option<DBProjectFlagRun>, ApiError> {
+    use crate::database::models::DBUserId;
+    use crate::database::models::project_flag_item::{
+        ProjectFlagRunOutput, ProjectFlagRunStatus, ProjectFlagRunUser,
+    };
+    let row = sqlx::query!(r#"
+        SELECT runs.id, runs.ruleset_id, runs.status AS "status: ProjectFlagRunStatus", runs.total_projects,
+            starter.id AS "started_by_id?", starter.username AS "started_by_username?",
+            applier.id AS "applied_by_id?", applier.username AS "applied_by_username?",
+            runs.started_at, runs.completed_at, runs.applied_at,
+            runs.output AS "output: sqlx::types::Json<ProjectFlagRunOutput>", runs.error
+        FROM project_flag_runs AS runs
+        LEFT JOIN users AS starter ON starter.id = runs.started_by
+        LEFT JOIN users AS applier ON applier.id = runs.applied_by
+        WHERE runs.id = $1 AND runs.ruleset_id IS NOT NULL
+    "#, id.0).fetch_optional(pool).await.internal_context("fetching initialized project flag run")?;
+    Ok(row.map(|row| DBProjectFlagRun {
+        id: ProjectFlagRunId(row.id),
+        ruleset_id: row.ruleset_id,
+        status: row.status,
+        total_projects: row.total_projects,
+        started_by: row.started_by_id.zip(row.started_by_username).map(
+            |(id, username)| ProjectFlagRunUser {
+                id: DBUserId(id).into(),
+                username,
+            },
+        ),
+        started_at: row.started_at,
+        completed_at: row.completed_at,
+        applied_at: row.applied_at,
+        applied_by: row.applied_by_id.zip(row.applied_by_username).map(
+            |(id, username)| ProjectFlagRunUser {
+                id: DBUserId(id).into(),
+                username,
+            },
+        ),
+        output: row.output.map(|output| output.0),
+        error: row.error,
+    }))
+}
+
 #[utoipa::path(
     context_path = "/moderation/project-flag",
     tag = "moderation",
@@ -479,19 +523,42 @@ pub async fn start_run(
     let project_ids = DBProjectFlagRun::queued_project_ids(&pool)
         .await
         .internal_context("fetching queued project IDs")?;
-    let input =
-        run::RunInput::new(ProjectFlagRunId(uuid::Uuid::now_v7()), project_ids);
+    let input = run::RunInput::new(
+        ProjectFlagRunId(uuid::Uuid::now_v7()),
+        project_ids,
+        user.user.id.into(),
+    );
 
     let response_pool = pool.clone();
     let run = tokio::spawn(async move {
-        let run = DBProjectFlagRun::create(
-            input.id, user.user.id.into(), input.projects.len(), &pool,
-        ).await.internal_context("creating project flag run")?;
-        tokio::time::timeout(std::time::Duration::from_secs(30), run::start(&temporal, input))
-            .await
-            .internal_context(format!("timed out confirming project flag run {}; check Temporal workflow {} before starting another run", run.id.0, run::workflow_id(run.id)))?
-            .internal_context(format!("starting project flag run {}; check Temporal workflow {} before starting another run", run.id.0, run::workflow_id(run.id)))?;
-        Ok::<_, ApiError>(run)
+        let id = input.id;
+        let workflow_id = run::workflow_id(id);
+        let start_result = tokio::time::timeout(
+            std::time::Duration::from_secs(10), run::start(&temporal, input),
+        ).await;
+        let initialized = tokio::time::timeout(std::time::Duration::from_secs(20), async {
+            loop {
+                if let Some(run) = initialized_run(id, &pool).await.internal_context(
+                    format!("confirming initialization of project flag run {}; check Temporal workflow `{workflow_id}` before starting another run", id.0),
+                )? {
+                    return Ok::<_, ApiError>(run);
+                }
+                tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+            }
+        }).await;
+        match initialized {
+            Ok(result) => result,
+            Err(_) => {
+                let detail = match start_result {
+                    Ok(Ok(())) => "temporal accepted the start".to_owned(),
+                    Ok(Err(error)) => format!("temporal start returned {error:#}"),
+                    Err(_) => "temporal start confirmation timed out".to_owned(),
+                };
+                Err(ApiError::Internal(anyhow!(
+                    "project flag run {} initialization was not confirmed; {detail}; check Temporal workflow `{workflow_id}` before starting another run", id.0,
+                )))
+            }
+        }
     }).await.internal_context("joining project flag run start")??;
     let mut responses =
         ProjectFlagRunResponse::from_runs(vec![run], &response_pool)

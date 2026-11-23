@@ -406,6 +406,64 @@ pub struct PersistedProjectFlag {
     pub active: bool,
 }
 
+/// Combines current emissions with retained evidence, keyed by violation identity.
+/// Current evidence wins; retention remains sticky across re-emissions.
+pub(crate) fn effective_project_flags<'a>(
+    current: impl IntoIterator<Item = &'a ProjectFlag>,
+    persisted: impl IntoIterator<Item = &'a ProjectFlag>,
+) -> Vec<PersistedProjectFlag> {
+    let mut effective = BTreeMap::new();
+    for flag in persisted {
+        if flag.retain_when_resolved {
+            effective.insert(
+                flag.key.clone(),
+                PersistedProjectFlag {
+                    flag: flag.clone(),
+                    active: false,
+                },
+            );
+        }
+    }
+    for flag in current {
+        let retained = effective
+            .get(&flag.key)
+            .is_some_and(|previous| previous.flag.retain_when_resolved);
+        let mut flag = flag.clone();
+        flag.retain_when_resolved |= retained;
+        effective.insert(
+            flag.key.clone(),
+            PersistedProjectFlag { flag, active: true },
+        );
+    }
+    effective.into_values().collect()
+}
+
+/// Approval application must still pass the existing project eligibility gates.
+pub(crate) fn effective_project_flag_outcome<'a>(
+    in_review: bool,
+    flags: impl IntoIterator<Item = &'a PersistedProjectFlag>,
+    has_error: bool,
+) -> Option<ProjectReviewOutcome> {
+    if !in_review || has_error {
+        return None;
+    }
+    let mut outcome = Some(ProjectReviewOutcome::Approved);
+    for flag in flags {
+        match flag.flag.flag_outcome {
+            FlagOutcome::Withheld => {
+                outcome = Some(ProjectReviewOutcome::Withheld)
+            }
+            FlagOutcome::ManualReview
+                if outcome != Some(ProjectReviewOutcome::Withheld) =>
+            {
+                outcome = None
+            }
+            FlagOutcome::ManualReview => {}
+        }
+    }
+    outcome
+}
+
 impl DBProjectFlag {
     pub async fn get_project_flags(
         project_id: DBProjectId,
@@ -458,6 +516,8 @@ pub struct ProjectFlagRunResult {
     /// Proposed review outcome at evaluation time; null for manual review, errors, projects not in review, or legacy results.
     pub proposed_review_outcome: Option<ProjectReviewOutcome>,
     pub rules: BTreeMap<String, ProjectFlagRunRuleResult>,
+    /// Effective violations at evaluation time, including resolved retained evidence.
+    pub effective_flags: Vec<PersistedProjectFlag>,
     pub num_flags: i64,
     pub error: Option<String>,
     pub evaluated_at: DateTime<Utc>,
@@ -545,7 +605,8 @@ impl DBProjectFlagRunResult {
             r#"
             SELECT projects.id, projects.name AS title, projects.slug, projects.icon_url,
                 results.rule_results AS "rules: sqlx::types::Json<RuleResults>",
-                results.num_flags, results.error, results.evaluated_at, results.proposed_review_outcome
+                results.num_flags, results.error, results.evaluated_at, results.proposed_review_outcome,
+                results.effective_flags AS "effective_flags: sqlx::types::Json<Vec<PersistedProjectFlag>>"
             FROM project_flag_run_results AS results
             INNER JOIN mods AS projects ON projects.id = results.project_id
             WHERE results.run_id = $1
@@ -599,6 +660,7 @@ impl DBProjectFlagRunResult {
                     proposed_review_outcome: row.proposed_review_outcome.map(
                         |outcome| ProjectReviewOutcome::from_string(&outcome),
                     ),
+                    effective_flags: row.effective_flags.0,
                     num_flags: row.num_flags,
                     error: row.error,
                     evaluated_at: row.evaluated_at,
@@ -627,6 +689,7 @@ impl DBProjectFlagRunResult {
             id: uuid::Uuid,
             #[serde(flatten)]
             result: DBProjectFlagRunResult,
+            effective_flags: Vec<PersistedProjectFlag>,
         }
 
         let mut run_results = std::collections::HashMap::new();
@@ -659,6 +722,7 @@ impl DBProjectFlagRunResult {
                 .map(|result| ResultPayload {
                     id: uuid::Uuid::now_v7(),
                     result,
+                    effective_flags: Vec::new(),
                 });
         let mut transaction = pool
             .begin()
@@ -677,9 +741,9 @@ impl DBProjectFlagRunResult {
         .fetch_all(&mut transaction)
         .await
         .context("locking project flag runs")?;
-        let surviving_projects = sqlx::query_scalar!(
+        let surviving_projects = sqlx::query!(
             r#"
-            SELECT id FROM mods
+            SELECT id, in_review FROM mods
             WHERE id = ANY($1)
             ORDER BY id
             FOR UPDATE
@@ -689,11 +753,41 @@ impl DBProjectFlagRunResult {
         .fetch_all(&mut transaction)
         .await
         .context("locking projects for project flag results")?;
+        let retained = sqlx::query!(
+            r#"SELECT project_id, what AS "what!: sqlx::types::Json<ProjectFlag>"
+            FROM project_flags
+            WHERE project_id = ANY($1) AND (what->>'retain_when_resolved')::bool = TRUE
+            ORDER BY project_id, what->>'key', id"#,
+            &project_ids,
+        ).fetch_all(&mut transaction).await.context("loading retained project flag evidence")?;
+        let mut retained_by_project: HashMap<i64, Vec<ProjectFlag>> =
+            HashMap::new();
+        for row in retained {
+            retained_by_project
+                .entry(row.project_id)
+                .or_default()
+                .push(row.what.0);
+        }
         let results = results
-            .filter(|payload| {
-                surviving_projects
-                    .binary_search(&payload.result.project_id.0)
-                    .is_ok()
+            .filter_map(|mut payload| {
+                let index = surviving_projects
+                    .binary_search_by_key(
+                        &payload.result.project_id.0,
+                        |project| project.id,
+                    )
+                    .ok()?;
+                let project = &surviving_projects[index];
+                payload.effective_flags = effective_project_flags(
+                    payload.result.rules.values().flat_map(|rule| &rule.flags),
+                    retained_by_project.get(&project.id).into_iter().flatten(),
+                );
+                payload.result.proposed_review_outcome =
+                    effective_project_flag_outcome(
+                        project.in_review,
+                        &payload.effective_flags,
+                        payload.result.error.is_some(),
+                    );
+                Some(payload)
             })
             .collect::<Vec<_>>();
         let results = serde_json::to_value(results)
@@ -701,31 +795,13 @@ impl DBProjectFlagRunResult {
         sqlx::query!(
             r#"
             INSERT INTO project_flag_run_results
-                (id, run_id, project_id, rule_results, num_flags, error, proposed_review_outcome)
+                (id, run_id, project_id, rule_results, num_flags, error, proposed_review_outcome, effective_flags)
             SELECT results.id, results.run_id, results.project_id, results.rule_results,
-                (SELECT COUNT(DISTINCT flag->>'key') FROM (
-                    SELECT flag FROM jsonb_each(results.rule_results) AS rule,
-                        LATERAL jsonb_array_elements(rule.value->'flags') AS flag
-                    UNION ALL
-                    SELECT what FROM project_flags
-                    WHERE project_id = results.project_id
-                        AND (what->>'retain_when_resolved')::bool = TRUE
-                ) AS effective_flags),
-                results.error, CASE
-                    WHEN results.proposed_review_outcome = 'approved' AND EXISTS (
-                        SELECT 1 FROM project_flags AS retained
-                        WHERE retained.project_id = results.project_id
-                            AND (retained.what->>'retain_when_resolved')::bool = TRUE
-                            AND NOT EXISTS (
-                                SELECT 1 FROM jsonb_each(results.rule_results) AS rule,
-                                    LATERAL jsonb_array_elements(rule.value->'flags') AS flag
-                                WHERE flag->>'key' = retained.what->>'key'
-                            )
-                    ) THEN NULL
-                    ELSE results.proposed_review_outcome END
+                jsonb_array_length(results.effective_flags)::BIGINT,
+                results.error, results.proposed_review_outcome, results.effective_flags
             FROM jsonb_to_recordset($1) AS results(
                 id UUID, run_id UUID, project_id BIGINT, rule_results JSONB, error TEXT,
-                proposed_review_outcome TEXT
+                proposed_review_outcome TEXT, effective_flags JSONB
             )
             LEFT JOIN project_flag_runs AS runs ON runs.id = results.run_id
             WHERE results.run_id IS NULL OR runs.status = 'running'

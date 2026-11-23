@@ -635,6 +635,29 @@ pub(crate) async fn apply_project_flag_reconciliation(
         &(&context.project, &context.versions),
     )?;
 
+    let persisted = sqlx::query!(
+        r#"SELECT what AS "what!: sqlx::types::Json<ProjectFlag>"
+        FROM project_flags
+        WHERE project_id = $1 AND (active OR (what->>'retain_when_resolved')::bool = TRUE)
+        ORDER BY what->>'key', id"#,
+        project_id.0,
+    )
+    .fetch_all(&mut transaction)
+    .await
+    .internal_context("loading reconciled project violations")?;
+    let effective = db_models::project_flag_item::effective_project_flags(
+        result.rules.values().flat_map(|rule| &rule.flags),
+        persisted.iter().map(|row| &row.what.0),
+    );
+    let flags = effective
+        .iter()
+        .filter(|flag| flag.active)
+        .map(|flag| {
+            serde_json::to_value(&flag.flag)
+                .map(|what| (flag.flag.key.clone(), what))
+        })
+        .collect::<Result<BTreeMap<_, _>, _>>()
+        .internal_context("serializing effective project flags")?;
     let mut changed = sqlx::query!(
         r#"UPDATE project_flags SET active = FALSE WHERE project_id = $1 AND active AND NOT ((what->>'key') = ANY($2::text[]))"#,
         project_id.0, &flags.keys().cloned().collect::<Vec<_>>(),
@@ -654,24 +677,11 @@ pub(crate) async fn apply_project_flag_reconciliation(
         ).execute(&mut transaction).await
             .internal_context("upserting reconciled project flag")?.rows_affected() > 0;
     }
-    let persisted = sqlx::query!(
-        r#"SELECT what AS "what!: sqlx::types::Json<ProjectFlag>"
-        FROM project_flags
-        WHERE project_id = $1 AND (active OR (what->>'retain_when_resolved')::bool = TRUE)
-        ORDER BY what->>'key', id"#,
-        project_id.0,
-    )
-    .fetch_all(&mut transaction)
-    .await
-    .internal_context("loading reconciled project violations")?;
-    state.project_flag_count = persisted.len() as i64;
-    let effective_rule = db_models::project_flag_item::ProjectFlagRuleResult {
-        flags: persisted.into_iter().map(|row| row.what.0).collect(),
-        log: Vec::new(),
-        error: None,
-    };
-    let desired = crate::workflow::project_flag::run_rules::determine_project_review_outcome(
-        state.in_review(), [&effective_rule], false,
+    state.project_flag_count = effective.len() as i64;
+    let desired = db_models::project_flag_item::effective_project_flag_outcome(
+        state.in_review(),
+        &effective,
+        false,
     );
     let outcome = desired.filter(|outcome| {
         *outcome != ProjectReviewOutcome::Approved || state.can_auto_approve()
@@ -680,7 +690,7 @@ pub(crate) async fn apply_project_flag_reconciliation(
         outcome.filter(|outcome| *outcome != state.review_outcome())
     {
         sqlx::query!(
-            r#"UPDATE mods SET review_outcome = $1 WHERE id = $2"#,
+            r#"UPDATE mods SET review_outcome = $1, in_review = FALSE WHERE id = $2"#,
             outcome.as_str(),
             project_id.0,
         )
@@ -708,8 +718,21 @@ pub(crate) async fn apply_project_flag_reconciliation(
         )
         .await
         .internal_context("recording project flag review outcome history")?;
+        db_models::DBProject::record_history(
+            project_id,
+            None,
+            ProjectDelta::ChangeInReview {
+                from: true,
+                to: false,
+            },
+            &mut transaction,
+        )
+        .await
+        .internal_context("recording project flag review completion history")?;
         state.project.review_outcome = outcome;
+        state.project.in_review = false;
         state.data.inner.review_outcome = outcome;
+        state.data.inner.in_review = false;
         changed = true;
     }
     if !changed {
@@ -992,6 +1015,114 @@ mod tests {
     use crate::models::ids::ThreadIssueId;
     use ariadne::ids::UserId;
     use serde_json::json;
+
+    #[actix_rt::test]
+    async fn reconciliation_completes_only_changed_review_outcomes() {
+        use crate::database::models::project_flag_item::{
+            DBProjectFlagRunResult, ProjectFlag, ProjectFlagRuleResult,
+        };
+        use crate::database::models::thread_issue_item::ThreadIssueBuilder;
+        use crate::models::thread_issues::ThreadIssueTarget;
+        use crate::queue::moderation::project_flag::{
+            FlagContext, FlagModerationThread, FlagTeam,
+        };
+        use crate::test::{
+            api_v3::ApiV3,
+            environment::{TestEnvironment, with_test_environment},
+        };
+        use std::collections::BTreeMap;
+
+        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+            let project_id = DBProjectId::from(env.dummy.project_alpha.project_id_parsed);
+            let ruleset_id = uuid::Uuid::new_v4();
+            sqlx::query!(
+                r#"INSERT INTO project_flag_rulesets (id, content_hash, rules, modules) VALUES ($1, $2, '[]'::jsonb, '[]'::jsonb)"#,
+                ruleset_id, ruleset_id.to_string(),
+            ).execute(&*env.db.pool).await.unwrap();
+            sqlx::query!(
+                r#"INSERT INTO project_flags_deployed (singleton, ruleset_id) VALUES (TRUE, $1)
+                ON CONFLICT (singleton) DO UPDATE SET ruleset_id = EXCLUDED.ruleset_id"#,
+                ruleset_id,
+            ).execute(&*env.db.pool).await.unwrap();
+            let files = sqlx::query!(
+                r#"SELECT f.id, f.version_id, f.filename, f.url, f.size FROM files f INNER JOIN versions v ON v.id = f.version_id WHERE v.mod_id = $1 ORDER BY f.id FOR SHARE OF f"#,
+                project_id.0,
+            ).fetch_all(&*env.db.pool).await.unwrap();
+            let manifest = files.into_iter().map(|file| (file.id, file.version_id, file.filename, file.url, i64::from(file.size))).collect::<Vec<_>>();
+            let manifest_hash = crate::workflow::project_flag::scan_cache::rules_input_hash(&manifest).unwrap();
+
+            for (initial, flag, expected, exits_review) in [
+                (ProjectReviewOutcome::NeverReviewed, None, ProjectReviewOutcome::Approved, true),
+                (ProjectReviewOutcome::Approved, Some("withheld"), ProjectReviewOutcome::Withheld, true),
+                (ProjectReviewOutcome::Withheld, Some("withheld"), ProjectReviewOutcome::Withheld, false),
+                (ProjectReviewOutcome::NeverReviewed, Some("manual_review"), ProjectReviewOutcome::NeverReviewed, false),
+            ] {
+                sqlx::query!(r#"UPDATE mods SET review_outcome = $1, in_review = TRUE WHERE id = $2"#, initial.as_str(), project_id.0)
+                    .execute(&*env.db.pool).await.unwrap();
+                let mut transaction = env.db.pool.begin().await.unwrap();
+                let mut state = load_project_state_with_options(project_id, false, false, &mut transaction, &env.db.pool, &env.db.redis_pool).await.unwrap();
+                if state.thread_issues.is_empty() {
+                    DBThreadIssue::insert_many(state.data.thread_id, db_models::DBUserId(crate::test::database::MOD_USER_ID_PARSED), vec![ThreadIssueBuilder {
+                        facets: vec![ThreadIssueTarget::RemoveIcon], why: json!({}),
+                    }], &mut transaction).await.unwrap();
+                }
+                let issues = DBThreadIssue::get_many_for_threads(&[state.data.thread_id], &mut transaction).await.unwrap();
+                for facet in issues.iter().flat_map(|issue| &issue.facets) {
+                    DBThreadIssue::update_facet_flags(facet.id.into(), Some(true), Some(true), &mut transaction).await.unwrap();
+                }
+                state = load_project_state_with_options(project_id, false, false, &mut transaction, &env.db.pool, &env.db.redis_pool).await.unwrap();
+                if flag.is_none() {
+                    assert!(state.can_auto_approve(), "fixture must be eligible for approval");
+                }
+                transaction.commit().await.unwrap();
+                db_models::DBProject::clear_cache(project_id, state.data.inner.slug.clone(), Some(true), &env.db.redis_pool).await.unwrap();
+                let cached = db_models::DBProject::get_id(project_id, &*env.db.ro_pool, &env.db.redis_pool).await.unwrap().unwrap();
+                assert!(cached.inner.in_review);
+                crate::queue::moderation::project_flag::sort_versions_newest_first(&mut state.versions);
+                let context = FlagContext {
+                    ai: crate::queue::moderation::project_flag::FlagAiContext::default(), project: state.project,
+                    team: FlagTeam { id: state.data.inner.team_id.into(), members: vec![] },
+                    users: vec![], organization: None, scanned_files: vec![],
+                    versions: state.versions, disclosures: vec![], attributions: vec![],
+                    moderation_thread: FlagModerationThread { id: state.data.thread_id.into(), messages: vec![] },
+                };
+                let history_before = db_models::DBProject::get_history(project_id, &env.db.ro_pool).await.unwrap().len();
+                let mut rules = BTreeMap::new();
+                if let Some(outcome) = flag {
+                    let flag: ProjectFlag = serde_json::from_value(json!({
+                        "key": "retained-review", "flag_outcome": outcome, "retain_when_resolved": true,
+                    })).unwrap();
+                    rules.insert("test".into(), ProjectFlagRuleResult { flags: vec![flag], log: vec![], error: None });
+                }
+                let result = DBProjectFlagRunResult { run_id: None, project_id, rules, error: None, proposed_review_outcome: None };
+                apply_project_flag_reconciliation(&context, &result, ruleset_id, manifest_hash, &env.db.pool, &env.db.redis_pool).await.unwrap();
+                let updated = db_models::DBProject::get_id(project_id, &*env.db.ro_pool, &env.db.redis_pool).await.unwrap().unwrap();
+                assert_eq!(updated.inner.review_outcome, expected);
+                assert_eq!(updated.inner.in_review, !exits_review);
+                let project = Project::from(updated);
+                assert_eq!(project.review_outcome, expected);
+                assert_eq!(project.in_review, !exits_review);
+                assert_eq!(serde_json::to_value(crate::models::v2::projects::ProjectStatus::from_project(&project)).unwrap(), json!(if !exits_review { "processing" } else if expected == ProjectReviewOutcome::Approved { "approved" } else { "withheld" }));
+                let history = db_models::DBProject::get_history(project_id, &env.db.ro_pool).await.unwrap();
+                let added = &history[history_before..];
+                assert_eq!(added.len(), if exits_review { 2 } else { 0 });
+                if exits_review {
+                    assert!(added.iter().any(|entry| matches!(entry.delta, ProjectDelta::ChangeReviewOutcome { from, to, .. } if from == initial && to == expected)));
+                    assert!(added.iter().any(|entry| matches!(entry.delta, ProjectDelta::ChangeInReview { from: true, to: false })));
+                }
+                if flag == Some("manual_review") {
+                    let mut context = context.clone();
+                    context.project = project;
+                    let result = DBProjectFlagRunResult { rules: BTreeMap::new(), ..result };
+                    apply_project_flag_reconciliation(&context, &result, ruleset_id, manifest_hash, &env.db.pool, &env.db.redis_pool).await.unwrap();
+                    let retained = db_models::DBProject::get_id(project_id, &*env.db.ro_pool, &env.db.redis_pool).await.unwrap().unwrap();
+                    assert!(retained.inner.in_review);
+                    assert_eq!(retained.inner.review_outcome, initial);
+                    assert_eq!(db_models::DBProject::get_history(project_id, &env.db.ro_pool).await.unwrap().len(), history.len());
+                }
+            }
+        }).await;
+    }
 
     #[test]
     fn reconciliation_source_comparison_rejects_stale_project_and_versions() {

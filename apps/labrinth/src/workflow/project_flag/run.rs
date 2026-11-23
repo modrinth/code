@@ -21,7 +21,8 @@ use crate::{
     database::{
         PgPool,
         models::{
-            DBProjectId, ProjectFlagRunId, project_flag_item::DBProjectFlagRule,
+            DBProjectId, DBUserId, ProjectFlagRunId,
+            project_flag_item::DBProjectFlagRule,
         },
     },
     queue::moderation::project_flag::ProjectFlagEngine,
@@ -156,6 +157,21 @@ impl ProjectFlagRunWorkflow {
         ctx: &mut WorkflowContext<Self>,
         mut input: RunInput,
     ) -> WorkflowResult<()> {
+        if !input.initialized {
+            ctx.execute_activity(
+                RunActivities::initialize,
+                InitializationInput {
+                    id: input.id,
+                    started_by: input.started_by,
+                    total_projects: input.projects.len(),
+                },
+                ActivityOptions::start_to_close_timeout(Duration::from_secs(
+                    60,
+                )),
+            )
+            .await?;
+            input.initialized = true;
+        }
         for _ in 0..BATCHES_PER_EXECUTION {
             let end = (input.offset + BATCH_SIZE).min(input.projects.len());
             let projects = input.projects[input.offset..end].to_vec();
@@ -193,16 +209,24 @@ impl ProjectFlagRunWorkflow {
 pub struct RunInput {
     pub id: ProjectFlagRunId,
     pub projects: Vec<DBProjectId>,
+    pub started_by: DBUserId,
+    pub initialized: bool,
     pub offset: usize,
 }
 
 impl RunInput {
-    pub fn new(id: ProjectFlagRunId, mut projects: Vec<DBProjectId>) -> Self {
+    pub fn new(
+        id: ProjectFlagRunId,
+        mut projects: Vec<DBProjectId>,
+        started_by: DBUserId,
+    ) -> Self {
         projects.sort_unstable_by_key(|id| id.0);
         projects.dedup_by_key(|id| id.0);
         Self {
             id,
             projects,
+            started_by,
+            initialized: false,
             offset: 0,
         }
     }
@@ -222,6 +246,7 @@ mod run_input_tests {
         let input = RunInput::new(
             ProjectFlagRunId(uuid::Uuid::now_v7()),
             vec![DBProjectId(3), DBProjectId(1), DBProjectId(3)],
+            DBUserId(42),
         );
         let restored: RunInput =
             serde_json::from_slice(&serde_json::to_vec(&input).unwrap())
@@ -229,6 +254,62 @@ mod run_input_tests {
         assert_eq!(restored.id, input.id);
         assert_eq!(restored.projects, vec![DBProjectId(1), DBProjectId(3)]);
         assert_eq!(restored.offset, 0);
+        assert_eq!(restored.started_by, DBUserId(42));
+        assert!(!restored.initialized);
+    }
+
+    #[actix_rt::test]
+    async fn concurrent_initialization_and_retries_preserve_frozen_run() {
+        use crate::test::{
+            api_v3::ApiV3,
+            environment::{TestEnvironment, with_test_environment},
+        };
+        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+            let user = sqlx::query_scalar!(r#"SELECT id FROM users ORDER BY id LIMIT 1"#)
+                .fetch_one(&env.db.pool).await.unwrap();
+            let input = InitializationInput {
+                id: ProjectFlagRunId(uuid::Uuid::now_v7()),
+                started_by: DBUserId(user),
+                total_projects: 3,
+            };
+            let (first, retry) = tokio::join!(
+                initialize_run(&env.db.pool, input.clone()),
+                initialize_run(&env.db.pool, input.clone()),
+            );
+            first.unwrap();
+            retry.unwrap();
+            let ruleset = sqlx::query_scalar!(r#"SELECT ruleset_id FROM project_flag_runs WHERE id = $1"#, input.id.0)
+                .fetch_one(&env.db.pool).await.unwrap().unwrap();
+            sqlx::query!(r#"INSERT INTO project_flag_modules (name, script) VALUES ($1, $2)"#,
+                format!("retry-test-{}", input.id.0), "fn changed() { [] }")
+                .execute(&env.db.pool).await.unwrap();
+            let frozen_count = sqlx::query_scalar!(r#"SELECT COUNT(*) FROM project_flag_rulesets"#)
+                .fetch_one(&env.db.pool).await.unwrap();
+            initialize_run(&env.db.pool, input.clone()).await.unwrap();
+            assert_eq!(sqlx::query_scalar!(r#"SELECT COUNT(*) FROM project_flag_rulesets"#)
+                .fetch_one(&env.db.pool).await.unwrap(), frozen_count);
+            let retained = sqlx::query_scalar!(r#"SELECT ruleset_id FROM project_flag_runs WHERE id = $1"#, input.id.0)
+                .fetch_one(&env.db.pool).await.unwrap();
+            assert_eq!(retained, Some(ruleset));
+            let mut mismatched = input;
+            mismatched.total_projects += 1;
+            assert!(initialize_run(&env.db.pool, mismatched).await.is_err());
+        }).await;
+    }
+
+    #[test]
+    fn initialization_retries_require_same_user_total_and_frozen_ruleset() {
+        let input = InitializationInput {
+            id: ProjectFlagRunId(uuid::Uuid::now_v7()),
+            started_by: DBUserId(42),
+            total_projects: 3,
+        };
+        let ruleset = Some(uuid::Uuid::now_v7());
+        assert!(verify_initialization(&input, Some(42), 3, ruleset).is_ok());
+        assert!(verify_initialization(&input, Some(43), 3, ruleset).is_err());
+        assert!(verify_initialization(&input, None, 3, ruleset).is_err());
+        assert!(verify_initialization(&input, Some(42), 4, ruleset).is_err());
+        assert!(verify_initialization(&input, Some(42), 3, None).is_err());
     }
 
     #[test]
@@ -238,7 +319,9 @@ mod run_input_tests {
             (0..(BATCH_SIZE * BATCHES_PER_EXECUTION + 1))
                 .map(|id| DBProjectId(id as i64))
                 .collect(),
+            DBUserId(42),
         );
+        input.initialized = true;
         input.offset = BATCH_SIZE * BATCHES_PER_EXECUTION;
         input.discard_completed_projects();
         assert_eq!(
@@ -246,6 +329,8 @@ mod run_input_tests {
             vec![DBProjectId((BATCH_SIZE * BATCHES_PER_EXECUTION) as i64,)]
         );
         assert_eq!(input.offset, 0);
+        assert!(input.initialized);
+        assert_eq!(input.started_by, DBUserId(42));
         input.offset = 1;
         input.discard_completed_projects();
         assert!(input.projects.is_empty());
@@ -258,6 +343,13 @@ pub struct BatchInput {
     pub projects: Vec<DBProjectId>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InitializationInput {
+    pub id: ProjectFlagRunId,
+    pub started_by: DBUserId,
+    pub total_projects: usize,
+}
+
 pub struct RunActivities {
     pub pool: PgPool,
     pub engine: ProjectFlagEngine,
@@ -265,6 +357,17 @@ pub struct RunActivities {
 
 #[activities]
 impl RunActivities {
+    #[activity]
+    pub async fn initialize(
+        self: Arc<Self>,
+        _ctx: ActivityContext,
+        input: InitializationInput,
+    ) -> Result<(), ActivityError> {
+        initialize_run(&self.pool, input)
+            .await
+            .map_err(|error| ActivityError::from(anyhow!("{error:#}")))
+    }
+
     #[activity]
     pub async fn finalize(
         self: Arc<Self>,
@@ -289,6 +392,99 @@ impl RunActivities {
             .await
             .map_err(|error| ActivityError::from(anyhow::anyhow!("{error:#}")))
     }
+}
+
+async fn initialize_run(
+    pool: &PgPool,
+    input: InitializationInput,
+) -> Result<()> {
+    let total = i64::try_from(input.total_projects)
+        .context("counting project flag run jobs")?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .context("starting project flag run initialization")?;
+    // A missing row cannot be row-locked; serialize retries before reading staging content.
+    sqlx::query!(
+        r#"SELECT pg_advisory_xact_lock(hashtextextended($1, 0))"#,
+        workflow_id(input.id)
+    )
+    .execute(&mut transaction)
+    .await
+    .context("locking project flag run initialization")?;
+    let existing = sqlx::query!(
+        r#"SELECT started_by, total_projects, ruleset_id FROM project_flag_runs WHERE id = $1"#,
+        input.id.0,
+    ).fetch_optional(&mut transaction).await.context("checking initialized project flag run")?;
+    if let Some(existing) = existing {
+        verify_initialization(
+            &input,
+            existing.started_by,
+            existing.total_projects,
+            existing.ruleset_id,
+        )?;
+        transaction
+            .commit()
+            .await
+            .context("finishing existing project flag run initialization")?;
+        return Ok(());
+    }
+    let row = sqlx::query!(r#"
+        SELECT
+            COALESCE((SELECT jsonb_agg(to_jsonb(rules) ORDER BY rules.id) FROM project_flag_rules AS rules), '[]'::jsonb) AS "rules!",
+            COALESCE((SELECT jsonb_object_agg(name, script) FROM project_flag_modules), '{}'::jsonb) AS "modules!"
+    "#).fetch_one(&mut transaction).await.context("freezing staging project flag content")?;
+    let snapshot = RunSnapshot {
+        rules: serde_json::from_value(row.rules.clone())
+            .context("decoding staging rules")?,
+        modules: serde_json::from_value(row.modules.clone())
+            .context("decoding staging modules")?,
+    };
+    let hash = snapshot.content_hash()?.to_hex().to_string();
+    let inserted = sqlx::query_scalar!(r#"
+        INSERT INTO project_flag_rulesets (id, content_hash, rules, modules, created_by)
+        VALUES ($1, $2, $3, $4, $5)
+        ON CONFLICT (content_hash) DO NOTHING
+        RETURNING id
+    "#, uuid::Uuid::now_v7(), hash, row.rules, row.modules, input.started_by.0)
+        .fetch_optional(&mut transaction).await.context("persisting immutable project flag ruleset")?;
+    let ruleset_id = match inserted {
+        Some(id) => id,
+        None => sqlx::query_scalar!(
+            r#"SELECT id FROM project_flag_rulesets WHERE content_hash = $1"#,
+            hash
+        )
+        .fetch_one(&mut transaction)
+        .await
+        .context("loading existing immutable project flag ruleset")?,
+    };
+    sqlx::query!(r#"
+        INSERT INTO project_flag_runs (id, status, started_by, started_at, total_projects, ruleset_id)
+        VALUES ($1, 'running', $2, CURRENT_TIMESTAMP, $3, $4)
+    "#, input.id.0, input.started_by.0, total, ruleset_id)
+        .execute(&mut transaction).await.context("creating initialized project flag run")?;
+    transaction
+        .commit()
+        .await
+        .context("committing project flag run initialization")?;
+    Ok(())
+}
+
+fn verify_initialization(
+    input: &InitializationInput,
+    started_by: Option<i64>,
+    total_projects: i64,
+    ruleset_id: Option<uuid::Uuid>,
+) -> Result<()> {
+    if started_by != Some(input.started_by.0)
+        || i64::try_from(input.total_projects).ok() != Some(total_projects)
+        || ruleset_id.is_none()
+    {
+        return Err(anyhow!(
+            "existing project flag run does not match initialization input"
+        ));
+    }
+    Ok(())
 }
 
 impl RunActivities {

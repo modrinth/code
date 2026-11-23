@@ -20,6 +20,37 @@ use super::image_scan::{
 };
 use crate::models::v3::ids::ProjectId;
 
+#[derive(Debug, thiserror::Error)]
+#[error("{0}")]
+struct InvalidScanInput(&'static str);
+
+pub(super) fn is_permanent_scan_error(error: &anyhow::Error) -> bool {
+    error.is::<InvalidScanInput>()
+        || error.chain().any(|cause| {
+            if let Some(error) = cause.downcast_ref::<reqwest::Error>() {
+                return error.is_builder()
+                    || error.status().is_some_and(|status| {
+                        status.is_client_error()
+                            && status != reqwest::StatusCode::TOO_MANY_REQUESTS
+                            && status != reqwest::StatusCode::REQUEST_TIMEOUT
+                    });
+            }
+            if let Some(error) = cause
+                .downcast_ref::<aws_sdk_s3::error::SdkError<
+                    aws_sdk_s3::operation::get_object::GetObjectError,
+                >>()
+            {
+                return error
+                    .as_service_error()
+                    .is_some_and(|error| error.is_no_such_key());
+            }
+            if let Some(error) = cause.downcast_ref::<std::io::Error>() {
+                return error.kind() == std::io::ErrorKind::NotFound;
+            }
+            false
+        })
+}
+
 pub struct ModelScanner {
     http: Client,
     pub(crate) config: ProjectFlags,
@@ -95,20 +126,19 @@ impl ModelScanner {
         input: &ImageScanInput,
     ) -> Result<(bytes::Bytes, &'static str)> {
         let cdn_prefix = format!("{}/", ENV.CDN_URL.trim_end_matches('/'));
-        let key = input
-            .url
-            .as_str()
-            .strip_prefix(&cdn_prefix)
-            .context("image URL must belong to the configured CDN")?;
-        let key =
-            urlencoding::decode(key).context("decoding image storage key")?;
+        let key = input.url.as_str().strip_prefix(&cdn_prefix).ok_or(
+            InvalidScanInput("image URL must belong to the configured CDN"),
+        )?;
+        let key = urlencoding::decode(key).map_err(|_| {
+            InvalidScanInput("invalid image storage key encoding")
+        })?;
         ensure!(
             input.url.query().is_none()
                 && input.url.fragment().is_none()
                 && !key.is_empty()
                 && !key.contains(['\\', '\0'])
                 && key.split('/').all(|part| !matches!(part, "" | "." | "..")),
-            "invalid image storage key"
+            InvalidScanInput("invalid image storage key")
         );
         let bytes = self
             .file_host
@@ -118,9 +148,12 @@ impl ModelScanner {
         let limit = GLOBALS
             .max_gallery_image_size
             .max(GLOBALS.max_project_icon_size);
-        ensure!(bytes.len() <= limit, "image exceeds the upload size limit");
+        ensure!(
+            bytes.len() <= limit,
+            InvalidScanInput("image exceeds the upload size limit")
+        );
         let content_type = image::guess_format(&bytes)
-            .context("detecting image format")?
+            .map_err(|_| InvalidScanInput("invalid image format"))?
             .to_mime_type();
         Ok((bytes, content_type))
     }
@@ -135,10 +168,13 @@ impl ModelScanner {
         let Some(config) = &self.config.infer_ai_generated else {
             return Ok(None);
         };
-        ensure!(!image.is_empty(), "image must not be empty");
+        ensure!(
+            !image.is_empty(),
+            InvalidScanInput("image must not be empty")
+        );
         ensure!(
             content_type.starts_with("image/"),
-            "content type must be an image media type"
+            InvalidScanInput("content type must be an image media type")
         );
 
         let mut request = self
@@ -183,10 +219,13 @@ impl ModelScanner {
         let Some(config) = &self.config.infer_decisions else {
             return Ok(None);
         };
-        ensure!(!image.is_empty(), "image must not be empty");
+        ensure!(
+            !image.is_empty(),
+            InvalidScanInput("image must not be empty")
+        );
         ensure!(
             matches!(content_type, "image/png" | "image/jpeg" | "image/webp"),
-            "decisions image must be PNG, JPEG, or WebP"
+            InvalidScanInput("decisions image must be PNG, JPEG, or WebP")
         );
 
         let state = json!([{
@@ -224,7 +263,10 @@ impl ModelScanner {
         let Some(config) = &self.config.infer_decisions else {
             return Ok(None);
         };
-        ensure!(!text.trim().is_empty(), "text must not be empty");
+        ensure!(
+            !text.trim().is_empty(),
+            InvalidScanInput("text must not be empty")
+        );
 
         self.decide(
             project_id,
@@ -301,7 +343,7 @@ fn decision_questions(questions: &[String]) -> Result<BTreeMap<String, Value>> {
         .map(|(index, instructions)| {
             ensure!(
                 !instructions.trim().is_empty(),
-                "decision instructions must not be empty"
+                InvalidScanInput("decision instructions must not be empty")
             );
             Ok((
                 format!("q{index}"),
@@ -344,6 +386,27 @@ fn validate_probability(probability: f64) -> Result<f64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn permanent_errors_survive_context_without_hiding_transient_errors() {
+        let invalid = anyhow::Error::new(InvalidScanInput("invalid image"))
+            .context("reading image");
+        assert!(is_permanent_scan_error(&invalid));
+        let missing = anyhow::Error::new(std::io::Error::from(
+            std::io::ErrorKind::NotFound,
+        ))
+        .context("reading image from storage");
+        assert!(is_permanent_scan_error(&missing));
+        let transient = anyhow::Error::new(std::io::Error::from(
+            std::io::ErrorKind::TimedOut,
+        ));
+        assert!(!is_permanent_scan_error(&transient));
+        assert!(!is_permanent_scan_error(&anyhow::anyhow!(
+            "invalid inference response"
+        )));
+        let invalid_prompt = decision_questions(&["  ".into()]).unwrap_err();
+        assert!(is_permanent_scan_error(&invalid_prompt));
+    }
 
     fn parse(value: Value, count: usize) -> Result<Vec<f64>> {
         decode_decisions(serde_json::from_value(value)?, count)

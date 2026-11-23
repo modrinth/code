@@ -127,6 +127,8 @@ export interface ProjectFlagRunResult {
 		icon_url: string | null
 	}
 	rules: Record<string, ProjectFlagRuleResult & { name: string | null }>
+	/** Snapshot evidence; inactive entries are resolved retained violations. */
+	effective_flags: PersistedProjectFlag[]
 	/** Distinct emitted and retained flag violations, including results with errors. */
 	num_flags: number
 	proposed_review_outcome: Labrinth.Projects.v3.ProjectReviewOutcome | null

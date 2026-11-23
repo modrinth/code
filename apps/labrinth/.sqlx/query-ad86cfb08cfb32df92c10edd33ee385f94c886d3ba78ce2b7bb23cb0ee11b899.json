@@ -1,0 +1,172 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT runs.id, runs.ruleset_id, runs.status AS \"status: ProjectFlagRunStatus\", runs.total_projects,\n            starter.id AS \"started_by_id?\", starter.username AS \"started_by_username?\",\n            applier.id AS \"applied_by_id?\", applier.username AS \"applied_by_username?\",\n            runs.started_at, runs.completed_at, runs.applied_at,\n            runs.output AS \"output: sqlx::types::Json<ProjectFlagRunOutput>\", runs.error\n        FROM project_flag_runs AS runs\n        LEFT JOIN users AS starter ON starter.id = runs.started_by\n        LEFT JOIN users AS applier ON applier.id = runs.applied_by\n        WHERE runs.id = $1 AND runs.ruleset_id IS NOT NULL\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "ruleset_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "ruleset_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "status: ProjectFlagRunStatus",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "status"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "total_projects",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "total_projects"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "started_by_id?",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "started_by_username?",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "username"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "applied_by_id?",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "applied_by_username?",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "username"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "started_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "started_at"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "completed_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "completed_at"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "applied_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "applied_at"
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "output: sqlx::types::Json<ProjectFlagRunOutput>",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "output"
+          }
+        }
+      },
+      {
+        "ordinal": 12,
+        "name": "error",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "error"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "ad86cfb08cfb32df92c10edd33ee385f94c886d3ba78ce2b7bb23cb0ee11b899"
+}

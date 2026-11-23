@@ -1,11 +1,8 @@
-use std::{
-    collections::{BTreeMap, BTreeSet},
-    time::Duration,
-};
+use std::collections::{BTreeMap, BTreeSet};
 
 use anyhow::{Context, Result, ensure};
 use serde::{Deserialize, Serialize};
-use temporalio_sdk::{ActivityOptions, WorkflowContext, WorkflowResult};
+use temporalio_sdk::{WorkflowContext, WorkflowResult};
 
 use super::model_scan::ModelScanner;
 use super::scan_cache::{
@@ -18,7 +15,7 @@ use crate::database::models::{
 };
 use crate::models::v3::ids::ProjectId;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ProjectText {
     pub(crate) title: String,
     pub(crate) summary: String,
@@ -56,7 +53,7 @@ pub(super) async fn scan_project_text(
         .execute_activity(
             ProjectFlagActivities::project_text,
             input,
-            ActivityOptions::start_to_close_timeout(Duration::from_secs(60)),
+            super::image_scan::scan_activity_options(),
         )
         .await?;
     let Some(plan) = plan else {
@@ -71,7 +68,7 @@ pub(super) async fn scan_project_text(
             content: plan.content,
             questions: plan.questions,
         },
-        ActivityOptions::start_to_close_timeout(Duration::from_secs(60)),
+        super::image_scan::scan_activity_options(),
     )
     .await?;
     Ok(())
@@ -124,6 +121,27 @@ pub(super) async fn project_text(
         },
         questions,
     }))
+}
+
+pub(super) async fn text_input_is_current(
+    pool: &PgPool,
+    input: &TextScanInput,
+) -> Result<bool> {
+    let current = project_text(
+        pool,
+        super::ReconcileRulesInput {
+            project_id: input.project_id,
+            ruleset_id: input.ruleset_id,
+        },
+    )
+    .await?;
+    Ok(current.is_some_and(|current| text_plan_matches(&current, input)))
+}
+
+fn text_plan_matches(current: &ProjectTextScan, input: &TextScanInput) -> bool {
+    current.content == input.content
+        && current.questions.iter().collect::<BTreeSet<_>>()
+            == input.questions.iter().collect::<BTreeSet<_>>()
 }
 
 pub(super) async fn scan_text(
@@ -206,6 +224,32 @@ pub(crate) fn decode_result(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn obsolete_text_or_questions_do_not_match_current_plan() {
+        let current = ProjectTextScan {
+            project_id: crate::database::models::DBProjectId(1).into(),
+            ruleset_id: Some(uuid::Uuid::nil()),
+            content: ProjectText {
+                title: "Title".into(),
+                summary: "Summary".into(),
+                description: "Description".into(),
+            },
+            questions: vec!["A?".into(), "B?".into()],
+        };
+        let mut input = TextScanInput {
+            project_id: current.project_id,
+            ruleset_id: current.ruleset_id,
+            content: current.content.clone(),
+            questions: vec!["B?".into(), "A?".into(), "A?".into()],
+        };
+        assert!(text_plan_matches(&current, &input));
+        input.content.summary.push('!');
+        assert!(!text_plan_matches(&current, &input));
+        input.content = current.content.clone();
+        input.questions.push("C?".into());
+        assert!(!text_plan_matches(&current, &input));
+    }
 
     #[test]
     fn text_identity_tracks_every_content_field() {

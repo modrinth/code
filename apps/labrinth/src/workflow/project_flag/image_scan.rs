@@ -26,20 +26,33 @@ pub(super) async fn scan_project_images(
         .execute_activity(
             ProjectFlagActivities::project_images,
             project_id,
-            ActivityOptions::start_to_close_timeout(Duration::from_secs(60)),
+            scan_activity_options(),
         )
         .await?;
 
-    futures::future::try_join_all(images.into_iter().map(|image| {
+    let results = futures::future::join_all(images.into_iter().map(|image| {
         ctx.execute_activity(
             ProjectFlagActivities::scan_image,
             image,
-            ActivityOptions::start_to_close_timeout(Duration::from_secs(60)),
+            scan_activity_options(),
         )
     }))
-    .await?;
+    .await;
+    for result in results {
+        result?;
+    }
 
     Ok(())
+}
+
+pub(super) fn scan_activity_options() -> ActivityOptions {
+    ActivityOptions::with_start_to_close_timeout(Duration::from_secs(60))
+        .retry_policy(
+            temporalio_common::RetryPolicy::builder()
+                .maximum_attempts(5)
+                .build(),
+        )
+        .build()
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -113,6 +126,11 @@ pub(super) fn image_scan_activity_error(error: anyhow::Error) -> ActivityError {
                 .next_retry_delay(retry_after)
                 .build(),
         );
+    }
+    if super::model_scan::is_permanent_scan_error(&error) {
+        return ActivityError::application(ApplicationFailure::non_retryable(
+            error.into_boxed_dyn_error(),
+        ));
     }
     ActivityError::from(error)
 }
@@ -304,6 +322,17 @@ pub(crate) fn image_input_hash(
 #[cfg(test)]
 mod cache_identity_tests {
     use super::*;
+
+    #[test]
+    fn scan_retries_are_bounded() {
+        assert_eq!(
+            scan_activity_options()
+                .retry_policy
+                .unwrap()
+                .maximum_attempts(),
+            5
+        );
+    }
 
     #[test]
     fn explicit_identity_tracks_prompt_and_url() {

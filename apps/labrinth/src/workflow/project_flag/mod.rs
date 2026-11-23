@@ -130,10 +130,15 @@ impl ReconcileProjectFlagsWorkflow {
                 project_id,
                 ruleset_id,
             };
-            futures::try_join!(
+            let (images, text) = futures::join!(
                 image_scan::scan_project_images(ctx, project_id),
                 text_scan::scan_project_text(ctx, input.clone()),
-            )?;
+            );
+            if ctx.state(|state| state.needs_reconcile) {
+                continue;
+            }
+            images?;
+            text?;
 
             let applied = ctx
                 .execute_activity(
@@ -295,7 +300,12 @@ impl ProjectFlagActivities {
         _ctx: ActivityContext,
         input: ImageScanInput,
     ) -> Result<ImageScanResult, ActivityError> {
-        if !project_in_review(&self.pool, input.project_id).await? {
+        if !project_in_review(&self.pool, input.project_id).await?
+            || !image_scan::project_images(&self.pool, input.project_id)
+                .await?
+                .iter()
+                .any(|image| image.url == input.url)
+        {
             return Ok(ImageScanResult::default());
         }
         scan_image(&self.scanner, &self.pool, input)
@@ -326,7 +336,9 @@ impl ProjectFlagActivities {
         Option<std::collections::BTreeMap<String, TextScanResult>>,
         ActivityError,
     > {
-        if !project_in_review(&self.pool, input.project_id).await? {
+        if !project_in_review(&self.pool, input.project_id).await?
+            || !text_scan::text_input_is_current(&self.pool, &input).await?
+        {
             return Ok(None);
         }
         text_scan::scan_text(&self.scanner, &self.pool, input)
