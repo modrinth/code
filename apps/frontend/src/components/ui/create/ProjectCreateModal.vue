@@ -63,17 +63,12 @@
 					/>
 				</template>
 			</Field>
-			<Field :label="formatMessage(messages.ownerLabel)" input-id="owner">
-				<Combobox
+			<Field :label="formatMessage(messages.ownerLabel)" input-id="project-create-owner-search">
+				<ProjectOwnerCombobox
 					v-model="owner"
-					search-name="owner"
-					:search-input-attrs="{ id: 'owner' }"
-					:options="[userOption, ...ownerOptions]"
-					searchable
-					:show-chevron="false"
+					input-id="project-create-owner-search"
+					:options="ownerOptions"
 					:disabled="hasHitLimit"
-					select-search-text-on-focus
-					show-icon-in-selected
 				/>
 			</Field>
 			<Field :label="formatMessage(commonMessages.visibilityLabel)">
@@ -117,12 +112,10 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { OrganizationIcon, PlusIcon, XIcon } from '@modrinth/assets'
+import { PlusIcon, XIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import {
 	Chips,
-	Combobox,
-	type ComboboxOption,
 	commonMessages,
 	defineMessages,
 	Field,
@@ -134,8 +127,9 @@ import {
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, defineAsyncComponent, h, useId } from 'vue'
+import { computed, useId } from 'vue'
 
+import ProjectOwnerCombobox from '~/components/ui/ProjectOwnerCombobox.vue'
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import {
 	generateUrlSlug,
@@ -233,14 +227,6 @@ const messages = defineMessages({
 		id: 'create.project.unknown-user',
 		defaultMessage: 'Unknown user',
 	},
-	userAvatarAlt: {
-		id: 'create.project.user-avatar-alt',
-		defaultMessage: 'User Avatar',
-	},
-	organizationIconAlt: {
-		id: 'create.project.organization-icon-alt',
-		defaultMessage: '{name} Icon',
-	},
 })
 
 const props = defineProps<{
@@ -266,7 +252,6 @@ const { checking: checkingSlugSuggestions, suggestions: slugSuggestions } =
 		username: () => auth.value.user?.username,
 	})
 const projectType = ref<ProjectType>('project')
-const ownerOptions = ref<ComboboxOption<string>[]>([])
 const owner = ref<string | undefined>('self')
 const organizations = ref<Labrinth.Projects.v3.Organization[]>([])
 const visibilityId = useId()
@@ -313,24 +298,19 @@ const cancel = () => {
 	modal.value?.hide()
 }
 
-const userOption = computed(() => ({
-	value: 'self',
-	label: auth.value.user?.username || formatMessage(messages.unknownUser),
-	icon: auth.value.user?.avatar_url
-		? markRaw(
-				defineAsyncComponent(() =>
-					Promise.resolve({
-						setup: () => () =>
-							h('img', {
-								src: auth.value.user?.avatar_url,
-								alt: formatMessage(messages.userAvatarAlt),
-								class: 'h-5 w-5 rounded-full',
-							}),
-					}),
-				),
-			)
-		: undefined,
-}))
+const ownerOptions = computed(() => [
+	{
+		value: 'self',
+		label: auth.value.user?.username || formatMessage(messages.unknownUser),
+		avatar_url: auth.value.user?.avatar_url,
+	},
+	...organizations.value.map((organization) => ({
+		value: organization.id,
+		label: organization.name,
+		avatar_url: organization.icon_url,
+		isOrganization: true,
+	})),
+])
 
 const { labrinth } = injectModrinthClient()
 
@@ -344,30 +324,6 @@ async function fetchOrganizations() {
 
 		organizations.value = orgs || []
 
-		ownerOptions.value = organizations.value.map((org) => ({
-			value: org.id,
-			label: org.name,
-			icon: org.icon_url
-				? markRaw(
-						defineAsyncComponent(() =>
-							Promise.resolve({
-								setup: () => () =>
-									h('img', {
-										src: org.icon_url,
-										alt: formatMessage(messages.organizationIconAlt, { name: org.name }),
-										class: 'h-5 w-5 rounded',
-									}),
-							}),
-						),
-					)
-				: markRaw(
-						defineAsyncComponent(() =>
-							Promise.resolve({
-								setup: () => () => h(OrganizationIcon, { class: 'size-5' }),
-							}),
-						),
-					),
-		}))
 		if (props.organizationId) owner.value = props.organizationId
 	} catch (err) {
 		console.error('Failed to fetch organizations:', err)

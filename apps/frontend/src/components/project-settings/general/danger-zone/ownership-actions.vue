@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
 	Button,
-	Combobox,
 	ConfirmModal,
 	defineMessages,
 	Field,
@@ -16,6 +15,7 @@ import { useMutation, useQuery } from '@tanstack/vue-query'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
 import ConfirmTransferProjectModal from '~/components/ui/ConfirmTransferProjectModal.vue'
+import ProjectOwnerCombobox from '~/components/ui/ProjectOwnerCombobox.vue'
 
 const {
 	projectV2: project,
@@ -85,7 +85,6 @@ const targets = computed(() => [
 		.map((member) => ({
 			value: `user:${member.user.id}`,
 			label: member.user.username,
-			subLabel: 'Project member',
 			userId: member.user.id,
 			avatar_url: member.user.avatar_url,
 			username: member.user.username,
@@ -96,7 +95,7 @@ const targets = computed(() => [
 		.map((org) => ({
 			value: `organization:${org.id}`,
 			label: org.name,
-			subLabel: 'Organization',
+			isOrganization: true,
 			organizationId: org.id,
 			avatar_url: org.icon_url,
 			name: org.name,
@@ -212,12 +211,10 @@ function confirmRemoveFromOrganization() {
 					This project is managed by {{ organization.name }}.
 				</p>
 				<Field label="Member or organization" input-id="project-transfer-target">
-					<Combobox
+					<ProjectOwnerCombobox
 						v-model="selectedTarget"
 						:options="targets"
-						searchable
-						:search-input-attrs="{ id: 'project-transfer-target' }"
-						placeholder="Select a member or organization"
+						input-id="project-transfer-target"
 						:disabled="transfer.isPending.value"
 					/>
 				</Field>
