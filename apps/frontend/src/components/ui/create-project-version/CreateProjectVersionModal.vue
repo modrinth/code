@@ -4,7 +4,7 @@
 		:stages="ctx.stageConfigs"
 		:context="ctx"
 		:breadcrumbs="!editingVersion"
-		:close-on-click-outside="false"
+		:close-on-click-outside="!editingVersion && filesToAdd.length === 0"
 		@hide="() => (modalOpen = false)"
 	/>
 	<DropArea
@@ -62,7 +62,7 @@ const modalOpen = ref(false)
 const ctx = createManageVersionContext(modal, host, () => emit('save'))
 provideManageVersionContext(ctx)
 
-const { newDraftVersion, editingVersion, handleNewFiles } = ctx
+const { newDraftVersion, editingVersion, filesToAdd, handleNewFiles } = ctx
 
 const { addNotification } = injectNotificationManager()
 const { labrinth } = injectModrinthClient()
