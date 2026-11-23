@@ -7,8 +7,7 @@
 				:thread="prefixedThread"
 				:project-owner-id="projectOwner?.id"
 				:project="project"
-				:set-status="setStatus"
-				:review-submission-disabled="!canSubmit"
+				:moderation-actions="moderationActions"
 				:current-member="currentMember ?? undefined"
 				:auth="auth"
 				class="min-h-0 flex-1"
@@ -41,8 +40,9 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { SpinnerIcon } from '@modrinth/assets'
+import { CheckIcon, EyeOffIcon, ScaleIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
+	type ButtonMenuAction,
 	commonMessages,
 	defineMessage,
 	defineMessages,
@@ -57,6 +57,7 @@ import dayjs from 'dayjs'
 import { computed, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
+import { isApproved } from '~/helpers/projects.js'
 import { verifyThreadIssuesForApproval } from '~/helpers/thread-issues'
 import { injectProjectPublishing } from '~/providers/project-publishing'
 
@@ -69,7 +70,6 @@ const messages = defineMessages({
 		id: 'project.moderation.project-changed',
 		defaultMessage: 'The selected project changed. Review it again.',
 	},
-
 	threadSectionTitle: {
 		id: 'project.moderation.thread.title',
 		defaultMessage: 'Moderation messages',
@@ -91,7 +91,6 @@ const messages = defineMessages({
 	},
 })
 
-const { addNotification } = injectNotificationManager()
 const {
 	projectV2: project,
 	setProcessing,
@@ -160,8 +159,49 @@ watch(
 
 const auth = await useAuth()
 const client = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const pending = computed(() => thread.value === undefined)
+
+const moderationActions = computed<ButtonMenuAction[]>(() => [
+	{
+		id: 'approve',
+		label: 'Approve',
+		icon: CheckIcon,
+		tone: 'green',
+		disabled: isApproved(project.value),
+		action: () => {
+			const requested = project.value.requested_status
+			return setStatus(
+				requested === 'unlisted' || requested === 'private' ? requested : 'approved',
+			)
+		},
+	},
+	{
+		id: 'reject',
+		label: 'Reject',
+		icon: XIcon,
+		tone: 'red',
+		disabled: project.value.status === 'rejected',
+		action: () => setStatus('rejected'),
+	},
+	{
+		id: 'withhold',
+		label: 'Withhold',
+		icon: EyeOffIcon,
+		tone: 'orange',
+		disabled: project.value.status === 'withheld',
+		action: () => setStatus('withheld'),
+	},
+	{
+		id: 'send-to-review',
+		label: 'Send to review',
+		icon: ScaleIcon,
+		tone: 'orange',
+		disabled: project.value.status === 'processing' || !canSubmit.value,
+		action: setProcessing,
+	},
+])
 
 function updateThread(newThread: Labrinth.Threads.v3.Thread | null | undefined) {
 	const threadId = newThread?.id ?? project.value?.thread_id
@@ -174,41 +214,35 @@ function updateThread(newThread: Labrinth.Threads.v3.Thread | null | undefined) 
 }
 
 async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
-	if (status === 'processing') {
-		return await setProcessing()
-	}
+	const { id: projectId, thread_id: threadId } = project.value
 	startLoading()
-	const projectId = project.value.id
-	const threadId = project.value.thread_id
 
 	try {
-		if (['approved', 'unlisted', 'private'].includes(status))
+		if (status === 'approved' || status === 'unlisted' || status === 'private') {
 			await verifyThreadIssuesForApproval(threadId, client, () => {
 				if (project.value.id !== projectId) throw new Error(formatMessage(messages.projectChanged))
 			})
+		}
 		await client.labrinth.projects_v3.edit(projectId, { status })
 		await invalidate()
-		await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
-		return true
-	} catch (err) {
+	} catch (error) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: getErrorDescription(err),
+			text: getErrorDescription(error),
 			type: 'error',
 		})
-		return false
 	} finally {
 		await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
 		stopLoading()
 	}
 }
 
-function getErrorDescription(err: unknown): string {
-	if (typeof err === 'object' && err !== null && 'data' in err) {
-		const data = (err as { data?: { description?: string } }).data
+function getErrorDescription(error: unknown): string {
+	if (typeof error === 'object' && error !== null && 'data' in error) {
+		const data = (error as { data?: { description?: string } }).data
 		if (data?.description) return data.description
 	}
 
-	return err instanceof Error ? err.message : String(err)
+	return error instanceof Error ? error.message : String(error)
 }
 </script>

@@ -2,7 +2,7 @@
 	<div :class="{ 'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden': compact }">
 		<DefineSendAction>
 			<Button
-				v-if="sortedMessages.length > 0"
+				v-if="sortedMessages.length > 0 || (compact && isStaff(auth.user))"
 				:type="!compact || useBrandSendButton ? 'colored' : 'base'"
 				color="brand"
 				:disabled="!replyBody.trim() || isLoading"
@@ -32,70 +32,20 @@
 				{{ formatMessage(messages.actionSend) }}
 			</Button>
 		</DefineSendAction>
-		<NewModal
-			ref="modalSubmit"
-			:header="
-				formatMessage(
-					isRejected(project)
-						? messages.resubmitModalHeaderResubmitting
-						: messages.resubmitModalHeaderSubmitting,
-				)
-			"
-		>
-			<div class="flex max-w-[35rem] flex-col gap-3">
-				<p class="m-0">
-					<IntlFormatted
-						:message-id="
-							isRejected(project)
-								? messages.resubmitModalDescription
-								: messages.submitModalDescription
-						"
-						:values="{ projectTitle: project.title }"
-					>
-						<template #project-title="{ children }">
-							<span class="font-semibold text-contrast">
-								<component :is="() => children" />
-							</span>
-						</template>
-					</IntlFormatted>
-				</p>
-				<p class="m-0">{{ formatMessage(messages.resubmitModalReminder) }}</p>
-				<p class="m-0 font-semibold text-red">
-					{{ formatMessage(messages.resubmitModalWarning) }}
-				</p>
-				<Checkbox
-					v-model="submissionConfirmation"
-					:description="formatMessage(messages.resubmitModalConfirmationDescription)"
-				>
-					{{ formatMessage(messages.resubmitModalConfirmationLabel) }}
-				</Checkbox>
-				<div class="flex flex-wrap items-center justify-end gap-2">
-					<Button type="outlined" @click="modalSubmit.hide()">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-					<Tooltip
-						:disabled="!reviewSubmissionDisabled"
-						:text="formatMessage(messages.resubmitRequiredActionsTooltip)"
-					>
-						<Button
-							type="colored"
-							color="orange"
-							:disabled="!submissionConfirmation || isLoading || reviewSubmissionDisabled"
-							@click="runBlockingAction('resubmit-modal', resubmit)"
-						>
-							<SpinnerIcon
-								v-if="loadingAction === 'resubmit-modal'"
-								class="animate-spin"
-								aria-hidden="true"
-							/>
-							<ScaleIcon v-else aria-hidden="true" />
-							{{ formatMessage(messages.actionResubmitForReview) }}
-						</Button>
-					</Tooltip>
-				</div>
-			</div>
-		</NewModal>
+		<DefinePrivateNoteAction>
+			<Button
+				:disabled="!replyBody.trim() || isLoading"
+				@click="runBlockingAction('private-note', () => sendReply({ privateMessage: true }))"
+			>
+				<SpinnerIcon
+					v-if="loadingAction === 'private-note'"
+					class="animate-spin"
+					aria-hidden="true"
+				/>
+				<StickyNotePlusIcon v-else aria-hidden="true" />
+				{{ formatMessage(compact ? messages.actionPrivateNote : messages.actionAddPrivateNote) }}
+			</Button>
+		</DefinePrivateNoteAction>
 		<NewModal ref="modalReply" :header="formatMessage(messages.replyModalHeader)">
 			<div class="flex max-w-[45rem] flex-col gap-3">
 				<p class="m-0">{{ formatMessage(messages.replyModalDescription) }}</p>
@@ -205,7 +155,7 @@
 				<div
 					:class="
 						compact
-							? 'mt-auto shrink-0 border-0 border-t border-solid border-divider px-4 pt-4 [&_.cm-editor]:text-sm'
+							? 'mt-auto shrink-0 border-0 border-t border-solid border-divider px-4 pt-4 [&_.cm-content]:!min-h-[6lh] [&_.cm-editor]:text-sm [&_.cm-scroller]:!max-h-[6lh] [&_.cm-scroller]:![font-family:var(--font-standard)]'
 							: 'mx-4 mt-2'
 					"
 				>
@@ -214,8 +164,6 @@
 						v-model="replyBody"
 						:image-only-toolbar="compact ? 'external' : false"
 						:hide-markdown-hint="compact"
-						:min-height="compact ? 80 : undefined"
-						:max-height="compact ? 200 : undefined"
 						:disabled="isLoading"
 						:placeholder="
 							formatMessage(
@@ -247,49 +195,12 @@
 				</div>
 
 				<div
-					class="shrink-0 flex-wrap items-center justify-between gap-4 p-4 pt-2"
-					:class="compact ? 'hidden has-[button]:flex' : 'flex'"
+					v-if="!compact"
+					class="flex shrink-0 flex-wrap items-center justify-between gap-4 p-4 pt-2"
 				>
 					<div class="flex flex-wrap items-center gap-2">
-						<SendAction v-if="!compact" />
-						<Button
-							v-if="isStaff(auth.user)"
-							:disabled="!replyBody.trim() || isLoading"
-							@click="runBlockingAction('private-note', () => sendReply(null, true))"
-						>
-							<SpinnerIcon
-								v-if="loadingAction === 'private-note'"
-								class="animate-spin"
-								aria-hidden="true"
-							/>
-							<StickyNotePlusIcon v-else aria-hidden="true" />
-							{{ formatMessage(messages.actionAddPrivateNote) }}
-						</Button>
-						<template v-if="currentMember && !currentMember.staffOnly">
-							<template v-if="isRejected(project)">
-								<Tooltip
-									:disabled="!reviewSubmissionDisabled"
-									:text="formatMessage(messages.resubmitRequiredActionsTooltip)"
-								>
-									<Button
-										v-if="replyBody"
-										:disabled="isLoading || reviewSubmissionDisabled"
-										@click="openResubmitModal(true)"
-									>
-										<ScaleIcon aria-hidden="true" />
-										{{ formatMessage(messages.actionResubmitForReviewWithReply) }}
-									</Button>
-									<Button
-										v-else
-										:disabled="isLoading || reviewSubmissionDisabled"
-										@click="openResubmitModal(false)"
-									>
-										<ScaleIcon aria-hidden="true" />
-										{{ formatMessage(messages.actionResubmitForReview) }}
-									</Button>
-								</Tooltip>
-							</template>
-						</template>
+						<SendAction />
+						<PrivateNoteAction v-if="isStaff(auth.user)" />
 					</div>
 					<div class="flex flex-wrap items-center gap-2">
 						<template v-if="report">
@@ -322,164 +233,34 @@
 								{{ formatMessage(messages.actionCloseThread) }}
 							</Button>
 						</template>
-						<template v-if="project">
-							<template v-if="isStaff(auth.user)">
-								<Button
-									v-if="replyBody"
-									type="colored"
-									color="green"
-									:disabled="isApproved(project) || isLoading"
-									@click="runBlockingAction('approve-with-reply', () => sendReply(requestedStatus))"
-								>
-									<SpinnerIcon
-										v-if="loadingAction === 'approve-with-reply'"
-										class="animate-spin"
-										aria-hidden="true"
-									/>
-									<CheckIcon v-else aria-hidden="true" />
-									{{ formatMessage(messages.actionApproveWithReply) }}
-								</Button>
-								<Button
-									v-else
-									type="colored"
-									color="green"
-									:disabled="isApproved(project) || isLoading"
-									@click="runBlockingAction('approve', () => setStatus(requestedStatus))"
-								>
-									<SpinnerIcon
-										v-if="loadingAction === 'approve'"
-										class="animate-spin"
-										aria-hidden="true"
-									/>
-									<CheckIcon v-else aria-hidden="true" />
-									{{ formatMessage(messages.actionApprove) }}
-								</Button>
-								<SplitButton
-									type="colored"
-									color="red"
-									:menu-label="formatMessage(commonMessages.moreOptionsButton)"
-									:disabled="isLoading"
-									:primary-disabled="project.status === 'rejected'"
-									:options="
-										replyBody
-											? [
-													{
-														id: 'withhold-reply',
-														label: formatMessage(messages.actionWithholdWithReply),
-														tone: 'orange',
-														hoverFilled: true,
-														action: () =>
-															runBlockingAction('withhold-reply', () => sendReply('withheld')),
-														disabled: project.status === 'withheld' || isLoading,
-													},
-													{
-														id: 'set-to-draft-reply',
-														label: formatMessage(messages.actionSetToDraftWithReply),
-														tone: 'orange',
-														hoverFilled: true,
-														action: () =>
-															runBlockingAction('set-to-draft-reply', () => sendReply('draft')),
-														disabled: project.status === 'draft' || isLoading,
-													},
-													{
-														id: 'send-to-review-reply',
-														label: formatMessage(messages.actionSendToReviewWithReply),
-														tone: 'orange',
-														hoverFilled: true,
-														action: () =>
-															runBlockingAction('send-to-review-reply', () =>
-																sendReply('processing', true),
-															),
-														disabled: project.status === 'processing' || isLoading,
-													},
-												]
-											: [
-													{
-														id: 'withhold',
-														label: formatMessage(messages.actionWithhold),
-														tone: 'orange',
-														hoverFilled: true,
-														action: () =>
-															runBlockingAction('withhold', () => setStatus('withheld')),
-														disabled: project.status === 'withheld' || isLoading,
-													},
-													{
-														id: 'set-to-draft',
-														label: formatMessage(messages.actionSetToDraft),
-														tone: 'orange',
-														hoverFilled: true,
-														action: () =>
-															runBlockingAction('set-to-draft', () => setStatus('draft')),
-														disabled: project.status === 'draft' || isLoading,
-													},
-													{
-														id: 'send-to-review',
-														label: formatMessage(messages.actionSendToReview),
-														tone: 'orange',
-														hoverFilled: true,
-														action: () =>
-															runBlockingAction('send-to-review', () => setStatus('processing')),
-														disabled: project.status === 'processing' || isLoading,
-													},
-												]
-									"
-									@click="
-										replyBody
-											? runBlockingAction('reject-with-reply', () => sendReply('rejected'))
-											: runBlockingAction('reject', () => setStatus('rejected'))
-									"
-								>
-									<SpinnerIcon
-										v-if="loadingAction === 'reject-with-reply' || loadingAction === 'reject'"
-										class="animate-spin"
-										aria-hidden="true"
-									/>
-									<XIcon v-else aria-hidden="true" />
-									{{
-										formatMessage(
-											replyBody ? messages.actionRejectWithReply : messages.actionReject,
-										)
-									}}
-									<template #withhold-reply>
-										<EyeOffIcon aria-hidden="true" />
-										{{ formatMessage(messages.actionWithholdWithReply) }}
-									</template>
-									<template #withhold>
-										<EyeOffIcon aria-hidden="true" />
-										{{ formatMessage(messages.actionWithhold) }}
-									</template>
-									<template #set-to-draft-reply>
-										<FileTextIcon aria-hidden="true" />
-										{{ formatMessage(messages.actionSetToDraftWithReply) }}
-									</template>
-									<template #set-to-draft>
-										<FileTextIcon aria-hidden="true" />
-										{{ formatMessage(messages.actionSetToDraft) }}
-									</template>
-									<template #send-to-review-reply>
-										<ScaleIcon aria-hidden="true" />
-										{{ formatMessage(messages.actionSendToReviewWithReply) }}
-									</template>
-									<template #send-to-review>
-										<ScaleIcon aria-hidden="true" />
-										{{ formatMessage(messages.actionSendToReview) }}
-									</template>
-								</SplitButton>
-							</template>
-						</template>
 					</div>
 				</div>
-				<div v-if="compact" class="flex shrink-0 items-center justify-between gap-2 p-4 pt-2">
+				<div
+					v-if="compact"
+					class="flex shrink-0 items-center justify-between gap-2 p-[18px] pb-4 pt-1.5"
+				>
 					<IconButton
 						v-tooltip="formatMessage(messages.actionAttachImage)"
 						:label="formatMessage(messages.actionAttachImage)"
-						size="sm"
 						:disabled="isLoading"
 						@click="replyEditor?.openImageModal?.()"
 					>
 						<ImageIcon aria-hidden="true" />
 					</IconButton>
-					<SendAction />
+					<div class="flex flex-wrap items-center justify-end gap-2">
+						<TeleportOverflowMenu
+							v-if="isStaff(auth.user) && moderationMenuOptions.length"
+							:label="formatMessage(commonMessages.moreOptionsButton)"
+							:options="moderationMenuOptions"
+							:disabled="isLoading"
+							:circular="false"
+							placement="top-end"
+						>
+							<MoreHorizontalIcon aria-hidden="true" />
+						</TeleportOverflowMenu>
+						<PrivateNoteAction v-if="isStaff(auth.user)" />
+						<SendAction />
+					</div>
 				</div>
 			</template>
 		</div>
@@ -508,14 +289,11 @@
 <script setup>
 import {
 	CheckCircleIcon,
-	CheckIcon,
 	ExternalIcon,
-	EyeOffIcon,
-	FileTextIcon,
 	ImageIcon,
 	MessagesSquareIcon,
+	MoreHorizontalIcon,
 	ReplyIcon,
-	ScaleIcon,
 	SendIcon,
 	SpinnerIcon,
 	StickyNotePlusIcon,
@@ -535,8 +313,7 @@ import {
 	IntlFormatted,
 	MarkdownEditor,
 	NewModal,
-	SplitButton,
-	Tooltip,
+	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
@@ -546,7 +323,7 @@ import { computed, nextTick, onActivated, onMounted, ref, watch } from 'vue'
 import IssueMessage from '~/components/ui/project-issue-card/issue-message.vue'
 import ThreadTimeline from '~/components/ui/thread/ThreadTimeline.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
-import { isApproved, isRejected } from '~/helpers/projects.js'
+import { isApproved } from '~/helpers/projects.js'
 import { sendThreadReply } from '~/helpers/thread-issues'
 import { isStaff } from '~/helpers/users.js'
 
@@ -556,6 +333,7 @@ const route = useRoute()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const [DefineSendAction, SendAction] = createReusableTemplate()
+const [DefinePrivateNoteAction, PrivateNoteAction] = createReusableTemplate()
 
 const messages = defineMessages({
 	actionAttachImage: {
@@ -581,41 +359,6 @@ const messages = defineMessages({
 	openImageExternally: {
 		id: 'conversation-thread.image.open-externally',
 		defaultMessage: 'Open externally',
-	},
-	resubmitModalHeaderResubmitting: {
-		id: 'conversation-thread.resubmit-modal.header.resubmitting',
-		defaultMessage: 'Resubmitting for review',
-	},
-	resubmitModalHeaderSubmitting: {
-		id: 'conversation-thread.resubmit-modal.header.submitting',
-		defaultMessage: 'Submitting for review',
-	},
-	resubmitModalDescription: {
-		id: 'conversation-thread.resubmit-modal.description.auto-approval',
-		defaultMessage:
-			"You're resubmitting <project-title>{projectTitle}</project-title>. If all moderation issues are resolved, it may be approved automatically. Otherwise, it will be sent to the moderators for review.",
-	},
-	submitModalDescription: {
-		id: 'conversation-thread.submit-modal.description',
-		defaultMessage:
-			"You're submitting <project-title>{projectTitle}</project-title> to be reviewed by the moderators.",
-	},
-	resubmitModalReminder: {
-		id: 'conversation-thread.resubmit-modal.reminder',
-		defaultMessage: 'Make sure you have addressed all the comments from the moderation team.',
-	},
-	resubmitModalWarning: {
-		id: 'conversation-thread.resubmit-modal.warning',
-		defaultMessage:
-			"Repeated submissions without addressing the moderators' comments may result in an account suspension.",
-	},
-	resubmitModalConfirmationDescription: {
-		id: 'conversation-thread.resubmit-modal.confirmation.description',
-		defaultMessage: 'Confirm I have addressed the messages from the moderators',
-	},
-	resubmitModalConfirmationLabel: {
-		id: 'conversation-thread.resubmit-modal.confirmation.label',
-		defaultMessage: "I confirm that I have properly addressed the moderators' comments.",
 	},
 	replyModalHeader: {
 		id: 'conversation-thread.reply-modal.header',
@@ -651,14 +394,6 @@ const messages = defineMessages({
 		id: 'conversation-thread.reply-editor.placeholder.send',
 		defaultMessage: 'Send a message...',
 	},
-	actionResubmitForReview: {
-		id: 'conversation-thread.action.resubmit-for-review',
-		defaultMessage: 'Resubmit for review',
-	},
-	resubmitRequiredActionsTooltip: {
-		id: 'conversation-thread.resubmit-required-actions-tooltip',
-		defaultMessage: 'You must complete all required actions above to resubmit',
-	},
 	actionReplyToThread: {
 		id: 'conversation-thread.action.reply-to-thread',
 		defaultMessage: 'Reply to thread',
@@ -679,9 +414,9 @@ const messages = defineMessages({
 		id: 'conversation-thread.action.add-private-note',
 		defaultMessage: 'Add private note',
 	},
-	actionResubmitForReviewWithReply: {
-		id: 'conversation-thread.action.resubmit-for-review-with-reply',
-		defaultMessage: 'Resubmit for review with reply',
+	actionPrivateNote: {
+		id: 'conversation-thread.action.private-note',
+		defaultMessage: 'Private note',
 	},
 	actionCloseWithReply: {
 		id: 'conversation-thread.action.close-with-reply',
@@ -690,46 +425,6 @@ const messages = defineMessages({
 	actionCloseThread: {
 		id: 'conversation-thread.action.close-report',
 		defaultMessage: 'Close report',
-	},
-	actionApproveWithReply: {
-		id: 'conversation-thread.action.approve-with-reply',
-		defaultMessage: 'Approve with reply',
-	},
-	actionApprove: {
-		id: 'conversation-thread.action.approve',
-		defaultMessage: 'Approve',
-	},
-	actionRejectWithReply: {
-		id: 'conversation-thread.action.reject-with-reply',
-		defaultMessage: 'Reject with reply',
-	},
-	actionReject: {
-		id: 'conversation-thread.action.reject',
-		defaultMessage: 'Reject',
-	},
-	actionWithholdWithReply: {
-		id: 'conversation-thread.action.withhold-with-reply',
-		defaultMessage: 'Withhold with reply',
-	},
-	actionWithhold: {
-		id: 'conversation-thread.action.withhold',
-		defaultMessage: 'Withhold',
-	},
-	actionSetToDraftWithReply: {
-		id: 'conversation-thread.action.set-to-draft-with-reply',
-		defaultMessage: 'Set to draft with reply',
-	},
-	actionSetToDraft: {
-		id: 'conversation-thread.action.set-to-draft',
-		defaultMessage: 'Set to draft',
-	},
-	actionSendToReviewWithReply: {
-		id: 'conversation-thread.action.send-to-review-with-reply',
-		defaultMessage: 'Send to review with reply',
-	},
-	actionSendToReview: {
-		id: 'conversation-thread.action.send-to-review',
-		defaultMessage: 'Send to review',
 	},
 	errorSendingMessage: {
 		id: 'conversation-thread.error.sending-message',
@@ -751,10 +446,6 @@ const props = defineProps({
 		type: String,
 		default: null,
 	},
-	reviewSubmissionDisabled: {
-		type: Boolean,
-		default: false,
-	},
 	thread: {
 		type: Object,
 		required: true,
@@ -769,10 +460,9 @@ const props = defineProps({
 		required: false,
 		default: null,
 	},
-	setStatus: {
-		type: Function,
-		required: false,
-		default: () => {},
+	moderationActions: {
+		type: Array,
+		default: () => [],
 	},
 	currentMember: {
 		type: Object,
@@ -898,11 +588,16 @@ onMounted(scrollToLatestMessage)
 onActivated(scrollToLatestMessage)
 watch(() => props.thread.messages.length, scrollToLatestMessage, { flush: 'post' })
 
-const modalSubmit = ref(null)
 const modalReply = ref(null)
 
 const loadingAction = ref(null)
 const isLoading = computed(() => loadingAction.value !== null)
+const moderationMenuOptions = computed(() =>
+	props.moderationActions.map((option) => ({
+		...option,
+		action: () => runBlockingAction(option.id, option.action),
+	})),
+)
 
 async function runBlockingAction(actionId, action) {
 	if (loadingAction.value !== null) {
@@ -946,7 +641,7 @@ async function onUploadImage(file) {
 }
 
 const replyMutation = useMutation({
-	mutationFn: async ({ threadId, projectId, status, privateMessage }) => {
+	mutationFn: async ({ threadId, projectId, privateMessage }) => {
 		const assertCurrent = () => {
 			if (props.thread.id !== threadId) throw new Error(formatMessage(messages.changedThread))
 		}
@@ -988,7 +683,6 @@ const replyMutation = useMutation({
 				queryKey: ['project', projectId, 'validation'],
 			})
 		assertCurrent()
-		if (status !== null) return (await props.setStatus(status)) !== false
 		return true
 	},
 	onError: (error) =>
@@ -1009,18 +703,15 @@ const replyMutation = useMutation({
 	},
 })
 
-async function sendReplyFromModal(status = null, privateMessage = false) {
-	if (await sendReply(status, privateMessage)) modalReply.value.hide()
+async function sendReplyFromModal() {
+	if (await sendReply()) modalReply.value.hide()
 }
 
-async function sendReply(status = null, privateMessage = false) {
-	if (status === 'processing' && props.reviewSubmissionDisabled && !isStaff(props.auth.user))
-		return false
+async function sendReply({ privateMessage = false } = {}) {
 	return await replyMutation
 		.mutateAsync({
 			threadId: props.thread.id,
 			projectId: props.project?.id,
-			status,
 			privateMessage,
 		})
 		.catch(() => false)
@@ -1066,36 +757,12 @@ async function reopenReport() {
 	}
 }
 
-const replyWithSubmission = ref(false)
-const submissionConfirmation = ref(false)
 const replyConfirmation = ref(false)
-
-function openResubmitModal(reply) {
-	submissionConfirmation.value = false
-	replyWithSubmission.value = reply
-	modalSubmit.value.show()
-}
 
 function openReplyModal() {
 	replyConfirmation.value = false
 	modalReply.value.show()
 }
-
-async function resubmit() {
-	if (props.reviewSubmissionDisabled) return
-	if (replyWithSubmission.value) {
-		if (!(await sendReply('processing'))) return
-	} else {
-		if ((await props.setStatus('processing')) === false) return
-	}
-	modalSubmit.value.hide()
-}
-
-const requestedStatus = computed(() =>
-	['approved', 'unlisted', 'private'].includes(props.project?.requested_status)
-		? props.project.requested_status
-		: 'approved',
-)
 
 defineOptions({
 	inheritAttrs: false,

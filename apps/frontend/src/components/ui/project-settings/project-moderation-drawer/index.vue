@@ -301,6 +301,20 @@ function show(target?: DrawerView) {
 	nextTick(() => panel.value?.focus())
 }
 
+function openPublishingDetails() {
+	switch (publishingState.value) {
+		case 'review':
+		case 'withheld':
+		case 'approved':
+		case 'unlisted':
+		case 'private':
+			show('thread')
+			break
+		default:
+			show('moderation')
+	}
+}
+
 function showOnHover() {
 	closeOnPageHover = true
 	open.value = true
@@ -379,7 +393,7 @@ useEventListener('keydown', (event) => {
 			:expanded="open"
 			controls="project-moderation-drawer"
 			:submitting="submitting"
-			@open="show('moderation')"
+			@open="openPublishingDetails"
 			@submit="setProcessing"
 			@dismiss="dismissBanner"
 		/>
@@ -650,7 +664,11 @@ useEventListener('keydown', (event) => {
 								!canSubmit && remaining ? 'Complete the required items to continue.' : undefined
 							"
 						>
-							<Button class="w-full" :disabled="!canSubmit" @click="setProcessing"
+							<Button
+								:type="canSubmit ? 'colored' : 'base'"
+								class="w-full"
+								:disabled="!canSubmit"
+								@click="setProcessing"
 								><SendIcon />{{ rejected ? 'Resubmit for review' : 'Submit for review' }}</Button
 							>
 						</div>
