@@ -22,6 +22,7 @@ use crate::validate::shader::{
     CanvasShaderValidator, CoreShaderValidator, ShaderValidator,
 };
 use actix_web::web;
+use anyhow::anyhow;
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
 
@@ -64,7 +65,7 @@ pub enum ValidationError {
     #[error("Error while managing threads")]
     Blocking(#[from] actix_web::error::BlockingError),
     #[error("internal error while validating uploaded file")]
-    Internal(#[from] eyre::Report),
+    Internal(#[from] anyhow::Error),
 }
 
 #[derive(Eq, PartialEq, Debug)]
@@ -210,7 +211,7 @@ pub async fn validate_file(
         let name = crate::models::minecraft::legacy_game_version_name(&name.0);
         all_game_versions.iter().find(|version| version.name.0 == name)
             .cloned()
-            .ok_or_else(|| eyre::eyre!("missing minecraft game version `{name}` required for validation"))
+            .ok_or_else(|| anyhow!("missing minecraft game version `{name}` required for validation"))
     }).collect::<Result<Vec<_>, _>>()?;
 
     let available_loaders = DBLoader::list(&mut *transaction, redis).await?;

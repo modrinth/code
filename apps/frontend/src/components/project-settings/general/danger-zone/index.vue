@@ -26,7 +26,7 @@
 					type="colored"
 					color="red"
 					:disabled="!hasDeletePermission"
-					@click="confirmModal?.show()"
+					@click="confirmDeleteProject"
 					>{{ formatMessage(messages.deleteProjectButton) }}</Button
 				>
 			</div>
@@ -45,7 +45,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 
-import { isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
+import { ensurePrivileged, isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
 
 import SettingsSection from '../../settings-section.vue'
 import MonetizationActions from './monetization-actions.vue'
@@ -67,11 +67,17 @@ const hasDeletePermission = computed(() => {
 	return ((currentMember.value?.permissions ?? 0) & DELETE_PROJECT) === DELETE_PROJECT
 })
 
+const requiresPrivileged = computed(() => tags.value.approvedStatuses.includes(project.value.status))
+
+async function confirmDeleteProject() {
+	if (await ensurePrivileged(requiresPrivileged.value)) confirmModal.value?.show()
+}
+
 const deleteProject = async () => {
 	try {
 		await runPrivileged(
 			() => labrinth.projects_v3.deleteProject(project.value.id),
-			tags.value.approvedStatuses.includes(project.value.status),
+			requiresPrivileged.value,
 		)
 	} catch (err) {
 		if (isReauthCancelled(err)) {

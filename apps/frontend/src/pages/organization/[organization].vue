@@ -269,12 +269,11 @@ watch(
 const {
 	data: projects,
 	refetch: refreshProjects,
-	isFetching: projectsIsFetching,
+	isLoading: projectsIsLoading,
 } = useQuery({
 	queryKey: computed(() => ['organization', orgId.value, 'projects'] as const),
 	queryFn: ({ queryKey: [, id] }) => client.labrinth.organizations_v3.getProjects(id),
 	enabled: computed(() => !!orgId.value),
-	placeholderData: [],
 })
 
 watch(
@@ -291,7 +290,7 @@ const refresh = async () => {
 
 // Loading state
 const isLoading = computed(() => {
-	return organizationIsPending.value || projectsIsFetching.value
+	return organizationIsPending.value || projectsIsLoading.value
 })
 
 // Filter accepted, sort by role, then by name and Owner role always goes first

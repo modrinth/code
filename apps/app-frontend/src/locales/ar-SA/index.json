@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "تم النسخ"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "نسخ التفاصيل"
-  },
   "app.action-bar.install.dismiss": {
     "message": "تجاهل"
   },

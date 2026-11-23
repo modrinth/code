@@ -1,6 +1,6 @@
 use actix_web::{HttpRequest, HttpResponse, get, patch, web};
+use anyhow::anyhow;
 use chrono::Utc;
-use eyre::eyre;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use xredis::RedisPool;
@@ -63,8 +63,8 @@ pub async fn get_project_disclosures(
 
     let project = db_models::DBProject::get(&string, &***ro_pool, &redis)
         .await
-        .wrap_internal_err("failed to fetch project")?
-        .wrap_not_found_err("resource not found")?;
+        .internal_context("failed to fetch project")?
+        .not_found_context("resource not found")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -78,9 +78,9 @@ pub async fn get_project_disclosures(
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
         .await
-        .wrap_internal_err("failed to check project visibility")?
+        .internal_context("failed to check project visibility")?
     {
-        return Err(ApiError::NotFound(eyre!("resource not found")));
+        return Err(ApiError::NotFound(anyhow!("resource not found")));
     }
 
     let viewer_is_moderator = user_option
@@ -91,7 +91,7 @@ pub async fn get_project_disclosures(
     let viewer_is_member = viewer_is_moderator
         || is_team_member_project(&project.inner, &user_option, &pool)
             .await
-            .wrap_internal_err("failed to check project team membership")?;
+            .internal_context("failed to check project team membership")?;
 
     let disclosures = db_models::DBProjectDisclosure::get_many_for_project(
         project.inner.id,
@@ -99,7 +99,7 @@ pub async fn get_project_disclosures(
         &***ro_pool,
     )
     .await
-    .wrap_internal_err("failed to fetch project disclosures")?;
+    .internal_context("failed to fetch project disclosures")?;
 
     Ok(HttpResponse::Ok().json(GetProjectDisclosures {
         disclosures: disclosures
@@ -156,7 +156,7 @@ pub async fn modify_project_disclosures(
     let body = body.into_inner();
 
     if body.set.is_empty() && body.remove.is_empty() {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "must provide at least one disclosure to set or remove"
         )));
     }
@@ -169,12 +169,12 @@ pub async fn modify_project_disclosures(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let project = db_models::DBProject::get(&string, &**pool, &redis)
         .await
-        .wrap_internal_err("failed to fetch project")?
-        .wrap_not_found_err("resource not found")?;
+        .internal_context("failed to fetch project")?
+        .not_found_context("resource not found")?;
 
     let (team_member, organization_team_member) =
         db_models::DBTeamMember::get_for_project_permissions(
@@ -183,7 +183,7 @@ pub async fn modify_project_disclosures(
             &**pool,
         )
         .await
-        .wrap_internal_err("failed to fetch project permissions")?;
+        .internal_context("failed to fetch project permissions")?;
 
     let can_edit_details = ProjectPermissions::get_permissions_by_scopes(
         user.scopes,
@@ -193,7 +193,7 @@ pub async fn modify_project_disclosures(
     .is_some_and(|perms| perms.contains(ProjectPermissions::EDIT_DETAILS));
 
     if !can_edit_details {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "you do not have permission to edit this project's disclosures"
         )));
     }
@@ -203,7 +203,7 @@ pub async fn modify_project_disclosures(
         team_member.is_some() || organization_team_member.is_some();
 
     if body.lock_status.is_some() && !is_moderator {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "only moderators can set the lock status of a disclosure"
         )));
     }
@@ -225,7 +225,7 @@ pub async fn modify_project_disclosures(
             &**pool,
         )
         .await
-        .wrap_internal_err("failed to fetch disclosure lock statuses")?;
+        .internal_context("failed to fetch disclosure lock statuses")?;
 
     let lock_status_of = |disclosure_type: &str| {
         lock_statuses
@@ -239,7 +239,7 @@ pub async fn modify_project_disclosures(
             let disclosure_type =
                 <&'static str>::from(ProjectDisclosureType::from(disclosure));
             if !lock_status_of(disclosure_type).allows_edit() {
-                return Err(ApiError::Auth(eyre!(
+                return Err(ApiError::Auth(anyhow!(
                     "you cannot modify the `{disclosure_type}` disclosure, it is locked by a moderator"
                 )));
             }
@@ -247,7 +247,7 @@ pub async fn modify_project_disclosures(
 
         for disclosure_type in &body.remove {
             if !lock_status_of(disclosure_type).allows_removal() {
-                return Err(ApiError::Auth(eyre!(
+                return Err(ApiError::Auth(anyhow!(
                     "you cannot remove the `{disclosure_type}` disclosure, it is locked by a moderator"
                 )));
             }
@@ -257,7 +257,7 @@ pub async fn modify_project_disclosures(
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     for disclosure in body.set {
         let disclosure_type =
@@ -280,7 +280,7 @@ pub async fn modify_project_disclosures(
         }
         .upsert(&mut transaction)
         .await
-        .wrap_internal_err("failed to upsert project disclosure")?;
+        .internal_context("failed to upsert project disclosure")?;
     }
 
     for disclosure_type in &body.remove {
@@ -290,7 +290,7 @@ pub async fn modify_project_disclosures(
 
         let disclosure_type = ProjectDisclosureType::from_str(disclosure_type)
             .map_err(|_| {
-                ApiError::Request(eyre!(
+                ApiError::Request(anyhow!(
                     "unknown disclosure type `{disclosure_type}`"
                 ))
             })?;
@@ -302,7 +302,7 @@ pub async fn modify_project_disclosures(
             &mut transaction,
         )
         .await
-        .wrap_internal_err("failed to remove project disclosure")?;
+        .internal_context("failed to remove project disclosure")?;
     }
 
     super::projects::mutation::finalize_mutation(

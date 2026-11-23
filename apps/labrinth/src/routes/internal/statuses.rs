@@ -19,6 +19,8 @@ use crate::util::error::Context as _;
 use actix_web::web::{Data, Payload};
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use actix_ws::Message;
+use anyhow::Result;
+use anyhow::anyhow;
 use ariadne::ids::UserId;
 use ariadne::networking::message::{
     ClientToServerMessage, ServerToClientMessage,
@@ -26,7 +28,6 @@ use ariadne::networking::message::{
 use ariadne::users::UserStatus;
 use chrono::Utc;
 use either::Either;
-use eyre::Result;
 use futures_util::future::select;
 use futures_util::{StreamExt, TryStreamExt};
 use serde::Deserialize;
@@ -71,11 +72,11 @@ pub async fn ws_init(
         false,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .wrap_auth_err_with(|| AuthenticationError::InvalidCredentials)?;
+    .auth_context("authenticating API request")?
+    .auth_context_with(|| AuthenticationError::InvalidCredentials)?;
 
     if !scopes.contains(Scopes::SESSION_ACCESS) {
-        return Err(ApiError::Auth(eyre::eyre!(
+        return Err(ApiError::Auth(anyhow!(
             AuthenticationError::InvalidCredentials,
         )));
     }
@@ -97,7 +98,7 @@ pub async fn ws_init(
     let friends =
         DBFriend::get_user_friends(user.id.into(), Some(true), &***ro_pool)
             .await
-            .wrap_internal_err("fetching friends from database")?;
+            .internal_context("fetching friends from database")?;
 
     let friend_statuses = if !friends.is_empty() {
         let db = db.clone();
@@ -135,7 +136,7 @@ pub async fn ws_init(
             serde_json::to_string(&ServerToClientMessage::FriendStatuses {
                 statuses: friend_statuses,
             })
-            .wrap_request_err("serializing friend statuses")?,
+            .request_context("serializing friend statuses")?,
         )
         .await;
 
@@ -146,7 +147,7 @@ pub async fn ws_init(
             &redis,
         )
         .await
-        .wrap_internal_err("fetching notifications from database")?
+        .internal_context("fetching notifications from database")?
         .into_iter()
         .filter(|notification| {
             !notification.read
@@ -163,7 +164,7 @@ pub async fn ws_init(
         let _ = session
             .text(
                 serde_json::to_string(&notification)
-                    .wrap_request_err("serializing launcher notification")?,
+                    .request_context("serializing launcher notification")?,
             )
             .await;
     }
@@ -182,13 +183,13 @@ pub async fn ws_init(
 
     replace_user_status(None, Some(&status), &redis)
         .await
-        .wrap_internal_err("reading HTTP response body")?;
+        .internal_context("reading HTTP response body")?;
     broadcast_friends_message(
         &redis,
         RedisFriendsMessage::StatusUpdate { status },
     )
     .await
-    .wrap_internal_err("reading HTTP response body")?;
+    .internal_context("reading HTTP response body")?;
 
     let (shutdown_sender, mut shutdown_receiver) =
         tokio::sync::oneshot::channel::<()>();
@@ -410,7 +411,7 @@ pub async fn broadcast_friends_message(
     redis
         .publish(FRIENDS_CHANNEL_NAME, message)
         .await
-        .wrap_err("publishing friends message to redis")?;
+        .context("publishing friends message to redis")?;
 
     Ok(())
 }
@@ -424,11 +425,11 @@ pub async fn broadcast_to_local_friends(
     let friends =
         DBFriend::get_user_friends(user_id.into(), Some(true), &**ro_pool)
             .await
-            .wrap_err("fetching user friends from database")?;
+            .context("fetching user friends from database")?;
 
     broadcast_to_known_local_friends(user_id, message, sockets, friends)
         .await
-        .wrap_err("broadcasting message to local friends")
+        .context("broadcasting message to local friends")
 }
 
 async fn broadcast_to_known_local_friends(
@@ -485,7 +486,7 @@ pub async fn send_message_to_user(
             if let Some(socket) = db.sockets.get(&socket_id) {
                 send_message(&socket, message)
                     .await
-                    .wrap_err("sending websocket message to user")?;
+                    .context("sending websocket message to user")?;
             }
         }
     }
@@ -499,7 +500,7 @@ pub async fn send_notification_to_user(
     notification: &Notification,
 ) -> Result<()> {
     let message = serde_json::to_string(notification)
-        .wrap_err("serializing websocket notification")?;
+        .context("serializing websocket notification")?;
 
     if let Some(socket_ids) = db.sockets_by_user_id.get(&user) {
         for socket_id in socket_ids.iter() {
@@ -530,13 +531,13 @@ pub async fn close_socket(
 
         replace_user_status(Some(&socket.status), None, redis)
             .await
-            .wrap_err("removing user status from redis")?;
+            .context("removing user status from redis")?;
         broadcast_friends_message(
             redis,
             RedisFriendsMessage::UserOffline { user: user_id },
         )
         .await
-        .wrap_err("broadcasting user offline status")?;
+        .context("broadcasting user offline status")?;
 
         for owned_socket in socket.owned_tunnel_sockets {
             let Some((_, tunnel_socket)) =

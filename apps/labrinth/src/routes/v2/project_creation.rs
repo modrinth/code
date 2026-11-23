@@ -3,9 +3,9 @@ use crate::database::models::version_item;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::ids::ImageId;
-use crate::models::projects::{Loader, Project, ProjectStatus};
+use crate::models::projects::{Loader, Project};
 use crate::models::v2::projects::{
-    DonationLink, LegacyProject, LegacySideType,
+    DonationLink, LegacyProject, LegacySideType, ProjectStatus,
 };
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::default_project_type;
@@ -294,7 +294,10 @@ pub async fn project_create(
                     is_draft: legacy_create.is_draft,
                     license_id: legacy_create.license_id,
                     gallery_items: legacy_create.gallery_items,
-                    requested_status: legacy_create.requested_status,
+                    requested_status: None,
+                    visibility: legacy_create.requested_status.visibility().ok_or_else(|| {
+                        crate::routes::ApiError::Request(anyhow::anyhow!("invalid requested project status"))
+                    })?,
                     uploaded_images: legacy_create.uploaded_images,
                     organization_id: legacy_create.organization_id,
                 })

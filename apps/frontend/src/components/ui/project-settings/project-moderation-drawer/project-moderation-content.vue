@@ -66,6 +66,18 @@ withDefaults(defineProps<{ view?: 'moderation' | 'thread' }>(), { view: 'thread'
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	approveWithReply: {
+		id: 'conversation-thread.action.approve-with-reply',
+		defaultMessage: 'Approve with reply',
+	},
+	rejectWithReply: {
+		id: 'conversation-thread.action.reject-with-reply',
+		defaultMessage: 'Reject with reply',
+	},
+	withholdWithReply: {
+		id: 'conversation-thread.action.withhold-with-reply',
+		defaultMessage: 'Withhold with reply',
+	},
 	projectChanged: {
 		id: 'project.moderation.project-changed',
 		defaultMessage: 'The selected project changed. Review it again.',
@@ -163,33 +175,44 @@ const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const pending = computed(() => thread.value === undefined)
 
-const moderationActions = computed<ButtonMenuAction[]>(() => [
+type ModerationAction = Omit<ButtonMenuAction, 'action'> & {
+	labelWithReply?: string
+	action: (reviewReason?: string) => Promise<unknown>
+}
+
+const moderationActions = computed<ModerationAction[]>(() => [
 	{
 		id: 'approve',
 		label: 'Approve',
+		labelWithReply: formatMessage(messages.approveWithReply),
 		icon: CheckIcon,
 		tone: 'green',
 		disabled: isApproved(project.value),
-		action: () => {
+		action: (reviewReason) => {
 			const requested = project.value.requested_status
-			return setStatus(requested === 'unlisted' || requested === 'private' ? requested : 'approved')
+			return setStatus(
+				requested === 'unlisted' || requested === 'private' ? requested : 'approved',
+				reviewReason,
+			)
 		},
 	},
 	{
 		id: 'reject',
 		label: 'Reject',
+		labelWithReply: formatMessage(messages.rejectWithReply),
 		icon: XIcon,
 		tone: 'red',
 		disabled: project.value.status === 'rejected',
-		action: () => setStatus('rejected'),
+		action: (reviewReason) => setStatus('rejected', reviewReason),
 	},
 	{
 		id: 'withhold',
 		label: 'Withhold',
+		labelWithReply: formatMessage(messages.withholdWithReply),
 		icon: EyeOffIcon,
 		tone: 'orange',
 		disabled: project.value.status === 'withheld',
-		action: () => setStatus('withheld'),
+		action: (reviewReason) => setStatus('withheld', reviewReason),
 	},
 	{
 		id: 'send-to-review',
@@ -211,7 +234,7 @@ function updateThread(newThread: Labrinth.Threads.v3.Thread | null | undefined) 
 	)
 }
 
-async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
+async function setStatus(status: Labrinth.Projects.v2.ProjectStatus, reviewReason?: string) {
 	const { id: projectId, thread_id: threadId } = project.value
 	startLoading()
 
@@ -221,14 +244,16 @@ async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
 				if (project.value.id !== projectId) throw new Error(formatMessage(messages.projectChanged))
 			})
 		}
-		await client.labrinth.projects_v3.edit(projectId, { status })
+		await client.labrinth.projects_v3.edit(projectId, { status, review_reason: reviewReason })
 		await invalidate()
+		return true
 	} catch (error) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: getErrorDescription(error),
 			type: 'error',
 		})
+		return false
 	} finally {
 		await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
 		stopLoading()

@@ -102,7 +102,7 @@ pub(super) async fn validate_server_modpack(
     }
     let version = DBVersion::get((*version_id).into(), pool, redis)
         .await
-        .wrap_internal_err("fetching server modpack version")?;
+        .internal_context("fetching server modpack version")?;
     let visible = if let Some(version) = version {
         is_visible_version(&version.inner, &None, pool, redis).await?
     } else {

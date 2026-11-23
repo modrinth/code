@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use chrono::Utc;
 use modrinth_util::decimal::Decimal2dp;
 use reqwest::Method;
@@ -39,7 +40,7 @@ pub(super) async fn create(
     is_venmo: bool,
 ) -> Result<PayoutFlow, ApiError> {
     let gross_usd =
-        Decimal2dp::new(amount).wrap_request_err("invalid amount")?;
+        Decimal2dp::new(amount).request_context("invalid amount")?;
     let fee_usd = Decimal2dp::rounded(
         FEE.compute_fee(amount),
         RoundingStrategy::AwayFromZero,
@@ -102,18 +103,18 @@ pub(super) async fn execute(
         if let Some(venmo) = &user.venmo_handle {
             ("Venmo", "user_handle", venmo.clone(), venmo)
         } else {
-            return Err(ApiError::Request(eyre::eyre!(
+            return Err(ApiError::Request(anyhow!(
                 "Venmo address has not been set for account!",
             )));
         }
     } else if let Some(paypal_id) = &user.paypal_id {
         if let Some(paypal_country) = &user.paypal_country {
             if paypal_country == "US" && method_id != "paypal_us" {
-                return Err(ApiError::Request(eyre::eyre!(
+                return Err(ApiError::Request(anyhow!(
                     "Please use the US PayPal transfer option!",
                 )));
             } else if paypal_country != "US" && method_id == "paypal_us" {
-                return Err(ApiError::Request(eyre::eyre!(
+                return Err(ApiError::Request(anyhow!(
                     "Please use the International PayPal transfer option!",
                 )));
             }
@@ -125,12 +126,12 @@ pub(super) async fn execute(
                 user.paypal_email.as_ref().unwrap_or(paypal_id),
             )
         } else {
-            return Err(ApiError::Request(eyre::eyre!(
+            return Err(ApiError::Request(anyhow!(
                 "Please re-link your PayPal account!",
             )));
         }
     } else {
-        return Err(ApiError::Request(eyre::eyre!(
+        return Err(ApiError::Request(anyhow!(
             "You have not linked a PayPal account!",
         )));
     };
@@ -163,7 +164,7 @@ pub(super) async fn execute(
             None,
         )
         .await
-        .wrap_internal_err("failed to make payout request")?;
+        .internal_context("failed to make payout request")?;
 
     // by this point, we've made a monetary payout request to this user;
     // no matter what we do, we *must* track this payout in the DB,
@@ -191,7 +192,7 @@ pub(super) async fn execute(
         let link = res
             .links
             .first()
-            .wrap_request_err("no PayPal links available")?;
+            .request_context("no PayPal links available")?;
 
         let res = queue
             .make_paypal_request::<(), PayoutData>(
@@ -202,8 +203,8 @@ pub(super) async fn execute(
                 Some(true),
             )
             .await
-            .wrap_internal_err("failed to make PayPal link request")?;
-        let data = res.items.first().wrap_internal_err(
+            .internal_context("failed to make PayPal link request")?;
+        let data = res.items.first().internal_context(
             "no payout items returned from PayPal link request",
         )?;
 
@@ -221,12 +222,12 @@ pub(super) async fn execute(
     payout
         .insert(&mut transaction)
         .await
-        .wrap_internal_err("failed to insert payout")?;
+        .internal_context("failed to insert payout")?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("failed to commit transaction")?;
+        .internal_context("failed to commit transaction")?;
 
     Ok(())
 }

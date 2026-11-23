@@ -192,13 +192,13 @@ pub(crate) async fn fetch(
 
     let mut cursor = query
         .fetch::<ViewRow>()
-        .wrap_internal_err("fetching project-view pagination cursor")?;
+        .internal_context("fetching project-view pagination cursor")?;
     let mut buckets = HashMap::<ViewBucket, u64>::new();
 
     while let Some(row) = cursor
         .next()
         .await
-        .wrap_internal_err("fetching project views")?
+        .internal_context("fetching project views")?
     {
         let key = ViewBucket {
             bucket: row.bucket,
@@ -261,7 +261,7 @@ pub(crate) async fn fetch(
                 }),
             }),
         )
-        .wrap_api_err("executing `ProjectMetrics::Views`")?;
+        .api_context("executing `ProjectMetrics::Views`")?;
     }
 
     Ok(())

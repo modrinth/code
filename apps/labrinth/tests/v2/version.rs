@@ -149,6 +149,24 @@ async fn update_files_respects_processing_project_visibility() {
             let api = &test_env.api;
             let project = &test_env.dummy.project_alpha;
 
+            for pat in [ENEMY_USER_PAT, None] {
+                let versions = api
+                    .update_files_deserialized_common(
+                        "sha1",
+                        vec![project.file_hash.clone()],
+                        None,
+                        None,
+                        None,
+                        pat,
+                    )
+                    .await;
+                assert_eq!(versions.len(), 1);
+                assert_eq!(
+                    versions[&project.file_hash].id.to_string(),
+                    project.version_id
+                );
+            }
+
             let response = api
                 .edit_project(
                     &project.project_slug,
@@ -157,6 +175,13 @@ async fn update_files_respects_processing_project_visibility() {
                 )
                 .await;
             assert_status!(&response, StatusCode::NO_CONTENT);
+            let processing_project = api
+                .get_project_deserialized(&project.project_slug, ADMIN_USER_PAT)
+                .await;
+            assert_eq!(
+                processing_project.status,
+                labrinth::models::v2::projects::ProjectStatus::Processing
+            );
 
             for pat in [USER_USER_PAT, MOD_USER_PAT] {
                 let versions = api

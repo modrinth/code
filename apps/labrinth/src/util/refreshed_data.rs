@@ -3,7 +3,7 @@ use std::pin::Pin;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant};
 
-use eyre::Result;
+use anyhow::Result;
 use rand::RngExt;
 use tokio::sync::{Mutex, RwLock};
 

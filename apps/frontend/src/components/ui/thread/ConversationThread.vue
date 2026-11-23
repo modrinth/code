@@ -593,11 +593,26 @@ const modalReply = ref(null)
 const loadingAction = ref(null)
 const isLoading = computed(() => loadingAction.value !== null)
 const moderationMenuOptions = computed(() =>
-	props.moderationActions.map((option) => ({
-		...option,
-		action: () => runBlockingAction(option.id, option.action),
-	})),
+	props.moderationActions.map(({ labelWithReply, action, ...option }) => {
+		const withReply = Boolean(labelWithReply && replyBody.value.trim())
+		return {
+			...option,
+			label: withReply ? labelWithReply : option.label,
+			action: () => runBlockingAction(option.id, () => applyModerationAction(action, withReply)),
+		}
+	}),
 )
+
+async function applyModerationAction(action, withReply) {
+	if (!withReply) return await action()
+
+	const reviewReason = replyBody.value.trim()
+	if (!reviewReason) return
+	const threadId = props.thread.id
+	const projectId = props.project?.id
+	if ((await action(reviewReason)) === false) return
+	if (props.thread.id === threadId && props.project?.id === projectId) await sendReply()
+}
 
 async function runBlockingAction(actionId, action) {
 	if (loadingAction.value !== null) {

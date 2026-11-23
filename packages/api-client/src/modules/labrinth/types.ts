@@ -1069,17 +1069,16 @@ export namespace Labrinth {
 				| 'unknown'
 
 			export type AutoApprovalCause =
-				| { type: 'resubmission'; user_id: string }
-				| { type: 'technical_review_no_details' }
-				| { type: 'scan_completed'; report_id: number; scan_id: string }
-				| { type: 'rules_changed'; revision: number; user_id: string }
-				| { type: 'moderator_technical_review_pass'; user_id: string }
-				| { type: 'local_verdicts_updated'; user_id: string }
-				| { type: 'global_verdicts_updated'; user_id: string }
+				| { kind: 'resubmission'; user_id: string }
+				| { kind: 'technical_review_no_details' }
+				| { kind: 'scan_completed'; report_id: number; scan_id: string }
+				| { kind: 'rules_changed'; revision: number; user_id: string }
+				| { kind: 'moderator_technical_review_pass'; user_id: string }
+				| { kind: 'local_verdicts_updated'; user_id: string }
+				| { kind: 'global_verdicts_updated'; user_id: string }
 
 			export type ApprovalProvenance = {
 				trigger: AutoApprovalCause
-				previous_status: Projects.v2.ProjectStatus
 				resolved_issue_ids: string[]
 			}
 
@@ -1305,6 +1304,7 @@ export namespace Labrinth {
 				license_id?: string
 				slug?: string
 				status?: v2.ProjectStatus
+				review_reason?: string
 				requested_status?: v2.ProjectStatus | null
 				moderation_message?: string | null
 				moderation_message_body?: string | null
@@ -2491,8 +2491,10 @@ export namespace Labrinth {
 				name: string
 				summary: string
 				icon_url: string | null
-				status: Projects.v2.ProjectStatus
-				requested_status: Projects.v2.ProjectStatus | null
+				visibility: 'public' | 'unlisted' | 'private'
+				in_review: boolean
+				review_outcome: 'never_reviewed' | 'approved' | 'rejected' | 'withheld'
+				effective_visibility: 'public' | 'unlisted' | 'private'
 				queued: string | null
 				initial_queued: string | null
 				published: string
