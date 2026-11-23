@@ -934,6 +934,8 @@ export namespace Archon {
 				 * server-incompatible files, and its content is never disabled on the server.
 				 */
 				drop_client_mods: boolean
+				/** Whether the server is restarted when it crashes after it finished starting, at most 3 times an hour. */
+				auto_restart_on_crash: boolean
 				location: ServerLocation
 				icon: Icons.v1.ServerIcon | null
 				worlds: WorldFull[]
@@ -969,6 +971,10 @@ export namespace Archon {
 				  }
 
 			export type ReleaseChannel = 'release' | 'beta' | 'alpha'
+
+			export type PatchServer = {
+				auto_restart_on_crash?: boolean
+			}
 
 			export type PatchWorld = {
 				name?: string
