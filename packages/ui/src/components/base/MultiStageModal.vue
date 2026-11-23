@@ -12,6 +12,7 @@
 		:closable="true"
 		:close-on-click-outside="closeOnClickOutside"
 		:width="resolvedMaxWidth"
+		:animate-resize="resolveCtxFn(currentStage.animateResize, context) ?? true"
 		:fade="fade"
 		:hide-header="resolveCtxFn(currentStage.hideHeader, context)"
 		:merge-header="resolveCtxFn(currentStage.mergeHeader, context)"
@@ -171,6 +172,7 @@ export interface StageConfigInput<T> {
 	rightButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 	/** Max width for the modal content and header defined in px (e.g., '460px', '600px'). Defaults to '460px'. */
 	maxWidth?: MaybeCtxFn<T, string>
+	animateResize?: MaybeCtxFn<T, boolean>
 	actionsTopMargin?: MaybeCtxFn<T, 'none' | 'sm' | 'md'>
 }
 
