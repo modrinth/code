@@ -1,7 +1,7 @@
 use crate::routes::ApiError;
 use crate::search::SearchRequest;
 use crate::util::error::Context;
-use eyre::eyre;
+use anyhow::anyhow;
 use std::borrow::Cow;
 
 pub struct ParsedSearchRequest<'a> {
@@ -20,13 +20,13 @@ pub fn parse_search_request(
         .as_deref()
         .unwrap_or("0")
         .parse::<usize>()
-        .wrap_request_err("invalid offset")?;
+        .request_context("invalid offset")?;
     let limit = info
         .limit
         .as_deref()
         .unwrap_or("10")
         .parse::<usize>()
-        .wrap_request_err("invalid limit")?
+        .request_context("invalid limit")?
         .min(100);
     let hits_per_page = if limit == 0 { 1 } else { limit };
 
@@ -88,7 +88,7 @@ pub fn parse_search_index(
         "minecraft_java_server.ping.data.players_online" => SearchSort {
             index: SearchIndex::MinecraftJavaServerPlayersOnline,
         },
-        i => return Err(ApiError::Request(eyre!("invalid index '{i}'"))),
+        i => return Err(ApiError::Request(anyhow!("invalid index '{i}'"))),
     })
 }
 

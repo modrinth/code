@@ -2,7 +2,7 @@
 //! maximum withdraw amounts, and execution logic.
 
 use crate::util::error::ApiContext as _;
-use eyre::eyre;
+use anyhow::anyhow;
 use modrinth_util::decimal::Decimal2dp;
 use rust_decimal::Decimal;
 use thiserror::Error;
@@ -38,10 +38,10 @@ impl PayoutsQueue {
             let method = self
                 .get_payout_methods()
                 .await
-                .wrap_internal_err("failed to fetch payout methods")?
+                .internal_context("failed to fetch payout methods")?
                 .into_iter()
                 .find(|method| method.id == withdrawal.method_id)
-                .wrap_request_err("invalid payout method ID")?;
+                .request_context("invalid payout method ID")?;
             Ok::<_, ApiError>(method)
         };
 
@@ -62,7 +62,7 @@ impl PayoutsQueue {
                     method_details,
                     &get_method
                         .await
-                        .wrap_api_err("executing `tremendous::create`")?,
+                        .api_context("executing `tremendous::create`")?,
                 )
                 .await
             }
@@ -166,11 +166,12 @@ impl ReadyPayoutFlow {
 }
 
 fn get_verified_email(user: &DBUser) -> Result<&str, ApiError> {
-    let email = user.email.as_ref().wrap_request_err(
-        "you must add an email to your account to withdraw",
-    )?;
+    let email = user
+        .email
+        .as_ref()
+        .request_context("you must add an email to your account to withdraw")?;
     if !user.email_verified {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "you must verify your email to withdraw"
         )));
     }

@@ -29,6 +29,7 @@ const props = withDefaults(
 		maxSize?: number | null
 		showIcon?: boolean
 		shouldAlwaysReset?: boolean
+		clearOnChange?: boolean
 		longStyle?: boolean
 		disabled?: boolean
 	}>(),
@@ -37,6 +38,7 @@ const props = withDefaults(
 		multiple: false,
 		showIcon: true,
 		shouldAlwaysReset: false,
+		clearOnChange: false,
 		longStyle: false,
 		disabled: false,
 	},
@@ -56,6 +58,9 @@ function addFiles(incoming: FileList, shouldNotReset = false) {
 	files.value = files.value.filter((file) => fileIsValid(file, validationOptions, formatBytes))
 	if (files.value.length > 0) {
 		emit('change', files.value)
+		if (props.clearOnChange) {
+			files.value = []
+		}
 	}
 }
 

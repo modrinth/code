@@ -5,8 +5,8 @@
 //! into its project document.
 
 use crate::util::error::ApiContext as _;
+use anyhow::{Result, anyhow};
 use async_trait::async_trait;
-use eyre::{Result, eyre};
 use itertools::Itertools;
 use reqwest::{Method, Response, StatusCode};
 use serde::Serialize;
@@ -113,7 +113,7 @@ impl ElasticsearchClient {
             .request(Method::GET, &format!("/_alias/{alias}"))
             .send()
             .await
-            .wrap_err("failed to get Elasticsearch alias")?;
+            .context("failed to get Elasticsearch alias")?;
         if response.status() == StatusCode::NOT_FOUND {
             return Ok(None);
         }
@@ -129,7 +129,7 @@ impl ElasticsearchClient {
             .request(Method::HEAD, &format!("/{index}"))
             .send()
             .await
-            .wrap_err("failed to check Elasticsearch index existence")?;
+            .context("failed to check Elasticsearch index existence")?;
         Ok(response.status().is_success())
     }
 
@@ -139,7 +139,7 @@ impl ElasticsearchClient {
             .json(schema)
             .send()
             .await
-            .wrap_err("failed to create Elasticsearch index")?;
+            .context("failed to create Elasticsearch index")?;
         response_json(response, "create Elasticsearch index").await?;
         Ok(())
     }
@@ -149,7 +149,7 @@ impl ElasticsearchClient {
             .request(Method::DELETE, &format!("/{index}"))
             .send()
             .await
-            .wrap_err("failed to delete Elasticsearch index")?;
+            .context("failed to delete Elasticsearch index")?;
         if response.status() == StatusCode::NOT_FOUND {
             return Ok(());
         }
@@ -182,7 +182,7 @@ impl ElasticsearchClient {
             .json(&json!({"actions": actions}))
             .send()
             .await
-            .wrap_err("failed to swap Elasticsearch alias")?;
+            .context("failed to swap Elasticsearch alias")?;
         response_json(response, "swap Elasticsearch alias").await?;
         Ok(())
     }
@@ -194,7 +194,7 @@ impl ElasticsearchClient {
             .body(body)
             .send()
             .await
-            .wrap_err("failed to execute Elasticsearch bulk request")?;
+            .context("failed to execute Elasticsearch bulk request")?;
         let body =
             response_json(response, "execute Elasticsearch bulk request")
                 .await?;
@@ -210,7 +210,7 @@ impl ElasticsearchClient {
                 .take(10)
                 .map(|error| error.to_string())
                 .join("; ");
-            return Err(eyre!(
+            return Err(anyhow!(
                 "Elasticsearch bulk request contained failures: {failures}"
             ));
         }
@@ -228,14 +228,14 @@ impl ElasticsearchClient {
             .json(&json!({"query": query}))
             .send()
             .await
-            .wrap_err("failed to delete Elasticsearch documents")?;
+            .context("failed to delete Elasticsearch documents")?;
         let body =
             response_json(response, "delete Elasticsearch documents").await?;
         if body["failures"]
             .as_array()
             .is_some_and(|failures| !failures.is_empty())
         {
-            return Err(eyre!(
+            return Err(anyhow!(
                 "Elasticsearch delete-by-query contained failures: {}",
                 body["failures"]
             ));
@@ -248,7 +248,7 @@ impl ElasticsearchClient {
             .request(Method::POST, &format!("/{index}/_refresh"))
             .send()
             .await
-            .wrap_err("failed to refresh Elasticsearch index")?;
+            .context("failed to refresh Elasticsearch index")?;
         response_json(response, "refresh Elasticsearch index").await?;
         Ok(())
     }
@@ -261,7 +261,7 @@ impl ElasticsearchClient {
             )
             .send()
             .await
-            .wrap_err("failed to force-merge Elasticsearch index")?;
+            .context("failed to force-merge Elasticsearch index")?;
         response_json(response, "force-merge Elasticsearch index").await?;
         Ok(())
     }
@@ -272,14 +272,14 @@ async fn response_json(response: Response, operation: &str) -> Result<Value> {
     let body = response
         .text()
         .await
-        .wrap_err_with(|| format!("failed to read response for {operation}"))?;
+        .with_context(|| format!("failed to read response for {operation}"))?;
     let json = serde_json::from_str(&body).unwrap_or_else(|_| {
         json!({
             "unparsed_response": body
         })
     });
     if !status.is_success() {
-        return Err(eyre!("{operation} failed ({status}): {json}"));
+        return Err(anyhow!("{operation} failed ({status}): {json}"));
     }
     Ok(json)
 }
@@ -339,7 +339,7 @@ impl Elasticsearch {
     ) -> Result<Option<ElasticsearchFilter>, ApiError> {
         let facet_part = if let Some(facets_json) = info.facets.as_deref() {
             from_legacy_v2_facets_json(facets_json)
-                .wrap_request_err("failed to parse facets")?
+                .request_context("failed to parse facets")?
         } else {
             None
         };
@@ -348,13 +348,13 @@ impl Elasticsearch {
             .filter(|filter| !filter.trim().is_empty())
             .map(|filter| parse_expression(&filter))
             .transpose()
-            .wrap_request_err("failed to parse filters")?;
+            .request_context("failed to parse filters")?;
 
         FilterExpr::and([facet_part, filter_part].into_iter().flatten())
             .map(normalize)
             .map(|filter| {
                 serialize_filter(&filter)
-                    .wrap_request_err("failed to build search filter")
+                    .request_context("failed to build search filter")
             })
             .transpose()
     }
@@ -386,10 +386,10 @@ impl Elasticsearch {
             .json(body)
             .send()
             .await
-            .wrap_internal_err("failed to execute Elasticsearch search")?;
+            .internal_context("failed to execute Elasticsearch search")?;
         let mut body = response_json(response, "execute Elasticsearch search")
             .await
-            .wrap_internal_err("parsing Elasticsearch search response")?;
+            .internal_context("parsing Elasticsearch search response")?;
         if sort_only && !body["hits"]["hits"].is_array() {
             body["hits"]["hits"] = Value::Array(Vec::new());
         }
@@ -408,18 +408,13 @@ impl Elasticsearch {
             )
             .send()
             .await
-            .wrap_internal_err("failed to open Elasticsearch point in time")?;
+            .internal_context("failed to open Elasticsearch point in time")?;
         let body = response_json(response, "open Elasticsearch point in time")
             .await
-            .wrap_internal_err(
-                "parsing Elasticsearch point-in-time response",
-            )?;
-        body["id"]
-            .as_str()
-            .map(ToOwned::to_owned)
-            .wrap_internal_err(
-                "finding ID in Elasticsearch point-in-time response",
-            )
+            .internal_context("parsing Elasticsearch point-in-time response")?;
+        body["id"].as_str().map(ToOwned::to_owned).internal_context(
+            "finding ID in Elasticsearch point-in-time response",
+        )
     }
 
     async fn close_point_in_time(&self, id: &str) -> Result<(), ApiError> {
@@ -429,12 +424,10 @@ impl Elasticsearch {
             .json(&json!({"id": id}))
             .send()
             .await
-            .wrap_internal_err("failed to close Elasticsearch point in time")?;
+            .internal_context("failed to close Elasticsearch point in time")?;
         response_json(response, "close Elasticsearch point in time")
             .await
-            .wrap_internal_err(
-                "parsing Elasticsearch point-in-time response",
-            )?;
+            .internal_context("parsing Elasticsearch point-in-time response")?;
         Ok(())
     }
 
@@ -454,7 +447,7 @@ impl Elasticsearch {
             .json(body)
             .send()
             .await
-            .wrap_internal_err(
+            .internal_context(
                 "failed to execute Elasticsearch point in time search",
             )?;
         let mut body = response_json(
@@ -462,7 +455,7 @@ impl Elasticsearch {
             "execute Elasticsearch point in time search",
         )
         .await
-        .wrap_internal_err(
+        .internal_context(
             "parsing Elasticsearch point-in-time search response",
         )?;
         if sort_only && !body["hits"]["hits"].is_array() {
@@ -483,7 +476,7 @@ impl Elasticsearch {
         let mut point_in_time_id = self
             .open_point_in_time(alias)
             .await
-            .wrap_api_err("executing `open_point_in_time`")?;
+            .api_context("executing `open_point_in_time`")?;
         let result = self
             .execute_deep_search_with_point_in_time(
                 query,
@@ -531,7 +524,7 @@ impl Elasticsearch {
             let body = self
                 .execute_point_in_time_search(&body, true)
                 .await
-                .wrap_api_err("executing `execute_point_in_time_search`")?;
+                .api_context("executing `execute_point_in_time_search`")?;
             if let Some(id) = body["pit_id"].as_str() {
                 *point_in_time_id = id.to_string();
             }
@@ -596,7 +589,7 @@ impl Elasticsearch {
         let body = self
             .execute_point_in_time_search(&body, false)
             .await
-            .wrap_api_err("executing `execute_point_in_time_search`")?;
+            .api_context("executing `execute_point_in_time_search`")?;
         if let Some(id) = body["pit_id"].as_str() {
             *point_in_time_id = id.to_string();
         }
@@ -872,12 +865,12 @@ impl Elasticsearch {
         info: &SearchRequest,
     ) -> Result<SearchResults, ApiError> {
         let parsed = parse_search_request(info)
-            .wrap_api_err("executing `parse_search_request`")?;
+            .api_context("executing `parse_search_request`")?;
         let search_sort =
             parse_search_index(parsed.index, info.new_filters.as_deref())
-                .wrap_api_err("executing `parse_search_index`")?;
+                .api_context("executing `parse_search_index`")?;
         let filter = Self::build_filter(info)
-            .wrap_api_err("executing `Self::build_filter`")?;
+            .api_context("executing `Self::build_filter`")?;
         let mut filters = vec![json!({"term": {"document_type": "project"}})];
         if let Some(filter) = &filter {
             filters.push(filter.query.clone());
@@ -901,7 +894,7 @@ impl Elasticsearch {
                 parsed.hits_per_page,
             )
             .await
-            .wrap_api_err("executing `execute_deep_search`")?
+            .api_context("executing `execute_deep_search`")?
         } else {
             let body = Self::search_body(
                 &query,
@@ -914,7 +907,7 @@ impl Elasticsearch {
             );
             self.execute_search(&alias, &body, false)
                 .await
-                .wrap_api_err("executing `execute_search`")?
+                .api_context("executing `execute_search`")?
         };
         let total_hits = body["hits"]["total"]["value"]
             .as_u64()
@@ -1006,7 +999,7 @@ impl SearchBackend for Elasticsearch {
                 self.config.index_chunk_size,
             )
             .await
-            .wrap_err("failed to fetch projects from local DB")?;
+            .context("failed to fetch projects from local DB")?;
             if documents.projects.is_empty() {
                 info!(
                     "no more documents; indexed {total_projects} projects and {total_versions} versions in {chunk_index} chunks"
@@ -1090,7 +1083,7 @@ impl SearchBackend for Elasticsearch {
             .request(Method::GET, "/_tasks?detailed=true")
             .send()
             .await
-            .wrap_err("failed to get Elasticsearch tasks")?;
+            .context("failed to get Elasticsearch tasks")?;
         response_json(response, "get Elasticsearch tasks").await
     }
 
@@ -1102,7 +1095,7 @@ impl SearchBackend for Elasticsearch {
                     .request(Method::POST, "/_tasks/_cancel")
                     .send()
                     .await
-                    .wrap_err("failed to cancel Elasticsearch tasks")?;
+                    .context("failed to cancel Elasticsearch tasks")?;
                 response_json(response, "cancel Elasticsearch tasks").await?;
             }
             TasksCancelFilter::AllEnqueued => {
@@ -1131,7 +1124,7 @@ impl SearchBackend for Elasticsearch {
                                 )
                                 .send()
                                 .await
-                                .wrap_err(
+                                .context(
                                     "failed to cancel Elasticsearch task",
                                 )?;
                             response_json(
@@ -1181,10 +1174,10 @@ fn projects_to_bulk(documents: &[UploadSearchProject]) -> Result<String> {
         )?;
 
         let mut source = serde_json::to_value(document)
-            .wrap_err("failed to serialize `UploadSearchProject`")?;
-        let object = source
-            .as_object_mut()
-            .ok_or_else(|| eyre!("project search document is not an object"))?;
+            .context("failed to serialize `UploadSearchProject`")?;
+        let object = source.as_object_mut().ok_or_else(|| {
+            anyhow!("project search document is not an object")
+        })?;
         object.insert(
             "document_type".to_string(),
             Value::String("project".to_string()),
@@ -1210,10 +1203,10 @@ fn versions_to_bulk(documents: &[UploadSearchVersion]) -> Result<String> {
         )?;
 
         let mut source = serde_json::to_value(document)
-            .wrap_err("failed to serialize `UploadSearchVersion`")?;
+            .context("failed to serialize `UploadSearchVersion`")?;
         source
             .as_object_mut()
-            .ok_or_else(|| eyre!("version search document is not an object"))?
+            .ok_or_else(|| anyhow!("version search document is not an object"))?
             .insert(
                 "document_type".to_string(),
                 json!({

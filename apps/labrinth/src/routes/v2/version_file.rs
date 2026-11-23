@@ -72,7 +72,7 @@ pub async fn get_version_from_hash(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
@@ -237,7 +237,7 @@ pub async fn get_update_from_hash(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
@@ -294,7 +294,7 @@ pub async fn get_versions_from_hashes(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
 
     // Convert to V2
     match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response)
@@ -348,7 +348,7 @@ pub async fn get_projects_from_hashes(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
 
     // Convert to V2
     match v2_reroute::extract_ok_json::<HashMap<String, Project>>(response)
@@ -368,7 +368,7 @@ pub async fn get_projects_from_hashes(
                 &redis,
             )
             .await
-            .wrap_internal_err("converting projects to legacy responses")?;
+            .internal_context("converting projects to legacy responses")?;
             let legacy_projects_hashes = hash_to_project_id
                 .into_iter()
                 .filter_map(|(hash, project_id)| {
@@ -585,7 +585,7 @@ pub async fn update_individual_files(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response)

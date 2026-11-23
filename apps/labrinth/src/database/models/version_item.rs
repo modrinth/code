@@ -7,9 +7,9 @@ use xredis::RedisPool;
 
 use crate::models::projects::{FileType, VersionStatus};
 use crate::queue::file_scan::scan_file;
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
-use eyre::{Result, WrapErr};
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -41,7 +41,7 @@ pub async fn cleanup_unused_attribution_files_and_groups(
     )
     .execute(&mut *transaction)
     .await
-    .wrap_err("deleting unused attribution files")?;
+    .context("deleting unused attribution files")?;
 
     sqlx::query!(
         "
@@ -55,7 +55,7 @@ pub async fn cleanup_unused_attribution_files_and_groups(
     )
     .execute(&mut *transaction)
     .await
-    .wrap_err("deleting unused attribution groups")?;
+    .context("deleting unused attribution groups")?;
 
     Ok(())
 }
@@ -99,7 +99,7 @@ impl DependencyBuilder {
                 dependency
                     .try_get_project_id(transaction)
                     .await
-                    .wrap_err("resolving dependency project")?
+                    .context("resolving dependency project")?
                     .map(|id| id.0),
             );
         }
@@ -133,7 +133,7 @@ impl DependencyBuilder {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting dependencies")?;
+        .context("inserting dependencies")?;
 
         Ok(())
     }
@@ -153,7 +153,7 @@ impl DependencyBuilder {
             )
             .fetch_optional(&mut *transaction)
             .await
-            .wrap_err("fetching dependency project")?
+            .context("fetching dependency project")?
             .map(|x| DBProjectId(x.mod_id))
         } else {
             None
@@ -183,7 +183,7 @@ impl VersionFileBuilder {
     ) -> Result<DBFileId> {
         let file_id = generate_file_id(&mut *transaction)
             .await
-            .wrap_err("generating file id")?;
+            .context("generating file id")?;
 
         sqlx::query!(
             "
@@ -200,7 +200,7 @@ impl VersionFileBuilder {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting version file")?;
+        .context("inserting version file")?;
 
         for hash in self.hashes {
             sqlx::query!(
@@ -214,7 +214,7 @@ impl VersionFileBuilder {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("inserting file hash")?;
+            .context("inserting file hash")?;
         }
 
         let attribution_scan = sqlx::query!(
@@ -232,7 +232,7 @@ impl VersionFileBuilder {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("creating attribution file scan")?;
+        .context("creating attribution file scan")?;
 
         if attribution_scan.rows_affected() > 0
             && let Err(err) = scan_file(
@@ -288,7 +288,7 @@ impl VersionBuilder {
         version
             .insert(transaction)
             .await
-            .wrap_err("inserting version")?;
+            .context("inserting version")?;
 
         sqlx::query!(
             "
@@ -300,7 +300,7 @@ impl VersionBuilder {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("updating project timestamp")?;
+        .context("updating project timestamp")?;
 
         let VersionBuilder {
             dependencies,
@@ -320,7 +320,7 @@ impl VersionBuilder {
                 delphi_scan_files,
             )
             .await
-            .wrap_err("inserting version file")?;
+            .context("inserting version file")?;
         }
 
         DependencyBuilder::insert_many(
@@ -329,7 +329,7 @@ impl VersionBuilder {
             transaction,
         )
         .await
-        .wrap_err("inserting version dependencies")?;
+        .context("inserting version dependencies")?;
 
         let loader_versions = loaders
             .iter()
@@ -340,7 +340,7 @@ impl VersionBuilder {
             .collect_vec();
         DBLoaderVersion::insert_many(loader_versions, transaction)
             .await
-            .wrap_err("inserting version loaders")?;
+            .context("inserting version loaders")?;
 
         Ok(self.version_id)
     }
@@ -371,7 +371,7 @@ impl DBLoaderVersion {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting version loaders")?;
+        .context("inserting version loaders")?;
 
         Ok(())
     }
@@ -440,7 +440,7 @@ impl DBVersion {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting version")?;
+        .context("inserting version")?;
 
         Ok(())
     }
@@ -452,7 +452,7 @@ impl DBVersion {
     ) -> Result<Option<()>> {
         let result = Self::get(id, &mut *transaction, redis)
             .await
-            .wrap_err("fetching version")?;
+            .context("fetching version")?;
 
         let Some(result) = result else {
             return Ok(None);
@@ -460,7 +460,7 @@ impl DBVersion {
 
         DBVersion::clear_cache(&result, redis)
             .await
-            .wrap_err("clearing version cache")?;
+            .context("clearing version cache")?;
 
         sqlx::query!(
             "
@@ -472,7 +472,7 @@ impl DBVersion {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("unlinking version reports")?;
+        .context("unlinking version reports")?;
 
         sqlx::query!(
             "
@@ -483,7 +483,7 @@ impl DBVersion {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("deleting version loaders")?;
+        .context("deleting version loaders")?;
 
         sqlx::query!(
             "
@@ -498,7 +498,7 @@ impl DBVersion {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("deleting version file hashes")?;
+        .context("deleting version file hashes")?;
 
         sqlx::query!(
             "
@@ -509,11 +509,11 @@ impl DBVersion {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("deleting version files")?;
+        .context("deleting version files")?;
 
         cleanup_unused_attribution_files_and_groups(transaction)
             .await
-            .wrap_err("cleaning up unused attribution files and groups")?;
+            .context("cleaning up unused attribution files and groups")?;
 
         // Sync dependencies
 
@@ -525,7 +525,7 @@ impl DBVersion {
         )
         .fetch_one(&mut *transaction)
         .await
-        .wrap_err("fetching version project")?;
+        .context("fetching version project")?;
 
         sqlx::query!(
             "
@@ -538,7 +538,7 @@ impl DBVersion {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("unlinking version dependencies")?;
+        .context("unlinking version dependencies")?;
 
         sqlx::query!(
             "
@@ -547,7 +547,7 @@ impl DBVersion {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("deleting orphaned dependencies")?;
+        .context("deleting orphaned dependencies")?;
 
         sqlx::query!(
             "
@@ -557,7 +557,7 @@ impl DBVersion {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("deleting version dependencies")?;
+        .context("deleting version dependencies")?;
 
         // delete version
 
@@ -569,7 +569,7 @@ impl DBVersion {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("deleting version")?;
+        .context("deleting version")?;
 
         crate::database::models::DBProject::clear_cache(
             DBProjectId(project_id.mod_id),
@@ -578,7 +578,7 @@ impl DBVersion {
             redis,
         )
         .await
-        .wrap_err("clearing project cache")?;
+        .context("clearing project cache")?;
 
         Ok(Some(()))
     }
@@ -593,7 +593,7 @@ impl DBVersion {
     {
         Self::get_many(&[id], executor, redis)
             .await
-            .wrap_err("fetching version")
+            .context("fetching version")
             .map(|x| x.into_iter().next())
     }
 
@@ -607,7 +607,7 @@ impl DBVersion {
     {
         Self::get_many_inner(version_ids, exec, redis, true)
             .await
-            .wrap_err("fetching versions")
+            .context("fetching versions")
     }
 
     pub async fn get_many_uncached<'a, E>(
@@ -620,7 +620,7 @@ impl DBVersion {
     {
         Self::get_many_inner(version_ids, exec, redis, false)
             .await
-            .wrap_err("fetching uncached versions")
+            .context("fetching uncached versions")
     }
 
     async fn get_many_inner<'a, E>(
@@ -640,7 +640,7 @@ impl DBVersion {
                 let mut exec = exec
                     .acquire()
                     .await
-                    .wrap_err("acquiring database connection")?;
+                    .context("acquiring database connection")?;
 
                 #[derive(Default)]
                 struct VersionLoaderData {
@@ -679,7 +679,7 @@ impl DBVersion {
                     )
                     .try_collect()
                     .await
-                    .wrap_err("fetching version loader data")?;
+                    .context("fetching version loader data")?;
 
                 #[derive(Deserialize)]
                 struct Hash {
@@ -708,7 +708,7 @@ impl DBVersion {
                     ",
                     &version_ids
                 ).fetch(&mut exec)
-                    .map_err(eyre::Report::from)
+                    .map_err(anyhow::Error::from)
                     .try_fold(DashMap::new(), |acc : DashMap<DBVersionId, Vec<File>>, m| {
                         let file = File {
                             id: DBFileId(m.id),
@@ -725,11 +725,11 @@ impl DBVersion {
                         acc.entry(DBVersionId(m.version_id))
                             .or_default()
                             .push(file);
-                        async move { eyre::Ok(acc) }
+                        async move { anyhow::Ok(acc) }
                     }
                     )
                     .await
-                    .wrap_err("fetching version files")?;
+                    .context("fetching version files")?;
 
                 let hashes: DashMap<DBVersionId, Vec<Hash>> = sqlx::query!(
                     "
@@ -740,7 +740,7 @@ impl DBVersion {
                     &file_ids.iter().map(|x| x.0).collect::<Vec<_>>()
                 )
                     .fetch(&mut exec)
-                    .map_err(eyre::Report::from)
+                    .map_err(anyhow::Error::from)
                     .try_fold(DashMap::new(), |acc: DashMap<DBVersionId, Vec<Hash>>, m| {
                         if let Some(found_hash) = m.hash {
                             let hash = Hash {
@@ -753,10 +753,10 @@ impl DBVersion {
                                 acc.entry(*version_id).or_default().push(hash);
                             }
                         }
-                        async move { eyre::Ok(acc) }
+                        async move { anyhow::Ok(acc) }
                     })
                     .await
-                    .wrap_err("fetching version file hashes")?;
+                    .context("fetching version file hashes")?;
 
                 let dependencies : DashMap<DBVersionId, Vec<DependencyQueryResult>> = sqlx::query!(
                     "
@@ -766,7 +766,7 @@ impl DBVersion {
                     ",
                     &version_ids
                 ).fetch(&mut exec)
-                    .map_err(eyre::Report::from)
+                    .map_err(anyhow::Error::from)
                     .try_fold(DashMap::new(), |acc : DashMap<_,Vec<DependencyQueryResult>>, m| {
                         let dependency = DependencyQueryResult {
                             id: m.dependency_id,
@@ -780,11 +780,11 @@ impl DBVersion {
                         acc.entry(DBVersionId(m.version_id))
                             .or_default()
                             .push(dependency);
-                        async move { eyre::Ok(acc) }
+                        async move { anyhow::Ok(acc) }
                     }
                     )
                     .await
-                    .wrap_err("fetching version dependencies")?;
+                    .context("fetching version dependencies")?;
 
                 let dependency_attributions =
                     crate::queue::file_scan::get_dependency_attributions(
@@ -811,7 +811,7 @@ impl DBVersion {
                 )
                     .fetch_all(&mut exec)
                     .await
-                    .wrap_err("fetching version rows")?;
+                    .context("fetching version rows")?;
 
                 let version_components = version_rows.iter()
                     .map(|row| (DBVersionId(row.id).into(), &row.components.0))
@@ -822,7 +822,7 @@ impl DBVersion {
                     redis,
                 )
                 .await
-                .wrap_err("fetching version query context")?;
+                .context("fetching version query context")?;
 
                 let res = version_rows.into_iter()
                     .try_fold(DashMap::new(), |acc, v| {
@@ -851,7 +851,7 @@ impl DBVersion {
                         let components_serial = v.components.0;
                         let components = components_serial.clone()
                             .into_query(version_id.into(), &version_query_context)
-                            .wrap_err("failed to populate query components")?;
+                            .context("failed to populate query components")?;
                         let query_version = VersionQueryResult {
                             inner: DBVersion {
                                 id: DBVersionId(v.id),
@@ -913,15 +913,15 @@ impl DBVersion {
                         };
 
                         acc.insert(v.id, query_version);
-							eyre::Ok(acc)
+							anyhow::Ok(acc)
                     })
-                    .wrap_err("populating versions")?;
+                    .context("populating versions")?;
 
-                eyre::Ok(res)
+                anyhow::Ok(res)
             },
         )
         .await
-        .wrap_err("fetching cached versions")?;
+        .context("fetching cached versions")?;
 
         val.sort();
 
@@ -940,7 +940,7 @@ impl DBVersion {
     {
         Self::get_files_from_hash(algo, &[hash], executor, redis)
             .await
-            .wrap_err("fetching version file from hash")
+            .context("fetching version file from hash")
             .map(|x| {
                 x.into_iter()
                     .find_or_first(|x| Some(x.version_id) == version_id)
@@ -975,7 +975,7 @@ impl DBVersion {
                     &file_ids.into_iter().filter_map(|x| x.split('_').last().map(|x| x.as_bytes().to_vec())).collect::<Vec<_>>(),
                 )
                     .fetch(executor)
-                    .map_err(eyre::Report::from)
+                    .map_err(anyhow::Error::from)
                     .try_fold(DashMap::new(), |acc, f| {
                         #[derive(Deserialize)]
                         struct Hash {
@@ -1008,16 +1008,16 @@ impl DBVersion {
                             acc.insert(key, file);
                         }
 
-                        async move { eyre::Ok(acc) }
+                        async move { anyhow::Ok(acc) }
                     })
                     .await
-                    .wrap_err("fetching version files from hashes")?;
+                    .context("fetching version files from hashes")?;
 
-                eyre::Ok(files)
+                anyhow::Ok(files)
             }
         )
         .await
-        .wrap_err("fetching cached version files")?;
+        .context("fetching cached version files")?;
 
         Ok(val)
     }
@@ -1029,7 +1029,7 @@ impl DBVersion {
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to clear version cache")?;
+            .context("connecting to redis to clear version cache")?;
         let mut keys =
             vec![redis.key().entity(VERSIONS_NAMESPACE, version.inner.id.0)];
         keys.extend(version.files.iter().flat_map(|file| {
@@ -1044,7 +1044,7 @@ impl DBVersion {
         redis
             .delete_many(&keys)
             .await
-            .wrap_err("clearing version cache")?;
+            .context("clearing version cache")?;
         Ok(())
     }
 
@@ -1055,7 +1055,7 @@ impl DBVersion {
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to clear version caches")?;
+            .context("connecting to redis to clear version caches")?;
         let keys = version_ids
             .iter()
             .map(|id| redis.key().entity(VERSIONS_NAMESPACE, id.0))
@@ -1064,7 +1064,7 @@ impl DBVersion {
         redis
             .delete_many(&keys)
             .await
-            .wrap_err("clearing version caches")?;
+            .context("clearing version caches")?;
         Ok(())
     }
 }

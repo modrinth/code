@@ -33,16 +33,22 @@ concurrency:
 env:
   INTERNAL: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
 
+permissions: {}
+
 jobs:
   build:
     name: Build meta-generator
     runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'namespace-profile-modrinth-meta-generator' || 'namespace-profile-untrusted-large-amd64' }}
+    permissions:
+      contents: read
     env:
       RUSTC_WRAPPER: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'sccache' || '' }}
     steps:
       - name: Check out code
         if: env.INTERNAL != 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Check out code (Namespace)
         if: env.INTERNAL == 'true'
@@ -85,6 +91,9 @@ jobs:
     needs: [build]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     uses: SparkUniverse/workflows/.github/workflows/docker-build.yaml@main
+    permissions:
+      contents: read
+      packages: write
     with:
       image-name: minecraft-meta
       dockerfile-path: apps/meta-generator/Dockerfile
@@ -94,6 +103,8 @@ jobs:
     needs: [docker-build]
     if: ${{ github.ref == 'refs/heads/prod' || github.ref == 'refs/heads/main' }}
     uses: SparkUniverse/workflows/.github/workflows/argo-update.yaml@main
+    permissions:
+      contents: read
     secrets:
       ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}
     with:

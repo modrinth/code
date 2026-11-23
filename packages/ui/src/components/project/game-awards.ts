@@ -15,7 +15,7 @@ export function getGameAwardsNominee(
 			projectName: project.title,
 			year: 2026,
 			votingDeadline: new Date(2026, 11, 10),
-			link: 'https://thegameawards.com/categories/best-user-creation',
+			link: 'https://modrinth.com/mod/create-aeronautics/vote',
 		}
 	}
 

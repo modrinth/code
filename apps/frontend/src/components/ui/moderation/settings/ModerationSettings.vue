@@ -63,10 +63,7 @@ const groups = [
 	{
 		id: 'queue-bar',
 		title: 'Queue Bar',
-		settings: [
-			general.ShowProjectReviewTimer,
-			general.ProjectReviewTimerWarning,
-		]
+		settings: [general.ShowProjectReviewTimer, general.ProjectReviewTimerWarning],
 	},
 	{
 		id: 'shortcuts',

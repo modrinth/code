@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-11-19T01:42:50+00:00`,
+		product: 'web',
+		body: `## Changed
+- Moved re-authentication prompt to before you perform actions so your state is not lost when you go to save.`,
+	},
+	{
 		date: `2026-11-18T20:04:02+00:00`,
 		product: 'app',
 		version: '0.23.5',

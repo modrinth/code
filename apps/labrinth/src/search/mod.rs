@@ -96,10 +96,10 @@ pub trait SearchBackend: Send + Sync {
         let mut results = self
             .search_for_project_raw(info)
             .await
-            .wrap_api_err("searching projects")?;
+            .api_context("searching projects")?;
         hydrate_search_results(&mut results.hits, redis)
             .await
-            .wrap_internal_err("hydrating search results from database")?;
+            .internal_context("hydrating search results from database")?;
         Ok(results)
     }
 
@@ -112,25 +112,25 @@ pub trait SearchBackend: Send + Sync {
         &self,
         ro_pool: PgPool,
         redis: RedisPool,
-    ) -> eyre::Result<()>;
+    ) -> anyhow::Result<()>;
 
     async fn apply_update(
         &self,
         update: SearchIndexUpdate<'_>,
-    ) -> eyre::Result<()>;
+    ) -> anyhow::Result<()>;
 
-    async fn tasks(&self) -> eyre::Result<Value>;
+    async fn tasks(&self) -> anyhow::Result<Value>;
 
     async fn tasks_cancel(
         &self,
         filter: &TasksCancelFilter,
-    ) -> eyre::Result<()>;
+    ) -> anyhow::Result<()>;
 }
 
 async fn hydrate_search_results(
     hits: &mut [ResultSearchProject],
     redis_pool: &RedisPool,
-) -> eyre::Result<()> {
+) -> anyhow::Result<()> {
     // Minecraft Java servers should fetch the latest player count that we have
     // from Redis, rather than the (pretty stale) data from search backend
     // TODO: this block should be made generic over the component type,

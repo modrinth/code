@@ -288,14 +288,16 @@ const settings = {
 			type: 'toggle',
 			id: 'show-project-review-timer',
 			title: 'Show project review timer',
-			description: 'Show a timer in the project review queue bar indicating how long you have been reviewing the current project.',
+			description:
+				'Show a timer in the project review queue bar indicating how long you have been reviewing the current project.',
 			default: false,
 		}),
 		ProjectReviewTimerWarning: setting.asNumber({
 			type: 'number',
 			id: 'project-review-timer-warning',
 			title: 'Project review timer warning',
-			description: 'Maximum time in seconds to show the project review timer before it turns red. Set to 0 to disable the warning. At >=75% of the time it will turn orange.',
+			description:
+				'Maximum time in seconds to show the project review timer before it turns red. Set to 0 to disable the warning. At >=50% of the time it will turn orange.',
 			default: 0,
 			min: 0,
 			max: 3600,

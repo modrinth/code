@@ -1,0 +1,38 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, components AS \"components: Json<exp::ProjectSerial>\"\n            FROM mods\n            WHERE\n                review_outcome = 'approved'\n                AND components ? 'minecraft_java_server'\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "components: Json<exp::ProjectSerial>",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "components"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "8f1e3b6c2c33639f3127857595dbea726751ecac5876d51a41cd4559e640e9c6"
+}
