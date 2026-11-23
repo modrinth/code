@@ -28,7 +28,7 @@
 		:auth="auth"
 		class="card-shadow mb-4 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4"
 	/>
-	<p v-if="filteredReports.length === 0">You don't have any active reports.</p>
+	<p v-if="filteredReports.length === 0" class="m-0">You don't have any active reports.</p>
 </template>
 <script setup>
 import { Chips, formatReportType, injectModrinthClient, useVIntl } from '@modrinth/ui'

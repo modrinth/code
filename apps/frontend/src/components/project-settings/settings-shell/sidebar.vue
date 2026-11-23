@@ -166,19 +166,11 @@ const moderatorSeeUserUi = computed<boolean>({
 </script>
 
 <template>
-	<div class="lg:sticky lg:top-6 lg:self-start">
-		<NavStack :items="navItems" />
-		<div v-if="isStaffMember" class="mt-4 flex items-center gap-2">
-			<Toggle id="moderator-see-user-ui-toggle" v-model="moderatorSeeUserUi" small />
-			<label for="moderator-see-user-ui-toggle">
-				{{ formatMessage(messages.showMemberUi) }}
-			</label>
-		</div>
+	<NavStack :items="navItems" />
+	<div v-if="isStaffMember" class="mt-4 flex items-center gap-2">
+		<Toggle id="moderator-see-user-ui-toggle" v-model="moderatorSeeUserUi" small />
+		<label for="moderator-see-user-ui-toggle">
+			{{ formatMessage(messages.showMemberUi) }}
+		</label>
 	</div>
 </template>
-
-<style scoped>
-:deep(nav li:not(:first-child) > div) {
-	margin-top: 16px;
-}
-</style>

@@ -1,11 +1,9 @@
 <template>
-	<div>
-		<NormalPage sidebar="left">
-			<template #header>
-				<h1 class="m-0 text-3xl font-semibold">
-					{{ formatMessage(commonMessages.settingsLabel) }}
-				</h1>
-			</template>
+	<div class="normal-page no-sidebar !py-4">
+		<h1 class="normal-page__header m-0 mb-4 text-3xl font-semibold">
+			{{ formatMessage(commonMessages.settingsLabel) }}
+		</h1>
+		<SidebarPageLayout class="normal-page__content" content-first wide-sidebar>
 			<template #sidebar>
 				<NavStack
 					:items="
@@ -106,7 +104,7 @@
 				/>
 			</template>
 			<NuxtPage :route="route" />
-		</NormalPage>
+		</SidebarPageLayout>
 	</div>
 </template>
 <script setup>
@@ -125,16 +123,11 @@ import {
 	ToggleRightIcon,
 	UserIcon,
 } from '@modrinth/assets'
-import {
-	commonMessages,
-	commonSettingsMessages,
-	defineMessages,
-	NormalPage,
-	useVIntl,
-} from '@modrinth/ui'
+import { commonMessages, commonSettingsMessages, defineMessages, useVIntl } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 
 import NavStack from '~/components/ui/NavStack.vue'
+import SidebarPageLayout from '~/components/ui/SidebarPageLayout.vue'
 
 const { formatMessage } = useVIntl()
 

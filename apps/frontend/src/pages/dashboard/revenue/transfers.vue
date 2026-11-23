@@ -1,5 +1,5 @@
 <template>
-	<div class="mb-20 flex flex-col gap-4 lg:pl-8">
+	<div class="mb-20 flex flex-col gap-4">
 		<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 			<span class="text-xl font-semibold text-contrast md:text-2xl">{{
 				formatMessage(messages.transactionsHeader)

@@ -3,6 +3,7 @@
 		<section>
 			<Breadcrumbs
 				v-if="breadcrumbsStack"
+				class="mb-4"
 				:current-title="`Report ${reportId}`"
 				:link-stack="breadcrumbsStack"
 			/>
@@ -35,11 +36,10 @@
 	</div>
 </template>
 <script setup>
-import { injectModrinthClient } from '@modrinth/ui'
+import { Breadcrumbs, injectModrinthClient } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
-import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import ReportInfo from '~/components/ui/report/ReportInfo.vue'
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import { addReportMessage } from '~/helpers/threads.js'

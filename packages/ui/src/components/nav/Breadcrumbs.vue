@@ -32,7 +32,6 @@ defineProps({
 <style lang="scss" scoped>
 .breadcrumbs {
 	display: flex;
-	margin-bottom: var(--gap-lg);
 	align-items: center;
 	flex-wrap: wrap;
 

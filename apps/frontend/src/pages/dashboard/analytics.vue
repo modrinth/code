@@ -1,5 +1,5 @@
 <template>
-	<AnalyticsDashboard class="lg:pl-4 lg:pt-1.5" />
+	<AnalyticsDashboard />
 </template>
 
 <script setup>

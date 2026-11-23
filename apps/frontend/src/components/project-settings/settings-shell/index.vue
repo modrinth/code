@@ -3,6 +3,7 @@ import { injectProjectPageContext } from '@modrinth/ui'
 import { ref } from 'vue'
 
 import ProjectModerationDrawer from '~/components/ui/project-settings/project-moderation-drawer/index.vue'
+import SidebarPageLayout from '~/components/ui/SidebarPageLayout.vue'
 import { provideProjectSettingsNavigation } from '~/composables/project-settings-navigation'
 
 import SettingsSidebar from './sidebar.vue'
@@ -21,12 +22,12 @@ const drawerPinned = ref(false)
 		:class="{ 'settings-with-review': drawerPinned }"
 	>
 		<ProjectModerationDrawer v-if="currentMember && projectV3" @pinned="drawerPinned = $event" />
-		<div class="grid gap-6 lg:grid-cols-[1fr_3.25fr]">
-			<SettingsSidebar />
-			<div class="min-w-0">
-				<slot />
-			</div>
-		</div>
+		<SidebarPageLayout>
+			<template #sidebar>
+				<SettingsSidebar />
+			</template>
+			<slot />
+		</SidebarPageLayout>
 	</div>
 </template>
 

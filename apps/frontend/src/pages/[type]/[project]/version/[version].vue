@@ -91,6 +91,7 @@
 		<div class="flex flex-col">
 			<BackToParentLink
 				:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
+				class="mb-4"
 			>
 				{{ formatMessage(messages.allVersions) }}
 			</BackToParentLink>
