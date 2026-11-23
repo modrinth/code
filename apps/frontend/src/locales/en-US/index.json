@@ -1088,12 +1088,6 @@
   "conversation-thread.action.add-private-note": {
     "message": "Add private note"
   },
-  "conversation-thread.action.approve": {
-    "message": "Approve"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Approve with reply"
-  },
   "conversation-thread.action.attach-image": {
     "message": "Attach image"
   },
@@ -1103,11 +1097,8 @@
   "conversation-thread.action.close-with-reply": {
     "message": "Close with reply"
   },
-  "conversation-thread.action.reject": {
-    "message": "Reject"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Reject with reply"
+  "conversation-thread.action.private-note": {
+    "message": "Private note"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reopen thread"
@@ -1118,32 +1109,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Reply to thread"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Resubmit for review"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Resubmit for review with reply"
-  },
   "conversation-thread.action.send": {
     "message": "Send"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Send to review"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Send to review with reply"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Set to draft"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Set to draft with reply"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Withhold"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Withhold with reply"
   },
   "conversation-thread.closed-thread.description": {
     "message": "This thread is closed and new messages cannot be sent to it."
@@ -1192,33 +1159,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Moderation issue"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Confirm I have addressed the messages from the moderators"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "I confirm that I have properly addressed the moderators' comments."
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "You're resubmitting <project-title>{projectTitle}</project-title>. If all moderation issues are resolved, it may be approved automatically. Otherwise, it will be sent to the moderators for review."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Resubmitting for review"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Submitting for review"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Make sure you have addressed all the comments from the moderation team."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "Repeated submissions without addressing the moderators' comments may result in an account suspension."
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "You must complete all required actions above to resubmit"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "You're submitting <project-title>{projectTitle}</project-title> to be reviewed by the moderators."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Supplementary files are for supporting resources like source code, not for alternative versions or variants."
@@ -1448,17 +1388,11 @@
   "create.project.name-placeholder": {
     "message": "Enter project name..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} Icon"
-  },
   "create.project.owner-label": {
     "message": "Owner"
   },
   "create.project.server-project-title": {
     "message": "Creating a server project"
-  },
-  "create.project.summary-description": {
-    "message": "A sentence or two that describes your project."
   },
   "create.project.summary-label": {
     "message": "Summary"
@@ -1475,20 +1409,26 @@
   "create.project.url-label": {
     "message": "URL"
   },
-  "create.project.user-avatar-alt": {
-    "message": "User Avatar"
-  },
-  "create.project.visibility-description": {
-    "message": "The visibility of your project after it has been approved."
+  "create.project.visibility-approval-description": {
+    "message": "Takes effect once approved. Until then, only project members can see the project."
   },
   "create.project.visibility-private": {
     "message": "Private"
   },
+  "create.project.visibility-private-description": {
+    "message": "Not publicly visible. Only accessible to project members."
+  },
   "create.project.visibility-public": {
     "message": "Public"
   },
+  "create.project.visibility-public-description": {
+    "message": "Visible via URL, on your profile, and in search."
+  },
   "create.project.visibility-unlisted": {
     "message": "Unlisted"
+  },
+  "create.project.visibility-unlisted-description": {
+    "message": "Visible via URL only. Not shown on your profile or in search."
   },
   "create.restricted-alert.description": {
     "message": "A moderator has removed this permission from your account."
@@ -1909,9 +1849,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Error loading notifications:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "History"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Notification history"
@@ -4640,9 +4577,6 @@
   "project.settings.environment.per-version": {
     "message": "Environments are now managed per version."
   },
-  "project.settings.gallery.add-image": {
-    "message": "Add gallery image"
-  },
   "project.settings.gallery.delete-description": {
     "message": "This will remove this gallery image forever (like really forever)."
   },
@@ -4664,20 +4598,14 @@
   "project.settings.gallery.invalid-file-title": {
     "message": "Unsupported image type"
   },
-  "project.settings.gallery.next-image": {
-    "message": "Next image"
-  },
-  "project.settings.gallery.previous-image": {
-    "message": "Previous image"
-  },
   "project.settings.gallery.reorder-error": {
     "message": "Could not save the gallery order"
   },
   "project.settings.gallery.reorder-image": {
     "message": "Reorder image. Drag or use the arrow keys."
   },
-  "project.settings.gallery.toggle-zoom": {
-    "message": "Toggle zoom"
+  "project.settings.gallery.skip-image": {
+    "message": "Skip image"
   },
   "project.settings.gallery.upload": {
     "message": "Upload images"
@@ -5000,11 +4928,29 @@
   "project.settings.members.invite.button": {
     "message": "Invite"
   },
+  "project.settings.members.invite.contacts-failed": {
+    "message": "Couldn’t load all your friends and organizations."
+  },
   "project.settings.members.invite.default-role": {
     "message": "Member"
   },
   "project.settings.members.invite.description": {
     "message": "They’ll get an invite and join the project once they accept."
+  },
+  "project.settings.members.invite.friends": {
+    "message": "Friends"
+  },
+  "project.settings.members.invite.lookup-failed": {
+    "message": "Couldn’t look up that username."
+  },
+  "project.settings.members.invite.member-count": {
+    "message": "{count, plural, one {# member} other {# members}}"
+  },
+  "project.settings.members.invite.no-contacts": {
+    "message": "No friends or organization members to show."
+  },
+  "project.settings.members.invite.organizations": {
+    "message": "Your organizations"
   },
   "project.settings.members.invite.user-not-found": {
     "message": "User does not exist"
@@ -5381,9 +5327,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Featured tags"
   },
-  "project.settings.tags.featured-tags-required": {
-    "message": "You must have at least one featured tag."
-  },
   "project.settings.tags.featured-tags-select-description": {
     "message": "Shown on your project’s card in Discover search results. Choose up to 3."
   },
@@ -5437,6 +5380,9 @@
   },
   "project.slug-suggestions.label": {
     "message": "Suggestions:"
+  },
+  "project.summary.search-description": {
+    "message": "One sentence shown under your project name in search results."
   },
   "project.versions.copy-id-option": {
     "message": "Copy ID"

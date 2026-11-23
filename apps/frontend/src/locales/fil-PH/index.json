@@ -449,9 +449,6 @@
   "collection.title": {
     "message": "{name} - Koleksiyon"
   },
-  "conversation-thread.action.reject": {
-    "message": "Tanggihan"
-  },
   "conversation-thread.action.reply": {
     "message": "Tugunan"
   },
@@ -563,9 +560,6 @@
   "create.project.server-project-title": {
     "message": "Naglilikha ng proyektong server"
   },
-  "create.project.summary-description": {
-    "message": "Maisa o dalawang pangungusap na maglalarawan sa iyong proyekto."
-  },
   "create.project.summary-label": {
     "message": "Buod"
   },
@@ -577,9 +571,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.visibility-description": {
-    "message": "Ang visibility ng itong proyekto matapos nitong ma-approve."
   },
   "create.project.visibility-private": {
     "message": "Pribado"

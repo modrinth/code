@@ -1088,23 +1088,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "プライベートメモを追加"
   },
-  "conversation-thread.action.approve": {
-    "message": "承認"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "送信して承認"
-  },
   "conversation-thread.action.close-report": {
     "message": "レポートを閉じる"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "返信して閉じる"
-  },
-  "conversation-thread.action.reject": {
-    "message": "却下済み"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "返信して拒否する"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "スレッドを再開する\n"
@@ -1115,32 +1103,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "スレッドに返信する\n"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "再審査を申請する\n"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "返信付きで再審査を申請する\n"
-  },
   "conversation-thread.action.send": {
     "message": "送信"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "審査に送信する\n"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "返信付きで審査に送信する\n"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "下書きとして保存"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "返信付きで下書きに戻す\n"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "保留にする\n"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "返信付きで保留にする\n"
   },
   "conversation-thread.closed-thread.description": {
     "message": "このスレッドは閉じられているため、新しいメッセージを送信できません。\n"
@@ -1189,33 +1153,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "モデレーションに関する問題"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "モデレーターからのメッセージに対応したことを確認する\n"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "モデレーターからのコメントに適切に対応したことを確認します。\n"
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "<project-title>{projectTitle}</project-title>を再送信しています。すべてのモデレーションの問題が解決された場合、自動的に承認される場合もあります。 それ以外の場合は、レビューのためにモデレータに送信されます"
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "再審査に再提出しています…\n"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "審査に提出しています…\n"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "モデレーションチームからのすべてのコメントに対応したことを確認してください。\n"
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "モデレーターのコメントに対応せずに繰り返し再提出すると、アカウントが停止される場合があります。\n"
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "再提出するには、上記の必要なすべてのアクションを完了する必要があります"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "<project-title>{projectTitle}</project-title>をモデレーターによる再審査に提出します。\n"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "補足ファイルはソースコードなどの支援用リソースのためのものであり、別バージョンや派生版を配布するためのものではありません。"
@@ -1445,17 +1382,11 @@
   "create.project.name-placeholder": {
     "message": "プロジェクト名を入力…"
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name}アイコン"
-  },
   "create.project.owner-label": {
     "message": "オーナー"
   },
   "create.project.server-project-title": {
     "message": "サーバープロジェクトを作成"
-  },
-  "create.project.summary-description": {
-    "message": "1〜2文程度のプロジェクトの説明。"
   },
   "create.project.summary-label": {
     "message": "概要"
@@ -1471,12 +1402,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "ユーザーのアバター"
-  },
-  "create.project.visibility-description": {
-    "message": "プロジェクトが承認された後の公開範囲"
   },
   "create.project.visibility-private": {
     "message": "非公開"
@@ -1906,9 +1831,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "通知の読み込み中にエラーが発生しました"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "履歴"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "通知履歴"
@@ -4330,9 +4252,6 @@
   },
   "project.settings.license.custom-name-invalid": {
     "message": "カスタムライセンスの名前には文字、数字、ピリオド、ハイフンのみを含めることができます。"
-  },
-  "project.settings.license.custom-name-required": {
-    "message": "カスタムライセンスの名前を入力してください。"
   },
   "project.settings.license.name": {
     "message": "ライセンス名"

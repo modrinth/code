@@ -1070,23 +1070,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "비공개 노트 추가"
   },
-  "conversation-thread.action.approve": {
-    "message": "승인"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "답글과 함께 승인"
-  },
   "conversation-thread.action.close-report": {
     "message": "티켓 닫기"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "답글과 함께 닫기"
-  },
-  "conversation-thread.action.reject": {
-    "message": "거부"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "답글과 함께 거부"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "스레드 다시 열기"
@@ -1097,32 +1085,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "스레드에 답글 게시"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "검토를 위해 다시 제출"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "검토를 위해 답글과 함께 다시 제출"
-  },
   "conversation-thread.action.send": {
     "message": "전송됨"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "검토 요청"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "답글과 함께 검토 요청"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "초안으로 설정"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "답글과 함께 초안으로 설정"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "보류"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "답글과 함께 보류"
   },
   "conversation-thread.closed-thread.description": {
     "message": "이 스레드는 닫혔으며, 더 이상 새로운 메시지를 작성할 수 없습니다."
@@ -1171,33 +1135,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "검토 관련 문제"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "운영진이 보낸 메시지에 답변했는지 확인"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "운영진의 지적 사항을 적절히 반영했음을 확인합니다."
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "<project-title>{projectTitle}</project-title> 프로젝트를 다시 제출하려고 합니다. 모든 검토 관련 문제가 해결되었다면 자동으로 승인될 수 있습니다. 그렇지 않으면 검토 담당자에게 전달되어 심사를 받게 됩니다."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "검토를 위해 다시 제출"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "검토를 위해 제출"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "운영진에서 제시한 모든 의견을 반영했는지 확인해 주세요."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "운영진의 지적 사항을 반영하지 않고 반복적으로 제출할 경우, 계정이 정지될 수 있습니다."
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "다시 제출하려면 위의 필수 조치를 모두 완료해야 합니다."
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "<project-title>{projectTitle}</project-title> 프로젝트를 검토 담당자의 심사를 받기 위해 제출합니다."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "보조 파일은 소스 코드와 같은 지원용 리소스를 위한 것이며, 대체 버전이나 변형을 위한 것이 아닙니다."
@@ -1427,17 +1364,11 @@
   "create.project.name-placeholder": {
     "message": "프로젝트 이름 입력..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} 아이콘"
-  },
   "create.project.owner-label": {
     "message": "소유자"
   },
   "create.project.server-project-title": {
     "message": "서버 프로젝트 생성"
-  },
-  "create.project.summary-description": {
-    "message": "프로젝트를 한두 문장으로 설명해 주세요."
   },
   "create.project.summary-label": {
     "message": "개요"
@@ -1453,12 +1384,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "사용자 아바타"
-  },
-  "create.project.visibility-description": {
-    "message": "승인 후 프로젝트의 공개 범위."
   },
   "create.project.visibility-private": {
     "message": "비공개"
@@ -1888,9 +1813,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "알림 불러오기 오류:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "기록"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "알림 기록"
@@ -4307,17 +4229,11 @@
   "project.settings.license.custom-name-invalid": {
     "message": "맞춤 라이선스 이름은 문자, 숫자, 마침표, 붙임표만 포함할 수 있습니다."
   },
-  "project.settings.license.custom-name-required": {
-    "message": "사용자 지정 라이선스 이름을 입력하세요."
-  },
   "project.settings.license.later": {
     "message": "이후 에디션"
   },
   "project.settings.license.later-description": {
     "message": "선택한 라이선스에 \"또는 그 이후\" 조항이 있습니다. 이 상자를 체크하면 사용자는 해당 라이선스의 이후 버전 하에서 프로젝트를 이용할 수 있게 됩니다."
-  },
-  "project.settings.license.missing-url": {
-    "message": "사용자 지정 라이선스 전문 URL을 입력하세요."
   },
   "project.settings.license.name": {
     "message": "라이선스 이름"
@@ -4588,9 +4504,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "추천 태그"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "추천 태그가 한 개 이상 필요합니다."
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "가장 관련성 높은 태그를 선택하세요. 선택한 태그는 다른 태그보다 먼저 표시됩니다."

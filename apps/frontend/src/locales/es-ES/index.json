@@ -1061,23 +1061,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Añadir nota privada"
   },
-  "conversation-thread.action.approve": {
-    "message": "Aprobar"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Aprobar con respuesta"
-  },
   "conversation-thread.action.close-report": {
     "message": "Cerrar informe"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Cerrar con respuesta"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Rechazar"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rechazar con respuesta"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reabrir hilo"
@@ -1088,32 +1076,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Responder al hilo"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Resubir para revisión"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Resubir para revisión con respuesta"
-  },
   "conversation-thread.action.send": {
     "message": "Enviar"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Enviar para revisión"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Enviar para revisión con respuesta"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Cambiar a borrador"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Cambiar a borrador con respuesta"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Retener"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Retener con respuesta"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Este hilo está cerrado y los nuevos mensajes no podrán ser enviados."
@@ -1162,30 +1126,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Error de moderación"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Confirma que respondiste los mensajes de los moderadores"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Confirmo que he respondido debidamente los comentarios de los moderadores."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Resubiendo para revisión"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Subiendo para revisión"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Asegúrate de que has respondido todos los mensajes del equipo de moderación."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "Subidas repetidas sin responder a los moderadores puede resultar en una suspensión de cuenta."
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "Debes completar todas las acciones requeridas para volver a enviar"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "Estás subiendo <project-title>{projectTitle}</project-title> para que sea revisado nuevamente por los moderadores."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Los archivos complementarios son para recursos de soporte, como el código fuente, no para versiones alternativas o variantes."
@@ -1415,17 +1355,11 @@
   "create.project.name-placeholder": {
     "message": "Introduzca el nombre del proyecto..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} Icono"
-  },
   "create.project.owner-label": {
     "message": "Dueño"
   },
   "create.project.server-project-title": {
     "message": "Creando un proyecto de servidor"
-  },
-  "create.project.summary-description": {
-    "message": "Una o dos frases que describan tu proyecto."
   },
   "create.project.summary-label": {
     "message": "Resumen"
@@ -1441,12 +1375,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Avatar del usuario"
-  },
-  "create.project.visibility-description": {
-    "message": "La visibilidad de tu proyecto después de que haya sido aprobado."
   },
   "create.project.visibility-private": {
     "message": "Privado"
@@ -1861,9 +1789,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Error al cargar las notificaciones:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Historial"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Historial de notificaciones"
@@ -4121,9 +4046,6 @@
   "project.settings.license.later-description": {
     "message": "La licencia que seleccionó tiene una cláusula \"o posterior\". Si marca esta casilla, los usuarios pueden utilizar su proyecto bajo ediciones posteriores de la licencia."
   },
-  "project.settings.license.missing-url": {
-    "message": "Introduzca una URL al texto completo de su licencia personalizada."
-  },
   "project.settings.license.name": {
     "message": "Nombre de licencia"
   },
@@ -4372,9 +4294,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Etiquetas experimentales"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "Debes seleccionar al menos una etiqueta destacada."
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "Selecciona las etiquetas más relevantes. Estas se mostrarán primero que las demás etiquetas."

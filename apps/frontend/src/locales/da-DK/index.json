@@ -758,20 +758,8 @@
   "conversation-thread.action.add-private-note": {
     "message": "Tilføj privat note"
   },
-  "conversation-thread.action.approve": {
-    "message": "Godkend"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Godkend med svar"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Luk med svar"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Afvis"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Afvis med svar"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Genåbn tråd"
@@ -781,12 +769,6 @@
   },
   "conversation-thread.action.send": {
     "message": "Send"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Send til gennemgang"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Send til gennemgang med svar"
   },
   "conversation-thread.reply-editor.placeholder.send": {
     "message": "Send en besked..."
@@ -932,17 +914,11 @@
   "create.project.name-placeholder": {
     "message": "Indtast projekt navn..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} Ikon"
-  },
   "create.project.owner-label": {
     "message": "Ejer"
   },
   "create.project.server-project-title": {
     "message": "Opretter et server projekt"
-  },
-  "create.project.summary-description": {
-    "message": "En sætning eller to som beskriver dit projekt."
   },
   "create.project.summary-label": {
     "message": "Resumé"
@@ -958,12 +934,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Bruger Avatar"
-  },
-  "create.project.visibility-description": {
-    "message": "Dit projekts synlighed efter det er blevet godkendt."
   },
   "create.project.visibility-private": {
     "message": "Privat"
@@ -1225,9 +1195,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Fejl ved indlæsning af notifikationer:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Historik"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Notifkations historik"

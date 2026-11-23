@@ -332,20 +332,8 @@
   "conversation-thread.action.add-private-note": {
     "message": "Lisää yksityinen muistiinpano"
   },
-  "conversation-thread.action.approve": {
-    "message": "Hyväksy"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Hyväksy vastauksella"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Sulje vastauksella"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Hylkää"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Hylkää vastauksella"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Avaa keskustelu uudelleen"
@@ -356,20 +344,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Vastaa keskusteluun"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Lähetä uudelleen arvioitavaksi"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Lähetä uudelleen arvioitavaksi vastauksella"
-  },
   "conversation-thread.action.send": {
     "message": "Lähetä"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Lähetä arvioitavaksi"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Lähetä arvioitavaksi vastauksella"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Vastaa keskusteluun..."
@@ -467,9 +443,6 @@
   "create.project.server-project-title": {
     "message": "Luodaan palvelin projektia"
   },
-  "create.project.summary-description": {
-    "message": "Lause tai pari, jotka kuvailevat projektiasi."
-  },
   "create.project.summary-label": {
     "message": "Yhteenveto"
   },
@@ -481,9 +454,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.visibility-description": {
-    "message": "Projektisi näkyvyys sen hyväksymisen jälkeen."
   },
   "create.project.visibility-private": {
     "message": "Yksityinen"

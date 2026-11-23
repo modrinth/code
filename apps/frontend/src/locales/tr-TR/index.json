@@ -1070,23 +1070,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Özel not ekle"
   },
-  "conversation-thread.action.approve": {
-    "message": "Onaylandı"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Onaylandı, işlem tamamlandı"
-  },
   "conversation-thread.action.close-report": {
     "message": "Raporu kapat"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Cevapla ve kapat"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Reddet"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Cevap vererek reddet"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Konuyu yeniden aç"
@@ -1097,32 +1085,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Konuya yanıt ver"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "İnceleme için yeniden gönder"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Yanıtla birlikte yeniden incelemeye gönder"
-  },
   "conversation-thread.action.send": {
     "message": "Gönder"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "İncelemeye gönder"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Yanıtla birlikte incelemeye gönder"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Taslağa ayarla"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Yanıtla birlikte taslağa ayarla"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Yanıtla birlikte taslağa çevir"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Yanıtla birlikte beklet"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Bu konu kapatılmıştır ve yeni mesaj gönderilemez."
@@ -1168,30 +1132,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Moderasyon sorunu"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Moderatörlerin mesajlarını yanıtladığımı onaylıyorum"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Moderatörlerin yorumlarını uygun şekilde yanıtladığımı onaylıyorum."
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "<project-title>{projectTitle}</project-title> projesini yeniden gönderiyorsun. Bütün moderasyon sorunları çözüldüyse,  otomatilk olarak onaylanabilir. Yoksa moderatörlerin incelemesine gönderilecek."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "İnceleme için yeniden gönderiliyor"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "İncelemeye gönderiliyor"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Moderatör ekibinin tüm yorumlarını ele aldığınızdan emin olun."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "Moderatörlerin yorumlarını ele almadan tekrar tekrar gönderim yapmak, hesabınızın askıya alınmasına neden olabilir."
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "<project-title>{projectTitle}</project-title> projesini moderatörler tarafından incelenmek üzere gönderiyorsun."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ek dosyalar, alternatif sürümler veya varyantlar için değil, kaynak kodu gibi destekleyici kaynaklar içindir."
@@ -1421,17 +1361,11 @@
   "create.project.name-placeholder": {
     "message": "Projenin ismini girin..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} İkon"
-  },
   "create.project.owner-label": {
     "message": "Sahip"
   },
   "create.project.server-project-title": {
     "message": "Sunucu Projesi oluştur"
-  },
-  "create.project.summary-description": {
-    "message": "Projenizi anlatan bir iki cümle."
   },
   "create.project.summary-label": {
     "message": "Özet"
@@ -1447,12 +1381,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Kullanıcı Avatarı"
-  },
-  "create.project.visibility-description": {
-    "message": "Projenizin onaylandıktan sonraki görünürlük ayarı."
   },
   "create.project.visibility-private": {
     "message": "Gizli"
@@ -1873,9 +1801,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Bildirimler yüklenirken hata oluştu:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Geçmiş"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Bildirim geçmişi"
@@ -4162,9 +4087,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Öne çıkan etiketler"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "En az bir biçim etiketiniz olmalıdır."
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "Görsel özellik etiketlerinizi seçin. Bunlar diğer etiketlerinizin önünde görüntülenir."

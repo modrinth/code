@@ -1061,23 +1061,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Thêm ghi chú bí mật"
   },
-  "conversation-thread.action.approve": {
-    "message": "Chấp thuận"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Chấp thuận với phản hồi"
-  },
   "conversation-thread.action.close-report": {
     "message": "Đóng báo cáo"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Đóng với phản hồi"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Từ chối"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Từ chối với phản hồi"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Mở lại luồng"
@@ -1088,32 +1076,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Phản hồi đến luồng"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Gửi lại để xét duyệt"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Gửi lại để xét duyệt kèm phản hồi"
-  },
   "conversation-thread.action.send": {
     "message": "Gửi"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Gửi để xem xét"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Gửi để xem xét với phản hồi"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Chuyển sang bản nháp"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Chuyển sang bản nháp kèm phản hồi"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Thu hồi"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Thu hồi với phản hồi"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Luồng này đã bị đóng và tin nhắn mới không thể gửi được vào."
@@ -1156,33 +1120,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Vấn đề liên quan đến kiểm duyệt"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Chắc chắn rằng tôi đã trả lời tin nhắn từ bên kiểm duyệt"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Tôi đã chắc chắn rằng tôi đã trả lời đúng cách các bình luận từ bên kiểm duyệt."
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "Bạn đang nộp lại <project-title>{projectTitle}</project-title>. Nếu tất cả các vấn đề liên quan đến kiểm duyệt đã được giải quyết, dự án của bạn sẽ tự động được phê duyệt. Nếu không thì nó sẽ được chuyển đến đội ngũ kiểm duyệt để được xem xét."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Gửi lại để kiểm duyệt"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Gửi để kiểm duyệt"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Hãy chắc chắn rằng bạn đã trả lời tất cả các bình luận từ bên kiểm duyệt."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "Gửi lại nhiều lần mà không trả lời các bình luận từ bên kiểm duyệt có thể đình chỉ tài khoản của bạn."
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "Bạn cần phải hoàn thành tất cả yêu cầu bắt buộc để nộp lại"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "Bạn đang nộp <project-title>{projectTitle}</project-title> để được xem xét bởi đội ngũ kiểm duyệt."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Các tệp bổ trợ dùng cho các tài nguyên hỗ trợ như mã nguồn, không dùng cho các phiên bản hoặc biến thể thay thế."
@@ -1412,17 +1349,11 @@
   "create.project.name-placeholder": {
     "message": "Nhập tên dự án..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "Biểu tượng của {name}"
-  },
   "create.project.owner-label": {
     "message": "Chủ sở hữu"
   },
   "create.project.server-project-title": {
     "message": "Tạo dự án máy chủ"
-  },
-  "create.project.summary-description": {
-    "message": "Một hoặc hai câu mô tả dự án của bạn."
   },
   "create.project.summary-label": {
     "message": "Tóm tắt"
@@ -1438,12 +1369,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Ảnh đại diện người dùng"
-  },
-  "create.project.visibility-description": {
-    "message": "Khả năng hiển thị của dự án sau khi được phê duyệt."
   },
   "create.project.visibility-private": {
     "message": "Riêng tư"
@@ -1858,9 +1783,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Không thể tải thông báo:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Lịch sử"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Lịch sử thông báo"
@@ -4010,17 +3932,11 @@
   "project.settings.license.custom": {
     "message": "Tùy chỉnh"
   },
-  "project.settings.license.custom-name-required": {
-    "message": "Nhập tên cho giấy phép tùy chỉnh của bạn."
-  },
   "project.settings.license.later": {
     "message": "Phiên bản giấy phép mới hơn"
   },
   "project.settings.license.later-description": {
     "message": "Giấy phép bạn chọn có điều khoản “hoặc phiên bản mới hơn”. Nếu chọn ô này, người dùng có thể sử dụng dự án của bạn theo các phiên bản giấy phép mới hơn."
-  },
-  "project.settings.license.missing-url": {
-    "message": "Nhập URL dẫn đến toàn bộ nội dung giấy phép tùy chỉnh."
   },
   "project.settings.license.name": {
     "message": "Tên giấy phép"
@@ -4270,9 +4186,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Thẻ nổi bật"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "Bạn phải có ít nhất một thẻ nổi bật."
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "Chọn các thẻ phù hợp nhất. Những thẻ này sẽ được hiển thị trước các thẻ còn lại."

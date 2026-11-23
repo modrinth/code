@@ -1088,23 +1088,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "添加个人笔记"
   },
-  "conversation-thread.action.approve": {
-    "message": "批准"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "批准并回复"
-  },
   "conversation-thread.action.close-report": {
     "message": "关闭举报"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "关闭并回复"
-  },
-  "conversation-thread.action.reject": {
-    "message": "驳回"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "驳回并回复"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "重开对话消息"
@@ -1115,32 +1103,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "回复对话消息"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "重新提交审核"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "重新提交审核并回复"
-  },
   "conversation-thread.action.send": {
     "message": "发送"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "送审"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "送审并回复"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "设为草稿"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "设为草稿并回复"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "暂扣"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "暂扣并回复"
   },
   "conversation-thread.closed-thread.description": {
     "message": "此对话消息已关闭，无法发送新消息。"
@@ -1189,33 +1153,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "审核问题"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "我已确认处理来自管理员的消息"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "我确认我已妥善处理了管理员的评论。"
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "您正在重复提交 <project-title>{projectTitle}</project-title>. 如果所有的管理员问题都被解决，那么此提交可能自动通过审核。否则，此提交将会交由管理员审核。"
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "重新提交审核"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "提交审核"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "请确保你已处理来自管理团队的所有评论。"
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "如果反复提交而不处理管理员的评论，可能会导致账户被暂停。"
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "你必须完成上面所有必需的操作才能重新提交"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "你正在上传 <project-title>{projectTitle}</project-title>以交由管理员审核。"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "补充文件仅用来保存源代码等支持性资料，不能用来存放替代版本或者变体文件。"
@@ -1445,17 +1382,11 @@
   "create.project.name-placeholder": {
     "message": "输入项目名称…"
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} 图标"
-  },
   "create.project.owner-label": {
     "message": "所有者"
   },
   "create.project.server-project-title": {
     "message": "创建服务器项目"
-  },
-  "create.project.summary-description": {
-    "message": "一两句话描述你的项目。"
   },
   "create.project.summary-label": {
     "message": "概述"
@@ -1471,12 +1402,6 @@
   },
   "create.project.url-label": {
     "message": "URL链接"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "用户头像"
-  },
-  "create.project.visibility-description": {
-    "message": "你的项目在获得批准后的可见性。"
   },
   "create.project.visibility-private": {
     "message": "私有"
@@ -1906,9 +1831,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "加载通知出错："
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "历史"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "历史通知"
@@ -4337,17 +4259,11 @@
   "project.settings.license.custom-name-invalid": {
     "message": "自定义许可证名称只能包含字母、数字、句点和连字符。"
   },
-  "project.settings.license.custom-name-required": {
-    "message": "为你的自定义许可证输入名称。"
-  },
   "project.settings.license.later": {
     "message": "后续版本"
   },
   "project.settings.license.later-description": {
     "message": "你选择的许可证包含“或更多”条款。如果你勾选此复选框，用户可以在该许可证的后续版本下使用你的项目。"
-  },
-  "project.settings.license.missing-url": {
-    "message": "输入指向你的自定义许可证全文的 URL。"
   },
   "project.settings.license.name": {
     "message": "许可证名称"
@@ -4618,9 +4534,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "精选标签"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "您必须至少有一个精选标签。"
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "选择您最相关的标签，这些标签将显示在您其余标签之前。"

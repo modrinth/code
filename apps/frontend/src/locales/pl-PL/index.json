@@ -1082,23 +1082,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Dodaj prywatną notatkę"
   },
-  "conversation-thread.action.approve": {
-    "message": "Zatwierdź"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Zatwierdź z odpowiedzią "
-  },
   "conversation-thread.action.close-report": {
     "message": "Zamknij zgłoszenie"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Zamknij z odpowiedzią"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Odrzuć"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Odrzuć z odpowiedzią"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Otwórz ponownie wątek "
@@ -1109,32 +1097,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Odpowiedz na wątek"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Wyślij ponownie do przeglądu"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Wyślij ponownie do przeglądu z odpowiedzią"
-  },
   "conversation-thread.action.send": {
     "message": "Wyślij "
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Wyślij do przeglądu"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Wyślij do przeglądu z odpowiedzią"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Ustaw jako wersję roboczą"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Ustaw jako wersję roboczą z odpowiedzią"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Wstrzymaj"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Wstrzymaj z odpowiedzią"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Ten wątek jest zamknięty i nie można wysyłać do niego nowych wiadomości."
@@ -1183,33 +1147,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Problem z moderacją"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Potwierdzenie, że komentarze od zespołu moderacji zostały zaadresowane"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Potwierdzam, że komentarze od zespołu moderacji zostały zaadresowane."
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "Przesyłasz ponownie <project-title>{projectTitle}</project-title>. Jeśli wszystkie problemy zgłoszone przez moderatorów zostały rozwiązane, projekt może zostać zatwierdzony automatycznie. W przeciwnym razie zostanie on wysłany do moderatorów do przeglądu."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Ponowne wysyłanie do przeglądu"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Wysyłanie do przeglądu"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Upewnij się, że wszystkie komentarze od zespołu moderacji zostały zaadresowane."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "Powtórne wysyłanie projektu do sprawdzenia bez zaadresowania komentarzy moderatorów może skutkować zawieszeniem konta."
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "Musisz wykonać wszystkie powyższe wymagane działania, aby ponownie przesłać projekt do przeglądu"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "Wysyłasz <project-title>{projectTitle}</project-title> do przeglądu przez naszych moderatorów."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Pliki uzupełniające to np. kod źródłowy, a nie alternatywne wersje lub wariacje."
@@ -1439,17 +1376,11 @@
   "create.project.name-placeholder": {
     "message": "Wprowadź nazwę projektu..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "Ikona {name}"
-  },
   "create.project.owner-label": {
     "message": "Właściciel"
   },
   "create.project.server-project-title": {
     "message": "Tworzenie serwera"
-  },
-  "create.project.summary-description": {
-    "message": "Zdanie lub dwa o Twoim projekcie."
   },
   "create.project.summary-label": {
     "message": "Podsumowanie"
@@ -1465,12 +1396,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Awatar użytkownika"
-  },
-  "create.project.visibility-description": {
-    "message": "Widoczność Twojego projektu po zatwierdzeniu."
   },
   "create.project.visibility-private": {
     "message": "Prywatny"
@@ -1900,9 +1825,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Wystąpił błąd podczas ładowania powiadomień:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Historia"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Historia powiadomień"
@@ -4244,17 +4166,11 @@
   "project.settings.license.custom": {
     "message": "Niestandardowa"
   },
-  "project.settings.license.custom-name-required": {
-    "message": "Podaj nazwę niestandardowej licencji."
-  },
   "project.settings.license.later": {
     "message": "Późniejsze edycje"
   },
   "project.settings.license.later-description": {
     "message": "Wybrana licencja ma klauzulę \"lub późniejszy\". Jeśli zaznaczysz to pole, użytkownicy mogą korzystać z projektu na prawach dozwolonych przez późniejsze edycje licencji."
-  },
-  "project.settings.license.missing-url": {
-    "message": "Podaj adres URL do pełnego tekstu niestandardowej licencji."
   },
   "project.settings.license.name": {
     "message": "Nazwa licencji"
@@ -4516,9 +4432,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Wyróżnione tagi"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "Musisz mieć co najmniej jeden polecany tag."
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "Wybierz najważniejsze tagi. Są one wyświetlane przed resztą tagów."

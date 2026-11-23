@@ -1040,23 +1040,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Lägg till privat anteckning"
   },
-  "conversation-thread.action.approve": {
-    "message": "Godkänn"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Godkänn med svar"
-  },
   "conversation-thread.action.close-report": {
     "message": "Stäng rapport"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Stäng med svar"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Avslå"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Avslå med svar"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Återuppta tråd"
@@ -1067,32 +1055,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Svara tråd"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Skicka in igen för granskning"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Skicka in igen för granskning med svar"
-  },
   "conversation-thread.action.send": {
     "message": "Skicka"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Skicka in för granskning"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Skicka in för granskning med svar"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Sätt till utkast"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Sätt till utkast med svar"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Tillhandahåll"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Tillbakahåll med svar"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Den här tråden är stängd och nya meddelanden kan inte skickas."
@@ -1135,24 +1099,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Modereringsfel"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Bekräfta att jag tagit itu med meddelandena från moderatorerna"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Jag bekräftar att jag ordentligt tagit itu med moderatorernas kommentarer."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Skickar in igen för granskning"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Skickar in för granskning"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Se till att du tagit itu med alla kommentarer från moderationsteamet."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "Upprepade inlämningar utan att ta itu med moderationsteamets kommentarer kan leda till tillfällig avstängning."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Kompletterande filer är avsedda för stödjande resurser som källkod, inte för alternativa versioner eller varianter."
@@ -1358,17 +1304,11 @@
   "create.project.name-placeholder": {
     "message": "Ange projektnamn..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} ikon"
-  },
   "create.project.owner-label": {
     "message": "Ägare"
   },
   "create.project.server-project-title": {
     "message": "Skapar ett serverprojekt"
-  },
-  "create.project.summary-description": {
-    "message": "En mening eller två som beskriver ditt projekt."
   },
   "create.project.summary-label": {
     "message": "Sammanfattning"
@@ -1384,12 +1324,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Användaravatar"
-  },
-  "create.project.visibility-description": {
-    "message": "Synligheten av ditt projekt efter att det har godkänts."
   },
   "create.project.visibility-private": {
     "message": "Privat"
@@ -1777,9 +1711,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Misslyckades att läsa in notifikationer:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Historik"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Notifikationshistorik"
@@ -3704,9 +3635,6 @@
   "project.settings.license.custom": {
     "message": "Anpassad"
   },
-  "project.settings.license.custom-name-required": {
-    "message": "Ange namnet för din anpassade licens."
-  },
   "project.settings.license.name": {
     "message": "Licensnamn"
   },
@@ -3883,9 +3811,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Nyckeltaggar"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "Du måste ha minst en nyckeltagg."
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "Markera dina mest relevanta taggar. De syns före resten av dina taggar."

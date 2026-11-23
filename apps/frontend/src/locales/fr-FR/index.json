@@ -1085,23 +1085,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Ajouter une note privée"
   },
-  "conversation-thread.action.approve": {
-    "message": "Approuver"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Approuver avec réponse"
-  },
   "conversation-thread.action.close-report": {
     "message": "Fermer le signalement"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Fermer avec réponse"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Rejeter"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rejeter avec réponse"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Rouvrir le fil"
@@ -1112,32 +1100,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Répondre au fil"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Soumettre de nouveau à la révision"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Soumettre de nouveau avec réponse"
-  },
   "conversation-thread.action.send": {
     "message": "Envoyer"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Envoyer à la révision"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Envoyer"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Ajouter aux brouillons"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Ajouter aux brouillons avec réponse"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Retenir"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Retenir avec réponse"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Ce fil est fermé et aucun message ne peut y être envoyé."
@@ -1186,33 +1150,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Problème de modération"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Confirmer que j'ai adressé les messages des modérateurs"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Je confirme que j'ai bel et bien adressé les messages des modérateurs."
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "Vous soumettez à nouveau <project-title>{projectTitle}</project-title>. Si tous les problèmes de modération sont résolus, il peut être approuvé automatiquement. Sinon, il sera envoyé aux modérateurs pour examen."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Soumettre de nouveau à la révision"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Nouvelle soumission à la révision en cours"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Assurez-vous d’avoir répondu à tous les commentaires de l’équipe de modération."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "Les soumissions répétées sans répondre aux commentaires des modérateurs peuvent entraîner une suspension de compte."
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "Vous devez compléter toutes les actions requises ci-dessus pour soumettre à nouveau"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "Vous soumettez <project-title>{projectTitle}</project-title> pour être révisé par les modérateurs."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Les fichiers supplémentaires servent à fournir des ressources complémentaires comme le code source, et non des versions alternatives ou des variantes."
@@ -1442,17 +1379,11 @@
   "create.project.name-placeholder": {
     "message": "Entrez le nom du projet..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "Icône de {name}"
-  },
   "create.project.owner-label": {
     "message": "Propriétaire"
   },
   "create.project.server-project-title": {
     "message": "Création d'un serveur"
-  },
-  "create.project.summary-description": {
-    "message": "Une phrase ou deux qui décrivent votre projet."
   },
   "create.project.summary-label": {
     "message": "Sommaire"
@@ -1468,12 +1399,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Avatar de l'utilisateur"
-  },
-  "create.project.visibility-description": {
-    "message": "La visibilité de votre projet après qu'il ait été approuvé."
   },
   "create.project.visibility-private": {
     "message": "Privé"
@@ -1903,9 +1828,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Erreur en essayant de charger les notifications :"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Historique"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Historique des notifications"
@@ -4531,9 +4453,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Tags mis en avant"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "Vous devez au moins avoir un tag mis en avant."
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "Sélectionnez vos tags les plus pertinents. Ils sont affichés avant le reste de vos tags."

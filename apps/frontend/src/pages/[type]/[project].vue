@@ -2297,7 +2297,14 @@ async function patchIcon(icon) {
 
 let galleryUploadQueue = Promise.resolve()
 
-async function createGalleryItem(file, title, description, featured, ordering, throwOnError = false) {
+async function createGalleryItem(
+	file,
+	title,
+	description,
+	featured,
+	ordering,
+	throwOnError = false,
+) {
 	const projectId = project.value.id
 	const upload = galleryUploadQueue.then(async () => {
 		startLoading()
@@ -2319,7 +2326,10 @@ async function createGalleryItem(file, title, description, featured, ordering, t
 			stopLoading()
 		}
 	})
-	galleryUploadQueue = upload.then(() => {}, () => {})
+	galleryUploadQueue = upload.then(
+		() => {},
+		() => {},
+	)
 	return upload
 }
 

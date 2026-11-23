@@ -1088,23 +1088,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "新增私人附註"
   },
-  "conversation-thread.action.approve": {
-    "message": "核准"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "回覆並核准"
-  },
   "conversation-thread.action.close-report": {
     "message": "關閉檢舉"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "回覆並關閉"
-  },
-  "conversation-thread.action.reject": {
-    "message": "拒絕"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "回覆並拒絕"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "重新開啟討論串"
@@ -1115,32 +1103,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "回覆討論串"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "重新提交審查"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "回覆並重新提交審查"
-  },
   "conversation-thread.action.send": {
     "message": "傳送"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "送交審查"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "回覆並送交審查"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "設為草稿"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "回覆並設為草稿"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "保留"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "回覆並保留"
   },
   "conversation-thread.closed-thread.description": {
     "message": "這個討論串已關閉，無法再傳送新訊息。"
@@ -1189,33 +1153,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "審查問題"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "確認我解決了管理員提到的問題"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "我確認管理員所提到的問題皆已解決。"
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "你即將重新提交 <project-title>{projectTitle}</project-title>。若所有審查問題均已解決，專案可能會自動獲得核准；否則，將送交管理員進行審查。"
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "重新提交審查"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "提交審查"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "請務必確認你解決了管理團隊提出的所有問題。"
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "在未解決管理員提出的問題的情況下反覆提交審查，可能會導致帳號被停權。"
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "你必須完成上述所有的必要動作才能重新提交"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "你即將提交 <project-title>{projectTitle}</project-title> 以供管理員審查。"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "補充檔案是用於提供原始碼等支援性資源，而非用於替代版本或變體。"
@@ -1445,17 +1382,11 @@
   "create.project.name-placeholder": {
     "message": "輸入專案名稱..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} 圖示"
-  },
   "create.project.owner-label": {
     "message": "擁有者"
   },
   "create.project.server-project-title": {
     "message": "建立伺服器專案"
-  },
-  "create.project.summary-description": {
-    "message": "用一兩句話描述你的專案。"
   },
   "create.project.summary-label": {
     "message": "摘要"
@@ -1471,12 +1402,6 @@
   },
   "create.project.url-label": {
     "message": "網址"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "使用者顯示圖片"
-  },
-  "create.project.visibility-description": {
-    "message": "你的專案核准後的瀏覽權限。"
   },
   "create.project.visibility-private": {
     "message": "私人"
@@ -1906,9 +1831,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "載入通知時發生錯誤："
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "紀錄"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "通知紀錄"
@@ -4307,17 +4229,11 @@
   "project.settings.license.custom-name-invalid": {
     "message": "自訂授權條款名稱只能包含字母、數字、句號及連字號。"
   },
-  "project.settings.license.custom-name-required": {
-    "message": "請輸入自訂授權條款的名稱。"
-  },
   "project.settings.license.later": {
     "message": "較新版本"
   },
   "project.settings.license.later-description": {
     "message": "你選擇的授權條款包含「或較新版本」的條款。若勾選此方塊，使用者即可依據授權條款的較新版本使用你的專案。"
-  },
-  "project.settings.license.missing-url": {
-    "message": "請輸入指向自訂授權條款全文的網址。"
   },
   "project.settings.license.name": {
     "message": "授權條款名稱"
@@ -4588,9 +4504,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "精選標籤"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "你必須選擇至少一個精選標籤。"
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "請選擇最相關的標籤。這些標籤會顯示在其他標籤之前。"

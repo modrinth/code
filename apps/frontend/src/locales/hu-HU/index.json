@@ -1070,23 +1070,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Privát megjegyzés"
   },
-  "conversation-thread.action.approve": {
-    "message": "Jóváhagyás"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Jóváhagyás és válasz"
-  },
   "conversation-thread.action.close-report": {
     "message": "Jelentés lezárása"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Bezárás és válasz"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Elutasítás"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Elutasítás és válasz"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Beszélgetés megnyitása újra"
@@ -1097,32 +1085,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Válasz a beszélgetésre"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Benyújtás újra felülvizsgálatra"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Újbóli beküldés ellenőrzésre, válasszal"
-  },
   "conversation-thread.action.send": {
     "message": "Küldés"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Küldés áttekintésre"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Küldés áttekintésre válasszal"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Beállítás vázlatként"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Piszkozatba állítás válasszal"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Visszatartás"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Visszatartás és válasz"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Ez a beszélgetés le van zárva, és nem lehet új üzeneteket küldeni benne."
@@ -1168,27 +1132,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Moderációs probléma"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Megerősítem, hogy foglalkoztam a moderátorok üzeneteivel"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Megerősítem, hogy a moderátorok észrevételeit megfelelően figyelembe vettem."
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "A <project-title>{projectTitle}</project-title> projektet újra benyújtod. Ha minden moderációs problémát megoldottál, a rendszer automatikusan jóváhagyhatja. Ellenkező esetben a moderátorokhoz kerül felülvizsgálatra."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Benyújtás újra felülvizsgálatra"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Benyújtás felülvizsgálatra"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Győződj meg róla, hogy a moderációs csapat minden megjegyzésével foglalkoztál."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "A moderátorok megjegyzéseinek figyelmen kívül hagyásával történő ismételt beküldések a fiókod felfüggesztését eredményezhetik."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "A kiegészítő fájlok olyan kiegészítő forrásokhoz tartoznak, mint például a forráskód, nem pedig alternatív verziókhoz vagy változatokhoz."
@@ -1418,17 +1361,11 @@
   "create.project.name-placeholder": {
     "message": "Adj meg egy projekt nevet..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} ikon"
-  },
   "create.project.owner-label": {
     "message": "Tulajdonos"
   },
   "create.project.server-project-title": {
     "message": "Szerverprojekt létrehozása"
-  },
-  "create.project.summary-description": {
-    "message": "Egy vagy kettő mondat ami leírja a projektedet."
   },
   "create.project.summary-label": {
     "message": "Összegzés"
@@ -1444,12 +1381,6 @@
   },
   "create.project.url-label": {
     "message": "Link"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Felhasználói avatár"
-  },
-  "create.project.visibility-description": {
-    "message": "A projekt láthatósága jóváhagyása után."
   },
   "create.project.visibility-private": {
     "message": "Privát"
@@ -1858,9 +1789,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Hiba az értesítések betöltése során:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Előzmények"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Értesítési előzmények"
@@ -4016,17 +3944,11 @@
   "project.settings.license.custom": {
     "message": "Egyéni"
   },
-  "project.settings.license.custom-name-required": {
-    "message": "Add meg az egyéni licenc nevét."
-  },
   "project.settings.license.later": {
     "message": "Későbbi kiadások"
   },
   "project.settings.license.later-description": {
     "message": "A kiválasztott licenc tartalmaz egy „vagy későbbi” záradékot. Ha bejelölöd ezt a jelölőnégyzetet, a felhasználók a projektedet a licenc későbbi kiadásai alapján is használhatják."
-  },
-  "project.settings.license.missing-url": {
-    "message": "Adj meg egy URL címet az egyéni licenced teljes tartalmához."
   },
   "project.settings.license.name": {
     "message": "A licenc neve"
@@ -4276,9 +4198,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Kiemelt címkék"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "Legalább egy címkét ki kell emlelned!"
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "Válaszd ki a legrelevánsabb címkéidet. Ezek a többi címke előtt jelennek meg."

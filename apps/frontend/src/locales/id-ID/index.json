@@ -707,9 +707,6 @@
   "create.project.server-project-title": {
     "message": "Membuat proyek server"
   },
-  "create.project.summary-description": {
-    "message": "Satu atau dua kalimat yang menjelaskan proyek Anda."
-  },
   "create.project.summary-label": {
     "message": "Ringkasan"
   },
@@ -721,9 +718,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.visibility-description": {
-    "message": "Visibilitas proyek Anda setelah ia disetujui."
   },
   "create.project.visibility-private": {
     "message": "Pribadi"

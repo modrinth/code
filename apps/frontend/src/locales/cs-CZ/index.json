@@ -980,23 +980,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Přidat soukromou poznámku"
   },
-  "conversation-thread.action.approve": {
-    "message": "Schválit"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Schválit s odpovědí"
-  },
   "conversation-thread.action.close-report": {
     "message": "Uzavřít hlášení"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Uzavřít s odpovědí"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Zamítnout"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Zamítnout s odpovědí"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Znovuotevřít vlákno"
@@ -1007,32 +995,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Odpovědět vláknu"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Znovu odeslat ke kontrole"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Znovu odeslat ke kontrole s odpovědí"
-  },
   "conversation-thread.action.send": {
     "message": "Odeslat"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Odeslat ke kontrole"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Odeslat ke kontrole s odpovědí"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Nastaven jako návrh"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Nastaven jako návrh s odpovědí"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Pozastavit"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Pozastavit s odpovědí"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Toto vlákno je uzavřené a nelze do něj posílat nové zprávy."
@@ -1063,12 +1027,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Moderační problém"
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Opětovné odesílání ke kontrole"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Odesílání ke kontrole"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Doplňkové soubory slouží jako podpůrné materiály (např. zdrojový kód), ne jako alternativní verze či varianty."
@@ -1238,17 +1196,11 @@
   "create.project.name-placeholder": {
     "message": "Zadejte název projektu..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} Ikona"
-  },
   "create.project.owner-label": {
     "message": "Vlastník"
   },
   "create.project.server-project-title": {
     "message": "Vytváření serverového projektu"
-  },
-  "create.project.summary-description": {
-    "message": "Popiště vaši organizace dvěma nebo jednou větou."
   },
   "create.project.summary-label": {
     "message": "Shrnutí"
@@ -1264,12 +1216,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Avatar uživatele"
-  },
-  "create.project.visibility-description": {
-    "message": "Viditelnost vašeho projektu poté co bude schválena."
   },
   "create.project.visibility-private": {
     "message": "Soukromé"
@@ -1516,9 +1462,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Chyba při načítání oznámení:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Historie"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Historie oznámení"

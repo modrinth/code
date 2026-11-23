@@ -539,12 +539,6 @@
   "collection.title": {
     "message": "{name} - Colecție"
   },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Retrimite pentru revizuire"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Retrimite pentru revizuire"
-  },
   "create-project-version.create-modal.stage.add-files.details-tab": {
     "message": "Detalii"
   },
@@ -707,9 +701,6 @@
   "create.project.name-placeholder": {
     "message": "Introduceți numele proiectului..."
   },
-  "create.project.summary-description": {
-    "message": "O propoziție sau două care îți descriu proiectul."
-  },
   "create.project.summary-label": {
     "message": "Rezumat"
   },
@@ -721,9 +712,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.visibility-description": {
-    "message": "Vizibilitatea proiectului tău după ce a fost aprobat."
   },
   "create.project.visibility-private": {
     "message": "Privat"

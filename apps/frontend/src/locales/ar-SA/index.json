@@ -998,20 +998,8 @@
   "conversation-thread.action.add-private-note": {
     "message": "إضافة ملاحظة خاصة"
   },
-  "conversation-thread.action.approve": {
-    "message": "موافقة"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "الموافقة مع الرد"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "الإغلاق مع الرد"
-  },
-  "conversation-thread.action.reject": {
-    "message": "رفض"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "الرفض مع الرد"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "إعادة فتح سلسلة المحادثة"
@@ -1022,32 +1010,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "الرد على سلسلة المحادثة"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "إعادة الإرسال للمراجعة"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "إعادة الإرسال للمراجعة مع الرد"
-  },
   "conversation-thread.action.send": {
     "message": "إرسال"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "إرسال للمراجعة"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "الإرسال للمراجعة مع الرد"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "تعيين كمسودة"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "تعيين كمسودة مع الرد"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "حجب"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "الحجب مع الرد"
   },
   "conversation-thread.closed-thread.description": {
     "message": "هذه السلسلة مغلقة، ولا يمكن إرسال رسائل جديدة إليها."
@@ -1081,24 +1045,6 @@
   },
   "conversation-thread.reply-modal.help-center-note": {
     "message": "إذا كنت بحاجة إلى التواصل مع فريق الإشراف، يُرجى استخدام <help-center-link>مركز مساعدة Modrinth</help-center-link> والنقر على الفقاعة الزرقاء في الزاوية السفلية اليمنى للتواصل مع الدعم."
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "تأكيد أنني قد عالجت رسائل المشرفين"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "أؤكد أنني تعاملت بشكل مناسب مع ملاحظات المشرفين."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "إعادة الإرسال للمراجعة"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "إرسال للمراجعة"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "تأكد من أنك قد تعاملت مع جميع ملاحظات فريق الإشراف."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "قد تؤدي عمليات الإرسال المتكررة دون معالجة ملاحظات المشرفين إلى تعليق الحساب."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "الملفات التكميلية تستخدم لدعم الموارد مثل كود المصدر، وليس للإصدارات أو الأنواع البديلة."
@@ -1328,17 +1274,11 @@
   "create.project.name-placeholder": {
     "message": "أدخل اسم المشروع..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "أيقونة {name}"
-  },
   "create.project.owner-label": {
     "message": "المالك"
   },
   "create.project.server-project-title": {
     "message": "إنشاء مشروع الخادم"
-  },
-  "create.project.summary-description": {
-    "message": "جملة أو جملتان تصف مجموعتك."
   },
   "create.project.summary-label": {
     "message": "الملخص"
@@ -1354,12 +1294,6 @@
   },
   "create.project.url-label": {
     "message": "عنوان URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "صورة المستخدم"
-  },
-  "create.project.visibility-description": {
-    "message": "رؤية مشروعك بعد الموافقة عليه."
   },
   "create.project.visibility-private": {
     "message": "خاص"
@@ -1768,9 +1702,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "حدث خطأ أثناء تحميل الإشعارات:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "السجل"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "سجل الإشعارات"

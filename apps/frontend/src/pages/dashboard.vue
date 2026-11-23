@@ -22,7 +22,11 @@
 							icon: LibraryIcon,
 						},
 						{ type: 'heading', label: formatMessage(messages.creators) },
-						{ link: '/dashboard/projects', label: formatMessage(messages.projects), icon: ListIcon },
+						{
+							link: '/dashboard/projects',
+							label: formatMessage(messages.projects),
+							icon: ListIcon,
+						},
 						{
 							link: '/dashboard/organizations',
 							label: formatMessage(messages.organizations),

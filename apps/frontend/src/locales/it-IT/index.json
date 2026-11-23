@@ -1088,23 +1088,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Aggiungi nota privata"
   },
-  "conversation-thread.action.approve": {
-    "message": "Approva"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Approva con risposta"
-  },
   "conversation-thread.action.close-report": {
     "message": "Chiudi segnalazione"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Chiudi con risposta"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Rifiuta"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rifiuta con risposta"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Riapri thread"
@@ -1115,32 +1103,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Rispondi al thread"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Ripresenta per la revisione"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Ripresenta per la revisione con risposta"
-  },
   "conversation-thread.action.send": {
     "message": "Invia"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Presenta per la revisione"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Presenta per la revisione con risposta"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Imposta come bozza"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Imposta come bozza con risposta"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Sospendi"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Sospendi con risposta"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Questo thread è stato chiuso. Non potranno essere inviati nuovi messaggi."
@@ -1189,33 +1153,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "il problema di moderazione"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Confermo di aver risposto ai messaggi dei moderatori"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Confermo di aver risposto adeguatamente ai messaggi dei moderatori."
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "Stai ripresentando <project-title>{projectTitle}</project-title>. Se tutti i problemi di moderazione sono risolti, potrebbe essere approvato automaticamente. Altrimenti, sarà inviato ai moderatori per la revisione."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Ripresentazione"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Presentazione"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Assicurati di aver risposto a tutti i commenti del team di moderazione."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "Ripresentare il progetto di continuo senza rispondere ai moderatori potrebbe portare alla sospensione dell'account."
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "Devi completare tutte le azioni richieste sopra prima di ripresentare"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "Stai presentando <project-title>{projectTitle}</project-title> per farlo revisionare ai moderatori."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "I file aggiuntivi sono per risorse di supporto come il codice sorgente, non per versioni alternative o varianti."
@@ -1445,17 +1382,11 @@
   "create.project.name-placeholder": {
     "message": "Inserisci nome progetto..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "Icona di {name}"
-  },
   "create.project.owner-label": {
     "message": "Proprietario"
   },
   "create.project.server-project-title": {
     "message": "Crea un server"
-  },
-  "create.project.summary-description": {
-    "message": "Una frase o due che descrivano il tuo progetto."
   },
   "create.project.summary-label": {
     "message": "Sintesi"
@@ -1471,12 +1402,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Foto profilo"
-  },
-  "create.project.visibility-description": {
-    "message": "La visibilità del tuo progetto appena sarà approvato."
   },
   "create.project.visibility-private": {
     "message": "Privato"
@@ -1906,9 +1831,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Impossibile caricare le notifiche:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Cronologia"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Cronologia delle notifiche"
@@ -4337,17 +4259,11 @@
   "project.settings.license.custom-name-invalid": {
     "message": "I nomi di licenza possono contenere solo lettere, numeri, punti e trattini."
   },
-  "project.settings.license.custom-name-required": {
-    "message": "Inserisci un nome per la licenza."
-  },
   "project.settings.license.later": {
     "message": "Edizioni successive"
   },
   "project.settings.license.later-description": {
     "message": "La licenza selezionata ha una clausola \"o successive\". Se spunti questa casella, gli utenti potrebbero utilizzare il progetto sotto le edizioni successive della licenza."
-  },
-  "project.settings.license.missing-url": {
-    "message": "Inserisci un URL per il testo completo della licenza."
   },
   "project.settings.license.name": {
     "message": "Nome della licenza"
@@ -4618,9 +4534,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Tag in evidenza"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "Devi avere almeno un tag in evidenza."
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "Seleziona i tag più pertinenti. Questi sono mostrati prima degli altri tag."

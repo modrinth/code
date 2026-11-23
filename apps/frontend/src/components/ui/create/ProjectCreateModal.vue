@@ -113,8 +113,8 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { PlusIcon, XIcon } from '@modrinth/assets'
-import { Button } from '@modrinth/ui'
 import {
+	Button,
 	Chips,
 	commonMessages,
 	defineMessages,

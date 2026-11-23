@@ -1088,23 +1088,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Adicionar nota privada"
   },
-  "conversation-thread.action.approve": {
-    "message": "Aprovar"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Aprovar com resposta"
-  },
   "conversation-thread.action.close-report": {
     "message": "Fechar denúncia"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Encerrar com resposta"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Rejeitar"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rejeitar com resposta"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reabrir tópico"
@@ -1115,32 +1103,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Responder ao tópico"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Reenviar para revisão"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Reenviar para revisão com resposta"
-  },
   "conversation-thread.action.send": {
     "message": "Enviar"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Enviar para revisão"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Enviar para revisão com resposta\t"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Definir como rascunho"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Definir como rascunho com resposta"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Reter"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Reter com resposta"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Este tópico foi encerrado e não é possível enviar mensagens nele."
@@ -1189,33 +1153,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Problema de moderação"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Confirmo que respondi às mensagens dos moderadores"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Confirmo que respondi adequadamente aos comentários dos moderadores."
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "Você está reenviando <project-title>{projectTitle}</project-title>. Se todos os problemas de moderação forem resolvidos, ele poderá ser aprovado automaticamente. Caso contrário, será enviado aos moderadores para revisão."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Reenviando para revisão"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Enviando para revisão"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Certifique-se de ter respondido a todos os comentários da equipe de moderação."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "O envio repetido de conteúdo sem considerar os comentários dos moderadores pode resultar na suspensão da conta."
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "Você deve completar todas as ações acima para reenviar"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "Você está enviando <project-title>{projectTitle}</project-title> para ser revisado pelos moderadores."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Os arquivos suplementares servem para fornecer recursos de apoio, como código-fonte, e não versões ou variantes alternativas."
@@ -1445,17 +1382,11 @@
   "create.project.name-placeholder": {
     "message": "Insira o nome do projeto..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "Ícone de {name}"
-  },
   "create.project.owner-label": {
     "message": "Dono"
   },
   "create.project.server-project-title": {
     "message": "Criando um projeto de servidor"
-  },
-  "create.project.summary-description": {
-    "message": "Uma ou duas frases que descrevam seu projeto."
   },
   "create.project.summary-label": {
     "message": "Resumo"
@@ -1471,12 +1402,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Avatar do usuário"
-  },
-  "create.project.visibility-description": {
-    "message": "A visibilidade do seu projeto após sua aprovação."
   },
   "create.project.visibility-private": {
     "message": "Privado"
@@ -1906,9 +1831,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Erro ao carregar as notificações:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Histórico"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Histórico de notificações"
@@ -4337,17 +4259,11 @@
   "project.settings.license.custom-name-invalid": {
     "message": "Os nomes de licenças personalizadas podem conter apenas letras, números, pontos e hífenes."
   },
-  "project.settings.license.custom-name-required": {
-    "message": "Digite um nome para sua licença personalizada."
-  },
   "project.settings.license.later": {
     "message": "Edições posteriores"
   },
   "project.settings.license.later-description": {
     "message": "A licença que você selecionou possui uma cláusula \"ou posterior\". Se você marcar esta caixa, os usuários poderão usar seu projeto sob edições posteriores da licença."
-  },
-  "project.settings.license.missing-url": {
-    "message": "Insira uma URL para o texto completo de sua licença personalizada."
   },
   "project.settings.license.name": {
     "message": "Nome da licença"
@@ -4618,9 +4534,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Etiquetas em destaque"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "Você deve ter pelo menos uma marcação em destaque."
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "Selecione suas marcações mais relevantes. Estas serão exibidas antes das outras marcações."

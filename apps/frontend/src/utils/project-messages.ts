@@ -7,5 +7,6 @@ export const projectSummaryHelp = defineMessage({
 
 export const projectVisibilityApprovalHelp = defineMessage({
 	id: 'create.project.visibility-approval-description',
-	defaultMessage: 'Takes effect once approved. Until then, only project members can see the project.',
+	defaultMessage:
+		'Takes effect once approved. Until then, only project members can see the project.',
 })

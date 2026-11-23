@@ -971,20 +971,8 @@
   "conversation-thread.action.add-private-note": {
     "message": "Adicionar nota privada"
   },
-  "conversation-thread.action.approve": {
-    "message": "Aprovar"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Aprovar com comentário"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Fechar com comentário"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Rejeitar"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rejeitar com comentário"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reabrir tópico"
@@ -995,32 +983,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Responder ao tópico"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Reenviar para revisão"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Reenviar para revisão com comentário"
-  },
   "conversation-thread.action.send": {
     "message": "Enviar"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Enviar para revisão"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Enviar para revisão com comentário"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Definir como rascunho"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Definir como rascunho com comentário"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Reter"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Reter com comentário"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Este tópico está fechado e não aceita novas mensagens."
@@ -1175,9 +1139,6 @@
   "create.project.server-project-title": {
     "message": "Criar um projeto de servidor"
   },
-  "create.project.summary-description": {
-    "message": "Uma ou duas frases que descrevem o teu projeto."
-  },
   "create.project.summary-label": {
     "message": "Resumo"
   },
@@ -1189,9 +1150,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.visibility-description": {
-    "message": "A visibilidade do teu projeto após ser aprovado."
   },
   "create.project.visibility-private": {
     "message": "Privado"
@@ -1552,9 +1510,6 @@
   },
   "dashboard.overview.notifications.empty.no-unread": {
     "message": "Não tens notificações por ler."
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Histórico"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Histórico de notificações"

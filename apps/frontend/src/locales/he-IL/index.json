@@ -479,9 +479,6 @@
   "create.project.server-project-title": {
     "message": "יצירת פרויקט שרת"
   },
-  "create.project.summary-description": {
-    "message": "משפט או שניים שמפרטים על הפרויקט שלך."
-  },
   "create.project.summary-label": {
     "message": "סיכום"
   },
@@ -493,9 +490,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.visibility-description": {
-    "message": "מצב נראות הפרויקט שלך אחרי שאושר."
   },
   "create.project.visibility-private": {
     "message": "פרויקט פרטי"

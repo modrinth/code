@@ -660,9 +660,7 @@ const missingCustomUrl = computed(
 	() => current.value.license.friendly === 'Custom' && !current.value.licenseUrl.trim(),
 )
 const customNameMessage = computed(() =>
-	invalidCustomName.value
-		? { severity: 'error' as const, message: messages.invalidName }
-		: null,
+	invalidCustomName.value ? { severity: 'error' as const, message: messages.invalidName } : null,
 )
 const canSave = computed(
 	() =>

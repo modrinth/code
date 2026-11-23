@@ -18,7 +18,7 @@
 					type="quiet"
 					interaction="none"
 					:to="`/organization/${org.slug}`"
-					class="universal-card org !bg-surface-3 !h-auto !w-full !shrink !items-stretch !justify-start !whitespace-normal !p-[var(--spacing-card-bg)]"
+					class="universal-card org !h-auto !w-full !shrink !items-stretch !justify-start !whitespace-normal !bg-surface-3 !p-[var(--spacing-card-bg)]"
 					:class="{ 'is-disabled': onlyAcceptedMembers(org.members).length === 0 }"
 				>
 					<Avatar :src="org.icon_url" :alt="org.name" class="icon" />

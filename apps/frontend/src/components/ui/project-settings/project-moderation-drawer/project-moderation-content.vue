@@ -172,9 +172,7 @@ const moderationActions = computed<ButtonMenuAction[]>(() => [
 		disabled: isApproved(project.value),
 		action: () => {
 			const requested = project.value.requested_status
-			return setStatus(
-				requested === 'unlisted' || requested === 'private' ? requested : 'approved',
-			)
+			return setStatus(requested === 'unlisted' || requested === 'private' ? requested : 'approved')
 		},
 	},
 	{

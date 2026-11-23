@@ -54,7 +54,7 @@ const messages = defineMessages({
 					<Button
 						v-for="name in selectedTags"
 						:key="`featured-${name}`"
-							class="aria-pressed:!bg-brand-highlight aria-[pressed=false]:!text-secondary aria-[pressed=false]:[&>svg]:!text-inherit"
+						class="aria-pressed:!bg-brand-highlight aria-[pressed=false]:!text-secondary aria-[pressed=false]:[&>svg]:!text-inherit"
 						:aria-pressed="featuredTags.includes(name)"
 						:aria-label="
 							formatMessage(messages.featureTag, { tag: formatCategory(formatMessage, name) })

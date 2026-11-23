@@ -758,20 +758,8 @@
   "collection.title": {
     "message": "{name} - Samling"
   },
-  "conversation-thread.action.approve": {
-    "message": "Godkjenn"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Godkjenn med svar"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Lukk med svar"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Avvis"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Avvis med svar"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Gjenåpne tråd"
@@ -899,9 +887,6 @@
   "create.project.server-project-title": {
     "message": "Laging av et nytt serverprosjekt"
   },
-  "create.project.summary-description": {
-    "message": "En eller to setninger som beskriver prosjektet ditt."
-  },
   "create.project.summary-label": {
     "message": "Oppsummering"
   },
@@ -913,9 +898,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.visibility-description": {
-    "message": "Synligheten til prosjektet ditt etter at det er godkjent."
   },
   "create.project.visibility-private": {
     "message": "Privat"
@@ -1270,9 +1252,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Feil ved lasting av varsler:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Historie"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Varslingshistorikk"
