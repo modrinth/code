@@ -7,7 +7,6 @@ import {
 	formatCategory,
 	FormattedTag,
 	ProjectCard,
-	TagItem,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -34,33 +33,20 @@ const messages = defineMessages({
 		id: 'project.settings.tags.select-at-least-one-category',
 		defaultMessage: 'Select at least one category to feature.',
 	},
-	featuredTagsRequired: {
-		id: 'project.settings.tags.featured-tags-required',
-		defaultMessage: 'You must have at least one featured tag.',
-	},
 	featureTag: { id: 'project.settings.tags.feature-tag', defaultMessage: 'Feature {tag}' },
 })
 </script>
 
 <template>
 	<section>
-		<div class="mb-2.5 flex items-center gap-2">
-			<h3 class="settings-section-title !mb-0">
-				{{ formatMessage(messages.featuredTags) }}
-			</h3>
-			<TagItem
-				v-tooltip="
-					featuredTags.length === 0 ? formatMessage(messages.featuredTagsRequired) : undefined
-				"
-			>
-				{{ featuredTags.length }}/{{ maxFeaturedTags }}
-			</TagItem>
-		</div>
+		<h3 class="settings-section-title !mb-2.5">
+			{{ formatMessage(messages.featuredTags) }}
+		</h3>
 		<p class="mb-3 mt-0">
 			{{ formatMessage(messages.featuredTagsDescription) }}
 		</p>
-		<div class="settings-content-card flex flex-col gap-2.5">
-			<div class="h-10">
+		<div class="settings-content-card flex flex-col gap-4">
+			<div class="min-h-10">
 				<p v-if="selectedTags.length < 1" class="m-0 my-2 text-secondary">
 					{{ formatMessage(messages.selectAtLeastOneCategory) }}
 				</p>
@@ -68,7 +54,7 @@ const messages = defineMessages({
 					<Button
 						v-for="name in selectedTags"
 						:key="`featured-${name}`"
-						class="aria-pressed:!bg-brand-highlight"
+							class="aria-pressed:!bg-brand-highlight aria-[pressed=false]:!text-secondary aria-[pressed=false]:[&>svg]:!text-inherit"
 						:aria-pressed="featuredTags.includes(name)"
 						:aria-label="
 							formatMessage(messages.featureTag, { tag: formatCategory(formatMessage, name) })
@@ -90,7 +76,6 @@ const messages = defineMessages({
 				:summary="project.description"
 				:icon-url="project.icon_url ?? undefined"
 				:tags="featuredTags"
-				:all-tags="selectedTags"
 				:downloads="project.downloads"
 				:followers="project.followers"
 			/>
