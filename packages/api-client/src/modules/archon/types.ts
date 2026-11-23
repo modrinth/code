@@ -138,6 +138,7 @@ export namespace Archon {
 				| 'server_stopped'
 				| 'server_restarted'
 				| 'server_killed'
+				| 'server_crash_restarted'
 				| 'port_allocation_added'
 				| 'port_allocation_removed'
 				| 'loader_version_edited'

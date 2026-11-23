@@ -5372,6 +5372,9 @@
   "servers.access-page.activity-log-filter.action.port-allocation-removed": {
     "defaultMessage": "Removed port allocation"
   },
+  "servers.access-page.activity-log-filter.action.server-crash-restarted": {
+    "defaultMessage": "Server automatically restarted after a crash"
+  },
   "servers.access-page.activity-log-filter.action.server-created": {
     "defaultMessage": "Created server"
   },
@@ -5767,6 +5770,9 @@
   },
   "servers.audit-log.event.port-allocation-removed": {
     "defaultMessage": "Removed port allocation <port></port>"
+  },
+  "servers.audit-log.event.server-crash-restarted": {
+    "defaultMessage": "Server automatically restarted after a crash"
   },
   "servers.audit-log.event.server-created": {
     "defaultMessage": "Created server"
