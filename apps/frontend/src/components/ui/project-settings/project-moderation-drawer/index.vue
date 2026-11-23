@@ -22,7 +22,6 @@ import {
 } from '@modrinth/moderation'
 import { readIssueLocations } from '@modrinth/moderation/src/data/issues/component-builders/locations'
 import {
-	BasicMarkdownText,
 	Button,
 	defineMessages,
 	getActiveDisclosures,
@@ -40,6 +39,7 @@ import { onClickOutside, useEventListener } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
 import { projectIssueSettingsPath } from '~/components/project-settings/settings-shell/destinations'
+import IssueMessage from '~/components/ui/project-issue-card/issue-message.vue'
 import { threadIssueField } from '~/components/ui/project-issue-card/issue-targets'
 import { injectProjectSettingsNavigation } from '~/composables/project-settings-navigation'
 import { projectQueryOptions } from '~/composables/queries/project'
@@ -504,10 +504,10 @@ useEventListener('keydown', (event) => {
 											<p class="mb-0 mt-0.5 text-xs text-orange">
 												{{ formatMessage(messages.requestedByModerator) }}
 											</p>
-											<BasicMarkdownText
+											<IssueMessage
 												v-if="issue.description"
-												:text="issue.description"
-												class="mt-1 text-xs leading-relaxed text-secondary"
+												:message="issue.description"
+												class="mt-1 text-xs text-secondary [&_a]:relative [&_a]:z-10 [&_button]:relative [&_button]:z-10 [&_p]:!mb-2 [&_ul]:!mb-2"
 											/>
 											<div v-if="!issue.to" class="mt-3 flex justify-end">
 												<Button

@@ -82,7 +82,7 @@
 					<div class="flex flex-col gap-3 pb-3">
 						<IssueMessage
 							v-if="issueMessage(issue)"
-							class="markdown-body min-w-0 text-sm text-inherit"
+							class="markdown-body min-w-0 text-sm text-inherit [&_p]:!mb-2 [&_ul]:!mb-2"
 							:message="issueMessage(issue)"
 						/>
 						<div
@@ -919,8 +919,5 @@ function toggle(issue: ThreadIssue) {
 	.project-issue-content.open > div {
 		overflow: visible;
 	}
-}
-.markdown-body :deep(p) {
-	margin-bottom: 12px;
 }
 </style>
