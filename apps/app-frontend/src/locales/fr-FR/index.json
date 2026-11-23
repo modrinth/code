@@ -20,6 +20,9 @@
   "app.action-bar.install.dismiss": {
     "message": "Ignorer"
   },
+  "app.action-bar.install.inspect-details": {
+    "message": "Inspecter les détails"
+  },
   "app.action-bar.install.open-instance": {
     "message": "Ouvrir l'instance"
   },
@@ -409,6 +412,12 @@
   },
   "app.download-manager.title": {
     "message": "Gestionnaire de téléchargement"
+  },
+  "app.error.copied-debug-info": {
+    "message": "Copié"
+  },
+  "app.error.inspect-debug-info": {
+    "message": "Examiner les informations de débogage"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Ouvrir le dossier de sauvegardes"
@@ -1049,6 +1058,9 @@
   "app.java-selector.not-set": {
     "message": "Aucun Java sélectionné"
   },
+  "app.java-selector.path-copied-text": {
+    "message": "Le chemin d'accès Java a été copié dans votre presse-papiers."
+  },
   "app.java-selector.path-copied-title": {
     "message": "Chemin copié"
   },
@@ -1390,6 +1402,18 @@
   },
   "app.library.title": {
     "message": "Bibliothèque"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-body": {
+    "message": "{unpublishCount, plural, one {L'instance partagée que vous possédez sera supprimée des serveurs de Modrinth, et les personnes qui l'utilisent} other {Les # instances partagées que vous possédez seront supprimées des serveurs de Modrinth, et les personnes qui les utilisent}} ne recevront plus de mises à jour. {leaveCount, plural, one {Vous perdrez l'accès à l'autre instance partagée et aurez besoin d'une nouvelle invitation pour la rejoindre.} other {Vous perdrez l'accès aux # autres instances partagées et aurez besoin d'une nouvelle invitation pour les rejoindre.}} Elles seront toutes retirées de votre bibliothèque."
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
+    "message": "Dépublier et quitter les instances partagées"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.header": {
+    "message": "Dépublier et quitter {count} instances partagées"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {Cela supprime l'instance partagée des serveurs de Modrinth. Les personnes qui l'utilisent dans l'application Modrinth cesseront de recevoir des mises à jour, et elles seront retirées de votre bibliothèque.} other {Cela supprime ces instances partagées des serveurs de Modrinth. Les personnes qui les utilisent dans l'application Modrinth cesseront de recevoir des mises à jour, et elles seront retirées de votre bibliothèque.}}"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "Contexte additionnel"
@@ -2912,12 +2936,6 @@
   "app.settings.privacy.telemetry.title": {
     "message": "Télémétrie"
   },
-  "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "Afficher l’action Copier les détails lorsqu’une installation est en attente ou en cours. Elle est toujours disponible pour les installations échouées ou interrompues."
-  },
-  "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Toujours afficher les détails de copie"
-  },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "L'application peut se charger plus lentement jusqu'à ce que le cache soit reconstruit."
   },
@@ -2945,8 +2963,23 @@
   "app.settings.resource-management.app-directory.change-to-default": {
     "message": "Rétablir par défaut"
   },
+  "app.settings.resource-management.app-directory.modal.admonition-header": {
+    "message": "Tous vos fichiers vont être déplacés"
+  },
+  "app.settings.resource-management.app-directory.modal.choose": {
+    "message": "Choisir un dossier"
+  },
+  "app.settings.resource-management.app-directory.modal.current": {
+    "message": "Actuel"
+  },
   "app.settings.resource-management.app-directory.modal.header": {
     "message": "Changer le répertoire de l'application"
+  },
+  "app.settings.resource-management.app-directory.modal.move-and-restart": {
+    "message": "Déplacer et redémarrer"
+  },
+  "app.settings.resource-management.app-directory.modal.move-later": {
+    "message": "Déplacer au prochain lancement"
   },
   "app.settings.resource-management.app-directory.modal.new": {
     "message": "Nouveau"
@@ -2956,6 +2989,9 @@
   },
   "app.settings.resource-management.app-directory.more-change-options": {
     "message": "Plus d'options répertoire"
+  },
+  "app.settings.resource-management.app-directory.move-now": {
+    "message": "Déplacer et redémarrer maintenant"
   },
   "app.settings.resource-management.app-directory.open-folder": {
     "message": "Ouvrir le dossier"
@@ -3343,6 +3379,12 @@
   },
   "app.shared-instance.lock-notice.delete-instance": {
     "message": "Supprimer l'instance"
+  },
+  "app.shared-instance.lock-notice.more-actions": {
+    "message": "Plus actions d'instance"
+  },
+  "app.shared-instance.lock-notice.reason": {
+    "message": "Raison"
   },
   "app.sidebar.playing-as": {
     "message": "Joue en tant que"
@@ -3797,8 +3839,14 @@
   "hosting.play.update-to-play": {
     "message": "Mettre à jour pour jouer"
   },
+  "installation-settings.advanced.title": {
+    "message": "Avancé"
+  },
   "installation-settings.relink-shared-instance.modal.input-placeholder": {
     "message": "https://modrinth.com/share/..."
+  },
+  "installation-settings.relink-shared-instance.modal.version-summary": {
+    "message": "{loader} {gameVersion} · Version {version}"
   },
   "installation-settings.shared-instance.linked-title": {
     "message": "Instance partagée liée"
@@ -4235,11 +4283,17 @@
   "instance.shared-instance.limit-reached.text": {
     "message": "Vous ne pouvez par partager plus d'instances."
   },
+  "instance.shared-instance.limit-reached.title": {
+    "message": "Limite d'instance partagées atteinte"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "Impossible de se connecter à l'API des instances partagées"
   },
   "instance.shared-instance.network-error.title": {
     "message": "Erreur de réseau"
+  },
+  "instance.shared-instance.owner-behind.text": {
+    "message": "Une version plus récente a été publiée depuis une autre installation Modrinth App. Téléchargez-la, puis réessayez."
   },
   "instance.shared-instance.owner-behind.title": {
     "message": "Impossible de déployer la mise à jour"
@@ -4253,6 +4307,9 @@
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Votre accès à l'instance partagée a été révoqué. Cette instance reste disponible, mais n'est plus liée et ne recevra plus de mises à jour."
   },
+  "instance.shared-instance.unavailable.locked-owner-title": {
+    "message": "L'instance n'est plus partageable"
+  },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Cette instance partagée a été verrouillée par la Team de Modération de Contenu. Elle ne recevra plus de mises à jour de l'instance primaire et ne peut plus être jouée."
   },
@@ -4261,6 +4318,12 @@
   },
   "instance.shared-instance.unavailable.manager-fallback": {
     "message": "le gestionnaire d'instance"
+  },
+  "instance.shared-instance.unavailable.not-found-text": {
+    "message": "Nous n'avons pas pu trouver cette instance partagée. Votre contenu installé est encore sur cet appareil."
+  },
+  "instance.shared-instance.unavailable.not-found-title": {
+    "message": "Instance partagée indisponible"
   },
   "instance.shared-instance.unavailable.text": {
     "message": "L'instance principale a été supprimée. Cette instance est encore disponible, mais n'est plus liée et ne va plus recevoir de mises à jour."
@@ -4456,6 +4519,12 @@
   },
   "search.filter.locked.server-environment.title": {
     "message": "Seuls les mods client peuvent être ajoutés à l'instance du serveur"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "La version du jeu est fournie par le serveur"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Le loader est fourni par le serveur"
   },
   "search.filter.locked.server.sync": {
     "message": "Synchroniser avec le serveur"

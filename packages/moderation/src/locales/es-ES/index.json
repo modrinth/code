@@ -69,7 +69,7 @@
     "defaultMessage": "La descripción de tu proyecto es demasiado breve. Añade más detalles para describir claramente el contenido, propósito y atractivo del proyecto."
   },
   "nags.description-too-short.title": {
-    "defaultMessage": "Amplíe la descripción"
+    "defaultMessage": "Ampliar la descripción"
   },
   "nags.disclosures-special-formatting.description": {
     "defaultMessage": "Las revelaciones de contenido no deben contener HTML, ya que sólo pueden mostrar en línea Markdown y texto plano."
@@ -235,6 +235,12 @@
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Valora el feedback"
+  },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "La versión del modpack seleccionada no está disponible públicamente. Elige una versión a la que todos los jugadores puedan acceder."
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "Seleccione una versión del modpack disponible públicamente"
   },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "Has seleccionado {count, plural, one {# etiqueta de resolución} other {# etiquetas de resolución}} ({tags}). Los paquetes de recursos o resource packs normalmente solo deberían tener una etiqueta de resolución que coincida con su resolución principal."
@@ -422,8 +428,83 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Visitar la configuración de enlaces"
   },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "Editar declaraciones"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "Editar imágenes de la galería"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "Revisar permisos"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "Administrar versiones"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "Confirmar"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "Añadir imágenes de la galería"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Añadir declaraciones"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "Marcar como resuelto"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "Cambiar descripción"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "Cambiar imagen de galería"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "Cambiar icono"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "Cambiar licencia"
+  },
   "project-review.issue-target.modify-links": {
     "defaultMessage": "Cambiar enlaces"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "Cambiar declaraciones"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "Cambiar nota de declaraciones"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "Cambiar la dirección del servidor"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "Cambiar idiomas del servidor"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "Cambiar URL slug"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "Cambiar resumen"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "Cambiar el rol del miembro del equipo"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "Cambiar título"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "Eliminar imágenes de la galería"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Eliminar icono"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "Eliminar declaraciones"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "Eliminar etiquetas"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "Cambiar versión"
   },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "El resumen de tu proyecto debe proporcionar información única y no repetir el nombre del proyecto."

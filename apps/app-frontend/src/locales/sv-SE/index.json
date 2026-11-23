@@ -2741,9 +2741,6 @@
   "app.settings.privacy.telemetry.title": {
     "message": "Telemetri"
   },
-  "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Visa alltid kopieringsdetaljer"
-  },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Appen kan laddas in långsammare tills cachen är återuppbyggd."
   },

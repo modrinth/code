@@ -50,6 +50,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "הורדה נכשלה"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "הכנת התקן לא צלחה"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "נתיב הקובץ לא קיים"
   },
@@ -200,8 +203,20 @@
   "app.behavior-settings.content.title": {
     "message": "בית ותוכן"
   },
+  "app.behavior-settings.hidden-instances.description": {
+    "message": "התקנים מוסתרים מהספריה במכשיר הזה. התקנים מוסתרים אינם מסונכרנים עם חשבון הModrinth שלך."
+  },
+  "app.behavior-settings.hidden-instances.empty": {
+    "message": "לא הוסתרו התקנים עדיין."
+  },
   "app.behavior-settings.hidden-instances.more-options": {
     "message": "אפשרויות נוספות"
+  },
+  "app.behavior-settings.hidden-instances.not-installed": {
+    "message": "לא מותקן"
+  },
+  "app.behavior-settings.hidden-instances.title": {
+    "message": "התקנים מוסתרים"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "הפעלה וניווט"
@@ -260,6 +275,9 @@
   "app.browse.project-type.mods": {
     "message": "מודים"
   },
+  "app.browse.project-type.plugins": {
+    "message": "תוספים"
+  },
   "app.browse.project-type.resource-packs": {
     "message": "טקסטורות"
   },
@@ -293,11 +311,101 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "הפעל סנכרון טקסטורות בהדרות האפליקציה קודם."
   },
+  "app.debug-export.canceling": {
+    "message": "מבטל ייצוא…"
+  },
+  "app.debug-export.exporting": {
+    "message": "מייצא…"
+  },
+  "app.debug-export.finishing": {
+    "message": "מסיים…"
+  },
+  "app.debug-export.preparing": {
+    "message": "מכין קבצים…"
+  },
+  "app.download-manager.active": {
+    "message": "פעיל"
+  },
+  "app.download-manager.attention": {
+    "message": "נדרשת התייחסות"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "מעדכן {count, plural,one {# פריטים}other {# פריטים}}"
+  },
+  "app.download-manager.cancel": {
+    "message": "ביטול ההתקנה"
+  },
+  "app.download-manager.canceling": {
+    "message": "מבטל התקנה…"
+  },
+  "app.download-manager.clear-all": {
+    "message": "ניקוי הכל"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "נקה משימות שהושלמו"
+  },
+  "app.download-manager.complete": {
+    "message": "הושלם"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "התקן משוכפל"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "מהירות הורדה משוערת"
+  },
+  "app.download-manager.eta": {
+    "message": "זמן משוער להורדה"
+  },
+  "app.download-manager.hide-tasks": {
+    "message": "הסתר משימות"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "התקן מייובא"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "הורדת התקן"
+  },
+  "app.download-manager.modpack": {
+    "message": "חבילת מודים"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "הורדת חבילת מודים"
+  },
+  "app.download-manager.new-instance": {
+    "message": "התקן חדש"
+  },
+  "app.download-manager.no-tasks": {
+    "message": "אין משימות"
+  },
   "app.download-manager.pause": {
     "message": "השהה את ההתקנה"
   },
+  "app.download-manager.paused": {
+    "message": "מושהה"
+  },
+  "app.download-manager.remove": {
+    "message": "הסר מההיסטוריה"
+  },
+  "app.download-manager.resume": {
+    "message": "המשך התקנה"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "התקן משותף"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "עדכון התקן משותף"
+  },
+  "app.download-manager.show-tasks": {
+    "message": "הצג משימות"
+  },
   "app.download-manager.tasks": {
     "message": "משימות"
+  },
+  "app.download-manager.title": {
+    "message": "מנהל הורדות"
+  },
+  "app.error.copied-debug-info": {
+    "message": "מועתק"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "לפתוח תיקיית גיבויים"
@@ -379,6 +487,15 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "סנכרן פיצ'רים בין מכשירים"
+  },
+  "app.file-download.canceling": {
+    "message": "מבטל הורדה…"
+  },
+  "app.file-download.preparing": {
+    "message": "מכין הורדה…"
+  },
+  "app.file-download.waiting": {
+    "message": "ממתין לשרת…"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "פעולות אקסמפלר"
@@ -524,6 +641,15 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "השינויים שלך עדיין לא נשמרו"
   },
+  "app.instance.admonitions.shared-instance.owner-update-body": {
+    "message": "פרסמת עדכון להתקן משותף זה מהורדה נוספת של Modrinth. הורד את השינויים האחרונים כדי להמשיך לנהל התקן זה מכאן."
+  },
+  "app.instance.admonitions.shared-instance.owner-update-button": {
+    "message": "הורד עדכון"
+  },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "עדכון זמין"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "קדם עדכון"
   },
@@ -648,6 +774,9 @@
     "message": "לא הוזמנו חברים"
   },
   "app.instance.share.empty.invite-friends-button": {
+    "message": "הזמנת חברים"
+  },
+  "app.instance.share.invite-friends": {
     "message": "הזמנת חברים"
   },
   "app.instance.share.invite-modal.heading": {

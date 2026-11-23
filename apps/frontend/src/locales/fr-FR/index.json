@@ -3284,9 +3284,6 @@
   "moderation.settings.highlights-section": {
     "message": "Points forts"
   },
-  "moderation.settings.issue-toggle-preview": {
-    "message": "Aperçu des problèmes"
-  },
   "moderation.settings.issue-toggles-section": {
     "message": "Permuter les anomalies"
   },
@@ -5110,9 +5107,6 @@
   },
   "scopes.userRead.label": {
     "message": "Lire les données de l'utilisateur"
-  },
-  "scopes.userReadEmail.description": {
-    "message": "Lire votre adresse e-mail"
   },
   "scopes.userReadEmail.label": {
     "message": "Lire l'adresse e-mail de l'utilisateur"

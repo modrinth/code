@@ -620,6 +620,9 @@
   "content.diff-modal.unknown-project": {
     "defaultMessage": "Неизвестно"
   },
+  "content.enabled-for.description": {
+    "defaultMessage": "Выберите, где контент включён. Переключайте его через «Действия»."
+  },
   "content.enabled-for.label": {
     "defaultMessage": "Включено для"
   },
@@ -897,13 +900,19 @@
     "defaultMessage": "Изменить"
   },
   "creation-flow.curseforge.checking-server-pack": {
-    "defaultMessage": "Проверка наличия набора сервера..."
+    "defaultMessage": "Проверка наличия серверного набора..."
   },
   "creation-flow.curseforge.description": {
     "defaultMessage": "Используйте сборку не с Modrinth."
   },
   "creation-flow.curseforge.file-label": {
     "defaultMessage": "Файл сборки из CurseForge"
+  },
+  "creation-flow.curseforge.ftb-installer": {
+    "defaultMessage": "В эту версию включён установщик сервера от FTB, используемый для настройки сервера."
+  },
+  "creation-flow.curseforge.invalid-link": {
+    "defaultMessage": "Укажите сборку с CurseForge или ссылку на её версию."
   },
   "creation-flow.curseforge.link-description": {
     "defaultMessage": "Вы можете использовать ссылку на сборку или версию сборки."
@@ -931,6 +940,21 @@
   },
   "creation-flow.curseforge.selected-file-label": {
     "defaultMessage": "Файл сборки"
+  },
+  "creation-flow.curseforge.server-pack-available": {
+    "defaultMessage": "Серверный набор доступен для этой версии. {filename} будет установлен на сервер."
+  },
+  "creation-flow.curseforge.server-pack-closest": {
+    "defaultMessage": "Серверный набор недоступен для этой версии. Ближайшая версия с серверным набором — <link>{version}</link>."
+  },
+  "creation-flow.curseforge.server-pack-description": {
+    "defaultMessage": "Добавьте серверный набор, чтобы легче определять, что нужно установить на сервер."
+  },
+  "creation-flow.curseforge.server-pack-label": {
+    "defaultMessage": "Серверный набор <optional>(необязательно)</optional>"
+  },
+  "creation-flow.curseforge.server-pack-none": {
+    "defaultMessage": "Серверный набор для любой версии проекта не найден. Выберите другой набор или загрузите его вручную."
   },
   "creation-flow.curseforge.title": {
     "defaultMessage": "Загрузка сборки из CurseForge"
@@ -2015,6 +2039,18 @@
   "hosting.content.enabled-for.client-only-on-server-warning": {
     "defaultMessage": "Этот клиентский контент включён на сервере и может помешать ему запуститься."
   },
+  "hosting.content.enabled-for.compatibility-unknown-warning": {
+    "defaultMessage": "Не удалось определить среду контента."
+  },
+  "hosting.content.enabled-for.resource-pack-lock": {
+    "defaultMessage": "Наборы ресурсов включаются только для игроков."
+  },
+  "hosting.content.enabled-for.server-only-for-players-warning": {
+    "defaultMessage": "Этот контент только сервера включён для игроков и может помешать запуску игры."
+  },
+  "hosting.content.enabled-for.shader-lock": {
+    "defaultMessage": "Шейдеры включаются только для игроков."
+  },
   "hosting.content.enabled-for.singleplayer-only-on-server-warning": {
     "defaultMessage": "Этот контент для одиночной игры включён на сервере и может помешать его запуску."
   },
@@ -2035,6 +2071,9 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Не удалось удалить контент"
+  },
+  "hosting.content.failed-to-set-enabled-for": {
+    "defaultMessage": "Не удалось изменить, где включено «{name}»"
   },
   "hosting.content.failed-to-toggle": {
     "defaultMessage": "Не удалось переключить {name}"
@@ -2137,6 +2176,12 @@
   },
   "hosting.settings.update-channel.select": {
     "defaultMessage": "Выбрать канал обновления"
+  },
+  "hosting.settings.warn-environment-changes.description": {
+    "defaultMessage": "Запрашивать подтверждение перед включением контента для неподдерживаемой стороны или отключении для обязательной."
+  },
+  "hosting.settings.warn-environment-changes.title": {
+    "defaultMessage": "Предупреждать о несовместимом или обязательном контенте"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Рост до {cpus} CPU"
@@ -2347,6 +2392,9 @@
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Для смены загрузчика необходимо переустановить сервер."
+  },
+  "installation-settings.reinstall-modpack.description": {
+    "defaultMessage": "Переустановка сбросит {type} к исходному состоянию, удалив все добавленные вами моды и контент."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Переустановить сборку"
@@ -2678,6 +2726,9 @@
   "instance.settings.sharing.active-invites.uses": {
     "defaultMessage": "Использований"
   },
+  "instance.settings.sharing.revoke-invite.admonition-body": {
+    "defaultMessage": "Ссылка <monospace>{code}</monospace> сразу перестанет работать. Уже присоединившиеся сохранят доступ."
+  },
   "instance.settings.sharing.revoke-invite.admonition-header": {
     "defaultMessage": "Это действие необратимо"
   },
@@ -2698,6 +2749,12 @@
   },
   "instance.shared-instance.publish-review.file-type-not-allowed": {
     "defaultMessage": "Оправлять этот тип файла запрещено."
+  },
+  "instance.shared-instance.publish-review.files-description": {
+    "defaultMessage": "Также можно включить отдельные файлы вместе с обнаруженными изменениями. Выберите дополнительные файлы на публикацию."
+  },
+  "instance.shared-instance.publish-review.files-error": {
+    "defaultMessage": "Не удалось загрузить файлы, которыми можно поделиться."
   },
   "instance.shared-instance.publish-review.files-tab": {
     "defaultMessage": "Файлы"
@@ -4295,6 +4352,30 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {подписчик} few {подписчика} other {подписчиков}}"
   },
+  "project.game-awards.body": {
+    "defaultMessage": "{projectName} — один из пяти номинантов. Ваш голос важен!"
+  },
+  "project.game-awards.category.best-user-creation": {
+    "defaultMessage": "Лучшее творение сообщества"
+  },
+  "project.game-awards.event-name": {
+    "defaultMessage": "The Game Awards {year}"
+  },
+  "project.game-awards.hide-voting-details": {
+    "defaultMessage": "Скрыть сведения о голосовании"
+  },
+  "project.game-awards.nominee-for": {
+    "defaultMessage": "Номинант на «{category}»"
+  },
+  "project.game-awards.official-nominee": {
+    "defaultMessage": "Официальный номинант"
+  },
+  "project.game-awards.vote": {
+    "defaultMessage": "Голосовать на The Game Awards"
+  },
+  "project.game-awards.vote-now": {
+    "defaultMessage": "Голосовать"
+  },
   "project.license.error": {
     "defaultMessage": "Не удалось получить текст лицензии."
   },
@@ -4925,6 +5006,9 @@
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Очистить поиск"
   },
+  "search.filter.option.search.no_results": {
+    "defaultMessage": "Ничего не найдено"
+  },
   "search.filter.option.search.placeholder": {
     "defaultMessage": "Поиск..."
   },
@@ -5068,6 +5152,9 @@
   },
   "server.settings.sharing.retry": {
     "defaultMessage": "Повторить"
+  },
+  "server.settings.sharing.unpublish-confirmation": {
+    "defaultMessage": "Совместная сборка будет удалена, а ссылки отключены. Игроки перестанут получать изменения. Ваш сервер и его контент останутся доступны."
   },
   "servers.access-page.activity-log-filter.action-group.backups": {
     "defaultMessage": "Резервные копии"
@@ -5389,6 +5476,9 @@
   },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Выполняется фоновая задача"
+  },
+  "servers.admonitions.curseforge-files.body": {
+    "defaultMessage": "Не удалось определить среду {count, plural, one {# файла} other {# файлов}}. Проверьте {count, plural, =1 {его} other {их}} — лишние файлы могут помешать запуску сервера."
   },
   "servers.admonitions.curseforge-files.review": {
     "defaultMessage": "Проверить файлы"
@@ -5720,11 +5810,20 @@
   "servers.backups.admonition.fallback-name": {
     "defaultMessage": "Ваша резервная копия"
   },
+  "servers.backups.admonition.migration-backing-up.title": {
+    "defaultMessage": "Создание резервной копии сервера"
+  },
   "servers.backups.admonition.migration-backup-failed.description": {
     "defaultMessage": "Не удалось создать {backupName}, поэтому контент остался нетронутым. Повторите из вкладки игры."
   },
+  "servers.backups.admonition.migration-cancelled.description": {
+    "defaultMessage": "Контент сервера не тронут."
+  },
   "servers.backups.admonition.migration-cancelled.title": {
     "defaultMessage": "Обновление сервера отменено"
+  },
+  "servers.backups.admonition.migration-completed.description": {
+    "defaultMessage": "Сервером теперь можно делиться с друзьями."
   },
   "servers.backups.admonition.migration-completed.title": {
     "defaultMessage": "Содержимое сервера обновлено"
@@ -5735,8 +5834,14 @@
   "servers.backups.admonition.migration-failed.title": {
     "defaultMessage": "Ошибка обновления сервера"
   },
+  "servers.backups.admonition.migration-queued.description": {
+    "defaultMessage": "Будет создана резервная копия сервера, а его контент — обновлён."
+  },
   "servers.backups.admonition.migration-queued.title": {
     "defaultMessage": "Обновление сервера в очереди"
+  },
+  "servers.backups.admonition.migration-updating.description": {
+    "defaultMessage": "Переустановка и настройка контента для сервера, игроков, или обоих. Это займёт несколько минут."
   },
   "servers.backups.admonition.migration-updating.title": {
     "defaultMessage": "Обновление контента сервера"
@@ -5999,6 +6104,9 @@
   "servers.backups.slots.limit": {
     "defaultMessage": "/ {limit, plural, one {# ячейка} few {# ячейки} other {# ячеек}}"
   },
+  "servers.backups.slots.manual.kept-until-deleted": {
+    "defaultMessage": "Оставить до удаления"
+  },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "Ручное резервное копирование"
   },
@@ -6016,6 +6124,12 @@
   },
   "servers.busy.installing": {
     "defaultMessage": "Сервер устанавливается"
+  },
+  "servers.busy.migrating": {
+    "defaultMessage": "Контент сервера обновляется"
+  },
+  "servers.curseforge-files-review.body": {
+    "defaultMessage": "{count, plural, one {# файла} other {# файлов}} в сборке нет на Modrinth, или не удалось определить среду. Проверьте и заполните столбец <bold>«Включить для»</bold>."
   },
   "servers.curseforge-files-review.header": {
     "defaultMessage": "Проверьте файлы сборки"
@@ -6043,6 +6157,12 @@
   },
   "servers.files.config-push.later": {
     "defaultMessage": "Позже"
+  },
+  "servers.files.config-push.other-changes-body": {
+    "defaultMessage": "Изменения в локальный контент также будут включены."
+  },
+  "servers.files.config-push.restart-body": {
+    "defaultMessage": "Отправка изменений перезапустит сервер, и игроки на нём будут отключены."
   },
   "servers.files.server-locked": {
     "defaultMessage": "Этот сервер заблокирован и его файлы теперь доступны только для чтения."
@@ -6536,6 +6656,12 @@
   "servers.notice.undismissable": {
     "defaultMessage": "Незакрываемое"
   },
+  "servers.play-migration.acknowledge": {
+    "defaultMessage": "Я понимаю, что сервер будет переустановлен и перезапущен."
+  },
+  "servers.play-migration.backup.description": {
+    "defaultMessage": "Резервная копия «{name}» будет создана в случае неполадок."
+  },
   "servers.play-migration.backup.name": {
     "defaultMessage": "До переустановки контента сервера"
   },
@@ -6545,11 +6671,35 @@
   "servers.play-migration.confirm": {
     "defaultMessage": "Резервировать и переустановить"
   },
+  "servers.play-migration.content-locked": {
+    "defaultMessage": "Откройте доступ к серверу во вкладке «Играть» и выберите, где контент включён."
+  },
+  "servers.play-migration.curseforge.warning": {
+    "defaultMessage": "Сервер настроен со сборкой с CurseForge. Загрузите <exact>ту же самую</exact> сборку заново, чтобы не повредить мир."
+  },
+  "servers.play-migration.description": {
+    "defaultMessage": "Требуется несколько изменений в контент сервера перед открытием доступа!"
+  },
+  "servers.play-migration.mrpack.file-description": {
+    "defaultMessage": "Набор включает контент для клиента вроде модов и наборов ресурсов, поэтому к нему можно открыть доступ."
+  },
   "servers.play-migration.mrpack.file-label": {
     "defaultMessage": "Файл .mrpack"
   },
+  "servers.play-migration.mrpack.warning": {
+    "defaultMessage": "Сервер настроен с внешним .mrpack. Загрузите <exact>ту же самую</exact> сборку, чтобы не повредить мир."
+  },
+  "servers.play-migration.reinstall.custom-description": {
+    "defaultMessage": "Контент сервера будет переустановлен, включив каждый проект для сервера, игроков или обоих, в зависимости от среды."
+  },
+  "servers.play-migration.reinstall.modpack-description": {
+    "defaultMessage": "{modpack} и дополнительный контент будут переустановлены, включив каждый проект для сервера, игроков или обоих, в зависимости от среды."
+  },
   "servers.play-migration.reinstall.title": {
     "defaultMessage": "Переустановите контент"
+  },
+  "servers.play-migration.restart.description": {
+    "defaultMessage": "Перезапуск сервера может занять несколько минут."
   },
   "servers.play-migration.restart.title": {
     "defaultMessage": "Перезапустите сервер"
@@ -6560,11 +6710,17 @@
   "servers.play-migration.what-will-happen": {
     "defaultMessage": "Что произойдет"
   },
+  "servers.play.busy": {
+    "defaultMessage": "Дождитесь завершения текущей операции."
+  },
   "servers.play.card.address.copied": {
     "defaultMessage": "Адрес сервера скопирован"
   },
   "servers.play.card.address.copy": {
     "defaultMessage": "Копировать адрес сервера"
+  },
+  "servers.play.card.app.description": {
+    "defaultMessage": "Самый простой способ поиграть - это приложение Modrinth, которое автоматически устанавливает все необходимое содержимое для вас и других игроков на вашем сервере."
   },
   "servers.play.card.app.invite-button": {
     "defaultMessage": "Пригласить игроков"
@@ -6584,6 +6740,12 @@
   "servers.play.invite-header": {
     "defaultMessage": "Пригласить в {name}"
   },
+  "servers.play.not-ready": {
+    "defaultMessage": "Совместный контент ещё не готов. Повторите попытку позже."
+  },
+  "servers.play.not-shared": {
+    "defaultMessage": "Владелец или модератор сначала должен поделиться этим миром."
+  },
   "servers.play.permission": {
     "defaultMessage": "У вас нет разрешения на то, чтобы поделиться этим миром."
   },
@@ -6598,6 +6760,9 @@
   },
   "servers.play.players.avatar-alt": {
     "defaultMessage": "Аватар {username}"
+  },
+  "servers.play.players.joined": {
+    "defaultMessage": "Добавлен"
   },
   "servers.play.players.last-played": {
     "defaultMessage": "Последний запуск"
@@ -6650,11 +6815,29 @@
   "servers.play.retry": {
     "defaultMessage": "Повторить"
   },
+  "servers.play.share-changes-play-body": {
+    "defaultMessage": "Запуск сервера отправит изменения всем приглашённым игрокам. Им будет предложено обновить их сборку перед началом игры."
+  },
+  "servers.play.start-failed": {
+    "defaultMessage": "Сервер остановлен до окончания подготовки. Проверьте консоль перед повторной попыткой."
+  },
+  "servers.play.start-timeout": {
+    "defaultMessage": "Сервер слишком долго запускается. Проверьте консоль перед повторной попыткой."
+  },
+  "servers.play.unpublished-body": {
+    "defaultMessage": "Опубликуйте обновление, чтобы поделиться изменениями на вашем сервере с игроками."
+  },
   "servers.power.push-and-restart": {
     "defaultMessage": "Отправить изменения и перезапустить"
   },
   "servers.power.push-and-start": {
     "defaultMessage": "Отправить изменения и запустить"
+  },
+  "servers.power.share-changes-restart-body": {
+    "defaultMessage": "Перезапуск сервера отправит изменения всем приглашённым игрокам. Им будет предложено обновить их сборку перед началом игры."
+  },
+  "servers.power.share-changes-start-body": {
+    "defaultMessage": "Запуск сервера отправит изменения всем приглашённым игрокам. Им будет предложено обновить их сборку перед началом игры."
   },
   "servers.purchase.notification.success.text": {
     "defaultMessage": "Ваша покупка Modrinth Hosting успешно завершена."
@@ -6983,6 +7166,9 @@
   "servers.sharing-update.continue": {
     "defaultMessage": "Продолжить"
   },
+  "servers.sharing-update.description": {
+    "defaultMessage": "Теперь вы можете поделиться сервером с друзьями в приложении. После принятия будет создана управляемая им сборка."
+  },
   "servers.sharing-update.get-server": {
     "defaultMessage": "Получить сервер"
   },
@@ -6991,6 +7177,9 @@
   },
   "servers.sharing-update.pause": {
     "defaultMessage": "Приостановить видео"
+  },
+  "servers.sharing-update.purchase-description": {
+    "defaultMessage": "Получите сервер и делитесь им с друзьями. После принятия в Modrinth App будет создана управляемая им сборка."
   },
   "servers.sharing-update.resume": {
     "defaultMessage": "Возобновить"

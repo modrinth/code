@@ -2768,12 +2768,6 @@
   "app.settings.privacy.telemetry.title": {
     "message": "Telemetria"
   },
-  "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "A „Részletek másolása” művelet megjelenítése, amíg a telepítés várólistán van vagy fut. A művelet mindig elérhető a sikertelen vagy megszakított telepítések esetén."
-  },
-  "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Mindig mutasd a Részletek másolását"
-  },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Az alkalmazás betöltése lassabb lehet, amíg a gyorsítótár újra nem települ."
   },

@@ -3999,7 +3999,7 @@
     "defaultMessage": "I permessi selezionati saranno rimossi"
   },
   "profile.restrict-user.deselect-all-button": {
-    "defaultMessage": "Deseleziona tutto"
+    "defaultMessage": "Nessuna selezione"
   },
   "profile.restrict-user.error-description": {
     "defaultMessage": "Sì è verificato un errore nell'aggiornare l'utente. Riprova più tardi."
@@ -4441,6 +4441,33 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} follower"
+  },
+  "project.game-awards.body": {
+    "defaultMessage": "{projectName} è uno dei cinque candidati. Ha bisogno del tuo voto!"
+  },
+  "project.game-awards.category.best-user-creation": {
+    "defaultMessage": "Miglior creazione"
+  },
+  "project.game-awards.days-left": {
+    "defaultMessage": "{days, plural, one {# giorno rimanente} other {# giorni rimanenti}}"
+  },
+  "project.game-awards.event-name": {
+    "defaultMessage": "The Game Awards {year}"
+  },
+  "project.game-awards.hide-voting-details": {
+    "defaultMessage": "Nascondi info voti"
+  },
+  "project.game-awards.nominee-for": {
+    "defaultMessage": "Candidati per: {category}"
+  },
+  "project.game-awards.official-nominee": {
+    "defaultMessage": "Candidato ufficiale"
+  },
+  "project.game-awards.vote": {
+    "defaultMessage": "Vota ai The Game Awards"
+  },
+  "project.game-awards.vote-now": {
+    "defaultMessage": "Vota ora"
   },
   "project.license.error": {
     "defaultMessage": "Impossibile recuperare la descrizione della licenza."
@@ -5071,6 +5098,9 @@
   },
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Cancella ricerca"
+  },
+  "search.filter.option.search.no_results": {
+    "defaultMessage": "Nessun risultato trovato"
   },
   "search.filter.option.search.placeholder": {
     "defaultMessage": "Cerca..."

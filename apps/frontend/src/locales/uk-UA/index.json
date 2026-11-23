@@ -1260,7 +1260,7 @@
     "message": "Метадані"
   },
   "create-project-version.create-modal.stage.details.version-changelog": {
-    "message": "Журнал змін версії"
+    "message": "Список змін версії"
   },
   "create-project-version.create-modal.stage.details.version-number": {
     "message": "Номер версії"
@@ -2616,19 +2616,19 @@
     "message": "Охоплення"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
-    "message": "Інтегруйте ваші інструменти збірки з Minotaur, щоб автоматично завантажувати нові версії, щойно ви їх випускаєте"
+    "message": "Інтегруйте свої інструменти збірки з Minotaur, щоб автоматично завантажувати нові версії, щойно ви їх випускаєте"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Різноманітна екосистема"
   },
   "landing.creator.feature.monetization.description": {
-    "message": "Отримуйте дохід від реклами на сторінках ваших проєктів і виводьте кошти в будь-який час"
+    "message": "Отримуйте дохід від реклами на сторінках своїх проєктів і виводьте кошти в будь-який час"
   },
   "landing.creator.feature.monetization.title": {
     "message": "Монетизація"
   },
   "landing.creator.feature.team-management.description": {
-    "message": "Запрошуйте учасників вашої команди й керуйте їхніми ролями та дозволами з легкістю"
+    "message": "Запрошуйте учасників та керуйте їхніми ролями й дозволами з легкістю"
   },
   "landing.creator.feature.team-management.title": {
     "message": "Керування командою"
@@ -2682,7 +2682,7 @@
     "message": "ATLauncher"
   },
   "landing.launcher.graphic-alt": {
-    "message": "Спрощене зображення вікна Minecraft, з логотипом Mojang Studios в зеленому кольорі Modrinth."
+    "message": "Спрощене зображення вікна Minecraft з логотипом Mojang Studios зеленого кольору."
   },
   "landing.launcher.modrinth-app-label": {
     "message": "Modrinth App"
@@ -2709,7 +2709,7 @@
     "message": "Для творців"
   },
   "landing.section.for-creators.tagline": {
-    "message": "Діліться вашим умістом зі світом"
+    "message": "Діліться своїм умістом зі світом"
   },
   "landing.section.for-players.description": {
     "message": "Від чарівних біомів до проклятих підземель — ви обов’язково знайдете вміст, який виведе вашу гру на новий рівень."
@@ -5213,9 +5213,6 @@
   "scopes.userRead.label": {
     "message": "Переглядати дані користувача"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Переглядати адресу вашої ел. пошти"
-  },
   "scopes.userReadEmail.label": {
     "message": "Переглядати адресу ел. пошти"
   },
@@ -5925,7 +5922,7 @@
     "message": "Вимкнути режим розробника"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>Режим розробника</strong> ввімкнений. Це дозволить вам переглядати внутрішні ID різних елементів Modrinth що може допомогти, якщо ви розробник, який використовує Modrinth API. Натисніть на логотип Modrinth знизу сторінки 5 разів, щоб перемкнути режим розробника."
+    "message": "<strong>Режим розробника</strong> ввімкнений. Це дасть вам змогу переглядати внутрішні ID різних елементів Modrinth, що може допомогти, якщо ви розробник, який використовує Modrinth API. Натисніть на логотип Modrinth знизу сторінки 5 разів, щоб перемкнути режим розробника."
   },
   "settings.display.notification.developer-mode-deactivated.text": {
     "message": "Режим розробника було вимкнено"
@@ -6102,7 +6099,7 @@
     "message": "Поясніть свої зміни у відповіді"
   },
   "thread-issues.facet.version.changelog": {
-    "message": "Змініть журнал змін для версії"
+    "message": "Змініть список змін для версії"
   },
   "thread-issues.facet.version.dependencies": {
     "message": "Змініть залежності версії"

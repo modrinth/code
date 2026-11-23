@@ -4229,6 +4229,33 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} 位{count, plural, other {追蹤者}}"
   },
+  "project.game-awards.body": {
+    "defaultMessage": "{projectName} 是五個入圍作品之一，現在需要你的一票！"
+  },
+  "project.game-awards.category.best-user-creation": {
+    "defaultMessage": "最佳玩家創作內容"
+  },
+  "project.game-awards.days-left": {
+    "defaultMessage": "{days, plural, other {剩餘 # 天}}"
+  },
+  "project.game-awards.event-name": {
+    "defaultMessage": "The Game Awards {year}"
+  },
+  "project.game-awards.hide-voting-details": {
+    "defaultMessage": "隱藏投票資訊"
+  },
+  "project.game-awards.nominee-for": {
+    "defaultMessage": "入圍「{category}」"
+  },
+  "project.game-awards.official-nominee": {
+    "defaultMessage": "正式入圍"
+  },
+  "project.game-awards.vote": {
+    "defaultMessage": "在 The Game Awards 投票"
+  },
+  "project.game-awards.vote-now": {
+    "defaultMessage": "立即投票"
+  },
   "project.license.error": {
     "defaultMessage": "取得授權條款文字內容時發生錯誤。"
   },
@@ -4859,6 +4886,9 @@
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "清除搜尋"
   },
+  "search.filter.option.search.no_results": {
+    "defaultMessage": "找不到結果"
+  },
   "search.filter.option.search.placeholder": {
     "defaultMessage": "搜尋..."
   },
@@ -5305,6 +5335,9 @@
   },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "背景工作執行中"
+  },
+  "servers.admonitions.curseforge-files.review": {
+    "defaultMessage": "檢視檔案"
   },
   "servers.audit-log.actor.support": {
     "defaultMessage": "客服"
@@ -5887,6 +5920,9 @@
   },
   "servers.curseforge-files-review.body": {
     "defaultMessage": "這個模組包中有 {count, plural, other {# 個檔案}}未在 Modrinth 上發布，或者我們無法確定{count, plural, =1 {這個} other {這些}}檔案應安裝在伺服器上、供玩家使用，還是兩者皆是。請在<bold>啟用對象</bold>欄位中檢視並完成設定。"
+  },
+  "servers.curseforge-files-review.header": {
+    "defaultMessage": "檢視模組包檔案"
   },
   "servers.download.failed.description": {
     "defaultMessage": "下載世界檔案時發生錯誤。"

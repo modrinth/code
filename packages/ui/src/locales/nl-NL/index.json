@@ -8,6 +8,24 @@
   "app.appearance-settings.native-decorations.title": {
     "defaultMessage": "Systeemvensterframe"
   },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "defaultMessage": "Je wijzigingen zijn nog niet gedeeld"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "defaultMessage": "Update verzenden"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "defaultMessage": "Verzenden..."
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "defaultMessage": "Controleren..."
+  },
+  "app.instance.share.members.empty": {
+    "defaultMessage": "Er zijn nog geen gebruikers lid geworden"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "defaultMessage": "Geen gebruikers gevonden op basis van de filters."
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Serverinstellingen konden niet worden geladen"
   },
@@ -164,6 +182,9 @@
   "button.close": {
     "defaultMessage": "Sluiten"
   },
+  "button.confirm": {
+    "defaultMessage": "Bevestigen"
+  },
   "button.continue": {
     "defaultMessage": "Doorgaan"
   },
@@ -253,6 +274,9 @@
   },
   "button.refresh": {
     "defaultMessage": "Ververs"
+  },
+  "button.reinstall-modpack": {
+    "defaultMessage": "Modpack opnieuw installeren"
   },
   "button.remove": {
     "defaultMessage": "Verwijderen"
@@ -380,6 +404,9 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, one {item} other {items}}"
   },
+  "content.card.external-file": {
+    "defaultMessage": "Extern bestand"
+  },
   "content.card.frozen": {
     "defaultMessage": "Dit project is vergrendeld met de huidige versie totdat het is losgemaakt."
   },
@@ -391,6 +418,9 @@
   },
   "content.card.synced": {
     "defaultMessage": "Gesynchroniseerd tussen instanties"
+  },
+  "content.card.uploaded-file": {
+    "defaultMessage": "Geüpload bestand"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Weet je zeker dat je {count, plural, one {# project} other {# projecten}} wilt bijwerken naar de nieuwste compatibele versie? Het wordt aanbevolen om de inhoud één voor één bij te werken."
@@ -421,6 +451,24 @@
   },
   "content.confirm-disable.header": {
     "defaultMessage": "{itemType} uitschakelen"
+  },
+  "content.confirm-environment.admonition-title": {
+    "defaultMessage": "Deze inhoud is mogelijk niet compatibel"
+  },
+  "content.confirm-environment.disable-player-title": {
+    "defaultMessage": "Uitzetten voor spelers?"
+  },
+  "content.confirm-environment.disable-server-title": {
+    "defaultMessage": "Uitschakelen voor je server?"
+  },
+  "content.confirm-environment.performance-admonition-title": {
+    "defaultMessage": "Prestatie-waarschuwing"
+  },
+  "content.confirm-environment.player-title": {
+    "defaultMessage": "Inschakelen voor spelers?"
+  },
+  "content.confirm-environment.required-admonition-title": {
+    "defaultMessage": "Deze inhoud is vereist hier"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Terugzetten} other {Bijwerken}} kan compatibiliteitsproblemen veroorzaken. Mods of content die je bovenop het modpack hebt toegevoegd, blijven behouden, maar zijn mogelijk niet compatibel met de nieuwe versie."
@@ -490,6 +538,9 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} toegevoegd"
+  },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Configuratiebestanden"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Toegevoegd (afhankelijkheid)"
@@ -562,6 +613,21 @@
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} bijgewerkt"
+  },
+  "content.enabled-for.player": {
+    "defaultMessage": "Speler"
+  },
+  "content.enabled-for.player-only-filter": {
+    "defaultMessage": "Alleen Speler"
+  },
+  "content.enabled-for.server": {
+    "defaultMessage": "Server"
+  },
+  "content.enabled-for.server-and-player": {
+    "defaultMessage": "Server en speler"
+  },
+  "content.enabled-for.server-only-filter": {
+    "defaultMessage": "Alleen server"
   },
   "content.filter.disabled": {
     "defaultMessage": "Uitgeschakeld"
@@ -823,6 +889,9 @@
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Stel server in"
+  },
+  "creation-flow.curseforge.checking-server-pack": {
+    "defaultMessage": "Controleren op een serverpakket..."
   },
   "creation-flow.modal.custom-setup.build-number.label": {
     "defaultMessage": "Bouw nummer"

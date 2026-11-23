@@ -20,6 +20,9 @@
   "app.action-bar.install.dismiss": {
     "message": "閉じる"
   },
+  "app.action-bar.install.inspect-details": {
+    "message": "詳細を確認する"
+  },
   "app.action-bar.install.open-instance": {
     "message": "インスタンスを表示"
   },
@@ -409,6 +412,12 @@
   },
   "app.download-manager.title": {
     "message": "ダウンロードマネージャー"
+  },
+  "app.error.copied-debug-info": {
+    "message": "コピーしました"
+  },
+  "app.error.inspect-debug-info": {
+    "message": "デバッグ情報を確認する"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "バックアップフォルダーを開く"
@@ -2955,10 +2964,10 @@
     "message": "テレメトリ"
   },
   "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "インストールの保留中または実行中に「詳細をコピー」アクションを表示します。失敗または中断されたインストールでは常に利用可能です。"
+    "message": "インストールがキューに入っている間または実行中に、「詳細を確認」アクションを表示します。失敗または中断されたインストールでは、常に利用できます。"
   },
   "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "「詳細をコピー」を常に表示"
+    "message": "常に「詳細を確認」を表示する"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "キャッシュが再構築されるまで、アプリの読み込みが遅くなる場合があります。"

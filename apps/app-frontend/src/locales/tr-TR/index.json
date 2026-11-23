@@ -1022,14 +1022,44 @@
   "app.java-selector.browse": {
     "message": "Göz at"
   },
+  "app.java-selector.copy-failed-title": {
+    "message": "Klasör yolu kopyalama başarısız"
+  },
+  "app.java-selector.copy-path": {
+    "message": "Yolu kopyala"
+  },
   "app.java-selector.detect": {
     "message": "Tespit et"
+  },
+  "app.java-selector.edit-path": {
+    "message": "Yolu düzenle"
+  },
+  "app.java-selector.install-java": {
+    "message": "Java {version} yükle"
   },
   "app.java-selector.installing": {
     "message": "Kuruluyor..."
   },
+  "app.java-selector.invalid": {
+    "message": "Geçersiz"
+  },
+  "app.java-selector.more-options": {
+    "message": "Daha fazla Java seçenekleri"
+  },
+  "app.java-selector.not-set": {
+    "message": "Hiçbir Java seçilmedi"
+  },
+  "app.java-selector.path-copied-text": {
+    "message": "Java klasör yolu panoya kopyalandı."
+  },
+  "app.java-selector.path-copied-title": {
+    "message": "Klasör yolu kopyalandı"
+  },
   "app.java-selector.path.placeholder": {
     "message": "/java/kurulum/yolu"
+  },
+  "app.java-selector.valid": {
+    "message": "Geçerli"
   },
   "app.library.actions.label": {
     "message": "Kütüphane eylemleri"
@@ -2830,12 +2860,6 @@
   },
   "app.settings.privacy.telemetry.title": {
     "message": "Telemetri"
-  },
-  "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "Bir yükleme işlemi kuyrukta beklerken veya devam ederken Ayrıntıları Kopyala eylemini gösterir. Bu eylem, başarısız olan veya kesintiye uğrayan yüklemeler için her zaman kullanılabilir."
-  },
-  "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Kopyalama ayrıntılarını her zaman göster"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Önbellek yeniden inşa edilene kadar uygulama daha yavaş yüklenebilir."

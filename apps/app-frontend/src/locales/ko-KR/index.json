@@ -2954,12 +2954,6 @@
   "app.settings.privacy.telemetry.title": {
     "message": "원격 분석"
   },
-  "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "설치가 대기 중이거나 진행 중일 때 '상세 정보 복사' 버튼을 표시합니다. 실패했거나 중단된 설치 건에서는 항상 사용할 수 있습니다."
-  },
-  "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "항상 상세 정보 복사 표시"
-  },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "캐시가 재구축될 때까지 앱 불러오기가 느려질 수 있습니다."
   },

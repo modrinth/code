@@ -3018,7 +3018,7 @@
     "message": "Abbonati a Modrinth+"
   },
   "layout.nav.use-signed-out": {
-    "message": "Uso disconnesso"
+    "message": "Da disconnesso"
   },
   "layout.publish.email-verification-required.description": {
     "message": "Devi verificare l'indirizzo email prima di pubblicare su Modrinth."
@@ -5220,7 +5220,7 @@
     "message": "Leggere dati utente"
   },
   "scopes.userReadEmail.description": {
-    "message": "Vedere la tua email"
+    "message": "Leggere il tuo indirizzo email"
   },
   "scopes.userReadEmail.label": {
     "message": "Leggere email utente"

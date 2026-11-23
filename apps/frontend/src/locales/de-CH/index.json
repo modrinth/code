@@ -4104,10 +4104,10 @@
     "message": "Du kannst dein Projekt weiterhin ändern, dies hat keinen Einfluss auf deine Position in der Warteschlange."
   },
   "project.moderation.admonition.under-review.body.4": {
-    "message": "Wir bemühen uns, Einsendungen innerhalb von 24 bis 48 Stunden zu überprüfen, doch bei einigen Projekten kann es zu Verzögerungen kommen. Dies bedeutet nicht, dass mit deiner Einreichung etwas nicht in Ordnung ist."
+    "message": "Wir bemühen uns, Einreichungen innerhalb von 24 bis 48 Stunden zu überprüfen, bei einigen Projekten kann es jedoch zu Verzögerungen kommen. Dies bedeutet nicht, dass mit deiner Einreichung etwas nicht in Ordnung ist."
   },
   "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "Wir bemühen uns, Einsendungen innerhalb von einer Woche zu überprüfen, doch bei einigen Projekten kann es zu Verzögerungen kommen. Dies bedeutet nicht, dass mit deiner Einreichung etwas nicht in Ordnung ist."
+    "message": "Wir bemühen uns, Einreichungen innerhalb einer Woche zu überprüfen, bei einigen Projekten kann es jedoch zu Verzögerungen kommen. Dies bedeutet nicht, dass mit deiner Einreichung etwas nicht in Ordnung ist."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Wir schätzen deine Geduld, während unsere Moderatoren hart daran arbeiten, Modrinth sicher zu halten, und freuen uns darauf, dir dabei zu helfen, deine Inhalte zu teilen! 💚</emphasis>"
@@ -4371,7 +4371,7 @@
     "message": "Angabe zu kostenpflichtigen Funktionen muss mindestens eine kostenpflichtige Funktion auflisten."
   },
   "project.settings.disclosures.save-blocked.photosensitivity-note": {
-    "message": "Angabe zur Fotosensibilitätswarnung muss eine Beschreibung enthalten."
+    "message": "Angabe zur Lichtempfindlichkeit muss eine Beschreibung enthalten."
   },
   "project.settings.disclosures.save-blocked.system-interactions-note": {
     "message": "Angabe zu externen Systeminteraktionen muss eine Beschreibung enthalten."
@@ -4401,7 +4401,7 @@
     "message": "Welche Daten werden erfasst?"
   },
   "project.settings.disclosures.telemetry.data-placeholder": {
-    "message": "z. B. Anonyme Startanalysen zur Erfassung der verwendeten Minecraft-Version und des verwendeten Mod-Loaders."
+    "message": "z. B. Anonyme Startanalysen zur Erfassung der verwendeten Minecraft-Version und des verwendeten Modloaders."
   },
   "project.settings.disclosures.telemetry.description": {
     "message": "Du musst dies aktivieren, falls dein Projekt Nutzungsdaten an dich selbst oder an einen Dritten zurücksendet."
@@ -5221,9 +5221,6 @@
   },
   "scopes.userRead.label": {
     "message": "Lesezugriff Benutzerdaten"
-  },
-  "scopes.userReadEmail.description": {
-    "message": "Deine E-Mail lesen"
   },
   "scopes.userReadEmail.label": {
     "message": "Lesezugriff Benutzer-E-Mail"
@@ -6384,7 +6381,7 @@
     "message": "Als Mod verpacken"
   },
   "version.package-as-mod.description": {
-    "message": "Dadurch wird eine neue Version mit Unterstützung für die ausgewählten Mod-Loader erstellt. Du wirst zur neuen Version weitergeleitet und kannst diese nach deinen Wünschen bearbeiten."
+    "message": "Dadurch wird eine neue Version mit Unterstützung für die ausgewählten Modloader erstellt. Du wirst zur neuen Version weitergeleitet und kannst diese nach deinen Wünschen bearbeiten."
   },
   "version.package-as-mod.header": {
     "message": "Datenpaket als Mod packen"

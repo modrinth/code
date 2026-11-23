@@ -20,6 +20,9 @@
   "app.action-bar.install.dismiss": {
     "message": "Zavřít"
   },
+  "app.action-bar.install.inspect-details": {
+    "message": "Zkontrolovat podrobnosti"
+  },
   "app.action-bar.install.open-instance": {
     "message": "Otevřít instanci"
   },
@@ -409,6 +412,12 @@
   },
   "app.download-manager.title": {
     "message": "Správce stahování"
+  },
+  "app.error.copied-debug-info": {
+    "message": "Zkopírováno"
+  },
+  "app.error.inspect-debug-info": {
+    "message": "Zkontrolovat ladicí informace"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Otevřít složku zaloh"
@@ -1019,14 +1028,44 @@
   "app.java-selector.browse": {
     "message": "Procházet"
   },
+  "app.java-selector.copy-failed-title": {
+    "message": "Kopírování cesty se nezdařilo"
+  },
+  "app.java-selector.copy-path": {
+    "message": "Zkopírovat cestu"
+  },
   "app.java-selector.detect": {
     "message": "Detekovat"
+  },
+  "app.java-selector.edit-path": {
+    "message": "Upravit cestu"
+  },
+  "app.java-selector.install-java": {
+    "message": "Instalovat Javu {version}"
   },
   "app.java-selector.installing": {
     "message": "Instalování..."
   },
+  "app.java-selector.invalid": {
+    "message": "Neplatné"
+  },
+  "app.java-selector.more-options": {
+    "message": "Další možnosti Javy"
+  },
+  "app.java-selector.not-set": {
+    "message": "Není vybrána žádná Java"
+  },
+  "app.java-selector.path-copied-text": {
+    "message": "Cesta k Javě byla zkopírována do vaší schránky."
+  },
+  "app.java-selector.path-copied-title": {
+    "message": "Cesta zkopírována"
+  },
   "app.java-selector.path.placeholder": {
     "message": "/cesta/k/javě"
+  },
+  "app.java-selector.valid": {
+    "message": "Platné"
   },
   "app.library.actions.label": {
     "message": "Akce knihovny"
@@ -2867,11 +2906,23 @@
   "app.settings.game-options.setting.view-bobbing.description": {
     "message": "Přidejte do kamery pohyb při procházení."
   },
+  "app.settings.game-options.setting.view-bobbing.label": {
+    "message": "Houpání při pohybu"
+  },
+  "app.settings.game-options.setting.vignette.label": {
+    "message": "Vinětace"
+  },
+  "app.settings.game-options.setting.voice-volume.label": {
+    "message": "Hlas a řeč"
+  },
   "app.settings.game-options.setting.vsync.description": {
     "message": "Omezit frekvenci snímků na obnovovací frekvenci zobrazení, aby se zabránilo vyučování obrazovky."
   },
   "app.settings.game-options.setting.vsync.label": {
     "message": "VSync"
+  },
+  "app.settings.game-options.setting.weather-radius.label": {
+    "message": "Okruh počasí"
   },
   "app.settings.game-options.setting.weather-volume.label": {
     "message": "Počasí"
@@ -2885,11 +2936,20 @@
   "app.settings.game-options.validation.missing-value": {
     "message": "Nejprve vyberte hodnotu."
   },
+  "app.settings.game-options.validation.no-compatible-instances": {
+    "message": "Některé z vašich instancí nemohou použít toto nastavení"
+  },
   "app.settings.java-installations.location.title": {
     "message": "Umístění Javy {version, number}"
   },
   "app.settings.operating-system.macos": {
     "message": "macOS"
+  },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "Reklamy umožňují provoz Modrinthu a vyplácí tvůrce. Naši partneři mohou ukládat či přistupovat k vašim cookies z důvodu personalizace reklam a měření výkonu. Můžete se odhlásit či upravit svoje preference níže."
+  },
+  "app.settings.privacy.discord-rich-presence.description": {
+    "message": "Zobrazit Modrinth aplikaci jako vaši aktuální aktivitu na Discordu. Nemá vliv na Rich Presence přidaný módy. Vyžaduje restart aplikace."
   },
   "app.settings.privacy.discord-rich-presence.title": {
     "message": "Discord Rich Presence"
@@ -2899,9 +2959,6 @@
   },
   "app.settings.privacy.telemetry.title": {
     "message": "Telemetrie"
-  },
-  "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Vždy zobrazazovat podrobnosti kopie"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Načítání aplikace může být pomalejší, dokud se mezipaměť neobnoví."
@@ -2917,6 +2974,36 @@
   },
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Zálohy databáze aplikace"
+  },
+  "app.settings.resource-management.app-directory.cancel-move": {
+    "message": "Zrušit přesun"
+  },
+  "app.settings.resource-management.app-directory.change": {
+    "message": "Změnit umístění"
+  },
+  "app.settings.resource-management.app-directory.change-to-default": {
+    "message": "Změnit na výchozí"
+  },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "Kde Modrinth App ukládá instalace a další soubory."
+  },
+  "app.settings.resource-management.app-directory.modal.admonition-body": {
+    "message": "Kde Modrinth App ukládá instalace a další soubory."
+  },
+  "app.settings.resource-management.app-directory.modal.admonition-header": {
+    "message": ""
+  },
+  "app.settings.resource-management.app-directory.modal.choose": {
+    "message": ""
+  },
+  "app.settings.resource-management.app-directory.move-now": {
+    "message": "Přesunout a restartovat nyní"
+  },
+  "app.settings.resource-management.app-directory.open-folder": {
+    "message": "Otevřít složku"
+  },
+  "app.settings.resource-management.app-directory.open-in-explorer": {
+    "message": "Otevřít v Průzkumníku souborů"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Složka aplikace"

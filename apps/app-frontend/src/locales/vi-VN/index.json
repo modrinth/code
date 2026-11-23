@@ -2729,12 +2729,6 @@
   "app.settings.privacy.telemetry.title": {
     "message": "Dữ liệu đo từ xa"
   },
-  "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "Hiển thị thao tác Sao chép chi tiết khi một lượt cài đặt đang chờ hoặc đang chạy. Thao tác này luôn có sẵn với các lượt cài đặt thất bại hoặc bị gián đoạn."
-  },
-  "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Luôn hiển thị sao chép chi tiết"
-  },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Ứng dụng có thể tải chậm hơn cho tới khi bộ nhớ đệm được tạo lại."
   },

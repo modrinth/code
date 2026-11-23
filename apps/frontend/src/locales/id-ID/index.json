@@ -284,17 +284,32 @@
   "analytics.project.select": {
     "message": "Pilih proyek"
   },
+  "analytics.project.your": {
+    "message": "Projek anda"
+  },
+  "analytics.query.filter.add": {
+    "message": "Tambahkan penyaring"
+  },
+  "analytics.query.label.project": {
+    "message": "Projek:"
+  },
   "analytics.stat.downloads": {
     "message": "Unduhan"
   },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "Pelajari lebih lanjut"
   },
+  "analytics.stat.monetization-banner.title": {
+    "message": "Bagaimana monetisasi bekerja?"
+  },
   "analytics.stat.playtime": {
     "message": "Waktu Bermain"
   },
   "analytics.stat.playtime-hours": {
     "message": "{hours} jam"
+  },
+  "analytics.value.other": {
+    "message": "Lainnya"
   },
   "app-marketing.download.description": {
     "message": "Aplikasi destop kami tersedia pada semua platform, pilih versi yang Anda inginkan."
@@ -479,6 +494,9 @@
   "auth.authorize.redirect-url": {
     "message": "Anda akan diarahkan ulang ke <redirect-url>{url}</redirect-url>"
   },
+  "auth.create-account.title": {
+    "message": "Buat sebuah Akun"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Kirim sur-el pemulihan"
   },
@@ -512,17 +530,32 @@
   "auth.reset-password.title.long": {
     "message": "Atur ulang kata sandi Anda"
   },
+  "auth.sign-in.add-account": {
+    "message": "Tambahkan akun"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Gunakan akun berbeda"
+  },
   "auth.sign-in.title": {
     "message": "Masuk"
   },
   "auth.sign-up.legal-dislaimer": {
     "message": "Dengan membuat sebuah akun, Anda menyetujui <terms-link>Ketentuan</terms-link> dan <privacy-policy-link>Kebijakan Privasi</privacy-policy-link> Modrinth."
   },
+  "auth.sign-up.show-fewer-options": {
+    "message": "Tunjukan opsi sedikit"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "Tunjukan pilihan lain"
+  },
   "auth.sign-up.sign-in-option.title": {
     "message": "Sudah memiliki akun?"
   },
   "auth.sign-up.title": {
     "message": "Daftar"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Buat sebuah Akun"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Pengaturan akun"
@@ -578,6 +611,9 @@
   "collection.error.not-found": {
     "message": "Koleksi tidak ditemukan"
   },
+  "collection.icon-label": {
+    "message": "ikon"
+  },
   "collection.label.created-at": {
     "message": "Dibuat {ago}"
   },
@@ -602,8 +638,14 @@
   "collection.title": {
     "message": "{name} - Koleksi"
   },
+  "conversation-thread.action.send": {
+    "message": "Kirim"
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Berkas tambahan hanya untuk sumber pendukung seperti kode sumber, bukan untuk versi atau varian lain."
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "Versi"
   },
   "create.collection.collection-info": {
     "message": "Koleksi baru Anda akan dibuat sebagai koleksi publik dengan {count, plural, =0 {0 proyek} other {# proyek}}."
@@ -745,6 +787,12 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Tidak terdaftar"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Total unduh"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Total pengikut"
   },
   "dashboard.collections.button.create-new": {
     "message": "Buat baru"
@@ -1022,6 +1070,21 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Anda telah menggunakan batas penarikan <b>{withdrawLimit}</b> Anda. Untuk melakukan penarikan lebih banyak Anda wajib melengkapi formulir pajak."
   },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Kreator"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Histori"
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projek"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Nama"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Tipe"
+  },
   "dashboard.revenue.available-now": {
     "message": "Tersedia sekarang"
   },
@@ -1066,6 +1129,9 @@
   },
   "dashboard.revenue.transactions.none.desc": {
     "message": "Pembayaran dan penarikan Anda akan muncul di sini."
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Bulan ini"
   },
   "dashboard.revenue.transactions.see-all": {
     "message": "Lihat semua"
@@ -1219,6 +1285,12 @@
   },
   "error.collection.404.title": {
     "message": "Koleksi tidak ditemukan"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "Tidak dapat berganti akun. Harap coba lagi"
+  },
+  "error.generic.401.title": {
+    "message": "Anda tidak memiliki akses ke halaman ini"
   },
   "error.generic.404.subtitle": {
     "message": "Halaman yang Anda cari tidak ada."
@@ -1820,6 +1892,9 @@
   "layout.nav.active-reports": {
     "message": "Laporan aktif"
   },
+  "layout.nav.add-account": {
+    "message": "Tambahkan akun"
+  },
   "layout.nav.discover": {
     "message": "Temukan"
   },
@@ -1870,6 +1945,9 @@
   },
   "moderation.page.reports": {
     "message": "Laporan"
+  },
+  "modpack-scan-modal.failed": {
+    "message": "Gagal"
   },
   "muralpay.account-type.checking": {
     "message": "Giro"
@@ -2138,6 +2216,12 @@
   "muralpay.warning.wallet-address": {
     "message": "Periksa ulang alamat dompet Anda. Dana yang terkirim ke alamat yang salah tidak dapat dipulihkan."
   },
+  "organization.project-transfer.name-column": {
+    "message": "Nama"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "Tipe"
+  },
   "project-member-header.error-decline": {
     "message": "Gagal menolak undangan tim"
   },
@@ -2279,6 +2363,15 @@
   "project.description.title": {
     "message": "Keterangan"
   },
+  "project.download.compatible-version-title": {
+    "message": "Versi kompatible"
+  },
+  "project.download.download": {
+    "message": "Unduh"
+  },
+  "project.download.file-unavailable": {
+    "message": "File ini tidak dapat di unduh"
+  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} tidak mendukung {gameVersion} untuk {platform}"
   },
@@ -2348,6 +2441,42 @@
   "project.notification.updated.title": {
     "message": "Proyek diperbarui"
   },
+  "project.settings.danger-zone": {
+    "message": "Zona bahaya"
+  },
+  "project.settings.delete-project.button": {
+    "message": "Hapus projek"
+  },
+  "project.settings.delete-project.confirmation.proceed-text": {
+    "message": "Hapus projek selamanya"
+  },
+  "project.settings.delete-project.confirmation.title": {
+    "message": "Apkah anda yakin mau menghapus projek ini?"
+  },
+  "project.settings.delete-project.title": {
+    "message": "Hapus projek"
+  },
+  "project.settings.description.title": {
+    "message": "Deskripsi"
+  },
+  "project.settings.description.updated": {
+    "message": "Deskripsi diperbarui"
+  },
+  "project.settings.disclosures.archived.title": {
+    "message": "Arsip projek"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "Contoh projek"
+  },
+  "project.settings.disclosures.derivative.open-link": {
+    "message": "Kunjungi tautan"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "Terdapat fitur berbayar"
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "Data apa yang di ambil?"
+  },
   "project.settings.general.name.description": {
     "message": "Hindari awalan, akhiran, tanda kurung, atau keterangan tambahan. Gunakan nama asli proyek."
   },
@@ -2393,8 +2522,71 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.license.custom": {
+    "message": "Kustom"
+  },
+  "project.settings.license.name": {
+    "message": "Nama lisensi"
+  },
+  "project.settings.license.name-placeholder": {
+    "message": "Nama lisensi"
+  },
+  "project.settings.license.optional-label": {
+    "message": "opsional"
+  },
+  "project.settings.license.select": {
+    "message": "Lisensi"
+  },
+  "project.settings.license.title": {
+    "message": "Lisensi"
+  },
+  "project.settings.license.updated-text": {
+    "message": "Lisensi anda telah di perbarui"
+  },
+  "project.settings.links.link-type": {
+    "message": "Tipe tautan"
+  },
+  "project.settings.links.title": {
+    "message": "Tautan"
+  },
+  "project.settings.monetization.title": {
+    "message": "Monetisasi"
+  },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "Hapus semua grup"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Pelajari lebih lanjut"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Ditolak"
+  },
+  "project.settings.server.cannot-save-title": {
+    "message": "tidak dapat menyimpan"
+  },
+  "project.settings.server.languages-label": {
+    "message": "Bahasa"
+  },
+  "project.settings.server.optional-label": {
+    "message": "Opsional"
+  },
+  "project.slug-suggestions.label": {
+    "message": "sugesti:"
+  },
+  "project.versions.copy-link-option": {
+    "message": "Salin tautan"
+  },
+  "project.versions.delete-button": {
+    "message": "Hapus"
+  },
+  "project.versions.delete-confirm.title": {
+    "message": "Apakah anda yakin mau menghapus versi ini?"
+  },
   "project.versions.title": {
     "message": "Versi"
+  },
+  "project.versions.version-deleted-title": {
+    "message": "Versi terhapus"
   },
   "report.already-reported": {
     "message": "Anda sudah melaporkan {title}"
@@ -2684,9 +2876,6 @@
   "scopes.userRead.label": {
     "message": "Baca data pengguna"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Membaca sur-el Anda"
-  },
   "scopes.userReadEmail.label": {
     "message": "Baca sur-el pengguna"
   },
@@ -2770,6 +2959,9 @@
   },
   "servers.plan.small.description": {
     "message": "Cocok untuk 1—5 orang teman dengan beberapa mod ringan."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "message": "Paling populer"
   },
   "settings.account.delete.confirm.proceed": {
     "message": "Hapus akun ini"
@@ -2873,11 +3065,32 @@
   "settings.account.security.email.title": {
     "message": "Sur-el"
   },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Nama"
+  },
+  "settings.account.security.passkey.modal.never-used": {
+    "message": "Tidak pernah digunakan"
+  },
   "settings.account.security.password.action.add": {
     "message": "Tambah kata sandi"
   },
   "settings.account.security.password.action.change": {
     "message": "Ubah kata sandi"
+  },
+  "settings.account.security.title": {
+    "message": "Kemanan akun"
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "Autentikasi dua langka"
+  },
+  "settings.account.standing.reason-label": {
+    "message": "Alasan:"
+  },
+  "settings.account.two-factor.field.code.label": {
+    "message": "Masukan code dua langka"
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "Kode verifikasi"
   },
   "settings.applications.about": {
     "message": "Tentang"
@@ -2963,6 +3176,12 @@
   "settings.applications.secret.disclaimer": {
     "message": "Simpan rahasia Anda sekarang, ia akan disembunyikan setelah Anda meninggalkan halaman ini!"
   },
+  "settings.billing.interval.month": {
+    "message": "bulan"
+  },
+  "settings.billing.interval.year": {
+    "message": "tahun"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Batal berlangganan"
   },
@@ -3002,6 +3221,9 @@
   "settings.billing.payment_method.title": {
     "message": "Metode pembayaran"
   },
+  "settings.billing.pyro.status.processing": {
+    "message": "Pembayaran anda sedang di proses. Server anda akan aktif ketika pembayaran selesai"
+  },
   "settings.billing.pyro_subscription.description": {
     "message": "Kelola langganan Modrinth Servers Anda."
   },
@@ -3013,6 +3235,12 @@
   },
   "settings.billing.subscription.title": {
     "message": "Langganan"
+  },
+  "settings.billing.update-method": {
+    "message": "Perbarui metode"
+  },
+  "settings.billing.upgrade": {
+    "message": "Perbarui"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "Matikan mode pengembang"
@@ -3086,6 +3314,15 @@
   "settings.sidebar.label.display": {
     "message": "Tampilan"
   },
+  "shared-instance.invite.trust.heading": {
+    "message": "Apakah anda Mengenal orang ini?"
+  },
+  "thread-issues.facet.version.remove": {
+    "message": "Hapus versi ini"
+  },
+  "thread.message.delete": {
+    "message": "Hapus"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Berita terkini dari Modrinth"
   },
@@ -3097,6 +3334,9 @@
   },
   "ui.newsletter-button.subscribed": {
     "message": "Sudah berlangganan!"
+  },
+  "version.all-versions": {
+    "message": "Semua versi"
   },
   "version.environment.none.description": {
     "message": "Lingkungan untuk versi ini belum ditentukan."

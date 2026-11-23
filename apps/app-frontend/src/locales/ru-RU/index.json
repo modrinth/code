@@ -20,6 +20,9 @@
   "app.action-bar.install.dismiss": {
     "message": "Закрыть"
   },
+  "app.action-bar.install.inspect-details": {
+    "message": "Посмотреть сведения"
+  },
   "app.action-bar.install.open-instance": {
     "message": "Открыть сборку"
   },
@@ -410,6 +413,12 @@
   "app.download-manager.title": {
     "message": "Управление загрузками"
   },
+  "app.error.copied-debug-info": {
+    "message": "Скопировано"
+  },
+  "app.error.inspect-debug-info": {
+    "message": "Посмотреть отладочную информацию"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Открыть папку резервных копий"
   },
@@ -663,7 +672,7 @@
     "message": "Удалён"
   },
   "app.instance.admonitions.shared-instance.restored-body": {
-    "message": "Сборка восстановлена из последней отправленной версии. Неотправленные изменения, например, настроки или контент в другой установке, не включены."
+    "message": "Сборка восстановлена из последней отправленной версии. Неотправленные изменения, например, настройки или контент в другой установке, не включены."
   },
   "app.instance.admonitions.shared-instance.restored-header": {
     "message": "Скачен только отправленный контент"
@@ -816,7 +825,7 @@
     "message": "Сменить аккаунт"
   },
   "app.instance.share.locked.wrong-account-heading": {
-    "message": "Неправильная учётная запись"
+    "message": "Не тот аккаунт"
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Пользователь больше не будет получать обновления совместной сборки"
@@ -858,7 +867,7 @@
     "message": "Отвяжите содержимое, чтобы поделиться сборкой"
   },
   "app.instance.share.unlink.header": {
-    "message": "Для обмена необходимо отменить связь"
+    "message": "Для открытия доступа требуется отвязка"
   },
   "app.instance.shared-instance-already-installed.body": {
     "message": "Совместный контент уже установлен в сборке <bold>{instanceName}</bold>. Создать копию?"
@@ -1308,16 +1317,25 @@
     "message": "Выбрать {name}"
   },
   "app.library.instance.shared-by": {
-    "message": "Совместная с {name}"
+    "message": "Доступ от {name}"
   },
   "app.library.instance.shared-by-owner": {
     "message": "Совместная с <owner>{name}</owner>"
   },
   "app.library.instance.shared-by-you": {
-    "message": "Поделились вы"
+    "message": "Доступ от вас"
   },
   "app.library.instance.stop": {
     "message": "Остановить"
+  },
+  "app.library.leave-shared-instance.modal.admonition-body": {
+    "message": "Доступ к {count, plural, =1 {сборке} other {сборкам}} будет утерян. Повторно присоединиться можно только по новому приглашению."
+  },
+  "app.library.leave-shared-instance.modal.admonition-header": {
+    "message": "Доступ к {count, plural, =1 {сборке} one {# сборке} other {# сборкам}} будет утерян"
+  },
+  "app.library.leave-shared-instance.modal.header": {
+    "message": "Выход из {count, plural, =1 {совместной сборки} one {# совместной сборки} other {# совместных сборок}}"
   },
   "app.library.search.no-results.title": {
     "message": "Нет сборок по вашему запросу."
@@ -1369,6 +1387,9 @@
   },
   "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
     "message": "Закрытие доступа и выход из совместных сборок"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, =1 {Совместная сборка будет удалена с серверов Modrinth. Её пользователи перестанут получать обновления, и она будет удалена из вашей библиотеки.} other {Совместные сборки будут удалены с серверов Modrinth. Их пользователи перестанут получать обновления, и она будет удалена из вашей библиотеки.}}"
   },
   "app.library.unpublish-shared-instance.modal.admonition-header": {
     "message": "Закрытие доступа к {count, plural, =1 {совместной сборке} one {# совместной сборке} other {# совместным сборкам}}"
@@ -1786,6 +1807,9 @@
   },
   "app.server-sharing-update.notification.dismiss": {
     "message": "Закрыть"
+  },
+  "app.server-sharing-update.notification.purchase-description": {
+    "message": "Получите сервер и пригласите друзей поиграть с управляемой им сборкой."
   },
   "app.server-sharing-update.notification.view-update": {
     "message": "Подробнее"
@@ -2910,10 +2934,10 @@
     "message": "Телеметрия"
   },
   "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "Показывать кнопку «Получить отчёт» на всех этапах установки. Для прерванных установок кнопка видна всегда."
+    "message": "Показывать кнопку «Посмотреть сведения» на всех этапах установки. Для прерванных установок кнопка видна всегда."
   },
   "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Отчёты на всех этапах установки"
+    "message": "Всегда показывать отладочную информацию"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Приложение может замедлиться, пока кеш не восстановится."
@@ -2957,8 +2981,14 @@
   "app.settings.resource-management.app-directory.modal.current": {
     "message": "Текущий"
   },
+  "app.settings.resource-management.app-directory.modal.drive-root": {
+    "message": "Выберите папку, а не корень диска, чтобы файлы не потерялись."
+  },
   "app.settings.resource-management.app-directory.modal.header": {
     "message": "Сменить каталог приложения"
+  },
+  "app.settings.resource-management.app-directory.modal.instances-running": {
+    "message": "Закройте все запущенные сборки перед изменением каталога."
   },
   "app.settings.resource-management.app-directory.modal.more-options": {
     "message": "Другие варианты перемещения"
@@ -3213,7 +3243,7 @@
     "message": "Синхронизированные опции применяются ко всем сборкам и переписывают значения, добавленные наборами модов."
   },
   "app.settings.synced-options.game-settings.sync-setting": {
-    "message": "Синхронизировать {setting} между сборками."
+    "message": "Синхронизировать {setting} между сборками"
   },
   "app.settings.synced-options.game-settings.sync-title": {
     "message": "Синхронизация настроек игры"
@@ -3228,10 +3258,10 @@
     "message": "Изменения не сохранены."
   },
   "app.settings.synced-options.game-settings.unsync-setting": {
-    "message": "Перестать синхронизировать {setting} между сборками."
+    "message": "Перестать синхронизировать {setting} между сборками"
   },
   "app.settings.synced-options.game-settings.value-mixed": {
-    "message": "Отличается в разных сборках."
+    "message": "Отличается в разных сборках"
   },
   "app.settings.synced-options.game-settings.value-off": {
     "message": "Выкл"
@@ -3375,7 +3405,7 @@
     "message": "Удалить сборку"
   },
   "app.shared-instance.lock-notice.more-actions": {
-    "message": "Допонительно"
+    "message": "Дополнительно"
   },
   "app.shared-instance.lock-notice.reason": {
     "message": "Причина"
@@ -3860,11 +3890,17 @@
   "installation-settings.relink-shared-instance.button": {
     "message": "Повторно связать совместную сборку"
   },
+  "installation-settings.relink-shared-instance.description": {
+    "message": "Переподключите к совместной сборке эту отвязанную от неё сборку через ссылку или ID."
+  },
   "installation-settings.relink-shared-instance.modal.already-linked": {
     "message": "Сборка «{name}» уже связана с совместной сборкой."
   },
   "installation-settings.relink-shared-instance.modal.blocked-header": {
     "message": "Сборку невозможно повторно связать"
+  },
+  "installation-settings.relink-shared-instance.modal.confirm-body": {
+    "message": "Эта сборка снова становится источником совместной. Участники получат изменения после публикации обновления."
   },
   "installation-settings.relink-shared-instance.modal.description": {
     "message": "Переподключите эту сборку к вашей совместной сборке."
@@ -3881,8 +3917,14 @@
   "installation-settings.relink-shared-instance.modal.input-placeholder": {
     "message": "https://modrinth.com/share/..."
   },
+  "installation-settings.relink-shared-instance.modal.mismatch-body": {
+    "message": "Эта сборка использует {localLoader} {localGameVersion}, но совместная — {loader} {gameVersion}. Следующая публикация изменит совместную сборку в соответствии с этой сборкой."
+  },
   "installation-settings.relink-shared-instance.modal.mismatch-header": {
-    "message": "Другая версия игры или загрузчик"
+    "message": "Другая версия игры или загрузчика"
+  },
+  "installation-settings.relink-shared-instance.modal.not-owner": {
+    "message": "Повторно связать совместную сборку может только владелец. Переустановите её из библиотеки, чтобы получать изменения."
   },
   "installation-settings.relink-shared-instance.modal.relink-button": {
     "message": "Повторно связать"
@@ -4376,11 +4418,14 @@
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Доступ к сборке отозван. Сборка всё ещё доступна, но она не будет связана и не будет обновляться."
   },
+  "instance.shared-instance.unavailable.locked-owner-text": {
+    "message": "Совместная сборка заблокирована модерацией Modrinth. Вы больше не можете отправлять изменения и повторно делиться сборкой."
+  },
   "instance.shared-instance.unavailable.locked-owner-title": {
     "message": "Сборка больше не может быть совместной"
   },
   "instance.shared-instance.unavailable.locked-text": {
-    "message": "Совместная сборка заблокирована модераторами контента. Она больше не будет получать обновления от основной сборки и недоступна для игры."
+    "message": "Совместная сборка заблокирована модерацией Modrinth. Она больше не будет получать обновления от основной сборки и недоступна для игры."
   },
   "instance.shared-instance.unavailable.locked-title": {
     "message": "Сборка заблокирована"

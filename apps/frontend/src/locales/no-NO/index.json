@@ -3116,9 +3116,6 @@
   "scopes.userRead.label": {
     "message": "Les brukerdata"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Les email-en din"
-  },
   "scopes.userReadEmail.label": {
     "message": "Les bruker-email-en"
   },

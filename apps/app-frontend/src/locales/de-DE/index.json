@@ -20,6 +20,9 @@
   "app.action-bar.install.dismiss": {
     "message": "Ausblenden"
   },
+  "app.action-bar.install.inspect-details": {
+    "message": "Details anzeigen"
+  },
   "app.action-bar.install.open-instance": {
     "message": "Instanz öffnen"
   },
@@ -409,6 +412,12 @@
   },
   "app.download-manager.title": {
     "message": "Download-Manager"
+  },
+  "app.error.copied-debug-info": {
+    "message": "Kopiert"
+  },
+  "app.error.inspect-debug-info": {
+    "message": "Debuginformationen anzeigen"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Sicherungsordner öffnen"
@@ -804,7 +813,7 @@
     "message": "{name} teilen"
   },
   "app.instance.share.invite-modal.user-limit-reached": {
-    "message": "Diese Instanz hat das Nutzerlimit von {limit} erreicht."
+    "message": "Diese Instanz hat das Benutzerlimit von {limit} erreicht."
   },
   "app.instance.share.limit-reached.description": {
     "message": "Du hast bereits das Maximum von {limit} Instanzen geteilt."
@@ -891,7 +900,7 @@
     "message": "das verknüpfte Konto"
   },
   "app.instance.shared-instance-wrong-account.owner-admonition-body-v2": {
-    "message": "um diese geteilte Instanz zu verwalten. Du wirst keine Updates an Nutzer senden können."
+    "message": "um diese geteilte Instanz zu verwalten. Du wirst keine Updates an Benutzer senden können."
   },
   "app.instance.shared-instance-wrong-account.sign-in-as-label": {
     "message": "Anmelden als"
@@ -2955,10 +2964,10 @@
     "message": "Telemetrie"
   },
   "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "Zeigt die Aktion \"Details kopieren\" an, während eine Installation in der Warteschlange steht oder ausgeführt wird. Bei fehlgeschlagenen oder abgebrochenen Installationen ist sie immer verfügbar."
+    "message": "Die Aktion „Details einsehen“ anzeigen, während eine Installation in der Warteschlange steht oder ausgeführt wird. Bei fehlgeschlagenen oder unterbrochenen Installationen ist sie jederzeit verfügbar."
   },
   "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Immer Kopierdetails anzeigen"
+    "message": "Immer Details einsehen anzeigen"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Die App könnte langsamer laden, bis der Cache neu aufgebaut wurde."
@@ -2970,13 +2979,13 @@
     "message": "App-Cache"
   },
   "app.settings.resource-management.app-database-backups.description": {
-    "message": "Backups von wichtigen App-Daten werden hier gespeichert, falls du sie später wiederherstellen musst."
+    "message": "Sicherungen wichtiger App-Daten werden hier gespeichert, falls du sie später wiederherstellen musst."
   },
   "app.settings.resource-management.app-database-backups.open-folder": {
-    "message": "Backups Ordner öffnen"
+    "message": "Sicherungsordner öffnen"
   },
   "app.settings.resource-management.app-database-backups.title": {
-    "message": "App-Daten Backups"
+    "message": "Sicherungen der App-Datenbank"
   },
   "app.settings.resource-management.app-directory.cancel-move": {
     "message": "Verschieben abbrechen"

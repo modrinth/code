@@ -5223,7 +5223,7 @@
     "message": "Acessar dados de usuário"
   },
   "scopes.userReadEmail.description": {
-    "message": "Ver seu e-mail"
+    "message": "Acessar seu endereço de e-mail"
   },
   "scopes.userReadEmail.label": {
     "message": "Ver e-mail de usuário"

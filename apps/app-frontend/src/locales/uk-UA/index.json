@@ -20,6 +20,9 @@
   "app.action-bar.install.dismiss": {
     "message": "Відхилити"
   },
+  "app.action-bar.install.inspect-details": {
+    "message": "Переглянути деталі"
+  },
   "app.action-bar.install.open-instance": {
     "message": "Відкрити примірник"
   },
@@ -159,10 +162,10 @@
     "message": "Приховати ім'я користувача над попереднім переглядом у меню «Вибір скіна»."
   },
   "app.appearance-settings.hide-nametag.title": {
-    "message": "Приховати ім'я"
+    "message": "Приховати імʼя над скіном"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Згортати Modrinth App під час запуску Minecraft."
+    "message": "Згортати Modrinth App, коли запуститься Minecraft."
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Згортати застосунок"
@@ -186,7 +189,7 @@
     "message": "Приховати праву бічну панель"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Показувати попередження про безпеку перед встановленням Modrinth Pack (.mrpack), який не розміщено на Modrinth."
+    "message": "Показувати попередження про небезпеку встановлення Modrinth Pack (.mrpack), який не розміщено на Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Попереджати перед установленням невідомих збірок"
@@ -306,7 +309,7 @@
     "message": "Розсинхронізувати"
   },
   "app.content.sync-data-packs-disabled": {
-    "message": "Спершу ввімкніть синхронізацію пакетів даних в налаштуваннях застосунку."
+    "message": "Спершу ввімкніть синхронізацію пакетів даних у налаштуваннях застосунку."
   },
   "app.content.sync-pack": {
     "message": "Синхронізувати"
@@ -409,6 +412,12 @@
   },
   "app.download-manager.title": {
     "message": "Менеджер завантажень"
+  },
+  "app.error.copied-debug-info": {
+    "message": "Скопійовано"
+  },
+  "app.error.inspect-debug-info": {
+    "message": "Переглянути інформацію налагодження"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Відкрити теку резервних копій"
@@ -768,13 +777,13 @@
     "message": "Назад до примірника"
   },
   "app.instance.server.offline.description": {
-    "message": "Цей сервер не в мережі. Ви можете запустити Minecraft, але не зможете підʼєднатися до нього."
+    "message": "Цей сервер поза мережею. Ви можете запустити Minecraft, але не зможете підʼєднатися до нього."
   },
   "app.instance.server.offline.launch-anyway": {
     "message": "Усе одно запустити"
   },
   "app.instance.server.offline.title": {
-    "message": "Сервер не в мережі"
+    "message": "Сервер поза мережею"
   },
   "app.instance.server.status.unknown": {
     "message": "Статус невідомий"
@@ -951,7 +960,7 @@
     "message": "Стандартний"
   },
   "app.instance.worlds.no-worlds-description": {
-    "message": "Додати сервер або переглянути, щоб почати"
+    "message": "Додайте сервер або знайдіть його, щоб почати"
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "Сервера або світи не додано"
@@ -2748,7 +2757,7 @@
     "message": "Частота музики"
   },
   "app.settings.game-options.setting.music-toast.description": {
-    "message": "Укажіть, чи показувати назву музики в меню паузи та спливному вікні."
+    "message": "Укажіть, чи показувати назву музики в меню павзи та спливному вікні."
   },
   "app.settings.game-options.setting.music-toast.label": {
     "message": "Сповіщення музики"
@@ -2946,10 +2955,10 @@
     "message": "Телеметрія"
   },
   "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "Показувати кнопку «Копіювати деталі», коли встановлення перебуває в черзі або виконується. Вона завжди доступна для невдалих або перерваних встановлень."
+    "message": "Показувати дію перегляду деталей, поки триває встановлення. Вона завжди показується для невдалих або перерваних установлень."
   },
   "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Завжди показувати деталі копіювання"
+    "message": "Завжди показувати деталі"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Застосунок може завантажуватися повільніше, поки кеш не відновиться."
@@ -2976,7 +2985,7 @@
     "message": "Змінити директорію"
   },
   "app.settings.resource-management.app-directory.change-to-default": {
-    "message": "Змінити на усталене"
+    "message": "Змінити на усталену"
   },
   "app.settings.resource-management.app-directory.description": {
     "message": "Де Modrinth App зберігає примірники та інші файли."
@@ -3066,7 +3075,7 @@
     "message": "Максимум одночасних завантажень"
   },
   "app.settings.resource-management.maximum-concurrent-writes.description": {
-    "message": "Кількість файлів, які застосунок може записувати на диск одночасно. Зменште це значення, якщо ви часто стикаєтеся з помилками вводу-виводу I/O. Потребує перезапуску застосунку."
+    "message": "Кількість файлів, які застосунок може записувати на диск одночасно. Зменште це значення, якщо часто стикаєтеся з помилками вводу-виводу. Потребує перезапуску застосунку."
   },
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Максимум одночасних записів"
@@ -3243,7 +3252,7 @@
     "message": "Не синхронізується"
   },
   "app.settings.synced-options.game-settings.retry": {
-    "message": "Повторіть спробу ще раз"
+    "message": "Повторити"
   },
   "app.settings.synced-options.game-settings.save": {
     "message": "Зберегти налаштування"
@@ -4512,7 +4521,7 @@
     "message": "Інші опції"
   },
   "instance.worlds.no_contact": {
-    "message": "Не вдалося зв’язатися зі сервером"
+    "message": "Не вдалося зв’язатися із сервером"
   },
   "instance.worlds.no_server_quick_play": {
     "message": "Запускатися у сервери напряму можливо лише починаючи з версії Minecraft Alpha 1.0.5"
@@ -4623,10 +4632,10 @@
     "message": "Увійти в Modrinth"
   },
   "onboarding-checklist.title": {
-    "message": "Почнімо"
+    "message": "Для початку"
   },
   "project.server.status.offline": {
-    "message": "Не в мережі"
+    "message": "Поза мережею"
   },
   "project.server.status.online": {
     "message": "У мережі"

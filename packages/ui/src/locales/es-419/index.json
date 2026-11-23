@@ -53,8 +53,17 @@
   "billing.resubscribe-modal.change-payment-method": {
     "defaultMessage": "Cambiar"
   },
+  "billing.resubscribe-modal.charged-now": {
+    "defaultMessage": "Se te cobrará {total} hoy día, y luego cada {period} hasta que canceles. Puedes cancelar en cualquier momento desde la configuración."
+  },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "Se te cobrará {total} en <charge-date>{date}</charge-date>y luego cada {period} hasta que canceles. Puedes cancelar en cualquier momento desde tu página de configuración."
+  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Estás a punto de renovar tu suscripción a <server-name>{serverName}</server-name>. Tu suscripción se reactivará y tu servidor seguirá funcionando sin interrupciones."
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "Error al cargar el metodo de pago"
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "No se puede renovar la suscripción, no se pudieron cargar los detalles."
@@ -68,17 +77,35 @@
   "billing.resubscribe-modal.no-payment-method": {
     "defaultMessage": "Ningún método de pago seleccionado"
   },
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "Modrinth Hosting ({plan})"
+  },
   "billing.resubscribe-modal.plan.custom": {
     "defaultMessage": "Personalizado"
   },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Grande"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Mediano"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Pequeño"
+  },
   "billing.resubscribe-modal.preview-error": {
     "defaultMessage": "No pudimos calcular el costo de volver a enviar. Asegúrese de que su método de pago tiene una dirección de facturación y vuelva a intentarlo."
+  },
+  "billing.resubscribe-modal.recurring-notice": {
+    "defaultMessage": "Al hacer clic en \"Reubscribe\", está reanudando una suscripción recurrente."
   },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Renovar suscripción"
   },
   "billing.resubscribe-modal.tax-item": {
-    "defaultMessage": "Impuestos"
+    "defaultMessage": "Impuesto"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Resuscribirse a Modrinth Hosting"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Aplicar preferencias guardadas"
@@ -151,6 +178,9 @@
   },
   "button.close": {
     "defaultMessage": "Cerrar"
+  },
+  "button.confirm": {
+    "defaultMessage": "Confirmar"
   },
   "button.continue": {
     "defaultMessage": "Continuar"
@@ -241,6 +271,9 @@
   },
   "button.refresh": {
     "defaultMessage": "Refrescar"
+  },
+  "button.reinstall-modpack": {
+    "defaultMessage": "Reinstalar modpack"
   },
   "button.remove": {
     "defaultMessage": "Eliminar"
@@ -368,8 +401,14 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, one {# ítem} other {# ítems}}"
   },
+  "content.card.external-file": {
+    "defaultMessage": "Archivo externo"
+  },
   "content.card.frozen": {
     "defaultMessage": "Este proyecto ha sido bloqueado a su versión actual hasta que sea desbloqueado."
+  },
+  "content.card.override-file": {
+    "defaultMessage": "Sobreescribir archivo"
   },
   "content.card.select-project": {
     "defaultMessage": "Seleccionar {project}"
@@ -379,6 +418,9 @@
   },
   "content.card.synced": {
     "defaultMessage": "Sincronizado entre instancias"
+  },
+  "content.card.uploaded-file": {
+    "defaultMessage": "Archivo subido"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Estás seguro de querer actualizar {count, plural,one {# proyecto} other {# proyectos}} a su última versión compatible? Se recomienda actualizar el contenido de uno-en-uno."
@@ -410,8 +452,17 @@
   "content.confirm-disable.header": {
     "defaultMessage": "Desactivar {itemType}"
   },
+  "content.confirm-environment.admonition-title": {
+    "defaultMessage": "Este contenido puede ser incompatible"
+  },
+  "content.confirm-environment.disable-player-body": {
+    "defaultMessage": "{project} es requerido en el cliente de los jugadores. Desactivarlo puede prevenir que los jugadores usen este contenido correctamente."
+  },
   "content.confirm-environment.disable-player-title": {
     "defaultMessage": "¿Desactivar para jugadores?"
+  },
+  "content.confirm-environment.disable-server-body": {
+    "defaultMessage": "Se requiere {project} en el servidor. Desactivarlo puede impedir que tu servidor funcione correctamente."
   },
   "content.confirm-environment.disable-server-title": {
     "defaultMessage": "¿Desactivar para su servidor?"
@@ -421,6 +472,24 @@
   },
   "content.confirm-environment.performance-admonition-title": {
     "defaultMessage": "Aviso de funcionamiento"
+  },
+  "content.confirm-environment.player-body": {
+    "defaultMessage": "{project} No fue intencionado para correr en los clientes de los jugadores. activarlo puede causar errores o prevenir que su juego arranque."
+  },
+  "content.confirm-environment.player-title": {
+    "defaultMessage": "¿Habilitar para jugadores?"
+  },
+  "content.confirm-environment.required-admonition-title": {
+    "defaultMessage": "Este contenido es requerido aquí"
+  },
+  "content.confirm-environment.server-body": {
+    "defaultMessage": "{project} no está pensado para ejecutarse en un servidor. Habilitarlo podría causar errores o impedir que tu servidor se inicie."
+  },
+  "content.confirm-environment.server-title": {
+    "defaultMessage": "¿Activar para tu servidor?"
+  },
+  "content.confirm-environment.singleplayer-body": {
+    "defaultMessage": "{project} está diseñado para un solo jugador. Habilitarlo en tu servidor podría causar errores o impedir que tu servidor se inicie."
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Bajar de versión} other {Actualizar}} puede causar problemas de compatibilidad. Los mods o contenido que agregaste sobre el modpack se mantendrán, pero podrían no ser compatibles con la nueva versión."
@@ -491,6 +560,12 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} añadido"
   },
+  "content.diff-modal.config-file-count": {
+    "defaultMessage": "{count, plural, one {Añadir archivo} other {Añadir archivos}}"
+  },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Archivos de configuración"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Se añadió (dependencia)"
   },
@@ -523,6 +598,9 @@
   },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Instalar de todos modos"
+  },
+  "content.diff-modal.instance-folder": {
+    "defaultMessage": "Carpeta de la instancia"
   },
   "content.diff-modal.loader-updated": {
     "defaultMessage": "Loader"
@@ -570,13 +648,19 @@
     "defaultMessage": "Habilitado para"
   },
   "content.enabled-for.not-supported-here": {
-    "defaultMessage": "Este contenido no está diseñado para activarse aquí."
+    "defaultMessage": "Este contenido no fue diseñado para activarse aqui."
   },
   "content.enabled-for.player": {
     "defaultMessage": "Jugador"
   },
   "content.enabled-for.player-only-filter": {
-    "defaultMessage": "Solo para jugadores"
+    "defaultMessage": "Sólo jugador"
+  },
+  "content.enabled-for.player-tooltip": {
+    "defaultMessage": "Incluye este contenido en la instancia compartida o .mrpack que los jugadores descargan."
+  },
+  "content.enabled-for.please-wait": {
+    "defaultMessage": "Espere"
   },
   "content.enabled-for.required-here": {
     "defaultMessage": "Este contenido tiene que ser activado para que funcione correctamente"
@@ -865,6 +949,33 @@
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Configurar servidor"
+  },
+  "creation-flow.curseforge.change-button": {
+    "defaultMessage": "Cambiar"
+  },
+  "creation-flow.curseforge.checking-server-pack": {
+    "defaultMessage": "Comprobando un paquete del servidor..."
+  },
+  "creation-flow.curseforge.description": {
+    "defaultMessage": "Utiliza un modpack que no está disponible en Modrinth."
+  },
+  "creation-flow.curseforge.file-description": {
+    "defaultMessage": "Necesitarás el archivo de modpack normal, y opcionalmente puedes añadir un paquete de servidor después si no podemos encontrar uno."
+  },
+  "creation-flow.curseforge.file-label": {
+    "defaultMessage": "Archivo Modpack de CurseForge"
+  },
+  "creation-flow.curseforge.ftb-installer": {
+    "defaultMessage": "Esta versión viene con el instalador de servidores de FTB, que usaremos para configurar el servidor."
+  },
+  "creation-flow.curseforge.invalid-link": {
+    "defaultMessage": ""
+  },
+  "creation-flow.curseforge.link-description": {
+    "defaultMessage": ""
+  },
+  "creation-flow.curseforge.server-pack-available": {
+    "defaultMessage": "Hay un paquete de servidor disponible para esta versión. Instalaremos {filename} en el servidor."
   },
   "creation-flow.modal.custom-setup.build-number.label": {
     "defaultMessage": "Número de compilación"
@@ -7383,4 +7494,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

@@ -4442,6 +4442,33 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, plural, =0 {Nenhum seguidor} one {{count} seguidor} other {{count} seguidores}}"
   },
+  "project.game-awards.body": {
+    "defaultMessage": "{projectName} é um dos cinco nomeados. Agora é preciso seu voto!"
+  },
+  "project.game-awards.category.best-user-creation": {
+    "defaultMessage": "Melhor Criação de Usuário"
+  },
+  "project.game-awards.days-left": {
+    "defaultMessage": "{days, plural, one {# dia restante} other {# dias restantes}}"
+  },
+  "project.game-awards.event-name": {
+    "defaultMessage": "The Game Awards {year}"
+  },
+  "project.game-awards.hide-voting-details": {
+    "defaultMessage": "Ocultar detalhes da votação"
+  },
+  "project.game-awards.nominee-for": {
+    "defaultMessage": "Indicado para {category}"
+  },
+  "project.game-awards.official-nominee": {
+    "defaultMessage": "Oficialmente indicado"
+  },
+  "project.game-awards.vote": {
+    "defaultMessage": "Vote no The Game Awards"
+  },
+  "project.game-awards.vote-now": {
+    "defaultMessage": "Vote agora"
+  },
   "project.license.error": {
     "defaultMessage": "Não foi possível obter o texto da licença."
   },
@@ -5071,6 +5098,9 @@
   },
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Limpar busca"
+  },
+  "search.filter.option.search.no_results": {
+    "defaultMessage": "Nenhum resultado encontrado"
   },
   "search.filter.option.search.placeholder": {
     "defaultMessage": "Buscar..."

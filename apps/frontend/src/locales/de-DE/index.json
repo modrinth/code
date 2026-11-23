@@ -546,7 +546,7 @@
     "message": "Unsere Desktop-App ist auf allen Plattformen verfügbar. Wähle einfach deine gewünschte Version."
   },
   "app-marketing.download.download-appimage": {
-    "message": "Lade das AppImage herunter"
+    "message": "Das AppImage herunterladen"
   },
   "app-marketing.download.download-appimage-arm64": {
     "message": "AppImage (ARM64) herunterladen"
@@ -993,16 +993,16 @@
     "message": "Bestätigungs-E-Mail erneut senden"
   },
   "auth.verify-email.failed-verification.description": {
-    "message": "Wir konnten deine E-Mail nicht verifizieren. Versuche, die Bestätigungs-E-Mail erneut über dein Dashboard zu senden, indem du dich anmeldest."
+    "message": "Wir konnten deine E-Mail nicht bestätigen. Melde dich an und sende die Bestätigungs-E-Mail über dein Dashboard erneut."
   },
   "auth.verify-email.failed-verification.description.logged-in": {
-    "message": "Wir konnten deine E-Mail-Adresse nicht bestätigen. Versuche die Bestätigungs-E-Mail über die Schaltfläche unten erneut zu senden."
+    "message": "Wir konnten deine E-Mail nicht bestätigen. Sende die Bestätigungs-E-Mail über die Schaltfläche unten erneut."
   },
   "auth.verify-email.failed-verification.title": {
-    "message": "E-Mail-Verifizierung fehlgeschlagen"
+    "message": "E-Mail-Bestätigung fehlgeschlagen"
   },
   "auth.verify-email.notification.email-sent.description": {
-    "message": "Eine E-Mail mit einem Link zur Verifizierung deines Accounts wurde an {email} gesendet."
+    "message": "Eine E-Mail mit einem Link zur Bestätigung deines Kontos wurde an {email} gesendet."
   },
   "auth.verify-email.notification.email-sent.title": {
     "message": "E-Mail gesendet"
@@ -1014,7 +1014,7 @@
     "message": "Deine E-Mail-Adresse wurde erfolgreich bestätigt!"
   },
   "auth.verify-email.post-verification.title": {
-    "message": "E-Mail-Verifizierung"
+    "message": "E-Mail-Bestätigung"
   },
   "auth.verify-email.title": {
     "message": "E-Mail bestätigen"
@@ -1728,7 +1728,7 @@
     "message": "Netzwerk"
   },
   "dashboard.creator-withdraw-modal.nearing-threshold": {
-    "message": "Du näherst dich der Auszahlungsgrenze. Du kannst jetzt <b>{amountRemaining}</b> abheben, für höhere Beträge ist jedoch ein Steuerformular erforderlich."
+    "message": "Du näherst dich der Auszahlungsgrenze. Du kannst jetzt <b>{amountRemaining}</b> auszahlen, für höhere Beträge ist jedoch ein Steuerformular erforderlich."
   },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "Konto"
@@ -2469,10 +2469,10 @@
     "message": "Füge deinem Server deine eigene Domain hinzu, reserviere bis zu 15 Ports für Mods, die diese benötigen, und vieles mehr."
   },
   "hosting-marketing.included.backups-included": {
-    "message": "Backups enthalten"
+    "message": "Sicherungen enthalten"
   },
   "hosting-marketing.included.backups-included.description": {
-    "message": "Jeder Server verfügt über 15 Backups, die sicher an einem externen Standort gespeichert werden."
+    "message": "Jeder Server verfügt über 15 Sicherungen, die sicher an einem externen Standort gespeichert werden."
   },
   "hosting-marketing.included.custom-url": {
     "message": "Benutzerdefinierte URL"
@@ -4104,10 +4104,10 @@
     "message": "Du kannst dein Projekt weiterhin bearbeiten, dies hat keinen Einfluss auf deinen Platz in der Warteschlange."
   },
   "project.moderation.admonition.under-review.body.4": {
-    "message": "Wir bemühen uns, Einsendungen innerhalb von 24 bis 48 Stunden zu überprüfen, doch bei einigen Projekten kann es zu Verzögerungen kommen. Dies bedeutet nicht, dass mit deiner Einreichung etwas nicht in Ordnung ist."
+    "message": "Wir bemühen uns, Einreichungen innerhalb von 24 bis 48 Stunden zu überprüfen, bei einigen Projekten kann es jedoch zu Verzögerungen kommen. Dies bedeutet nicht, dass mit deiner Einreichung etwas nicht in Ordnung ist."
   },
   "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "Wir bemühen uns, Einsendungen innerhalb von einer Woche zu überprüfen, doch bei einigen Projekten kann es zu Verzögerungen kommen. Dies bedeutet nicht, dass mit deiner Einreichung etwas nicht in Ordnung ist."
+    "message": "Wir bemühen uns, Einreichungen innerhalb einer Woche zu überprüfen, bei einigen Projekten kann es jedoch zu Verzögerungen kommen. Dies bedeutet nicht, dass mit deiner Einreichung etwas nicht in Ordnung ist."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Wir danken dir für deine Geduld, während unsere Moderatoren daran arbeiten, Modrinth sicher zu halten, und freuen uns darauf, dir dabei zu helfen, deine Inhalte zu teilen! 💚</emphasis>"
@@ -4371,7 +4371,7 @@
     "message": "Angabe zu kostenpflichtigen Funktionen muss mindestens eine kostenpflichtige Funktion auflisten."
   },
   "project.settings.disclosures.save-blocked.photosensitivity-note": {
-    "message": "Angabe zur Fotosensibilitätswarnung muss eine Beschreibung enthalten."
+    "message": "Angabe zur Lichtempfindlichkeit muss eine Beschreibung enthalten."
   },
   "project.settings.disclosures.save-blocked.system-interactions-note": {
     "message": "Angabe zu externen Systeminteraktionen muss eine Beschreibung enthalten."
@@ -4401,7 +4401,7 @@
     "message": "Welche Daten werden erfasst?"
   },
   "project.settings.disclosures.telemetry.data-placeholder": {
-    "message": "z. B. Anonyme Startanalysen zur Erfassung der verwendeten Minecraft-Version und des verwendeten Mod-Loaders."
+    "message": "z. B. Anonyme Startanalysen zur Erfassung der verwendeten Minecraft-Version und des verwendeten Modloaders."
   },
   "project.settings.disclosures.telemetry.description": {
     "message": "Du musst dies aktivieren, falls dein Projekt Nutzungsdaten an dich selbst oder an einen Dritten zurücksendet."
@@ -5222,9 +5222,6 @@
   "scopes.userRead.label": {
     "message": "Benutzerdaten einsehen"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Deine E-Mail einsehen"
-  },
   "scopes.userReadEmail.label": {
     "message": "Benutzer E-Mail einsehen"
   },
@@ -5283,7 +5280,7 @@
     "message": "Beginn"
   },
   "servers.notice.dismissable": {
-    "message": "Entfernbar"
+    "message": "Ausblendbar"
   },
   "servers.notice.expires": {
     "message": "Läuft ab"
@@ -5295,7 +5292,7 @@
     "message": "Level"
   },
   "servers.notice.undismissable": {
-    "message": "Nicht entfernbar"
+    "message": "Nicht ausblendbar"
   },
   "servers.notices.create-notice": {
     "message": "Mitteilung erstellen"
@@ -5733,7 +5730,7 @@
     "message": "Diese App steht in keiner Verbindung zu Modrinth, trotz ihres Namens."
   },
   "settings.billing.charges.description": {
-    "message": "Hier werden alle bisherigen Belastungen deines Modrinth-Kontos aufgeführt:"
+    "message": "Hier werden alle bisherigen Abbuchungen deines Modrinth-Kontos aufgelistet:"
   },
   "settings.billing.charges.product.medal-trial": {
     "message": "Medal Server-Testversion"
@@ -5832,7 +5829,7 @@
     "message": "Du hast noch keine Zahlungsmethoden hinzugefügt."
   },
   "settings.billing.payment_method.primary": {
-    "message": "Bevorzugte Zahlungsmethode"
+    "message": "Primär"
   },
   "settings.billing.payment_method.title": {
     "message": "Zahlungsmethoden"
@@ -6384,7 +6381,7 @@
     "message": "Als Mod verpacken"
   },
   "version.package-as-mod.description": {
-    "message": "Dadurch wird eine neue Version mit Unterstützung für die ausgewählten Mod-Loader erstellt. Du wirst zur neuen Version weitergeleitet und kannst diese nach deinen Wünschen bearbeiten."
+    "message": "Dadurch wird eine neue Version mit Unterstützung für die ausgewählten Modloader erstellt. Du wirst zur neuen Version weitergeleitet und kannst diese nach deinen Wünschen bearbeiten."
   },
   "version.package-as-mod.header": {
     "message": "Datenpaket als Mod packen"

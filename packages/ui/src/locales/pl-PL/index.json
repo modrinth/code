@@ -4430,6 +4430,27 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {obserwujący} other {obserwujących}}"
   },
+  "project.game-awards.body": {
+    "defaultMessage": "{projectName} jest jednym z pięciu nominatów. Teraz potrzebuje twojego głosu!"
+  },
+  "project.game-awards.days-left": {
+    "defaultMessage": "{days, plural, one {Został # dzień} few {Zostały # dni} other {Zostało # dni}}"
+  },
+  "project.game-awards.event-name": {
+    "defaultMessage": "The Game Awards {year}"
+  },
+  "project.game-awards.hide-voting-details": {
+    "defaultMessage": "Ukryj szczegóły głosowania"
+  },
+  "project.game-awards.nominee-for": {
+    "defaultMessage": "Nominowany w kategorii {category}"
+  },
+  "project.game-awards.official-nominee": {
+    "defaultMessage": "Oficjalny nominat"
+  },
+  "project.game-awards.vote-now": {
+    "defaultMessage": "Głosuj teraz"
+  },
   "project.license.error": {
     "defaultMessage": "Nie można pobrać tekstu licencji."
   },
@@ -5060,6 +5081,9 @@
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Wyczyść pole wyszukiwania"
   },
+  "search.filter.option.search.no_results": {
+    "defaultMessage": "Brak wyników wyszukiwania"
+  },
   "search.filter.option.search.placeholder": {
     "defaultMessage": "Szukaj..."
   },
@@ -5254,6 +5278,9 @@
   },
   "servers.access-page.activity-log-filter.action.addon-server-enabled": {
     "defaultMessage": "Zmiana zawartości serwera"
+  },
+  "servers.access-page.activity-log-filter.action.addon-side-toggle-locked": {
+    "defaultMessage": "Zmieniono blokadę treści bocznej"
   },
   "servers.access-page.activity-log-filter.action.addon-updated": {
     "defaultMessage": "Zaktualizowano zawartość"
@@ -5600,6 +5627,12 @@
   "servers.audit-log.event.addon-server-enabled": {
     "defaultMessage": "Włączono <files></files> na serwerze"
   },
+  "servers.audit-log.event.addon-side-locked": {
+    "defaultMessage": "Zablokowano przełączniki stron dla <files></files>"
+  },
+  "servers.audit-log.event.addon-side-unlocked": {
+    "defaultMessage": "Odblokowano przełączniki stron dla <files></files>"
+  },
   "servers.audit-log.event.addon-updated": {
     "defaultMessage": "Zaktualizowano zawartość <content></content>"
   },
@@ -5759,6 +5792,12 @@
   "servers.audit-log.event.server-restarted": {
     "defaultMessage": "Ponownie uruchomiono serwer"
   },
+  "servers.audit-log.event.server-resuspended": {
+    "defaultMessage": "Serwer został wcześnie ponownie zwieszony"
+  },
+  "servers.audit-log.event.server-resuspended-expired": {
+    "defaultMessage": "Okres zniesienia zawieszenia wygasł, serwer został ponownie zwieszony"
+  },
   "servers.audit-log.event.server-started": {
     "defaultMessage": "Uruchomiono serwer"
   },
@@ -5767,6 +5806,15 @@
   },
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Zmieniono poddomenę serwera na <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.server-suspended": {
+    "defaultMessage": "{reason, select, moderated {Serwer zawieszony przez moderatorów} paymentfailed {Serwer zawieszony przez nieudaną opłatę} cancelled {Serwer zawieszony z powodu anulowanej subskrypcji} other {Serwer zawieszony}}"
+  },
+  "servers.audit-log.event.server-suspension-lifted": {
+    "defaultMessage": "Tymczasowo zniesiono zawieszenie do <until></until>"
+  },
+  "servers.audit-log.event.server-suspension-lifted-restricted": {
+    "defaultMessage": "Tymczasowo zniesiono zawieszenie do <until></until> z zablokowanymi akcjami stanu uruchomienia"
   },
   "servers.audit-log.event.server-unsuspended": {
     "defaultMessage": "Serwer został odwieszony"
@@ -5858,11 +5906,17 @@
   "servers.backups.admonition.migration-backing-up.title": {
     "defaultMessage": "Tworzenie kopii zapasowej serwera"
   },
+  "servers.backups.admonition.migration-backup-failed.description": {
+    "defaultMessage": "Coś poszło nie tak podczas tworzenia {backupName}, więc zawartość nie została dotknięta. Spróbuj ponownie z karty Graj."
+  },
   "servers.backups.admonition.migration-cancelled.description": {
     "defaultMessage": "Zawartość Twojego serwera nie została zmieniona."
   },
   "servers.backups.admonition.migration-cancelled.title": {
     "defaultMessage": "Anulowano aktualizację serwera"
+  },
+  "servers.backups.admonition.migration-completed.description": {
+    "defaultMessage": "Twój serwer jest gotowy do udostępnienia znajomym."
   },
   "servers.backups.admonition.migration-completed.title": {
     "defaultMessage": "Zawartość serwera zaktualizowana"
@@ -5873,8 +5927,14 @@
   "servers.backups.admonition.migration-failed.title": {
     "defaultMessage": "Aktualizacja serwera nieudana"
   },
+  "servers.backups.admonition.migration-queued.description": {
+    "defaultMessage": "Zaraz wykonamy kopię zapasową i zaktualizujemy Twój serwer."
+  },
   "servers.backups.admonition.migration-queued.title": {
     "defaultMessage": "Aktualizacja serwera w kolejce"
+  },
+  "servers.backups.admonition.migration-updating.description": {
+    "defaultMessage": "Ponowna instalacja zawartości i konfigurowanie jej dla serwera, graczy lub obu. Może to potrwać kilka minut."
   },
   "servers.backups.admonition.migration-updating.title": {
     "defaultMessage": "Aktualizacja zawartości serwera"
@@ -5918,6 +5978,9 @@
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "Wybrano {count, plural, one {# kopię zapasową} few {# kopie zapasowe} other {# kopii zapasowych}}"
   },
+  "servers.backups.create.in-progress": {
+    "defaultMessage": "Wykonywanie kopii zapasowej jest już w kolejce lub w toku"
+  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "Po usunięciu nie będzie można odzyskać {count, plural, one {tej kopii zapasowej} other {tych kopii zapasowych}}. Usuwanie jest trwałe."
   },
@@ -5933,8 +5996,20 @@
   "servers.backups.delete-modal.header": {
     "defaultMessage": "Usuń {count, plural, one {kopię zapasową} other {kopie zapasowe}}"
   },
+  "servers.backups.delete.error": {
+    "defaultMessage": "Nie udało się usunąć {count, plural, one {kopii zapasowej} other {# kopii zapasowych}}"
+  },
   "servers.backups.deleted.auto-badge": {
     "defaultMessage": "Automatyczne"
+  },
+  "servers.backups.deleted.bulk-bar.none-recoverable": {
+    "defaultMessage": "Nie można cofnąć usunięcia żadnej z zaznaczonych kopii zapasowych"
+  },
+  "servers.backups.deleted.bulk-bar.selected-count": {
+    "defaultMessage": "Wybrano {count, plural, one {# kopię zapasową} few {# kopie zapasowe} other {# kopii zapasowych}}"
+  },
+  "servers.backups.deleted.bulk-bar.some-unrecoverable": {
+    "defaultMessage": "Można cofnąć usunięcie tylko dla {recoverable} z {count, plural, one {# wybranej kopii zapasowej} other {# wybranych kopii zapasowych}}"
   },
   "servers.backups.deleted.column.created": {
     "defaultMessage": "Utworzono"
@@ -5984,11 +6059,20 @@
   "servers.backups.deleted.search-label": {
     "defaultMessage": "Wyszukaj usunięte kopie zapasowe"
   },
+  "servers.backups.deleted.search-placeholder": {
+    "defaultMessage": "Szukaj {count, plural, one {# usuniętej kopii zapasowej} other {# usuniętych kopii zapasowych}}..."
+  },
   "servers.backups.deleted.title": {
     "defaultMessage": "Usunięte kopie zapasowe"
   },
   "servers.backups.deleted.undelete": {
     "defaultMessage": "Przywróć"
+  },
+  "servers.backups.deleted.undelete.error": {
+    "defaultMessage": "Nie udało się cofnąć usunięcia {count, plural, one {kopii zapasowej} other {# kopii zapasowych}}"
+  },
+  "servers.backups.deleted.undelete.success": {
+    "defaultMessage": "Cofnięto usunięcie {count, plural, one {kopii zapasowej} other {# kopii zapasowych}}"
   },
   "servers.backups.deleted.unrecoverable": {
     "defaultMessage": "Niemożliwe do odzyskania"
@@ -6149,11 +6233,23 @@
   "servers.download.unavailable.title": {
     "defaultMessage": "Pobieranie niedostępne"
   },
+  "servers.files.config-push.admonition-body": {
+    "defaultMessage": "Edytowano {path}. Prześlij aktualizację, by gracze otrzymali te zmiany, gdy spróbują uruchomić grę."
+  },
   "servers.files.config-push.admonition-header": {
     "defaultMessage": "Podziel się tą konfiguracją z graczami"
   },
+  "servers.files.config-push.header": {
+    "defaultMessage": "Opublikować konfigurację graczom?"
+  },
   "servers.files.config-push.later": {
     "defaultMessage": "Później"
+  },
+  "servers.files.config-push.other-changes-body": {
+    "defaultMessage": "Inne nieopublikowane zmiany także zostaną dołączone."
+  },
+  "servers.files.config-push.restart-body": {
+    "defaultMessage": "Przesłanie aktualizacji uruchomi ponownie serwer, a gracze, którzy do niego dołączyli, zostaną rozłączeni."
   },
   "servers.files.server-locked": {
     "defaultMessage": "Ten serwer jest zablokowany, a jego pliki są tylko do odczytu."
@@ -6287,6 +6383,12 @@
   "servers.lift-suspension.error.title": {
     "defaultMessage": "Nie udało się podnieść zawieszenia"
   },
+  "servers.lift-suspension.header": {
+    "defaultMessage": "Zdejmij zawieszenie serwera {name}"
+  },
+  "servers.lift-suspension.lift-button": {
+    "defaultMessage": "Zdejmij zawieszenie serwera"
+  },
   "servers.lift-suspension.minutes": {
     "defaultMessage": "Minuty"
   },
@@ -6296,8 +6398,26 @@
   "servers.lift-suspension.minutes.placeholder": {
     "defaultMessage": "Wprowadź liczbę minut"
   },
+  "servers.lift-suspension.restrict-power.description": {
+    "defaultMessage": "Serwer nie może zostać uruchomiony, więc jego panel i pliki mogą być używane bez grania na serwerza."
+  },
+  "servers.lift-suspension.restrict-power.label": {
+    "defaultMessage": "Blokuj akcje stanu uruchomienia podczas podnoszenia zawieszenia"
+  },
+  "servers.lift-suspension.success.text": {
+    "defaultMessage": "Zawieszenie {name} jest zdjęte do {date}."
+  },
+  "servers.lift-suspension.success.text-restricted": {
+    "defaultMessage": "Zawieszenie {name} jest zdjęte do {date}, z zablokowanymi akcjami stanu uruchomienia."
+  },
   "servers.lift-suspension.success.title": {
     "defaultMessage": "Zdjęto zawieszenie"
+  },
+  "servers.lift-suspension.temporary.body": {
+    "defaultMessage": "Po upływie okresu czasu serwer automatycznie zostanie ponownie zawieszony. Jego poddomena pozostaje nieprzypisana, a zawieszenie zostaje cofnięte."
+  },
+  "servers.lift-suspension.temporary.header": {
+    "defaultMessage": "Zdjęcie zawieszenia jest tymczasowe"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Posiadasz już serwer?"
@@ -6539,6 +6659,9 @@
   "servers.manage.suspended.go-to-admin-billing": {
     "defaultMessage": "Przejdź do rozliczeń administratora"
   },
+  "servers.manage.suspended.lift-suspension": {
+    "defaultMessage": "Zdejmij zawieszenie serwera"
+  },
   "servers.manage.unlock-server": {
     "defaultMessage": "Odblokuj serwer"
   },
@@ -6623,14 +6746,47 @@
   "servers.play-migration.acknowledge": {
     "defaultMessage": "Rozumiem, że mój serwer zostanie ponownie zainstalowany i zrestartowany."
   },
+  "servers.play-migration.backup.description": {
+    "defaultMessage": "Stworzymy kopię zapasową, którą możesz przywrócić, jeśli coś pójdzie nie tak, o nazwie \"{name}\"."
+  },
   "servers.play-migration.backup.name": {
     "defaultMessage": "Przed ponowną instalacją zawartości serwera"
+  },
+  "servers.play-migration.backup.title": {
+    "defaultMessage": "Utwórz kopię zapasową serwera"
   },
   "servers.play-migration.confirm": {
     "defaultMessage": "Kopia zapasowa i ponowna instalacja"
   },
   "servers.play-migration.content-locked": {
     "defaultMessage": "Udostępnij swój serwer na karcie Play, aby wybrać, gdzie zawartość jest włączona."
+  },
+  "servers.play-migration.curseforge.warning": {
+    "defaultMessage": "Wygląda na to, że Twój serwer został skonfigurowany za pomocą paczki modów z CurseForge. Musisz przesłać <exact>dokładnie tę samą paczkę</exact>, aby uniknąć uszkodzenia świata."
+  },
+  "servers.play-migration.description": {
+    "defaultMessage": "Musimy trochę pozmieniać zawartość Twojego serwera, by móc go udostępnić Twoim znajomym!"
+  },
+  "servers.play-migration.mrpack.file-description": {
+    "defaultMessage": "Paczka może zawierać zawartość działającą po stronie klienta, taką jak mody lub paczki danych, która zostanie potem przesłana do graczy."
+  },
+  "servers.play-migration.mrpack.file-label": {
+    "defaultMessage": "Plik .mrpack"
+  },
+  "servers.play-migration.mrpack.warning": {
+    "defaultMessage": "Wygląda na to, że Twój serwer został skonfigurowany za pomocą zewnętrznego pliku .mrpack. Musisz przesłać <exact>dokładnie tę samą paczkę</exact>, aby uniknąć uszkodzenia świata."
+  },
+  "servers.play-migration.reinstall.custom-description": {
+    "defaultMessage": "Zainstalujemy ponownie zawartość serwera, włączając każdy projekt dla serwera, graczy lub obu na podstawie jego środowiska."
+  },
+  "servers.play-migration.reinstall.modpack-description": {
+    "defaultMessage": "Zainstalujemy ponownie {modpack} i dodatkową zawartość, włączając każdy projekt dla serwera, graczy lub obu na podstawie jego środowiska."
+  },
+  "servers.play-migration.reinstall.title": {
+    "defaultMessage": "Zainstaluj ponownie zawartość"
+  },
+  "servers.play-migration.restart.description": {
+    "defaultMessage": "Uruchomimy ponownie Twój serwer, co może potrwać kilka minut."
   },
   "servers.play-migration.restart.title": {
     "defaultMessage": "Zrestartuj serwer"
@@ -6673,6 +6829,12 @@
   },
   "servers.play.invite-header": {
     "defaultMessage": "Zaproś graczy do {name}"
+  },
+  "servers.play.invites-unavailable": {
+    "defaultMessage": "Zaproszenia są niedostępne, gdy jakaś akcja jest w toku lub gdy limit graczy został osiągnięty."
+  },
+  "servers.play.not-ready": {
+    "defaultMessage": "Udostępniona zawartość nie jest jeszcze gotowa. Poczekaj i spróbuj ponownie."
   },
   "servers.play.not-shared": {
     "defaultMessage": "Właściciel lub edytor musi najpierw udostępnić ten świat."
@@ -6731,14 +6893,32 @@
   "servers.play.preview-error": {
     "defaultMessage": "Nie udało się odświeżyć zmian. Spróbuj ponownie przed opublikowaniem."
   },
+  "servers.play.push-and-play": {
+    "defaultMessage": "Prześlij aktualizację i graj"
+  },
+  "servers.play.push-restart-and-play": {
+    "defaultMessage": "Prześlij, uruchom ponownie i graj"
+  },
   "servers.play.refreshing-preview": {
     "defaultMessage": "Odświeżanie zmian…"
+  },
+  "servers.play.remove-description": {
+    "defaultMessage": "Usunąć gracza {username} z tej udostępnionej instancji? Nie zostanie zbanowany z serwera Minecraft."
   },
   "servers.play.remove-player": {
     "defaultMessage": "Usuń gracza"
   },
   "servers.play.retry": {
     "defaultMessage": "Spróbuj ponownie"
+  },
+  "servers.play.share-changes-play-body": {
+    "defaultMessage": "Uruchomienie serwera spowoduje przesłanie tych zmian do wszystkich zaproszonych graczy. Zostaną oni poproszeni o zaktualizowanie instancji następnym razem, gdy spróbują w nią zagrać."
+  },
+  "servers.play.start-failed": {
+    "defaultMessage": "Serwer zatrzymał się, zanim przeszedł w stan gotowości. Sprawdź konsolę, zanim ponownie spróbujesz go uruchomić."
+  },
+  "servers.play.start-timeout": {
+    "defaultMessage": "Serwer zbyt długo się uruchamia. Sprawdź konsolę, zanim ponownie spróbujesz go uruchomić."
   },
   "servers.play.unpublished-body": {
     "defaultMessage": "Wciśnij aktualizację, aby udostępnić graczom zmiany zawartości Twojego serwera."
@@ -6748,6 +6928,12 @@
   },
   "servers.power.push-and-start": {
     "defaultMessage": "Wciśnij aktualizacje i uruchom"
+  },
+  "servers.power.share-changes-restart-body": {
+    "defaultMessage": "Ponowne uruchomienie serwera spowoduje przesłanie tych zmian do wszystkich zaproszonych graczy. Zostaną oni poproszeni o zaktualizowanie instancji następnym razem, gdy spróbują w nią zagrać."
+  },
+  "servers.power.share-changes-start-body": {
+    "defaultMessage": "Uruchomienie serwera spowoduje przesłanie tych zmian do wszystkich zaproszonych graczy. Zostaną oni poproszeni o zaktualizowanie instancji następnym razem, gdy spróbują w nią zagrać."
   },
   "servers.purchase.notification.success.text": {
     "defaultMessage": "Zakup Modrinth Hosting zakończony sukcesem."
@@ -6968,14 +7154,32 @@
   "servers.settings.support.hide-support-features.title": {
     "defaultMessage": "Ukryj funkcje wsparcia"
   },
+  "servers.settings.support.resuspend.button": {
+    "defaultMessage": "Zawieś ponownie"
+  },
+  "servers.settings.support.resuspend.description": {
+    "defaultMessage": "To wcześnie ponownie zawiesi {name}. Serwer od razu zostanie zawieszony."
+  },
+  "servers.settings.support.resuspend.error-title": {
+    "defaultMessage": "Nie udało się zawiesić ponownie serwera"
+  },
   "servers.settings.support.resuspend.success-text": {
     "defaultMessage": "Serwer {name} został zawieszony ponownie."
   },
   "servers.settings.support.resuspend.success-title": {
     "defaultMessage": "Zawieszono serwer"
   },
+  "servers.settings.support.resuspend.title": {
+    "defaultMessage": "Zawiesić serwer ponownie?"
+  },
   "servers.settings.support.suspend-server": {
     "defaultMessage": "Zawieś serwer"
+  },
+  "servers.settings.support.suspension-lifted.power-allowed": {
+    "defaultMessage": "Akcje stanu uruchomienia są dozwolone, a zawieszenie zostaje cofnięte."
+  },
+  "servers.settings.support.suspension-lifted.power-blocked": {
+    "defaultMessage": "Akcje stanu uruchomienia są zablokowane, a zawieszenie zostaje cofnięte."
   },
   "servers.settings.support.suspension-lifted.suspended-again": {
     "defaultMessage": "Zawieszono ponownie {time}"
@@ -6988,6 +7192,9 @@
   },
   "servers.setup.onboarding.invite.copy-failed": {
     "defaultMessage": "Nie udało się skopiować linku"
+  },
+  "servers.setup.onboarding.invite.description": {
+    "defaultMessage": "Udostępnij ten link, a gracze będą mogli otrzymać udostępnioną instancją z wszystkim, czego potrzebują, by grać na tym serwerze, zarządzaną przez serwer!"
   },
   "servers.setup.onboarding.invite.done": {
     "defaultMessage": "Gotowe"
@@ -7018,6 +7225,9 @@
   },
   "servers.setup.onboarding.step.configure-world.title": {
     "defaultMessage": "Skonfiguruj swój świat"
+  },
+  "servers.setup.onboarding.step.invite-friends.description": {
+    "defaultMessage": "Zaproś znajomych na swój serwer przez jeden link i pozwól im dołączyć jednym kliknięciem przez Modrinth App."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Zaproś swoich znajomych"
@@ -7052,14 +7262,26 @@
   "servers.sharing-update.badge": {
     "defaultMessage": "Nowa aktualizacja"
   },
+  "servers.sharing-update.blog": {
+    "defaultMessage": "Dowiedz się więcej o tej wersji w blogu o <link>udostępnianiu serwerów</link>."
+  },
   "servers.sharing-update.continue": {
     "defaultMessage": "Kontynuuj"
+  },
+  "servers.sharing-update.description": {
+    "defaultMessage": "Możesz teraz udostępnić swój serwer znajomym bezpośrednio w aplikacji. Gdy zaakceptują zaproszenie, automatycznie otrzymają instancję zarządzaną przez Twój serwer."
+  },
+  "servers.sharing-update.get-server": {
+    "defaultMessage": "Zdobądź serwer"
   },
   "servers.sharing-update.mute": {
     "defaultMessage": "Wycisz film"
   },
   "servers.sharing-update.pause": {
     "defaultMessage": "Wstrzymaj film"
+  },
+  "servers.sharing-update.purchase-description": {
+    "defaultMessage": "Zdobądź serwer i udostępnij go bezpośrednio znajomym. Gdy zaakceptują zaproszenie w Modrinth App, automatycznie otrzymają instancję zarządzaną przez Twój serwer."
   },
   "servers.sharing-update.resume": {
     "defaultMessage": "Wznów"
@@ -7071,7 +7293,7 @@
     "defaultMessage": "Udostępniaj serwery znajomym"
   },
   "servers.sharing-update.unmute": {
-    "defaultMessage": "Wyłącz wyciszenie filmu"
+    "defaultMessage": "Odcisz film"
   },
   "servers.sharing-update.watch": {
     "defaultMessage": "Obejrzyj"
@@ -8310,7 +8532,7 @@
     "defaultMessage": "Członek Modrinth+"
   },
   "user.profile.badge.pride.about.1": {
-    "defaultMessage": "Ten użytkownik wspierał choć jedną z naszych zbiórek na rzecz osób LGBTQ+."
+    "defaultMessage": "Ten użytkownik wspierał jedną z naszych zbiórek na rzecz osób LGBTQ+."
   },
   "user.profile.badge.pride.link": {
     "defaultMessage": "Odwiedź naszą najnowszą zbiórkę na rzecz miesiąca dumy."

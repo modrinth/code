@@ -20,6 +20,9 @@
   "app.action-bar.install.dismiss": {
     "message": "Dispensar"
   },
+  "app.action-bar.install.inspect-details": {
+    "message": "Inspecionar detalhes"
+  },
   "app.action-bar.install.open-instance": {
     "message": "Abrir instância"
   },
@@ -409,6 +412,12 @@
   },
   "app.download-manager.title": {
     "message": "Gerenciador de Downloads"
+  },
+  "app.error.copied-debug-info": {
+    "message": "Copiado"
+  },
+  "app.error.inspect-debug-info": {
+    "message": "Inspecionar informações de depuração"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Abrir pasta das cópias de segurança"
@@ -2958,7 +2967,7 @@
     "message": "Exibe a ação de copiar detalhes caso uma instalação esteja na fila ou em execução. Essa opção está sempre disponível para instalações interrompidas ou falhas."
   },
   "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Sempre exibir copiar detalhes"
+    "message": "Sempre mostre os detalhes da inspeção"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "O aplicativo talvez carregue mais lentamente até o cache ser refeito."

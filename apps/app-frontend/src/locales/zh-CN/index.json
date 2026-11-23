@@ -20,6 +20,9 @@
   "app.action-bar.install.dismiss": {
     "message": "隐藏"
   },
+  "app.action-bar.install.inspect-details": {
+    "message": "查看项目详情"
+  },
   "app.action-bar.install.open-instance": {
     "message": "打开实例"
   },
@@ -409,6 +412,12 @@
   },
   "app.download-manager.title": {
     "message": "下载管理"
+  },
+  "app.error.copied-debug-info": {
+    "message": "已复制"
+  },
+  "app.error.inspect-debug-info": {
+    "message": "查看调试信息"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "打开备份文件夹"
@@ -1343,6 +1352,9 @@
   "app.library.leave-shared-instance.modal.admonition-header": {
     "message": "{count, plural, one {正在离开共享实例} other {正在离开 # 个共享实例}}"
   },
+  "app.library.leave-shared-instance.modal.header": {
+    "message": "{count, plural, other {离开#个共享实例}}"
+  },
   "app.library.search.no-results.title": {
     "message": "没有与搜索匹配的实例。"
   },
@@ -1394,11 +1406,23 @@
   "app.library.title": {
     "message": "实例库"
   },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-body": {
+    "message": "{unpublishCount, plural, other {你拥有的#个共享实例将会被从Modrinth服务器上删除，该实例的用户}}将不再会接收到更新。{leaveCount, plural, other {你会失去对其他#个共享实例的访问权限，要想重新获得权限，需要重新被邀请。}}其中的所有实例将会被从你的库里删除。"
+  },
   "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
-    "message": "取消发布并保留共享实例"
+    "message": "取消发布并离开共享实例"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.header": {
+    "message": "取消发布并离开{count}个共享实例"
   },
   "app.library.unpublish-shared-instance.modal.admonition-body": {
     "message": "{count, plural, other {这将会删除Modrinth服务器上的共享实例。 在Modrinth App中的使用者将停止接收更新，该共享实例也将从您的库中删除。}}"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, other {正在取消发布#个共享实例}}"
+  },
+  "app.library.unpublish-shared-instance.modal.header": {
+    "message": "{count, plural, other {取消发布#个共享实例}}"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "补充说明"
@@ -2940,10 +2964,10 @@
     "message": "遥测"
   },
   "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "在安装排队或运行时显示“复制详细信息”选项。对于失败或中断的安装，该选项始终可用。"
+    "message": "安装操作处于队列中或正在执行时显示检查详细信息操作。对于失败或中断的安装，它始终可用。"
   },
   "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "始终显示复制详情"
+    "message": "总是显示检查详细信息"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "在缓存重建之前，应用加载可能会更慢。"
@@ -3037,6 +3061,9 @@
   },
   "app.settings.resource-management.app-directory.path-copy-failed-title": {
     "message": "路径复制失败"
+  },
+  "app.settings.resource-management.app-directory.pending": {
+    "message": "下次打开 Modrinth 应用时，您的应用目录将移动至 {path}。"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "应用目录"
@@ -3875,6 +3902,72 @@
   "hosting.play.no-address": {
     "message": "此服务器尚无连接地址。"
   },
+  "hosting.play.not-ready": {
+    "message": "此实例无法启动。请检查其在库中的安装状态。"
+  },
+  "hosting.play.update-description": {
+    "message": "在加入此实例之前，将此实例更新为服务器上最新的共享内容。"
+  },
+  "hosting.play.update-to-play": {
+    "message": "更新以游玩"
+  },
+  "hosting.play.world-changed": {
+    "message": "这个世界已经不再活跃，或没有被共享。请打开服务器面板，并再次按下启动服务器按钮。"
+  },
+  "installation-settings.advanced.title": {
+    "message": "高级"
+  },
+  "installation-settings.relink-shared-instance.button": {
+    "message": "重连共享实例"
+  },
+  "installation-settings.relink-shared-instance.description": {
+    "message": "使用邀请链接或 ID 重新将此实例连接到其已取消关联的共享实例。"
+  },
+  "installation-settings.relink-shared-instance.modal.already-linked": {
+    "message": "您的实例“{name}”已经被关联到此共享实例。"
+  },
+  "installation-settings.relink-shared-instance.modal.blocked-header": {
+    "message": "此实例无法被重新关联"
+  },
+  "installation-settings.relink-shared-instance.modal.confirm-body": {
+    "message": "该实例再次成为共享实例的源文件。用户在您发布更新时会收到您的更改。"
+  },
+  "installation-settings.relink-shared-instance.modal.description": {
+    "message": "重新关联此实例到您拥有的共享实例。"
+  },
+  "installation-settings.relink-shared-instance.modal.find-button": {
+    "message": "查找共享实例"
+  },
+  "installation-settings.relink-shared-instance.modal.header": {
+    "message": "重新关联共享实例"
+  },
+  "installation-settings.relink-shared-instance.modal.input-label": {
+    "message": "邀请链接或共享实例 ID"
+  },
+  "installation-settings.relink-shared-instance.modal.input-placeholder": {
+    "message": "https://modrinth.com/share/…"
+  },
+  "installation-settings.relink-shared-instance.modal.mismatch-body": {
+    "message": "此实例使用{localLoader}{localGameVersion}但此共享实例使用{loader}{gameVersion}。您的下一次更新将更改共享实例以匹配此实例。"
+  },
+  "installation-settings.relink-shared-instance.modal.mismatch-header": {
+    "message": "游戏版本或加载器版本不一致"
+  },
+  "installation-settings.relink-shared-instance.modal.not-owner": {
+    "message": "只有作者可以重新关联共享实例。要以用户身份获取更新，请从你的库重新安装它。"
+  },
+  "installation-settings.relink-shared-instance.modal.relink-button": {
+    "message": "重新连接"
+  },
+  "installation-settings.relink-shared-instance.modal.server-managed": {
+    "message": "此共享实例由服务器管理，因此它不能被重新连接。"
+  },
+  "installation-settings.relink-shared-instance.modal.version-summary": {
+    "message": "{loader}{gameVersion}·版本{version}"
+  },
+  "installation-settings.relink-shared-instance.title": {
+    "message": "重新关联共享实例"
+  },
   "installation-settings.shared-instance.linked-title": {
     "message": "已关联的共享实例"
   },
@@ -4001,6 +4094,12 @@
   "instance.settings.defaults.open-app-settings": {
     "message": "管理默认设置"
   },
+  "instance.settings.reset-setting-to-default": {
+    "message": "将 {setting} 恢复为默认值"
+  },
+  "instance.settings.reset-to-default": {
+    "message": "重置为默认设置"
+  },
   "instance.settings.sidebar.label.game": {
     "message": "游戏"
   },
@@ -4069,6 +4168,9 @@
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
     "message": "安装时无法复制。"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.locked": {
+    "message": "无法复制已锁定的实例。"
   },
   "instance.settings.tabs.general.duplicate-instance": {
     "message": "复制实例"
@@ -4196,14 +4298,29 @@
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "输入 Java 参数……"
   },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "环境变量"
+  },
   "instance.settings.tabs.java.hooks": {
     "message": "钩子"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Java 参数"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Java 安装路径"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "内存分配"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
   },
   "instance.settings.tabs.java.label": {
     "message": "Java 和内存"
+  },
+  "instance.settings.tabs.java.recommended-java-version": {
+    "message": "此实例的 Minecraft 版本推荐使用 Java {version}。"
   },
   "instance.settings.tabs.sharing": {
     "message": "共享"
@@ -4298,17 +4415,29 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "输入宽度……"
   },
+  "instance.settings.using-defaults": {
+    "message": "使用默认值"
+  },
   "instance.shared-instance.error.title": {
     "message": "出错了"
   },
   "instance.shared-instance.file-not-allowed.title": {
     "message": "不支持的文件类型"
   },
+  "instance.shared-instance.limit-reached.text": {
+    "message": "你不能共享更多的实例。"
+  },
+  "instance.shared-instance.limit-reached.title": {
+    "message": "已达到实例共享限制"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "无法连接到共享实例API"
   },
   "instance.shared-instance.network-error.title": {
     "message": "网络错误"
+  },
+  "instance.shared-instance.owner-behind.text": {
+    "message": "一个新的版本被另一个的 Modrinth App 推送了。请下载后重试。"
   },
   "instance.shared-instance.owner-behind.title": {
     "message": "无法推送更新"
@@ -4321,6 +4450,9 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "你对此共享实例的访问权限已被撤销。该实例仍可正常使用，但已解除关联且不再接收后续更新。"
+  },
+  "instance.shared-instance.unavailable.locked-owner-text": {
+    "message": "相同实例已被内容管理团队锁定，您现在无法推送更新或重新共享此实例。"
   },
   "instance.shared-instance.unavailable.locked-owner-title": {
     "message": "改实例不再可共享"
@@ -4534,6 +4666,9 @@
   },
   "search.filter.locked.server-environment.title": {
     "message": "只能将客户端模组添加到服务器实例中"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "游戏版本由服务器提供"
   },
   "search.filter.locked.server-loader.title": {
     "message": "启动器由服务器提供"

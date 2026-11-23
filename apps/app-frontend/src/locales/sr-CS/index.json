@@ -20,6 +20,9 @@
   "app.action-bar.install.dismiss": {
     "message": "Otpusti"
   },
+  "app.action-bar.install.inspect-details": {
+    "message": "Ispitaj detalje"
+  },
   "app.action-bar.install.open-instance": {
     "message": "Otvori instancu"
   },
@@ -49,6 +52,9 @@
   },
   "app.action-bar.install.summary.download-failed": {
     "message": "Preuzimanje nije završeno"
+  },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Nije moguće pripremiti instancu"
   },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Put do datoteke nije ispravan"
@@ -140,6 +146,9 @@
   "app.ads-consent.title": {
     "message": "Tvoja bezbednost i kako reklame pomažu Modrinth-u"
   },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Prikaži biblioteku instanci u kompaktnom rasporedu."
+  },
   "app.appearance-settings.compact-mode.title": {
     "message": "Kompaktni mod"
   },
@@ -179,6 +188,9 @@
   "app.appearance-settings.toggle-sidebar.title": {
     "message": "Sakrij desnu bočnu traku"
   },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Prikaži sigurnosno upozorenje pre instaliranja Modrinth Pack-a (.mrpack) koji nije hostovan na Modrinth-u."
+  },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Upozoti me prije instalacije nepoznatih modpackova"
   },
@@ -190,6 +202,12 @@
   },
   "app.behavior-settings.confirmations.title": {
     "message": "Potvrde"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Početna i sadržaj"
+  },
+  "app.behavior-settings.hidden-instances.description": {
+    "message": "Instance koje ste sakrili sa Vaše biblioteke na ovom računaru. Sakrivene instance se ne sinhronizuju sa Vašim Modrinth nalogom."
   },
   "app.browse.add-servers-to-instance": {
     "message": "Dodavanje servera na instancu"
@@ -581,6 +599,360 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Pretraži {count} svetova..."
   },
+  "app.library.actions.label": {
+    "message": "Akcije biblioteke"
+  },
+  "app.library.context-menu.create-instance": {
+    "message": "Nova instanca"
+  },
+  "app.library.filter.add": {
+    "message": "Dodaj filter"
+  },
+  "app.library.filter.clear": {
+    "message": "Ukloni filtere"
+  },
+  "app.library.filter.game-version": {
+    "message": "Verzija igre"
+  },
+  "app.library.filter.install-state": {
+    "message": "Status instalacije"
+  },
+  "app.library.filter.install-state.installed": {
+    "message": "Instalirano"
+  },
+  "app.library.filter.install-state.not-installed": {
+    "message": "Nije instalirano"
+  },
+  "app.library.filter.instance-type": {
+    "message": "Vrsta instance"
+  },
+  "app.library.filter.instance-type.custom": {
+    "message": "Custom"
+  },
+  "app.library.filter.instance-type.modpack": {
+    "message": "Modpack"
+  },
+  "app.library.filter.instance-type.server": {
+    "message": "Server"
+  },
+  "app.library.filter.label": {
+    "message": "Filtriraj prema"
+  },
+  "app.library.filter.loader": {
+    "message": "Učitavaču"
+  },
+  "app.library.filter.owner": {
+    "message": "Vlasniku"
+  },
+  "app.library.filter.owner.me": {
+    "message": "Sebi"
+  },
+  "app.library.filter.owner.others": {
+    "message": "Drugima"
+  },
+  "app.library.filter.sharing": {
+    "message": "Deljenju"
+  },
+  "app.library.filter.sharing.not-shared": {
+    "message": "Nije deljeno"
+  },
+  "app.library.filter.sharing.shared": {
+    "message": "Deljeno"
+  },
+  "app.library.group-by.custom-group": {
+    "message": "Prilagođena grupa"
+  },
+  "app.library.group-by.game-version": {
+    "message": "Verziji igre"
+  },
+  "app.library.group-by.instance-type": {
+    "message": "Vrsti instance"
+  },
+  "app.library.group-by.label": {
+    "message": "Grupiši prema"
+  },
+  "app.library.group-by.loader": {
+    "message": "Učitavaču"
+  },
+  "app.library.group-by.none": {
+    "message": "Bez grupisanja"
+  },
+  "app.library.group.actions.label": {
+    "message": "Grupne akcije"
+  },
+  "app.library.group.collapse": {
+    "message": "Sakrij grupu"
+  },
+  "app.library.group.context-menu.add-to-group": {
+    "message": "Dodaj u grupu"
+  },
+  "app.library.group.create": {
+    "message": "Napravi grupu"
+  },
+  "app.library.group.create.cancel": {
+    "message": "Otkaži"
+  },
+  "app.library.group.delete": {
+    "message": "Ukloni grupu"
+  },
+  "app.library.group.delete-description": {
+    "message": "Instance iz ove grupe će biti razdružene."
+  },
+  "app.library.group.edit-name": {
+    "message": "Izmeni ime grupe"
+  },
+  "app.library.group.empty": {
+    "message": "Privuci ovde i otpusti za dodavanje instanci."
+  },
+  "app.library.group.expand": {
+    "message": "Proširi grupu"
+  },
+  "app.library.group.favorites": {
+    "message": "Omiljeno"
+  },
+  "app.library.group.instance.add": {
+    "message": "Dodaj"
+  },
+  "app.library.group.instance.added": {
+    "message": "Dodato"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "Dodaj"
+  },
+  "app.library.group.instances-modal.added": {
+    "message": "Dodato"
+  },
+  "app.library.group.instances-modal.no-instances-found": {
+    "message": "Nema pronađenih instanci"
+  },
+  "app.library.group.instances-modal.search-placeholder": {
+    "message": "Pretraga instance"
+  },
+  "app.library.group.instances-modal.title": {
+    "message": "Dodaj instance u \"{groupName}\""
+  },
+  "app.library.group.move-down": {
+    "message": "Pomeri grupu ispod"
+  },
+  "app.library.group.move-up": {
+    "message": "Pomeri grupu iznad"
+  },
+  "app.library.group.name": {
+    "message": "Ime grupe"
+  },
+  "app.library.group.name-empty": {
+    "message": "Imena grupa ne mogu biti prazna."
+  },
+  "app.library.group.name-placeholder": {
+    "message": "Unesite ime grupe"
+  },
+  "app.library.group.name-reserved": {
+    "message": "\"None\" je rezervisano i ne može se koristiti kao ime grupe."
+  },
+  "app.library.group.name-too-long": {
+    "message": "Imena grupa ne mogu biti duža od {maxLength} karaktera."
+  },
+  "app.library.group.new": {
+    "message": "Nova grupa"
+  },
+  "app.library.group.no-instances-found": {
+    "message": "Nema pronađenih instanci"
+  },
+  "app.library.group.rename-failed": {
+    "message": "Nije moguće preimenovati grupu"
+  },
+  "app.library.group.search-instance": {
+    "message": "Pretraga instance"
+  },
+  "app.library.group.ungrouped": {
+    "message": "Negrupisano"
+  },
+  "app.library.group.unknown": {
+    "message": "Nepoznata grupa"
+  },
+  "app.library.instance-hidden.text": {
+    "message": "Možete ponovo prikazati u Podešavanja > Ponašanje."
+  },
+  "app.library.instance-hidden.title": {
+    "message": "Sakriveno iz biblioteke"
+  },
+  "app.library.instance.action.add-content": {
+    "message": "Dodaj sadržaj"
+  },
+  "app.library.instance.action.add-to-favorites": {
+    "message": "Dodaj u omiljeno"
+  },
+  "app.library.instance.action.copy-path": {
+    "message": "Iskopiraj putanju"
+  },
+  "app.library.instance.action.delete": {
+    "message": "Obriši"
+  },
+  "app.library.instance.action.duplicate": {
+    "message": "Dupliraj instancu"
+  },
+  "app.library.instance.action.hide-from-library": {
+    "message": "Ukloni iz biblioteke"
+  },
+  "app.library.instance.action.leave": {
+    "message": "Napusti"
+  },
+  "app.library.instance.action.open-folder": {
+    "message": "Otvori folder"
+  },
+  "app.library.instance.action.play": {
+    "message": "Igraj"
+  },
+  "app.library.instance.action.remove-from-favorites": {
+    "message": "Ukloni iz omiljenih"
+  },
+  "app.library.instance.action.remove-from-group": {
+    "message": "Ukloni iz grupe"
+  },
+  "app.library.instance.action.show-in-library": {
+    "message": "Prikaži u biblioteci"
+  },
+  "app.library.instance.action.stop": {
+    "message": "Zaustavi"
+  },
+  "app.library.instance.action.unpublish": {
+    "message": "Povuci objavu"
+  },
+  "app.library.instance.action.unpublish-and-leave": {
+    "message": "Povuci objavu i ukloni"
+  },
+  "app.library.instance.action.view-instance": {
+    "message": "Pregledaj instancu"
+  },
+  "app.library.instance.actions.label": {
+    "message": "Akcije instance"
+  },
+  "app.library.instance.deselect": {
+    "message": "Povuci selekciju instance"
+  },
+  "app.library.instance.deselect-with-name": {
+    "message": "Povuci selekciju {name}"
+  },
+  "app.library.instance.install": {
+    "message": "Instaliraj"
+  },
+  "app.library.instance.install-with-name": {
+    "message": "Instaliraj {name}"
+  },
+  "app.library.instance.installing": {
+    "message": "Instaliranje..."
+  },
+  "app.library.instance.loading": {
+    "message": "Instanca se učitava..."
+  },
+  "app.library.instance.new": {
+    "message": "Nova instanca"
+  },
+  "app.library.instance.open-with-name": {
+    "message": "Otvori {name}"
+  },
+  "app.library.instance.play": {
+    "message": "Igraj"
+  },
+  "app.library.instance.repair": {
+    "message": "Popravi"
+  },
+  "app.library.instance.select": {
+    "message": "Odaberi instancu"
+  },
+  "app.library.instance.select-with-name": {
+    "message": "Odaberi {name}"
+  },
+  "app.library.instance.shared-by": {
+    "message": "Deli {name}"
+  },
+  "app.library.instance.shared-by-owner": {
+    "message": "Deli <owner>{name}</owner>"
+  },
+  "app.library.instance.shared-by-you": {
+    "message": "Vi ste podelili"
+  },
+  "app.library.instance.stop": {
+    "message": "Zaustavi"
+  },
+  "app.library.leave-shared-instance.modal.admonition-body": {
+    "message": "{count, plural,\n  one {Izgubićete pristup ovoj deljenoj instanci i ona će biti uklonjena iz Vaše biblioteke. Biće Vam potrebna nova pozivnica da biste joj ponovo pristupili.}\n  few {Izgubićete pristup ovim deljenim instancama i one će biti uklonjene iz Vaše biblioteke. Biće Vam potrebna nova pozivnica da biste im ponovo pristupili.}\n  other {Izgubićete pristup ovim deljenim instancama i one će biti uklonjene iz Vaše biblioteke. Biće Vam potrebna nova pozivnica da biste im ponovo pristupili.}}"
+  },
+  "app.library.leave-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, one {Napuštanje deljene instance} few {Napuštanje # deljene instance} other {Napuštanje # deljenih instanci}}"
+  },
+  "app.library.leave-shared-instance.modal.header": {
+    "message": "{count, plural, one {Napusti deljenu instancu} few {Napusti # deljene instance} other {Napusti # deljenih instanci}}"
+  },
+  "app.library.search.no-results.title": {
+    "message": "Nijedna instanca se ne podudara sa pretragom."
+  },
+  "app.library.search.placeholder": {
+    "message": "Pretraga"
+  },
+  "app.library.selection.aria-label": {
+    "message": "Odabrane instance"
+  },
+  "app.library.selection.deleting": {
+    "message": "Uklanjanje odabranih instanci"
+  },
+  "app.library.selection.new-group": {
+    "message": "Nova grupa"
+  },
+  "app.library.selection.remove-from-group": {
+    "message": "Ukloni iz grupe"
+  },
+  "app.library.selection.removing-shared-instances": {
+    "message": "Uklanjanje odabranih deljenih instanci"
+  },
+  "app.library.selection.selected-count": {
+    "message": "{count} odabrano"
+  },
+  "app.library.sort.date-created": {
+    "message": "Datum kreiranja"
+  },
+  "app.library.sort.date-modified": {
+    "message": "Datum izmene"
+  },
+  "app.library.sort.game-version": {
+    "message": "Verzija igre"
+  },
+  "app.library.sort.hours-played": {
+    "message": "Odigranih sati"
+  },
+  "app.library.sort.label": {
+    "message": "Sortiraj prema"
+  },
+  "app.library.sort.last-played": {
+    "message": "Poslednjem igranju"
+  },
+  "app.library.sort.loader": {
+    "message": "Učitavaču"
+  },
+  "app.library.sort.name": {
+    "message": "Imenu"
+  },
+  "app.library.title": {
+    "message": "Biblioteka"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-body": {
+    "message": "{unpublishCount, plural, one {# deljena instanca čiji si vlasnik biće izbrisana sa Modrinthovih servera, a oni koji je koriste} few {# deljene instance čiji si vlasnik biće izbrisane sa Modrinthovih servera, a oni koji ih koriste} other {# deljenih instanci čiji si vlasnik biće izbrisano sa Modrinthovih servera, a oni koji ih koriste}} prestaće da dobijaju ažuriranja. {leaveCount, plural, one {Izgubićeš pristup drugoj deljenoj instanci i biće ti potrebna nova pozivnica da joj ponovo pristupiš.} few {Izgubićeš pristup drugim # deljenim instancama i biće ti potrebna nova pozivnica da im ponovo pristupiš.} other {Izgubićeš pristup drugim # deljenim instancama i biće ti potrebna nova pozivnica da im ponovo pristupiš.}} Sve ove instance biće uklonjene iz tvoje biblioteke."
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
+    "message": "Opozivanje objavljivanja i napuštanje deljenih instanci"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.header": {
+    "message": "Opozovi objavljivanje i napusti {count} deljenih instanci"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {Ovim će deljena instanca biti izbrisana sa Modrinthovih servera. Korisnici koji je koriste u aplikaciji Modrinth prestaće da dobijaju ažuriranja, a instanca će biti uklonjena iz tvoje biblioteke.} few {Ovim će deljene instance biti izbrisane sa Modrinthovih servera. Korisnici koji ih koriste u aplikaciji Modrinth prestaće da dobijaju ažuriranja, a instance će biti uklonjene iz tvoje biblioteke.} other {Ovim će deljene instance biti izbrisane sa Modrinthovih servera. Korisnici koji ih koriste u aplikaciji Modrinth prestaće da dobijaju ažuriranja, a instance će biti uklonjene iz tvoje biblioteke.}}"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, one {Povlačenje deljene instance iz objave} few {Povlačenje # deljene instance iz objave} other {Povlačenje # deljenih instanci iz objave}}"
+  },
+  "app.library.unpublish-shared-instance.modal.header": {
+    "message": "{count, plural, one {Povuci deljenu instancu iz objave} few {Povuci # deljene instance iz objave} other {Povuci # deljenih instanci iz objave}}"
+  },
   "app.modal.install-to-play.header": {
     "message": "Instaliraj da bi igrao"
   },
@@ -901,6 +1273,12 @@
   },
   "friends.sign-in-to-add-friends": {
     "message": "<link>Prijavi se na Modrinth račun</link> da bi dodao prijatelje i vidio šta igraju!"
+  },
+  "hosting.play.not-ready": {
+    "message": "Ova instanca nije dostupna za pokretanje. Proveri njen status instalacije u svojoj biblioteci."
+  },
+  "installation-settings.relink-shared-instance.modal.not-owner": {
+    "message": "Samo vlasnik može ponovo povezati deljenu instancu. Da biste primali njena ažuriranja kao član, instalirajte je ponovo sa Vaše biblioteke."
   },
   "instance.add-server.add-and-play": {
     "message": "Dodaj i igraj"

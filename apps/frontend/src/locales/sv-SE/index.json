@@ -4364,9 +4364,6 @@
   "scopes.userRead.label": {
     "message": "Läs användardata"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Läs din e-post"
-  },
   "scopes.userReadEmail.label": {
     "message": "Läs användares e-post"
   },
