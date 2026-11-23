@@ -1,7 +1,7 @@
 name: Changelog Comment
 
 on:
-  pull_request_target:
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
     types: [opened, reopened]
   workflow_dispatch:
     inputs:
@@ -45,7 +45,7 @@ jobs:
 
             // Resolve PR number from event or workflow_dispatch input
             const prNumber = context.payload.pull_request?.number
-              ?? parseInt('${{ github.event.inputs.pr_number }}', 10);
+              ?? parseInt(context.payload.inputs?.pr_number, 10);
 
             if (!prNumber || isNaN(prNumber)) {
               core.setFailed('Could not determine PR number');
