@@ -83,7 +83,13 @@
 							role="group"
 							:aria-labelledby="labelId"
 						>
-							<Avatar :src="iconSrc" :alt="project.name" size="108px" class="project__icon" />
+							<Avatar
+								:src="iconSrc"
+								:alt="project.name"
+								size="108px"
+								class="project__icon"
+								no-shadow
+							/>
 							<div class="max-w-full">
 								<div class="flex items-center gap-2">
 									<FileButton
