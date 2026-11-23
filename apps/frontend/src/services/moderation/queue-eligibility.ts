@@ -60,9 +60,8 @@ export async function findNextEligibleQueueProject(
 	moderationQueue: ModerationQueueService,
 	candidateIds: string[],
 	strict = false,
-	includeNonProcessing = useModerationSettings().value.get(
-		moderationSettings.General.IncludeNonProcessingProjects,
-	),
+	skipProcessed = moderationQueue.currentQueue.skipProcessedIds ??
+		!useModerationSettings().value.get(moderationSettings.General.IncludeNonProcessingProjects),
 ): Promise<EligibleQueueProject | null> {
 	const excluded: string[] = []
 	let checkedCount = 0
@@ -77,7 +76,7 @@ export async function findNextEligibleQueueProject(
 
 		for (const id of batch) {
 			const result = results.get(id)
-			if (isEligibleQueueCandidate(result, includeNonProcessing)) {
+			if (isEligibleQueueCandidate(result, !skipProcessed)) {
 				return { project: id, excluded: [...excluded] }
 			}
 			excluded.push(id)

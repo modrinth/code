@@ -1,7 +1,7 @@
 name: Slash Command Dispatch
 
 on:
-  issue_comment:
+  issue_comment: # zizmor: ignore[dangerous-triggers]
     types: [created]
 
 permissions: {}
