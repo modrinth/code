@@ -4241,9 +4241,6 @@
   "project.settings.editing-project": {
     "message": "{projectType}のプロジェクトを編集中"
   },
-  "project.settings.license.all-rights": {
-    "message": "無断転載禁止 / ライセンスなし"
-  },
   "project.settings.license.allow-later": {
     "message": "後の版を許可する"
   },
@@ -4372,9 +4369,6 @@
   },
   "project.settings.server.select-region-placeholder": {
     "message": "地域を選択"
-  },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "関連するタグを選択してください。タグの残りのタグの前に表示されます。"
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types}のカテゴリ} other {カテゴリ}}"

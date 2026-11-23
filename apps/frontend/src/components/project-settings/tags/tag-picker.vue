@@ -2,6 +2,7 @@
 import { CheckIcon, SERVER_CATEGORY_ICON_MAP, StarIcon } from '@modrinth/assets'
 import { Button, formatCategory, FormattedTag, TagIcon, useVIntl } from '@modrinth/ui'
 
+import SettingsSection from '../settings-section.vue'
 import type { Category, CategoryGroup } from './types'
 
 defineProps<{
@@ -27,13 +28,14 @@ function categoryIconName(category: Category) {
 		data-project-field-scroll-only
 		class="settings-content-card flex flex-col gap-6 overflow-y-auto p-6"
 	>
-		<section v-for="group in groups" :key="group.id" :aria-labelledby="`tags-${group.id}`">
-			<h3 :id="`tags-${group.id}`" class="m-0 mb-2.5 text-lg font-semibold text-contrast">
-				{{ group.title }}
-			</h3>
-			<p v-if="group.description" class="mb-3 mt-0 text-secondary">
-				{{ group.description }}
-			</p>
+		<SettingsSection
+			v-for="group in groups"
+			:key="group.id"
+			:title="group.title"
+			:title-id="`tags-${group.id}`"
+			:subtitle="group.description"
+			heading="h3"
+		>
 			<div class="flex flex-wrap gap-2">
 				<Button
 					v-for="category in group.categories"
@@ -57,6 +59,6 @@ function categoryIconName(category: Category) {
 					<FormattedTag :tag="category.name" enforce-type="category" />
 				</Button>
 			</div>
-		</section>
+		</SettingsSection>
 	</div>
 </template>

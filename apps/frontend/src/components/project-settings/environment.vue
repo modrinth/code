@@ -1,9 +1,8 @@
 <template>
 	<LoadingIndicator v-if="!projectV3" class="py-6" />
-	<div v-else-if="showEnvironmentMigration">
-		<h2 class="settings-section-title">Project environment</h2>
+	<SettingsSection v-else-if="showEnvironmentMigration" title="Project environment">
 		<div class="settings-content-card"><EnvironmentMigration /></div>
-	</div>
+	</SettingsSection>
 	<div v-else class="grid place-content-center py-32">
 		<div class="flex flex-col items-center gap-5 text-center">
 			<div class="flex flex-col gap-2">
@@ -35,6 +34,8 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
+
+import SettingsSection from './settings-section.vue'
 
 const { currentMember, projectV2, projectV3 } = injectProjectPageContext()
 

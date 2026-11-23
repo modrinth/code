@@ -4217,9 +4217,6 @@
   "project.settings.editing-project": {
     "message": "{projectType} 프로젝트 수정 중"
   },
-  "project.settings.license.all-rights": {
-    "message": "모든 권리 보유/라이선스 없음"
-  },
   "project.settings.license.allow-later": {
     "message": "이후 에디션 허용"
   },
@@ -4238,9 +4235,6 @@
   "project.settings.license.name": {
     "message": "라이선스 이름"
   },
-  "project.settings.license.optional-url": {
-    "message": "라이선스 URL(선택)"
-  },
   "project.settings.license.select": {
     "message": "라이선스"
   },
@@ -4258,9 +4252,6 @@
   },
   "project.settings.license.url": {
     "message": "라이선스 URL"
-  },
-  "project.settings.license.url-description": {
-    "message": "라이선스 전문의 웹 위치입니다. 링크를 제공하지 않으면 라이선스 텍스트가 대신 표시됩니다."
   },
   "project.settings.links.add-link": {
     "message": "링크 추가"
@@ -4505,9 +4496,6 @@
   "project.settings.tags.featured-tags": {
     "message": "추천 태그"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "가장 관련성 높은 태그를 선택하세요. 선택한 태그는 다른 태그보다 먼저 표시됩니다."
-  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} 카테고리} other {카테고리}}"
   },
@@ -4531,15 +4519,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "추천 카테고리를 지정하려면 적어도 하나의 카테고리를 선택해야 합니다."
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "선택한 태그가 {count}개입니다. 프로젝트를 더 집중적이고 검색하기 쉽게 만들려면 태그를 8개 이하로 줄이는 것이 좋습니다."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "선택한 태그가 {count}개입니다. 서버를 더 집중적이고 검색하기 쉽게 만들려면 태그를 18개 이하로 줄여 주세요."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "선택한 태그가 {count}개입니다. 서버를 더 집중적이고 검색하기 쉽게 만들려면 태그를 12개 이하로 줄이는 것이 좋습니다."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "태그를 추가하기 전에 버전을 업로드하세요"

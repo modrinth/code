@@ -2,8 +2,58 @@
 	<div>
 		<AiImageWarningModal ref="aiImageWarningModal" />
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
-		<h2 class="settings-section-title">{{ formatMessage(messages.title) }}</h2>
-		<p class="mb-4 mt-0 text-secondary">{{ formatMessage(messages.subtitle) }}</p>
+		<SettingsSection :title="formatMessage(messages.title)" class="mb-3" />
+		<Accordion
+			v-if="mounted"
+			class="mb-4 min-w-0 rounded-2xl border border-solid border-surface-4 bg-surface-3 px-4 pb-1"
+			button-class="m-0 flex w-full cursor-pointer items-center gap-2 border-0 bg-transparent px-0 pb-3 pt-4 text-left text-base font-semibold text-contrast"
+			content-class="pb-3 text-sm leading-relaxed text-primary"
+			:open-by-default="guidanceOpen"
+			@on-open="guidanceOpen = true"
+			@on-close="guidanceOpen = false"
+		>
+			<template #button="{ open }">
+				<InfoIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
+				<span class="min-w-0 flex-1 [overflow-wrap:anywhere]">
+					{{ formatMessage(messages.guidanceTitle) }}
+				</span>
+				<ChevronDownIcon
+					class="mr-1.5 size-5 shrink-0 text-secondary transition-transform duration-300 motion-reduce:transition-none"
+					:class="{ 'rotate-180': open }"
+					aria-hidden="true"
+				/>
+			</template>
+			<p class="m-0">
+				{{
+					formatMessage(isServerProject ? messages.serverGuidanceIntro : messages.guidanceIntro, {
+						contentType,
+					})
+				}}
+			</p>
+			<p class="mb-0 mt-3">{{ formatMessage(messages.guidelinesHeading) }}</p>
+			<ul class="my-3 list-none space-y-2 p-0" role="list">
+				<li v-for="guideline in guidelines" :key="guideline.id" class="flex items-start gap-2">
+					<CheckIcon class="mt-1 size-4 shrink-0 text-green" aria-hidden="true" />
+					<span>{{ formatMessage(guideline, { contentType }) }}</span>
+				</li>
+			</ul>
+			<p class="m-0">{{ formatMessage(messages.mistakesHeading) }}</p>
+			<ul class="my-3 list-none space-y-2 p-0" role="list">
+				<li v-for="mistake in mistakes" :key="mistake.id" class="flex items-start gap-2">
+					<XCircleIcon class="mt-1 size-4 shrink-0 text-red" aria-hidden="true" />
+					<span>{{ formatMessage(mistake, { contentType }) }}</span>
+				</li>
+			</ul>
+			<p class="m-0">
+				<IntlFormatted :message-id="messages.guidanceRules">
+					<template #rules="{ children }">
+						<NuxtLink class="font-semibold text-link" target="_blank" to="/legal/rules"
+							><component :is="() => children"
+						/></NuxtLink>
+					</template>
+				</IntlFormatted>
+			</p>
+		</Accordion>
 		<div
 			class="[&_.cm-editor]:text-sm"
 			data-project-field="description"
@@ -26,50 +76,7 @@
 				:on-image-upload="onUploadHandler"
 				integrated
 				:min-height="480"
-			>
-				<template #guidance>
-					<Accordion
-						class="border-0 border-b border-solid border-surface-5"
-						button-class="m-0 flex w-full cursor-pointer items-center gap-2 border-0 bg-transparent px-5 py-3 text-sm text-secondary"
-						content-class="px-5 pb-4 text-sm leading-relaxed text-secondary"
-					>
-						<template #button="{ open }">
-							<InfoIcon class="size-4 shrink-0" />
-							{{ formatMessage(messages.guidanceTitle) }}
-							<ChevronDownIcon
-								class="ml-auto size-4 transition-transform motion-reduce:transition-none"
-								:class="{ 'rotate-180': open }"
-							/>
-						</template>
-						<p class="m-0">{{ formatMessage(messages.guidanceIntro) }}</p>
-						<ul class="my-3 space-y-2 pl-5">
-							<li>{{ formatMessage(messages.guidanceAi) }}</li>
-							<li>
-								<IntlFormatted :message-id="messages.guidanceTranslation">
-									<template #deepl="{ children }">
-										<a
-											class="font-semibold text-link"
-											href="https://www.deepl.com/translator"
-											target="_blank"
-											rel="noopener noreferrer"
-											><component :is="() => children"
-										/></a>
-									</template>
-								</IntlFormatted>
-							</li>
-						</ul>
-						<p class="m-0">
-							<IntlFormatted :message-id="messages.guidanceRules">
-								<template #rules="{ children }">
-									<NuxtLink class="font-semibold text-link" target="_blank" to="/legal/rules"
-										><component :is="() => children"
-									/></NuxtLink>
-								</template>
-							</IntlFormatted>
-						</p>
-					</Accordion>
-				</template>
-			</MarkdownEditor>
+			/>
 		</div>
 		<UnsavedChangesPopup
 			:original="saved"
@@ -83,7 +90,7 @@
 </template>
 
 <script lang="ts" setup>
-import { DropdownIcon as ChevronDownIcon, InfoIcon } from '@modrinth/assets'
+import { CheckIcon, DropdownIcon as ChevronDownIcon, InfoIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Accordion,
 	ConfirmLeaveModal,
@@ -98,6 +105,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, TeamMemberPermission } from '@modrinth/utils'
+import { useLocalStorage, useMounted } from '@vueuse/core'
 import { computed, useTemplateRef } from 'vue'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
@@ -108,8 +116,17 @@ import { useProjectIssueFieldAction } from '~/composables/project-issue-field-ac
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
+import { projectCopyType } from '~/utils/project-messages'
 
-const { projectV2: project, currentMember, patchProjectV3 } = injectProjectPageContext()
+import SettingsSection from './settings-section.vue'
+
+const { projectV2: project, projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
+const isServerProject = computed(() => projectV3.value.minecraft_server != null)
+const contentType = computed(() => projectCopyType(projectV3.value))
+const guidanceOpen = useLocalStorage('project-description-guidance-open', true, {
+	initOnMounted: true,
+})
+const mounted = useMounted()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
@@ -117,34 +134,84 @@ const messages = defineMessages({
 		id: 'project.settings.description.placeholder',
 		defaultMessage: 'Describe your project...',
 	},
-	subtitle: {
-		id: 'project.settings.description.subtitle',
-		defaultMessage: 'Explain what your project does, how to install it, and what it works with.',
-	},
 	guidanceTitle: {
 		id: 'project.settings.description.guidance-title',
 		defaultMessage: 'What makes a good description?',
 	},
 	title: { id: 'project.settings.description.title', defaultMessage: 'Description' },
 	guidanceIntro: {
-		id: 'project.settings.description.guidance-intro',
+		id: 'project.settings.description.guidance.introduction',
 		defaultMessage:
-			'Project descriptions must make a clear and honest attempt at describing what your project does so that anyone who comes across your project can understand what it adds, changes, or removes before downloading it.',
+			'The description is the most important part of your project page and will be the deciding factor for someone choosing to download your content! A good description must explain the content, purpose, and appeal of your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} to new users.',
 	},
-	guidanceAi: {
-		id: 'project.settings.description.guidance-ai',
+	serverGuidanceIntro: {
+		id: 'project.settings.description.guidance.server-introduction',
 		defaultMessage:
-			'Do not use AI to generate a description. Descriptions must be accurate, and AI tends to make up things that aren’t true about your project.',
+			'The description is the most important part of your server page and will be the deciding factor for someone choosing to join your server! A good description must explain the content, purpose, and appeal of your server to new players.',
 	},
-	guidanceTranslation: {
-		id: 'project.settings.description.guidance-translation',
+	guidelinesHeading: {
+		id: 'project.settings.description.guidance.guidelines-heading',
+		defaultMessage: 'Great descriptions follow a few key guidelines:',
+	},
+	explainAppeal: {
+		id: 'project.settings.description.guidance.explain-appeal',
 		defaultMessage:
-			'If your description is in a language other than English, an English translation must also be available unless the project is only meant to be used in a particular language, such as a translation pack. Use of machine translation such as <deepl>DeepL</deepl> is allowed.',
+			'Explain what makes your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} interesting.',
+	},
+	explainUse: {
+		id: 'project.settings.description.guidance.explain-use',
+		defaultMessage:
+			'Explain how your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} can be used or played with.',
+	},
+	explainServerPlay: {
+		id: 'project.settings.description.guidance.explain-server-play',
+		defaultMessage: 'Explain how players can play on your server.',
+	},
+	showGallery: {
+		id: 'project.settings.description.guidance.show-gallery',
+		defaultMessage: 'Showcase images from the Gallery, if applicable.',
+	},
+	accessibleFormatting: {
+		id: 'project.settings.description.guidance.accessible-formatting',
+		defaultMessage: 'Make proper use of formatting and be accessible to all users.',
+	},
+	mistakesHeading: {
+		id: 'project.settings.description.guidance.mistakes-heading',
+		defaultMessage: 'Avoid these common mistakes:',
+	},
+	avoidAssumptions: {
+		id: 'project.settings.description.guidance.avoid-assumptions',
+		defaultMessage:
+			'Do NOT assume users already understand your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} or its functionality.',
+	},
+	avoidServerAssumptions: {
+		id: 'project.settings.description.guidance.avoid-server-assumptions',
+		defaultMessage: 'Do NOT assume players already understand your server or its functionality.',
+	},
+	avoidMisleadingClaims: {
+		id: 'project.settings.description.guidance.avoid-misleading-claims',
+		defaultMessage:
+			'Do NOT make hyperbolic or misleading claims, or otherwise attempt to deceive users.',
+	},
+	avoidRepetition: {
+		id: 'project.settings.description.guidance.avoid-repetition',
+		defaultMessage:
+			'Do NOT add repetitive or unnecessary information, such as installation instructions, unless unique to the {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}.',
+	},
+	avoidServerRepetition: {
+		id: 'project.settings.description.guidance.avoid-server-repetition',
+		defaultMessage:
+			'Do NOT add repetitive or unnecessary information, such as joining instructions, unless unique to the server.',
+	},
+	avoidAi: {
+		id: 'project.settings.description.guidance.avoid-ai',
+		defaultMessage:
+			'Do NOT rely on AI-generated text, as AI is likely to be inaccurate or create unappealing descriptions that users will avoid.',
 	},
 	guidanceRules: {
-		id: 'project.settings.description.guidance-rules',
+		id: 'project.settings.description.guidance.content-rules',
 		defaultMessage:
-			'Please refer to Section 2.1 of Modrinth’s <rules>Content Rules</rules> for more information.',
+			"The content of your description must abide by all of Modrinth's <rules>Content Rules</rules>.",
 	},
 	updated: { id: 'project.settings.description.updated', defaultMessage: 'Description updated' },
 	updatedText: {
@@ -152,6 +219,19 @@ const messages = defineMessages({
 		defaultMessage: 'Your description has been updated.',
 	},
 })
+const guidelines = computed(() => [
+	messages.explainAppeal,
+	isServerProject.value ? messages.explainServerPlay : messages.explainUse,
+	messages.showGallery,
+	messages.accessibleFormatting,
+])
+const mistakes = computed(() => [
+	isServerProject.value ? messages.avoidServerAssumptions : messages.avoidAssumptions,
+	messages.avoidMisleadingClaims,
+	isServerProject.value ? messages.avoidServerRepetition : messages.avoidRepetition,
+	messages.avoidAi,
+])
+
 const aiImageWarningModal = useTemplateRef('aiImageWarningModal')
 
 const {

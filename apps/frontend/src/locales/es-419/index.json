@@ -4061,9 +4061,6 @@
   "project.settings.editing-project": {
     "message": "Editando un proyecto {projectType}"
   },
-  "project.settings.license.all-rights": {
-    "message": "Todos los derechos reservados/Sin licencia"
-  },
   "project.settings.license.allow-later": {
     "message": "Permitir ediciones posteriores"
   },
@@ -4090,9 +4087,6 @@
   },
   "project.settings.license.url": {
     "message": "URL de la licencia"
-  },
-  "project.settings.license.url-description": {
-    "message": "La ubicación web del texto completo de la licencia. Si no proporcionas un link, el texto de la licencia se mostrará en su lugar."
   },
   "project.settings.links.add-link": {
     "message": "Añadir link"
@@ -4325,9 +4319,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Etiquetas destacadas"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Selecciona las etiquetas más relevantes. Estas se mostrarán primero que las demás etiquetas."
-  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} categorías} other {Categorías}}"
   },
@@ -4351,15 +4342,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Selecciona al menos una categoría para destacar una categoría."
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "Has seleccionado {count} etiquetas. Considera reducirlas a 8 o menos para mantener tu proyecto enfocado y que sea más fácil de descubrir."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "Has seleccionado {count} etiquetas. Considera reducirlas a 18 o menos para mantener tu servidor enfocado y que sea más fácil de descubrir."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "Has seleccionado {count} etiquetas. Considera reducirlas a 12 o menos para mantener tu servidor enfocado y que sea más fácil de descubrir."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Sube versiones antes de añadir etiquetas"

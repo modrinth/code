@@ -4232,9 +4232,6 @@
   "project.settings.editing-project": {
     "message": "Редактирование проекта {projectType}"
   },
-  "project.settings.license.all-rights": {
-    "message": "Все права защищены/Без лицензии"
-  },
   "project.settings.license.allow-later": {
     "message": "Допускать более поздние версии"
   },
@@ -4253,9 +4250,6 @@
   "project.settings.license.name": {
     "message": "Название лицензии"
   },
-  "project.settings.license.optional-url": {
-    "message": "Ссылка на лицензию (необязательно)"
-  },
   "project.settings.license.select": {
     "message": "Лицензия"
   },
@@ -4273,9 +4267,6 @@
   },
   "project.settings.license.url": {
     "message": "Ссылка на лицензию"
-  },
-  "project.settings.license.url-description": {
-    "message": "Расположение полного текста лицензии. Если ссылка не указана, будет отображаться текст лицензии."
   },
   "project.settings.links.add-link": {
     "message": "Добавить ссылку"
@@ -4516,9 +4507,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Ключевые теги"
-  },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Выберите наиболее подходящие теги. Они видны первыми."
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types}: категории} other {Категории}}"

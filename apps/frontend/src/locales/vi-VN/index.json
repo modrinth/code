@@ -3923,9 +3923,6 @@
   "project.settings.editing-project": {
     "message": "Đang chỉnh sửa dự án {projectType}"
   },
-  "project.settings.license.all-rights": {
-    "message": "Bảo lưu mọi quyền/Không có giấy phép"
-  },
   "project.settings.license.allow-later": {
     "message": "Cho phép các phiên bản giấy phép mới hơn"
   },
@@ -3952,9 +3949,6 @@
   },
   "project.settings.license.url": {
     "message": "URL giấy phép"
-  },
-  "project.settings.license.url-description": {
-    "message": "Địa chỉ web chứa toàn bộ nội dung giấy phép. Nếu bạn không cung cấp liên kết, nội dung giấy phép sẽ được hiển thị thay thế."
   },
   "project.settings.links.add-link": {
     "message": "Thêm liên kết"
@@ -4187,9 +4181,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Thẻ nổi bật"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Chọn các thẻ phù hợp nhất. Những thẻ này sẽ được hiển thị trước các thẻ còn lại."
-  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} danh mục} other {Danh mục}}"
   },
@@ -4213,15 +4204,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Chọn ít nhất một danh mục để có thể đặt danh mục nổi bật."
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "Bạn đã chọn {count} thẻ. Hãy cân nhắc giảm xuống còn 8 thẻ trở xuống để dự án tập trung hơn và dễ được tìm thấy."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "Bạn đã chọn {count} thẻ. Vui lòng giảm xuống còn 18 thẻ trở xuống để máy chủ tập trung hơn và dễ được tìm thấy."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "Bạn đã chọn {count} thẻ. Hãy cân nhắc giảm xuống còn 12 thẻ trở xuống để máy chủ tập trung hơn và dễ được tìm thấy."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Tải phiên bản lên trước khi thêm thẻ"

@@ -19,6 +19,7 @@ import { computed, nextTick, onMounted, useTemplateRef, watch } from 'vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import { projectQueryOptions } from '~/composables/queries/project'
 import { removeSelfFromTeam } from '~/helpers/teams.js'
+import { projectCopyType } from '~/utils/project-messages'
 
 import SettingsSection from '../settings-section.vue'
 import InviteDialog from './invite-modal.vue'
@@ -62,6 +63,11 @@ const auth = await useAuth()
 const currentUserId = computed(() => auth.value.user?.id)
 
 const messages = defineMessages({
+	membersHelp: {
+		id: 'project.settings.members.access-help',
+		defaultMessage:
+			'Members have access to this {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} even when private, and can modify the project page if assigned permissions by the owner.',
+	},
 	addMember: {
 		id: 'project.settings.members.add-member',
 		defaultMessage: 'Add member',
@@ -588,7 +594,10 @@ const canLeaveProject = computed(() =>
 			@confirm="remove"
 		/>
 		<div class="flex flex-col gap-8">
-			<SettingsSection :title="formatMessage(commonProjectSettingsMessages.members)">
+			<SettingsSection
+				:title="formatMessage(commonProjectSettingsMessages.members)"
+				:subtitle="formatMessage(messages.membersHelp, { contentType: projectCopyType(projectV3) })"
+			>
 				<template v-if="canManageInvites" #actions>
 					<Button type="colored" color="brand" @click="inviteDialog?.show()">
 						<UserPlusIcon /> {{ formatMessage(messages.addMember) }}

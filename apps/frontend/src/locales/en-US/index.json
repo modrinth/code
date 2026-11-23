@@ -1409,26 +1409,14 @@
   "create.project.url-label": {
     "message": "URL"
   },
-  "create.project.visibility-approval-description": {
-    "message": "Takes effect once approved. Until then, only project members can see the project."
-  },
   "create.project.visibility-private": {
     "message": "Private"
-  },
-  "create.project.visibility-private-description": {
-    "message": "Not publicly visible. Only accessible to project members."
   },
   "create.project.visibility-public": {
     "message": "Public"
   },
-  "create.project.visibility-public-description": {
-    "message": "Visible via URL, on your profile, and in search."
-  },
   "create.project.visibility-unlisted": {
     "message": "Unlisted"
-  },
-  "create.project.visibility-unlisted-description": {
-    "message": "Visible via URL only. Not shown on your profile or in search."
   },
   "create.restricted-alert.description": {
     "message": "A moderator has removed this permission from your account."
@@ -4340,26 +4328,59 @@
   "project.settings.delete-project.title": {
     "message": "Delete project"
   },
-  "project.settings.description.guidance-ai": {
-    "message": "Do not use AI to generate a description. Descriptions must be accurate, and AI tends to make up things that aren’t true about your project."
-  },
-  "project.settings.description.guidance-intro": {
-    "message": "Project descriptions must make a clear and honest attempt at describing what your project does so that anyone who comes across your project can understand what it adds, changes, or removes before downloading it."
-  },
-  "project.settings.description.guidance-rules": {
-    "message": "Please refer to Section 2.1 of Modrinth’s <rules>Content Rules</rules> for more information."
-  },
   "project.settings.description.guidance-title": {
     "message": "What makes a good description?"
   },
-  "project.settings.description.guidance-translation": {
-    "message": "If your description is in a language other than English, an English translation must also be available unless the project is only meant to be used in a particular language, such as a translation pack. Use of machine translation such as <deepl>DeepL</deepl> is allowed."
+  "project.settings.description.guidance.accessible-formatting": {
+    "message": "Make proper use of formatting and be accessible to all users."
+  },
+  "project.settings.description.guidance.avoid-ai": {
+    "message": "Do NOT rely on AI-generated text, as AI is likely to be inaccurate or create unappealing descriptions that users will avoid."
+  },
+  "project.settings.description.guidance.avoid-assumptions": {
+    "message": "Do NOT assume users already understand your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} or its functionality."
+  },
+  "project.settings.description.guidance.avoid-misleading-claims": {
+    "message": "Do NOT make hyperbolic or misleading claims, or otherwise attempt to deceive users."
+  },
+  "project.settings.description.guidance.avoid-repetition": {
+    "message": "Do NOT add repetitive or unnecessary information, such as installation instructions, unless unique to the {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}."
+  },
+  "project.settings.description.guidance.avoid-server-assumptions": {
+    "message": "Do NOT assume players already understand your server or its functionality."
+  },
+  "project.settings.description.guidance.avoid-server-repetition": {
+    "message": "Do NOT add repetitive or unnecessary information, such as joining instructions, unless unique to the server."
+  },
+  "project.settings.description.guidance.content-rules": {
+    "message": "The content of your description must abide by all of Modrinth's <rules>Content Rules</rules>."
+  },
+  "project.settings.description.guidance.explain-appeal": {
+    "message": "Explain what makes your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} interesting."
+  },
+  "project.settings.description.guidance.explain-server-play": {
+    "message": "Explain how players can play on your server."
+  },
+  "project.settings.description.guidance.explain-use": {
+    "message": "Explain how your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} can be used or played with."
+  },
+  "project.settings.description.guidance.guidelines-heading": {
+    "message": "Great descriptions follow a few key guidelines:"
+  },
+  "project.settings.description.guidance.introduction": {
+    "message": "The description is the most important part of your project page and will be the deciding factor for someone choosing to download your content! A good description must explain the content, purpose, and appeal of your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} to new users."
+  },
+  "project.settings.description.guidance.mistakes-heading": {
+    "message": "Avoid these common mistakes:"
+  },
+  "project.settings.description.guidance.server-introduction": {
+    "message": "The description is the most important part of your server page and will be the deciding factor for someone choosing to join your server! A good description must explain the content, purpose, and appeal of your server to new players."
+  },
+  "project.settings.description.guidance.show-gallery": {
+    "message": "Showcase images from the Gallery, if applicable."
   },
   "project.settings.description.placeholder": {
     "message": "Describe your project..."
-  },
-  "project.settings.description.subtitle": {
-    "message": "Explain what your project does, how to install it, and what it works with."
   },
   "project.settings.description.title": {
     "message": "Description"
@@ -4583,6 +4604,9 @@
   "project.settings.gallery.delete-title": {
     "message": "Are you sure you want to delete this gallery image?"
   },
+  "project.settings.gallery.discovery-image-help": {
+    "message": "Upload screenshots from your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}. Setting a featured image determines what image is shown in the Discovery card. AI-generated images are not allowed."
+  },
   "project.settings.gallery.edit-title": {
     "message": "Edit gallery item"
   },
@@ -4616,26 +4640,41 @@
   "project.settings.gallery.upload-title": {
     "message": "Add to gallery"
   },
-  "project.settings.license.all-rights": {
-    "message": "All Rights Reserved/No License"
+  "project.settings.general.limited-visibility-help": {
+    "message": "Moderation has limited this {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s visibility to {maximumVisibility}. Your changes will only take effect if approved after <checklist-link>resubmitting the {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}</checklist-link>."
+  },
+  "project.settings.general.reduced-visibility-help": {
+    "message": "Visibility only affects how users find your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}. Your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} can still be played by users who’ve installed it."
+  },
+  "project.settings.general.slug-help": {
+    "message": "The end of your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s URL (aka the slug) can be customized to suit the {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}. This should match your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s name if possible."
+  },
+  "project.settings.license.all-rights-reserved": {
+    "message": "All Rights Reserved"
+  },
+  "project.settings.license.all-rights-reserved-help": {
+    "message": "No license provided, you reserve all rights to this {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} unless explicitly granted."
   },
   "project.settings.license.allow-later": {
     "message": "Allow later editions"
   },
+  "project.settings.license.creator-use-help": {
+    "message": "The {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s license governs how other creators can use your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}."
+  },
   "project.settings.license.custom": {
     "message": "Custom"
+  },
+  "project.settings.license.custom-full-text-help": {
+    "message": "This should take users directly to the full text of your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s License."
   },
   "project.settings.license.custom-name-invalid": {
     "message": "Custom license names can only contain letters, numbers, periods, and hyphens."
   },
+  "project.settings.license.custom-terms-help": {
+    "message": "Link to this {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s unique licensing terms."
+  },
   "project.settings.license.custom-type": {
     "message": "Custom license"
-  },
-  "project.settings.license.custom-type-description": {
-    "message": "Link to your own non-standard license."
-  },
-  "project.settings.license.custom-url-help": {
-    "message": "The web location of the full license text."
   },
   "project.settings.license.example-url-placeholder": {
     "message": "https://example.com/license.txt"
@@ -4652,8 +4691,8 @@
   "project.settings.license.later-description": {
     "message": "The license you selected has an \"or later\" clause. If you check this box, users may use your project under later editions of the license."
   },
-  "project.settings.license.link-own-copy": {
-    "message": "Use a link to the license instead of the license text below."
+  "project.settings.license.link-to-standard-text": {
+    "message": "Link to the full text of your license, instead of displaying the standard license text below."
   },
   "project.settings.license.name": {
     "message": "License name"
@@ -4664,14 +4703,8 @@
   "project.settings.license.none-listed": {
     "message": "None listed."
   },
-  "project.settings.license.none-type": {
-    "message": "No license"
-  },
-  "project.settings.license.none-type-description": {
-    "message": "You reserve all rights to your work unless you explicitly grant them."
-  },
-  "project.settings.license.optional-url": {
-    "message": "License URL (optional)"
+  "project.settings.license.remove-url": {
+    "message": "Remove license URL"
   },
   "project.settings.license.select": {
     "message": "License"
@@ -4679,11 +4712,14 @@
   "project.settings.license.select-placeholder": {
     "message": "Search licenses..."
   },
+  "project.settings.license.standard-options-help": {
+    "message": "Pick from a list of commonly used licenses."
+  },
   "project.settings.license.standard-type": {
     "message": "Standard license"
   },
-  "project.settings.license.standard-type-description": {
-    "message": "Pick one of the commonly used SPDX licenses."
+  "project.settings.license.standard-url-help": {
+    "message": "If your license text is not a copy of the {license}, you may want to select Custom License instead."
   },
   "project.settings.license.summary-attribution": {
     "message": "This summary is provided by <source-link>Choose a License</source-link> and is not legal advice."
@@ -4724,9 +4760,6 @@
   "project.settings.license.url": {
     "message": "License URL"
   },
-  "project.settings.license.url-description": {
-    "message": "The web location of the full license text. If you don't provide a link, the license text will be displayed instead."
-  },
   "project.settings.license.what-it-means": {
     "message": "What it means"
   },
@@ -4745,6 +4778,9 @@
   "project.settings.links.donation-platform": {
     "message": "Platform"
   },
+  "project.settings.links.donation-platforms-help": {
+    "message": "Link to platforms where you accept donations for your work on this content."
+  },
   "project.settings.links.donation-url": {
     "message": "URL"
   },
@@ -4759,6 +4795,12 @@
   },
   "project.settings.links.donations-description": {
     "message": "Add donation links for users to support you directly."
+  },
+  "project.settings.links.donations-empty-state": {
+    "message": "Donation links let users support you directly."
+  },
+  "project.settings.links.external-resources-help": {
+    "message": "Link to external resources that give users more information about your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}."
   },
   "project.settings.links.issues": {
     "message": "Issue tracker"
@@ -4819,6 +4861,9 @@
   },
   "project.settings.links.wiki-description": {
     "message": "A page containing information, documentation, and help for the project."
+  },
+  "project.settings.members.access-help": {
+    "message": "Members have access to this {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} even when private, and can modify the project page if assigned permissions by the owner."
   },
   "project.settings.members.access.admin": {
     "message": "Admin"
@@ -5318,8 +5363,8 @@
   "project.settings.tags.all-tags-selected-warning": {
     "message": "You've selected all {count} available tags. Please select only the tags that truly apply to your project."
   },
-  "project.settings.tags.description": {
-    "message": "Help people find your project when they filter search results in Discover. Choose up to {count}."
+  "project.settings.tags.discovery-help": {
+    "message": "Help users find your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} when filtering in Discovery on Modrinth or the Modrinth App."
   },
   "project.settings.tags.feature-tag": {
     "message": "Feature {tag}"
@@ -5327,8 +5372,8 @@
   "project.settings.tags.featured-tags": {
     "message": "Featured tags"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Shown on your project’s card in Discover search results. Choose up to 3."
+  "project.settings.tags.featured-tags-discovery-help": {
+    "message": "Shown on your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s Discovery card, pick up to {count, number} selected tags that best represent this {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}."
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} categories} other {Categories}}"
@@ -5357,17 +5402,14 @@
   "project.settings.tags.select-at-least-one-category": {
     "message": "Select at least one category to feature."
   },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "You've selected {count} tags. Consider reducing to 8 or fewer to keep your project focused and easier to discover."
+  "project.settings.tags.server-limit-warning": {
+    "message": "You've selected {count} tags. Please reduce to {limit, number} or fewer to keep your server focused and easier to discover."
   },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "You've selected {count} tags. Please reduce to 18 or fewer to keep your server focused and easier to discover."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "You've selected {count} tags. Consider reducing to 12 or fewer to keep your server focused and easier to discover."
+  "project.settings.tags.upload-version-first.description": {
+    "message": "Come back once you've uploaded your first version"
   },
   "project.settings.tags.upload-version-first.heading": {
-    "message": "Upload versions before adding tags"
+    "message": "Upload a version first"
   },
   "project.settings.versions.empty.create": {
     "message": "Create version"
@@ -5380,6 +5422,9 @@
   },
   "project.slug-suggestions.label": {
     "message": "Suggestions:"
+  },
+  "project.summary.discovery-help": {
+    "message": "The summary is shown in your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s Discovery card and project page. It should provide an appealing introduction to your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}."
   },
   "project.summary.search-description": {
     "message": "One sentence shown under your project name in search results."
@@ -5434,6 +5479,18 @@
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Version {version_name}} other {Versions}} withheld due to unknown embedded content"
+  },
+  "project.visibility.initial-review-help": {
+    "message": "This {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} still needs to be approved by Moderation. Until then, only members can see it. When ready, you may submit this {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} for review."
+  },
+  "project.visibility.private.discovery-description": {
+    "message": "Only visible to project members. Does not appear in Discovery."
+  },
+  "project.visibility.public.discovery-description": {
+    "message": "Visible for Discovery on Modrinth, the Modrinth App, and search engines."
+  },
+  "project.visibility.unlisted.discovery-description": {
+    "message": "Visible to anyone with a link. Only appears in the Modrinth App if installed."
   },
   "report.already-reported": {
     "message": "You've already reported {title}"

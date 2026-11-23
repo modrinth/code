@@ -2906,9 +2906,6 @@
   "project.notification.updated.title": {
     "message": "Projeto atualizado"
   },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "Selecionaste {count} marcadores. Considera reduzir para 12 ou menos para manter o foco do servidor e torná-lo mais fácil de descobrir."
-  },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Carrega versões antes de adicionar marcadores"
   },

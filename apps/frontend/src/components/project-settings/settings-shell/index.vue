@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { injectProjectPageContext } from '@modrinth/ui'
-import { ref } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 
 import ProjectModerationDrawer from '~/components/ui/project-settings/project-moderation-drawer/index.vue'
 import SidebarPageLayout from '~/components/ui/SidebarPageLayout.vue'
@@ -10,7 +10,8 @@ import SettingsSidebar from './sidebar.vue'
 
 const { currentMember, projectV3 } = injectProjectPageContext()
 const settingsRoot = ref<HTMLElement | null>(null)
-provideProjectSettingsNavigation(settingsRoot)
+const moderationDrawer = useTemplateRef('moderationDrawer')
+provideProjectSettingsNavigation(settingsRoot, () => moderationDrawer.value?.show('moderation'))
 
 const drawerPinned = ref(false)
 </script>
@@ -21,7 +22,11 @@ const drawerPinned = ref(false)
 		class="project-settings mb-8 flex w-full flex-col gap-4"
 		:class="{ 'settings-with-review': drawerPinned }"
 	>
-		<ProjectModerationDrawer v-if="currentMember && projectV3" @pinned="drawerPinned = $event" />
+		<ProjectModerationDrawer
+			v-if="currentMember && projectV3"
+			ref="moderationDrawer"
+			@pinned="drawerPinned = $event"
+		/>
 		<SidebarPageLayout>
 			<template #sidebar>
 				<SettingsSidebar />
@@ -42,7 +47,6 @@ const drawerPinned = ref(false)
 }
 
 .project-settings :deep(.settings-section-title) {
-	margin: 0 0 12px;
 	@apply text-2xl font-semibold text-contrast;
 }
 

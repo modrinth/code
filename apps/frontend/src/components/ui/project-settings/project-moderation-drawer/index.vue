@@ -74,8 +74,10 @@ const {
 	state: publishingState,
 	submitting,
 } = injectProjectPublishing()
-const showChecklist = computed(() =>
-	isProjectChecklistVisible(publishingState.value, remaining.value),
+const showChecklist = computed(
+	() =>
+		projectV3.value.status === 'withheld' ||
+		isProjectChecklistVisible(publishingState.value, remaining.value),
 )
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
@@ -317,6 +319,8 @@ function show(target?: DrawerView) {
 	nextTick(() => panel.value?.focus())
 }
 
+defineExpose({ show })
+
 function openPublishingDetails() {
 	switch (publishingState.value) {
 		case 'review':
@@ -401,7 +405,7 @@ useEventListener('keydown', (event) => {
 </script>
 
 <template>
-	<div ref="anchor">
+	<div ref="anchor" class="empty:hidden">
 		<ProjectPublishingBanner
 			v-if="!bannerDismissed"
 			:state="publishingState"

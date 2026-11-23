@@ -8,11 +8,15 @@
 		/>
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<div class="flex min-w-0 flex-col gap-8">
-			<section v-for="section in linkSections" :key="section.id" class="min-w-0">
-				<div class="mb-3 flex flex-wrap items-center justify-between gap-3">
-					<h2 class="settings-section-title !mb-0">{{ section.title }}</h2>
+			<SettingsSection
+				v-for="section in linkSections"
+				:key="section.id"
+				:title="section.title"
+				:subtitle="section.description"
+				class="min-w-0"
+			>
+				<template v-if="section.id === 'donations' && section.rows.length > 0" #actions>
 					<TeleportOverflowMenu
-						v-if="section.id === 'donations' && section.rows.length > 0"
 						:options="donationPlatformOptions"
 						:label="formatMessage(messages.addLink)"
 						:disabled="saving || !hasPermission || donationPlatformOptions.length === 0"
@@ -23,7 +27,7 @@
 						<PlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.addLink) }}
 					</TeleportOverflowMenu>
-				</div>
+				</template>
 				<Table
 					:columns="section.columns"
 					:data="section.rows"
@@ -34,7 +38,7 @@
 						<span class="ml-3.5">{{ column.label }}</span>
 					</template>
 					<template #empty-state>
-						<EmptyState :description="formatMessage(messages.donationsDescription)" class="my-4">
+						<EmptyState :description="formatMessage(messages.donationsEmptyState)" class="my-4">
 							<template #actions>
 								<TeleportOverflowMenu
 									:options="donationPlatformOptions"
@@ -132,7 +136,7 @@
 						</div>
 					</template>
 				</Table>
-			</section>
+			</SettingsSection>
 		</div>
 		<ValidationMessage :check="otherSaveMessages" class="my-4" />
 		<UnsavedChangesPopup
@@ -181,7 +185,9 @@ import {
 	toggleDonationInput,
 } from '~/helpers/donation-links'
 import { normalizeProjectUrl } from '~/helpers/project-url'
+import { projectCopyType } from '~/utils/project-messages'
 
+import SettingsSection from '../settings-section.vue'
 import { messages } from './messages'
 
 type EditableLinkField = 'discord' | 'issues' | 'site' | 'source' | 'store' | 'wiki'
@@ -311,6 +317,7 @@ const linkSections = computed(() => [
 	{
 		id: 'links',
 		title: formatMessage(messages.title),
+		description: formatMessage(messages.linksHelp, { contentType: projectCopyType(project.value) }),
 		columns: linkColumns.value,
 		rows: linkRows.value.filter((row) => row.field),
 	},
@@ -320,6 +327,7 @@ const linkSections = computed(() => [
 				{
 					id: 'donations',
 					title: formatMessage(messages.donations),
+					description: formatMessage(messages.donationsHelp),
 					columns: linkColumns.value.map((column) => ({
 						...column,
 						label: formatMessage(

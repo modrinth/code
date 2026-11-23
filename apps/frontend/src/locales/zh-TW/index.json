@@ -4217,9 +4217,6 @@
   "project.settings.editing-project": {
     "message": "正在編輯{projectType}專案"
   },
-  "project.settings.license.all-rights": {
-    "message": "版權所有／無授權條款"
-  },
   "project.settings.license.allow-later": {
     "message": "允許較新版本"
   },
@@ -4238,9 +4235,6 @@
   "project.settings.license.name": {
     "message": "授權條款名稱"
   },
-  "project.settings.license.optional-url": {
-    "message": "授權條款網址（可選）"
-  },
   "project.settings.license.select": {
     "message": "授權條款"
   },
@@ -4258,9 +4252,6 @@
   },
   "project.settings.license.url": {
     "message": "授權條款網址"
-  },
-  "project.settings.license.url-description": {
-    "message": "授權條款全文的網址。如果不提供連結，則會直接顯示授權條款文字。"
   },
   "project.settings.links.add-link": {
     "message": "新增連結"
@@ -4505,9 +4496,6 @@
   "project.settings.tags.featured-tags": {
     "message": "精選標籤"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "請選擇最相關的標籤。這些標籤會顯示在其他標籤之前。"
-  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types}類別} other {類別}}"
   },
@@ -4531,15 +4519,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "請選擇至少一個類別再選擇精選標籤。"
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "你選擇了 {count} 個標籤。請考慮減少到 8 個或更少，以確保你的專案主題更明確，並更容易被搜尋到。"
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "你選擇了 {count} 個標籤。請減少到 18 個或更少，以確保你的伺服器主題更明確，並更容易被搜尋到。"
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "你選擇了 {count} 個標籤。請考慮減少到 12 個或更少，以確保你的伺服器主題更明確，並更容易被搜尋到。"
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "請先上傳版本再新增標籤"

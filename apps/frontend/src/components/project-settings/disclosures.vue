@@ -20,6 +20,8 @@ import { useDisclosureEditor } from '~/components/ui/project-settings/disclosure
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 
+import SettingsSection from './settings-section.vue'
+
 const {
 	projectV2: project,
 	projectV3,
@@ -90,32 +92,33 @@ const { isPending, isError, refetch } = disclosuresQuery
 			]"
 			class="mb-4"
 		/>
-		<h2 class="settings-section-title">{{ formatMessage(messages.title) }}</h2>
-		<p class="mb-4 mt-2">
-			<IntlFormatted :message-id="messages.description">
-				<template #rules="{ children }">
-					<nuxt-link
-						to="/legal/rules"
-						target="_blank"
-						class="text-blue hover:underline focus-visible:underline"
-					>
-						<component :is="() => normalizeChildren(children)" />
-					</nuxt-link>
-				</template>
-			</IntlFormatted>
-			{{ ' ' }}
-			<IntlFormatted :message-id="messages.description2">
-				<template #faq-link="{ children }">
-					<a
-						href="https://support.modrinth.com/en/articles/16567675#h_29503820b1"
-						target="_blank"
-						class="text-blue hover:underline focus-visible:underline"
-					>
-						<component :is="() => normalizeChildren(children)" />
-					</a>
-				</template>
-			</IntlFormatted>
-		</p>
+		<SettingsSection :title="formatMessage(messages.title)" class="mb-4">
+			<template #subtitle>
+				<IntlFormatted :message-id="messages.description">
+					<template #rules="{ children }">
+						<nuxt-link
+							to="/legal/rules"
+							target="_blank"
+							class="text-blue hover:underline focus-visible:underline"
+						>
+							<component :is="() => normalizeChildren(children)" />
+						</nuxt-link>
+					</template>
+				</IntlFormatted>
+				{{ ' ' }}
+				<IntlFormatted :message-id="messages.description2">
+					<template #faq-link="{ children }">
+						<a
+							href="https://support.modrinth.com/en/articles/16567675#h_29503820b1"
+							target="_blank"
+							class="text-blue hover:underline focus-visible:underline"
+						>
+							<component :is="() => normalizeChildren(children)" />
+						</a>
+					</template>
+				</IntlFormatted>
+			</template>
+		</SettingsSection>
 		<ValidationMessage
 			class="mb-4"
 			:check="[...disclosureValidation, ...disclosureTextValidation]"

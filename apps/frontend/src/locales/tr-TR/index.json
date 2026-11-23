@@ -4088,9 +4088,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Öne çıkan etiketler"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Görsel özellik etiketlerinizi seçin. Bunlar diğer etiketlerinizin önünde görüntülenir."
-  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select,yes {{types} kategorileri}other {Kategoriler}}"
   },
@@ -4105,15 +4102,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Bir kategoriyi öne çıkarmak için en az bir kategori seçin."
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "{count} adet etiket seçtiniz. Sunucunuzun odağını korumak ve daha kolay bulunmasını sağlamak için lütfen bu sayıyı 8 veya daha azına indirmeyi düşünün."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "{count} adet etiket seçtiniz. Sunucunuzun odağını korumak ve daha kolay bulunmasını sağlamak için lütfen bu sayıyı 18 veya daha azına indirin."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "{count} adet etiket seçtiniz. Sunucunuzun odağını korumak ve daha kolay bulunmasını sağlamak için bu sayıyı 12 veya daha azına indirmeyi düşünün."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Etiket eklemeden önce sürümleri yükleyin"

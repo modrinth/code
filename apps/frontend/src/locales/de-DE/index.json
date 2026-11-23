@@ -4247,9 +4247,6 @@
   "project.settings.editing-project": {
     "message": "{projectType}-Projekt bearbeiten"
   },
-  "project.settings.license.all-rights": {
-    "message": "Alle Rechte vorbehalten/Keine Lizenz"
-  },
   "project.settings.license.allow-later": {
     "message": "Spätere Ausgaben zulassen"
   },
@@ -4268,9 +4265,6 @@
   "project.settings.license.name": {
     "message": "Lizenzname"
   },
-  "project.settings.license.optional-url": {
-    "message": "Lizenz-URL (optional)"
-  },
   "project.settings.license.select": {
     "message": "Lizenz"
   },
@@ -4288,9 +4282,6 @@
   },
   "project.settings.license.url": {
     "message": "Lizenz-URL"
-  },
-  "project.settings.license.url-description": {
-    "message": "Die Webadresse des vollständigen Lizenztextes. Falls du keinen Link angibst, wird stattdessen der Lizenztext angezeigt."
   },
   "project.settings.links.add-link": {
     "message": "Link hinzufügen"
@@ -4535,9 +4526,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Hervorgehobene Tags"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Wähle deine relevantesten Tags aus. Diese werden vor den übrigen Tags angezeigt."
-  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} Kategorien} other {Kategorien}}"
   },
@@ -4561,15 +4549,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Wähle mindestens eine Kategorie aus, um eine Kategorie hervorzuheben."
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "Du hast {count} Tags ausgewählt. Wir empfehlen dir, die Anzahl auf maximal 8 zu reduzieren, damit dein Projekt übersichtlich bleibt und leichter gefunden werden kann."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "Du hast {count} Tags ausgewählt. Bitte reduziere die Anzahl auf maximal 18, damit dein Server übersichtlich bleibt und leichter gefunden werden kann."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "Du hast {count} Tags ausgewählt. Wir empfehlen dir, die Anzahl auf 12 oder weniger zu reduzieren, damit dein Server übersichtlich bleibt und leichter gefunden werden kann."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Lade Versionen hoch, bevor du Tags hinzufügst"

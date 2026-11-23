@@ -1,9 +1,7 @@
 <template>
 	<AnalyticsDashboard>
 		<template #title>
-			<h2 class="settings-section-title !mb-0">
-				{{ formatMessage(commonProjectSettingsMessages.analytics) }}
-			</h2>
+			<SettingsSection :title="formatMessage(commonProjectSettingsMessages.analytics)" />
 		</template>
 	</AnalyticsDashboard>
 </template>
@@ -12,6 +10,8 @@
 import { commonProjectSettingsMessages, useVIntl } from '@modrinth/ui'
 
 import AnalyticsDashboard from '~/components/analytics-dashboard/index.vue'
+
+import SettingsSection from './settings-section.vue'
 
 const { formatMessage } = useVIntl()
 </script>

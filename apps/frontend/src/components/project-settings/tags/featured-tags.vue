@@ -10,8 +10,10 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 
+import SettingsSection from '../settings-section.vue'
 defineProps<{
 	project: Labrinth.Projects.v2.Project
+	contentType: string
 	selectedTags: string[]
 	featuredTags: string[]
 	maxFeaturedTags: number
@@ -26,8 +28,9 @@ const messages = defineMessages({
 		defaultMessage: 'Featured tags',
 	},
 	featuredTagsDescription: {
-		id: 'project.settings.tags.featured-tags-select-description',
-		defaultMessage: 'Shown on your project’s card in Discover search results. Choose up to 3.',
+		id: 'project.settings.tags.featured-tags-discovery-help',
+		defaultMessage:
+			'Shown on your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s Discovery card, pick up to {count, number} selected tags that best represent this {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}.',
 	},
 	selectAtLeastOneCategory: {
 		id: 'project.settings.tags.select-at-least-one-category',
@@ -38,13 +41,13 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<section>
-		<h3 class="m-0 mb-2.5 text-xl font-semibold text-contrast">
-			{{ formatMessage(messages.featuredTags) }}
-		</h3>
-		<p class="mb-3 mt-0">
-			{{ formatMessage(messages.featuredTagsDescription) }}
-		</p>
+	<SettingsSection
+		:title="formatMessage(messages.featuredTags)"
+		:subtitle="
+			formatMessage(messages.featuredTagsDescription, { contentType, count: maxFeaturedTags })
+		"
+		heading="h3"
+	>
 		<div class="settings-content-card flex flex-col gap-4">
 			<div class="min-h-10">
 				<p v-if="selectedTags.length < 1" class="m-0 my-2 text-secondary">
@@ -80,5 +83,5 @@ const messages = defineMessages({
 				:followers="project.followers"
 			/>
 		</div>
-	</section>
+	</SettingsSection>
 </template>

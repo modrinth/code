@@ -3626,9 +3626,6 @@
   "project.settings.editing-project": {
     "message": "Ändrar {projectType}projekt"
   },
-  "project.settings.license.all-rights": {
-    "message": "Alla rättigheter förbehållna/Ingen licens"
-  },
   "project.settings.license.allow-later": {
     "message": "Tillåt senare versioner"
   },
@@ -3637,9 +3634,6 @@
   },
   "project.settings.license.name": {
     "message": "Licensnamn"
-  },
-  "project.settings.license.optional-url": {
-    "message": "Licens-URL (valfritt)"
   },
   "project.settings.license.select": {
     "message": "Licens"
@@ -3811,9 +3805,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Nyckeltaggar"
-  },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Markera dina mest relevanta taggar. De syns före resten av dina taggar."
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} kategorier} other {Kategorier}}"

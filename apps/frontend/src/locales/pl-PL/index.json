@@ -4157,9 +4157,6 @@
   "project.settings.editing-project": {
     "message": "Edytowanie projektu: {projectType}"
   },
-  "project.settings.license.all-rights": {
-    "message": "Wszelkie prawa zastrzeżone/brak licencji"
-  },
   "project.settings.license.allow-later": {
     "message": "Zezwalaj na późniejsze edycje"
   },
@@ -4174,9 +4171,6 @@
   },
   "project.settings.license.name": {
     "message": "Nazwa licencji"
-  },
-  "project.settings.license.optional-url": {
-    "message": "Adres URL licencji (opcjonalne)"
   },
   "project.settings.license.select": {
     "message": "Licencja"
@@ -4195,9 +4189,6 @@
   },
   "project.settings.license.url": {
     "message": "Adres URL licencji"
-  },
-  "project.settings.license.url-description": {
-    "message": "Strona zawierająca pełny tekst licencji. Jeśli nie podasz linku, wyświetlony zostanie tekst licencji."
   },
   "project.settings.links.add-link": {
     "message": "Dodaj link"
@@ -4433,9 +4424,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Wyróżnione tagi"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Wybierz najważniejsze tagi. Są one wyświetlane przed resztą tagów."
-  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} kategorie} other {Kategorie}}"
   },
@@ -4459,15 +4447,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Wybierz co najmniej jedną kategorię, aby móc korzystać z kategorii."
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "Wybrałeś {count} tagów. Rozważ zmniejszenie ich do 8 lub mniej, aby Twój serwer był konkretny i łatwiejszy do odkrycia."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "Wybrałeś {count} tagów. Rozważ zmniejszenie ich do 18 lub mniej, aby Twój serwer był konkretny i łatwiejszy do odkrycia."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "Wybrałeś {count} tagów. Rozważ zmniejszenie ich do 12 lub mniej, aby Twój serwer był konkretny i łatwiejszy do odkrycia."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Prześlij wersje przed dodaniem tagów"

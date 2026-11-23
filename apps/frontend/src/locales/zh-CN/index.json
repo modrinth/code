@@ -4247,9 +4247,6 @@
   "project.settings.editing-project": {
     "message": "编辑 {projectType} 项目"
   },
-  "project.settings.license.all-rights": {
-    "message": "保留所有权利/无许可证"
-  },
   "project.settings.license.allow-later": {
     "message": "允许后续版本"
   },
@@ -4268,9 +4265,6 @@
   "project.settings.license.name": {
     "message": "许可证名称"
   },
-  "project.settings.license.optional-url": {
-    "message": "许可证URL(可选)"
-  },
   "project.settings.license.select": {
     "message": "许可证"
   },
@@ -4288,9 +4282,6 @@
   },
   "project.settings.license.url": {
     "message": "许可证 URL"
-  },
-  "project.settings.license.url-description": {
-    "message": "完整许可证文本的网址。如果你不提供链接，将改为显示许可证文本。"
   },
   "project.settings.links.add-link": {
     "message": "添加链接"
@@ -4535,9 +4526,6 @@
   "project.settings.tags.featured-tags": {
     "message": "精选标签"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "选择您最相关的标签，这些标签将显示在您其余标签之前。"
-  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types}类别} other {类别}}"
   },
@@ -4561,15 +4549,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "请先至少选择一个分类，再设置精选分类。"
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "你选择了 {count} 个标签。建议将数量减少到 8 个或更少，以确保你的项目主题更明确，且更容易发现。"
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "你选择了 {count} 个标签。请将数量减少到 18 个或更少，以确保你的服务器主题更明确，且更容易发现。"
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "你选择了 {count} 个标签。建议将数量减少到 12 个或更少，以确保你的服务器主题更明确，且更容易发现。"
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "添加标签前上传版本"

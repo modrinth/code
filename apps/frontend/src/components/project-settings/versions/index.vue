@@ -69,9 +69,7 @@
 		>
 			<template #heading>
 				<div class="flex w-full flex-col gap-3">
-					<h2 class="settings-section-title !mb-0">
-						{{ formatMessage(commonProjectSettingsMessages.versions) }}
-					</h2>
+					<SettingsSection :title="formatMessage(commonProjectSettingsMessages.versions)" />
 					<ValidationMessage :check="environmentValidation" />
 				</div>
 			</template>
@@ -277,6 +275,7 @@ import { promptAuth } from '~/composables/auth-modal.ts'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
+import SettingsSection from '../settings-section.vue'
 import VersionsEmptyState from './empty-state.vue'
 
 const route = useRoute()

@@ -4199,9 +4199,6 @@
   "project.settings.editing-project": {
     "message": "Modification d'un {projectType}"
   },
-  "project.settings.license.all-rights": {
-    "message": "Tous droits réservés / Aucune licence"
-  },
   "project.settings.license.allow-later": {
     "message": "Autoriser les éditions futures"
   },
@@ -4213,9 +4210,6 @@
   },
   "project.settings.license.name": {
     "message": "Nom de la licence"
-  },
-  "project.settings.license.optional-url": {
-    "message": "URL de la licence (optionnel)"
   },
   "project.settings.license.select": {
     "message": "Licence"
@@ -4454,9 +4448,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Tags mis en avant"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Sélectionnez vos tags les plus pertinents. Ils sont affichés avant le reste de vos tags."
-  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} catégories} other {Catégories}}"
   },
@@ -4480,15 +4471,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Sélectionnez au moins une catégorie afin de pouvoir mettre en avant une catégorie."
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "Vous avez sélectionné {count} tags. Considérez réduire à 8 ou moins pour garder votre projet concis et plus facile à découvrir."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "Vous avez sélectionné {count} tags. Merci de réduire à 18 ou moins pour garder votre serveur concis et plus facile à découvrir."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "Vous avez sélectionné {count} tags. Considérez réduire à 12 ou moins pour garder votre serveur concis et plus facile à découvrir."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Téléversez des versions avant d'ajouter des tags"

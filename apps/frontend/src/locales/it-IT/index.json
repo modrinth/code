@@ -4247,9 +4247,6 @@
   "project.settings.editing-project": {
     "message": "Modifica {projectType}"
   },
-  "project.settings.license.all-rights": {
-    "message": "Tutti i diritti riservati/Nessuna licenza"
-  },
   "project.settings.license.allow-later": {
     "message": "Ammetti le edizioni successive"
   },
@@ -4268,9 +4265,6 @@
   "project.settings.license.name": {
     "message": "Nome della licenza"
   },
-  "project.settings.license.optional-url": {
-    "message": "URL della licenza (opzionale)"
-  },
   "project.settings.license.select": {
     "message": "Licenza"
   },
@@ -4288,9 +4282,6 @@
   },
   "project.settings.license.url": {
     "message": "URL della licenza"
-  },
-  "project.settings.license.url-description": {
-    "message": "La posizione web del testo completo della licenza. Se non fornisci un link, verrà mostrato il testo della licenza invece."
   },
   "project.settings.links.add-link": {
     "message": "Aggiungi collegamento"
@@ -4535,9 +4526,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Tag in evidenza"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Seleziona i tag più pertinenti. Questi sono mostrati prima degli altri tag."
-  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types}: categorie} other {Categorie}}"
   },
@@ -4561,15 +4549,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Seleziona almeno una categoria per metterla in evidenza."
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "Hai selezionato {count} tag. Dovresti tenerne al massimo 8, così che il tuo progetto rimanga più facile da individuare."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "Hai selezionato {count} tag. Tienine al massimo 18, così che il tuo server rimanga più facile da individuare."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "Hai selezionato {count} tag. Dovresti tenerne al massimo 12, così che il tuo server rimanga più facile da individuare."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Carica una versione prima di aggiungere i tag"

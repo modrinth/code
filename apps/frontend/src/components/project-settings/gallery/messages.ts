@@ -22,6 +22,11 @@ export const messages = defineMessages({
 		defaultMessage: '{filename} must be a PNG, JPEG, GIF, or WebP image.',
 	},
 	editTitle: { id: 'project.settings.gallery.edit-title', defaultMessage: 'Edit gallery item' },
+	galleryHelp: {
+		id: 'project.settings.gallery.discovery-image-help',
+		defaultMessage:
+			'Upload screenshots from your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}. Setting a featured image determines what image is shown in the Discovery card. AI-generated images are not allowed.',
+	},
 	emptyDescription: {
 		id: 'project.settings.gallery.empty-description',
 		defaultMessage: 'Upload your first gallery image.',

@@ -76,17 +76,25 @@
 					<Chips
 						v-model="visibility"
 						:items="visibilityOptions"
-						:format-label="(option) => formatMessage(visibilityLabels[option])"
-						:format-tooltip="(option) => formatMessage(visibilityDescriptions[option])"
+						:format-label="(option) => formatMessage(projectVisibilityOptions[option].label)"
+						:format-tooltip="
+							(option) => formatMessage(projectVisibilityOptions[option].description)
+						"
 						:aria-labelledby="labelId"
-						:aria-describedby="`${visibilityId}-description`"
+						:aria-describedby="visibility !== 'private' ? visibilityId : undefined"
 						:capitalize="false"
 						:disabled-items="hasHitLimit ? visibilityOptions : undefined"
 					/>
 				</template>
 				<template #bottom>
-					<p :id="`${visibilityId}-description`" class="mb-0 mt-2 text-sm text-secondary">
-						{{ formatMessage(projectVisibilityApprovalHelp) }}
+					<p
+						v-if="visibility !== 'private'"
+						:id="visibilityId"
+						class="mb-0 mt-2 text-sm text-secondary"
+					>
+						{{
+							formatMessage(projectMessages.visibilityApprovalHelp, { contentType: projectType })
+						}}
 					</p>
 				</template>
 			</Field>
@@ -136,7 +144,11 @@ import {
 	useProjectSlugSuggestions,
 	useSlugSuggestionVisibility,
 } from '~/composables/project-slug-suggestions'
-import { projectSummaryHelp, projectVisibilityApprovalHelp } from '~/utils/project-messages'
+import {
+	projectMessages,
+	projectSummaryHelp,
+	projectVisibilityOptions,
+} from '~/utils/project-messages'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
 import RestrictedActionAlert from './RestrictedActionAlert.vue'
@@ -195,30 +207,6 @@ const messages = defineMessages({
 		id: 'create.project.create-project',
 		defaultMessage: 'Create project',
 	},
-	visibilityPublic: {
-		id: 'create.project.visibility-public',
-		defaultMessage: 'Public',
-	},
-	visibilityPublicDescription: {
-		id: 'create.project.visibility-public-description',
-		defaultMessage: 'Visible via URL, on your profile, and in search.',
-	},
-	visibilityUnlisted: {
-		id: 'create.project.visibility-unlisted',
-		defaultMessage: 'Unlisted',
-	},
-	visibilityUnlistedDescription: {
-		id: 'create.project.visibility-unlisted-description',
-		defaultMessage: 'Visible via URL only. Not shown on your profile or in search.',
-	},
-	visibilityPrivate: {
-		id: 'create.project.visibility-private',
-		defaultMessage: 'Private',
-	},
-	visibilityPrivateDescription: {
-		id: 'create.project.visibility-private-description',
-		defaultMessage: 'Not publicly visible. Only accessible to project members.',
-	},
 	missingFieldsTooltip: {
 		id: 'create.project.missing-fields-tooltip',
 		defaultMessage: 'Missing fields: {fields}',
@@ -255,18 +243,8 @@ const projectType = ref<ProjectType>('project')
 const owner = ref<string | undefined>('self')
 const organizations = ref<Labrinth.Projects.v3.Organization[]>([])
 const visibilityId = useId()
-const visibilityLabels = {
-	approved: messages.visibilityPublic,
-	unlisted: messages.visibilityUnlisted,
-	private: messages.visibilityPrivate,
-}
-const visibilityDescriptions = {
-	approved: messages.visibilityPublicDescription,
-	unlisted: messages.visibilityUnlistedDescription,
-	private: messages.visibilityPrivateDescription,
-}
-type Visibility = keyof typeof visibilityLabels
-const visibilityOptions: Visibility[] = ['approved', 'unlisted', 'private']
+type Visibility = keyof typeof projectVisibilityOptions
+const visibilityOptions = Object.keys(projectVisibilityOptions) as Visibility[]
 const visibility = ref<Visibility>('approved')
 
 const disableCreate = computed(() => {

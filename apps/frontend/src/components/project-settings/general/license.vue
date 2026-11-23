@@ -1,6 +1,10 @@
 <template>
-	<div id="license" data-project-field="license">
-		<h2 class="settings-section-title">{{ formatMessage(messages.title) }}</h2>
+	<SettingsSection
+		id="license"
+		data-project-field="license"
+		:title="formatMessage(messages.title)"
+		:subtitle="formatMessage(messages.licenseHelp, { contentType: projectCopyType(projectV3) })"
+	>
 		<section class="universal-card settings-content-card flex flex-col gap-6">
 			<ProjectIssueCard
 				target="modify_license"
@@ -23,7 +27,9 @@
 							max-width="250px"
 							:value="option.value"
 							:label="formatMessage(option.label)"
-							:description="formatMessage(option.description)"
+							:description="
+								formatMessage(option.description, { contentType: projectCopyType(projectV3) })
+							"
 							:icon="option.icon"
 							:disabled="saving || !hasPermission"
 						/>
@@ -39,6 +45,19 @@
 					/>
 				</template>
 			</Field>
+			<Button
+				v-if="
+					licenseType === 'none' &&
+					saved.license.short === 'All-Rights-Reserved' &&
+					saved.licenseUrl
+				"
+				type="outlined"
+				class="self-start"
+				:disabled="saving || !hasPermission || !current.licenseUrl"
+				@click="clearLicenseUrl"
+			>
+				{{ formatMessage(messages.removeUrl) }}
+			</Button>
 			<Field
 				v-if="licenseType === 'standard'"
 				:label="formatMessage(messages.select)"
@@ -63,6 +82,7 @@
 					:disabled="saving || !hasPermission"
 					trigger-type="base"
 					:show-chevron="false"
+					search-autocomplete="off"
 					class="w-full max-w-[384px]"
 				/>
 				<template #bottom>
@@ -124,7 +144,7 @@
 			</Field>
 
 			<div
-				v-if="current.license.friendly"
+				v-if="licenseType === 'custom' || (licenseType === 'standard' && selectedLicense)"
 				id="project-settings-field-license-url"
 				data-project-field="license-url"
 				class="flex min-w-0 max-w-[600px] flex-col gap-2"
@@ -137,35 +157,32 @@
 				/>
 				<Field
 					v-if="licenseType !== 'standard' || current.useStandardLicenseUrl"
-					:label="formatMessage(licenseUrlMessages.url)"
+					:label="formatMessage(messages.url)"
 					input-id="license-url"
-					:label-optional="licenseType === 'none'"
 				>
 					<template v-if="licenseType === 'standard'" #label>
-						<span class="sr-only">{{ formatMessage(licenseUrlMessages.url) }}</span>
+						<span class="sr-only">{{ formatMessage(messages.url) }}</span>
 					</template>
 					<Input
 						id="license-url"
 						v-model="current.licenseUrl"
 						type="url"
 						:maxlength="2048"
-						:placeholder="
-							formatMessage(
-								licenseType === 'none' ? licenseUrlMessages.optionalUrl : messages.urlPlaceholder,
-							)
-						"
-						:required="licenseType === 'standard'"
-						:disabled="saving || !hasPermission || licenseId === 'LicenseRef-Unknown'"
-						wrapper-class="w-full"
+						:placeholder="formatMessage(messages.urlPlaceholder)"
+						required
+						:disabled="saving || !hasPermission"
+						:wrapper-class="licenseType === 'standard' ? 'w-full max-w-[384px]' : 'w-full'"
 					/>
 					<template #bottom>
-						<p v-if="licenseType !== 'standard'" class="mb-0 mt-2 text-sm text-secondary">
+						<p class="mb-0 mt-2 text-sm text-secondary">
 							{{
-								formatMessage(
-									current.license.friendly === 'Custom'
-										? licenseUrlMessages.customUrlDescription
-										: licenseUrlMessages.urlDescription,
-								)
+								licenseType === 'standard'
+									? formatMessage(messages.standardUrlHelp, {
+											license: licenseDisplayName(current.license),
+										})
+									: formatMessage(messages.customUrlHelp, {
+											contentType: projectCopyType(projectV3),
+										})
 							}}
 						</p>
 						<ValidationMessage
@@ -203,10 +220,12 @@
 				"
 				class="my-4"
 			/>
-			<section v-if="licenseSummary" aria-labelledby="license-meaning-title">
-				<h3 id="license-meaning-title" class="mb-3 mt-0 text-base font-semibold text-contrast">
-					{{ formatMessage(messages.whatItMeans) }}
-				</h3>
+			<SettingsSection
+				v-if="licenseSummary"
+				:title="formatMessage(messages.whatItMeans)"
+				title-id="license-meaning-title"
+				heading="h3"
+			>
 				<div class="rounded-xl border border-solid border-surface-4 bg-surface-2 p-4">
 					<p class="mb-4 mt-0 leading-relaxed">{{ licenseSummary.description }}</p>
 					<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -247,11 +266,13 @@
 						</template>
 					</IntlFormatted>
 				</p>
-			</section>
-			<section v-if="showLicenseText" aria-labelledby="license-text-title">
-				<h3 id="license-text-title" class="mb-3 mt-0 text-base font-semibold text-contrast">
-					{{ formatMessage(messages.licenseText) }}
-				</h3>
+			</SettingsSection>
+			<SettingsSection
+				v-if="showLicenseText"
+				:title="formatMessage(messages.licenseText)"
+				title-id="license-text-title"
+				heading="h3"
+			>
 				<div
 					class="group/license-text relative rounded-xl border border-solid border-surface-4 bg-surface-2 px-1 py-4"
 					:aria-busy="loadingLicense"
@@ -289,7 +310,11 @@
 					ref="licenseTextModal"
 					:header="formatMessage(messages.licenseText)"
 					width="60rem"
-					style="box-sizing: border-box; height: min(calc(100vh - 100px), 800px)"
+					style="
+						box-sizing: border-box;
+						height: fit-content;
+						max-height: min(calc(100vh - 100px), 800px);
+					"
 					scrollable
 					max-content-height="none"
 				>
@@ -299,9 +324,9 @@
 						{{ licenseBody }}
 					</div>
 				</NewModal>
-			</section>
+			</SettingsSection>
 		</section>
-	</div>
+	</SettingsSection>
 </template>
 
 <script setup lang="ts">
@@ -315,6 +340,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Button,
 	Checkbox,
 	Combobox,
 	type ComboboxOption,
@@ -341,21 +367,41 @@ import { useProjectIssueFieldAction } from '~/composables/project-issue-field-ac
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { normalizeProjectUrl } from '~/helpers/project-url'
-import { licenseUrlMessages } from '~/utils/license-messages'
+import { projectCopyType } from '~/utils/project-messages'
 
+import SettingsSection from '../settings-section.vue'
 import {
 	getLicenseSummary,
 	type LicenseSummaryCategory,
 	licenseSummaryRules,
 } from './license-summaries'
-
-const { projectV2: project, currentMember, patchProjectV3 } = injectProjectPageContext()
+const { projectV2: project, projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const licenseTextModal = useTemplateRef('licenseTextModal')
 const messages = defineMessages({
+	url: { id: 'project.settings.license.url', defaultMessage: 'License URL' },
+	removeUrl: {
+		id: 'project.settings.license.remove-url',
+		defaultMessage: 'Remove license URL',
+	},
+	licenseHelp: {
+		id: 'project.settings.license.creator-use-help',
+		defaultMessage:
+			'The {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s license governs how other creators can use your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}.',
+	},
+	standardUrlHelp: {
+		id: 'project.settings.license.standard-url-help',
+		defaultMessage:
+			'If your license text is not a copy of the {license}, you may want to select Custom License instead.',
+	},
+	customUrlHelp: {
+		id: 'project.settings.license.custom-full-text-help',
+		defaultMessage:
+			'This should take users directly to the full text of your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s License.',
+	},
 	licenseType: {
 		id: 'project.settings.license.type',
 		defaultMessage: 'License type',
@@ -364,13 +410,14 @@ const messages = defineMessages({
 		id: 'project.settings.license.standard-type',
 		defaultMessage: 'Standard license',
 	},
-	noLicense: {
-		id: 'project.settings.license.none-type',
-		defaultMessage: 'No license',
+	allRightsReserved: {
+		id: 'project.settings.license.all-rights-reserved',
+		defaultMessage: 'All Rights Reserved',
 	},
-	noLicenseDescription: {
-		id: 'project.settings.license.none-type-description',
-		defaultMessage: 'You reserve all rights to your work unless you explicitly grant them.',
+	allRightsReservedDescription: {
+		id: 'project.settings.license.all-rights-reserved-help',
+		defaultMessage:
+			'No license provided, you reserve all rights to this {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} unless explicitly granted.',
 	},
 	customLicense: {
 		id: 'project.settings.license.custom-type',
@@ -426,18 +473,15 @@ const messages = defineMessages({
 		defaultMessage: 'Conditions',
 	},
 	standardLicenseDescription: {
-		id: 'project.settings.license.standard-type-description',
-		defaultMessage: 'Pick one of the commonly used SPDX licenses.',
+		id: 'project.settings.license.standard-options-help',
+		defaultMessage: 'Pick from a list of commonly used licenses.',
 	},
 	customLicenseDescription: {
-		id: 'project.settings.license.custom-type-description',
-		defaultMessage: 'Link to your own non-standard license.',
+		id: 'project.settings.license.custom-terms-help',
+		defaultMessage:
+			'Link to this {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s unique licensing terms.',
 	},
 	custom: { id: 'project.settings.license.custom', defaultMessage: 'Custom' },
-	allRights: {
-		id: 'project.settings.license.all-rights',
-		defaultMessage: 'All Rights Reserved/No License',
-	},
 	title: { id: 'project.settings.license.title', defaultMessage: 'License' },
 	select: {
 		id: 'project.settings.license.select',
@@ -461,8 +505,9 @@ const messages = defineMessages({
 		defaultMessage: 'Allow later editions',
 	},
 	linkOwnCopy: {
-		id: 'project.settings.license.link-own-copy',
-		defaultMessage: 'Use a link to the license instead of the license text below.',
+		id: 'project.settings.license.link-to-standard-text',
+		defaultMessage:
+			'Link to the full text of your license, instead of displaying the standard license text below.',
 	},
 	urlPlaceholder: {
 		id: 'project.settings.license.example-url-placeholder',
@@ -489,7 +534,7 @@ const messages = defineMessages({
 
 function licenseDisplayName(license: { short: string; friendly: string }) {
 	if (license.friendly === 'Custom') return formatMessage(messages.custom)
-	if (license.short === 'All-Rights-Reserved') return formatMessage(messages.allRights)
+	if (license.short === 'All-Rights-Reserved') return formatMessage(messages.allRightsReserved)
 	return license.friendly
 }
 
@@ -517,7 +562,7 @@ const availableLicenses = computed<LicenseOption[]>(() => {
 		...defaultLicenseIds.map((short) => ({
 			friendly:
 				short === 'All-Rights-Reserved'
-					? 'All Rights Reserved/No License'
+					? 'All Rights Reserved'
 					: (licensesById.get(short)?.name ?? short),
 			short,
 			requiresOnlyOrLater: orLaterLicenseIds.has(short),
@@ -616,9 +661,15 @@ const {
 )
 
 const licenseUrl = computed(() => {
+	if (licenseType.value === 'none') return null
 	if (licenseType.value === 'standard' && !current.value.useStandardLicenseUrl) return null
 	return normalizeProjectUrl(current.value.licenseUrl) || null
 })
+
+function clearLicenseUrl() {
+	current.value.licenseUrl = ''
+	current.value.useStandardLicenseUrl = false
+}
 
 const licenseSelectionValidation = useProjectNagMessages('license')
 const customLicenseValidation = useProjectNagMessages('custom-license')
@@ -753,8 +804,8 @@ const licenseTypes = [
 	{
 		value: 'none',
 		icon: LockIcon,
-		label: messages.noLicense,
-		description: messages.noLicenseDescription,
+		label: messages.allRightsReserved,
+		description: messages.allRightsReservedDescription,
 	},
 	{
 		value: 'custom',
@@ -837,7 +888,11 @@ const licenseSummaryGroups = computed(() => {
 const showLicenseText = computed(
 	() =>
 		licenseType.value === 'standard' &&
-		!current.value.useStandardLicenseUrl &&
+		!(
+			current.value.useStandardLicenseUrl &&
+			saved.value.useStandardLicenseUrl &&
+			licenseId.value === project.value.license.id
+		) &&
 		!!licenseId.value &&
 		!licenseId.value.startsWith('LicenseRef-'),
 )

@@ -1,6 +1,6 @@
 <template>
 	<AiImageWarningModal ref="aiImageWarningModal" />
-	<h2 class="settings-section-title">About</h2>
+	<SettingsSection title="About" class="mb-3" />
 	<section class="universal-card settings-content-card">
 		<div class="flex flex-col gap-6">
 			<Field
@@ -51,7 +51,7 @@
 				/>
 				<template #bottom>
 					<p class="mb-0 mt-2 text-sm text-secondary">
-						{{ formatMessage(projectSummaryHelp) }}
+						{{ formatMessage(projectMessages.summaryHelp, { contentType }) }}
 					</p>
 					<ValidationMessage
 						:check="summaryValidation"
@@ -222,6 +222,9 @@
 					</template>
 				</Input>
 				<template #bottom>
+					<p class="mb-0 mt-2 text-sm text-secondary">
+						{{ formatMessage(messages.slugHelp, { contentType }) }}
+					</p>
 					<ValidationMessage :check="saveValidation.forField('slug')" class="mt-2" />
 					<ProjectIssueCard target="modify_slug" :field-action="slugIssueAction" class="mt-2" />
 					<SlugSuggestions
@@ -233,7 +236,7 @@
 				</template>
 			</Field>
 
-			<Field id="visibility" label="Visibility" class="w-full">
+			<Field id="visibility" :label="formatMessage(commonMessages.visibilityLabel)" class="w-full">
 				<template #default="{ labelId }">
 					<div
 						role="radiogroup"
@@ -255,11 +258,25 @@
 					</div>
 				</template>
 				<template #bottom>
-					<p
-						v-if="!tags.approvedStatuses.includes(project.status)"
-						class="mb-0 mt-2 text-sm text-secondary"
-					>
-						{{ formatMessage(projectVisibilityApprovalHelp) }}
+					<p v-if="visibilityHelp" class="mb-0 mt-2 text-sm text-secondary">
+						<IntlFormatted
+							:message-id="visibilityHelp"
+							:values="{
+								contentType,
+								maximumVisibility: formatMessage(projectVisibilityOptions.unlisted.label),
+							}"
+						>
+							<template #checklist-link="{ children }">
+								<a
+									:href="checklistHref"
+									class="font-semibold text-link"
+									aria-controls="project-moderation-drawer"
+									@click.exact.prevent="openModerationChecklist"
+								>
+									<component :is="() => children" />
+								</a>
+							</template>
+						</IntlFormatted>
 					</p>
 				</template>
 			</Field>
@@ -273,6 +290,7 @@ import {
 	Avatar,
 	commonMessages,
 	commonProjectSettingsMessages,
+	defineMessages,
 	Field,
 	FileButton,
 	IconButton,
@@ -280,13 +298,14 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 	Input,
+	IntlFormatted,
 	RadioCard,
 	Textarea,
 	useFormatBytes,
 	useGlobals,
 	useVIntl,
 } from '@modrinth/ui'
-import { fileIsValid, formatProjectStatus, isAdmin } from '@modrinth/utils'
+import { fileIsValid, isAdmin } from '@modrinth/utils'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
@@ -295,19 +314,54 @@ import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
+import { injectProjectSettingsNavigation } from '~/composables/project-settings-navigation'
 import {
 	useProjectSlugSuggestions,
 	useSlugSuggestionVisibility,
 } from '~/composables/project-slug-suggestions'
 import { fileDeclaresAi } from '~/helpers/c2pa'
-import { getProjectTypeForUrl } from '~/helpers/projects.js'
-import { projectSummaryHelp, projectVisibilityApprovalHelp } from '~/utils/project-messages'
+import { getProjectTypeForUrl, isDraft, isListed } from '~/helpers/projects.js'
+import {
+	projectCopyType,
+	projectMessages,
+	projectVisibilityOptions,
+} from '~/utils/project-messages'
 
+import SettingsSection from '../settings-section.vue'
 const props = defineProps({ pageSaving: Boolean })
 
 const { data: globals } = useGlobals()
 
 const { formatMessage } = useVIntl()
+const { openModerationChecklist } = injectProjectSettingsNavigation()
+const route = useRoute()
+const router = useRouter()
+const checklistHref = computed(
+	() =>
+		router.resolve({
+			path: route.path,
+			query: { ...route.query, moderation: 'checklist' },
+			hash: route.hash,
+		}).href,
+)
+
+const messages = defineMessages({
+	slugHelp: {
+		id: 'project.settings.general.slug-help',
+		defaultMessage:
+			'The end of your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s URL (aka the slug) can be customized to suit the {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}. This should match your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s name if possible.',
+	},
+	reducedVisibilityHelp: {
+		id: 'project.settings.general.reduced-visibility-help',
+		defaultMessage:
+			'Visibility only affects how users find your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}. Your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} can still be played by users who’ve installed it.',
+	},
+	limitedVisibilityHelp: {
+		id: 'project.settings.general.limited-visibility-help',
+		defaultMessage:
+			'Moderation has limited this {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s visibility to {maximumVisibility}. Your changes will only take effect if approved after <checklist-link>resubmitting the {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}</checklist-link>.',
+	},
+})
 
 const { addNotification } = injectNotificationManager()
 const {
@@ -358,6 +412,7 @@ const visibility = ref(
 // Server project specific refs
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
 const isServerProject = computed(() => project.value?.minecraft_server != null)
+const contentType = computed(() => projectCopyType(project.value))
 const projectTypeForUrl = computed(() => {
 	if (isServerProject.value) return 'server'
 	const type = project.value.project_types?.[0] ?? 'mod'
@@ -386,29 +441,35 @@ const iconValidation = useProjectNagMessages('icon')
 const canSave = computed(() => hasPermission.value && !saveValidation.hasErrors.value)
 
 const visibilityOptions = computed(() =>
-	tags.value.approvedStatuses
-		.filter((status) => status !== 'archived')
-		.map((status) => {
-			const subLabel = () => {
-				switch (status) {
-					case 'approved':
-						return 'Visible via URL, on your profile, and in search.'
-					case 'unlisted':
-						return 'Visible via URL only. Not shown on your profile or in search.'
-					case 'private':
-						return 'Not publicly visible. Only accessible to project members.'
-					default:
-						return ''
-				}
-			}
-			return {
-				value: status,
-				label: formatProjectStatus(status),
-				subLabel: subLabel(),
-				icon: status === 'approved' ? GlobeIcon : status === 'unlisted' ? LinkIcon : LockIcon,
-			}
-		}),
+	Object.entries(projectVisibilityOptions).map(([status, option]) => ({
+		value: status,
+		label: formatMessage(option.label),
+		subLabel: formatMessage(option.description),
+		icon: status === 'approved' ? GlobeIcon : status === 'unlisted' ? LinkIcon : LockIcon,
+	})),
 )
+
+const visibilityHelp = computed(() => {
+	const { status, queued, approved } = project.value
+	if (status === 'withheld' && visibility.value === 'approved') {
+		return messages.limitedVisibilityHelp
+	}
+	if (
+		isListed(project.value) &&
+		(visibility.value === 'unlisted' || visibility.value === 'private')
+	) {
+		return messages.reducedVisibilityHelp
+	}
+	if (
+		!queued &&
+		!approved &&
+		isDraft(project.value) &&
+		(visibility.value === 'approved' || visibility.value === 'unlisted')
+	) {
+		return projectMessages.visibilityApprovalHelp
+	}
+	return undefined
+})
 
 const basePatchData = computed(() => {
 	const data = {}

@@ -2,7 +2,7 @@
 	<div data-project-field="server" data-project-field-scroll-only>
 		<ProjectIssueCard location="server" class="mb-4" />
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
-		<h2 class="settings-section-title">{{ formatMessage(messages.serverDetailsHeading) }}</h2>
+		<SettingsSection :title="formatMessage(messages.serverDetailsHeading)" class="mb-3" />
 		<section class="universal-card settings-content-card flex flex-col gap-8">
 			<div class="flex flex-col gap-6">
 				<Field
@@ -193,6 +193,7 @@ import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { useJavaServerPing } from '~/providers/manage-server-compatibility-modal'
 
+import SettingsSection from '../settings-section.vue'
 import JavaPingStatus from './java-ping-status.vue'
 import { messages } from './messages'
 

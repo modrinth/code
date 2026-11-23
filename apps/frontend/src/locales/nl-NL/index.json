@@ -4091,9 +4091,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Uitgelichte tags"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Kies je meest relevante tags. Deze worden vóór de overige tags weergegeven."
-  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} categorieën} other {Categorieën}}"
   },
@@ -4117,15 +4114,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Selecteer minstens één categorie om een categorie uit te lichten."
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "Je hebt {count} tags geselecteerd. Overweeg om dit aantal terug te brengen tot 8 of minder, zodat je project gericht blijft en gemakkelijker te vinden is."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "Je hebt {count} tags geselecteerd. Beperk dit aantal tot maximaal 18, zodat je project gericht blijft en gemakkelijker te vinden is."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "Je hebt {count} tags geselecteerd. Overweeg om dit aantal terug te brengen tot 12 of minder, zodat je project gericht blijft en gemakkelijker te vinden is."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Versies uploaden voor het toevoegen van onthullingen"

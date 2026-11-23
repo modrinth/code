@@ -4247,9 +4247,6 @@
   "project.settings.editing-project": {
     "message": "Editando projeto {projectType}"
   },
-  "project.settings.license.all-rights": {
-    "message": "Todos os direitos reservados/Sem licença"
-  },
   "project.settings.license.allow-later": {
     "message": "Permitir edições posteriores"
   },
@@ -4268,9 +4265,6 @@
   "project.settings.license.name": {
     "message": "Nome da licença"
   },
-  "project.settings.license.optional-url": {
-    "message": "URL da licença (opcional)"
-  },
   "project.settings.license.select": {
     "message": "Licença"
   },
@@ -4288,9 +4282,6 @@
   },
   "project.settings.license.url": {
     "message": "URL da licença"
-  },
-  "project.settings.license.url-description": {
-    "message": "O endereço web do texto completo da licença. Caso não forneça um link, o texto da licença será exibido em vez disso."
   },
   "project.settings.links.add-link": {
     "message": "Adicionar link"
@@ -4535,9 +4526,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Etiquetas em destaque"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Selecione suas marcações mais relevantes. Estas serão exibidas antes das outras marcações."
-  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} categorias} other {Categorias}}"
   },
@@ -4561,15 +4549,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Selecione pelo menos uma categoria para ela ser destacada."
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "Você selecionou {count} etiquetas. Considere reduzir para 8 ou menos para manter seu projeto focado e mais fácil de encontrar."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "Você selecionou {count} etiquetas. Reduzir para 18 ou menos para manter seu projeto focado e mais fácil de encontrar."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "Você selecionou {count} etiquetas. Considere reduzir para 12 ou menos para manter seu projeto focado e mais fácil de encontrar."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Enviar versões antes de adicionar tags"

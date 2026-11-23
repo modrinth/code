@@ -248,6 +248,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive, watch } from 'vue'
 
 import type { ProjectIssueFieldAction } from '~/composables/project-issue-field-action'
+import { isUnderReview } from '~/helpers/projects.js'
 import {
 	isThreadIssueFacetReadyToAddress,
 	isThreadIssueVerified,
@@ -629,6 +630,7 @@ const matchingIssues = computed(() =>
 		.filter(
 			(issue) =>
 				(props.threadHistory || !isThreadIssueVerified(issue)) &&
+				(!isUnderReview(projectContext?.projectV3.value) || !isAddressed(issue)) &&
 				(props.issues !== undefined ||
 					matchesLocation(issue) ||
 					issue.facets.some(({ what }) => matchesTarget(what))),

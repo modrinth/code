@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { PlusIcon } from '@modrinth/assets'
+import { BoxIcon, PlusIcon } from '@modrinth/assets'
 import {
 	Button,
-	commonMessages,
 	commonProjectSettingsMessages,
 	ConfirmLeaveModal,
 	defineMessages,
@@ -28,7 +27,9 @@ import { useProjectIssueFieldAction } from '~/composables/project-issue-field-ac
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { isPermission } from '~/utils/permissions'
+import { projectCopyType } from '~/utils/project-messages'
 
+import SettingsSection from '../settings-section.vue'
 import { versionActionMessages } from '../versions/messages'
 import FeaturedTags from './featured-tags.vue'
 import CategoryPicker from './tag-picker.vue'
@@ -48,12 +49,16 @@ const { formatMessage, locale } = useVIntl()
 const messages = defineMessages({
 	uploadVersionFirstHeading: {
 		id: 'project.settings.tags.upload-version-first.heading',
-		defaultMessage: 'Upload versions before adding tags',
+		defaultMessage: 'Upload a version first',
+	},
+	uploadVersionFirstDescription: {
+		id: 'project.settings.tags.upload-version-first.description',
+		defaultMessage: "Come back once you've uploaded your first version",
 	},
 	description: {
-		id: 'project.settings.tags.description',
+		id: 'project.settings.tags.discovery-help',
 		defaultMessage:
-			'Help people find your project when they filter search results in Discover. Choose up to {count}.',
+			'Help users find your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} when filtering in Discovery on Modrinth or the Modrinth App.',
 	},
 	gameplay: {
 		id: 'project.settings.tags.group-title.gameplay',
@@ -69,19 +74,9 @@ const messages = defineMessages({
 			'Select the realistic performance impact of your {type}. Select multiple if the {type} is configurable to different levels of performance impact.',
 	},
 	tooManyTagsServerHardWarning: {
-		id: 'project.settings.tags.too-many-tags-server-hard-warning',
+		id: 'project.settings.tags.server-limit-warning',
 		defaultMessage:
-			"You've selected {count} tags. Please reduce to 18 or fewer to keep your server focused and easier to discover.",
-	},
-	tooManyTagsServerSoftWarning: {
-		id: 'project.settings.tags.too-many-tags-server-soft-warning',
-		defaultMessage:
-			"You've selected {count} tags. Consider reducing to 12 or fewer to keep your server focused and easier to discover.",
-	},
-	tooManyTagsProjectWarning: {
-		id: 'project.settings.tags.too-many-tags-project-warning',
-		defaultMessage:
-			"You've selected {count} tags. Consider reducing to 8 or fewer to keep your project focused and easier to discover.",
+			"You've selected {count} tags. Please reduce to {limit, number} or fewer to keep your server focused and easier to discover.",
 	},
 	multipleResolutionTagsWarning: {
 		id: 'project.settings.tags.multiple-resolution-tags-warning',
@@ -308,7 +303,7 @@ const serverTagLimitMessage = computed(() =>
 		? {
 				severity: 'error' as const,
 				message: messages.tooManyTagsServerHardWarning,
-				values: { count: current.value.selectedTags.length },
+				values: { count: current.value.selectedTags.length, limit: MAX_SERVER_TAGS },
 			}
 		: null,
 )
@@ -414,14 +409,11 @@ const toggleFeatured = (tag: string) => {
 			ref="create-project-version-modal"
 			:enable-drop-area="false"
 		/>
-		<h2 v-if="canSelectTags" class="settings-section-title">
-			{{ formatMessage(commonProjectSettingsMessages.tags) }}
-		</h2>
 		<EmptyState
 			v-if="!canSelectTags"
-			type="no-documents"
+			:icon="BoxIcon"
 			:heading="formatMessage(messages.uploadVersionFirstHeading)"
-			:description="formatMessage(commonMessages.uploadVersionsEmptyStateDescription)"
+			:description="formatMessage(messages.uploadVersionFirstDescription)"
 		>
 			<template v-if="currentMember" #actions>
 				<Button
@@ -435,10 +427,11 @@ const toggleFeatured = (tag: string) => {
 				</Button>
 			</template>
 		</EmptyState>
-		<div v-else>
-			<p class="mb-4 mt-0 text-secondary">
-				{{ formatMessage(messages.description, { count: isServerProject ? MAX_SERVER_TAGS : 8 }) }}
-			</p>
+		<SettingsSection
+			v-else
+			:title="formatMessage(commonProjectSettingsMessages.tags)"
+			:subtitle="formatMessage(messages.description, { contentType: projectCopyType(projectV3) })"
+		>
 			<div class="mb-4 flex flex-col gap-2.5 empty:hidden">
 				<ProjectIssueCard target="remove_tags" :field-action="tagsIssueAction" />
 				<ValidationMessage :check="serverTagLimitMessage" :debounce="0" />
@@ -464,11 +457,12 @@ const toggleFeatured = (tag: string) => {
 					:selected-tags="current.selectedTags"
 					:featured-tags="current.featuredTags"
 					:max-featured-tags="MAX_FEATURED_TAGS"
+					:content-type="projectCopyType(projectV3)"
 					:disabled="!hasPermission || saving"
 					@toggle="toggleFeatured"
 				/>
 			</div>
-		</div>
+		</SettingsSection>
 		<UnsavedChangesPopup
 			:original="saved"
 			:modified="current"

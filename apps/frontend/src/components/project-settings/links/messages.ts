@@ -2,6 +2,11 @@ import { defineMessages } from '@modrinth/ui'
 
 export const messages = defineMessages({
 	title: { id: 'project.settings.links.title', defaultMessage: 'Links' },
+	linksHelp: {
+		id: 'project.settings.links.external-resources-help',
+		defaultMessage:
+			'Link to external resources that give users more information about your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}.',
+	},
 	issues: { id: 'project.settings.links.issues', defaultMessage: 'Issue tracker' },
 	issuesDescription: {
 		id: 'project.settings.links.issues-description',
@@ -44,6 +49,14 @@ export const messages = defineMessages({
 	donationsDescription: {
 		id: 'project.settings.links.donations-description',
 		defaultMessage: 'Add donation links for users to support you directly.',
+	},
+	donationsEmptyState: {
+		id: 'project.settings.links.donations-empty-state',
+		defaultMessage: 'Donation links let users support you directly.',
+	},
+	donationsHelp: {
+		id: 'project.settings.links.donation-platforms-help',
+		defaultMessage: 'Link to platforms where you accept donations for your work on this content.',
 	},
 	urlPlaceholder: {
 		id: 'project.settings.links.url-placeholder',

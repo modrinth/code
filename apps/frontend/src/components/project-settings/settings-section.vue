@@ -2,26 +2,37 @@
 defineProps<{
 	title: string
 	titleId?: string
+	subtitle?: string
 	danger?: boolean
+	heading?: 'h2' | 'h3'
 }>()
 </script>
 
 <template>
-	<section :aria-labelledby="titleId" :aria-label="titleId ? undefined : title">
-		<div v-if="$slots.actions" class="mb-3 flex items-center justify-between gap-3">
-			<h2 :id="titleId" class="settings-section-title !m-0 text-xl font-semibold text-contrast">
-				{{ title }}
-			</h2>
-			<slot name="actions" />
+	<component
+		:is="$slots.default ? 'section' : 'header'"
+		:aria-labelledby="$slots.default ? titleId : undefined"
+		:aria-label="$slots.default && !titleId ? title : undefined"
+	>
+		<div :class="{ 'mb-3': $slots.default }">
+			<div :class="{ 'flex flex-wrap items-center justify-between gap-3': $slots.actions }">
+				<component
+					:is="heading ?? 'h2'"
+					:id="titleId"
+					class="m-0 font-semibold"
+					:class="[
+						heading === 'h3' ? 'text-lg' : 'settings-section-title text-xl',
+						danger ? '!text-red' : 'text-contrast',
+					]"
+				>
+					{{ title }}
+				</component>
+				<slot name="actions" />
+			</div>
+			<p v-if="subtitle || $slots.subtitle" class="mb-0 mt-2 text-secondary">
+				<slot name="subtitle">{{ subtitle }}</slot>
+			</p>
 		</div>
-		<h2
-			v-else
-			:id="titleId"
-			class="settings-section-title mb-3 mt-0 text-xl font-semibold"
-			:class="danger ? '!text-red' : 'text-contrast'"
-		>
-			{{ title }}
-		</h2>
 		<slot />
-	</section>
+	</component>
 </template>

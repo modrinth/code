@@ -4244,9 +4244,6 @@
   "project.settings.editing-project": {
     "message": "Редагування проєкту"
   },
-  "project.settings.license.all-rights": {
-    "message": "Усі права захищено/Без ліцензії"
-  },
   "project.settings.license.allow-later": {
     "message": "Дозволити пізніші версії"
   },
@@ -4265,9 +4262,6 @@
   "project.settings.license.name": {
     "message": "Назва ліцензії"
   },
-  "project.settings.license.optional-url": {
-    "message": "URL ліцензії (необовʼязково)"
-  },
   "project.settings.license.select": {
     "message": "Ліцензія"
   },
@@ -4285,9 +4279,6 @@
   },
   "project.settings.license.url": {
     "message": "URL ліцензії"
-  },
-  "project.settings.license.url-description": {
-    "message": "Розташування повного тексту ліцензії. Якщо ви не вкажете посилання, показуватиметься текст ліцензії."
   },
   "project.settings.links.add-link": {
     "message": "Додати посилання"
@@ -4532,9 +4523,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Основні позначки"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Виберіть підхожі позначки. Їх буде показано першими."
-  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} категорії} other {Категорії}}"
   },
@@ -4558,15 +4546,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Виберіть хоча б одну категорію, щоб рекомендувати її."
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "Ви вибрали {count} позначок. Радимо зменшити їхню кількість до 8, щоб ваш проєкт можна було легше знайти."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "Ви вибрали забагато позначок ({count}). Зменште їхню кількість до 18, щоб ваш сервер можна було легше знайти."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "Ви вибрали забагато позначок ({count}). Радимо зменшити їхню кількість до 12, щоб ваш сервер було легше знайти."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Завантажте версії, перш ніж додавати позначки"

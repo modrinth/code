@@ -5,11 +5,15 @@ import { isNavigationFailure, NavigationFailureType } from 'vue-router'
 
 const [injectNavigation, provideNavigation] = createContext<{
 	reveal: (path: string, field?: string) => Promise<void>
+	openModerationChecklist: () => void
 }>('ProjectSettingsNavigation')
 
 export const injectProjectSettingsNavigation = injectNavigation
 
-export function provideProjectSettingsNavigation(root: Ref<HTMLElement | null>) {
+export function provideProjectSettingsNavigation(
+	root: Ref<HTMLElement | null>,
+	openModerationChecklist: () => void,
+) {
 	const router = useRouter()
 	let pendingField: string | undefined
 	let pendingPath: string | undefined
@@ -82,6 +86,7 @@ export function provideProjectSettingsNavigation(root: Ref<HTMLElement | null>) 
 		clearHighlight?.()
 	})
 	provideNavigation({
+		openModerationChecklist,
 		async reveal(path, field) {
 			const request = ++sequence
 			pendingField = undefined

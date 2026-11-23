@@ -3935,9 +3935,6 @@
   "project.settings.editing-project": {
     "message": "Projekt szerkesztése"
   },
-  "project.settings.license.all-rights": {
-    "message": "Minden jog fenntartva/Nincs licenc"
-  },
   "project.settings.license.allow-later": {
     "message": "Későbbi kiadások engedélyezése"
   },
@@ -3964,9 +3961,6 @@
   },
   "project.settings.license.url": {
     "message": "A licenc linkje"
-  },
-  "project.settings.license.url-description": {
-    "message": "Az internetes elérhetősége a teljes licenc tartalomnak. Ha nem adod meg az elérési utat, a licenced szövege lesz megjelenítve."
   },
   "project.settings.links.add-link": {
     "message": "Hivatkozás megadása"
@@ -4199,9 +4193,6 @@
   "project.settings.tags.featured-tags": {
     "message": "Kiemelt címkék"
   },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Válaszd ki a legrelevánsabb címkéidet. Ezek a többi címke előtt jelennek meg."
-  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} kategóriák} other {Kategóriák}}"
   },
@@ -4225,15 +4216,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Válassz ki legalább egy kategóriát ahhoz, hogy kiemelj egy kategóriát."
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "{count} címkét választottál ki. Fontold meg, hogy 8-ra vagy annál kevesebbre csökkentsd a számukat, hogy a projekted célzott maradjon és könnyebben megtalálható legyen."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "{count} címkét választottál ki. Kérjük, csökkentsd a számukat 18-ra vagy annál kevesebbre, hogy a szervered célzott maradjon és könnyebben megtalálható legyen."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "{count} címkét választottál ki. Fontold meg, hogy 12-re vagy annál kevesebbre csökkentsd a számukat, hogy a szervered célzott maradjon és könnyebben megtalálható legyen."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Tölts fel verziókat a címkék hozzáadása előtt"

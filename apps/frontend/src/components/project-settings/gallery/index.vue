@@ -2,25 +2,28 @@
 	<div data-project-field="gallery" data-project-field-scroll-only>
 		<ValidationMessage :check="galleryImagesValidation" class="mb-4" />
 		<ProjectIssueCard :target="['add_gallery_images', 'remove_gallery_images']" class="mb-4" />
-		<div v-if="filteredGallery.length" class="mb-3 flex flex-wrap items-center gap-3">
-			<h2 class="settings-section-title !mb-0">
-				{{ formatMessage(commonProjectSettingsMessages.gallery) }}
-			</h2>
-			<FileButton
-				v-if="currentMember"
-				type="colored"
-				color="brand"
-				:max-size="globals?.max_gallery_image_size"
-				:accept="acceptFileTypes"
-				multiple
-				:prompt="formatMessage(messages.upload)"
-				class="ml-auto"
-				:disabled="!canUploadGallery || galleryActionsBusy"
-				@change="handleFiles"
-			>
-				<UploadIcon aria-hidden="true" />
-			</FileButton>
-		</div>
+		<SettingsSection
+			v-if="filteredGallery.length"
+			:title="formatMessage(commonProjectSettingsMessages.gallery)"
+			:subtitle="formatMessage(messages.galleryHelp, { contentType: projectCopyType(projectV3) })"
+			class="mb-4"
+		>
+			<template v-if="currentMember" #actions>
+				<FileButton
+					type="colored"
+					color="brand"
+					:max-size="globals?.max_gallery_image_size"
+					:accept="acceptFileTypes"
+					multiple
+					:prompt="formatMessage(messages.upload)"
+					class="ml-auto"
+					:disabled="!canUploadGallery || galleryActionsBusy"
+					@change="handleFiles"
+				>
+					<UploadIcon aria-hidden="true" />
+				</FileButton>
+			</template>
+		</SettingsSection>
 		<DropArea v-if="canUploadGallery" accept="" @change="handleFiles" />
 		<AiImageWarningModal ref="aiImageWarningModal" />
 		<Modal
@@ -165,20 +168,20 @@
 		</div>
 		<EmptyState
 			v-else
-			type="no-images"
+			:icon="ImageIcon"
 			:heading="formatMessage(messages.emptyHeading)"
-			:description="canUploadGallery ? formatMessage(messages.emptyDescription) : undefined"
-			class="py-10"
+			:description="formatMessage(messages.emptyDescription)"
 		>
-			<template v-if="canUploadGallery" #actions>
+			<template #actions>
 				<FileButton
 					type="colored"
 					color="green"
+					size="lg"
 					:max-size="globals?.max_gallery_image_size"
 					:accept="acceptFileTypes"
 					multiple
 					:prompt="formatMessage(messages.upload)"
-					:disabled="galleryActionsBusy"
+					:disabled="!canUploadGallery || galleryActionsBusy"
 					@change="handleFiles"
 				>
 					<UploadIcon aria-hidden="true" />
@@ -189,7 +192,15 @@
 </template>
 
 <script setup>
-import { EditIcon, PlusIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from '@modrinth/assets'
+import {
+	EditIcon,
+	ImageIcon,
+	PlusIcon,
+	SaveIcon,
+	TrashIcon,
+	UploadIcon,
+	XIcon,
+} from '@modrinth/assets'
 import {
 	Button,
 	commonMessages,
@@ -219,7 +230,9 @@ import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { isPermission } from '~/utils/permissions.ts'
+import { projectCopyType } from '~/utils/project-messages'
 
+import SettingsSection from '../settings-section.vue'
 import { messages } from './messages'
 
 const { data: globals } = useGlobals()

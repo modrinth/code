@@ -15,6 +15,8 @@ import ProjectPermissions from '~/components/ui/project-settings/modpack-permiss
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 
+import SettingsSection from './settings-section.vue'
+
 const auth = await useAuth()
 const flags = useFeatureFlags()
 const isModerator = computed(
@@ -40,9 +42,10 @@ const openImageInNewTab = defineMessage({
 			:refresh-project-validation="refreshProjectValidation"
 		>
 			<template #heading>
-				<h2 class="settings-section-title">
-					{{ formatMessage(commonProjectSettingsMessages.permissions) }}
-				</h2>
+				<SettingsSection
+					:title="formatMessage(commonProjectSettingsMessages.permissions)"
+					class="mb-3"
+				/>
 			</template>
 			<template #image-viewer-actions="{ item }">
 				<ButtonLink
