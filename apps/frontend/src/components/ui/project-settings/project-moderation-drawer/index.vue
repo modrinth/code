@@ -465,7 +465,10 @@ useEventListener('keydown', (event) => {
 										class="transition-[filter] duration-150 group-hover/checklist-heading:brightness-125 motion-reduce:transition-none"
 										>{{ group.title }}</span
 									>
-									<TagItem as="span" class="relative bottom-px !bg-surface-4 !py-px !text-xs">
+									<TagItem
+										as="span"
+										class="relative bottom-px !bg-surface-4 !px-1.5 !py-px !text-xs"
+									>
 										{{ group.items.length + (group.title === 'TODO' ? issueItems.length : 0) }}
 									</TagItem>
 									<DropdownIcon

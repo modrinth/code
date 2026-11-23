@@ -4,7 +4,11 @@
 			<ProjectBackgroundGradient :project="project" />
 		</Teleport>
 		<template v-if="isSettings">
-			<div v-if="canAccessSettings" class="normal-page no-sidebar" :class="`align-${marginTarget}`">
+			<div
+				v-if="canAccessSettings"
+				class="normal-page no-sidebar project-settings-page"
+				:class="`align-${marginTarget}`"
+			>
 				<div class="normal-page__header mb-6">
 					<PageHeader :title="project.title" :row-class="'items-center'">
 						<template #leading>
@@ -2519,13 +2523,15 @@ provideProjectPageContext({
 </script>
 
 <style lang="scss" scoped>
-.normal-page.no-sidebar > .normal-page__header {
-	padding-right: var(--project-settings-panel-offset, 0px);
-	transition: padding-right 240ms cubic-bezier(0.16, 1, 0.3, 1);
+@media (min-width: 1280px) {
+	.project-settings-page {
+		margin-right: max(var(--project-settings-drawer-space, 0px), (100% - 80rem) / 2);
+		transition: margin-right 240ms cubic-bezier(0.16, 1, 0.3, 1);
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.normal-page.no-sidebar > .normal-page__header {
+	.project-settings-page {
 		transition: none;
 	}
 }

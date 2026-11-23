@@ -59,21 +59,4 @@ const drawerPinned = ref(false)
 		padding: 16px;
 	}
 }
-
-.project-settings {
-	box-sizing: border-box;
-	transition: padding-right 240ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.project-settings {
-		transition: none;
-	}
-}
-
-@media (min-width: 1280px) {
-	.settings-with-review {
-		padding-right: var(--project-settings-panel-offset, 0px);
-	}
-}
 </style>

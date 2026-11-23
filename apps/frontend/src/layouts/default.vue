@@ -1607,12 +1607,12 @@ function changeTheme() {
 
 @media (min-width: 1280px) {
 	.layout:has(.settings-with-review) {
-		--project-settings-panel-offset: max(0px, calc(406px - (100vw - 1280px) / 2));
+		--project-settings-drawer-space: 406px;
 	}
 
-	.desktop-navigation {
-		padding-right: calc(1.5rem + var(--project-settings-panel-offset, 0px));
-		transition: padding-right 240ms cubic-bezier(0.16, 1, 0.3, 1);
+	.layout > .desktop-navigation {
+		margin-right: max(var(--project-settings-drawer-space, 0px), (100% - 1280px) / 2);
+		transition: margin-right 240ms cubic-bezier(0.16, 1, 0.3, 1);
 	}
 }
 
@@ -1628,7 +1628,7 @@ function changeTheme() {
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.desktop-navigation {
+	.layout > .desktop-navigation {
 		transition: none;
 	}
 }
