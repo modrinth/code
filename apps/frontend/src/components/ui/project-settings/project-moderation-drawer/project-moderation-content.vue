@@ -123,17 +123,16 @@ const prefixedThread = computed(() => {
 	}
 	const projectDate = project.value?.queued ?? project.value?.approved ?? project.value?.published
 	if (projectDate && dayjs(projectDate).isBefore(dayjs(THREADS_RELEASE_DATE))) {
-		const newThread = { ...ownerThread, messages: [...ownerThread.messages] }
-		newThread.messages.unshift({
+		const legacyMessage = {
 			id: '69',
 			author_id: null,
 			body: {
-				type: 'legacy_project_message',
+				type: 'legacy_project_message' as const,
 			},
 			created: THREADS_RELEASE_DATE,
 			hide_identity: false,
-		})
-		return newThread
+		}
+		return { ...ownerThread, messages: [legacyMessage, ...ownerThread.messages] }
 	}
 	return ownerThread
 })

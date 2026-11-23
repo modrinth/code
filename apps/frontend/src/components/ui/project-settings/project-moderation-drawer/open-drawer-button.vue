@@ -34,15 +34,11 @@ const showChecklist = computed(() => isProjectChecklistVisible(props.state, prop
 
 const trigger = ref<HTMLButtonElement>()
 
-function focusTrigger() {
-	trigger.value?.focus()
-}
-
 function onPointerMove(event: PointerEvent) {
 	if (event.pointerType === 'mouse' && event.buttons === 0) emit('hover')
 }
 
-defineExpose({ focusTrigger })
+defineExpose({ element: trigger })
 </script>
 
 <template>

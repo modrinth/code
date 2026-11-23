@@ -62,6 +62,7 @@
 					select-search-text-on-focus
 					:disabled="saving || !hasPermission"
 					trigger-type="base"
+					:show-chevron="false"
 					class="w-full max-w-[600px]"
 				/>
 				<template #bottom>

@@ -32,6 +32,7 @@ import {
 	injectProjectPageContext,
 	OverlayScrollArea,
 	Tabs,
+	TagItem,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -169,12 +170,19 @@ const { data: disclosures } = useQuery(
 )
 const anchor = ref<HTMLElement>()
 const teleportTarget = ref<HTMLElement>()
+const ownerDocument = computed(() => teleportTarget.value?.ownerDocument)
 onMounted(() => {
 	teleportTarget.value = anchor.value?.ownerDocument.body
 })
+const drawerArea = ref<HTMLElement>()
 const panel = ref<HTMLElement>()
 const launcher = ref<InstanceType<typeof OpenDrawerButton>>()
-watch([open, pinned], () => emit('pinned', open.value && pinned.value))
+const launcherElement = computed(() => launcher.value?.element)
+let closeOnPageHover = false
+watch([open, pinned], ([isOpen, isPinned]) => {
+	if (!isOpen) closeOnPageHover = false
+	emit('pinned', isOpen && isPinned)
+})
 const issues = computed(() =>
 	publishingIssues.value.map(({ source, verdict }) => {
 		const message = source.why?.message ?? ''
@@ -276,8 +284,16 @@ const groups = computed(() => [
 		items: nags.value.filter((nag) => nag.severity === 'suggestion'),
 	},
 ])
-function onItemClick(event: MouseEvent, path: string, field?: string) {
-	if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+function onItemClick(event: MouseEvent, path: string | undefined, field?: string) {
+	if (
+		!path ||
+		event.button !== 0 ||
+		event.metaKey ||
+		event.ctrlKey ||
+		event.shiftKey ||
+		event.altKey
+	)
+		return
 	event.preventDefault()
 	if (!pinned.value) open.value = false
 	void settingsNavigation.reveal(path.replace(/#.*$/, ''), field)
@@ -289,10 +305,15 @@ function show(target?: DrawerView) {
 	nextTick(() => panel.value?.focus())
 }
 
+function showOnHover() {
+	closeOnPageHover = true
+	open.value = true
+}
+
 function close() {
 	const focused = panel.value?.contains(panel.value.ownerDocument.activeElement)
 	open.value = false
-	if (focused) nextTick(() => launcher.value?.focusTrigger())
+	if (focused) nextTick(() => launcherElement.value?.focus())
 }
 watch(
 	() => route.query.moderation,
@@ -313,13 +334,24 @@ watch(
 const modalSelector = '[data-modal-root], [aria-modal="true"]'
 const popoverSelector = '[role="menu"], [data-popper-placement], .v-popper__inner'
 
-function onDrawerPointerLeave(event: PointerEvent) {
-	if (event.pointerType !== 'mouse' || !open.value || pinned.value) return
-	if (panel.value?.ownerDocument.querySelector(modalSelector)) return
-	if ((event.relatedTarget as Element | null)?.closest?.(popoverSelector)) return
+useEventListener<PointerEvent>(
+	ownerDocument,
+	'pointermove',
+	(event) => {
+		if (event.pointerType !== 'mouse' || !open.value || !drawerArea.value) return
+		if (event.composedPath().includes(drawerArea.value)) {
+			closeOnPageHover = true
+			return
+		}
+		if (!closeOnPageHover || pinned.value || ownerDocument.value?.querySelector(modalSelector))
+			return
+		if (event.clientX >= drawerArea.value.getBoundingClientRect().left) return
+		if ((event.target as Element | null)?.closest?.(popoverSelector)) return
 
-	close()
-}
+		close()
+	},
+	{ capture: true },
+)
 
 onClickOutside(
 	panel,
@@ -327,7 +359,7 @@ onClickOutside(
 		if (!pinned.value) open.value = false
 	},
 	{
-		ignore: [launcher, anchor, modalSelector, popoverSelector],
+		ignore: [launcherElement, anchor, modalSelector, popoverSelector],
 	},
 )
 useEventListener('keydown', (event) => {
@@ -365,12 +397,12 @@ useEventListener('keydown', (event) => {
 			:remaining="remaining"
 			controls="project-moderation-drawer"
 			@open="show()"
-			@hover="open = true"
+			@hover="showOnHover"
 		/>
 		<div
+			ref="drawerArea"
 			class="fixed bottom-0 right-0 top-0 z-40 w-full max-w-[400px]"
 			:class="open ? 'pointer-events-auto' : 'pointer-events-none'"
-			@pointerleave="onDrawerPointerLeave"
 		>
 			<Transition name="moderation-drawer" appear>
 				<aside
@@ -426,19 +458,19 @@ useEventListener('keydown', (event) => {
 								:key="group.title"
 								open-by-default
 								class="mb-4 last:mb-0"
-								button-class="group/checklist-heading m-0 flex w-full cursor-pointer items-center gap-2 border-0 bg-transparent px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-primary"
+								button-class="group/checklist-heading m-0 flex w-full cursor-pointer items-center gap-1.5 border-0 bg-transparent px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-primary"
 							>
 								<template #button="{ open: expanded }">
 									<span
 										class="transition-[filter] duration-150 group-hover/checklist-heading:brightness-125 motion-reduce:transition-none"
 										>{{ group.title }}</span
 									>
-									<span class="rounded-md bg-surface-2 px-1.5 py-0.5">{{
-										group.items.length + (group.title === 'TODO' ? issueItems.length : 0)
-									}}</span
-									><DropdownIcon
+									<TagItem as="span" class="relative bottom-px !bg-surface-4 !py-px !text-xs">
+										{{ group.items.length + (group.title === 'TODO' ? issueItems.length : 0) }}
+									</TagItem>
+									<DropdownIcon
 										class="ml-auto size-4 transition-[transform,filter] duration-300 group-hover/checklist-heading:brightness-125 motion-reduce:transition-none"
-										:class="{ '-rotate-90': !expanded }"
+										:class="{ 'rotate-180': expanded }"
 									/>
 								</template>
 								<template v-if="group.title === 'TODO'">
@@ -488,7 +520,7 @@ useEventListener('keydown', (event) => {
 												:href="href"
 												class="absolute inset-0 rounded-lg focus-visible:outline focus-visible:outline-brand"
 												:aria-label="`View issue: ${issue.title}`"
-												@click="onItemClick($event, destination.fullPath, issue.highlightField)"
+												@click="onItemClick($event, destination?.fullPath, issue.highlightField)"
 											/>
 										</NuxtLink>
 									</div>
@@ -557,7 +589,7 @@ useEventListener('keydown', (event) => {
 										<a
 											:href="href"
 											class="absolute inset-0 rounded-lg text-transparent focus-visible:outline focus-visible:outline-brand"
-											@click="onItemClick($event, destination.fullPath, nag.highlightField)"
+											@click="onItemClick($event, destination?.fullPath, nag.highlightField)"
 											>{{
 												typeof nag.link.title === 'string'
 													? nag.link.title
@@ -573,11 +605,13 @@ useEventListener('keydown', (event) => {
 							>
 								<template #button="{ open: expanded }">
 									{{ formatMessage(messages.completed) }}
-									<span>{{ completedItems.length }}</span>
+									<TagItem as="span" class="relative bottom-px !bg-surface-4 !py-px !text-xs">
+										{{ completedItems.length }}
+									</TagItem>
 									<DropdownIcon
 										aria-hidden="true"
 										class="ml-auto size-4 transition-transform duration-300 motion-reduce:transition-none"
-										:class="{ '-rotate-90': !expanded }"
+										:class="{ 'rotate-180': expanded }"
 									/>
 								</template>
 								<ul class="m-0 list-none p-0">

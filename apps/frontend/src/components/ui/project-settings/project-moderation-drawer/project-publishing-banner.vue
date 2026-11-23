@@ -187,6 +187,7 @@ const summaryCopy = computed(() => {
 				id: 'project.publishing.changes.checklist.title',
 				defaultMessage: '{count, plural, one {# item} other {# items}} left to resubmit',
 			}),
+			body: undefined,
 		}
 	}
 	if (props.state === 'review') {
