@@ -3,20 +3,23 @@ import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckIcon,
 	ChevronRightIcon,
+	CircleAlertIcon,
 	CircleDashedIcon,
 	CircleIcon,
 	DropdownIcon,
 	ListTodoIcon,
+	MessageSquareWarningIcon,
 	MessagesSquareIcon,
 	PinIcon,
+	RightArrowIcon,
 	SendIcon,
-	TriangleAlertIcon,
 	XCircleIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	getProjectNagCategory,
 	nagDefinitions,
+	nagDestinations,
 	normalizeProjectNagKind,
 	toProjectNag,
 } from '@modrinth/moderation'
@@ -187,43 +190,43 @@ const issues = computed(() =>
 	publishingIssues.value.map(({ source, verdict }) => {
 		const message = source.why?.message ?? ''
 		const heading = message.match(/^\s*#{1,6}\s+(.+)(?:\r?\n|$)/)
+		const field = issueHighlightField(source)
 		return {
+			id: source.id,
 			source,
 			verdict,
+			to: field ? settingsDestination(projectIssueSettingsPath(field), field) : undefined,
+			highlightField: field,
 			title: heading?.[1]?.trim() || source.why?.title || 'Moderator issue',
 			description: (heading ? message.slice(heading[0].length) : message).trim(),
 		}
 	}),
 )
-const issueItems = computed(() =>
-	issues.value
-		.filter((issue) => issue.verdict === 'open')
-		.map(({ source, title, description }) => {
-			const field = issueHighlightField(source)
-			return {
-				id: source.id,
-				source,
-				to: field ? settingsDestination(projectIssueSettingsPath(field), field) : undefined,
-				highlightField: field,
-				title,
-				description,
-			}
-		}),
-)
+const issueItems = computed(() => issues.value.filter((issue) => issue.verdict === 'open'))
 const nags = computed(() =>
-	publishingNags.value.map((nag) => ({
-		...toProjectNag(nag, project.value.project_type),
-		severity: nag.severity,
-		category: getProjectNagCategory(nag.kind),
-	})),
+	publishingNags.value.map((nag) => {
+		const category = getProjectNagCategory(nag.kind)
+		return {
+			...toProjectNag(nag, project.value.project_type),
+			severity: nag.severity,
+			category,
+			isRequiredValidation: nag.severity === 'required' && category === 'validation',
+		}
+	}),
 )
+const threadDestination = computed(() => settingsDestination('moderation'))
 const completedItems = computed(() => {
 	const data = projectV3.value
 	const items = issues.value
 		.filter((issue) => issue.verdict !== 'open')
-		.map(({ source, title }) => ({ id: `issue-${source.id}`, title }))
+		.map(({ id, title, to, highlightField }) => ({ id: `issue-${id}`, title, to, highlightField }))
 	if (data.summary.trim()) {
-		items.push({ id: 'write-summary', title: formatMessage(messages.writeSummary) })
+		items.push({
+			id: 'write-summary',
+			title: formatMessage(messages.writeSummary),
+			to: settingsDestination(nagDestinations.general.path, 'summary'),
+			highlightField: 'summary',
+		})
 	}
 	if (!projectValidation.value) return items
 
@@ -246,7 +249,16 @@ const completedItems = computed(() => {
 
 	for (const [id, complete, title] of candidates) {
 		if (complete && !outstanding.has(id)) {
-			items.push({ id, title: formatMessage(title ?? nagDefinitions[id].title) })
+			const definition = nagDefinitions[id]
+			items.push({
+				id,
+				title: formatMessage(title ?? definition.title),
+				to: settingsDestination(
+					nagDestinations[definition.destination].path,
+					definition.highlightField,
+				),
+				highlightField: definition.highlightField,
+			})
 		}
 	}
 	return items
@@ -270,7 +282,7 @@ const groups = computed(() => [
 	{
 		title: 'Warnings',
 		color: 'text-orange',
-		icon: TriangleAlertIcon,
+		icon: CircleAlertIcon,
 		items: nags.value.filter((nag) => nag.severity === 'warning'),
 	},
 	{
@@ -291,6 +303,10 @@ function onItemClick(event: MouseEvent, path: string | undefined, field?: string
 	)
 		return
 	event.preventDefault()
+	if (path === threadDestination.value) {
+		show('thread')
+		return
+	}
 	if (!pinned.value) open.value = false
 	void settingsNavigation.reveal(path.replace(/#.*$/, ''), field)
 }
@@ -490,10 +506,10 @@ useEventListener('keydown', (event) => {
 									<div
 										v-for="issue in issueItems"
 										:key="issue.id"
-										class="group relative flex min-w-0 items-start gap-1.5 rounded-lg px-2.5 py-3"
-										:class="{ 'hover:bg-surface-2': issue.to }"
+										class="group relative flex min-w-0 items-start gap-1.5 rounded-lg px-2.5 py-3 transition-colors"
+										:class="{ 'hover:bg-surface-4': issue.to }"
 									>
-										<TriangleAlertIcon
+										<MessageSquareWarningIcon
 											class="mt-0.5 size-4 shrink-0 text-orange"
 											aria-hidden="true"
 										/>
@@ -542,6 +558,7 @@ useEventListener('keydown', (event) => {
 									v-for="nag in group.items"
 									:key="nag.id"
 									class="group relative flex items-start gap-2 rounded-lg p-3 px-2.5 transition-colors hover:bg-surface-4"
+									:class="nag.isRequiredValidation ? 'text-red' : group.color"
 								>
 									<CircleDashedIcon
 										v-if="nag.severity === 'suggestion'"
@@ -549,18 +566,9 @@ useEventListener('keydown', (event) => {
 										class="mt-0.5 size-4 shrink-0 text-secondary"
 									/>
 									<component
-										:is="
-											nag.severity === 'required' && nag.category === 'validation'
-												? XCircleIcon
-												: group.icon
-										"
+										:is="nag.isRequiredValidation ? XCircleIcon : group.icon"
 										v-else
 										class="mt-0.5 size-4 shrink-0"
-										:class="
-											nag.severity === 'required' && nag.category === 'validation'
-												? 'text-red'
-												: group.color
-										"
 									/>
 									<div class="min-w-0 flex-1">
 										<p class="m-0 text-sm font-semibold text-contrast">
@@ -575,7 +583,7 @@ useEventListener('keydown', (event) => {
 												nag.category === 'validation' &&
 												(nag.severity === 'required' || nag.severity === 'warning')
 											"
-											class="mb-0 mt-0.5 text-xs text-red"
+											class="mb-0 mt-0.5 text-xs"
 										>
 											{{ formatMessage(messages.automaticCheck) }}
 										</p>
@@ -628,18 +636,30 @@ useEventListener('keydown', (event) => {
 									/>
 								</template>
 								<ul class="m-0 list-none p-0">
-									<li
-										v-for="item in completedItems"
-										:key="item.id"
-										class="flex items-center gap-3 px-2.5 py-2.5 text-sm font-semibold text-secondary"
-									>
-										<span
-											class="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-green text-[var(--color-accent-contrast)]"
-											aria-hidden="true"
+									<li v-for="item in completedItems" :key="item.id">
+										<NuxtLink
+											v-slot="{ href, route: destination }"
+											:to="item.to ?? threadDestination"
+											custom
 										>
-											<CheckIcon class="size-3" />
-										</span>
-										{{ item.title }}
+											<a
+												:href="href"
+												class="no-click-animation group flex items-center gap-3 rounded-lg px-2.5 py-2.5 text-sm font-semibold text-secondary no-underline hover:bg-surface-4 focus-visible:bg-surface-4 focus-visible:outline focus-visible:outline-brand active:scale-95 motion-safe:transition-[background-color,scale]"
+												@click="onItemClick($event, destination.fullPath, item.highlightField)"
+											>
+												<span
+													class="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-green text-[var(--color-accent-contrast)]"
+													aria-hidden="true"
+												>
+													<CheckIcon class="size-3" />
+												</span>
+												<span class="min-w-0 flex-1">{{ item.title }}</span>
+												<RightArrowIcon
+													aria-hidden="true"
+													class="size-4 shrink-0 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
+												/>
+											</a>
+										</NuxtLink>
 									</li>
 								</ul>
 							</ChecklistAccordion>

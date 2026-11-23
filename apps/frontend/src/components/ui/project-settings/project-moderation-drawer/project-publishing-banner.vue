@@ -1,6 +1,20 @@
 <script setup lang="ts">
-import { ChevronRightIcon, Clock4Icon, SendIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import { Admonition, Button, defineMessage, IconButton, IntlFormatted, useVIntl } from '@modrinth/ui'
+import {
+	ChevronRightIcon,
+	Clock4Icon,
+	MessageSquareWarningIcon,
+	SendIcon,
+	SpinnerIcon,
+	XIcon,
+} from '@modrinth/assets'
+import {
+	Admonition,
+	Button,
+	defineMessage,
+	IconButton,
+	IntlFormatted,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed } from 'vue'
 
 import {
@@ -287,13 +301,17 @@ const checklistProgressLabel = defineMessage({
 				</IntlFormatted>
 			</p>
 		</template>
-		<template v-if="state === 'checking' || state === 'review'" #icon="{ iconClass }">
+		<template
+			v-if="state === 'checking' || state === 'review' || state === 'changes'"
+			#icon="{ iconClass }"
+		>
 			<SpinnerIcon
 				v-if="state === 'checking'"
 				class="size-6 shrink-0 animate-spin text-secondary"
 				aria-hidden="true"
 			/>
-			<Clock4Icon v-else :class="iconClass" aria-hidden="true" />
+			<Clock4Icon v-else-if="state === 'review'" :class="iconClass" aria-hidden="true" />
+			<MessageSquareWarningIcon v-else :class="iconClass" aria-hidden="true" />
 		</template>
 		<template #top-right-actions>
 			<Button
