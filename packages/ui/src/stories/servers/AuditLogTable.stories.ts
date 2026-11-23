@@ -88,6 +88,7 @@ const serverFullResponse: Archon.Servers.v1.ServerFull = {
 	sftp_password: 'temporary-password',
 	tags: ['medal'],
 	drop_client_mods: true,
+	auto_restart_on_crash: true,
 	location: {
 		status: 'assigned',
 		location_metadata: {
