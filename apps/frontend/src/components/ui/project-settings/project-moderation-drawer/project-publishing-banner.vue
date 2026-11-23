@@ -238,8 +238,6 @@ const checklistProgressLabel = defineMessage({
 		:type="tone"
 		:header="formatMessage(copy.title, { count: remaining })"
 		:body="formatMessage(copy.body)"
-		inline-actions
-		center-content
 	>
 		<template v-if="state === 'checking' || state === 'review'" #icon="{ iconClass }">
 			<SpinnerIcon
@@ -249,7 +247,7 @@ const checklistProgressLabel = defineMessage({
 			/>
 			<Clock4Icon v-else :class="iconClass" aria-hidden="true" />
 		</template>
-		<template #actions>
+		<template #top-right-actions>
 			<Button
 				v-if="submitAction"
 				type="colored"
@@ -271,7 +269,6 @@ const checklistProgressLabel = defineMessage({
 			</Button>
 			<IconButton
 				v-if="state === 'approved' || state === 'withheld'"
-				class="ml-2"
 				type="quiet"
 				:color="buttonColor"
 				:circular="false"
