@@ -1362,10 +1362,10 @@ function openVideoModal() {
 }
 
 .integrated-editor {
+	@apply bg-surface-3;
 	padding: 0;
 	border: 1px solid var(--surface-5);
 	border-radius: 16px;
-	background: var(--surface-2);
 	overflow: hidden;
 
 	.editor-action-row {
@@ -1386,10 +1386,10 @@ function openVideoModal() {
 		grid-template-columns: minmax(0, 1fr);
 	}
 	.editor-input {
+		@apply bg-surface-2;
 		border: 0;
 		border-radius: 0;
 		padding: 20px;
-		background: transparent;
 		font-weight: 400;
 	}
 	.editor-input:focus-within {
