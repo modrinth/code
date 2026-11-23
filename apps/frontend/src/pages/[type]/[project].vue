@@ -1375,18 +1375,33 @@ async function invalidateProject(id = projectId.value) {
 }
 
 async function redirectIfNewSlug(newSlug, id) {
-	if (newSlug === undefined || newSlug === route.params.project) {
+	if (newSlug === undefined) {
 		return
 	}
 
-	warmProjectCheckCaches(queryClient, { id, slug: newSlug })
+	const slug = newSlug.toLowerCase()
+	const projectKeys = [
+		projectQueryOptions.v2(id, client).queryKey,
+		projectQueryOptions.v3(id, client).queryKey,
+	]
+	await Promise.all(projectKeys.map((queryKey) => queryClient.cancelQueries({ queryKey })))
+	for (const queryKey of projectKeys) {
+		queryClient.setQueryData(queryKey, (cachedProject) =>
+			cachedProject ? { ...cachedProject, slug } : cachedProject,
+		)
+	}
+	warmProjectCheckCaches(queryClient, { id, slug })
+
+	if (slug === route.params.project) {
+		return
+	}
 
 	await navigateTo(
 		{
 			name: route.name,
 			params: {
 				type: route.params.type,
-				project: newSlug,
+				project: slug,
 			},
 			query: route.query,
 			hash: route.hash,

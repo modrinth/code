@@ -1088,6 +1088,9 @@
   "conversation-thread.action.add-private-note": {
     "message": "Add private note"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Approve with reply"
+  },
   "conversation-thread.action.attach-image": {
     "message": "Attach image"
   },
@@ -1100,6 +1103,9 @@
   "conversation-thread.action.private-note": {
     "message": "Private note"
   },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Reject with reply"
+  },
   "conversation-thread.action.reopen-thread": {
     "message": "Reopen thread"
   },
@@ -1111,6 +1117,9 @@
   },
   "conversation-thread.action.send": {
     "message": "Send"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Withhold with reply"
   },
   "conversation-thread.closed-thread.description": {
     "message": "This thread is closed and new messages cannot be sent to it."

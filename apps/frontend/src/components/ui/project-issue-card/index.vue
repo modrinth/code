@@ -252,6 +252,7 @@ import { isUnderReview } from '~/helpers/projects.js'
 import {
 	isThreadIssueFacetReadyToAddress,
 	isThreadIssueVerified,
+	isThreadIssueVisible,
 	threadIssueVerdict,
 } from '~/helpers/thread-issues'
 
@@ -629,8 +630,11 @@ const matchingIssues = computed(() =>
 	(props.issues ?? thread.value?.issues ?? [])
 		.filter(
 			(issue) =>
-				(props.threadHistory || !isThreadIssueVerified(issue)) &&
-				(!isUnderReview(projectContext?.projectV3.value) || !isAddressed(issue)) &&
+				isThreadIssueVisible(
+					issue,
+					Boolean(isUnderReview(projectContext?.projectV3.value)),
+					props.threadHistory,
+				) &&
 				(props.issues !== undefined ||
 					matchesLocation(issue) ||
 					issue.facets.some(({ what }) => matchesTarget(what))),

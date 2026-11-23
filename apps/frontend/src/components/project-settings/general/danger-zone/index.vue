@@ -67,7 +67,9 @@ const hasDeletePermission = computed(() => {
 	return ((currentMember.value?.permissions ?? 0) & DELETE_PROJECT) === DELETE_PROJECT
 })
 
-const requiresPrivileged = computed(() => tags.value.approvedStatuses.includes(project.value.status))
+const requiresPrivileged = computed(() =>
+	tags.value.approvedStatuses.includes(project.value.status),
+)
 
 async function confirmDeleteProject() {
 	if (await ensurePrivileged(requiresPrivileged.value)) confirmModal.value?.show()

@@ -212,8 +212,6 @@
 					autocomplete="off"
 					:disabled="!hasPermission"
 					wrapper-class="w-full"
-					@focusin="onSlugSuggestionFocusIn"
-					@focusout="onSlugSuggestionFocusOut"
 				>
 					<template #prefix>
 						<span class="whitespace-nowrap">
@@ -225,12 +223,12 @@
 					<p class="mb-0 mt-2 text-sm text-secondary">
 						{{ formatMessage(messages.slugHelp, { contentType }) }}
 					</p>
-					<ValidationMessage :check="saveValidation.forField('slug')" class="mt-2" />
+					<ValidationMessage :check="slugSaveMessages" :debounce="0" class="mt-2" />
 					<ProjectIssueCard target="modify_slug" :field-action="slugIssueAction" class="mt-2" />
 					<SlugSuggestions
 						:selected="slug"
 						:suggestions="slugSuggestions"
-						:visible="hasPermission && showSlugSuggestions"
+						:visible="showSlugSuggestions"
 						@select="slug = $event"
 					/>
 				</template>
@@ -315,12 +313,10 @@ import { useProjectIssueFieldAction } from '~/composables/project-issue-field-ac
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { injectProjectSettingsNavigation } from '~/composables/project-settings-navigation'
-import {
-	useProjectSlugSuggestions,
-	useSlugSuggestionVisibility,
-} from '~/composables/project-slug-suggestions'
+import { useProjectSlugSuggestions } from '~/composables/project-slug-suggestions'
 import { fileDeclaresAi } from '~/helpers/c2pa'
-import { getProjectTypeForUrl, isDraft, isListed } from '~/helpers/projects.js'
+import { getProjectTypeForUrl, isDraft, isListed, isUnderReview } from '~/helpers/projects.js'
+import { isThreadIssueVisible } from '~/helpers/thread-issues'
 import {
 	projectCopyType,
 	projectMessages,
@@ -368,6 +364,7 @@ const {
 	projectV3: project,
 	currentMember,
 	allMembers,
+	thread,
 	patchProjectV3,
 	patchIcon,
 	invalidate,
@@ -381,21 +378,8 @@ const formatBytes = useFormatBytes()
 
 const name = ref(project.value.name)
 const slug = ref(project.value.slug ?? '')
+const rejectedSlug = ref(null)
 const summary = ref(project.value.summary)
-const {
-	onFocusIn: onSlugSuggestionFocusIn,
-	onFocusOut: onSlugSuggestionFocusOut,
-	visible: showSlugSuggestions,
-} = useSlugSuggestionVisibility()
-const ownerUsername = computed(
-	() => (allMembers.value.find((member) => member.is_owner) ?? allMembers.value[0])?.user.username,
-)
-const { suggestions: slugSuggestions } = useProjectSlugSuggestions({
-	title: name,
-	username: ownerUsername,
-	currentProjectId: () => project.value.id,
-	enabled: showSlugSuggestions,
-})
 const icon = ref(null)
 const previewImage = ref(null)
 const deletedIcon = ref(false)
@@ -526,6 +510,7 @@ const hasChanges = computed(() =>
 
 function reset() {
 	saveValidation.clear()
+	rejectedSlug.value = null
 	name.value = project.value.name
 	slug.value = project.value.slug ?? ''
 	summary.value = project.value.summary
@@ -541,9 +526,62 @@ function reset() {
 }
 
 const saveValidation = useProjectSaveValidation(() => modified.value)
+const slugSaveMessages = computed(() => saveValidation.forField('slug'))
+const slugIsTaken = computed(() => rejectedSlug.value === slug.value.trim().toLowerCase())
+const visibleIssues = computed(() =>
+	(thread.value?.issues ?? []).filter((issue) =>
+		isThreadIssueVisible(issue, isUnderReview(project.value)),
+	),
+)
+const hasOpenSlugIssue = computed(() =>
+	visibleIssues.value.some((issue) =>
+		issue.facets.some(
+			({ what, verdict, moderator_verified }) =>
+				what.type === 'modify_slug' && verdict === 'open' && !moderator_verified,
+		),
+	),
+)
+const hasModeratorSlugSuggestion = computed(() =>
+	visibleIssues.value.some((issue) =>
+		issue.facets.some(({ what }) => what.type === 'modify_slug' && what.value.suggestion?.trim()),
+	),
+)
+const showSlugSuggestions = computed(
+	() =>
+		hasPermission.value &&
+		!hasModeratorSlugSuggestion.value &&
+		(slugIsTaken.value ||
+			slugSaveMessages.value.some((message) => message.severity === 'error') ||
+			hasOpenSlugIssue.value),
+)
+const ownerUsername = computed(
+	() => (allMembers.value.find((member) => member.is_owner) ?? allMembers.value[0])?.user.username,
+)
+const { suggestions: availableSlugSuggestions } = useProjectSlugSuggestions({
+	title: name,
+	username: ownerUsername,
+	currentProjectId: () => project.value.id,
+	enabled: showSlugSuggestions,
+})
+const slugSuggestions = computed(() =>
+	availableSlugSuggestions.value.filter((suggestion) => suggestion !== rejectedSlug.value),
+)
 const validationMessages = computed(() =>
 	saveValidation.withoutFields(['name', 'summary', 'icon', 'slug']),
 )
+
+function captureSlugCollision(error, submittedSlug) {
+	const description =
+		error?.v1Error?.description ?? error?.responseData?.description ?? error?.message
+	if (
+		submittedSlug === undefined ||
+		description !== 'Your URL is already being used by another project!'
+	) {
+		return false
+	}
+	rejectedSlug.value = submittedSlug.toLowerCase()
+	return true
+}
 
 function useTextIssueAction(field, input) {
 	return useProjectIssueFieldAction({
@@ -559,9 +597,13 @@ function useTextIssueAction(field, input) {
 			const value = submitted.trim()
 			if (value !== (project.value[field] ?? '')) {
 				if (field === 'slug') {
-					await labrinth.projects_v3.edit(project.value.id, {
-						slug: value,
-					})
+					try {
+						await labrinth.projects_v3.edit(project.value.id, { slug: value })
+						rejectedSlug.value = null
+					} catch (error) {
+						captureSlugCollision(error, value)
+						throw error
+					}
 				} else {
 					await patchProjectV3({ [field]: value }, true, true)
 				}
@@ -608,13 +650,13 @@ async function save() {
 	name.value = name.value.trim()
 	slug.value = slug.value.trim()
 	summary.value = summary.value.trim()
+	const patch = basePatchData.value
 	const submittedState = saveValidation.snapshot()
 	saving.value = true
 	try {
-		const hasPatchChanges = Object.keys(basePatchData.value).length > 0
-
-		if (hasPatchChanges) {
-			await patchProjectV3(basePatchData.value, false, true)
+		if (Object.keys(patch).length > 0) {
+			await patchProjectV3(patch, false, true)
+			if (patch.slug !== undefined) rejectedSlug.value = null
 		}
 
 		if (!(await saveIconChanges())) return false
@@ -630,6 +672,7 @@ async function save() {
 		saveValidation.clear()
 		return true
 	} catch (error) {
+		if (captureSlugCollision(error, patch.slug)) return false
 		if (!saveValidation.capture(error, submittedState)) throw error
 		return false
 	} finally {
