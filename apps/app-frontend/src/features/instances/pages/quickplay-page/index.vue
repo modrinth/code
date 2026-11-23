@@ -86,14 +86,21 @@ const readyPending = useReadyState(worldsQuery)
 const { protocolVersion, getServerData, getServerAvailability, refreshServer, refreshAllServers } =
 	useServerStatuses(serverWorlds)
 
-const { activeTab, searchQuery, selectedFilters, filterOptions, activeWorlds, filteredWorlds } =
-	useQuickplayFilters({
-		serverWorlds,
-		singleplayerWorlds,
-		getServerAvailability,
-		highlightedWorld,
-		loaded: () => worldsQuery.isSuccess.value,
-	})
+const {
+	activeTab,
+	searchQuery,
+	selectedFilters,
+	filterOptions,
+	hasAnyWorlds,
+	activeWorlds,
+	filteredWorlds,
+} = useQuickplayFilters({
+	serverWorlds,
+	singleplayerWorlds,
+	getServerAvailability,
+	highlightedWorld,
+	loaded: () => worldsQuery.isSuccess.value,
+})
 
 const { startingInstance, joinWorld, stop, isPlayingWorld } = useWorldLaunch(isManagedServerWorld)
 
@@ -180,6 +187,7 @@ function worldKey(world: World) {
 	<ReadyTransition :pending="readyPending">
 		<div class="flex flex-col gap-4">
 			<QuickplayToolbar
+				v-if="hasAnyWorlds"
 				v-model:tab="activeTab"
 				v-model:search="searchQuery"
 				v-model:filters="selectedFilters"

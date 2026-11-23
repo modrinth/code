@@ -12,6 +12,7 @@ const props = defineProps<{
 	tabs: ToolbarTab<T>[]
 	label: string
 	replace?: boolean
+	fullWidth?: boolean
 }>()
 
 const active = defineModel<T>()
@@ -124,6 +125,7 @@ watch(
 			:aria-selected="active === tab.value"
 			class="toolbar-tab-color no-click-animation relative z-[1] flex h-[34px] shrink-0 items-center whitespace-nowrap rounded-xl border border-solid border-transparent px-3 text-base font-semibold leading-5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
 			:class="[
+				{ 'flex-1 justify-center': fullWidth },
 				active === tab.value ? 'text-brand' : ['text-primary', { 'toolbar-tab-hover': !sliding }],
 				{ 'toolbar-tab-active': active === tab.value && !sliderReady },
 			]"

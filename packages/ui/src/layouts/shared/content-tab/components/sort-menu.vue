@@ -8,7 +8,7 @@ import {
 import { computed } from 'vue'
 
 import { type ButtonMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
-import SegmentedControl from '#ui/components/base/SegmentedControl.vue'
+import ToolbarTabs, { type ToolbarTab } from '#ui/components/base/ToolbarTabs.vue'
 import { defineMessages, type MessageDescriptor, useVIntl } from '#ui/composables/i18n'
 
 import {
@@ -83,6 +83,10 @@ const directions = computed<ContentSortDirection[]>(() =>
 	isDateField.value ? ['desc', 'asc'] : ['asc', 'desc'],
 )
 
+const directionTabs = computed<ToolbarTab<ContentSortDirection>[]>(() =>
+	directions.value.map((value) => ({ value, label: formatDirection(value) })),
+)
+
 const direction = computed<ContentSortDirection>({
 	get: () => sortMode.value.direction,
 	set: (value) => (sortMode.value = { ...sortMode.value, direction: value }),
@@ -150,12 +154,10 @@ const sortOptions = computed<ButtonMenuOption[]>(() =>
 		{{ fieldLabel }}
 		<template #footer>
 			<div role="separator" class="mb-2 mt-1 h-px bg-surface-5" />
-			<SegmentedControl
+			<ToolbarTabs
 				v-model="direction"
-				:items="directions"
-				:neutral-items="directions"
-				:format-label="formatDirection"
-				:aria-label="formatMessage(messages.directionLabel)"
+				:tabs="directionTabs"
+				:label="formatMessage(messages.directionLabel)"
 				full-width
 			/>
 		</template>

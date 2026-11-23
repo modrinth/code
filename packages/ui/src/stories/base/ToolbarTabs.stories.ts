@@ -29,3 +29,23 @@ export const Default: StoryObj = {
 		`,
 	}),
 }
+
+export const FullWidth: StoryObj = {
+	render: () => ({
+		components: { ToolbarTabs },
+		setup() {
+			const value = ref('asc')
+			const tabs = [
+				{ value: 'asc', label: 'A-Z' },
+				{ value: 'desc', label: 'Z-A' },
+			]
+
+			return { value, tabs }
+		},
+		template: /* html */ `
+			<div class="w-64">
+				<ToolbarTabs v-model="value" :tabs="tabs" label="Sort direction" full-width />
+			</div>
+		`,
+	}),
+}

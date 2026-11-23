@@ -2049,10 +2049,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				v-tooltip.right="formatMessage(messages.home)"
 				to="/"
 				:is-primary="(route) => route.path === '/'"
-				:is-subpage="
-					() =>
-						(route.path.startsWith('/browse') || route.path.startsWith('/project')) && route.query.i
-				"
 			>
 				<PlayIcon class="ml-0.5" />
 			</NavButton>

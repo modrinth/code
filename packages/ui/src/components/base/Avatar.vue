@@ -58,6 +58,10 @@
 	</svg>
 </template>
 
+<script lang="ts">
+const detectionCache = new Map<string, { pixelated: boolean; transparentCorners?: boolean }>()
+</script>
+
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 
@@ -136,17 +140,34 @@ watch(
 	{ immediate: true },
 )
 
+function applyCachedDetection(source: string | undefined) {
+	const cached = source ? detectionCache.get(source) : undefined
+	pixelated.value = cached?.pixelated ?? false
+	hasTransparentCorners.value = cached?.transparentCorners ?? false
+	hasDetectedCorners.value = cached?.transparentCorners !== undefined
+}
+
+function cacheDetection(source: string | undefined, transparentCorners?: boolean) {
+	if (!source) return
+	const cached = detectionCache.get(source)
+	detectionCache.set(source, {
+		pixelated: pixelated.value,
+		transparentCorners: transparentCorners ?? cached?.transparentCorners,
+	})
+}
+
+applyCachedDetection(cachedSrc.value)
+
 const isCachedIcon = computed(
 	() => props.cacheIcon && !!cachedSrc.value && cachedSrc.value !== props.src,
 )
 
-watch(cachedSrc, () => {
+watch(cachedSrc, (source) => {
 	clearDetectionTimeout()
 	detectingSource = undefined
 	failed.value = false
 	imageLoaded.value = false
-	hasTransparentCorners.value = false
-	hasDetectedCorners.value = false
+	applyCachedDetection(source)
 })
 
 onMounted(() => {
@@ -183,13 +204,18 @@ function onLoad() {
 	const source = image.currentSrc
 	if (detectingSource === source) return
 
-	if (image.naturalWidth && image.naturalWidth < 32) {
-		pixelated.value = true
-	} else {
-		pixelated.value = false
-	}
+	const cacheKey = cachedSrc.value
+	pixelated.value = !!image.naturalWidth && image.naturalWidth < 32
+	cacheDetection(cacheKey)
 
 	if (!props.padTransparentCorners) {
+		return
+	}
+
+	const cachedCorners = cacheKey ? detectionCache.get(cacheKey)?.transparentCorners : undefined
+	if (cachedCorners !== undefined) {
+		hasTransparentCorners.value = cachedCorners
+		hasDetectedCorners.value = true
 		return
 	}
 
@@ -202,6 +228,7 @@ function onLoad() {
 			detectingSource = undefined
 			hasTransparentCorners.value = transparentCorners
 			hasDetectedCorners.value = true
+			cacheDetection(cacheKey, transparentCorners)
 			return
 		}
 	}
@@ -216,6 +243,7 @@ function onLoad() {
 		clearDetectionTimeout()
 		hasTransparentCorners.value = detectTransparentCorners(probe) ?? false
 		hasDetectedCorners.value = true
+		cacheDetection(cacheKey, hasTransparentCorners.value)
 	}
 	probe.onerror = () => {
 		if (detectionFinished || img.value?.currentSrc !== source) return
@@ -223,6 +251,7 @@ function onLoad() {
 		detectingSource = undefined
 		clearDetectionTimeout()
 		hasDetectedCorners.value = true
+		cacheDetection(cacheKey, false)
 	}
 	detectionTimeout = window.setTimeout(() => {
 		if (img.value?.currentSrc !== source) return

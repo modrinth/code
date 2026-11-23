@@ -17,7 +17,7 @@
 			:show-chevron="false"
 			fit-content
 			trigger-type="base"
-			trigger-size="lg"
+			:trigger-size="selectedFilters[dropdown.key].length > 0 ? 'sm' : 'lg'"
 			:trigger-class="getDropdownTriggerClass(dropdown.key)"
 			:dropdown-min-width="dropdown.dropdownMinWidth"
 			checkbox-position="right"
@@ -25,7 +25,7 @@
 			@update:model-value="(values) => updateSelected(dropdown.key, values)"
 		>
 			<template #input-content="{ isOpen, openDirection }">
-				<div class="flex min-h-8 min-w-0 max-w-full items-center gap-2 sm:max-w-80">
+				<div class="flex min-h-6 min-w-0 max-w-full items-center gap-2 sm:max-w-80">
 					<span class="min-w-0 flex-1 truncate">
 						<template v-if="selectedFilters[dropdown.key].length > 0">
 							<span class="font-medium">{{ dropdown.label }}:</span>
@@ -140,8 +140,7 @@ const messages = defineMessages({
 
 const filterTriggerClass =
 	'!h-[34px] !rounded-xl !border !border-solid !border-surface-5 !bg-transparent !px-3 !text-sm !font-medium !text-primary !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-surface-3 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
-const filterPreviewTriggerClass =
-	'!h-[34px] !rounded-xl !border !border-solid !border-brand !bg-brand-highlight !px-3 !text-sm !font-medium !text-brand !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-brand-highlight focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5 [&>svg]:!text-brand'
+const filterPreviewTriggerClass = '!h-[34px] max-w-[16rem] !rounded-xl !px-3'
 
 type FilterType = 'channel' | 'gameVersion' | 'platform' | 'environment'
 type Filter = string

@@ -289,8 +289,11 @@ const searchPlaceholder = computed(() =>
 						size="lg"
 						:label="formatMessage(messages.resultsPerPageCurrent, { count: view.maxResults.value })"
 						:options="maxResultsOptions"
+						:icon-only="false"
+						animate-width
 					>
 						<SlidersVerticalIcon aria-hidden="true" />
+						{{ view.maxResults.value }}
 					</TeleportOverflowMenu>
 
 					<IconButton

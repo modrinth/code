@@ -38,6 +38,24 @@ const { updatePreferences } = injectUserPreferences()
 const appSettings = useAppSettings()
 const instancesQuery = useQuery(instanceListQueryOptions())
 const router = useRouter()
+
+function instancePath(instanceId) {
+	return `/instance/${encodeURIComponent(instanceId)}`
+}
+
+function isInstanceRoute(route, instanceId) {
+	const path = decodeURIComponent(route.path)
+	const base = `/instance/${instanceId}`
+	return path === base || path.startsWith(`${base}/`)
+}
+
+function isInstanceBrowseRoute(route, instanceId) {
+	return (
+		(route.path.startsWith('/browse') || route.path.startsWith('/project')) &&
+		route.query.i === instanceId
+	)
+}
+
 const instanceOptions = ref()
 const runningInstances = ref([])
 
@@ -365,7 +383,9 @@ function openContextMenu(event, instance) {
 					:key="instance.id"
 					v-tooltip.right="instance.name"
 					class="quick-instance-item relative"
-					:to="`/instance/${encodeURIComponent(instance.id)}`"
+					:to="instancePath(instance.id)"
+					:is-primary="(r) => isInstanceRoute(r, instance.id)"
+					:is-subpage="(r) => isInstanceBrowseRoute(r, instance.id)"
 					@contextmenu.prevent.stop="(event) => openContextMenu(event, instance)"
 				>
 					<Avatar
