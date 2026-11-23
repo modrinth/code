@@ -178,7 +178,7 @@ function confirmRemoveFromOrganization() {
 <template>
 	<div id="ownership" class="danger-zone-row">
 		<div>
-			<h3 class="mb-1 mt-0 text-base font-semibold text-contrast">
+			<h3 class="mb-1 mt-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.transferOwnership) }}
 			</h3>
 			<p class="m-0 text-sm leading-relaxed text-secondary">
@@ -257,7 +257,7 @@ function confirmRemoveFromOrganization() {
 	</div>
 	<div v-if="organization && canRemoveFromOrganization" class="danger-zone-row">
 		<div>
-			<h3 class="mb-1 mt-0 text-base font-semibold text-contrast">
+			<h3 class="mb-1 mt-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.removeFromOrganization) }}
 			</h3>
 			<p class="m-0 text-sm leading-relaxed text-secondary">

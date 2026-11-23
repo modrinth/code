@@ -15,7 +15,6 @@
 			:proceed-label="formatMessage(messages.deleteButton)"
 			@proceed="deleteVersion()"
 		/>
-		<ValidationMessage :check="environmentValidation" class="mb-4" />
 		<Admonition
 			v-if="withheldVersions.length > 0"
 			type="circle-warning"
@@ -69,9 +68,12 @@
 			:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
 		>
 			<template #heading>
-				<h2 class="settings-section-title !mb-0">
-					{{ formatMessage(commonProjectSettingsMessages.versions) }}
-				</h2>
+				<div class="flex w-full flex-col gap-3">
+					<h2 class="settings-section-title !mb-0">
+						{{ formatMessage(commonProjectSettingsMessages.versions) }}
+					</h2>
+					<ValidationMessage :check="environmentValidation" />
+				</div>
 			</template>
 			<template #version-issue="{ version }">
 				<ProjectIssueCard target="version" :version-id="version.id" />
@@ -227,10 +229,10 @@
 			</template>
 		</ProjectPageVersions>
 
-		<VersionsEmptyState
-			v-if="!versions?.length"
-			@create="createProjectVersionModal?.openCreateVersionModal()"
-		/>
+		<template v-else>
+			<ValidationMessage :check="environmentValidation" class="mb-4" />
+			<VersionsEmptyState @create="createProjectVersionModal?.openCreateVersionModal()" />
+		</template>
 	</div>
 </template>
 

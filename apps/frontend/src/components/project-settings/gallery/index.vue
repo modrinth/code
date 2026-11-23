@@ -2,12 +2,12 @@
 	<div data-project-field="gallery" data-project-field-scroll-only>
 		<ValidationMessage :check="galleryImagesValidation" class="mb-4" />
 		<ProjectIssueCard :target="['add_gallery_images', 'remove_gallery_images']" class="mb-4" />
-		<div class="mb-3 flex flex-wrap items-center gap-3">
+		<div v-if="filteredGallery.length" class="mb-3 flex flex-wrap items-center gap-3">
 			<h2 class="settings-section-title !mb-0">
 				{{ formatMessage(commonProjectSettingsMessages.gallery) }}
 			</h2>
 			<FileButton
-				v-if="currentMember && filteredGallery.length"
+				v-if="currentMember"
 				type="colored"
 				color="brand"
 				:max-size="globals?.max_gallery_image_size"

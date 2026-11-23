@@ -35,6 +35,7 @@ import CategoryPicker from './tag-picker.vue'
 import type { Category, CategoryGroup } from './types'
 
 const MAX_FEATURED_TAGS = 3
+const MAX_SERVER_TAGS = 18
 
 const SHARED_CATEGORY_PROJECT_TYPES: Record<string, string> = {
 	plugin: 'mod',
@@ -296,6 +297,21 @@ const {
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
 const saveValidation = useProjectSaveValidation(() => current.value)
+const serverTagLimitReached = computed(
+	() => isServerProject.value && current.value.selectedTags.length >= MAX_SERVER_TAGS,
+)
+const serverTagLimitExceeded = computed(
+	() => isServerProject.value && current.value.selectedTags.length > MAX_SERVER_TAGS,
+)
+const serverTagLimitMessage = computed(() =>
+	serverTagLimitExceeded.value
+		? {
+				severity: 'error' as const,
+				message: messages.tooManyTagsServerHardWarning,
+				values: { count: current.value.selectedTags.length },
+			}
+		: null,
+)
 const hasPermission = computed(
 	() =>
 		isAdmin(currentMember.value?.user) ||
@@ -304,6 +320,7 @@ const hasPermission = computed(
 const canSave = computed(
 	() =>
 		hasPermission.value &&
+		!serverTagLimitExceeded.value &&
 		current.value.featuredTags.length <= MAX_FEATURED_TAGS &&
 		!saveValidation.hasErrors.value,
 )
@@ -351,7 +368,12 @@ function reset() {
 	saveValidation.clear()
 }
 
-const tagValidation = useProjectNagMessages('tags')
+const savedTagValidation = useProjectNagMessages('tags')
+const tagValidation = computed(() =>
+	serverTagLimitExceeded.value
+		? savedTagValidation.value.filter((message) => message.code !== 'too-many-tags-server')
+		: savedTagValidation.value,
+)
 
 function toggleTagRaw(selection: string[], tag: string) {
 	if (selection.includes(tag)) {
@@ -361,7 +383,12 @@ function toggleTagRaw(selection: string[], tag: string) {
 }
 
 const toggleTag = (tag: string) => {
-	if (!hasPermission.value || saving.value) return
+	if (
+		!hasPermission.value ||
+		saving.value ||
+		(serverTagLimitReached.value && !current.value.selectedTags.includes(tag))
+	)
+		return
 	current.value.selectedTags = toggleTagRaw(current.value.selectedTags, tag)
 	if (!current.value.selectedTags.includes(tag)) {
 		current.value.featuredTags = current.value.featuredTags.filter((x) => x !== tag)
@@ -408,16 +435,28 @@ const toggleFeatured = (tag: string) => {
 				</Button>
 			</template>
 		</EmptyState>
-		<div v-else class="flex flex-col gap-4">
-			<p class="mb-0 mt-0 text-secondary">
-				{{ formatMessage(messages.description, { count: isServerProject ? 18 : 8 }) }}
+		<div v-else>
+			<p class="mb-4 mt-0 text-secondary">
+				{{ formatMessage(messages.description, { count: isServerProject ? MAX_SERVER_TAGS : 8 }) }}
 			</p>
+			<div class="mb-4 flex flex-col gap-2.5 empty:hidden">
+				<ProjectIssueCard target="remove_tags" :field-action="tagsIssueAction" />
+				<ValidationMessage :check="serverTagLimitMessage" :debounce="0" />
+				<ValidationMessage
+					:check="tagValidation"
+					:project-field="JSON.stringify(saved)"
+					:current-field="JSON.stringify(current)"
+				/>
+				<ValidationMessage :check="saveValidation.forField('tags')" />
+				<ValidationMessage :check="saveValidation.withoutFields(['tags'])" />
+			</div>
 			<div class="flex flex-col gap-8">
 				<CategoryPicker
 					:groups="categoryGroups"
 					:selected-tags="current.selectedTags"
 					:featured-tags="current.featuredTags"
 					:disabled="!hasPermission || saving"
+					:limit-reached="serverTagLimitReached"
 					@toggle="toggleTag"
 				/>
 				<FeaturedTags
@@ -429,15 +468,7 @@ const toggleFeatured = (tag: string) => {
 					@toggle="toggleFeatured"
 				/>
 			</div>
-			<ValidationMessage
-				:check="tagValidation"
-				:project-field="JSON.stringify(saved)"
-				:current-field="JSON.stringify(current)"
-			/>
-			<ValidationMessage :check="saveValidation.forField('tags')" />
-			<ProjectIssueCard target="remove_tags" :field-action="tagsIssueAction" class="mt-2" />
 		</div>
-		<ValidationMessage :check="saveValidation.withoutFields(['tags'])" class="my-4" />
 		<UnsavedChangesPopup
 			:original="saved"
 			:modified="current"

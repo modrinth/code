@@ -56,7 +56,7 @@ function show(nextMode: 'member' | 'moderator', event: MouseEvent) {
 <template>
 	<div class="danger-zone-row">
 		<div>
-			<h3 class="mb-1 mt-0 text-base font-semibold text-contrast">{{ memberAction }}</h3>
+			<h3 class="mb-1 mt-0 text-lg font-semibold text-contrast">{{ memberAction }}</h3>
 			<p class="m-0 text-sm leading-relaxed text-secondary">
 				Projects on Modrinth are automatically enrolled in the
 				<NuxtLink to="/legal/cmp-info" target="_blank" class="text-link">Rewards Program</NuxtLink>.

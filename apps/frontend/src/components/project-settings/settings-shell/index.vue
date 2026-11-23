@@ -43,10 +43,7 @@ const drawerPinned = ref(false)
 
 .project-settings :deep(.settings-section-title) {
 	margin: 0 0 12px;
-	font-size: 20px;
-	line-height: 28px;
-	font-weight: 600;
-	color: var(--color-contrast);
+	@apply text-2xl font-semibold text-contrast;
 }
 
 .project-settings :deep(.settings-content-card) {

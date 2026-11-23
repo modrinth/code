@@ -9,6 +9,7 @@ defineProps<{
 	selectedTags: string[]
 	featuredTags: string[]
 	disabled: boolean
+	limitReached: boolean
 }>()
 const emit = defineEmits<{ toggle: [tag: string] }>()
 const { formatMessage } = useVIntl()
@@ -27,7 +28,7 @@ function categoryIconName(category: Category) {
 		class="settings-content-card flex flex-col gap-6 overflow-y-auto p-6"
 	>
 		<section v-for="group in groups" :key="group.id" :aria-labelledby="`tags-${group.id}`">
-			<h3 :id="`tags-${group.id}`" class="m-0 mb-2.5 text-base font-semibold text-contrast">
+			<h3 :id="`tags-${group.id}`" class="m-0 mb-2.5 text-lg font-semibold text-contrast">
 				{{ group.title }}
 			</h3>
 			<p v-if="group.description" class="mb-3 mt-0 text-secondary">
@@ -40,7 +41,7 @@ function categoryIconName(category: Category) {
 					class="aria-pressed:!bg-brand-highlight aria-[pressed=false]:!text-secondary aria-[pressed=false]:[&>svg]:!text-inherit"
 					:aria-pressed="selectedTags.includes(category.name)"
 					:aria-label="formatCategory(formatMessage, category.name)"
-					:disabled="disabled"
+					:disabled="disabled || (limitReached && !selectedTags.includes(category.name))"
 					:type="selectedTags.includes(category.name) ? 'outlined' : 'base'"
 					:color="selectedTags.includes(category.name) ? 'brand' : undefined"
 					@click="emit('toggle', category.name)"

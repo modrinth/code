@@ -1,7 +1,7 @@
 <template>
-	<AnalyticsDashboard class="!gap-8">
+	<AnalyticsDashboard>
 		<template #title>
-			<h2 class="m-0 text-xl font-semibold leading-7 text-contrast">
+			<h2 class="settings-section-title !mb-0">
 				{{ formatMessage(commonProjectSettingsMessages.analytics) }}
 			</h2>
 		</template>

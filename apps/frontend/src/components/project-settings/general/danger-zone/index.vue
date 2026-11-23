@@ -14,7 +14,7 @@
 			<OwnershipActions />
 			<div class="danger-zone-row">
 				<div>
-					<h3 class="mb-1 mt-0 text-base font-semibold text-contrast">
+					<h3 class="mb-1 mt-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.deleteProjectTitle) }}
 					</h3>
 					<p class="m-0 text-sm leading-relaxed text-secondary">

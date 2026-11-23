@@ -39,7 +39,7 @@ const messages = defineMessages({
 
 <template>
 	<section>
-		<h3 class="settings-section-title !mb-2.5">
+		<h3 class="m-0 mb-2.5 text-xl font-semibold text-contrast">
 			{{ formatMessage(messages.featuredTags) }}
 		</h3>
 		<p class="mb-3 mt-0">
