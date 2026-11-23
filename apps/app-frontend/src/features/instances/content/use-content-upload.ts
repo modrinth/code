@@ -5,11 +5,10 @@ import {
 	type UnknownFileWarningModal,
 	useVIntl,
 } from '@modrinth/ui'
-import { nextTick, onMounted, onUnmounted, type Ref, ref } from 'vue'
+import { nextTick, type Ref, ref } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { add_project_from_path, is_file_on_modrinth } from '@/helpers/instance'
-import { listenNativeDragDrop } from '@/helpers/native-drag-drop'
 import { get as getSettings, set as setSettings } from '@/helpers/settings'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { pickFiles } from '@/platform/dialogs'
@@ -31,14 +30,12 @@ const messages = defineMessages({
 
 export interface ContentUploadOptions {
 	instance: Ref<GameInstance>
-	isInstanceBusy: Readonly<Ref<boolean>>
 	items: Readonly<Ref<ContentItem[]>>
 	refetchContent: (cacheBehaviour?: CacheBehaviour) => Promise<void>
 }
 
 export function useContentUpload({
 	instance,
-	isInstanceBusy,
 	items,
 	refetchContent,
 }: ContentUploadOptions) {
@@ -134,34 +131,6 @@ export function useContentUpload({
 					: formatMessage(messages.projectsWereAdded, { count: names.length }),
 		})
 	}
-
-	let isUnmounted = false
-	let unlistenDragDrop: (() => void) | null = null
-
-	onMounted(() => {
-		void listenNativeDragDrop(async (event) => {
-			if (event.type !== 'drop' || !instance.value || isInstanceBusy.value) return
-
-			for (const file of event.paths) {
-				if (file.endsWith('.mrpack')) continue
-				await add_project_from_path(instance.value.id, file).catch(handleError)
-			}
-			await refetchContent()
-		})
-			.then((unlisten) => {
-				if (isUnmounted) {
-					unlisten()
-					return
-				}
-				unlistenDragDrop = unlisten
-			})
-			.catch(handleError)
-	})
-
-	onUnmounted(() => {
-		isUnmounted = true
-		unlistenDragDrop?.()
-	})
 
 	return {
 		unknownFileWarningModal,

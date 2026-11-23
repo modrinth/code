@@ -2,12 +2,12 @@
 import {
 	BoxIcon,
 	CodeIcon,
+	CompassIcon,
 	DownloadIcon,
 	DropdownIcon,
 	FileIcon,
 	FolderOpenIcon,
 	LinkIcon,
-	PlusIcon,
 	ShareIcon,
 	TextCursorInputIcon,
 	TrashIcon,
@@ -55,10 +55,6 @@ const props = withDefaults(
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	addContent: {
-		id: 'content.page-layout.add-content',
-		defaultMessage: 'Add content',
-	},
 	uploadFiles: {
 		id: 'content.page-layout.upload-files',
 		defaultMessage: 'Upload files',
@@ -87,21 +83,25 @@ const messages = defineMessages({
 		id: 'content.page-layout.empty.no-content-installed',
 		defaultMessage: 'No content installed',
 	},
-	emptyModpackHint: {
-		id: 'content.page-layout.empty.modpack-hint',
-		defaultMessage: 'Add additional content on top of this modpack',
-	},
 	emptyHint: {
 		id: 'content.page-layout.empty.projects-hint',
-		defaultMessage: 'Browse or upload projects to get started.',
+		defaultMessage: 'Upload or browse for content to get started.',
 	},
 	noTypeInstalled: {
 		id: 'content.page-layout.empty.no-type-installed',
 		defaultMessage: 'No {contentType} installed',
 	},
+	typeHint: {
+		id: 'content.page-layout.empty.type-hint',
+		defaultMessage: 'Upload or browse for {contentType} to get started.',
+	},
 	browseType: {
 		id: 'content.page-layout.empty.browse-type',
 		defaultMessage: 'Browse {contentType}',
+	},
+	browseContent: {
+		id: 'content.page-layout.empty.browse-content',
+		defaultMessage: 'Browse content',
 	},
 	shareProjectNames: {
 		id: 'content.page-layout.share.project-names',
@@ -392,8 +392,19 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 						v-if="typeItems.length === 0"
 						:icon="getProjectTypeIcon(activeType)"
 						:heading="formatMessage(messages.noTypeInstalled, { contentType: activeTypePlural })"
+						:description="formatMessage(messages.typeHint, { contentType: activeTypePlural })"
 					>
 						<template #actions>
+							<Button
+								v-tooltip="addTooltip"
+								type="outlined"
+								size="lg"
+								:disabled="isBusy || !ctx.canAdd.value"
+								@click="ctx.upload()"
+							>
+								<FolderOpenIcon />
+								{{ formatMessage(messages.uploadFiles) }}
+							</Button>
 							<Button
 								v-tooltip="addTooltip"
 								type="colored"
@@ -402,7 +413,7 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 								:disabled="isBusy || !ctx.canAdd.value"
 								@click="ctx.browse(activeType)"
 							>
-								<PlusIcon class="size-5" />
+								<CompassIcon />
 								{{ formatMessage(messages.browseType, { contentType: activeTypePlural }) }}
 							</Button>
 						</template>
@@ -439,9 +450,7 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 							ctx.managed.value ? messages.noExtraContentInstalled : messages.noContentInstalled,
 						)
 					"
-					:description="
-						formatMessage(ctx.managed.value ? messages.emptyModpackHint : messages.emptyHint)
-					"
+					:description="formatMessage(messages.emptyHint)"
 				>
 					<template #actions>
 						<Button
@@ -462,8 +471,8 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 							:disabled="isBusy || !ctx.canAdd.value"
 							@click="ctx.browse(activeType)"
 						>
-							<PlusIcon />
-							{{ formatMessage(messages.addContent) }}
+							<CompassIcon />
+							{{ formatMessage(messages.browseContent) }}
 						</Button>
 					</template>
 				</EmptyState>

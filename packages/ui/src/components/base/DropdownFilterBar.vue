@@ -11,15 +11,25 @@
 	<template v-for="preview in showPreviews ? appliedFilterPreviews : []" :key="preview.key">
 		<Button
 			v-if="preview.category.direct"
-			type="outlined"
+			type="base"
 			native-type="button"
 			:size="compact ? 'sm' : 'lg'"
 			:class="effectivePreviewTriggerClass"
 			:aria-label="formatMessage(messages.clearNamedFilter, { name: preview.label })"
 			@click="clearFilterCategory(preview.key)"
 		>
-			<span class="font-semibold">{{ preview.label }}</span>
-			<XIcon class="size-4" />
+			<div
+				class="flex min-w-0 max-w-full items-center gap-2 sm:max-w-80"
+				:class="compact ? 'min-h-6' : 'min-h-8'"
+			>
+				<FilterIcon
+					v-if="showPreviewFilterIcon"
+					class="size-5 shrink-0 text-primary"
+					aria-hidden="true"
+				/>
+				<span class="min-w-0 flex-1 truncate font-semibold text-contrast">{{ preview.label }}</span>
+				<XIcon class="size-4 shrink-0 text-primary" />
+			</div>
 		</Button>
 		<MultiSelect
 			v-else

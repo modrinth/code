@@ -49,8 +49,9 @@ export function useContentViewState(options: ContentViewStateOptions) {
 		]
 	})
 
-	const activeType = ref<ContentType>(types.value[0] ?? 'mod')
-	syncRefToRouteQuery(activeType, 'type', activeType.value, (candidate): candidate is ContentType =>
+	const defaultType = types.value[0] ?? 'mod'
+	const activeType = ref<ContentType>(defaultType)
+	syncRefToRouteQuery(activeType, 'type', defaultType, (candidate): candidate is ContentType =>
 		types.value.includes(candidate as ContentType),
 	)
 	watch(types, (next) => {
@@ -59,6 +60,24 @@ export function useContentViewState(options: ContentViewStateOptions) {
 
 	const typeItems = computed(() =>
 		options.items.value.filter((item) => contentTypeOf(item) === activeType.value),
+	)
+
+	let autoSelectedType: ContentType | null = activeType.value === defaultType ? defaultType : null
+	watch(activeType, (next) => {
+		if (next !== autoSelectedType) autoSelectedType = null
+	})
+	watch(
+		options.items,
+		(items) => {
+			if (autoSelectedType === null || typeItems.value.length > 0) return
+			const populated = types.value.find((type) =>
+				items.some((item) => contentTypeOf(item) === type),
+			)
+			if (!populated) return
+			autoSelectedType = populated
+			activeType.value = populated
+		},
+		{ immediate: true },
 	)
 
 	const sortModes = persisted<Partial<Record<ContentType, ContentSortMode>>>(

@@ -803,11 +803,11 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Please wait for the operation to complete before editing content."
   },
+  "content.page-layout.empty.browse-content": {
+    "defaultMessage": "Browse content"
+  },
   "content.page-layout.empty.browse-type": {
     "defaultMessage": "Browse {contentType}"
-  },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Add additional content on top of this modpack"
   },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "No content installed"
@@ -819,7 +819,10 @@
     "defaultMessage": "No {contentType} installed"
   },
   "content.page-layout.empty.projects-hint": {
-    "defaultMessage": "Browse or upload projects to get started."
+    "defaultMessage": "Upload or browse for content to get started."
+  },
+  "content.page-layout.empty.type-hint": {
+    "defaultMessage": "Upload or browse for {contentType} to get started."
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Failed to load content"

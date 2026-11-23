@@ -243,7 +243,7 @@ export function useInstanceContentManager() {
 	})
 	managedState.watchHighlightedManagedItem(items)
 
-	const upload = useContentUpload({ instance, isInstanceBusy, items, refetchContent })
+	const upload = useContentUpload({ instance, items, refetchContent })
 
 	async function findDependents(targets: ContentItem[]) {
 		if (instancePage.isServerInstance.value) return null
