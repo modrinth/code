@@ -60,8 +60,10 @@ const navItems = computed(() => {
 	const base = `${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
 
 	const showEnvironment =
-		projectV3.value?.project_types?.some((type) => ['mod', 'modpack'].includes(type)) &&
-		isStaffMember.value
+		!isServerProject.value &&
+		isStaffMember.value &&
+		!flags.value.showModeratorProjectMemberUi &&
+		projectV3.value?.project_types?.some((type) => ['mod', 'modpack'].includes(type))
 
 	const hasPermissionsPage = projectV3.value?.project_types?.includes('modpack')
 
@@ -129,16 +131,14 @@ const navItems = computed(() => {
 			label: formatMessage(commonProjectSettingsMessages.analytics),
 			icon: ChartIcon,
 		},
-		!isServerProject.value && {
+		showEnvironment && {
 			type: 'heading',
 			label: 'moderation',
-			shown: showEnvironment,
 		},
-		!isServerProject.value && {
+		showEnvironment && {
 			link: `/${base}/settings/environment`,
 			label: formatMessage(commonProjectSettingsMessages.environment),
 			icon: GlobeIcon,
-			shown: showEnvironment,
 		},
 	]
 	return items
