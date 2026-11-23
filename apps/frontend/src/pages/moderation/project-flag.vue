@@ -24,6 +24,16 @@
 				>
 			</p>
 			<p v-else class="m-0 text-secondary">No rules deployed.</p>
+			<Button :disabled="isDeploying || isBusy || isEditing" @click="confirmStagingDeploy">
+				<LoaderCircleIcon v-if="isDeploying" class="animate-spin" />
+				{{ isDeploying ? 'Deploying…' : 'Deploy current staging' }}
+			</Button>
+			<p v-if="deployError" role="alert" class="m-0 text-red">
+				Could not deploy staging: {{ errorMessage(deployError) }}
+			</p>
+			<p v-if="deploySuccess" role="status" class="m-0 text-green">
+				Current staging deployed successfully.
+			</p>
 		</div>
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<NavTabs :links="tabs" query="tab" />
@@ -179,6 +189,18 @@
 				<div class="flex flex-wrap items-start justify-between gap-3">
 					<div class="min-w-0">
 						<h2 class="m-0 break-words text-lg font-bold text-contrast">{{ rule.name }}</h2>
+						<p
+							class="m-0 text-sm text-secondary"
+							title="Compares rule ID, name, and parameters, excluding audit metadata. Shared modules are excluded."
+						>
+							{{
+								rule.deployment_status === 'current'
+									? 'Deployed · current definition'
+									: rule.deployment_status === 'outdated'
+										? 'Outdated · definition differs from live'
+										: 'Not deployed'
+							}}
+						</p>
 						<p class="m-0 mt-1 text-sm text-secondary">
 							Created {{ formatDate(rule.created_at) }} · Updated {{ formatDate(rule.updated_at) }}
 						</p>
@@ -299,6 +321,26 @@ const {
 	isFetching: deploymentFetching,
 	refetch: refetchDeployment,
 } = useQuery(projectFlagDeploymentQueryOptions(client))
+const {
+	mutate: deployStaging,
+	isPending: isDeploying,
+	error: deployError,
+	isSuccess: deploySuccess,
+} = useMutation({
+	mutationFn: () => api.deployStaging(),
+	retry: false,
+	onSuccess: async () => {
+		await queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag'] })
+	},
+})
+function confirmStagingDeploy() {
+	if (
+		window.confirm(
+			'Deploy all currently saved staging rules and shared modules to live? This includes additions, edits, and deletions, without running a test scan. Unsaved edits are not included.',
+		)
+	)
+		deployStaging()
+}
 type Rule = Awaited<ReturnType<typeof api.get>>
 
 const PAGE_SIZE = 25
@@ -380,7 +422,7 @@ const {
 		await nextTick()
 		closeEditor()
 		if (id === null) offset.value = 0
-		await queryClient.invalidateQueries({ queryKey })
+		await queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag'] })
 	},
 })
 
@@ -396,7 +438,7 @@ const {
 		if (rules.value.length === 1 && offset.value > 0) {
 			offset.value = Math.max(0, offset.value - PAGE_SIZE)
 		}
-		await queryClient.invalidateQueries({ queryKey })
+		await queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag'] })
 	},
 })
 const isBusy = computed(() => isSaving.value || isDeleting.value)

@@ -140,7 +140,7 @@ const {
 	retry: false,
 	onSuccess: async (_, { module }) => {
 		original.value = { ...module }
-		await queryClient.invalidateQueries({ queryKey })
+		await queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag'] })
 	},
 })
 const {
@@ -155,7 +155,7 @@ const {
 		editing.value = false
 		original.value = null
 		Object.assign(form, { name: '', script: '' })
-		await queryClient.invalidateQueries({ queryKey })
+		await queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag'] })
 	},
 })
 const busy = computed(() => isSaving.value || isDeleting.value)

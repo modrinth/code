@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT rulesets.rules FROM project_flags_deployed AS deployed\n        JOIN project_flag_rulesets AS rulesets ON rulesets.id = deployed.ruleset_id\n        WHERE deployed.singleton\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "rules",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_flag_rulesets",
+            "name": "rules"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "c23337e5eb9c53804b9e2586b193485ef006df2b36ba25d13e93754263bb7981"
+}

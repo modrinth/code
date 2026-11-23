@@ -26,6 +26,7 @@ export interface ProjectFlagRule {
 	updated_by: number | null
 	updated_at: string
 	params: ProjectFlagRuleParams
+	deployment_status: 'current' | 'outdated' | 'not_deployed'
 }
 
 export type ListProjectFlagRulesParams = {
@@ -91,10 +92,18 @@ export interface ProjectFlagDeployment {
 export interface ProjectFlagRun {
 	id: string
 	ruleset_id: string | null
-	status: 'done' | { running: { num_queued: number } }
+	status:
+		| 'completed'
+		| 'failed'
+		| 'canceled'
+		| 'terminated'
+		| 'timed_out'
+		| 'continued_as_new'
+		| 'unknown'
+		| { running: { num_queued: number } }
 	/** Projects originally queued, including projects not yet evaluated. */
 	total_projects: number
-	/** Projects with persisted results, including failed evaluations. */
+	/** Completed projects, including failed evaluations and deleted-project skips. */
 	num_scanned: number
 	/** Successfully evaluated projects with at least one flag. */
 	num_flagged: number
@@ -104,12 +113,11 @@ export interface ProjectFlagRun {
 	num_no_flags: number
 	/** Projects with any project or rule error, even if also flagged. */
 	num_errors: number
+	/** Projects deleted before result persistence. */
+	num_skipped: number
 	started_by: ProjectFlagRunUser | null
 	started_at: string
 	completed_at: string | null
-	applied_at: string | null
-	applied_by: ProjectFlagRunUser | null
-	output: Record<string, never> | null
 	error: string | null
 }
 

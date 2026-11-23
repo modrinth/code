@@ -38,6 +38,7 @@ pub fn project_flag_worker_options(
     pool: PgPool,
     redis: RedisPool,
     file_host: Arc<dyn FileHost>,
+    temporal: temporalio_client::Client,
 ) -> Result<WorkerOptions> {
     let engine =
         crate::queue::moderation::project_flag::ProjectFlagEngine::new(
@@ -51,6 +52,7 @@ pub fn project_flag_worker_options(
         .register_workflow::<run::ProjectFlagRunWorkflow>()
         .context("registering project flag run workflow")?
         .register_activities(run::RunActivities {
+            temporal,
             pool: pool.clone(),
             engine: engine.clone(),
         })

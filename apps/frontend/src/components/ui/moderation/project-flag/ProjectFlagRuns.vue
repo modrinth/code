@@ -3,6 +3,10 @@
 		<p v-if="activityError" role="alert" class="m-0 text-red">
 			Could not load scan activity: {{ errorMessage(activityError) }}
 		</p>
+		<p class="m-0 text-sm text-secondary">
+			Runs are listed from Temporal and remain available for its configured history retention
+			period. Stored evaluation results and deployed rulesets outlive that history.
+		</p>
 		<p v-if="startError" role="alert" class="m-0 text-red">
 			Could not start the run: {{ errorMessage(startError) }}
 		</p>
@@ -40,22 +44,10 @@
 			</template>
 			<template #cell-status="{ row }">
 				<span class="inline-flex items-center gap-2"
-					><LoaderCircleIcon v-if="row.status !== 'done'" class="size-4 animate-spin" />{{
+					><LoaderCircleIcon v-if="isRunning(row.status)" class="size-4 animate-spin" />{{
 						formatStatus(row.status)
 					}}</span
 				>
-			</template>
-			<template #cell-applied_at="{ row }">
-				<div class="flex flex-col gap-1">
-					<span>{{ formatDate(row.applied_at) }}</span>
-					<NuxtLink
-						v-if="row.applied_by"
-						data-no-row-click
-						:to="`/user/${row.applied_by.id}`"
-						class="text-sm text-link"
-						>{{ row.applied_by.username }}</NuxtLink
-					>
-				</div>
 			</template>
 			<template #cell-view="{ row }">
 				<div class="flex items-center gap-2" data-no-row-click>
@@ -103,8 +95,9 @@
 					>?
 				</p>
 				<p class="m-0 text-secondary">
-					This permanently deletes the run, its results, and its unretained inactive project flags.
-					Active and retained flags are preserved and detached from the run. This cannot be undone.
+					This terminates any running execution and permanently deletes its Temporal history,
+					results, and unretained inactive project flags. Active and retained flags are preserved
+					and detached from the run. This cannot be undone.
 				</p>
 				<p v-if="deleteError" role="alert" class="m-0 text-red">
 					Could not delete the run: {{ errorMessage(deleteError) }}
@@ -132,13 +125,27 @@
 			:on-hide="closeRun"
 		>
 			<div v-if="selectedRun" class="flex w-[64rem] max-w-full flex-col gap-4">
+				<p v-if="runDetailError" role="alert" class="m-0 text-red">
+					Could not refresh Temporal execution: {{ errorMessage(runDetailError) }}
+				</p>
+				<p v-if="historyUnavailable" role="status" class="m-0 text-secondary">
+					Temporal history is unavailable. Metadata below is from the last loaded snapshot, not a
+					current execution status. Stored results remain accessible, but this run cannot be
+					deployed.
+				</p>
 				<dl class="m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
 					<dt class="font-semibold text-contrast">Run ID</dt>
 					<dd class="m-0 break-all font-mono">{{ selectedRun.id }}</dd>
 					<dt class="font-semibold text-contrast">Tested revision</dt>
 					<dd class="m-0 break-all font-mono">{{ selectedRun.ruleset_id ?? 'Unavailable' }}</dd>
 					<dt class="font-semibold text-contrast">Status</dt>
-					<dd class="m-0">{{ formatStatus(selectedRun.status) }}</dd>
+					<dd class="m-0">
+						{{
+							historyUnavailable
+								? 'Unavailable (deleted or expired)'
+								: formatStatus(selectedRun.status)
+						}}
+					</dd>
 					<dt class="font-semibold text-contrast">Started by</dt>
 					<dd class="m-0">
 						<NuxtLink
@@ -153,21 +160,9 @@
 					<dd class="m-0">{{ formatDate(selectedRun.started_at) }}</dd>
 					<dt class="font-semibold text-contrast">Completed</dt>
 					<dd class="m-0">{{ formatDate(selectedRun.completed_at) }}</dd>
-					<dt class="font-semibold text-contrast">Applied</dt>
-					<dd class="m-0">{{ formatDate(selectedRun.applied_at) }}</dd>
-					<dt class="font-semibold text-contrast">Applied by</dt>
-					<dd class="m-0">
-						<NuxtLink
-							v-if="selectedRun.applied_by"
-							:to="`/user/${selectedRun.applied_by.id}`"
-							class="text-link"
-							>{{ selectedRun.applied_by.username }}</NuxtLink
-						>
-						<span v-else>—</span>
-					</dd>
 					<dt class="font-semibold text-contrast">Originally queued</dt>
 					<dd class="m-0">{{ selectedRun.total_projects }}</dd>
-					<dt class="font-semibold text-contrast">Scanned</dt>
+					<dt class="font-semibold text-contrast">Completed (including skipped)</dt>
 					<dd class="m-0">{{ selectedRun.num_scanned }}</dd>
 					<dt class="font-semibold text-contrast">Flagged</dt>
 					<dd class="m-0">{{ selectedRun.num_flagged }}</dd>
@@ -177,6 +172,8 @@
 					<dd class="m-0">{{ selectedRun.num_no_flags }}</dd>
 					<dt class="font-semibold text-contrast">Errors</dt>
 					<dd class="m-0">{{ selectedRun.num_errors }}</dd>
+					<dt class="font-semibold text-contrast">Skipped (deleted)</dt>
+					<dd class="m-0">{{ selectedRun.num_skipped }}</dd>
 				</dl>
 				<p
 					v-if="selectedRun.error !== null"
@@ -185,13 +182,10 @@
 				>
 					Run error: {{ selectedRun.error }}
 				</p>
-				<details v-if="selectedRun.output !== null">
-					<summary class="cursor-pointer font-semibold text-contrast">Run output</summary>
-					<pre class="max-h-64 overflow-auto whitespace-pre-wrap break-words text-sm">{{
-						json(selectedRun.output)
-					}}</pre>
-				</details>
-				<div v-if="selectedRun.status === 'done'" class="flex flex-col items-start gap-3">
+				<div
+					v-if="!historyUnavailable && selectedRun.status === 'completed'"
+					class="flex flex-col items-start gap-3"
+				>
 					<Button
 						type="colored"
 						color="brand"
@@ -360,7 +354,7 @@
 					</details>
 					<p v-if="resultRows.length === 0" class="p-6 text-center text-secondary">
 						{{
-							selectedRun.status !== 'done'
+							isRunning(selectedRun.status)
 								? 'No project results on this page yet. Results refresh automatically.'
 								: 'No project results on this page.'
 						}}
@@ -446,6 +440,7 @@ const {
 		queryClient.setQueryData(deploymentOptions.queryKey, deployed)
 		confirmingDeploy.value = false
 		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag', 'rules'] }),
 			queryClient.invalidateQueries({ queryKey: deploymentOptions.queryKey }),
 			queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag', 'runs'] }),
 		])
@@ -485,13 +480,31 @@ const { data, isPending, isError, error, isFetching, refetch } = useQuery({
 		{ limit: PAGE_SIZE + 1, offset: offset.value },
 	]),
 	queryFn: () => api.listRuns({ limit: PAGE_SIZE + 1, offset: offset.value }),
-	refetchInterval: (query) =>
-		query.state.data?.some((run) => run.status !== 'done') ? REFRESH_INTERVAL : false,
+	refetchInterval: REFRESH_INTERVAL,
 })
 const runs = computed(() => data.value?.slice(0, PAGE_SIZE) ?? [])
 const hasNextPage = computed(() => (data.value?.length ?? 0) > PAGE_SIZE)
+const { data: runDetail, error: runDetailError } = useQuery({
+	queryKey: computed(() => [
+		'moderation',
+		'project-flag',
+		'runs',
+		selectedSnapshot.value?.id,
+		'detail',
+	]),
+	queryFn: () => {
+		if (!selectedSnapshot.value) throw new Error('No run selected.')
+		return api.getRun(selectedSnapshot.value.id)
+	},
+	enabled: computed(() => selectedSnapshot.value !== null),
+	refetchInterval: REFRESH_INTERVAL,
+})
+const historyUnavailable = computed(() => runDetail.value === null)
 const selectedRun = computed(
-	() => data.value?.find((run) => run.id === selectedSnapshot.value?.id) ?? selectedSnapshot.value,
+	() =>
+		runDetail.value ??
+		data.value?.find((run) => run.id === selectedSnapshot.value?.id) ??
+		selectedSnapshot.value,
 )
 const alreadyDeployed = computed(
 	() =>
@@ -500,7 +513,10 @@ const alreadyDeployed = computed(
 )
 const canDeploy = computed(
 	() =>
-		selectedRun.value?.status === 'done' &&
+		!!runDetail.value &&
+		!historyUnavailable.value &&
+		!runDetailError.value &&
+		selectedRun.value?.status === 'completed' &&
 		!!selectedRun.value.ruleset_id &&
 		!alreadyDeployed.value &&
 		!deploymentPending.value &&
@@ -533,7 +549,9 @@ const {
 	},
 	enabled: computed(() => selectedRun.value !== null),
 	refetchInterval: () =>
-		selectedRun.value && selectedRun.value.status !== 'done' ? REFRESH_INTERVAL : false,
+		selectedRun.value && !historyUnavailable.value && isRunning(selectedRun.value.status)
+			? REFRESH_INTERVAL
+			: false,
 })
 function formatProposedReviewOutcome(outcome: RunResult['proposed_review_outcome']): string {
 	switch (outcome) {
@@ -582,18 +600,19 @@ const columns = [
 	{ key: 'started_by', label: 'Started by' },
 	{ key: 'status', label: 'Status' },
 	{ key: 'total_projects', label: 'Originally queued' },
-	{ key: 'num_scanned', label: 'Scanned' },
+	{ key: 'num_scanned', label: 'Completed' },
 	{ key: 'num_flagged', label: 'Flagged' },
 	{ key: 'num_no_flags', label: 'No flags' },
 	{ key: 'num_errors', label: 'Errors' },
-	{ key: 'applied_at', label: 'Applied' },
+	{ key: 'num_skipped', label: 'Skipped' },
 	{ key: 'view', label: 'Actions', cellClass: 'whitespace-nowrap' },
 ]
 
 watch(
 	() => selectedRun.value?.status,
 	(status, previousStatus) => {
-		if (status === 'done' && previousStatus && previousStatus !== 'done') refetchResults()
+		if (status && !isRunning(status) && previousStatus && isRunning(previousStatus))
+			refetchResults()
 	},
 )
 
@@ -628,8 +647,22 @@ function closeRun() {
 	resultsOffset.value = 0
 }
 
+function isRunning(status: Run['status']) {
+	return typeof status === 'object' && 'running' in status
+}
+
 function formatStatus(status: Run['status']) {
-	return status === 'done' ? 'Done' : 'Running'
+	if (typeof status === 'object') return `Running (${status.running.num_queued} queued)`
+	const labels = {
+		completed: 'Completed',
+		failed: 'Failed',
+		canceled: 'Canceled',
+		terminated: 'Terminated',
+		timed_out: 'Timed out',
+		continued_as_new: 'Continued as new',
+		unknown: 'Unknown',
+	}
+	return labels[status]
 }
 
 function formatDate(value: string | null) {

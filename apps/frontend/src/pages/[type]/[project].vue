@@ -2212,7 +2212,8 @@ watch(
 async function setProcessing() {
 	if (
 		patchStatusMutation.isPending.value ||
-		!canSubmitProjectForReview(projectValidation.value, reviewSubmissionLoading.value) ||
+		(!isStaff(auth.value.user) &&
+			!canSubmitProjectForReview(projectValidation.value, reviewSubmissionLoading.value)) ||
 		(isRejected(project.value) && !canResubmitProjectForReview(thread.value))
 	) {
 		return false
@@ -2220,9 +2221,9 @@ async function setProcessing() {
 	reviewSubmissionPending.value = true
 	startLoading()
 	try {
-		const validation = await refreshProjectValidation()
+		const validation = isStaff(auth.value.user) ? null : await refreshProjectValidation()
 		if (
-			!canSubmitProjectForReview(validation, false) ||
+			(!isStaff(auth.value.user) && !canSubmitProjectForReview(validation, false)) ||
 			(isRejected(project.value) && !canResubmitProjectForReview(thread.value))
 		) {
 			return false

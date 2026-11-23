@@ -139,6 +139,8 @@ import { isStaff } from '@modrinth/utils'
 import type { Component } from 'vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
+import { useAuthState } from '~/composables/auth'
+
 interface Tags {
 	categories?: Labrinth.Tags.v2.Category[]
 	rejectedStatuses: string[]
@@ -213,6 +215,7 @@ const messages = defineMessages({
 
 const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()
+const auth = useAuthState()
 
 const props = withDefaults(defineProps<Props>(), {
 	versions: () => [],
@@ -364,9 +367,10 @@ const nagContext = computed<NagContext>(() => ({
 
 const canSubmitForReview = computed(() => {
 	return (
-		!props.validationLoading &&
-		props.validationAvailable &&
-		!props.validationNags.some((nag) => nag.severity === 'required')
+		isStaff(auth.value.user) ||
+		(!props.validationLoading &&
+			props.validationAvailable &&
+			!props.validationNags.some((nag) => nag.severity === 'required'))
 	)
 })
 

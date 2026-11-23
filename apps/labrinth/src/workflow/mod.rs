@@ -29,8 +29,14 @@ pub async fn run(
         .map_err(|error| anyhow::Error::from_boxed(error.into()))?;
     let worker = Worker::new(
         &runtime,
-        temporal.client,
-        project_flag_worker_options(project_flags, pool, redis, file_host)?,
+        temporal.client.clone(),
+        project_flag_worker_options(
+            project_flags,
+            pool,
+            redis,
+            file_host,
+            temporal.client,
+        )?,
     )
     .context("creating temporal worker")?;
 

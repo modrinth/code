@@ -387,7 +387,7 @@ pub struct ProjectFlagRuleResult {
 
 type RuleResults = BTreeMap<String, ProjectFlagRuleResult>;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DBProjectFlagRunResult {
     pub run_id: Option<ProjectFlagRunId>,
     pub project_id: DBProjectId,
@@ -536,6 +536,7 @@ pub struct ProjectFlagRunCounts {
     pub num_flagged: i64,
     pub num_no_flags: i64,
     pub num_errors: i64,
+    pub num_skipped: i64,
 }
 
 impl DBProjectFlagRunResult {
@@ -548,9 +549,10 @@ impl DBProjectFlagRunResult {
             r#"
             SELECT run_id AS "run_id!", COUNT(*) AS "num_scanned!",
                 COALESCE(SUM(num_flags), 0)::bigint AS "num_flags!",
-                COUNT(*) FILTER (WHERE error IS NULL AND num_flags > 0) AS "num_flagged!",
-                COUNT(*) FILTER (WHERE error IS NULL AND num_flags = 0) AS "num_no_flags!",
-                COUNT(*) FILTER (WHERE error IS NOT NULL) AS "num_errors!"
+                COUNT(*) FILTER (WHERE NOT skipped AND error IS NULL AND num_flags > 0) AS "num_flagged!",
+                COUNT(*) FILTER (WHERE NOT skipped AND error IS NULL AND num_flags = 0) AS "num_no_flags!",
+                COUNT(*) FILTER (WHERE NOT skipped AND error IS NOT NULL) AS "num_errors!",
+                COUNT(*) FILTER (WHERE skipped) AS "num_skipped!"
             FROM project_flag_run_results
             WHERE run_id = ANY($1)
             GROUP BY run_id
@@ -571,6 +573,7 @@ impl DBProjectFlagRunResult {
                         num_flagged: row.num_flagged,
                         num_no_flags: row.num_no_flags,
                         num_errors: row.num_errors,
+                        num_skipped: row.num_skipped,
                     },
                 )
             })
@@ -582,25 +585,18 @@ impl DBProjectFlagRunResult {
         limit: i64,
         offset: i64,
         pool: &ReadOnlyPgPool,
-    ) -> Result<Option<ProjectFlagRunResults>> {
+    ) -> Result<ProjectFlagRunResults> {
         let run = sqlx::query!(
             r#"
-            SELECT (
-                SELECT COUNT(*)
-                FROM project_flag_run_results
-                WHERE run_id = runs.id
-            ) AS "total!"
-            FROM project_flag_runs AS runs
-            WHERE runs.id = $1
-            "#,
-            run_id.0,
+            SELECT COUNT(*) AS "total!" FROM project_flag_run_results AS results
+            INNER JOIN mods AS projects ON projects.id = results.project_id
+            WHERE results.run_id = $1
+        "#,
+            run_id.0
         )
-        .fetch_optional(&**pool)
+        .fetch_one(&**pool)
         .await
         .context("counting project flag run results")?;
-        let Some(run) = run else {
-            return Ok(None);
-        };
         let rows = sqlx::query!(
             r#"
             SELECT projects.id, projects.name AS title, projects.slug, projects.icon_url,
@@ -638,7 +634,7 @@ impl DBProjectFlagRunResult {
         .into_iter()
         .map(|row| (row.id.to_string(), row.name))
         .collect::<BTreeMap<_, _>>();
-        Ok(Some(ProjectFlagRunResults {
+        Ok(ProjectFlagRunResults {
             results: rows
                 .into_iter()
                 .map(|row| ProjectFlagRunResult {
@@ -667,10 +663,43 @@ impl DBProjectFlagRunResult {
                 })
                 .collect(),
             total: run.total,
-        }))
+        })
     }
 
     pub async fn upsert_many(results: Vec<Self>, pool: &PgPool) -> Result<()> {
+        anyhow::ensure!(
+            results.iter().all(|r| r.run_id.is_none()),
+            "run results require a temporal activity guard"
+        );
+        Self::upsert_many_guarded(results, pool, None).await
+    }
+
+    pub(crate) async fn upsert_many_guarded(
+        results: Vec<Self>,
+        pool: &PgPool,
+        guard: Option<(
+            &temporalio_client::Client,
+            &temporalio_sdk::activities::ActivityContext,
+        )>,
+    ) -> Result<()> {
+        Self::upsert_many_checked(results, pool, |id| async move {
+            let (client, ctx) = guard.context("run results require a temporal activity guard")?;
+            if ctx.is_cancelled() {
+                return Ok(false);
+            }
+            Ok(crate::workflow::project_flag::run::describe(client, id).await?
+                .is_some_and(|run| run.status == crate::workflow::project_flag::run::RunStatus::Running))
+        }).await
+    }
+
+    async fn upsert_many_checked<F>(
+        results: Vec<Self>,
+        pool: &PgPool,
+        can_persist: impl Fn(ProjectFlagRunId) -> F + Send + Sync,
+    ) -> Result<()>
+    where
+        F: std::future::Future<Output = Result<bool>> + Send,
+    {
         if results.is_empty() {
             return Ok(());
         }
@@ -690,6 +719,7 @@ impl DBProjectFlagRunResult {
             #[serde(flatten)]
             result: DBProjectFlagRunResult,
             effective_flags: Vec<PersistedProjectFlag>,
+            skipped: bool,
         }
 
         let mut run_results = std::collections::HashMap::new();
@@ -723,24 +753,20 @@ impl DBProjectFlagRunResult {
                     id: uuid::Uuid::now_v7(),
                     result,
                     effective_flags: Vec::new(),
+                    skipped: false,
                 });
         let mut transaction = pool
             .begin()
             .await
             .context("starting project flag results transaction")?;
-        sqlx::query!(
-            r#"
-            SELECT id
-            FROM project_flag_runs
-            WHERE id = ANY($1)
-            ORDER BY id
-            FOR UPDATE
-            "#,
-            &run_ids,
-        )
-        .fetch_all(&mut transaction)
-        .await
-        .context("locking project flag runs")?;
+        for id in &run_ids {
+            let id = ProjectFlagRunId(*id);
+            crate::workflow::project_flag::run::lock_run(&mut transaction, id)
+                .await?;
+            if !can_persist(id).await? {
+                return Ok(());
+            }
+        }
         let surviving_projects = sqlx::query!(
             r#"
             SELECT id, in_review FROM mods
@@ -770,12 +796,18 @@ impl DBProjectFlagRunResult {
         }
         let results = results
             .filter_map(|mut payload| {
-                let index = surviving_projects
-                    .binary_search_by_key(
-                        &payload.result.project_id.0,
-                        |project| project.id,
-                    )
-                    .ok()?;
+                let index = surviving_projects.binary_search_by_key(
+                    &payload.result.project_id.0,
+                    |project| project.id,
+                );
+                let Ok(index) = index else {
+                    payload.result.run_id?;
+                    payload.skipped = true;
+                    payload.result.rules.clear();
+                    payload.result.error = None;
+                    payload.result.proposed_review_outcome = None;
+                    return Some(payload);
+                };
                 let project = &surviving_projects[index];
                 payload.effective_flags = effective_project_flags(
                     payload.result.rules.values().flat_map(|rule| &rule.flags),
@@ -795,16 +827,14 @@ impl DBProjectFlagRunResult {
         sqlx::query!(
             r#"
             INSERT INTO project_flag_run_results
-                (id, run_id, project_id, rule_results, num_flags, error, proposed_review_outcome, effective_flags)
+                (id, run_id, project_id, rule_results, num_flags, error, proposed_review_outcome, effective_flags, skipped)
             SELECT results.id, results.run_id, results.project_id, results.rule_results,
                 jsonb_array_length(results.effective_flags)::BIGINT,
-                results.error, results.proposed_review_outcome, results.effective_flags
+                results.error, results.proposed_review_outcome, results.effective_flags, results.skipped
             FROM jsonb_to_recordset($1) AS results(
                 id UUID, run_id UUID, project_id BIGINT, rule_results JSONB, error TEXT,
-                proposed_review_outcome TEXT, effective_flags JSONB
+                proposed_review_outcome TEXT, effective_flags JSONB, skipped BOOLEAN
             )
-            LEFT JOIN project_flag_runs AS runs ON runs.id = results.run_id
-            WHERE results.run_id IS NULL OR runs.status = 'running'
             ORDER BY results.run_id, results.project_id
             ON CONFLICT (run_id, project_id) DO NOTHING
             "#,
@@ -821,232 +851,67 @@ impl DBProjectFlagRunResult {
     }
 }
 
+#[cfg(test)]
+mod skipped_result_tests {
+    use super::*;
+    use crate::test::{
+        api_v3::ApiV3,
+        environment::{TestEnvironment, with_test_environment},
+    };
+
+    #[actix_rt::test]
+    async fn deleted_projects_complete_idempotently_without_resurrecting_runs()
+    {
+        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+            let pool = &env.db.pool;
+            let existing = sqlx::query_scalar!(r#"SELECT id FROM mods ORDER BY id LIMIT 1"#)
+                .fetch_one(pool).await.unwrap();
+            for projects in [vec![existing, -1], vec![-1, -2]] {
+                let run_id = ProjectFlagRunId(uuid::Uuid::now_v7());
+                let results = projects.into_iter().map(|id| DBProjectFlagRunResult {
+                    run_id: Some(run_id), project_id: DBProjectId(id),
+                    proposed_review_outcome: Some(ProjectReviewOutcome::Approved),
+                    rules: BTreeMap::new(), error: None,
+                }).collect::<Vec<_>>();
+                assert!(DBProjectFlagRunResult::upsert_many(results.clone(), pool).await.is_err());
+                let (first, retry) = tokio::join!(
+                    DBProjectFlagRunResult::upsert_many_checked(results.clone(), pool, |_| async { Ok(true) }),
+                    DBProjectFlagRunResult::upsert_many_checked(results.clone(), pool, |_| async { Ok(true) }),
+                );
+                first.unwrap(); retry.unwrap();
+                let counts = DBProjectFlagRunResult::counts(&[run_id], pool).await.unwrap().remove(&run_id).unwrap();
+                assert_eq!(counts.num_scanned, 2);
+                let skipped = if results[0].project_id.0 == existing { 1 } else { 2 };
+                assert_eq!(counts.num_skipped, skipped);
+                assert_eq!(counts.num_no_flags, 2 - skipped);
+                assert_eq!(counts.num_errors, 0);
+                assert_eq!(counts.num_flagged, 0);
+                let tombstones = sqlx::query!(r#"
+                    SELECT rule_results, effective_flags, proposed_review_outcome, error, num_flags
+                    FROM project_flag_run_results WHERE run_id = $1 AND skipped
+                "#, run_id.0).fetch_all(pool).await.unwrap();
+                assert_eq!(tombstones.len() as i64, skipped);
+                for row in tombstones {
+                    assert_eq!(row.rule_results, serde_json::json!({}));
+                    assert_eq!(row.effective_flags, serde_json::json!([]));
+                    assert!(row.proposed_review_outcome.is_none());
+                    assert!(row.error.is_none());
+                    assert_eq!(row.num_flags, 0);
+                }
+                sqlx::query!(r#"DELETE FROM project_flag_run_results WHERE run_id = $1"#, run_id.0)
+                    .execute(pool).await.unwrap();
+                DBProjectFlagRunResult::upsert_many_checked(results, pool, |_| async { Ok(false) }).await.unwrap();
+                assert!(DBProjectFlagRunResult::counts(&[run_id], pool).await.unwrap().is_empty());
+            }
+        }).await;
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct ProjectFlagRunUser {
     pub id: ariadne::ids::UserId,
     pub username: String,
 }
-
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct DBProjectFlagRun {
-    pub id: ProjectFlagRunId,
-    pub ruleset_id: Option<uuid::Uuid>,
-    pub status: ProjectFlagRunStatus,
-    pub total_projects: i64,
-    pub started_by: Option<ProjectFlagRunUser>,
-    pub started_at: DateTime<Utc>,
-    pub completed_at: Option<DateTime<Utc>>,
-    pub applied_at: Option<DateTime<Utc>>,
-    pub applied_by: Option<ProjectFlagRunUser>,
-    pub output: Option<ProjectFlagRunOutput>,
-    pub error: Option<String>,
-}
-
-impl DBProjectFlagRun {
-    pub async fn num_scanning(pool: &ReadOnlyPgPool) -> Result<i64> {
-        sqlx::query_scalar!(
-            r#"
-            SELECT COALESCE(SUM(GREATEST(runs.total_projects - (
-                SELECT COUNT(*) FROM project_flag_run_results WHERE run_id = runs.id
-            ), 0)), 0)::BIGINT AS "num_scanning!"
-            FROM project_flag_runs AS runs WHERE runs.status = 'running'
-            "#,
-        )
-        .fetch_one(&**pool)
-        .await
-        .context("counting unfinished project flag scans")
-    }
-
-    pub async fn delete(id: ProjectFlagRunId, pool: &PgPool) -> Result<bool> {
-        let mut transaction = pool
-            .begin()
-            .await
-            .context("starting project flag run deletion")?;
-        let run = sqlx::query_scalar!(
-            r#"SELECT id FROM project_flag_runs WHERE id = $1 FOR UPDATE"#,
-            id.0,
-        )
-        .fetch_optional(&mut transaction)
-        .await
-        .context("locking project flag run for deletion")?;
-        if run.is_none() {
-            return Ok(false);
-        }
-        sqlx::query!(
-            r#"
-            SELECT id FROM mods
-            WHERE id IN (SELECT project_id FROM project_flags WHERE run_id = $1)
-            ORDER BY id
-            FOR UPDATE
-            "#,
-            id.0,
-        )
-        .fetch_all(&mut transaction)
-        .await
-        .context("locking projects for run deletion")?;
-        sqlx::query!(
-            r#"UPDATE project_flags SET run_id = NULL WHERE run_id = $1 AND (active OR (what->>'retain_when_resolved')::bool = TRUE)"#,
-            id.0,
-        ).execute(&mut transaction).await.context("detaching current and retained project flags")?;
-        let result = sqlx::query!(
-            r#"
-            DELETE FROM project_flag_runs
-            WHERE id = $1
-            "#,
-            id.0,
-        )
-        .execute(&mut transaction)
-        .await
-        .context("deleting project flag run")?;
-        transaction
-            .commit()
-            .await
-            .context("committing project flag run deletion")?;
-        Ok(result.rows_affected() > 0)
-    }
-
-    pub async fn queued_project_ids(pool: &PgPool) -> Result<Vec<DBProjectId>> {
-        let ids =
-            sqlx::query_scalar!(r#"SELECT id FROM mods WHERE in_review"#,)
-                .fetch_all(pool)
-                .await
-                .context("fetching queued project IDs")?;
-        Ok(ids.into_iter().map(DBProjectId).collect())
-    }
-
-    pub async fn create(
-        id: ProjectFlagRunId,
-        user_id: DBUserId,
-        total_projects: usize,
-        pool: &PgPool,
-    ) -> Result<Self> {
-        let total_projects = i64::try_from(total_projects)
-            .context("counting project flag run jobs")?;
-        let username = sqlx::query_scalar!(
-            r#"SELECT username FROM users WHERE id = $1"#,
-            user_id.0,
-        )
-        .fetch_one(pool)
-        .await
-        .context("fetching project flag run starter")?;
-        let mut run = Self {
-            id,
-            ruleset_id: None,
-            status: ProjectFlagRunStatus::Running,
-            total_projects,
-            started_by: Some(ProjectFlagRunUser {
-                id: user_id.into(),
-                username,
-            }),
-            started_at: Utc::now(),
-            completed_at: None,
-            applied_at: None,
-            applied_by: None,
-            output: None,
-            error: None,
-        };
-        let mut transaction = pool
-            .begin()
-            .await
-            .context("starting project flag run creation")?;
-        let ruleset_id =
-            freeze_project_flag_ruleset(user_id, &mut transaction).await?;
-        run.ruleset_id = Some(ruleset_id);
-        sqlx::query!(
-            r#"
-            INSERT INTO project_flag_runs (id, status, started_by, started_at, total_projects, ruleset_id)
-            VALUES ($1, 'running', $2, $3, $4, $5)
-            "#,
-            run.id.0,
-            user_id.0,
-            run.started_at,
-            total_projects,
-            ruleset_id,
-        )
-        .execute(&mut transaction)
-        .await
-        .context("creating project flag run")?;
-        transaction
-            .commit()
-            .await
-            .context("committing project flag run creation")?;
-        Ok(run)
-    }
-
-    pub async fn list(
-        limit: i64,
-        offset: i64,
-        pool: &ReadOnlyPgPool,
-    ) -> Result<Vec<Self>> {
-        let rows = sqlx::query!(
-            r#"
-            SELECT runs.id, runs.ruleset_id, runs.status AS "status: ProjectFlagRunStatus", runs.total_projects,
-                starter.id AS "started_by_id?", starter.username AS "started_by_username?",
-                applier.id AS "applied_by_id?", applier.username AS "applied_by_username?",
-                runs.started_at, runs.completed_at, runs.applied_at,
-                runs.output AS "output: sqlx::types::Json<ProjectFlagRunOutput>", runs.error
-            FROM project_flag_runs AS runs
-            LEFT JOIN users AS starter ON starter.id = runs.started_by
-            LEFT JOIN users AS applier ON applier.id = runs.applied_by
-            ORDER BY runs.started_at DESC, runs.id DESC
-            LIMIT $1 OFFSET $2
-            "#,
-            limit,
-            offset,
-        )
-        .fetch_all(&**pool)
-        .await
-        .context("listing project flag runs")?;
-
-        Ok(rows
-            .into_iter()
-            .map(|row| Self {
-                id: ProjectFlagRunId(row.id),
-                ruleset_id: row.ruleset_id,
-                status: row.status,
-                total_projects: row.total_projects,
-                started_by: row.started_by_id.zip(row.started_by_username).map(
-                    |(id, username)| ProjectFlagRunUser {
-                        id: DBUserId(id).into(),
-                        username,
-                    },
-                ),
-                started_at: row.started_at,
-                completed_at: row.completed_at,
-                applied_at: row.applied_at,
-                applied_by: row.applied_by_id.zip(row.applied_by_username).map(
-                    |(id, username)| ProjectFlagRunUser {
-                        id: DBUserId(id).into(),
-                        username,
-                    },
-                ),
-                output: row.output.map(|output| output.0),
-                error: row.error,
-            })
-            .collect())
-    }
-}
-
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Serialize,
-    Deserialize,
-    sqlx::Type,
-    utoipa::ToSchema,
-)]
-#[serde(rename_all = "snake_case")]
-#[sqlx(type_name = "text", rename_all = "snake_case")]
-pub enum ProjectFlagRunStatus {
-    Running,
-    Done,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct ProjectFlagRunOutput {}
 
 pub async fn project_flag_ruleset_snapshot(
     pool: &PgPool,
@@ -1072,7 +937,7 @@ pub async fn project_flag_ruleset_snapshot(
     .transpose()
 }
 
-async fn freeze_project_flag_ruleset(
+pub(crate) async fn freeze_project_flag_ruleset(
     user_id: DBUserId,
     transaction: &mut sqlx_tracing::Transaction<'_, sqlx::Postgres>,
 ) -> Result<uuid::Uuid> {

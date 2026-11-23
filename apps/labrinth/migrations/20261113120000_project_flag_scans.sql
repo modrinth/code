@@ -7,7 +7,8 @@ ALTER TABLE project_flag_run_results
 ALTER TABLE project_flag_run_results
     ADD COLUMN num_flags BIGINT NOT NULL CHECK (num_flags >= 0),
     ADD COLUMN proposed_review_outcome TEXT,
-    ADD COLUMN effective_flags JSONB NOT NULL DEFAULT '[]'::jsonb;
+    ADD COLUMN effective_flags JSONB NOT NULL DEFAULT '[]'::jsonb,
+    ADD COLUMN skipped BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- reusable modules for rule scripts
 
@@ -28,9 +29,15 @@ CREATE TABLE project_flag_scans (
     PRIMARY KEY (scan_kind, input_hash, model_version)
 );
 
--- store which rules and modules were used for which runs
-
 DROP TABLE project_flag_run_pending_jobs;
+
+ALTER TABLE project_flag_run_results
+    DROP CONSTRAINT project_flag_run_results_run_id_fkey;
+
+ALTER TABLE project_flags
+    DROP CONSTRAINT project_flags_run_id_fkey;
+
+DROP TABLE project_flag_runs;
 
 -- Results must survive project deletion so snapshot progress remains accurate.
 ALTER TABLE project_flag_run_results
@@ -45,8 +52,6 @@ CREATE TABLE project_flag_rulesets (
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE project_flag_runs
-    ADD COLUMN ruleset_id UUID REFERENCES project_flag_rulesets(id);
 
 CREATE TABLE project_flags_deployed (
     singleton BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (singleton),

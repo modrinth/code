@@ -47,6 +47,7 @@ pub(super) async fn reconcile_rules(
         vec![project_id],
         snapshot,
         Some(ruleset_id),
+        None,
     )
     .await
 }
@@ -63,8 +64,19 @@ pub(super) async fn scan_batch(
     run_id: Option<ProjectFlagRunId>,
     project_ids: Vec<DBProjectId>,
     snapshot: RunSnapshot,
+    temporal: &temporalio_client::Client,
+    ctx: &temporalio_sdk::activities::ActivityContext,
 ) -> Result<()> {
-    scan_batch_inner(engine, pool, run_id, project_ids, snapshot, None).await
+    scan_batch_inner(
+        engine,
+        pool,
+        run_id,
+        project_ids,
+        snapshot,
+        None,
+        Some((temporal, ctx)),
+    )
+    .await
 }
 
 async fn scan_batch_inner(
@@ -74,6 +86,10 @@ async fn scan_batch_inner(
     project_ids: Vec<DBProjectId>,
     snapshot: RunSnapshot,
     deployed_ruleset_id: Option<uuid::Uuid>,
+    guard: Option<(
+        &temporalio_client::Client,
+        &temporalio_sdk::activities::ActivityContext,
+    )>,
 ) -> Result<()> {
     let snapshot_hash = if run_id.is_none() {
         Some(super::scan_cache::rules_input_hash(&snapshot)?)
@@ -114,9 +130,36 @@ async fn scan_batch_inner(
                     .load_reconciliation_contexts(&project_ids, &ai_rules)
                     .await
             } else {
-                engine
-                    .load_contexts_for_rules(&project_ids, &ai_rules)
-                    .await
+                let mut remaining = project_ids.clone();
+                loop {
+                    let loaded = engine
+                        .load_contexts_for_rules(&remaining, &ai_rules)
+                        .await;
+                    match loaded {
+                        Ok(contexts) => break Ok(contexts),
+                        Err(error) if run_id.is_some() => {
+                            let ids = remaining
+                                .iter()
+                                .map(|id| id.0)
+                                .collect::<Vec<_>>();
+                            let surviving = sqlx::query_scalar!(
+                                r#"SELECT id FROM mods WHERE id = ANY($1)"#,
+                                &ids,
+                            ).fetch_all(pool).await.context("checking deleted projects after context load failure")?;
+                            let previous = remaining.len();
+                            remaining.retain(|id| surviving.contains(&id.0));
+                            if remaining.len() == previous {
+                                break Err(error);
+                            }
+                            tracing::info!(
+                                ?run_id,
+                                skipped = previous - remaining.len(),
+                                "Skipping deleted projects after context load failure"
+                            );
+                        }
+                        Err(error) => break Err(error),
+                    }
+                }
             }
         },
         engine.load_files(&project_ids),
@@ -280,7 +323,7 @@ async fn scan_batch_inner(
             }),
     );
     let result_count = results.len();
-    DBProjectFlagRunResult::upsert_many(results, pool).await?;
+    DBProjectFlagRunResult::upsert_many_guarded(results, pool, guard).await?;
     tracing::info!(
         ?run_id,
         result_count,

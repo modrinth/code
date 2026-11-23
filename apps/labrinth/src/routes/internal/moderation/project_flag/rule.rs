@@ -2,7 +2,7 @@ use actix_web::{HttpRequest, delete, get, post, put, web};
 use anyhow::anyhow;
 use futures::{StreamExt, stream};
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use validator::Validate;
 use xredis::RedisPool;
 
@@ -10,9 +10,7 @@ use crate::auth::get_user_from_headers;
 use crate::database::models::project_flag_item::{
     DBProjectFlagRunResult, ProjectFlagRunResults, ProjectRuleParams,
 };
-use crate::database::models::{
-    DBProject, DBProjectFlagRule, DBProjectFlagRun, ProjectFlagRunId,
-};
+use crate::database::models::{DBProject, DBProjectFlagRule, ProjectFlagRunId};
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::ids::{ProjectFlagRuleId, ProjectId};
 use crate::models::pats::Scopes;
@@ -109,7 +107,13 @@ pub async fn list_rules(
     )
     .await
     .internal_context("listing project flag rules")?;
-    Ok(web::Json(rules.into_iter().map(Into::into).collect()))
+    let deployed = deployed_rule_definitions(&ro_pool).await?;
+    Ok(web::Json(
+        rules
+            .into_iter()
+            .map(|rule| ProjectFlagRuleResponse::new(rule, &deployed))
+            .collect(),
+    ))
 }
 
 #[utoipa::path(
@@ -140,7 +144,8 @@ pub async fn get_rule(
         .await
         .internal_context("fetching project flag rule")?
         .not_found_context("project flag rule not found")?;
-    Ok(web::Json(rule.into()))
+    let deployed = deployed_rule_definitions(&ro_pool).await?;
+    Ok(web::Json(ProjectFlagRuleResponse::new(rule, &deployed)))
 }
 
 #[derive(Deserialize, Validate, utoipa::ToSchema)]
@@ -189,7 +194,8 @@ pub async fn create_rule(
     )
     .await
     .internal_context("creating project flag rule")?;
-    Ok(web::Json(rule.into()))
+    let deployed = deployed_rule_definitions(&pool).await?;
+    Ok(web::Json(ProjectFlagRuleResponse::new(rule, &deployed)))
 }
 
 #[utoipa::path(
@@ -231,7 +237,8 @@ pub async fn update_rule(
     .await
     .internal_context("updating project flag rule")?
     .not_found_context("project flag rule not found")?;
-    Ok(web::Json(rule.into()))
+    let deployed = deployed_rule_definitions(&pool).await?;
+    Ok(web::Json(ProjectFlagRuleResponse::new(rule, &deployed)))
 }
 
 #[utoipa::path(
@@ -327,8 +334,7 @@ pub async fn list_run_results(
         &ro_pool,
     )
     .await
-    .internal_context("listing project flag run results")?
-    .not_found_context("project flag run not found")?;
+    .internal_context("listing project flag run results")?;
     for result in &mut results.results {
         result.error = result.error.take().map(|message| {
             message
@@ -390,7 +396,7 @@ pub async fn get_run_activity(
     .await
     .auth_context("authenticating moderator")?;
     let (num_scanning, num_workers) = tokio::try_join!(
-        DBProjectFlagRun::num_scanning(&ro_pool),
+        run::num_scanning(&temporal, &ro_pool),
         run::num_workers(&temporal),
     )
     .internal_context("fetching project flag scan activity")?;
@@ -419,6 +425,7 @@ pub struct ListRuns {
 pub async fn list_runs(
     req: HttpRequest,
     query: web::Query<ListRuns>,
+    temporal: web::Data<TemporalClient>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -438,10 +445,11 @@ pub async fn list_runs(
             "`limit` must be between 1 and 200"
         )));
     }
-    let runs = DBProjectFlagRun::list(
-        i64::from(query.limit),
-        i64::from(query.offset),
-        &ro_pool,
+    let runs = run::list(
+        &temporal,
+        usize::from(query.limit),
+        query.offset as usize,
+        false,
     )
     .await
     .internal_context("listing project flag runs")?;
@@ -452,48 +460,41 @@ pub async fn list_runs(
     ))
 }
 
-async fn initialized_run(
-    id: ProjectFlagRunId,
-    pool: &PgPool,
-) -> Result<Option<DBProjectFlagRun>, ApiError> {
-    use crate::database::models::DBUserId;
-    use crate::database::models::project_flag_item::{
-        ProjectFlagRunOutput, ProjectFlagRunStatus, ProjectFlagRunUser,
+/// Returns null when execution history is unavailable (deleted or past Temporal retention).
+#[utoipa::path(
+    context_path = "/moderation/project-flag", tag = "moderation",
+    security(("bearer_auth" = [])), params(("id" = ProjectFlagRunId, Path)),
+    responses((status = OK, body = Option<ProjectFlagRunResponse>))
+)]
+#[get("/rules/run/{id}")]
+pub async fn get_run(
+    req: HttpRequest,
+    path: web::Path<ProjectFlagRunId>,
+    temporal: web::Data<TemporalClient>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Option<ProjectFlagRunResponse>>, ApiError> {
+    get_user_from_headers(
+        &req,
+        &***ro_pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
+    )
+    .await
+    .auth_context("authenticating moderator")?;
+    let Some(run) = run::describe(&temporal.client, path.into_inner())
+        .await
+        .internal_context("describing project flag run")?
+    else {
+        return Ok(web::Json(None));
     };
-    let row = sqlx::query!(r#"
-        SELECT runs.id, runs.ruleset_id, runs.status AS "status: ProjectFlagRunStatus", runs.total_projects,
-            starter.id AS "started_by_id?", starter.username AS "started_by_username?",
-            applier.id AS "applied_by_id?", applier.username AS "applied_by_username?",
-            runs.started_at, runs.completed_at, runs.applied_at,
-            runs.output AS "output: sqlx::types::Json<ProjectFlagRunOutput>", runs.error
-        FROM project_flag_runs AS runs
-        LEFT JOIN users AS starter ON starter.id = runs.started_by
-        LEFT JOIN users AS applier ON applier.id = runs.applied_by
-        WHERE runs.id = $1 AND runs.ruleset_id IS NOT NULL
-    "#, id.0).fetch_optional(pool).await.internal_context("fetching initialized project flag run")?;
-    Ok(row.map(|row| DBProjectFlagRun {
-        id: ProjectFlagRunId(row.id),
-        ruleset_id: row.ruleset_id,
-        status: row.status,
-        total_projects: row.total_projects,
-        started_by: row.started_by_id.zip(row.started_by_username).map(
-            |(id, username)| ProjectFlagRunUser {
-                id: DBUserId(id).into(),
-                username,
-            },
-        ),
-        started_at: row.started_at,
-        completed_at: row.completed_at,
-        applied_at: row.applied_at,
-        applied_by: row.applied_by_id.zip(row.applied_by_username).map(
-            |(id, username)| ProjectFlagRunUser {
-                id: DBUserId(id).into(),
-                username,
-            },
-        ),
-        output: row.output.map(|output| output.0),
-        error: row.error,
-    }))
+    let response = ProjectFlagRunResponse::from_runs(vec![run], &ro_pool)
+        .await
+        .internal_context("aggregating project flag run counts")?
+        .pop();
+    Ok(web::Json(response))
 }
 
 #[utoipa::path(
@@ -520,50 +521,33 @@ pub async fn start_run(
     .await
     .auth_context("authenticating moderator")?;
 
-    let project_ids = DBProjectFlagRun::queued_project_ids(&pool)
-        .await
-        .internal_context("fetching queued project IDs")?;
-    let input = run::RunInput::new(
-        ProjectFlagRunId(uuid::Uuid::now_v7()),
-        project_ids,
-        user.user.id.into(),
-    );
-
-    let response_pool = pool.clone();
-    let run = tokio::spawn(async move {
-        let id = input.id;
-        let workflow_id = run::workflow_id(id);
-        let start_result = tokio::time::timeout(
-            std::time::Duration::from_secs(10), run::start(&temporal, input),
-        ).await;
-        let initialized = tokio::time::timeout(std::time::Duration::from_secs(20), async {
-            loop {
-                if let Some(run) = initialized_run(id, &pool).await.internal_context(
-                    format!("confirming initialization of project flag run {}; check Temporal workflow `{workflow_id}` before starting another run", id.0),
-                )? {
-                    return Ok::<_, ApiError>(run);
-                }
-                tokio::time::sleep(std::time::Duration::from_millis(100)).await;
-            }
-        }).await;
-        match initialized {
-            Ok(result) => result,
-            Err(_) => {
-                let detail = match start_result {
-                    Ok(Ok(())) => "temporal accepted the start".to_owned(),
-                    Ok(Err(error)) => format!("temporal start returned {error:#}"),
-                    Err(_) => "temporal start confirmation timed out".to_owned(),
-                };
-                Err(ApiError::Internal(anyhow!(
-                    "project flag run {} initialization was not confirmed; {detail}; check Temporal workflow `{workflow_id}` before starting another run", id.0,
-                )))
-            }
-        }
-    }).await.internal_context("joining project flag run start")??;
-    let mut responses =
-        ProjectFlagRunResponse::from_runs(vec![run], &response_pool)
+    let project_ids =
+        sqlx::query_scalar!(r#"SELECT id FROM mods WHERE in_review"#)
+            .fetch_all(&**pool)
             .await
-            .internal_context("aggregating project flag run counts")?;
+            .internal_context("fetching queued project IDs")?
+            .into_iter()
+            .map(crate::database::models::DBProjectId)
+            .collect();
+    let id = ProjectFlagRunId(uuid::Uuid::now_v7());
+    let input = run::RunInput::new(
+        id,
+        project_ids,
+        run::ProjectFlagRunUser {
+            id: user.user.id,
+            username: user.user.username.clone(),
+        },
+    );
+    run::start(&temporal, input).await.internal_context(format!(
+        "starting project flag run {}; check Temporal workflow `{}` before retrying an ambiguous start", id.0, run::workflow_id(id)
+    ))?;
+    let run = run::describe(&temporal.client, id)
+        .await
+        .internal_context("describing started project flag run")?
+        .not_found_context("started project flag run not found")?;
+    let mut responses = ProjectFlagRunResponse::from_runs(vec![run], &pool)
+        .await
+        .internal_context("aggregating project flag run counts")?;
     Ok(web::Json(responses.remove(0)))
 }
 
@@ -594,22 +578,9 @@ pub async fn delete_run(
     .await
     .auth_context("authenticating moderator")?;
     let id = path.into_inner();
-    if !DBProjectFlagRun::delete(id, &pool)
+    run::delete(&temporal, &pool, id)
         .await
-        .internal_context("deleting project flag run")?
-    {
-        return Err(ApiError::NotFound(anyhow!("project flag run not found")));
-    }
-    if let Err(error) = temporal
-        .client
-        .get_workflow_handle::<run::ProjectFlagRunWorkflow>(run::workflow_id(
-            id,
-        ))
-        .cancel(temporalio_client::WorkflowCancelOptions::default())
-        .await
-    {
-        tracing::warn!(run_id = %id.0, ?error, "Run deleted; workflow cancellation was not confirmed");
-    }
+        .internal_context("deleting project flag run")?;
     Ok(())
 }
 
@@ -666,6 +637,7 @@ pub async fn get_deployment(
 pub async fn deploy_run(
     req: HttpRequest,
     path: web::Path<ProjectFlagRunId>,
+    temporal: web::Data<TemporalClient>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -683,12 +655,13 @@ pub async fn deploy_run(
         .begin()
         .await
         .internal_context("starting project flag deployment")?;
-    let run = sqlx::query!(r#"
-        SELECT ruleset_id, status, completed_at FROM project_flag_runs WHERE id = $1 FOR UPDATE
-    "#, path.into_inner().0).fetch_optional(&mut transaction).await
-        .internal_context("locking project flag run for deployment")?
-        .not_found_context("project flag run not found")?;
-    if run.status != "done" || run.completed_at.is_none() {
+    let run = run::describe(&temporal.client, path.into_inner())
+        .await
+        .internal_context("describing project flag run for deployment")?
+        .not_found_context(
+            "project flag run not found or temporal history expired",
+        )?;
+    if run.status != run::RunStatus::Completed {
         return Err(ApiError::Request(anyhow!(
             "only completed runs can be deployed"
         )));
@@ -697,23 +670,13 @@ pub async fn deploy_run(
         .ruleset_id
         .request_context("run has no frozen ruleset")?;
     let user_id = crate::database::models::DBUserId::from(user.user.id);
-    let row = sqlx::query!(r#"
-        INSERT INTO project_flags_deployed (singleton, ruleset_id, deployed_by, deployed_at)
-        VALUES (TRUE, $1, $2, clock_timestamp())
-        ON CONFLICT (singleton) DO UPDATE SET ruleset_id = EXCLUDED.ruleset_id,
-            deployed_by = EXCLUDED.deployed_by, deployed_at = EXCLUDED.deployed_at
-        RETURNING deployed_at
-    "#, ruleset_id, user_id.0).fetch_one(&mut transaction).await
-        .internal_context("deploying project flag ruleset")?;
+    let deployment =
+        deploy_ruleset(ruleset_id, user_id, &mut transaction).await?;
     transaction
         .commit()
         .await
         .internal_context("committing project flag deployment")?;
-    Ok(web::Json(ProjectFlagDeployment {
-        ruleset_id,
-        deployed_by: Some(user_id.into()),
-        deployed_at: row.deployed_at,
-    }))
+    Ok(web::Json(deployment))
 }
 
 #[derive(Serialize, utoipa::ToSchema)]
@@ -826,6 +789,61 @@ mod tests {
     use serde_json::json;
 
     #[test]
+    fn deployment_status_compares_definitions_not_audit_or_other_rules() {
+        let rule = DBProjectFlagRule {
+            id: crate::database::models::DBProjectFlagRuleId(1),
+            name: "test".into(),
+            created_by: None,
+            created_at: chrono::Utc::now(),
+            updated_by: None,
+            updated_at: chrono::Utc::now(),
+            params: serde_json::from_value(
+                serde_json::json!({"expression": "[]"}),
+            )
+            .unwrap(),
+        };
+        let deployed = HashMap::from([(
+            rule.id.0,
+            run::RunSnapshot::rule_definition(&rule),
+        )]);
+        assert_eq!(
+            rule_deployment_status(&rule, &HashMap::new()),
+            RuleDeploymentStatus::NotDeployed
+        );
+        let mut current = rule.clone();
+        current.updated_at += chrono::Duration::seconds(1);
+        current.created_at += chrono::Duration::seconds(1);
+        current.updated_by = Some(crate::database::models::DBUserId(42));
+        current.created_by = Some(crate::database::models::DBUserId(42));
+        assert_eq!(
+            rule_deployment_status(&current, &deployed),
+            RuleDeploymentStatus::Current
+        );
+        current.name.push('!');
+        assert_eq!(
+            rule_deployment_status(&current, &deployed),
+            RuleDeploymentStatus::Outdated
+        );
+        current = rule.clone();
+        current.params.expression.push(' ');
+        assert_eq!(
+            rule_deployment_status(&current, &deployed),
+            RuleDeploymentStatus::Outdated
+        );
+        current = rule.clone();
+        current.id = crate::database::models::DBProjectFlagRuleId(2);
+        assert_eq!(
+            rule_deployment_status(&current, &deployed),
+            RuleDeploymentStatus::NotDeployed
+        );
+        let response = ProjectFlagRuleResponse::new(rule, &deployed);
+        assert_eq!(
+            serde_json::to_value(response).unwrap()["deployment_status"],
+            "current"
+        );
+    }
+
+    #[test]
     fn accepts_batch_project_ids() {
         let body: EvalRule = serde_json::from_value(json!({
             "project_ids": ["Abcd", "Efgh"],
@@ -877,11 +895,17 @@ pub struct ProjectFlagRuleResponse {
     pub updated_by: Option<crate::database::models::DBUserId>,
     pub updated_at: chrono::DateTime<chrono::Utc>,
     pub params: ProjectRuleParams,
+    pub deployment_status: RuleDeploymentStatus,
 }
 
-impl From<DBProjectFlagRule> for ProjectFlagRuleResponse {
-    fn from(rule: DBProjectFlagRule) -> Self {
+impl ProjectFlagRuleResponse {
+    fn new(
+        rule: DBProjectFlagRule,
+        deployed: &HashMap<i64, serde_json::Value>,
+    ) -> Self {
+        let deployment_status = rule_deployment_status(&rule, deployed);
         Self {
+            deployment_status,
             id: rule.id.into(),
             name: rule.name,
             created_by: rule.created_by,
@@ -890,5 +914,109 @@ impl From<DBProjectFlagRule> for ProjectFlagRuleResponse {
             updated_at: rule.updated_at,
             params: rule.params,
         }
+    }
+}
+
+async fn deploy_ruleset(
+    ruleset_id: uuid::Uuid,
+    user_id: crate::database::models::DBUserId,
+    transaction: &mut sqlx_tracing::Transaction<'_, sqlx::Postgres>,
+) -> Result<ProjectFlagDeployment, ApiError> {
+    let row = sqlx::query!(r#"
+        INSERT INTO project_flags_deployed (singleton, ruleset_id, deployed_by, deployed_at)
+        VALUES (TRUE, $1, $2, clock_timestamp())
+        ON CONFLICT (singleton) DO UPDATE SET ruleset_id = EXCLUDED.ruleset_id,
+            deployed_by = EXCLUDED.deployed_by, deployed_at = EXCLUDED.deployed_at
+        RETURNING deployed_at
+    "#, ruleset_id, user_id.0).fetch_one(&mut *transaction).await
+        .internal_context("deploying project flag ruleset")?;
+    Ok(ProjectFlagDeployment {
+        ruleset_id,
+        deployed_by: Some(user_id.into()),
+        deployed_at: row.deployed_at,
+    })
+}
+
+/// Freeze and deploy current staging without starting or applying a run.
+#[utoipa::path(
+    context_path = "/moderation/project-flag", tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = ProjectFlagDeployment))
+)]
+#[post("/deployment")]
+pub async fn deploy_staging(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<ProjectFlagDeployment>, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
+    )
+    .await
+    .auth_context("authenticating moderator")?;
+    let user_id = crate::database::models::DBUserId::from(user.user.id);
+    let mut transaction = pool
+        .begin()
+        .await
+        .internal_context("starting staging deployment")?;
+    let ruleset_id = crate::database::models::project_flag_item::freeze_project_flag_ruleset(
+        user_id, &mut transaction,
+    ).await.internal_context("freezing staging ruleset")?;
+    let deployment =
+        deploy_ruleset(ruleset_id, user_id, &mut transaction).await?;
+    transaction
+        .commit()
+        .await
+        .internal_context("committing staging deployment")?;
+    Ok(web::Json(deployment))
+}
+
+#[derive(Debug, PartialEq, Eq, Serialize, utoipa::ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum RuleDeploymentStatus {
+    Current,
+    Outdated,
+    NotDeployed,
+}
+
+async fn deployed_rule_definitions(
+    pool: &PgPool,
+) -> Result<HashMap<i64, serde_json::Value>, ApiError> {
+    let row = sqlx::query!(r#"
+        SELECT rulesets.rules FROM project_flags_deployed AS deployed
+        JOIN project_flag_rulesets AS rulesets ON rulesets.id = deployed.ruleset_id
+        WHERE deployed.singleton
+    "#)
+    .fetch_optional(pool)
+    .await
+    .internal_context("loading deployed project flag rules")?;
+    let rules: Vec<DBProjectFlagRule> = row
+        .map(|row| serde_json::from_value(row.rules))
+        .transpose()
+        .internal_context("decoding deployed project flag rules")?
+        .unwrap_or_default();
+    Ok(rules
+        .iter()
+        .map(|rule| (rule.id.0, run::RunSnapshot::rule_definition(rule)))
+        .collect())
+}
+
+fn rule_deployment_status(
+    rule: &DBProjectFlagRule,
+    deployed: &HashMap<i64, serde_json::Value>,
+) -> RuleDeploymentStatus {
+    match deployed.get(&rule.id.0) {
+        None => RuleDeploymentStatus::NotDeployed,
+        Some(previous)
+            if *previous == run::RunSnapshot::rule_definition(rule) =>
+        {
+            RuleDeploymentStatus::Current
+        }
+        Some(_) => RuleDeploymentStatus::Outdated,
     }
 }

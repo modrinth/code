@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT rule_results, effective_flags, proposed_review_outcome, error, num_flags\n                    FROM project_flag_run_results WHERE run_id = $1 AND skipped\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "rule_results",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_flag_run_results",
+            "name": "rule_results"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "effective_flags",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_flag_run_results",
+            "name": "effective_flags"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "proposed_review_outcome",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "project_flag_run_results",
+            "name": "proposed_review_outcome"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "error",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "project_flag_run_results",
+            "name": "error"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "num_flags",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_flag_run_results",
+            "name": "num_flags"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "dc58ec116c22d40cab3eba4d63378f081f2d33713bf82cbc94500037080a9bac"
+}

@@ -121,6 +121,14 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 		})
 	}
 
+	/** Null means Temporal history was deleted or has expired; DB results may still exist. */
+	public async getRun(id: string): Promise<ProjectFlagRun | null> {
+		return this.client.request<ProjectFlagRun | null>(
+			`/moderation/project-flag/rules/run/${encodeURIComponent(id)}`,
+			{ api: 'labrinth', version: 'internal', method: 'GET' },
+		)
+	}
+
 	public async getRunActivity(): Promise<ProjectFlagRunActivity> {
 		return this.client.request<ProjectFlagRunActivity>(
 			'/moderation/project-flag/rules/run/activity',
@@ -150,6 +158,15 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 				method: 'GET',
 			},
 		)
+	}
+
+	public async deployStaging(): Promise<ProjectFlagDeployment> {
+		return this.client.request<ProjectFlagDeployment>('/moderation/project-flag/deployment', {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'POST',
+			retry: false,
+		})
 	}
 
 	public async deployRun(id: string): Promise<ProjectFlagDeployment> {

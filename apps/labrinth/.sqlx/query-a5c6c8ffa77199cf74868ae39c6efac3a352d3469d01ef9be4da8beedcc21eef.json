@@ -1,28 +1,26 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id FROM project_flag_runs WHERE id = $1 AND status = 'running'",
+  "query": "SELECT id FROM mods ORDER BY id LIMIT 1",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
         "name": "id",
-        "type_info": "Uuid",
+        "type_info": "Int8",
         "origin": {
           "Table": {
-            "table": "project_flag_runs",
+            "table": "mods",
             "name": "id"
           }
         }
       }
     ],
     "parameters": {
-      "Left": [
-        "Uuid"
-      ]
+      "Left": []
     },
     "nullable": [
       false
     ]
   },
-  "hash": "5af1bc953329ff69517e1b3c95c39567555727a11f1182032a51c96c7ef23c82"
+  "hash": "a5c6c8ffa77199cf74868ae39c6efac3a352d3469d01ef9be4da8beedcc21eef"
 }

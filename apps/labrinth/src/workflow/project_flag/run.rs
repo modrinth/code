@@ -40,16 +40,18 @@ pub struct RunSnapshot {
 }
 
 impl RunSnapshot {
+    pub(crate) fn rule_definition(
+        rule: &DBProjectFlagRule,
+    ) -> serde_json::Value {
+        serde_json::json!({ "id": rule.id, "name": rule.name, "params": rule.params })
+    }
+
     pub(crate) fn content_hash(&self) -> Result<blake3::Hash> {
         let mut rules = self.rules.iter().collect::<Vec<_>>();
         rules.sort_by_key(|rule| rule.id.0);
         let rules = rules
             .into_iter()
-            .map(|rule| {
-                serde_json::json!({
-                    "id": rule.id, "name": rule.name, "params": rule.params,
-                })
-            })
+            .map(Self::rule_definition)
             .collect::<Vec<_>>();
         super::scan_cache::rules_input_hash(&serde_json::json!({
             "rules": rules, "modules": self.modules,
@@ -117,7 +119,7 @@ mod ruleset_tests {
             .decision_questions
             .insert("q".into(), "Different".into());
         assert_ne!(hash, changed.content_hash().unwrap());
-        let mut changed = original.clone();
+        let mut changed = original;
         changed
             .modules
             .insert("shared".into(), "fn test() { [1] }".into());
@@ -129,8 +131,23 @@ pub fn workflow_id(id: ProjectFlagRunId) -> String {
     format!("project-flag-run:{}", id.0)
 }
 
+const RUN_MEMO: &str = "project_flag_run";
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RunMetadata {
+    pub id: ProjectFlagRunId,
+    pub started_by: ProjectFlagRunUser,
+    pub total_projects: i64,
+    pub started_at: chrono::DateTime<chrono::Utc>,
+    pub ruleset_id: Option<uuid::Uuid>,
+}
+
+pub use crate::database::models::project_flag_item::ProjectFlagRunUser;
+
 pub async fn start(temporal: &TemporalClient, input: RunInput) -> Result<()> {
-    let id = input.id;
+    let mut memo = temporalio_common::MemoValues::new();
+    memo.insert(RUN_MEMO, input.metadata.clone());
+    let id = input.metadata.id;
     temporal
         .client
         .start_workflow(
@@ -139,6 +156,7 @@ pub async fn start(temporal: &TemporalClient, input: RunInput) -> Result<()> {
             WorkflowStartOptions::new(PROJECT_FLAG_TASK_QUEUE, workflow_id(id))
                 .id_conflict_policy(WorkflowIdConflictPolicy::UseExisting)
                 .id_reuse_policy(WorkflowIdReusePolicy::RejectDuplicate)
+                .memo(memo)
                 .build(),
         )
         .await
@@ -157,39 +175,45 @@ impl ProjectFlagRunWorkflow {
         ctx: &mut WorkflowContext<Self>,
         mut input: RunInput,
     ) -> WorkflowResult<()> {
-        if !input.initialized {
-            ctx.execute_activity(
-                RunActivities::initialize,
-                InitializationInput {
-                    id: input.id,
-                    started_by: input.started_by,
-                    total_projects: input.projects.len(),
-                },
-                ActivityOptions::start_to_close_timeout(Duration::from_secs(
-                    60,
-                )),
-            )
-            .await?;
-            input.initialized = true;
-        }
-        for _ in 0..BATCHES_PER_EXECUTION {
-            let end = (input.offset + BATCH_SIZE).min(input.projects.len());
-            let projects = input.projects[input.offset..end].to_vec();
-            if projects.is_empty() {
-                ctx.execute_activity(
-                    RunActivities::finalize,
-                    input.id,
+        if input.metadata.ruleset_id.is_none() {
+            let snapshot = ctx
+                .execute_activity(
+                    RunActivities::snapshot,
+                    (),
                     ActivityOptions::start_to_close_timeout(
                         Duration::from_secs(60),
                     ),
                 )
                 .await?;
+            let ruleset_id = ctx
+                .execute_activity(
+                    RunActivities::freeze,
+                    (input.metadata.started_by.id, snapshot),
+                    ActivityOptions::start_to_close_timeout(
+                        Duration::from_secs(60),
+                    ),
+                )
+                .await?;
+            input.metadata.ruleset_id = Some(ruleset_id);
+            ctx.upsert_memo([(
+                RUN_MEMO,
+                Some(temporalio_common::MemoValue::new(input.metadata.clone())),
+            )])?;
+        }
+        for _ in 0..BATCHES_PER_EXECUTION {
+            let end = (input.offset + BATCH_SIZE).min(input.projects.len());
+            let projects = input.projects[input.offset..end].to_vec();
+            if projects.is_empty() {
                 return Ok(());
             }
             ctx.execute_activity(
                 RunActivities::evaluate_batch,
                 BatchInput {
-                    id: input.id,
+                    id: input.metadata.id,
+                    ruleset_id: input
+                        .metadata
+                        .ruleset_id
+                        .expect("initialized ruleset"),
                     projects,
                 },
                 ActivityOptions::start_to_close_timeout(Duration::from_secs(
@@ -199,7 +223,8 @@ impl ProjectFlagRunWorkflow {
             .await?;
             input.offset = end;
         }
-        input.discard_completed_projects();
+        input.projects.drain(..input.offset);
+        input.offset = 0;
         ctx.continue_as_new(input, ContinueAsNewOptions::default())?;
         Ok(())
     }
@@ -207,10 +232,8 @@ impl ProjectFlagRunWorkflow {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RunInput {
-    pub id: ProjectFlagRunId,
+    pub metadata: RunMetadata,
     pub projects: Vec<DBProjectId>,
-    pub started_by: DBUserId,
-    pub initialized: bool,
     pub offset: usize,
 }
 
@@ -218,303 +241,105 @@ impl RunInput {
     pub fn new(
         id: ProjectFlagRunId,
         mut projects: Vec<DBProjectId>,
-        started_by: DBUserId,
+        started_by: ProjectFlagRunUser,
     ) -> Self {
         projects.sort_unstable_by_key(|id| id.0);
         projects.dedup_by_key(|id| id.0);
         Self {
-            id,
+            metadata: RunMetadata {
+                id,
+                started_by,
+                total_projects: projects.len() as i64,
+                started_at: chrono::Utc::now(),
+                ruleset_id: None,
+            },
             projects,
-            started_by,
-            initialized: false,
             offset: 0,
         }
-    }
-
-    fn discard_completed_projects(&mut self) {
-        self.projects.drain(..self.offset);
-        self.offset = 0;
-    }
-}
-
-#[cfg(test)]
-mod run_input_tests {
-    use super::*;
-
-    #[test]
-    fn selection_is_sorted_deduplicated_and_round_trips() {
-        let input = RunInput::new(
-            ProjectFlagRunId(uuid::Uuid::now_v7()),
-            vec![DBProjectId(3), DBProjectId(1), DBProjectId(3)],
-            DBUserId(42),
-        );
-        let restored: RunInput =
-            serde_json::from_slice(&serde_json::to_vec(&input).unwrap())
-                .unwrap();
-        assert_eq!(restored.id, input.id);
-        assert_eq!(restored.projects, vec![DBProjectId(1), DBProjectId(3)]);
-        assert_eq!(restored.offset, 0);
-        assert_eq!(restored.started_by, DBUserId(42));
-        assert!(!restored.initialized);
-    }
-
-    #[actix_rt::test]
-    async fn concurrent_initialization_and_retries_preserve_frozen_run() {
-        use crate::test::{
-            api_v3::ApiV3,
-            environment::{TestEnvironment, with_test_environment},
-        };
-        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-            let user = sqlx::query_scalar!(r#"SELECT id FROM users ORDER BY id LIMIT 1"#)
-                .fetch_one(&env.db.pool).await.unwrap();
-            let input = InitializationInput {
-                id: ProjectFlagRunId(uuid::Uuid::now_v7()),
-                started_by: DBUserId(user),
-                total_projects: 3,
-            };
-            let (first, retry) = tokio::join!(
-                initialize_run(&env.db.pool, input.clone()),
-                initialize_run(&env.db.pool, input.clone()),
-            );
-            first.unwrap();
-            retry.unwrap();
-            let ruleset = sqlx::query_scalar!(r#"SELECT ruleset_id FROM project_flag_runs WHERE id = $1"#, input.id.0)
-                .fetch_one(&env.db.pool).await.unwrap().unwrap();
-            sqlx::query!(r#"INSERT INTO project_flag_modules (name, script) VALUES ($1, $2)"#,
-                format!("retry-test-{}", input.id.0), "fn changed() { [] }")
-                .execute(&env.db.pool).await.unwrap();
-            let frozen_count = sqlx::query_scalar!(r#"SELECT COUNT(*) FROM project_flag_rulesets"#)
-                .fetch_one(&env.db.pool).await.unwrap();
-            initialize_run(&env.db.pool, input.clone()).await.unwrap();
-            assert_eq!(sqlx::query_scalar!(r#"SELECT COUNT(*) FROM project_flag_rulesets"#)
-                .fetch_one(&env.db.pool).await.unwrap(), frozen_count);
-            let retained = sqlx::query_scalar!(r#"SELECT ruleset_id FROM project_flag_runs WHERE id = $1"#, input.id.0)
-                .fetch_one(&env.db.pool).await.unwrap();
-            assert_eq!(retained, Some(ruleset));
-            let mut mismatched = input;
-            mismatched.total_projects += 1;
-            assert!(initialize_run(&env.db.pool, mismatched).await.is_err());
-        }).await;
-    }
-
-    #[test]
-    fn initialization_retries_require_same_user_total_and_frozen_ruleset() {
-        let input = InitializationInput {
-            id: ProjectFlagRunId(uuid::Uuid::now_v7()),
-            started_by: DBUserId(42),
-            total_projects: 3,
-        };
-        let ruleset = Some(uuid::Uuid::now_v7());
-        assert!(verify_initialization(&input, Some(42), 3, ruleset).is_ok());
-        assert!(verify_initialization(&input, Some(43), 3, ruleset).is_err());
-        assert!(verify_initialization(&input, None, 3, ruleset).is_err());
-        assert!(verify_initialization(&input, Some(42), 4, ruleset).is_err());
-        assert!(verify_initialization(&input, Some(42), 3, None).is_err());
-    }
-
-    #[test]
-    fn continuation_keeps_only_unprocessed_selection() {
-        let mut input = RunInput::new(
-            ProjectFlagRunId(uuid::Uuid::now_v7()),
-            (0..(BATCH_SIZE * BATCHES_PER_EXECUTION + 1))
-                .map(|id| DBProjectId(id as i64))
-                .collect(),
-            DBUserId(42),
-        );
-        input.initialized = true;
-        input.offset = BATCH_SIZE * BATCHES_PER_EXECUTION;
-        input.discard_completed_projects();
-        assert_eq!(
-            input.projects,
-            vec![DBProjectId((BATCH_SIZE * BATCHES_PER_EXECUTION) as i64,)]
-        );
-        assert_eq!(input.offset, 0);
-        assert!(input.initialized);
-        assert_eq!(input.started_by, DBUserId(42));
-        input.offset = 1;
-        input.discard_completed_projects();
-        assert!(input.projects.is_empty());
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BatchInput {
     pub id: ProjectFlagRunId,
+    pub ruleset_id: uuid::Uuid,
     pub projects: Vec<DBProjectId>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct InitializationInput {
-    pub id: ProjectFlagRunId,
-    pub started_by: DBUserId,
-    pub total_projects: usize,
 }
 
 pub struct RunActivities {
     pub pool: PgPool,
     pub engine: ProjectFlagEngine,
+    pub temporal: temporalio_client::Client,
 }
 
 #[activities]
 impl RunActivities {
     #[activity]
-    pub async fn initialize(
+    pub async fn snapshot(
         self: Arc<Self>,
         _ctx: ActivityContext,
-        input: InitializationInput,
-    ) -> Result<(), ActivityError> {
-        initialize_run(&self.pool, input)
-            .await
-            .map_err(|error| ActivityError::from(anyhow!("{error:#}")))
+        _input: (),
+    ) -> Result<RunSnapshot, ActivityError> {
+        let row = sqlx::query!(r#"
+            SELECT
+                COALESCE((SELECT jsonb_agg(to_jsonb(rules) ORDER BY rules.id) FROM project_flag_rules AS rules), '[]'::jsonb) AS "rules!",
+                COALESCE((SELECT jsonb_object_agg(name, script) FROM project_flag_modules), '{}'::jsonb) AS "modules!"
+        "#).fetch_one(&self.pool).await.map_err(|e| ActivityError::from(anyhow!(e)))?;
+        Ok(RunSnapshot {
+            rules: serde_json::from_value(row.rules)
+                .map_err(|e| ActivityError::from(anyhow!(e)))?,
+            modules: serde_json::from_value(row.modules)
+                .map_err(|e| ActivityError::from(anyhow!(e)))?,
+        })
     }
 
     #[activity]
-    pub async fn finalize(
+    pub async fn freeze(
         self: Arc<Self>,
         _ctx: ActivityContext,
-        id: ProjectFlagRunId,
-    ) -> Result<(), ActivityError> {
-        sqlx::query!(r#"
-            UPDATE project_flag_runs SET status = 'done', completed_at = CURRENT_TIMESTAMP
-            WHERE id = $1 AND status = 'running'
-        "#, id.0).execute(&self.pool).await
-            .map_err(|error| ActivityError::from(anyhow::anyhow!(error)))?;
-        Ok(())
+        input: (ariadne::ids::UserId, RunSnapshot),
+    ) -> Result<uuid::Uuid, ActivityError> {
+        let (user, snapshot) = input;
+        let hash = snapshot.content_hash()?.to_hex().to_string();
+        let mut transaction = self
+            .pool
+            .begin()
+            .await
+            .map_err(|e| ActivityError::from(anyhow!(e)))?;
+        let inserted = sqlx::query_scalar!(r#"
+            INSERT INTO project_flag_rulesets (id, content_hash, rules, modules, created_by)
+            VALUES ($1, $2, $3, $4, $5)
+            ON CONFLICT (content_hash) DO NOTHING
+            RETURNING id
+        "#, uuid::Uuid::now_v7(), hash, serde_json::to_value(snapshot.rules)?, serde_json::to_value(snapshot.modules)?, DBUserId::from(user).0)
+            .fetch_optional(&mut transaction).await.map_err(|e| ActivityError::from(anyhow!(e)))?;
+        let id = match inserted { Some(id) => id, None => sqlx::query_scalar!(
+            r#"SELECT id FROM project_flag_rulesets WHERE content_hash = $1"#, hash
+        ).fetch_one(&mut transaction).await.map_err(|e| ActivityError::from(anyhow!(e)))? };
+        transaction
+            .commit()
+            .await
+            .map_err(|e| ActivityError::from(anyhow!(e)))?;
+        Ok(id)
     }
 
     #[activity]
     pub async fn evaluate_batch(
         self: Arc<Self>,
-        _ctx: ActivityContext,
+        ctx: ActivityContext,
         input: BatchInput,
     ) -> Result<(), ActivityError> {
-        self.evaluate(input)
-            .await
-            .map_err(|error| ActivityError::from(anyhow::anyhow!("{error:#}")))
-    }
-}
-
-async fn initialize_run(
-    pool: &PgPool,
-    input: InitializationInput,
-) -> Result<()> {
-    let total = i64::try_from(input.total_projects)
-        .context("counting project flag run jobs")?;
-    let mut transaction = pool
-        .begin()
-        .await
-        .context("starting project flag run initialization")?;
-    // A missing row cannot be row-locked; serialize retries before reading staging content.
-    sqlx::query!(
-        r#"SELECT pg_advisory_xact_lock(hashtextextended($1, 0))"#,
-        workflow_id(input.id)
-    )
-    .execute(&mut transaction)
-    .await
-    .context("locking project flag run initialization")?;
-    let existing = sqlx::query!(
-        r#"SELECT started_by, total_projects, ruleset_id FROM project_flag_runs WHERE id = $1"#,
-        input.id.0,
-    ).fetch_optional(&mut transaction).await.context("checking initialized project flag run")?;
-    if let Some(existing) = existing {
-        verify_initialization(
-            &input,
-            existing.started_by,
-            existing.total_projects,
-            existing.ruleset_id,
-        )?;
-        transaction
-            .commit()
-            .await
-            .context("finishing existing project flag run initialization")?;
-        return Ok(());
-    }
-    let row = sqlx::query!(r#"
-        SELECT
-            COALESCE((SELECT jsonb_agg(to_jsonb(rules) ORDER BY rules.id) FROM project_flag_rules AS rules), '[]'::jsonb) AS "rules!",
-            COALESCE((SELECT jsonb_object_agg(name, script) FROM project_flag_modules), '{}'::jsonb) AS "modules!"
-    "#).fetch_one(&mut transaction).await.context("freezing staging project flag content")?;
-    let snapshot = RunSnapshot {
-        rules: serde_json::from_value(row.rules.clone())
-            .context("decoding staging rules")?,
-        modules: serde_json::from_value(row.modules.clone())
-            .context("decoding staging modules")?,
-    };
-    let hash = snapshot.content_hash()?.to_hex().to_string();
-    let inserted = sqlx::query_scalar!(r#"
-        INSERT INTO project_flag_rulesets (id, content_hash, rules, modules, created_by)
-        VALUES ($1, $2, $3, $4, $5)
-        ON CONFLICT (content_hash) DO NOTHING
-        RETURNING id
-    "#, uuid::Uuid::now_v7(), hash, row.rules, row.modules, input.started_by.0)
-        .fetch_optional(&mut transaction).await.context("persisting immutable project flag ruleset")?;
-    let ruleset_id = match inserted {
-        Some(id) => id,
-        None => sqlx::query_scalar!(
-            r#"SELECT id FROM project_flag_rulesets WHERE content_hash = $1"#,
-            hash
-        )
-        .fetch_one(&mut transaction)
-        .await
-        .context("loading existing immutable project flag ruleset")?,
-    };
-    sqlx::query!(r#"
-        INSERT INTO project_flag_runs (id, status, started_by, started_at, total_projects, ruleset_id)
-        VALUES ($1, 'running', $2, CURRENT_TIMESTAMP, $3, $4)
-    "#, input.id.0, input.started_by.0, total, ruleset_id)
-        .execute(&mut transaction).await.context("creating initialized project flag run")?;
-    transaction
-        .commit()
-        .await
-        .context("committing project flag run initialization")?;
-    Ok(())
-}
-
-fn verify_initialization(
-    input: &InitializationInput,
-    started_by: Option<i64>,
-    total_projects: i64,
-    ruleset_id: Option<uuid::Uuid>,
-) -> Result<()> {
-    if started_by != Some(input.started_by.0)
-        || i64::try_from(input.total_projects).ok() != Some(total_projects)
-        || ruleset_id.is_none()
-    {
-        return Err(anyhow!(
-            "existing project flag run does not match initialization input"
-        ));
-    }
-    Ok(())
-}
-
-impl RunActivities {
-    async fn evaluate(&self, input: BatchInput) -> Result<()> {
-        let snapshot = sqlx::query!(r#"
-            SELECT rulesets.rules, rulesets.modules FROM project_flag_runs AS runs
-            JOIN project_flag_rulesets AS rulesets ON rulesets.id = runs.ruleset_id
-            WHERE runs.id = $1 AND runs.status = 'running'
-        "#, input.id.0).fetch_optional(&self.pool).await.context("loading project flag run snapshot")?;
-        let Some(snapshot) = snapshot else {
-            let active = sqlx::query_scalar!(r#"SELECT id FROM project_flag_runs WHERE id = $1 AND status = 'running'"#, input.id.0)
-                .fetch_optional(&self.pool).await.context("checking project flag run")?;
-            if active.is_some() {
-                return Err(anyhow!("project flag run snapshot missing"));
-            }
-            return Ok(());
-        };
-        run_rules::scan_batch(
-            &self.engine,
-            &self.pool,
-            Some(input.id),
-            input.projects,
-            RunSnapshot {
-                rules: serde_json::from_value(snapshot.rules)
-                    .context("decoding run rules")?,
-                modules: serde_json::from_value(snapshot.modules)
-                    .context("decoding run modules")?,
-            },
-        )
-        .await
+        if ctx.is_cancelled() {
+            return Err(ActivityError::from(anyhow!(
+                "project flag activity cancelled"
+            )));
+        }
+        let snapshot = crate::database::models::project_flag_item::project_flag_ruleset_snapshot(&self.pool, input.ruleset_id)
+            .await?.context("project flag run snapshot missing")?;
+        tokio::select! {
+            result = run_rules::scan_batch(&self.engine, &self.pool, Some(input.id), input.projects, snapshot, &self.temporal, &ctx) => result.map_err(ActivityError::from),
+            _ = ctx.cancelled() => Err(ActivityError::from(anyhow!("project flag activity cancelled"))),
+        }
     }
 }
 
@@ -547,4 +372,423 @@ pub async fn num_workers(temporal: &TemporalClient) -> Result<usize> {
         .map(|poller| poller.identity)
         .collect::<HashSet<_>>()
         .len())
+}
+
+use temporalio_client::{NamespacedClient, grpc::WorkflowService};
+use temporalio_common::protos::temporal::api::{
+    common::v1::WorkflowExecution,
+    enums::v1::{HistoryEventFilterType, WorkflowExecutionStatus},
+    workflow::v1::WorkflowExecutionInfo,
+    workflowservice::v1::{
+        DeleteWorkflowExecutionRequest, GetWorkflowExecutionHistoryRequest,
+        TerminateWorkflowExecutionRequest,
+    },
+};
+
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum RunStatus {
+    Running,
+    Completed,
+    Failed,
+    Canceled,
+    Terminated,
+    TimedOut,
+    ContinuedAsNew,
+    Unknown,
+}
+
+impl From<i32> for RunStatus {
+    fn from(value: i32) -> Self {
+        match WorkflowExecutionStatus::try_from(value).ok() {
+            Some(WorkflowExecutionStatus::Running) => Self::Running,
+            Some(WorkflowExecutionStatus::Completed) => Self::Completed,
+            Some(WorkflowExecutionStatus::Failed) => Self::Failed,
+            Some(WorkflowExecutionStatus::Canceled) => Self::Canceled,
+            Some(WorkflowExecutionStatus::Terminated) => Self::Terminated,
+            Some(WorkflowExecutionStatus::TimedOut) => Self::TimedOut,
+            Some(WorkflowExecutionStatus::ContinuedAsNew) => {
+                Self::ContinuedAsNew
+            }
+            _ => Self::Unknown,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct TemporalRun {
+    pub id: ProjectFlagRunId,
+    pub ruleset_id: Option<uuid::Uuid>,
+    pub status: RunStatus,
+    pub total_projects: i64,
+    pub started_by: Option<ProjectFlagRunUser>,
+    pub started_at: chrono::DateTime<chrono::Utc>,
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    pub error: Option<String>,
+    execution_id: String,
+}
+
+fn decode_run(
+    info: WorkflowExecutionInfo,
+    metadata: RunMetadata,
+) -> Result<TemporalRun> {
+    let execution = info.execution.context("missing temporal execution")?;
+    anyhow::ensure!(
+        execution.workflow_id == workflow_id(metadata.id),
+        "project flag run memo does not match workflow id"
+    );
+    Ok(TemporalRun {
+        id: metadata.id,
+        ruleset_id: metadata.ruleset_id,
+        status: info.status.into(),
+        total_projects: metadata.total_projects,
+        started_by: Some(metadata.started_by),
+        started_at: metadata.started_at,
+        completed_at: info.close_time.and_then(|t| {
+            chrono::DateTime::from_timestamp(t.seconds, t.nanos as u32)
+        }),
+        error: None,
+        execution_id: execution.run_id,
+    })
+}
+
+pub async fn describe(
+    client: &temporalio_client::Client,
+    id: ProjectFlagRunId,
+) -> Result<Option<TemporalRun>> {
+    let description = match client
+        .get_workflow_handle::<ProjectFlagRunWorkflow>(workflow_id(id))
+        .describe(temporalio_client::WorkflowDescribeOptions::default())
+        .await
+    {
+        Ok(description) => description,
+        Err(temporalio_client::errors::WorkflowInteractionError::NotFound(
+            _,
+        )) => {
+            return Ok(None);
+        }
+        Err(error) => return Err(error).context("describing project flag run"),
+    };
+    let metadata = description
+        .memo()
+        .get::<RunMetadata>(RUN_MEMO)
+        .context("decoding project flag run memo")?
+        .context("missing project flag run metadata")?;
+    let info = description
+        .raw_description
+        .workflow_execution_info
+        .context("missing temporal workflow information")?;
+    let mut run = decode_run(info, metadata)?;
+    let activity_errors = description
+        .raw_description
+        .pending_activities
+        .iter()
+        .filter_map(|activity| activity.last_failure.as_ref())
+        .map(|failure| format!("{failure:?}"))
+        .collect::<Vec<_>>();
+    if !activity_errors.is_empty() {
+        run.error = Some(activity_errors.join("\n"));
+    }
+    load_error(client, &mut run).await?;
+    Ok(Some(run))
+}
+
+async fn load_error(
+    client: &temporalio_client::Client,
+    run: &mut TemporalRun,
+) -> Result<()> {
+    let mut rpc = client.clone();
+    if matches!(
+        run.status,
+        RunStatus::Failed
+            | RunStatus::TimedOut
+            | RunStatus::Canceled
+            | RunStatus::Terminated
+    ) {
+        let history = rpc
+            .get_workflow_execution_history(
+                temporalio_client::tonic::Request::new(
+                    GetWorkflowExecutionHistoryRequest {
+                        namespace: client.namespace(),
+                        execution: Some(WorkflowExecution {
+                            workflow_id: workflow_id(run.id),
+                            run_id: run.execution_id.clone(),
+                        }),
+                        history_event_filter_type:
+                            HistoryEventFilterType::CloseEvent as i32,
+                        ..Default::default()
+                    },
+                ),
+            )
+            .await
+            .context("reading project flag run failure")?
+            .into_inner();
+        use temporalio_common::protos::temporal::api::history::v1::history_event::Attributes;
+        run.error =
+            history.history.into_iter().flat_map(|h| h.events).find_map(
+                |event| match event.attributes? {
+                    Attributes::WorkflowExecutionFailedEventAttributes(a) => {
+                        a.failure.map(|f| format!("{f:?}"))
+                    }
+                    Attributes::WorkflowExecutionTimedOutEventAttributes(_) => {
+                        Some("workflow execution timed out".into())
+                    }
+                    Attributes::WorkflowExecutionCanceledEventAttributes(a) => {
+                        Some(format!(
+                            "workflow execution canceled: {:?}",
+                            a.details
+                        ))
+                    }
+                    Attributes::WorkflowExecutionTerminatedEventAttributes(
+                        a,
+                    ) => Some(a.reason),
+                    _ => None,
+                },
+            );
+    }
+    Ok(())
+}
+
+pub async fn list(
+    temporal: &TemporalClient,
+    limit: usize,
+    offset: usize,
+    running_only: bool,
+) -> Result<Vec<TemporalRun>> {
+    use futures::{StreamExt, TryStreamExt};
+    let query = format!(
+        "WorkflowType = 'ProjectFlagRunWorkflow' AND WorkflowId STARTS_WITH 'project-flag-run:'{}",
+        if running_only {
+            " AND ExecutionStatus = 'Running'"
+        } else {
+            " AND ExecutionStatus != 'ContinuedAsNew'"
+        },
+    );
+    let executions = temporal.client.list_workflows(
+        query,
+        temporalio_client::WorkflowListOptions::default(),
+    );
+    executions
+        .try_filter(|execution| {
+            std::future::ready(execution.memo().contains_key(RUN_MEMO))
+        })
+        .skip(offset)
+        .take(limit)
+        .map(|execution| {
+            let execution =
+                execution.context("listing temporal project flag runs")?;
+            let metadata = execution
+                .memo()
+                .get::<RunMetadata>(RUN_MEMO)
+                .context("decoding project flag run memo")?
+                .context("missing project flag run metadata")?;
+            decode_run(execution.raw().clone(), metadata)
+        })
+        .try_collect()
+        .await
+}
+
+/// Serialize deletion and result writes without persisting execution state in Postgres.
+pub async fn lock_run(
+    transaction: &mut sqlx_tracing::Transaction<'_, sqlx::Postgres>,
+    id: ProjectFlagRunId,
+) -> Result<()> {
+    sqlx::query!(
+        r#"SELECT pg_advisory_xact_lock(hashtextextended($1, 0))"#,
+        workflow_id(id)
+    )
+    .execute(&mut *transaction)
+    .await
+    .context("locking project flag run results")?;
+    Ok(())
+}
+
+pub async fn delete(
+    temporal: &TemporalClient,
+    pool: &PgPool,
+    id: ProjectFlagRunId,
+) -> Result<()> {
+    let mut transaction = pool
+        .begin()
+        .await
+        .context("starting project flag run deletion")?;
+    lock_run(&mut transaction, id).await?;
+    let mut rpc = temporal.client.clone();
+    let execution = WorkflowExecution {
+        workflow_id: workflow_id(id),
+        run_id: String::new(),
+    };
+    let terminated = rpc
+        .terminate_workflow_execution(temporalio_client::tonic::Request::new(
+            TerminateWorkflowExecutionRequest {
+                namespace: temporal.client.namespace(),
+                workflow_execution: Some(execution.clone()),
+                reason: "deleted by moderator".into(),
+                ..Default::default()
+            },
+        ))
+        .await;
+    if let Err(error) = terminated
+        && !matches!(
+            error.code(),
+            temporalio_client::tonic::Code::NotFound
+                | temporalio_client::tonic::Code::FailedPrecondition
+        )
+    {
+        return Err(error).context("terminating project flag run");
+    }
+    let mut executions = Vec::new();
+    let mut execution = execution;
+    loop {
+        let history = rpc
+            .get_workflow_execution_history(
+                temporalio_client::tonic::Request::new(
+                    GetWorkflowExecutionHistoryRequest {
+                        namespace: temporal.client.namespace(),
+                        execution: Some(execution.clone()),
+                        maximum_page_size: 1,
+                        ..Default::default()
+                    },
+                ),
+            )
+            .await;
+        let history = match history {
+            Ok(response) => response.into_inner(),
+            Err(error)
+                if error.code() == temporalio_client::tonic::Code::NotFound =>
+            {
+                break;
+            }
+            Err(error) => {
+                return Err(error)
+                    .context("reading project flag continuation chain");
+            }
+        };
+        use temporalio_common::protos::temporal::api::history::v1::history_event::Attributes;
+        let started = history
+            .history
+            .and_then(|h| h.events.into_iter().next())
+            .and_then(|event| event.attributes)
+            .context("missing project flag workflow start event")?;
+        let Attributes::WorkflowExecutionStartedEventAttributes(started) =
+            started
+        else {
+            return Err(anyhow!(
+                "unexpected project flag workflow start event"
+            ));
+        };
+        executions.push(execution.clone());
+        if started.continued_execution_run_id.is_empty() {
+            break;
+        }
+        execution.run_id = started.continued_execution_run_id;
+    }
+    for execution in executions.into_iter().rev() {
+        let deleted = rpc
+            .delete_workflow_execution(temporalio_client::tonic::Request::new(
+                DeleteWorkflowExecutionRequest {
+                    namespace: temporal.client.namespace(),
+                    workflow_execution: Some(execution),
+                },
+            ))
+            .await;
+        if let Err(error) = deleted
+            && error.code() != temporalio_client::tonic::Code::NotFound
+        {
+            return Err(error).context("deleting temporal project flag run");
+        }
+    }
+    sqlx::query!(r#"UPDATE project_flags SET run_id = NULL WHERE run_id = $1 AND (active OR (what->>'retain_when_resolved')::bool = TRUE)"#, id.0)
+        .execute(&mut transaction).await.context("preserving active and retained project flags")?;
+    sqlx::query!(r#"DELETE FROM project_flags WHERE run_id = $1"#, id.0)
+        .execute(&mut transaction)
+        .await
+        .context("deleting inactive run flags")?;
+    sqlx::query!(
+        r#"DELETE FROM project_flag_run_results WHERE run_id = $1"#,
+        id.0
+    )
+    .execute(&mut transaction)
+    .await
+    .context("deleting project flag run results")?;
+    transaction
+        .commit()
+        .await
+        .context("committing project flag run deletion")?;
+    Ok(())
+}
+
+pub async fn num_scanning(
+    temporal: &TemporalClient,
+    pool: &PgPool,
+) -> Result<i64> {
+    let runs = list(temporal, usize::MAX, 0, true).await?;
+    let ids = runs.iter().map(|r| r.id).collect::<Vec<_>>();
+    let counts = crate::database::models::project_flag_item::DBProjectFlagRunResult::counts(&ids, pool).await?;
+    Ok(runs
+        .iter()
+        .map(|r| {
+            (r.total_projects - counts.get(&r.id).map_or(0, |c| c.num_scanned))
+                .max(0)
+        })
+        .sum())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn selection_is_sorted_deduplicated_and_round_trips() {
+        let input = RunInput::new(
+            ProjectFlagRunId(uuid::Uuid::now_v7()),
+            vec![DBProjectId(3), DBProjectId(1), DBProjectId(3)],
+            ProjectFlagRunUser {
+                id: DBUserId(42).into(),
+                username: "moderator".into(),
+            },
+        );
+        let restored: RunInput =
+            serde_json::from_slice(&serde_json::to_vec(&input).unwrap())
+                .unwrap();
+        assert_eq!(restored.projects, vec![DBProjectId(1), DBProjectId(3)]);
+        assert_eq!(restored.metadata.total_projects, 2);
+        assert_eq!(restored.metadata.id, input.metadata.id);
+    }
+    #[test]
+    fn continuation_preserves_original_metadata() {
+        let mut input = RunInput::new(
+            ProjectFlagRunId(uuid::Uuid::now_v7()),
+            vec![DBProjectId(1), DBProjectId(2)],
+            ProjectFlagRunUser {
+                id: DBUserId(42).into(),
+                username: "moderator".into(),
+            },
+        );
+        input.metadata.ruleset_id = Some(uuid::Uuid::now_v7());
+        let metadata = serde_json::to_value(&input.metadata).unwrap();
+        input.projects.drain(..1);
+        let restored: RunInput =
+            serde_json::from_value(serde_json::to_value(input).unwrap())
+                .unwrap();
+        assert_eq!(restored.projects, vec![DBProjectId(2)]);
+        assert_eq!(serde_json::to_value(restored.metadata).unwrap(), metadata);
+    }
+    #[test]
+    fn statuses_come_from_temporal_not_progress_counts() {
+        for (raw, expected) in [
+            (1, RunStatus::Running),
+            (2, RunStatus::Completed),
+            (3, RunStatus::Failed),
+            (4, RunStatus::Canceled),
+            (5, RunStatus::Terminated),
+            (6, RunStatus::ContinuedAsNew),
+            (7, RunStatus::TimedOut),
+            (0, RunStatus::Unknown),
+            (99, RunStatus::Unknown),
+        ] {
+            assert_eq!(RunStatus::from(raw), expected);
+        }
+    }
 }
