@@ -2456,7 +2456,21 @@ export namespace Labrinth {
 
 	export namespace Moderation {
 		export namespace Internal {
+			export type AutoApprovalStatus = {
+				auto_approve_blocked: boolean
+				eligible: boolean
+				generation: number
+				finished: boolean
+				deadline: string | null
+				phase: string
+			}
+			export type AutoApprovalQueueEntry = {
+				workflow_id: string
+				run_id: string
+				state: AutoApprovalStatus | null
+			}
 			export type AutoApprovalDiagnostics = {
+				workflow: AutoApprovalStatus | null
 				/** Current checks only, not evidence of a successful scan or inference run. */
 				can_auto_approve: boolean
 				eligible_by_checks: boolean

@@ -834,9 +834,12 @@ impl ProjectFlagEngine {
         ruleset_id: uuid::Uuid,
         file_manifest_hash: blake3::Hash,
         approval_due: bool,
+        approval_guard: Option<
+            &crate::workflow::project_flag::approve::ApprovalGuard,
+        >,
     ) -> Result<()> {
         crate::routes::v3::projects::mutation::apply_project_flag_reconciliation_after_delay(
-            context, result, ruleset_id, file_manifest_hash, pool, &self.redis, approval_due,
+            context, result, ruleset_id, file_manifest_hash, pool, &self.redis, approval_due, approval_guard,
         ).await.map_err(|error| match error {
             crate::routes::ApiError::Internal(report) => report.context("applying project flag reconciliation"),
             error => anyhow!("applying project flag reconciliation: {error}"),

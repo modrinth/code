@@ -133,6 +133,7 @@ pub(super) async fn text_input_is_current(
             project_id: input.project_id,
             ruleset_id: input.ruleset_id,
             approval_due: false,
+            approval_token: None,
         },
     )
     .await?;

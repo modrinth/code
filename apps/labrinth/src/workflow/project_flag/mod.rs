@@ -1,4 +1,4 @@
-mod approve;
+pub(crate) mod approve;
 pub(crate) mod image_scan;
 mod model_scan;
 pub mod run;
@@ -65,12 +65,13 @@ pub fn project_flag_worker_options(
             config: config.clone(),
             pool: pool.clone(),
             redis: redis.clone(),
-            temporal,
+            temporal: temporal.clone(),
         })
         .register_activities(ProjectFlagActivities {
             scanner: ModelScanner::new(config, redis, file_host),
             pool,
             engine,
+            temporal,
         })
         .build())
 }
@@ -89,7 +90,7 @@ pub(crate) async fn reconcile_project_review_state(
     in_review: bool,
 ) -> Result<()> {
     if !in_review {
-        approve::update_approval(&temporal.client, project_id, false).await?;
+        return Ok(());
     }
     temporal
         .client
@@ -152,6 +153,7 @@ impl ReconcileProjectFlagsWorkflow {
                 project_id,
                 ruleset_id,
                 approval_due: false,
+                approval_token: None,
             };
             let (images, text) = futures::join!(
                 image_scan::scan_project_images(ctx, project_id),
@@ -205,6 +207,8 @@ pub struct ReconcileRulesInput {
     ruleset_id: Option<uuid::Uuid>,
     #[serde(default)]
     approval_due: bool,
+    #[serde(default)]
+    approval_token: Option<approve::ApprovalToken>,
 }
 
 impl ReconcileRulesInput {
@@ -277,6 +281,7 @@ pub struct ProjectFlagActivities {
     pub scanner: ModelScanner,
     pub pool: PgPool,
     pub engine: crate::queue::moderation::project_flag::ProjectFlagEngine,
+    pub temporal: temporalio_client::Client,
 }
 
 #[activities]
@@ -316,6 +321,11 @@ impl ProjectFlagActivities {
             input.project_id().into(),
             input.ruleset_id(),
             input.approval_due,
+            input.approval_token.map(|token| approve::ApprovalGuard {
+                temporal: self.temporal.clone(),
+                project_id: input.project_id,
+                token,
+            }),
         )
         .await
         {

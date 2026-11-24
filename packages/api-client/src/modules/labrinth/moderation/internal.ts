@@ -6,6 +6,31 @@ export class LabrinthModerationInternalModule extends AbstractModule {
 		return 'labrinth_moderation_internal'
 	}
 
+	public async blockProjectAutoApprove(
+		projectId: string,
+	): Promise<Labrinth.Moderation.Internal.AutoApprovalStatus> {
+		return this.client.request<Labrinth.Moderation.Internal.AutoApprovalStatus>(
+			`/moderation/project-auto-approve/${projectId}/block`,
+			{ api: 'labrinth', version: 'internal', method: 'POST', timeout: 65 * 1000, retry: false },
+		)
+	}
+
+	public async unblockProjectAutoApprove(
+		projectId: string,
+	): Promise<Labrinth.Moderation.Internal.AutoApprovalStatus> {
+		return this.client.request<Labrinth.Moderation.Internal.AutoApprovalStatus>(
+			`/moderation/project-auto-approve/${projectId}/block`,
+			{ api: 'labrinth', version: 'internal', method: 'DELETE', timeout: 65 * 1000, retry: false },
+		)
+	}
+
+	public async getAutoApproveQueue(): Promise<Labrinth.Moderation.Internal.AutoApprovalQueueEntry[]> {
+		return this.client.request<Labrinth.Moderation.Internal.AutoApprovalQueueEntry[]>(
+			'/moderation/project-auto-approve',
+			{ api: 'labrinth', version: 'internal', method: 'GET' },
+		)
+	}
+
 	public async getProjectAutoApprove(
 		projectId: string,
 	): Promise<Labrinth.Moderation.Internal.AutoApprovalDiagnostics> {

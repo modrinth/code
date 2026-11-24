@@ -31,6 +31,7 @@ pub(super) async fn reconcile_rules(
     project_id: DBProjectId,
     ruleset_id: Option<uuid::Uuid>,
     approval_due: bool,
+    approval_guard: Option<super::approve::ApprovalGuard>,
 ) -> Result<()> {
     if !super::project_in_review(pool, project_id.into()).await? {
         return Ok(());
@@ -50,6 +51,7 @@ pub(super) async fn reconcile_rules(
         Some(ruleset_id),
         approval_due,
         None,
+        approval_guard.as_ref(),
     )
     .await
 }
@@ -78,6 +80,7 @@ pub(super) async fn scan_batch(
         None,
         false,
         Some((temporal, ctx)),
+        None,
     )
     .await
 }
@@ -94,6 +97,7 @@ async fn scan_batch_inner(
         &temporalio_client::Client,
         &temporalio_sdk::activities::ActivityContext,
     )>,
+    approval_guard: Option<&super::approve::ApprovalGuard>,
 ) -> Result<()> {
     let snapshot_hash = if run_id.is_none() {
         Some(super::scan_cache::rules_input_hash(&snapshot)?)
@@ -300,6 +304,7 @@ async fn scan_batch_inner(
                                 ruleset_id,
                                 manifest_hash,
                                 approval_due,
+                                approval_guard,
                             )
                             .await?;
                     }
