@@ -1283,9 +1283,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Версії"
   },
-  "create.collection.collection-info": {
-    "message": "Ваша нова добірка після створення буде публічною {count, plural,=0 {без проєктів} one {і міститиме # проєкт} few {і міститиме # проєкти} other {і міститиме # проєктів}}."
-  },
   "create.collection.create-collection": {
     "message": "Створити добірку"
   },
@@ -1348,9 +1345,6 @@
   },
   "create.organization.name-placeholder": {
     "message": "Уведіть назву організації…"
-  },
-  "create.organization.ownership-info": {
-    "message": "Ви будете власником цієї організації, але зможете запрошувати інших учасників та передавати власність коли завгодно."
   },
   "create.organization.summary-description": {
     "message": "Кілька речень, які описують вашу організацію."

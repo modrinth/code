@@ -3509,12 +3509,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "동영상"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "파일 없음"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "이미지 업로드 핸들러가 없음"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },
@@ -8652,4 +8646,3 @@
     "defaultMessage": "유형"
   }
 }
-

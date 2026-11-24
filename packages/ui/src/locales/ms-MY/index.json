@@ -2042,9 +2042,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Video"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Tiada fail disediakan"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },
@@ -4752,4 +4749,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

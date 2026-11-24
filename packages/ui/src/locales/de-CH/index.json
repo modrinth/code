@@ -3509,12 +3509,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Video"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Keine Datei gegeben"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "Kein Bild-Upload-Handler vorhanden"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },
@@ -8652,4 +8646,3 @@
     "defaultMessage": "Typ"
   }
 }
-

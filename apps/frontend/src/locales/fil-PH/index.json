@@ -458,9 +458,6 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ang mga supplementary file ay para sa mga resource na pangsuporta katulad ng source code, hindi para sa ibang bersiyon or baryante."
   },
-  "create.collection.collection-info": {
-    "message": "Ang iyong bagong koleksiyon ay lilikhain bilang isang pampublikong koleksiyon na {count, plural, =0 {walang proyekto} one {may # proyekto} other {may # na proyekto}}."
-  },
   "create.collection.create-collection": {
     "message": "Lumikha ng koleksiyon"
   },
@@ -523,9 +520,6 @@
   },
   "create.organization.name-placeholder": {
     "message": "Ilagay ang pangalan ng organisasyon..."
-  },
-  "create.organization.ownership-info": {
-    "message": "Ikaw ang magiging may-ari ng organisasyon, ngunit maaari kang makapag-anyaya ng ibang mga miyembro at mailipat ang pagiging-may-ari sa kahit anong panahon."
   },
   "create.organization.summary-description": {
     "message": "Maisa o dalawang pangungusap na maglalarawan sa iyong organisasyon."

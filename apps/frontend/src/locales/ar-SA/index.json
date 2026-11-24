@@ -1178,9 +1178,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "الإصدارات"
   },
-  "create.collection.collection-info": {
-    "message": "سيتم إنشاء مجموعتك الجديدة كمجموعة عامة تحتوي على {count, plural,\n  one {# مشروع}\n  other {# مشاريع}\n}."
-  },
   "create.collection.create-collection": {
     "message": "إنشاء مجموعة"
   },
@@ -1243,9 +1240,6 @@
   },
   "create.organization.name-placeholder": {
     "message": "أدخل اسم المنظمة..."
-  },
-  "create.organization.ownership-info": {
-    "message": "سوف تكون مالك هذه المنظمة, لكن يمكنك بدعوة أعضاء آخرين و تحويل حالة الملكية في أي وقت."
   },
   "create.organization.summary-description": {
     "message": "جملة أو جملتان تصف مجموعتك."

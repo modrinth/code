@@ -2957,12 +2957,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Video"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Dosya sağlanmadı"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "Resim yükleme işleyicisi sağlanmadı"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },

@@ -2852,12 +2852,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Video"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Không có tệp"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "Không trình xử lý tải ảnh nào được cung cấp"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },
@@ -7011,4 +7005,3 @@
     "defaultMessage": "Loại"
   }
 }
-

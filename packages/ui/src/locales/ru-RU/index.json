@@ -3365,12 +3365,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Видео"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Файл не предоставлен"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "Обработчик загрузки изображений не задан"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "Адрес"
   },

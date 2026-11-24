@@ -1253,9 +1253,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Phiên bản"
   },
-  "create.collection.collection-info": {
-    "message": "Bộ sưu tập mới của bạn sẽ được tạo dưới dạng bộ sưu tập công khai với {count, plural, =0 {không có dự án} other {# dự án}}."
-  },
   "create.collection.create-collection": {
     "message": "Tạo bộ sưu tập"
   },
@@ -1318,9 +1315,6 @@
   },
   "create.organization.name-placeholder": {
     "message": "Nhập tên tổ chức..."
-  },
-  "create.organization.ownership-info": {
-    "message": "Bạn sẽ là chủ của tổ chức này, nhưng bạn có thể mời các thành viên khác và chuyển quyền sở hữu bất cứ lúc nào."
   },
   "create.organization.summary-description": {
     "message": "Một hoặc hai câu mô tả tổ chức của bạn."

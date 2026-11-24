@@ -3509,12 +3509,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Vídeo"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Nenhum arquivo fornecido"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "Nenhum manipulador para upload de imagem fornecido"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },

@@ -1301,11 +1301,14 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Versions"
   },
-  "create.collection.collection-info": {
-    "message": "Your new collection will be created as a public collection with {count, plural, =0 {no projects} one {# project} other {# projects}}."
-  },
   "create.collection.create-collection": {
     "message": "Create collection"
+  },
+  "create.collection.invalid-name": {
+    "message": "Enter a collection name of 3 to 64 characters."
+  },
+  "create.collection.invalid-summary": {
+    "message": "Enter a summary of 3 to 255 characters or leave it blank."
   },
   "create.collection.name-label": {
     "message": "Name"
@@ -1358,17 +1361,26 @@
   "create.limit-alert.type-project": {
     "message": "project"
   },
+  "create.organization.checking-url": {
+    "message": "Checking URL availability…"
+  },
   "create.organization.create-organization": {
     "message": "Create organization"
+  },
+  "create.organization.invalid-name": {
+    "message": "Enter an organization name of 3 to 64 characters."
+  },
+  "create.organization.invalid-summary": {
+    "message": "Enter an organization summary of 3 to 256 characters."
+  },
+  "create.organization.invalid-url": {
+    "message": "Enter a URL of 3 to 64 characters using letters, numbers, dots, underscores, or hyphens."
   },
   "create.organization.name-label": {
     "message": "Name"
   },
   "create.organization.name-placeholder": {
     "message": "Enter organization name..."
-  },
-  "create.organization.ownership-info": {
-    "message": "You will be the owner of this organization, but you can invite other members and transfer ownership at any time."
   },
   "create.organization.summary-description": {
     "message": "A sentence or two that describes your organization."
@@ -1384,6 +1396,9 @@
   },
   "create.organization.url-label": {
     "message": "URL"
+  },
+  "create.organization.url-taken": {
+    "message": "This organization URL is already taken."
   },
   "create.project.create-project": {
     "message": "Create project"
@@ -4378,9 +4393,6 @@
   },
   "project.settings.description.guidance.explain-appeal": {
     "message": "Explain what makes your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} interesting."
-  },
-  "project.settings.description.guidance.explain-server-play": {
-    "message": "Explain how players can play on your server."
   },
   "project.settings.description.guidance.explain-use": {
     "message": "Explain how your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} can be used or played with."

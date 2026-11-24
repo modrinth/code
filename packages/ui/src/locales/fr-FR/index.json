@@ -3149,12 +3149,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Vidéo"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Aucun fichier autorisé"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "Aucun lanceur d'image autorisée"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },

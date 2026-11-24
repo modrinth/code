@@ -608,9 +608,6 @@
   "create-project-version.create-modal.stage.metadata.details-tab": {
     "message": "Detalii"
   },
-  "create.collection.collection-info": {
-    "message": "Noua ta colecție va fi creată ca o colecție publică cu {count, plural, =0 {niciun proiect} one {# proiect} other {# proiecte}}."
-  },
   "create.collection.create-collection": {
     "message": "Creează o colecție"
   },
@@ -673,9 +670,6 @@
   },
   "create.organization.name-placeholder": {
     "message": "Introduceți numele organizației..."
-  },
-  "create.organization.ownership-info": {
-    "message": "Vei fi proprietarul acestei organizații, dar poți invita alți membri și poți transfera proprietatea oricând."
   },
   "create.organization.summary-description": {
     "message": "O propoziție sau două care îți descriu organizația."

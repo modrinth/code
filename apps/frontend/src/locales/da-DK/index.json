@@ -830,9 +830,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Versioner"
   },
-  "create.collection.collection-info": {
-    "message": "Din nye samling vil blive skabt som en offentlig samling med {count, plural, =0 {ingen projekter} one {# projekt} other {# projekter}}."
-  },
   "create.collection.create-collection": {
     "message": "Opret samling"
   },
@@ -883,9 +880,6 @@
   },
   "create.organization.name-placeholder": {
     "message": "Indtast organisation navn..."
-  },
-  "create.organization.ownership-info": {
-    "message": "Du vil blive ejeren af denne organisation, men du kan invitere andre medlemmer og overføre ejerskabet på et hvert tidspunkt."
   },
   "create.organization.summary-description": {
     "message": "En sætning eller to som beskriver din organisation."

@@ -7,6 +7,7 @@
 				: formatMessage(messages.title)
 		"
 		max-width="550px"
+		:initial-focus="getNameInput"
 	>
 		<div class="flex w-full flex-col gap-6">
 			<RestrictedActionAlert v-model="isRestricted" scope="PROJECT_CREATE" @navigate="cancel" />
@@ -15,6 +16,7 @@
 			<Field :label="formatMessage(messages.nameLabel)" input-id="name">
 				<Input
 					id="name"
+					ref="nameInput"
 					v-model="name"
 					:maxlength="64"
 					:placeholder="formatMessage(messages.namePlaceholder)"
@@ -23,18 +25,6 @@
 					:disabled="hasHitLimit"
 					@update:model-value="updatedName()"
 				/>
-			</Field>
-			<Field :label="formatMessage(messages.summaryLabel)" input-id="additional-information">
-				<Textarea
-					id="additional-information"
-					v-model="description"
-					:maxlength="256"
-					:placeholder="formatMessage(messages.summaryPlaceholder)"
-					:disabled="hasHitLimit"
-				/>
-				<template #bottom>
-					<p class="mb-0 mt-2 text-sm text-secondary">{{ formatMessage(projectSummaryHelp) }}</p>
-				</template>
 			</Field>
 			<Field
 				:label="formatMessage(messages.urlLabel)"
@@ -61,6 +51,18 @@
 						:visible="showSlugSuggestions"
 						@select="selectSlugSuggestion"
 					/>
+				</template>
+			</Field>
+			<Field :label="formatMessage(messages.summaryLabel)" input-id="additional-information">
+				<Textarea
+					id="additional-information"
+					v-model="description"
+					:maxlength="256"
+					:placeholder="formatMessage(messages.summaryPlaceholder)"
+					:disabled="hasHitLimit"
+				/>
+				<template #bottom>
+					<p class="mb-0 mt-2 text-sm text-secondary">{{ formatMessage(projectSummaryHelp) }}</p>
 				</template>
 			</Field>
 			<Field :label="formatMessage(messages.ownerLabel)" input-id="project-create-owner-search">
@@ -222,6 +224,7 @@ const props = defineProps<{
 }>()
 
 const modal = ref<InstanceType<typeof NewModal>>()
+const nameInput = ref<InstanceType<typeof Input>>()
 const hasHitLimit = ref(false)
 const isRestricted = ref(false)
 
@@ -398,6 +401,11 @@ async function show(event?: MouseEvent, options?: ShowOptions) {
 	projectType.value = options?.type ?? 'project'
 	await fetchOrganizations()
 	modal.value?.show(event)
+}
+
+function getNameInput() {
+	const root: HTMLElement | undefined = nameInput.value?.$el
+	return root?.querySelector<HTMLInputElement>('input:enabled') ?? null
 }
 
 function updatedName() {

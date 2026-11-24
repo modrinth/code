@@ -3077,12 +3077,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Video"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Geen bestand opgegeven"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "Geen handler voor uploaden van afbeeldingen opgegeven"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },

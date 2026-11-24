@@ -1286,9 +1286,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "バージョン"
   },
-  "create.collection.collection-info": {
-    "message": "新しいコレクションは、{count, plural, =0 {空の} other {#個のプロジェクトを含む}}公開コレクションとして作成されます。"
-  },
   "create.collection.create-collection": {
     "message": "コレクションを作成"
   },
@@ -1351,9 +1348,6 @@
   },
   "create.organization.name-placeholder": {
     "message": "組織名を入力…"
-  },
-  "create.organization.ownership-info": {
-    "message": "あなたはこの組織のオーナーになりますが、いつでも他のメンバーを招待して所有権を譲渡することができます。"
   },
   "create.organization.summary-description": {
     "message": "1〜2文程度のあなたの組織の説明。"

@@ -785,9 +785,6 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Tilleggsfiler er for støtteressurser som kildekode, ikke for alternative versjoner eller varianter."
   },
-  "create.collection.collection-info": {
-    "message": "Den nye samlinga di kommer til å bli laga som ei offentlig samling med {count, plural, =0 {ingen prosjekt} one {# prosjekt} other {# prosjekt}}."
-  },
   "create.collection.create-collection": {
     "message": "Opprett samling"
   },
@@ -850,9 +847,6 @@
   },
   "create.organization.name-placeholder": {
     "message": "Tast inn organiseringsnavn..."
-  },
-  "create.organization.ownership-info": {
-    "message": "Du kommer til å bli eieren til denne organiseringa, men du kan invitere andre medlemmer og overføre eierskap når som helst."
   },
   "create.organization.summary-description": {
     "message": "Ei eller to setninger som beskriver organiseringa di."

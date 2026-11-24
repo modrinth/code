@@ -2972,9 +2972,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Video"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Ingen fil försedd"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },

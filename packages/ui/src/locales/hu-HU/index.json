@@ -3110,12 +3110,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Videó"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Fájl nem került megadásra"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "Nincs megadva képfeltöltési kezelő"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },

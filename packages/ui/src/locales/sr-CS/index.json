@@ -2834,12 +2834,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Video"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Nije priložena nijedna datoteka"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "Nije obezbeđen program za otpremanje slika"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },
@@ -6174,4 +6168,3 @@
     "defaultMessage": "Tip"
   }
 }
-

@@ -1280,9 +1280,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Версии"
   },
-  "create.collection.collection-info": {
-    "message": "Будет создана публичная коллекция {count, plural, =0 {без проектов} one {с # проектом} other {с # проектами}}."
-  },
   "create.collection.create-collection": {
     "message": "Создать коллекцию"
   },
@@ -1345,9 +1342,6 @@
   },
   "create.organization.name-placeholder": {
     "message": "Введите название организации..."
-  },
-  "create.organization.ownership-info": {
-    "message": "Вы станете владельцем организации и в любой момент сможете пригласить участников и передать владение."
   },
   "create.organization.summary-description": {
     "message": "Пара предложений про организацию."

@@ -1268,9 +1268,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "버전"
   },
-  "create.collection.collection-info": {
-    "message": "새 모음집은 {count, plural, =0 {아무 프로젝트 없이} other {#개의 프로젝트를 포함하여}} 공개 모음집으로 생성됩니다."
-  },
   "create.collection.create-collection": {
     "message": "모음집 생성"
   },
@@ -1333,9 +1330,6 @@
   },
   "create.organization.name-placeholder": {
     "message": "조직 이름 입력..."
-  },
-  "create.organization.ownership-info": {
-    "message": "여러분은 이 조직의 소유자이며, 필요시 다른 멤버를 초대하거나 권한을 이전할 수 있습니다."
   },
   "create.organization.summary-description": {
     "message": "여러분의 조직에 대해 짧게 설명해 보세요."

@@ -161,10 +161,6 @@ const messages = defineMessages({
 		defaultMessage:
 			'Explain how your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} can be used or played with.',
 	},
-	explainServerPlay: {
-		id: 'project.settings.description.guidance.explain-server-play',
-		defaultMessage: 'Explain how players can play on your server.',
-	},
 	showGallery: {
 		id: 'project.settings.description.guidance.show-gallery',
 		defaultMessage: 'Showcase images from the Gallery, if applicable.',
@@ -219,7 +215,7 @@ const messages = defineMessages({
 })
 const guidelines = computed(() => [
 	messages.explainAppeal,
-	isServerProject.value ? messages.explainServerPlay : messages.explainUse,
+	...(isServerProject.value ? [] : [messages.explainUse]),
 	messages.showGallery,
 	messages.accessibleFormatting,
 ])

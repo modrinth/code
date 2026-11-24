@@ -863,9 +863,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Versi"
   },
-  "create.collection.collection-info": {
-    "message": "Koleksi baharu anda akan dibuat sebagai koleksi awam dengan {count, plural, =0 {0 projek} other {# projek}}."
-  },
   "create.collection.create-collection": {
     "message": "Cipta koleksi"
   },
@@ -928,9 +925,6 @@
   },
   "create.organization.name-placeholder": {
     "message": "Masukkan nama organisasi..."
-  },
-  "create.organization.ownership-info": {
-    "message": "Anda akan menjadi pemilik organisasi ini, tetapi anda boleh menjemput ahli lain dan memindahkan pemilikan pada bila-bila masa."
   },
   "create.organization.summary-description": {
     "message": "Satu atau dua ayat yang menerangkan organisasi anda."
