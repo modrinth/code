@@ -5,5 +5,5 @@
 pub mod enums;
 pub mod event;
 pub mod http;
-pub mod iso3166_alpha2;
+pub mod iso3166_1_alpha_2;
 pub mod normal;

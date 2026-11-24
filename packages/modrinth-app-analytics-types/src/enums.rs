@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::iso3166_alpha2;
+use crate::iso3166_1_alpha_2;
 
 /// Loader of a Minecraft instance.
 #[derive(
@@ -124,7 +124,7 @@ impl Country {
             return None;
         };
 
-        iso3166_alpha2::SORTED_CODES
+        iso3166_1_alpha_2::SORTED_CODES
             .iter()
             .chain([Country::UNKNOWN.as_str(), Country::TOR.as_str()].iter())
             .any(|code| code == &value)
