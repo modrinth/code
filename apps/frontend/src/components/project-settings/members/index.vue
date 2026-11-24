@@ -568,6 +568,7 @@ const canLeaveProject = computed(() =>
 		<InviteDialog
 			ref="inviteDialog"
 			:team-id="project.team"
+			:team-members-by-user-id="teamByUserId"
 			:on-invited="invalidate"
 			:can-invite="canManageInvites"
 			:grantable="permissions ?? 0"
@@ -599,7 +600,12 @@ const canLeaveProject = computed(() =>
 				:subtitle="formatMessage(messages.membersHelp, { contentType: projectCopyType(projectV3) })"
 			>
 				<template v-if="canManageInvites" #actions>
-					<Button type="colored" color="brand" @click="inviteDialog?.show()">
+					<Button
+						type="colored"
+						color="brand"
+						:aria-busy="inviteDialog?.isOpening || undefined"
+						@click="inviteDialog?.show()"
+					>
 						<UserPlusIcon /> {{ formatMessage(messages.addMember) }}
 					</Button>
 				</template>
@@ -623,7 +629,12 @@ const canLeaveProject = computed(() =>
 								rel="noopener noreferrer"
 								class="inline-flex items-center gap-1 align-middle"
 							>
-								<Avatar :src="organization.icon_url" size="1.5rem" no-shadow />
+								<Avatar
+									:src="organization.icon_url"
+									:tint-by="organization.id"
+									size="1.5rem"
+									no-shadow
+								/>
 								<span class="underline"><component :is="() => children" /></span>
 							</NuxtLink>
 						</template>

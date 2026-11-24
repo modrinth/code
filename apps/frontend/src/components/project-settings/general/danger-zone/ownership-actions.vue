@@ -216,6 +216,7 @@ function confirmRemoveFromOrganization() {
 						:options="targets"
 						input-id="project-transfer-target"
 						:disabled="transfer.isPending.value"
+						hide-chevron
 					/>
 				</Field>
 				<p v-if="!targets.length && !isError" class="m-0 text-secondary">
@@ -244,9 +245,10 @@ function confirmRemoveFromOrganization() {
 			ref="transferModal"
 			:project="{ name: project.title, icon_url: project.icon_url ?? null }"
 			:current-owner="{
-				avatar_url: owner?.user.avatar_url ?? null,
+				avatar_url: (owner ? owner.user.avatar_url : organization?.icon_url) ?? null,
 				username: owner?.user.username ?? organization?.name ?? '',
 				role: owner?.role ?? 'Owner',
+				organizationId: owner ? undefined : organization?.id,
 			}"
 			:transfer-to="target"
 			:on-confirm="() => transfer.mutate()"

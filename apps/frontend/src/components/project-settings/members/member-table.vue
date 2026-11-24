@@ -153,7 +153,13 @@ function accessLabel(member: MemberDraft) {
 		</template>
 		<template #cell-member="{ row: member }">
 			<div class="flex items-center gap-2 py-2.5">
-				<Avatar :src="member.user.avatar_url" :alt="member.user.username" size="2.5rem" circle />
+				<Avatar
+					:src="member.user.avatar_url"
+					:alt="member.user.username"
+					:tint-by="member.user.username"
+					size="2.5rem"
+					circle
+				/>
 				<NuxtLink :to="`/user/${member.user.username}`" class="font-semibold text-contrast">
 					{{ member.user.username }}
 				</NuxtLink>

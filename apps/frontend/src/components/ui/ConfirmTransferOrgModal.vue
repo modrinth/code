@@ -7,6 +7,7 @@
 					:src="organization.icon_url"
 					:raw-src="organization.raw_icon_url"
 					:alt="organization.name"
+					:tint-by="organization.id"
 					size="xs"
 				/>
 				<span class="text-lg font-extrabold text-contrast">{{ organization.name }}</span>
@@ -28,7 +29,13 @@
 				class="grid grid-cols-[1fr_auto_1fr] items-center justify-center gap-6 rounded-2xl bg-surface-2 p-4"
 			>
 				<div class="flex items-center gap-2">
-					<Avatar :src="currentOwner.avatar_url" :alt="currentOwner.username" size="xs" circle />
+					<Avatar
+						:src="currentOwner.avatar_url"
+						:alt="currentOwner.username"
+						:tint-by="currentOwner.username"
+						size="xs"
+						circle
+					/>
 					<div class="flex flex-col items-start justify-start gap-1">
 						<span class="font-medium text-contrast">{{ currentOwner.username }}</span>
 						<span class="text-sm text-secondary">{{ currentOwner.role }}</span>
@@ -36,7 +43,13 @@
 				</div>
 				<RightArrowIcon class="h-6 w-6 text-secondary" />
 				<div class="flex items-center gap-2">
-					<Avatar :src="transferTo.avatar_url" :alt="transferTo.username" size="xs" circle />
+					<Avatar
+						:src="transferTo.avatar_url"
+						:alt="transferTo.username"
+						:tint-by="transferTo.username"
+						size="xs"
+						circle
+					/>
 					<div class="flex flex-col items-start justify-start gap-1">
 						<span class="font-medium text-contrast">{{ transferTo.username }} </span>
 						<span class="text-sm text-secondary">{{ transferTo.role }} </span>
@@ -81,7 +94,7 @@ import { Admonition, Avatar, Button, Input, NewModal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 const props = defineProps<{
-	organization: { name: string; icon_url: string | null; raw_icon_url?: string | null }
+	organization: { id: string; name: string; icon_url: string | null; raw_icon_url?: string | null }
 	currentOwner: { avatar_url: string | null; username: string; role: string }
 	transferTo: { avatar_url: string | null; username: string; role: string }
 	onConfirm: () => void

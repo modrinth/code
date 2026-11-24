@@ -15,8 +15,9 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useMutation, useQuery } from '@tanstack/vue-query'
-import { createReusableTemplate, refDebounced } from '@vueuse/core'
-import { computed, nextTick, ref, shallowRef, useTemplateRef } from 'vue'
+import { createReusableTemplate, refDebounced, until } from '@vueuse/core'
+import Fuse from 'fuse.js'
+import { computed, nextTick, ref, shallowRef, useId, useTemplateRef, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import ProjectAccessPicker, {
@@ -28,12 +29,15 @@ import { useMemberErrorNotification } from './use-member-error-notification'
 
 type InviteUser = Pick<Labrinth.Users.v2.User, 'id' | 'username' | 'avatar_url'>
 
+const CONTACTS_TIMEOUT_MS = 5_000
+
 const props = defineProps<{
 	canInvite: boolean
 	grantable?: number
 	accessOptions?: { presets: ProjectAccessPreset[]; groups: ProjectAccessGroup[] }
 	title: string
 	teamId: string
+	teamMembersByUserId?: ReadonlyMap<string, { accepted: boolean }>
 	organization?: boolean
 	onInvited: () => Promise<unknown>
 }>()
@@ -46,17 +50,22 @@ const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')
 const usernameForm = useTemplateRef<HTMLFormElement>('usernameForm')
 const roleInput = useTemplateRef('roleInput')
 const isOpen = ref(false)
+const isOpening = ref(false)
 const username = ref('')
+const usernameFocused = ref(false)
+const usernameResultsId = useId()
+const highlightedUserId = ref<string>()
 const selectedUser = shallowRef<InviteUser>()
 const role = ref('')
 const permissions = ref(0)
 const [DefineUsernameStage, UsernameStage] = createReusableTemplate()
 const [DefineAccessStage, AccessStage] = createReusableTemplate()
-const [DefineUserRow, UserRow] = createReusableTemplate<{ user: InviteUser; exactMatch?: boolean }>(
-	{
-		inheritAttrs: false,
-	},
-)
+const [DefineUserRow, UserRow] = createReusableTemplate<{
+	user: InviteUser
+	exactMatch?: boolean
+	optionId?: string
+	highlighted?: boolean
+}>({ inheritAttrs: false })
 
 const messages = defineMessages({
 	description: {
@@ -81,6 +90,14 @@ const messages = defineMessages({
 	inviteUser: {
 		id: 'project.settings.members.invite.user-title',
 		defaultMessage: 'Invite {username}',
+	},
+	alreadyMember: {
+		id: 'project.settings.members.invite.already-member',
+		defaultMessage: 'Already a member',
+	},
+	invitePending: {
+		id: 'project.settings.members.invite.pending',
+		defaultMessage: 'Invite pending',
 	},
 	userNotFound: {
 		id: 'project.settings.members.invite.user-not-found',
@@ -142,7 +159,9 @@ const checkedUser = computed(() =>
 		: undefined,
 )
 const userId = computed(() => auth.user.value?.id)
-const canLoadContacts = computed(() => isOpen.value && props.canInvite && !!userId.value)
+const canLoadContacts = computed(
+	() => (isOpening.value || isOpen.value) && props.canInvite && !!userId.value,
+)
 const friends = useQuery({
 	queryKey: computed(() => sharedInstanceKeys.friends(userId.value)),
 	enabled: canLoadContacts,
@@ -159,25 +178,65 @@ const organizations = useQuery({
 	enabled: canLoadContacts,
 	queryFn: ({ queryKey: [, id] }) => labrinth.users_v2.getOrganizations(id!),
 })
-const loadingContacts = computed(() => friends.isLoading.value || organizations.isLoading.value)
+const contactsPending = computed(() => friends.isPending.value || organizations.isPending.value)
 const contactsFailed = computed(() => friends.isError.value || organizations.isError.value)
-const visibleFriends = computed(() => friends.data.value ?? [])
-const visibleOrganizations = computed(() =>
-	(organizations.data.value ?? []).flatMap((organization) => {
-		const acceptedMembers = organization.members.filter((member) => member.accepted)
-		if (
-			acceptedMembers.length < 2 ||
-			!acceptedMembers.some((member) => member.user.id === userId.value)
-		)
-			return []
-
-		const members = acceptedMembers.filter(({ user }) => user.id !== userId.value)
-		return [{ organization, members, memberCount: members.length }]
-	}),
+const contactCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
+const visibleFriends = computed(() =>
+	[...(friends.data.value ?? [])].sort((a, b) => contactCollator.compare(a.username, b.username)),
 )
+const visibleOrganizations = computed(() =>
+	(organizations.data.value ?? [])
+		.flatMap((organization) => {
+			const acceptedMembers = organization.members.filter((member) => member.accepted)
+			if (
+				acceptedMembers.length < 2 ||
+				!acceptedMembers.some((member) => member.user.id === userId.value)
+			)
+				return []
+
+			const members = acceptedMembers
+				.filter(({ user }) => user.id !== userId.value)
+				.sort((a, b) => contactCollator.compare(a.user.username, b.user.username))
+			return [{ organization, members, memberCount: members.length }]
+		})
+		.sort((a, b) => contactCollator.compare(a.organization.name, b.organization.name)),
+)
+const contactSearch = computed(() => {
+	const contacts = [
+		...visibleFriends.value,
+		...visibleOrganizations.value.flatMap(({ members }) => members.map(({ user }) => user)),
+	]
+	const eligibleUsers = new Map<string, InviteUser>()
+	for (const user of contacts) {
+		if (!props.teamMembersByUserId?.has(user.id)) eligibleUsers.set(user.id, user)
+	}
+	return new Fuse([...eligibleUsers.values()], { keys: ['username'], threshold: 0.4 })
+})
+const usernameResults = computed(() => {
+	const exactUser = checkedUser.value
+	if (exactUser === undefined) return []
+	const matches = contactSearch.value.search(enteredUsername.value).map(({ item }) => item)
+	return exactUser ? [exactUser, ...matches.filter((user) => user.id !== exactUser.id)] : matches
+})
+const exactMatch = computed(() =>
+	usernameResults.value.find((user) => user.username.toLowerCase() === enteredUsername.value),
+)
+const selectableResults = computed(() =>
+	usernameResults.value.filter((user) => !props.teamMembersByUserId?.has(user.id)),
+)
+const highlightedUser = computed(() =>
+	selectableResults.value.find((user) => user.id === highlightedUserId.value) ??
+	selectableResults.value[0],
+)
+const resultsExpanded = computed(
+	() => props.canInvite && usernameFocused.value && usernameResults.value.length > 0,
+)
+watch(enteredUsername, () => {
+	highlightedUserId.value = undefined
+})
 const contactsStatus = computed(() => {
 	if (!canLoadContacts.value) return
-	if (loadingContacts.value) return commonMessages.loadingLabel
+	if (contactsPending.value) return commonMessages.loadingLabel
 	if (contactsFailed.value) return messages.contactsFailed
 	if (visibleFriends.value.length || visibleOrganizations.value.length) return
 	return messages.noContacts
@@ -210,6 +269,7 @@ const canSubmit = computed(
 	() =>
 		props.canInvite &&
 		!!selectedUser.value &&
+		!props.teamMembersByUserId?.has(selectedUser.value.id) &&
 		!inviting.value &&
 		(permissions.value & (props.grantable ?? 0)) === permissions.value,
 )
@@ -253,11 +313,29 @@ const stages: StageConfigInput<undefined>[] = [
 ]
 
 async function selectUser(user?: InviteUser | null) {
-	if (!user || !props.canInvite || inviting.value) return
+	if (!user || !props.canInvite || inviting.value || props.teamMembersByUserId?.has(user.id)) return
 	selectedUser.value = user
 	modal.value?.nextStage()
 	await nextTick()
 	roleInput.value?.focus()
+}
+
+async function moveHighlight(event: KeyboardEvent, direction: -1 | 1) {
+	const results = selectableResults.value
+	if (event.isComposing || !results.length) return
+	event.preventDefault()
+	const index = results.findIndex((user) => user.id === highlightedUser.value?.id)
+	highlightedUserId.value = results[(index + direction + results.length) % results.length]?.id
+	await nextTick()
+	usernameForm.value
+		?.querySelector('[role="option"][aria-selected="true"]')
+		?.scrollIntoView({ block: 'nearest' })
+}
+
+function highlightUserFromPointer(event: PointerEvent, user: InviteUser) {
+	if (event.pointerType === 'touch' || !props.canInvite || props.teamMembersByUserId?.has(user.id))
+		return
+	highlightedUserId.value = user.id
 }
 
 function selectDefaultRole() {
@@ -298,54 +376,82 @@ async function submit() {
 	modal.value?.hide()
 }
 
-function show() {
-	username.value = ''
-	selectedUser.value = undefined
-	role.value = defaultRole.value
-	permissions.value =
-		props.accessOptions && hasPermission(props.grantable, viewerPermissions) ? viewerPermissions : 0
-	modal.value?.setStage('username')
-	isOpen.value = true
-	modal.value?.show()
+async function show() {
+	if (isOpening.value || isOpen.value || !props.canInvite) return
+	const teamId = props.teamId
+	isOpening.value = true
+	try {
+		await nextTick()
+		await until(() => !canLoadContacts.value || !contactsPending.value).toBe(true, {
+			timeout: CONTACTS_TIMEOUT_MS,
+		})
+		if (!modal.value || !props.canInvite || props.teamId !== teamId) return
+
+		username.value = ''
+		selectedUser.value = undefined
+		role.value = defaultRole.value
+		permissions.value =
+			props.accessOptions && hasPermission(props.grantable, viewerPermissions) ? viewerPermissions : 0
+		modal.value.setStage('username')
+		isOpen.value = true
+		modal.value.show()
+	} finally {
+		isOpening.value = false
+	}
 }
 
-defineExpose({ show })
+defineExpose({ show, isOpening })
 </script>
 
 <template>
-	<DefineUserRow v-slot="{ user, exactMatch }">
+	<DefineUserRow v-slot="{ user, exactMatch, optionId, highlighted }">
 		<button
+			:id="optionId"
 			type="button"
-			class="group/invite-user flex w-full items-center gap-3 rounded-xl border-0 py-2 pr-2 text-left font-semibold text-contrast motion-safe:transition-colors"
-			:class="
-				exactMatch
-					? 'bg-surface-4 pl-2 hover:bg-surface-5 focus-visible:bg-surface-5'
-					: 'bg-transparent pl-3 hover:bg-surface-3 focus-visible:bg-surface-3'
-			"
-			:disabled="!canInvite"
-			@mousedown="exactMatch && $event.preventDefault()"
+			:role="optionId ? 'option' : undefined"
+			:tabindex="optionId ? -1 : undefined"
+			:aria-selected="optionId ? !!highlighted : undefined"
+			class="group/invite-user flex w-full items-center border-0 text-left font-semibold text-contrast disabled:opacity-60 motion-safe:transition-colors"
+			:class="[
+				optionId
+					? 'gap-2.5 rounded-none px-4 py-2'
+					: 'gap-3 rounded-xl py-2 pl-3 pr-2 enabled:hover:bg-surface-3 focus-visible:bg-surface-3',
+				highlighted ? 'bg-surface-4 brightness-[115%]' : 'bg-transparent',
+			]"
+			:disabled="!canInvite || teamMembersByUserId?.has(user.id)"
+			@mousedown="optionId && $event.preventDefault()"
+			@pointermove="optionId && highlightUserFromPointer($event, user)"
 			@click="selectUser(user)"
 		>
 			<Avatar
-				v-if="user.avatar_url"
 				:src="user.avatar_url"
+				:tint-by="user.username"
 				:loading="exactMatch ? 'eager' : 'lazy'"
 				circle
 				no-shadow
 			/>
-			<span
-				v-else
-				class="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-highlight text-xs"
-				aria-hidden="true"
-			>
-				{{ user.username.slice(0, 2).toUpperCase() }}
+			<span class="min-w-0 flex-1 truncate group-disabled/invite-user:text-secondary">
+				{{ user.username }}
 			</span>
-			<span class="min-w-0 flex-1 truncate">{{ user.username }}</span>
+			<span
+				v-if="teamMembersByUserId?.has(user.id)"
+				class="text-right text-xs font-normal text-secondary"
+			>
+				{{
+					formatMessage(
+						teamMembersByUserId.get(user.id)?.accepted
+							? messages.alreadyMember
+							: messages.invitePending,
+					)
+				}}
+			</span>
 			<RightArrowIcon
-				class="mr-1 size-4 shrink-0 motion-safe:transition-opacity"
+				v-else
+				class="size-4 shrink-0 motion-safe:transition-opacity"
 				:class="{
-					'opacity-0 group-hover/invite-user:opacity-100 group-focus-visible/invite-user:opacity-100':
-						!exactMatch,
+					'opacity-0': optionId && !highlighted,
+					'mr-1 opacity-0 group-hover/invite-user:opacity-100 group-focus-visible/invite-user:opacity-100':
+						!optionId,
 				}"
 				aria-hidden="true"
 			/>
@@ -359,25 +465,54 @@ defineExpose({ show })
 			<form
 				ref="usernameForm"
 				class="group/lookup relative"
-				@submit.prevent="selectUser(checkedUser)"
+				@submit.prevent="selectUser(highlightedUser)"
 			>
 				<Input
 					v-model="username"
 					:placeholder="formatMessage(messages.usernamePlaceholder)"
 					:aria-label="formatMessage(messages.username)"
+					role="combobox"
+					aria-autocomplete="list"
+					:aria-expanded="resultsExpanded"
+					:aria-controls="usernameResults.length ? usernameResultsId : undefined"
+					:aria-activedescendant="
+						resultsExpanded && highlightedUser ? `${usernameResultsId}-${highlightedUser.id}` : undefined
+					"
 					:disabled="!canInvite"
 					size="medium"
 					autocomplete="off"
 					autocapitalize="off"
 					:spellcheck="false"
 					wrapper-class="w-full"
+					@focus="usernameFocused = true"
+					@blur="usernameFocused = false"
+					@keydown.down="moveHighlight($event, 1)"
+					@keydown.up="moveHighlight($event, -1)"
 				/>
 				<div
 					v-if="enteredUsername && canInvite"
-					class="absolute inset-x-0 top-full z-10 mt-2 hidden rounded-xl border border-solid border-surface-5 bg-surface-3 p-1 shadow-lg group-focus-within/lookup:block"
+					class="username-dropdown absolute inset-x-0 top-full z-10 mt-2 hidden max-h-72 overflow-y-auto rounded-[14px] border border-solid border-surface-5 bg-surface-4 shadow-2xl group-focus-within/lookup:block"
 				>
-					<UserRow v-if="checkedUser" :user="checkedUser" :exact-match="true" />
-					<div v-else class="flex flex-wrap items-center gap-x-2 px-2 py-2 text-sm" role="status">
+					<div
+						v-if="usernameResults.length"
+						:id="usernameResultsId"
+						role="listbox"
+						:aria-label="formatMessage(messages.username)"
+					>
+						<UserRow
+							v-for="user in usernameResults"
+							:key="user.id"
+							:user="user"
+							:exact-match="user.id === exactMatch?.id"
+							:option-id="`${usernameResultsId}-${user.id}`"
+							:highlighted="user.id === highlightedUser?.id"
+						/>
+					</div>
+					<div
+						v-else
+						class="flex flex-wrap items-center gap-x-2 px-4 py-3 text-sm text-secondary"
+						role="status"
+					>
 						<template v-if="checkedUser === null">
 							{{ formatMessage(messages.userNotFound) }}
 						</template>
@@ -427,14 +562,7 @@ defineExpose({ show })
 					content-class="ml-7 border-0 border-l border-solid border-surface-4 pl-1"
 				>
 					<template #button="{ open }">
-						<Avatar v-if="org.icon_url" :src="org.icon_url" no-shadow />
-						<span
-							v-else
-							class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface-4 text-xs font-semibold"
-							aria-hidden="true"
-						>
-							{{ org.name.slice(0, 2).toUpperCase() }}
-						</span>
+						<Avatar :src="org.icon_url" :tint-by="org.id" no-shadow />
 						<span class="min-w-0 flex-1 truncate font-semibold">{{ org.name }}</span>
 						<span class="text-right text-xs text-secondary">
 							{{ formatMessage(messages.memberCount, { count: memberCount }) }}
@@ -488,6 +616,11 @@ defineExpose({ show })
 </template>
 
 <style scoped>
+.username-dropdown {
+	scrollbar-color: var(--surface-5) transparent;
+	scrollbar-width: thin;
+}
+
 @media (prefers-reduced-motion: no-preference) {
 	.organization-accordion :deep(.accordion-content) {
 		transition-duration: 150ms;

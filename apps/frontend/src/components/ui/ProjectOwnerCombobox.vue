@@ -4,6 +4,7 @@
 		class="project-owner-combobox"
 		:options="options"
 		:disabled="disabled"
+		:show-chevron="!hideChevron"
 		searchable
 		select-search-text-on-focus
 		search-type="search"
@@ -51,6 +52,7 @@ const props = defineProps<{
 	inputId: string
 	options: { value: string; label: string; avatar_url?: string | null; isOrganization?: boolean }[]
 	disabled?: boolean
+	hideChevron?: boolean
 }>()
 const owner = defineModel<string>()
 const optionsByValue = computed(

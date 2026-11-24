@@ -612,7 +612,13 @@ function leave() {
 		/>
 		<SettingsSection :title="formatMessage(commonProjectSettingsMessages.members)">
 			<template v-if="canInvite" #actions>
-				<Button type="colored" color="brand" :disabled="busy" @click="inviteDialog?.show()">
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="busy"
+					:aria-busy="inviteDialog?.isOpening || undefined"
+					@click="inviteDialog?.show()"
+				>
 					<UserPlusIcon /> {{ formatMessage(messages.addMember) }}
 				</Button>
 			</template>

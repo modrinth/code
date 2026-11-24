@@ -29,7 +29,13 @@
 				class="grid grid-cols-[1fr_auto_1fr] items-center justify-center gap-6 rounded-2xl bg-surface-2 p-4"
 			>
 				<div class="flex items-center gap-2">
-					<Avatar :src="currentOwner.avatar_url" :alt="currentOwner.username" size="xs" circle />
+					<Avatar
+						:src="currentOwner.avatar_url"
+						:alt="currentOwner.username"
+						:tint-by="currentOwner.organizationId ?? currentOwner.username"
+						size="xs"
+						:circle="!currentOwner.organizationId"
+					/>
 					<div class="flex flex-col items-start justify-start gap-1">
 						<span class="font-medium text-contrast">{{ currentOwner.username }}</span>
 						<span class="text-sm text-secondary">{{ currentOwner.role }}</span>
@@ -40,8 +46,9 @@
 					<Avatar
 						:src="transferTo.avatar_url"
 						:alt="transferTo.username || transferTo.name"
+						:tint-by="transferTo.organizationId ?? transferTo.username"
 						size="xs"
-						circle
+						:circle="!transferTo.organizationId"
 					/>
 					<div class="flex flex-col items-start justify-start gap-1">
 						<span class="font-medium text-contrast">
@@ -90,9 +97,10 @@ import { computed, ref } from 'vue'
 
 const props = defineProps<{
 	project: { name: string; icon_url: string | null; raw_icon_url?: string | null }
-	currentOwner: { avatar_url: string | null; username: string; role: string }
+	currentOwner: { avatar_url: string | null; username: string; role: string; organizationId?: string }
 	transferTo: {
 		avatar_url?: string | null
+		organizationId?: string
 		username?: string
 		name?: string
 		role?: string
