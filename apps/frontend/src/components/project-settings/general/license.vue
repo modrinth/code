@@ -41,7 +41,7 @@
 						:check="licenseSelectionValidation"
 						:project-field="project.license.id"
 						:current-field="licenseId"
-						class="mt-2 max-w-[600px]"
+						class="max-w-[600px]"
 					/>
 				</template>
 			</Field>
@@ -90,19 +90,20 @@
 						:check="licenseSelectionValidation"
 						:project-field="project.license.id"
 						:current-field="licenseId || project.license.id"
-						class="mt-2"
 					/>
 					<ValidationMessage
 						:check="[
 							...saveValidation.forField('license'),
 							...saveValidation.forField('source-availability', 'source'),
 						]"
-						class="mt-2"
 					/>
 				</template>
 			</Field>
 
-			<div v-if="current.license.requiresOnlyOrLater" class="flex min-w-0 flex-col gap-2">
+			<div
+				v-if="current.license.requiresOnlyOrLater"
+				class="flex min-w-0 max-w-[600px] flex-col gap-2"
+			>
 				<Checkbox
 					id="or-later-checkbox"
 					v-model="current.allowOrLater"
@@ -111,7 +112,7 @@
 				>
 					{{ formatMessage(messages.allowLater) }}
 				</Checkbox>
-				<p class="m-0 text-sm text-secondary">
+				<p class="m-0 leading-tight text-secondary">
 					{{ formatMessage(messages.laterDescription) }}
 				</p>
 			</div>
@@ -132,7 +133,7 @@
 					:disabled="saving || !hasPermission"
 				/>
 				<template #bottom>
-					<ValidationMessage :check="customNameMessage" class="mt-2" />
+					<ValidationMessage :check="customNameMessage" />
 					<ValidationMessage
 						:check="
 							saveValidation
@@ -173,18 +174,18 @@
 						:disabled="saving || !hasPermission"
 						:wrapper-class="licenseType === 'standard' ? 'w-full max-w-[384px]' : 'w-full'"
 					/>
+					<template #subtext>
+						{{
+							licenseType === 'standard'
+								? formatMessage(messages.standardUrlHelp, {
+										license: licenseDisplayName(current.license),
+									})
+								: formatMessage(messages.customUrlHelp, {
+										contentType: projectCopyType(projectV3),
+									})
+						}}
+					</template>
 					<template #bottom>
-						<p class="mb-0 mt-2 text-sm text-secondary">
-							{{
-								licenseType === 'standard'
-									? formatMessage(messages.standardUrlHelp, {
-											license: licenseDisplayName(current.license),
-										})
-									: formatMessage(messages.customUrlHelp, {
-											contentType: projectCopyType(projectV3),
-										})
-							}}
-						</p>
 						<ValidationMessage
 							:check="
 								saveValidation
@@ -202,10 +203,7 @@
 							:project-field="project.license.url ?? ''"
 							:current-field="current.licenseUrl"
 						/>
-						<ValidationMessage
-							:check="saveValidation.forField('license-url', 'license')"
-							class="mt-2"
-						/>
+						<ValidationMessage :check="saveValidation.forField('license-url', 'license')" />
 					</template>
 				</Field>
 			</div>
@@ -227,7 +225,7 @@
 				heading="h3"
 			>
 				<div class="rounded-xl border border-solid border-surface-4 bg-surface-2 p-4">
-					<p class="mb-4 mt-0 leading-relaxed">{{ licenseSummary.description }}</p>
+					<p class="mb-4 mt-0 leading-normal">{{ licenseSummary.description }}</p>
 					<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
 						<div v-for="group in licenseSummaryGroups" :key="group.key">
 							<h4 class="mb-2 mt-0 text-xs font-semibold text-contrast">{{ group.title }}</h4>
@@ -252,7 +250,7 @@
 						</div>
 					</div>
 				</div>
-				<p class="mb-0 mt-2 text-sm text-secondary">
+				<p class="mb-0 mt-2 leading-tight text-secondary">
 					<IntlFormatted :message-id="messages.summaryAttribution">
 						<template #source-link="{ children }">
 							<a

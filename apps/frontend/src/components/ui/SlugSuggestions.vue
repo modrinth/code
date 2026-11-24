@@ -1,6 +1,6 @@
 <template>
 	<Transition name="slug-suggestions">
-		<div v-if="visible && hasSuggestions" class="mt-2 grid grid-rows-[1fr]">
+		<div v-if="visible && hasSuggestions" class="grid grid-rows-[1fr]">
 			<div class="flex min-h-0 flex-wrap items-center gap-2 overflow-hidden">
 				<span class="text-sm text-secondary">{{ formatMessage(messages.label) }}</span>
 				<TagItem

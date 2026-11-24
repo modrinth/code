@@ -5,7 +5,7 @@
 				<div
 					v-for="(validation, index) in validations"
 					:key="validation.code ?? validation.message?.id ?? index"
-					class="flex w-full items-start gap-1 text-sm"
+					class="flex w-full items-start gap-1 leading-tight"
 					:class="{
 						'text-red': validation.severity === 'error',
 						'text-orange': validation.severity === 'warning',

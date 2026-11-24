@@ -61,7 +61,7 @@ const bannerDescriptionId = useId()
 				wrapper-class="w-full"
 			/>
 			<template #bottom>
-				<div v-if="$slots['title-feedback']" class="mt-2 flex flex-col gap-2 empty:hidden">
+				<div v-if="$slots['title-feedback']" class="flex flex-col gap-2 empty:hidden">
 					<slot name="title-feedback" />
 				</div>
 			</template>
@@ -74,7 +74,7 @@ const bannerDescriptionId = useId()
 				:placeholder="formatMessage(messages.descriptionPlaceholder)"
 			/>
 			<template #bottom>
-				<div v-if="$slots['description-feedback']" class="mt-2 flex flex-col gap-2 empty:hidden">
+				<div v-if="$slots['description-feedback']" class="flex flex-col gap-2 empty:hidden">
 					<slot name="description-feedback" />
 				</div>
 			</template>
@@ -82,7 +82,7 @@ const bannerDescriptionId = useId()
 		<div class="flex flex-col gap-2">
 			<div class="flex flex-col gap-1">
 				<p class="m-0 font-semibold text-contrast">{{ formatMessage(messages.banner) }}</p>
-				<p :id="bannerDescriptionId" class="m-0 text-sm text-secondary">
+				<p :id="bannerDescriptionId" class="m-0 leading-tight text-secondary">
 					{{ formatMessage(messages.bannerDescription) }}
 				</p>
 			</div>

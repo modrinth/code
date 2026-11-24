@@ -8,6 +8,7 @@
 			'expanded-mobile-nav': isBrowseMenuOpen,
 			'modrinth-parent__no-modal-blurs': !cosmetics.advancedRendering,
 		}"
+		:style="{ '--moderation-drawer-reserved-width': `${moderationDrawerReservedWidth}px` }"
 	>
 		<div class="pointer-events-none fixed inset-0 z-[-1]">
 			<div id="fixed-background-teleport" class="relative"></div>
@@ -76,6 +77,7 @@
 		<ViewOnModrinthBanner />
 		<header
 			class="desktop-navigation desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
+			:class="{ 'desktop-navigation-stacked': shouldStackPinnedNavigation }"
 		>
 			<div>
 				<NuxtLink
@@ -876,6 +878,7 @@ import {
 } from '@modrinth/ui'
 import { isAdmin, isStaff } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
+import { useMediaQuery } from '@vueuse/core'
 
 import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
 import TextLogo from '~/components/brand/TextLogo.vue'
@@ -893,6 +896,10 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
+import {
+	moderationDrawerGap,
+	moderationDrawerWidth,
+} from '~/components/ui/project-settings/project-moderation-drawer/layout'
 import {
 	browseSignedOut,
 	forgetStoredAccount,
@@ -913,6 +920,10 @@ import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 import { hasActiveMidas } from '~/utils/user-membership.ts'
 
 const country = useUserCountry()
+const moderationDrawerReservedWidth = moderationDrawerWidth + moderationDrawerGap
+const shouldStackPinnedNavigation = useMediaQuery(
+	`(max-width: ${1280 + moderationDrawerReservedWidth - 1}px)`,
+)
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
@@ -1588,6 +1599,34 @@ function changeTheme() {
 }
 </script>
 
+<style>
+@media (min-width: 1280px) {
+	.layout:has(.settings-with-review) {
+		--project-settings-drawer-space: var(--moderation-drawer-reserved-width);
+	}
+
+	.layout > .desktop-navigation {
+		margin-right: max(var(--project-settings-drawer-space, 0px), (100% - 1280px) / 2);
+		transition: margin-right 240ms cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.layout:has(.settings-with-review) > .desktop-navigation-stacked {
+		grid-template-columns: 1fr auto;
+	}
+
+	.layout:has(.settings-with-review) > .desktop-navigation-stacked .desktop-primary-navigation {
+		grid-column: 1 / -1;
+		grid-row: 2;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.layout > .desktop-navigation {
+		transition: none;
+	}
+}
+</style>
+
 <style lang="scss">
 @import '~/assets/styles/global.scss';
 // @import '@modrinth/assets';
@@ -1602,34 +1641,6 @@ function changeTheme() {
 
 	main {
 		grid-area: main;
-	}
-}
-
-@media (min-width: 1280px) {
-	.layout:has(.settings-with-review) {
-		--project-settings-drawer-space: 406px;
-	}
-
-	.layout > .desktop-navigation {
-		margin-right: max(var(--project-settings-drawer-space, 0px), (100% - 1280px) / 2);
-		transition: margin-right 240ms cubic-bezier(0.16, 1, 0.3, 1);
-	}
-}
-
-@media (min-width: 1280px) and (max-width: 1679px) {
-	.layout:has(.settings-with-review) .desktop-navigation {
-		grid-template-columns: 1fr auto;
-
-		.desktop-primary-navigation {
-			grid-column: 1 / -1;
-			grid-row: 2;
-		}
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.layout > .desktop-navigation {
-		transition: none;
 	}
 }
 

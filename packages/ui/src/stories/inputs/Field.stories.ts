@@ -25,8 +25,8 @@ export const WithCharacterCountAndHelp: StoryObj<typeof meta> = {
 					<span class="text-xs text-secondary">{{ name.length }} / 64</span>
 				</template>
 				<Input :id="args.inputId" v-model="name" :maxlength="64" />
-				<template #bottom>
-					<p class="mb-0 mt-2 text-sm text-secondary">This name appears on your project page.</p>
+				<template #subtext>
+					This name appears on your project page.
 				</template>
 			</Field>
 		`,
@@ -36,4 +36,9 @@ export const WithCharacterCountAndHelp: StoryObj<typeof meta> = {
 export const WithOptionalLabel: StoryObj<typeof meta> = {
 	...WithCharacterCountAndHelp,
 	args: { labelOptional: true },
+}
+
+export const WithCustomSubtext: StoryObj<typeof meta> = {
+	...WithCharacterCountAndHelp,
+	args: { subtextClass: 'text-sm leading-normal text-secondary' },
 }

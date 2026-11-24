@@ -28,10 +28,8 @@
 					placeholder="Select version"
 					:disabled="!recommendedOptions.length"
 				/>
-				<template #bottom>
-					<p class="mb-0 mt-2 text-sm text-secondary">
-						Players joining the server from the Modrinth App will connect using this version.
-					</p>
+				<template #subtext>
+					Players joining the server from the Modrinth App will connect using this version.
 				</template>
 			</Field>
 		</div>

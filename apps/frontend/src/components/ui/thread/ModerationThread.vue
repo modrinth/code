@@ -97,7 +97,7 @@
 		>
 			<div
 				v-if="hasTimelineEntries && $slots['thread-help']"
-				class="shrink-0 border-0 border-b border-solid border-divider px-4 py-3 text-xs leading-relaxed text-secondary"
+				class="shrink-0 border-0 border-b border-solid border-divider px-4 py-3 leading-tight text-secondary"
 			>
 				<slot name="thread-help" />
 			</div>
@@ -119,7 +119,6 @@
 					:auth="auth"
 					raised
 					image-previews
-					:compact="compact"
 					@update-thread="() => updateThreadLocal()"
 					@open-image="openImage"
 				/>

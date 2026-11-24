@@ -279,10 +279,10 @@
 												<XIcon aria-hidden="true" />
 											</IconButton>
 										</div>
-										<p class="m-0 text-sm font-medium leading-tight text-secondary">
+										<p class="m-0 font-medium leading-tight text-secondary">
 											{{ formatMessage(messages.serversPromoDescription) }}
 										</p>
-										<p class="m-0 text-sm font-semibold text-contrast">
+										<p class="m-0 font-semibold text-contrast">
 											<IntlFormatted
 												:message-id="messages.serversPromoPricing"
 												:values="{ price: formatPrice(500, 'USD', true) }"

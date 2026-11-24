@@ -16,15 +16,14 @@ const { formatMessage } = useVIntl()
 
 <template>
 	<div
-		v-if="javaAddress"
-		class="mt-2 flex gap-1.5"
+		v-if="javaAddress && (javaPingResult || javaPingLoading)"
+		class="flex gap-1.5 leading-tight"
 		:class="{
 			'items-center': javaPingResult?.online,
 			'items-start': javaPingResult && !javaPingResult.online,
 		}"
 	>
 		<IconButton
-			v-if="(javaAddress && javaPingResult) || javaPingLoading"
 			v-tooltip="formatMessage(messages.refreshPingTooltip)"
 			class="!size-6"
 			type="quiet"
@@ -64,7 +63,7 @@ const { formatMessage } = useVIntl()
 			</IntlFormatted>
 		</div>
 	</div>
-	<div v-else class="mt-2 text-sm">
+	<div v-else-if="!javaAddress" class="leading-tight">
 		<IntlFormatted :message-id="messages.srvRecordsHint">
 			<template #srv-tooltip="{ children }">
 				<span

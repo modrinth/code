@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="message group/thread relative grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-start gap-x-2 break-words px-4 py-3 before:pointer-events-none before:absolute before:inset-0 before:opacity-5 before:content-[''] [&>.message__icon:focus-visible+.message__content_.message__author_a]:underline [&>.message__icon:hover+.message__content_.message__author_a]:underline"
+		class="message group/thread relative grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-start gap-x-2.5 break-words px-4 py-3 before:pointer-events-none before:absolute before:inset-0 before:opacity-5 before:content-[''] [&>.message__icon:focus-visible+.message__content_.message__author_a]:underline [&>.message__icon:hover+.message__content_.message__author_a]:underline"
 		:class="[
 			noLinks ? '!p-0' : 'focus-within:bg-surface-2.5 hover:bg-surface-2.5',
 			isPrivateMessage ? 'text-[var(--color-icon)]' : '',
@@ -30,7 +30,7 @@
 			<ThreadRoleBadge v-else role="moderator" avatar />
 		</div>
 		<div
-			class="message__content relative mt-1.5 min-w-0"
+			class="message__content relative min-w-0"
 			:class="{ 'pr-8': isStaff(auth.user) && message.author_id === auth.user.id && !noLinks }"
 		>
 			<template v-if="author">
@@ -90,7 +90,7 @@
 			<span
 				v-if="hasBody"
 				v-tooltip="formatDateTime(message.created)"
-				class="message__date ms-1.5 text-sm text-secondary opacity-80"
+				class="message__date ms-1.5 whitespace-nowrap text-sm text-secondary opacity-80"
 			>
 				{{ timeSincePosted }}
 			</span>
@@ -208,8 +208,8 @@
 			<span
 				v-if="!hasBody"
 				v-tooltip="formatDateTime(message.created)"
-				class="message__date ms-1.5 text-sm text-secondary opacity-80"
-				:class="{ 'ms-0 mt-1 block text-xs': message.body.type === 'tech_review' }"
+				class="message__date ms-1.5 whitespace-nowrap text-sm text-secondary opacity-80"
+				:class="{ '!ms-0 mt-1 block w-fit': message.body.type === 'tech_review' }"
 			>
 				{{ timeSincePosted }}
 			</span>

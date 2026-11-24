@@ -24,9 +24,8 @@
 							:check="regionValidation"
 							:project-field="projectV3?.minecraft_server?.region ?? ''"
 							:current-field="region"
-							class="mt-2"
 						/>
-						<ValidationMessage :check="saveValidation.forField('server-region')" class="mt-2" />
+						<ValidationMessage :check="saveValidation.forField('server-region')" />
 					</template>
 				</Field>
 
@@ -58,13 +57,11 @@
 								JSON.stringify([...(projectV3?.minecraft_server?.languages ?? [])].sort())
 							"
 							:current-field="JSON.stringify([...languages].sort())"
-							class="mt-2"
 						/>
-						<ValidationMessage :check="saveValidation.forField('server-languages')" class="mt-2" />
+						<ValidationMessage :check="saveValidation.forField('server-languages')" />
 						<ProjectIssueCard
 							target="modify_server_languages"
 							:field-action="languagesIssueAction"
-							class="mt-2"
 						/>
 					</template>
 				</Field>
@@ -100,14 +97,12 @@
 							:check="javaAddressValidation"
 							:project-field="projectV3?.minecraft_java_server?.address ?? ''"
 							:current-field="javaAddress.trim()"
-							class="mt-2"
 						/>
-						<ValidationMessage :check="saveValidation.forField('java-address')" class="mt-2" />
+						<ValidationMessage :check="saveValidation.forField('java-address')" />
 						<ProjectIssueCard
 							target="modify_server_address"
 							platform="minecraft_java"
 							:field-action="javaAddressIssueAction"
-							class="mt-2"
 						/>
 					</template>
 				</Field>
@@ -131,7 +126,6 @@
 							target="modify_server_address"
 							platform="minecraft_bedrock"
 							:field-action="bedrockAddressIssueAction"
-							class="mt-2"
 						/>
 					</template>
 				</Field>

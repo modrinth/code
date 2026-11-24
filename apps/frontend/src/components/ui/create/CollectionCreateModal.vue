@@ -34,10 +34,8 @@
 					:disabled="hasHitLimit"
 					:aria-describedby="summaryHelpId"
 				/>
-				<template #bottom>
-					<p :id="summaryHelpId" class="mb-0 mt-2 text-sm text-secondary">
-						{{ formatMessage(messages.summaryDescription) }}
-					</p>
+				<template #subtext>
+					<span :id="summaryHelpId">{{ formatMessage(messages.summaryDescription) }}</span>
 				</template>
 			</Field>
 			<div class="flex flex-wrap justify-end gap-2.5">

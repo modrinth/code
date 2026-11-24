@@ -50,6 +50,7 @@ import { isThreadIssueFacetReadyToAddress } from '~/helpers/thread-issues'
 import { injectProjectPublishing, isProjectChecklistVisible } from '~/providers/project-publishing'
 
 import ChecklistAccordion from './checklist-accordion.vue'
+import { moderationDrawerWidth } from './layout'
 import OpenDrawerButton from './open-drawer-button.vue'
 import ProjectModerationContent from './project-moderation-content.vue'
 import ProjectPublishingBanner from './project-publishing-banner.vue'
@@ -431,8 +432,9 @@ useEventListener('keydown', (event) => {
 		/>
 		<div
 			ref="drawerArea"
-			class="fixed bottom-0 right-0 top-0 z-40 w-full max-w-[400px]"
+			class="fixed bottom-0 right-0 top-0 z-40 w-full"
 			:class="open ? 'pointer-events-auto' : 'pointer-events-none'"
+			:style="{ maxWidth: `${moderationDrawerWidth}px` }"
 		>
 			<Transition name="moderation-drawer" appear>
 				<aside
@@ -502,7 +504,7 @@ useEventListener('keydown', (event) => {
 										{{ group.items.length + (group.title === 'TODO' ? issueItems.length : 0) }}
 									</TagItem>
 									<DropdownIcon
-										class="ml-auto size-4 transition-[transform,filter] duration-300 group-hover/checklist-heading:brightness-125 motion-reduce:transition-none"
+										class="ml-auto size-5 transition-[transform,filter] duration-300 group-hover/checklist-heading:brightness-125 motion-reduce:transition-none"
 										:class="{ 'rotate-180': expanded }"
 									/>
 								</template>
@@ -514,20 +516,20 @@ useEventListener('keydown', (event) => {
 										:class="{ 'hover:bg-surface-4': issue.to }"
 									>
 										<MessageSquareWarningIcon
-											class="mt-0.5 size-4 shrink-0 text-orange"
+											class="mt-0.5 size-5 shrink-0 text-orange"
 											aria-hidden="true"
 										/>
 										<div class="min-w-0 flex-1">
-											<p class="m-0 text-sm font-semibold text-contrast">
+											<p class="m-0 font-semibold text-contrast">
 												{{ issue.title }}
 											</p>
-											<p class="mb-0 mt-0.5 text-xs text-orange">
+											<p class="mb-0 mt-0.5 text-sm text-orange">
 												{{ formatMessage(messages.requestedByModerator) }}
 											</p>
 											<IssueMessage
 												v-if="issue.description"
 												:message="issue.description"
-												class="mt-1 text-xs text-secondary [&_a]:relative [&_a]:z-10 [&_button]:relative [&_button]:z-10 [&_p]:!mb-2 [&_ul]:!mb-2"
+												class="mt-1 text-base text-secondary [&_a]:relative [&_a]:z-10 [&_button]:relative [&_button]:z-10 [&_p]:!mb-2 [&_ul]:!mb-2"
 											/>
 											<div v-if="!issue.to" class="mt-3 flex justify-end">
 												<Button
@@ -541,7 +543,7 @@ useEventListener('keydown', (event) => {
 										</div>
 										<ChevronRightIcon
 											v-if="issue.to"
-											class="mt-0.5 size-4 shrink-0 text-secondary opacity-0 transition-opacity group-hover:opacity-100"
+											class="mt-0.5 size-5 shrink-0 text-secondary opacity-0 transition-opacity group-hover:opacity-100"
 										/>
 										<NuxtLink
 											v-if="issue.to"
@@ -567,15 +569,15 @@ useEventListener('keydown', (event) => {
 									<CircleDashedIcon
 										v-if="nag.severity === 'suggestion'"
 										aria-hidden="true"
-										class="mt-0.5 size-4 shrink-0 text-secondary"
+										class="mt-0.5 size-5 shrink-0 text-secondary"
 									/>
 									<component
 										:is="nag.isRequiredValidation ? XCircleIcon : group.icon"
 										v-else
-										class="mt-0.5 size-4 shrink-0"
+										class="mt-0.5 size-5 shrink-0"
 									/>
 									<div class="min-w-0 flex-1">
-										<p class="m-0 text-sm font-semibold text-contrast">
+										<p class="m-0 font-semibold text-contrast">
 											{{
 												typeof nag.title === 'string'
 													? nag.title
@@ -587,13 +589,13 @@ useEventListener('keydown', (event) => {
 												nag.category === 'validation' &&
 												(nag.severity === 'required' || nag.severity === 'warning')
 											"
-											class="mb-0 mt-0.5 text-xs"
+											class="mb-0 mt-0.5 text-sm"
 										>
 											{{ formatMessage(messages.automaticCheck) }}
 										</p>
 										<p
 											v-if="typeof nag.description !== 'function'"
-											class="mb-0 mt-1 text-xs leading-relaxed text-secondary"
+											class="mb-0 mt-1 text-sm leading-relaxed text-secondary"
 										>
 											{{
 												typeof nag.description === 'string'
@@ -603,7 +605,7 @@ useEventListener('keydown', (event) => {
 										</p>
 									</div>
 									<ChevronRightIcon
-										class="mt-0.5 size-4 shrink-0 text-secondary opacity-0 transition-opacity group-hover:opacity-100"
+										class="mt-0.5 size-5 shrink-0 text-secondary opacity-0 transition-opacity group-hover:opacity-100"
 									/>
 									<NuxtLink
 										v-if="nag.link"
@@ -635,7 +637,7 @@ useEventListener('keydown', (event) => {
 									</TagItem>
 									<DropdownIcon
 										aria-hidden="true"
-										class="ml-auto size-4 transition-transform duration-300 motion-reduce:transition-none"
+										class="ml-auto size-5 transition-transform duration-300 motion-reduce:transition-none"
 										:class="{ 'rotate-180': expanded }"
 									/>
 								</template>
@@ -660,7 +662,7 @@ useEventListener('keydown', (event) => {
 												<span class="min-w-0 flex-1">{{ item.title }}</span>
 												<RightArrowIcon
 													aria-hidden="true"
-													class="size-4 shrink-0 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
+													class="size-5 shrink-0 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
 												/>
 											</a>
 										</NuxtLink>

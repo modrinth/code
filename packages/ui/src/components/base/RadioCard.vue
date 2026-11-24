@@ -41,7 +41,7 @@ const checked = computed(() => props.modelValue === props.value)
 			@change="emit('update:modelValue', value)"
 		/>
 		<span
-			class="radio-card border-surface-4 bg-surface-2 peer-checked:border-brand peer-focus-visible:outline-brand box-border flex h-full flex-col gap-1 rounded-xl border border-solid p-3.5 transition-[border-color,background-color,filter] group-hover:peer-[:enabled:not(:checked)]:border-surface-4 group-hover:peer-[:enabled:not(:checked)]:brightness-125 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 motion-reduce:transition-none"
+			class="radio-card border-surface-4 bg-surface-2 peer-checked:border-brand peer-focus-visible:outline-brand box-border flex h-full flex-col gap-2 rounded-xl border border-solid p-3.5 transition-[border-color,background-color,filter] group-hover:peer-[:enabled:not(:checked)]:border-surface-4 group-hover:peer-[:enabled:not(:checked)]:brightness-125 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 motion-reduce:transition-none"
 		>
 			<span class="flex items-center gap-2">
 				<component
@@ -61,12 +61,9 @@ const checked = computed(() => props.modelValue === props.value)
 					:class="checked ? 'text-brand' : 'text-secondary'"
 				/>
 			</span>
-			<span
-				v-if="description"
-				:id="`${id}-description`"
-				class="text-secondary text-xs leading-relaxed"
-				>{{ description }}</span
-			>
+			<span v-if="description" :id="`${id}-description`" class="text-secondary text-sm">{{
+				description
+			}}</span>
 		</span>
 	</label>
 </template>

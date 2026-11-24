@@ -180,7 +180,7 @@ function confirmRemoveFromOrganization() {
 			<h3 class="mb-1 mt-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.transferOwnership) }}
 			</h3>
-			<p class="m-0 text-sm leading-relaxed text-secondary">
+			<p class="m-0 leading-normal text-secondary">
 				Give full control of this project to another member or an organization. You’ll stay on as a
 				member, but only the new owner can transfer it back.
 			</p>
@@ -259,7 +259,7 @@ function confirmRemoveFromOrganization() {
 			<h3 class="mb-1 mt-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.removeFromOrganization) }}
 			</h3>
-			<p class="m-0 text-sm leading-relaxed text-secondary">
+			<p class="m-0 leading-normal text-secondary">
 				{{
 					formatMessage(messages.removeFromOrganizationDescription, {
 						organization: organization.name,

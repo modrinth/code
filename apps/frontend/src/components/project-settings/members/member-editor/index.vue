@@ -219,19 +219,20 @@ defineExpose({ show, hide: () => modal.value?.hide() })
 					:aria-describedby="`${id}-role-description`"
 					@update:model-value="draft.role = String($event ?? '')"
 				/>
-				<template #bottom>
-					<p :id="`${id}-role-description`" class="mb-0 mt-2 text-sm text-secondary">
+				<template #subtext>
+					<span :id="`${id}-role-description`">
 						{{
 							formatMessage(
 								organization ? messages.organizationRoleDescription : messages.roleDescription,
 							)
 						}}
-					</p>
+					</span>
+				</template>
+				<template #bottom>
 					<ProjectIssueCard
 						v-if="!organization"
 						target="modify_team_member_role"
 						:user-id="draft.user.id"
-						class="mt-2"
 					/>
 				</template>
 			</Field>
@@ -255,14 +256,14 @@ defineExpose({ show, hide: () => modal.value?.hide() })
 						draft.payouts_split = typeof $event === 'number' ? $event : undefined
 					"
 				/>
-				<template #bottom>
-					<p :id="`${id}-payout-weight-description`" class="mb-0 mt-2 text-sm text-secondary">
+				<template #subtext>
+					<span :id="`${id}-payout-weight-description`">
 						{{
 							invalidPayoutWeight
 								? formatMessage(messages.invalidPayoutWeight, { max: maxPayoutWeight })
 								: formatMessage(messages.payoutWeightDescription)
 						}}
-					</p>
+					</span>
 				</template>
 			</Field>
 

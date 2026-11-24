@@ -61,8 +61,8 @@
 					:placeholder="formatMessage(messages.summaryPlaceholder)"
 					:disabled="hasHitLimit"
 				/>
-				<template #bottom>
-					<p class="mb-0 mt-2 text-sm text-secondary">{{ formatMessage(projectSummaryHelp) }}</p>
+				<template #subtext>
+					{{ formatMessage(projectSummaryHelp) }}
 				</template>
 			</Field>
 			<Field :label="formatMessage(messages.ownerLabel)" input-id="project-create-owner-search">
@@ -89,16 +89,12 @@
 						:disabled-items="hasHitLimit ? visibilityOptions : undefined"
 					/>
 				</template>
-				<template #bottom>
-					<p
-						v-if="visibility !== 'private'"
-						:id="visibilityId"
-						class="mb-0 mt-2 text-sm text-secondary"
-					>
+				<template v-if="visibility !== 'private'" #subtext>
+					<span :id="visibilityId">
 						{{
 							formatMessage(projectMessages.visibilityApprovalHelp, { contentType: projectType })
 						}}
-					</p>
+					</span>
 				</template>
 			</Field>
 			<div class="flex justify-end gap-2.5">

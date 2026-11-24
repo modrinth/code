@@ -319,7 +319,7 @@ function confirmDelete() {
 						<h3 class="mb-1 mt-0 text-base font-semibold text-contrast">
 							{{ formatMessage(messages.delete) }}
 						</h3>
-						<p class="m-0 text-sm leading-relaxed text-secondary">
+						<p class="m-0 leading-normal text-secondary">
 							{{ formatMessage(messages.deleteDescription) }}
 						</p>
 					</div>

@@ -25,10 +25,9 @@
 						:check="nameValidation"
 						:project-field="project.name"
 						:current-field="name"
-						class="mt-2"
 					/>
-					<ValidationMessage :check="saveValidation.forField('name')" class="mt-2" />
-					<ProjectIssueCard target="modify_title" :field-action="nameIssueAction" class="mt-2" />
+					<ValidationMessage :check="saveValidation.forField('name')" />
+					<ProjectIssueCard target="modify_title" :field-action="nameIssueAction" />
 				</template>
 			</Field>
 
@@ -49,22 +48,17 @@
 					:disabled="!hasPermission"
 					resize="vertical"
 				/>
+				<template #subtext>
+					{{ formatMessage(projectMessages.summaryHelp, { contentType }) }}
+				</template>
 				<template #bottom>
-					<p class="mb-0 mt-2 text-sm text-secondary">
-						{{ formatMessage(projectMessages.summaryHelp, { contentType }) }}
-					</p>
 					<ValidationMessage
 						:check="summaryValidation"
 						:project-field="project.summary"
 						:current-field="summary"
-						class="mt-2"
 					/>
-					<ValidationMessage :check="saveValidation.forField('summary')" class="mt-2" />
-					<ProjectIssueCard
-						target="modify_summary"
-						:field-action="summaryIssueAction"
-						class="mt-2"
-					/>
+					<ValidationMessage :check="saveValidation.forField('summary')" />
+					<ProjectIssueCard target="modify_summary" :field-action="summaryIssueAction" />
 				</template>
 			</Field>
 
@@ -90,7 +84,7 @@
 								class="project__icon"
 								no-shadow
 							/>
-							<div class="max-w-full">
+							<div class="flex max-w-full flex-col gap-2">
 								<div class="flex items-center gap-2">
 									<FileButton
 										id="project-icon"
@@ -114,7 +108,7 @@
 										<TrashIcon aria-hidden="true" />
 									</IconButton>
 								</div>
-								<div class="mt-2 text-sm text-secondary">Square, 512 px</div>
+								<div class="leading-tight text-secondary">Square, 512 px</div>
 							</div>
 						</div>
 					</template>
@@ -123,13 +117,11 @@
 							:check="iconValidation"
 							:project-field="false"
 							:current-field="Boolean(icon || deletedIcon)"
-							class="mt-2"
 						/>
-						<ValidationMessage :check="saveValidation.forField('icon')" class="mt-2" />
+						<ValidationMessage :check="saveValidation.forField('icon')" />
 						<ProjectIssueCard
 							:target="['modify_icon', 'remove_icon']"
 							:field-action="iconIssueAction"
-							class="mt-2"
 						/>
 					</template>
 				</Field>
@@ -172,7 +164,7 @@
 							"
 						/>
 					</label>
-					<div class="mt-2 flex items-center gap-2">
+					<div class="flex items-center gap-2">
 						<FileButton
 							:max-size="globals?.max_gallery_image_size"
 							accept="image/png,image/jpeg,image/gif,image/webp"
@@ -194,7 +186,7 @@
 							<TrashIcon aria-hidden="true" />
 						</IconButton>
 					</div>
-					<div class="mt-2 text-sm text-secondary">3:1, 1920 × 640 px</div>
+					<template #subtext>3:1, 1920 × 640 px</template>
 				</Field>
 			</div>
 
@@ -219,12 +211,12 @@
 						</span>
 					</template>
 				</Input>
+				<template #subtext>
+					{{ formatMessage(messages.slugHelp, { contentType }) }}
+				</template>
 				<template #bottom>
-					<p class="mb-0 mt-2 text-sm text-secondary">
-						{{ formatMessage(messages.slugHelp, { contentType }) }}
-					</p>
-					<ValidationMessage :check="slugSaveMessages" :debounce="0" class="mt-2" />
-					<ProjectIssueCard target="modify_slug" :field-action="slugIssueAction" class="mt-2" />
+					<ValidationMessage :check="slugSaveMessages" :debounce="0" />
+					<ProjectIssueCard target="modify_slug" :field-action="slugIssueAction" />
 					<SlugSuggestions
 						:selected="slug"
 						:suggestions="slugSuggestions"
@@ -239,14 +231,13 @@
 					<div
 						role="radiogroup"
 						:aria-labelledby="labelId"
-						class="grid grid-cols-1 gap-2 sm:grid-cols-[repeat(3,minmax(0,250px))]"
+						class="grid w-full max-w-[770px] grid-cols-1 gap-2 sm:grid-cols-3"
 					>
 						<RadioCard
 							v-for="option in visibilityOptions"
 							:key="option.value"
 							v-model="visibility"
 							name="project-visibility"
-							max-width="250px"
 							:value="option.value"
 							:label="option.label"
 							:description="option.subLabel"
@@ -255,8 +246,8 @@
 						/>
 					</div>
 				</template>
-				<template #bottom>
-					<p v-if="visibilityHelp" class="mb-0 mt-2 text-sm text-secondary">
+				<template v-if="visibilityHelp" #subtext>
+					<div class="max-w-[770px]">
 						<IntlFormatted
 							:message-id="visibilityHelp"
 							:values="{
@@ -275,7 +266,7 @@
 								</a>
 							</template>
 						</IntlFormatted>
-					</p>
+					</div>
 				</template>
 			</Field>
 		</div>

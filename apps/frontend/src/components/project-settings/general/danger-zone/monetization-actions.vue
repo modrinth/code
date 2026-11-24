@@ -57,13 +57,13 @@ function show(nextMode: 'member' | 'moderator', event: MouseEvent) {
 	<div class="danger-zone-row">
 		<div>
 			<h3 class="mb-1 mt-0 text-lg font-semibold text-contrast">{{ memberAction }}</h3>
-			<p class="m-0 text-sm leading-relaxed text-secondary">
+			<p class="m-0 leading-normal text-secondary">
 				Projects on Modrinth are automatically enrolled in the
 				<NuxtLink to="/legal/cmp-info" target="_blank" class="text-link">Rewards Program</NuxtLink>.
 				If you don’t want to (or can’t for legal reasons) earn revenue from this project, you can
 				disable rewards here.
 			</p>
-			<p v-if="forceDisabled" class="mb-0 mt-2 text-sm text-secondary">
+			<p v-if="forceDisabled" class="mb-0 mt-2 leading-tight text-secondary">
 				Monetization has been disabled by a moderator.
 				<a
 					href="https://support.modrinth.com"
