@@ -23,8 +23,6 @@ SET visibility = CASE
     ELSE 'never_reviewed'
   END;
 
-CREATE INDEX mods_in_review_ids ON mods (id) WHERE in_review;
-
 CREATE TABLE project_history (
   id BIGSERIAL PRIMARY KEY,
   project_id BIGINT NOT NULL,
