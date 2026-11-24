@@ -148,6 +148,11 @@ pub struct SandboxCommand {
     pub read_only_paths: Vec<PathBuf>,
     /// Host paths mounted read-write at the same path in the sandbox.
     pub read_write_paths: Vec<PathBuf>,
+    /// (Windows only) Registry keys inside of `HKEY_CURRENT_USER` which can be
+    /// read in the sandbox.
+    ///
+    /// Keys which don't exist are ignored.
+    pub registry_read_keys: Vec<String>,
     /// What directory the executable is ran from.
     pub working_directory: Option<PathBuf>,
     /// Names of environment variables copied from the host when present.

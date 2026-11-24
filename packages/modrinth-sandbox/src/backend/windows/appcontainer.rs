@@ -25,9 +25,10 @@ use windows::{
                 ConvertSidToStringSidW, ConvertStringSidToSidW,
                 EXPLICIT_ACCESS_W, GRANT_ACCESS, GetNamedSecurityInfoW,
                 GetSecurityInfo, NO_MULTIPLE_TRUSTEE, REVOKE_ACCESS,
-                SE_FILE_OBJECT, SE_WINDOW_OBJECT, SET_ACCESS, SetEntriesInAclW,
+                SE_FILE_OBJECT, SE_OBJECT_TYPE, SE_REGISTRY_KEY,
+                SE_WINDOW_OBJECT, SET_ACCESS, SetEntriesInAclW,
                 SetNamedSecurityInfoW, SetSecurityInfo, TRUSTEE_IS_GROUP,
-                TRUSTEE_IS_SID,
+                TRUSTEE_IS_SID, TRUSTEE_W,
             },
             CONTAINER_INHERIT_ACE, CreateWellKnownSid,
             DACL_SECURITY_INFORMATION, DeriveCapabilitySidsFromName, EqualSid,
@@ -54,6 +55,7 @@ use windows::{
         System::{
             Com::CoTaskMemFree,
             Memory::{GetProcessHeap, HEAP_FLAGS, HeapFree},
+            Registry::KEY_READ,
             StationsAndDesktops::OpenWindowStationW,
             SystemServices::{SE_GROUP_ENABLED, SECURITY_DESCRIPTOR_REVISION},
             Threading::PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITIES,
@@ -80,8 +82,9 @@ use crate::{
 
 use super::{
     WindowsChild,
-    acl::{AppliedAclLedger, Grant, PermissionType, paths_equal},
+    acl::{AppliedAclLedger, Grant, GrantKind, PermissionType, paths_equal},
     drag_intercept::DragInterceptHandle,
+    home::link_into_sandbox_home,
 };
 
 #[derive(Debug)]
@@ -145,12 +148,19 @@ fn spawn(
     let local_state = app_container_folder.join("LocalState");
     let roaming_state = app_container_folder.join("RoamingState");
     let temp_state = app_container_folder.join("TempState");
-    let home = local_state.join("Home");
-    for path in [&local_state, &roaming_state, &temp_state, &home] {
+    let sandbox_home = local_state.join("Home");
+    for path in [&local_state, &roaming_state, &temp_state, &sandbox_home] {
         std::fs::create_dir_all(path).wrap_err_with(|| {
             format!("creating AppContainer storage directory {path:?}")
         })?;
     }
+
+    let path_set = command.take_paths()?;
+    let real_home = std::env::home_dir();
+    let home = real_home
+        .clone()
+        .filter(|home| path_set.can_write(home.clone()))
+        .unwrap_or_else(|| sandbox_home.clone());
 
     command.extra_environment.extend([
         ("APPDATA".into(), roaming_state.into()),
@@ -164,7 +174,7 @@ fn spawn(
     ]);
     if command.is_jvm {
         let mut user_home = OsString::from("-Duser.home=");
-        user_home.push(home);
+        user_home.push(&home);
         command.args.insert(0, user_home.into());
     }
 
@@ -266,9 +276,21 @@ fn spawn(
             .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
     }
 
-    let mut parents_to_add: HashSet<std::path::PathBuf> = HashSet::default();
-    let path_set = command.take_paths()?;
+    if let Some(real_home) = &real_home
+        && home == sandbox_home
+    {
+        for path in path_set.iter_read_write() {
+            if let Err(err) =
+                link_into_sandbox_home(path, real_home, &sandbox_home)
+            {
+                tracing::warn!(
+                    "unable to link {path:?} into sandbox home: {err:#}"
+                );
+            }
+        }
+    }
 
+    let mut parents_to_add: HashSet<std::path::PathBuf> = HashSet::default();
     for path in path_set.iter_both() {
         if let Some(parent) = path.parent() {
             parents_to_add.insert(parent.to_path_buf());
@@ -316,6 +338,13 @@ fn spawn(
         );
     }
 
+    instance_grants.extend(
+        command
+            .registry_read_keys
+            .iter()
+            .filter_map(|key| Grant::from_registry_key(key)),
+    );
+
     let locked_acl_ledger = acl_ledger
         .lock()
         .wrap_err("locking AppContainer ACL ledger")?;
@@ -334,8 +363,12 @@ fn spawn(
             .any(|desired| paths_equal(&desired.path, &grant.path))
         {
             let path = PathBuf::from(&grant.path);
-            if let Err(err) = remove_from_acl(&app_container_sid, &path) {
-                if is_access_denied(&err) {
+            if let Err(err) = revoke_grant(&app_container_sid, grant) {
+                if grant.kind == GrantKind::RegistryKey {
+                    tracing::warn!(
+                        "unable to revoke sandbox access from registry key {path:?}: {err:#}"
+                    );
+                } else if is_access_denied(&err) {
                     remove_paths_to_elevate.push(path);
                 } else {
                     return Err(err).wrap_err_with(|| {
@@ -348,8 +381,12 @@ fn spawn(
 
     for grant in prepared.desired_effective() {
         let path = PathBuf::from(&grant.path);
-        if let Err(err) = set_acl(&app_container_sid, &path, grant.permission) {
-            if is_access_denied(&err) {
+        if let Err(err) = apply_grant(&app_container_sid, grant) {
+            if grant.kind == GrantKind::RegistryKey {
+                tracing::warn!(
+                    "unable to grant sandbox access to registry key {path:?}: {err:#}"
+                );
+            } else if is_access_denied(&err) {
                 match grant.permission {
                     PermissionType::Traverse => parents_to_elevate.push(path),
                     PermissionType::Read => read_paths_to_elevate.push(path),
@@ -635,21 +672,14 @@ impl SandboxHandleOp for WindowsSandboxHandle {
                 self.acl_instance_id,
                 grants,
                 |grant| {
-                    set_acl(
-                        &app_container_sid,
-                        Path::new(&grant.path),
-                        grant.permission,
-                    )
-                    .wrap_err_with(|| {
+                    apply_grant(&app_container_sid, grant).wrap_err_with(|| {
                         format!(
                             "granting dynamic sandbox {:?} access to {:?}",
                             grant.permission, grant.path
                         )
                     })
                 },
-                |grant| {
-                    remove_from_acl(&app_container_sid, Path::new(&grant.path))
-                },
+                |grant| revoke_grant(&app_container_sid, grant),
             )
             .wrap_err("adding dynamic AppContainer ACL grants")?;
 
@@ -672,7 +702,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
 
 /// Some applications, including Java, don't support the verbatim prefix that
 /// canonical paths have.
-fn strip_verbatim_prefix(path: &Path) -> PathBuf {
+pub(super) fn strip_verbatim_prefix(path: &Path) -> PathBuf {
     let Some(path_str) = path.to_str() else {
         return path.to_owned();
     };
@@ -1119,7 +1149,91 @@ fn set_acl(
     Ok(())
 }
 
-fn remove_from_acl(app_container: &PSID, path: &Path) -> Result<()> {
+fn set_registry_acl(app_container: &PSID, path: &Path) -> Result<()> {
+    let encoded_path = path
+        .as_os_str()
+        .encode_wide()
+        .chain([0])
+        .collect::<Vec<_>>();
+    let mut old_acl = std::ptr::null_mut();
+    let mut old_descriptor = PSECURITY_DESCRIPTOR::default();
+    unsafe {
+        GetNamedSecurityInfoW(
+            PCWSTR(encoded_path.as_ptr()),
+            SE_REGISTRY_KEY,
+            DACL_SECURITY_INFORMATION,
+            None,
+            None,
+            Some(&raw mut old_acl),
+            None,
+            &raw mut old_descriptor,
+        )
+        .ok()?;
+    }
+    scopeguard::defer! {
+        unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(old_descriptor.0))) };
+    }
+
+    let access = EXPLICIT_ACCESS_W {
+        grfAccessPermissions: KEY_READ.0,
+        grfAccessMode: SET_ACCESS,
+        grfInheritance: NO_INHERITANCE,
+        Trustee: TRUSTEE_W {
+            pMultipleTrustee: std::ptr::null_mut(),
+            MultipleTrusteeOperation: NO_MULTIPLE_TRUSTEE,
+            TrusteeForm: TRUSTEE_IS_SID,
+            TrusteeType: TRUSTEE_IS_GROUP,
+            ptstrName: PWSTR(app_container.0.cast()),
+        },
+    };
+    let mut new_acl = std::ptr::null_mut();
+    unsafe {
+        SetEntriesInAclW(Some(&[access]), Some(old_acl), &raw mut new_acl)
+            .ok()?;
+    }
+    scopeguard::defer! {
+        unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(new_acl.cast()))) };
+    }
+
+    if acl_eq(old_acl, new_acl)? {
+        return Ok(());
+    }
+    unsafe {
+        SetNamedSecurityInfoW(
+            PCWSTR(encoded_path.as_ptr()),
+            SE_REGISTRY_KEY,
+            DACL_SECURITY_INFORMATION,
+            None,
+            None,
+            Some(new_acl),
+            None,
+        )
+        .ok()?;
+    }
+    Ok(())
+}
+
+fn apply_grant(app_container: &PSID, grant: &Grant) -> Result<()> {
+    let path = Path::new(&grant.path);
+    match grant.kind {
+        GrantKind::File => set_acl(app_container, path, grant.permission),
+        GrantKind::RegistryKey => set_registry_acl(app_container, path),
+    }
+}
+
+fn revoke_grant(app_container: &PSID, grant: &Grant) -> Result<()> {
+    let object_type = match grant.kind {
+        GrantKind::File => SE_FILE_OBJECT,
+        GrantKind::RegistryKey => SE_REGISTRY_KEY,
+    };
+    remove_from_acl(app_container, Path::new(&grant.path), object_type)
+}
+
+fn remove_from_acl(
+    app_container: &PSID,
+    path: &Path,
+    object_type: SE_OBJECT_TYPE,
+) -> Result<()> {
     let encoded_path = path
         .as_os_str()
         .encode_wide()
@@ -1129,7 +1243,7 @@ fn remove_from_acl(app_container: &PSID, path: &Path) -> Result<()> {
     let err = unsafe {
         GetNamedSecurityInfoW(
             PCWSTR(encoded_path.as_ptr()),
-            SE_FILE_OBJECT,
+            object_type,
             DACL_SECURITY_INFORMATION,
             None,
             None,
@@ -1176,7 +1290,7 @@ fn remove_from_acl(app_container: &PSID, path: &Path) -> Result<()> {
     let err = unsafe {
         SetNamedSecurityInfoW(
             PCWSTR(encoded_path.as_ptr()),
-            SE_FILE_OBJECT,
+            object_type,
             DACL_SECURITY_INFORMATION,
             None,
             None,
@@ -1309,7 +1423,7 @@ pub fn run_helper(
 
     for path in std::env::split_paths(remove_paths.as_os_str()) {
         if !path.as_os_str().is_empty() {
-            remove_from_acl(&psid, &path)?;
+            remove_from_acl(&psid, &path, SE_FILE_OBJECT)?;
         }
     }
     apply_acl_paths(

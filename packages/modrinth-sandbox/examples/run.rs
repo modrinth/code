@@ -42,6 +42,7 @@ async fn main() -> Result<()> {
             ensure_dirs_exist: Vec::new(),
             read_only_paths: cli.read,
             read_write_paths: cli.write,
+            registry_read_keys: Vec::new(),
             working_directory: cli.cwd,
             passthrough_environment: BTreeSet::new(),
             extra_environment: BTreeMap::new(),

@@ -128,6 +128,7 @@ pub unsafe extern "C" fn modrinth_sandbox_prepare_command(
                     .into_iter()
                     .map(|path| path.as_ref().into())
                     .collect(),
+                registry_read_keys: Vec::new(),
                 read_write_paths: read_write_paths
                     .into_iter()
                     .map(|path| path.as_ref().into())

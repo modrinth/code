@@ -1,7 +1,10 @@
 use url::Url;
 
 pub async fn open_url(url: Url) {
-    assert!(matches!(url.scheme(), "http" | "https" | "steam"));
+    assert!(matches!(
+        url.scheme(),
+        "http" | "https" | "steam" | "signalrgb"
+    ));
 
     #[cfg(target_os = "linux")]
     {

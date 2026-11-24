@@ -90,13 +90,35 @@ pub enum PermissionType {
     Write,
 }
 
+#[derive(
+    Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum GrantKind {
+    #[default]
+    File,
+    RegistryKey,
+}
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Grant {
+    #[serde(default)]
+    pub kind: GrantKind,
     pub path: String,
     pub permission: PermissionType,
 }
 
 impl Grant {
+    /// Grants read access to a key inside of `HKEY_CURRENT_USER`, if it exists.
+    pub fn from_registry_key(key: &str) -> Option<Self> {
+        RegKey::predef(HKEY_CURRENT_USER).open_subkey(key).ok()?;
+        Some(Self {
+            kind: GrantKind::RegistryKey,
+            path: format!(r"CURRENT_USER\{key}"),
+            permission: PermissionType::Read,
+        })
+    }
+
     pub fn from_path(
         path: &Path,
         permission: PermissionType,
@@ -111,6 +133,7 @@ impl Grant {
             )
         })?;
         Ok(Some(Self {
+            kind: GrantKind::File,
             path: path.to_owned(),
             permission,
         }))

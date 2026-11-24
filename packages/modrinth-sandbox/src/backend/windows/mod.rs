@@ -57,6 +57,7 @@ use crate::{
 mod acl;
 pub(crate) mod appcontainer;
 mod drag_intercept;
+mod home;
 pub(crate) mod runas;
 
 pub(crate) use appcontainer::AppContainerChild;

@@ -95,6 +95,10 @@ pub const JVM_ARGUMENTS: &[&str] = &[
     JAVA_AGENT_JVM_ARGUMENT,
 ];
 
+/// Used by the illuminate mod (https://github.com/creeperkatze/mc-mods/blob/main/illuminate/)
+const SIGNALRGB_REGISTRY_KEY: &str =
+    r"Software\WhirlwindFX\SignalRgb\effects\selected";
+
 #[cfg(windows)]
 const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
     "COMPUTERNAME",
@@ -427,6 +431,7 @@ pub async fn setup_minecraft_command(
         skins_path,
     ];
     read_write_paths.extend(minecraft.granted_paths);
+    read_write_paths.extend(signalrgb_effects_dir());
     read_write_paths.sort_unstable();
     read_write_paths.dedup();
 
@@ -458,6 +463,7 @@ pub async fn setup_minecraft_command(
         ensure_dirs_exist,
         read_only_paths,
         read_write_paths,
+        registry_read_keys: vec![SIGNALRGB_REGISTRY_KEY.to_owned()],
         working_directory: Some(instance_path),
         passthrough_environment: MINECRAFT_PASSTHROUGH_ENVIRONMENT
             .iter()
@@ -542,4 +548,19 @@ fn replace_path_placeholder(argument: &str, path: &Path) -> OsString {
     result.push(path);
     result.push(suffix);
     result
+}
+
+/// Used by the illuminate mod (https://github.com/creeperkatze/mc-mods/blob/main/illuminate/)
+fn signalrgb_effects_dir() -> Option<PathBuf> {
+    if !cfg!(windows) {
+        return None;
+    }
+    let home = std::env::home_dir()?;
+    [
+        home.join("Documents"),
+        home.join("OneDrive").join("Documents"),
+    ]
+    .into_iter()
+    .map(|documents| documents.join("WhirlwindFX").join("Effects"))
+    .find(|effects| effects.is_dir())
 }

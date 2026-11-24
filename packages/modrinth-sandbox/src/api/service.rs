@@ -922,7 +922,7 @@ impl SandboxApiService {
             return RequestStatus::BadRequest;
         };
 
-        if matches!(url.scheme(), "http" | "https" | "steam") {
+        if matches!(url.scheme(), "http" | "https" | "steam" | "signalrgb") {
             if url.scheme() == "steam" {
                 let allowed = match url.host_str() {
                     Some("forceinputappid") => true,
@@ -932,6 +932,12 @@ impl SandboxApiService {
                 if !allowed {
                     return RequestStatus::Forbidden;
                 }
+            }
+            if url.scheme() == "signalrgb"
+                && !(url.host_str() == Some("effect")
+                    && url.path().starts_with("/apply/"))
+            {
+                return RequestStatus::Forbidden;
             }
 
             tokio::task::spawn(super::desktop::open_url(url));

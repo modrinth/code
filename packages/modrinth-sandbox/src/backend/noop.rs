@@ -202,6 +202,7 @@ mod tests {
             ensure_dirs_exist: Vec::new(),
             read_only_paths: Vec::new(),
             read_write_paths: Vec::new(),
+            registry_read_keys: Vec::new(),
             working_directory: None,
             passthrough_environment: BTreeSet::new(),
             extra_environment: BTreeMap::new(),
