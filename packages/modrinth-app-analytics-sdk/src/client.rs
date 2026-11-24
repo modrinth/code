@@ -14,7 +14,7 @@ use crate::backend::{AnalyticsBackend, init_pool};
 use crate::queue::EventQueue;
 use crate::types::enums::{AppArch, AppOs};
 use crate::types::http::batch::{AppEvent, AppEventBatch};
-use crate::types::http::extract::MAX_EVENTS_PER_BATCH;
+use crate::types::http::extract::{MAX_EVENTS_PER_BATCH, is_valid_source};
 use crate::worker::bg;
 
 #[derive(Clone)]
@@ -67,7 +67,19 @@ impl AppAnalytics {
         this
     }
 
+    /// Queues an event to be sent.
+    ///
+    /// Events can be dropped if they are not valid.
     pub fn add_event(&self, event: AppEvent) {
+        if !is_valid_source(&event.source) {
+            warn!(
+                source = %event.source,
+                event = event.event.name(),
+                "Dropping analytics event with an invalid source"
+            );
+            return;
+        }
+
         self.inner.queue.push(event);
     }
 

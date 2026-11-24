@@ -18,6 +18,7 @@ pub const MAX_EVENTS_PER_BATCH: usize = 128;
 /// Oldest an event may be when its batch is sent. Clients should drop older
 /// events instead of sending them.
 pub const MAX_EVENT_AGE: TimeDelta = TimeDelta::days(2);
+
 /// How far in advance an event may be when its batch is sent.
 ///
 /// Note events still mainly use corrected client time, and not the raw event time sent
@@ -29,7 +30,7 @@ pub const MAX_EVENT_IN_ADVANCE: TimeDelta = TimeDelta::hours(23);
 pub const MAX_APP_VERSION_LEN: usize = 32;
 
 /// Longest event source accepted, in bytes.
-pub const MAX_SOURCE_LEN: usize = 32;
+pub const MAX_SOURCE_LEN: usize = 23;
 
 /// Events extracted from a received batch.
 #[derive(Debug)]
@@ -72,7 +73,7 @@ pub enum SingleEventProcessingError {
     #[error("id is not a valid UUID v7")]
     IdIsNotUuidVersion7,
     #[error(
-        "source is not 1 to {MAX_SOURCE_LEN} lowercase ASCII letters, digits, `_` or `-`"
+        "source is not 1 to {MAX_SOURCE_LEN} ASCII letters or digits starting with an uppercase letter"
     )]
     InvalidSource,
     #[error(
@@ -194,14 +195,17 @@ fn is_valid_app_version(version: &str) -> bool {
         })
 }
 
-/// Checks that a client-supplied event source is a short identifier.
-fn is_valid_source(source: &str) -> bool {
+/// Checks that an event source is a short PascalCase identifier, such as
+/// `BrowseTab` or `NewInstance`: ASCII letters and digits, starting with an
+/// uppercase letter.
+#[must_use]
+pub fn is_valid_source(source: &str) -> bool {
     (1..=MAX_SOURCE_LEN).contains(&source.len())
-        && source.bytes().all(|b| {
-            b.is_ascii_lowercase()
-                || b.is_ascii_digit()
-                || matches!(b, b'_' | b'-')
-        })
+        && source.bytes().all(|b| b.is_ascii_alphanumeric())
+        && source
+            .bytes()
+            .next()
+            .is_some_and(|b| b.is_ascii_uppercase())
 }
 
 /// Deserializes `T` from JSON, reporting the path to the value that failed.
@@ -276,7 +280,7 @@ mod tests {
 
     fn event(id: &str, event: &str) -> String {
         format!(
-            r#"{{"id":"{id}","timestamp":"2026-11-23T11:00:00Z","source":"browse","event":{event}}}"#
+            r#"{{"id":"{id}","timestamp":"2026-11-23T11:00:00Z","source":"BrowseTab","event":{event}}}"#
         )
     }
     #[test]
@@ -325,7 +329,7 @@ mod tests {
         let body = body(&format!(
             "{},{}",
             event(EVENT_ID_A, r#"{"MicrosoftSignIn":{}}"#)
-                .replace(r#""source":"browse""#, r#""source":"Browse""#),
+                .replace(r#""source":"BrowseTab""#, r#""source":"browse_tab""#),
             event(EVENT_ID_B, r#"{"MicrosoftSignIn":{}}"#),
         ));
 
@@ -354,5 +358,20 @@ mod tests {
             extracted.rejected.as_slice(),
             [SingleEventProcessingError::InvalidAppVersion]
         ));
+    }
+
+    #[test]
+    fn validates_source_format() {
+        assert!(is_valid_source("BrowseTab"));
+        assert!(is_valid_source("NewInstance2"));
+        assert!(is_valid_source("X"));
+        assert!(!is_valid_source(""));
+        assert!(!is_valid_source("browseTab"));
+        assert!(!is_valid_source("Browse_Tab"));
+        assert!(!is_valid_source("2Browse"));
+        assert!(!is_valid_source(&format!(
+            "A{}",
+            "a".repeat(MAX_SOURCE_LEN)
+        )));
     }
 }
