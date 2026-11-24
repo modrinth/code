@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/vue-query'
 import { computed, type MaybeRefOrGetter, toValue } from 'vue'
 
-import { appSettingsQueryOptions, sandboxUnavailableReasonQueryOptions } from '@/helpers/settings'
+import { appSettingsQueryOptions } from '@/helpers/settings'
 import type { SandboxOverrides } from '@/helpers/types'
+
+import { sandboxUnavailableReasonQueryOptions } from './queries'
 
 export function useOfferSandbox(overrides?: MaybeRefOrGetter<SandboxOverrides | null | undefined>) {
 	const settings = useQuery(appSettingsQueryOptions())

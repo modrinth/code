@@ -24,7 +24,6 @@ const props = defineProps<{
 	settings: SandboxSettings
 	instanceSettings?: boolean
 	unavailableReason?: string | null
-	disabled?: boolean
 }>()
 const emit = defineEmits<{ update: [patch: Partial<SandboxSettings>] }>()
 const { formatMessage } = useVIntl()
@@ -160,7 +159,7 @@ async function browseForFolder() {
 
 <template>
 	<div class="flex flex-col gap-6">
-		<div class="flex flex-col gap-4" :class="{ 'opacity-60': disabled }" :inert="disabled">
+		<div class="flex flex-col gap-4">
 			<Admonition type="info">
 				<p class="m-0 leading-6">
 					<IntlFormatted :message-id="messages.info">
@@ -203,7 +202,7 @@ async function browseForFolder() {
 			</div>
 		</div>
 		<div class="border-0 border-t border-solid border-surface-5 pt-6">
-			<div :class="{ 'opacity-60': disabled || !sandboxed }" :inert="disabled || !sandboxed">
+			<div :class="{ 'opacity-60': !sandboxed }" :inert="!sandboxed">
 				<h2 class="m-0 text-xl font-semibold text-contrast">
 					{{ formatMessage(messages.settingsTitle) }}
 				</h2>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
 
-import { sandboxUnavailableReasonQueryOptions } from '@/helpers/settings'
+import { sandboxUnavailableReasonQueryOptions } from '@/features/sandbox/queries'
+import SandboxSettingsForm from '@/features/sandbox/sandbox-settings-form/index.vue'
 
-import SandboxSettingsForm from './sandbox-settings-form/index.vue'
 import { useDefaultInstanceSettings } from './use-default-instance-settings'
 
 const { settings } = useDefaultInstanceSettings(

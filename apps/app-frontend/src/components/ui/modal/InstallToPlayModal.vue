@@ -196,7 +196,7 @@ import {
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, ref } from 'vue'
 
-import { useOfferSandbox } from '@/composables/use-offer-sandbox'
+import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
 import { get_project, get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { injectServerInstall } from '@/providers/server-install'
 

@@ -15,7 +15,7 @@ import { UnknownFileWarningModal } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { useOfferSandbox } from '@/composables/use-offer-sandbox'
+import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
 
 const appSettings = useAppSettings()
 const offerSandbox = useOfferSandbox()

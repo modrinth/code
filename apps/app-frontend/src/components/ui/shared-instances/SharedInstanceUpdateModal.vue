@@ -41,7 +41,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import { useOfferSandbox } from '@/composables/use-offer-sandbox'
+import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
 import {
 	getSharedInstanceUnavailableReason,
 	install_update_shared_instance,

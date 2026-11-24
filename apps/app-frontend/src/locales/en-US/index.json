@@ -4412,14 +4412,8 @@
   "instance.settings.tabs.sandbox": {
     "message": "Sandboxing"
   },
-  "instance.settings.tabs.sandbox.custom.description": {
-    "message": "Use custom sandbox settings for this instance instead of following App settings."
-  },
-  "instance.settings.tabs.sandbox.custom.title": {
-    "message": "Use custom settings"
-  },
-  "instance.settings.tabs.sandbox.default-settings": {
-    "message": "Default settings"
+  "instance.settings.tabs.sandbox.default-settings-description": {
+    "message": "Your instance uses the default sandbox settings unless you override them here."
   },
   "instance.settings.tabs.sharing": {
     "message": "Sharing"

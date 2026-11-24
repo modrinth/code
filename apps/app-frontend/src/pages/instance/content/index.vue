@@ -132,7 +132,7 @@ import { useManagedContentPolicy } from '@/composables/instances/use-managed-con
 import { useSyncedPackActions } from '@/composables/instances/use-synced-pack-actions'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { useOfferSandbox } from '@/composables/use-offer-sandbox'
+import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version, get_version_many } from '@/helpers/cache.js'
 import { install_bulk_update_content } from '@/helpers/install'

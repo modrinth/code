@@ -40,7 +40,7 @@ import {
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
-import { useOfferSandbox } from '@/composables/use-offer-sandbox'
+import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
 import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { wait_for_install_job } from '@/helpers/install'
 import { update_managed_modrinth_version } from '@/helpers/instance'
