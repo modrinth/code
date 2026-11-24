@@ -26,6 +26,7 @@ const props = defineProps<{
 	unavailableReason?: string | null
 }>()
 const emit = defineEmits<{ update: [patch: Partial<SandboxSettings>] }>()
+defineSlots<{ reset?: (props: { field: keyof SandboxSettings; label: string }) => unknown }>()
 const { formatMessage } = useVIntl()
 const { openExternalUrl } = injectPageContext()
 const id = useId()
@@ -192,13 +193,19 @@ async function browseForFolder() {
 						}}
 					</p>
 				</div>
-				<Toggle
-					:id="`${id}-mode`"
-					class="shrink-0"
-					:model-value="sandboxed"
-					:aria-describedby="`${id}-mode-description`"
-					@update:model-value="setSandboxed"
-				/>
+				<div class="flex shrink-0 items-center gap-2">
+					<Toggle
+						:id="`${id}-mode`"
+						:model-value="sandboxed"
+						:aria-describedby="`${id}-mode-description`"
+						@update:model-value="setSandboxed"
+					/>
+					<slot
+						name="reset"
+						field="mode"
+						:label="formatMessage(instanceSettings ? messages.instanceTitle : messages.title)"
+					/>
+				</div>
 			</div>
 		</div>
 		<div class="border-0 border-t border-solid border-surface-5 pt-6">
@@ -220,20 +227,25 @@ async function browseForFolder() {
 								{{ formatMessage(option.description) }}
 							</p>
 						</div>
-						<Toggle
-							:id="`${id}-${option.key}`"
-							class="shrink-0"
-							:model-value="settings[option.key]"
-							:aria-describedby="`${id}-${option.key}-description`"
-							@update:model-value="(value) => update(option.key, value)"
-						/>
+						<div class="flex shrink-0 items-center gap-2">
+							<Toggle
+								:id="`${id}-${option.key}`"
+								:model-value="settings[option.key]"
+								:aria-describedby="`${id}-${option.key}-description`"
+								@update:model-value="(value) => update(option.key, value)"
+							/>
+							<slot name="reset" :field="option.key" :label="formatMessage(option.label)" />
+						</div>
 					</div>
 					<div class="flex flex-col gap-2.5">
-						<div class="flex min-w-0 flex-col gap-1">
-							<h3 class="m-0 text-lg font-semibold text-contrast">
-								{{ formatMessage(messages.folders) }}
-							</h3>
-							<p class="m-0">{{ formatMessage(messages.foldersDescription) }}</p>
+						<div class="flex items-center justify-between gap-4">
+							<div class="flex min-w-0 flex-col gap-1">
+								<h3 class="m-0 text-lg font-semibold text-contrast">
+									{{ formatMessage(messages.folders) }}
+								</h3>
+								<p class="m-0">{{ formatMessage(messages.foldersDescription) }}</p>
+							</div>
+							<slot name="reset" field="extra_paths" :label="formatMessage(messages.folders)" />
 						</div>
 						<form class="flex gap-2" @submit.prevent="addFolder">
 							<Input

@@ -11,6 +11,7 @@ import type { SandboxOverrides, SandboxSettings } from '@/helpers/types'
 
 import DefaultSettingsIntro from './default-settings-intro.vue'
 import { injectInstanceSettings } from './instance-settings-context'
+import ResetToDefaultButton from './reset-to-default-button.vue'
 import { useInstanceSettingsDraft } from './use-instance-settings-draft'
 
 const { handleError } = injectNotificationManager()
@@ -70,6 +71,14 @@ function applyPatch(patch: Partial<SandboxSettings>) {
 			instance-settings
 			:unavailable-reason="unavailableReason.data.value"
 			@update="applyPatch"
-		/>
+		>
+			<template #reset="{ field, label }">
+				<ResetToDefaultButton
+					:disabled="draft[field] === null"
+					:setting="label"
+					@reset="draft = { ...draft, [field]: null }"
+				/>
+			</template>
+		</SandboxSettingsForm>
 	</div>
 </template>
