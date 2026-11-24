@@ -36,7 +36,7 @@
     "defaultMessage": "Add external links"
   },
   "nags.add-summary.description": {
-    "defaultMessage": "Add a short summary that tells users what your project does."
+    "defaultMessage": "Add a short summary that provides an appealing introduction to your project."
   },
   "nags.add-summary.title": {
     "defaultMessage": "Add a summary"

@@ -6,7 +6,7 @@ const messages = defineMessages({
 	addTitle: { id: 'nags.add-summary.title', defaultMessage: 'Add a summary' },
 	add: {
 		id: 'nags.add-summary.description',
-		defaultMessage: 'Add a short summary that tells users what your project does.',
+		defaultMessage: 'Add a short summary that provides an appealing introduction to your project.',
 	},
 	linksTitle: {
 		id: 'nags.project-summary-links.title',
