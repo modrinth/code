@@ -298,7 +298,7 @@ export function useDiscoverBrowse({
 		projectType,
 		tags,
 		searchQuery: (params) => ({
-			queryKey: ['discover', 'search', 'v3', params],
+			queryKey: ['discover', 'search', 'v3', params] as const,
 			queryFn: () => fetchSearch(params),
 			staleTime: 30_000,
 		}),
@@ -384,12 +384,30 @@ export function useDiscoverBrowse({
 	function previewActions(): CardAction[] {
 		const noop = () => {}
 		return [
-			{ key: 'download', label: 'Download', icon: DownloadIcon, color: 'brand', onClick: noop },
-			{ key: 'heart', label: '', icon: HeartIcon, circular: true, onClick: noop },
-			{ key: 'bookmark', label: '', icon: BookmarkIcon, circular: true, onClick: noop },
+			{
+				key: 'download',
+				label: formatMessage(commonMessages.downloadButton),
+				icon: DownloadIcon,
+				color: 'brand',
+				onClick: noop,
+			},
+			{
+				key: 'heart',
+				label: formatMessage(commonMessages.followButton),
+				icon: HeartIcon,
+				circular: true,
+				onClick: noop,
+			},
+			{
+				key: 'bookmark',
+				label: formatMessage(commonMessages.saveButton),
+				icon: BookmarkIcon,
+				circular: true,
+				onClick: noop,
+			},
 			{
 				key: 'more',
-				label: '',
+				label: formatMessage(commonMessages.moreOptionsButton),
 				icon: MoreVerticalIcon,
 				circular: true,
 				type: 'transparent',

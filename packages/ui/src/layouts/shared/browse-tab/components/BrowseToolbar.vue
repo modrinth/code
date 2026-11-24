@@ -363,7 +363,7 @@ const searchPlaceholder = computed(() =>
 		>
 			<template #actions>
 				<Button type="colored" color="blue" @click="view.applySavedAdvancedPrefs()">
-					<RotateCounterClockwiseIcon />
+					<RotateCounterClockwiseIcon aria-hidden="true" />
 					{{ formatMessage(messages.applySavedPreferences) }}
 				</Button>
 			</template>

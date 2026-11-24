@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import PageHeaderBackButton from '../../components/base/page-header/page-header-back-button.vue'
+import PageHeaderBackButton from '../../components/base/page-header/back-button.vue'
 
 const meta = {
 	title: 'Base/PageHeaderBackButton',

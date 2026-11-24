@@ -37,6 +37,7 @@ export function linkedServerQueryOptions(
 export function linkedServerWorldsQueryOptions(instanceId: string) {
 	return queryOptions({
 		queryKey: linkedServerKeys.worlds(instanceId),
+		networkMode: 'always',
 		queryFn: () => getInstanceWorlds(instanceId),
 	})
 }

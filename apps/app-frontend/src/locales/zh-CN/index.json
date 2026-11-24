@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "隐藏"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "打开实例"
-  },
   "app.action-bar.install.retry": {
     "message": "重试"
   },
@@ -739,9 +736,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "实例"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "项目"
   },
   "app.instance.mods.freeze-content": {
     "message": "锁定版本"

@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Ignora"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "Apri istanza"
-  },
   "app.action-bar.install.retry": {
     "message": "Riprova"
   },
@@ -739,9 +736,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Istanza"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "progetto"
   },
   "app.instance.mods.freeze-content": {
     "message": "Congela"

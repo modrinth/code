@@ -4,6 +4,7 @@ import { get_project_v3 } from '@/helpers/cache.js'
 import { install_get_shared_instance_update_preview } from '@/helpers/install'
 import {
 	get as getInstance,
+	get_linked_modpack_content,
 	list as listInstances,
 	list_instance_screenshots,
 	list_screenshot_groups,
@@ -11,7 +12,7 @@ import {
 } from '@/helpers/instance'
 import { loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
-import type { GameInstance } from '@/helpers/types'
+import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { getRecommendedJavaVersion } from '@/platform/app-lib/instances/commands'
 import { refreshSharedInstanceLock } from '@/platform/app-lib/shared-instances/commands'
 
@@ -176,5 +177,16 @@ export function instanceContentQueryOptions(
 		networkMode: 'always',
 		queryFn: () => loadInstanceContentData(instanceId, undefined, onError),
 		staleTime: 30_000,
+	})
+}
+
+export function linkedModpackContentQueryOptions(
+	instanceId: string,
+	cacheBehaviour?: CacheBehaviour,
+) {
+	return queryOptions({
+		queryKey: instanceKeys.linkedContent(instanceId),
+		networkMode: 'always',
+		queryFn: () => get_linked_modpack_content(instanceId, cacheBehaviour),
 	})
 }

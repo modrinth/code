@@ -13,6 +13,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
+import { instanceKeys, instanceListQueryOptions } from '@/features/instances/queries'
 import { injectSettingsActions } from '@/features/settings/settings-actions'
 import CommandHistoryModal from '@/features/settings/syncing/command-history-modal.vue'
 import GameSettingsModal from '@/features/settings/syncing/game-settings-modal/index.vue'
@@ -35,7 +36,6 @@ import {
 	syncedServersQueryOptions,
 } from '@/helpers/synced-options'
 import type { GameInstance } from '@/helpers/types'
-import { instanceKeys, instanceListQueryOptions } from '@/pages/instance/query-options'
 
 import { injectInstanceSettings } from './instance-settings-context'
 

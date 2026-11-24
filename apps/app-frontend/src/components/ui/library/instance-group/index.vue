@@ -23,16 +23,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useElementSize, useWindowSize } from '@vueuse/core'
-import {
-	computed,
-	inject,
-	nextTick,
-	onErrorCaptured,
-	onMounted,
-	onUnmounted,
-	ref,
-	watch,
-} from 'vue'
+import { computed, nextTick, onErrorCaptured, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import GroupActionButtons from '@/components/ui/library/instance-group/group-action-buttons.vue'
 import InstanceCard from '@/components/ui/library/instance-group/instance-card.vue'
@@ -43,6 +34,7 @@ import type {
 } from '@/components/ui/library/use-library'
 import { useLibrary } from '@/components/ui/library/use-library'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { injectInstanceCreation } from '@/features/instances/instance-creation-context'
 import { isUninstalledSharedInstance } from '@/features/library/library-instance'
 import { FAVORITES_GROUP_ID, MAX_INSTANCE_GROUP_NAME_LENGTH } from '@/helpers/instance-groups'
 
@@ -86,7 +78,7 @@ const {
 	instanceGroupDragTarget,
 	getInstanceGroupDropState,
 } = useLibrary()
-const showCreationModal = inject<() => void>('showCreationModal')
+const instanceCreation = injectInstanceCreation(null)
 
 const instanceComponents = new Map<string, InstanceCardExposed>()
 const groupDropTarget = ref<HTMLElement>()
@@ -356,7 +348,7 @@ function openGroupContextMenu(event: MouseEvent) {
 			id: 'new_instance',
 			label: formatMessage(messages.newInstance),
 			icon: PlusIcon,
-			action: () => showCreationModal?.(),
+			action: () => instanceCreation?.showCreationModal(),
 		},
 		{
 			id: 'add_instances',

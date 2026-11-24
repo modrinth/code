@@ -37,7 +37,7 @@ import { provideInstanceSettings } from './instance-settings-context.ts'
 import JavaSettings from './java-settings.vue'
 import SharingSettings from './sharing-settings/index.vue'
 import SyncedOptionsSettings from './synced-options-settings.vue'
-import TroubleshootingSettings from './troubleshooting/index.vue'
+import TroubleshootingSettings from './troubleshooting-settings.vue'
 import WindowSettings from './window-settings.vue'
 
 const { formatMessage } = useVIntl()

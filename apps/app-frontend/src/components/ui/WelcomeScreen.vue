@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ImportIcon, PlusIcon } from '@modrinth/assets'
 import { Button, defineMessages, IntlFormatted, useVIntl } from '@modrinth/ui'
-import { inject, onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
+
+import { injectInstanceCreation } from '@/features/instances/instance-creation-context'
 
 import modrinthSocialIcon from '../../assets/welcome/modrinth-social-icon.png'
 
-const showCreationModal = inject<() => void>('showCreationModal')
-const showImportModal = inject<() => void>('showImportModal')
+const instanceCreation = injectInstanceCreation(null)
 
 const { formatMessage } = useVIntl()
 
@@ -63,7 +64,7 @@ function handleQuickCreate(event: KeyboardEvent) {
 
 	if (!offline.value) {
 		event.preventDefault()
-		showCreationModal?.()
+		instanceCreation?.showCreationModal()
 	}
 }
 
@@ -106,7 +107,7 @@ onUnmounted(() => {
 						size="lg"
 						class="!shadow-none"
 						:disabled="offline"
-						@click="showCreationModal?.()"
+						@click="instanceCreation?.showCreationModal()"
 					>
 						<PlusIcon />
 						{{ formatMessage(messages.createInstance) }}
@@ -129,7 +130,12 @@ onUnmounted(() => {
 			class="flex flex-col h-max items-center justify-end gap-4 text-sm leading-5 text-secondary"
 		>
 			<span class="whitespace-nowrap">{{ formatMessage(messages.importPrompt) }}</span>
-			<Button size="lg" class="!font-medium" :disabled="offline" @click="showImportModal?.()">
+			<Button
+				size="lg"
+				class="!font-medium"
+				:disabled="offline"
+				@click="instanceCreation?.showImportModal()"
+			>
 				<ImportIcon />
 				{{ formatMessage(messages.importFromLauncher) }}
 			</Button>

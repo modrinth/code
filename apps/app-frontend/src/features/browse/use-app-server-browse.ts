@@ -11,7 +11,6 @@ import {
 import type { ButtonMenuOption, CardAction } from '@modrinth/ui'
 import { commonMessages, defineMessages, useDebugLogger, useVIntl } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import type { Ref } from 'vue'
 import { onUnmounted, ref, shallowRef } from 'vue'
 import type { Router } from 'vue-router'
@@ -24,6 +23,7 @@ import { kill, list as listInstances } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
 import { addServerToInstance } from '@/platform/app-lib/worlds/commands'
+import { openExternalUrl } from '@/platform/external-links'
 
 interface BrowseServerInstance {
 	id: string
@@ -278,7 +278,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 				id: 'open_link',
 				label: formatMessage(commonMessages.openInModrinthButton),
 				icon: GlobeIcon,
-				action: () => void openUrl(url),
+				action: () => void openExternalUrl(url),
 			},
 			{
 				id: 'copy_link',

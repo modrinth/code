@@ -64,7 +64,9 @@ function positionSlider(animate = true) {
 		transitionsEnabled.value = false
 		slider.value = position
 		sliderReady.value = true
-		void nextTick(() => requestAnimationFrame(() => (transitionsEnabled.value = true)))
+		void nextTick(() =>
+			ownerWindow()?.requestAnimationFrame(() => (transitionsEnabled.value = true)),
+		)
 		return
 	}
 
@@ -83,10 +85,16 @@ function positionSlider(animate = true) {
 
 let resizeObserver: ResizeObserver | undefined
 
+function ownerWindow() {
+	return tablist.value?.ownerDocument.defaultView ?? null
+}
+
 onMounted(() => {
 	positionSlider(false)
-	resizeObserver = new ResizeObserver(() => positionSlider(false))
-	if (tablist.value) resizeObserver.observe(tablist.value)
+	const view = ownerWindow()
+	if (!tablist.value || !view) return
+	resizeObserver = new view.ResizeObserver(() => positionSlider(false))
+	resizeObserver.observe(tablist.value)
 })
 
 onUnmounted(() => {

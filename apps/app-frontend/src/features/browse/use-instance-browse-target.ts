@@ -7,14 +7,14 @@ import { useRoute } from 'vue-router'
 
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { getInstanceIconUrl } from '@/helpers/instance'
-import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import {
 	instanceDetailQueryOptions,
 	instanceLinkedProjectQueryOptions,
-} from '@/pages/instance/query-options'
+} from '@/features/instances/queries'
+import { getInstanceIconUrl } from '@/helpers/instance'
+import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 
-import { installedProjectIdsQueryOptions, settleQuery } from './query-options'
+import { installedProjectIdsQueryOptions, settleQuery } from './queries'
 
 const MOD_LOADERS = ['fabric', 'forge', 'quilt', 'neoforge']
 

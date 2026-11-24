@@ -169,6 +169,8 @@ import { useRouter } from 'vue-router'
 
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import SharedInstancePublishModal from '@/components/ui/shared-instances/SharedInstancePublishModal.vue'
+import { injectInstancePage } from '@/features/instances/instance-context'
+import { injectSharedInstance } from '@/features/instances/shared-instance-context'
 import { OWNED_SHARED_INSTANCES_FILTER } from '@/features/library/library-instance'
 import { useOwnedSharedInstanceLimit } from '@/features/library/shared-instances/use-owned-shared-instance-limit'
 import {
@@ -181,8 +183,6 @@ import { edit } from '@/helpers/instance'
 import type { ModrinthAuthFlow } from '@/helpers/mr_auth.ts'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 
-import { injectInstancePage } from '../instance-context'
-import { injectSharedInstance } from '../shared-instance-context'
 import { provideSharedInstanceManagement } from './shared-instance-management-context'
 import SharedInstanceMembersTable from './shared-instance-members-table.vue'
 import SharedInstanceRemoveMemberModal from './shared-instance-remove-member-modal.vue'

@@ -17,6 +17,10 @@ const messages = defineMessages({
 		id: 'app.browse.discover-servers',
 		defaultMessage: 'Discover servers',
 	},
+	hosting: {
+		id: 'app.browse.breadcrumb.hosting',
+		defaultMessage: 'Hosting',
+	},
 })
 
 export interface BrowseBreadcrumbOptions {
@@ -80,7 +84,7 @@ export function useBrowseBreadcrumbs({
 	const serversBreadcrumb = {
 		slot: 'root',
 		id: 'servers',
-		label: 'Hosting',
+		label: () => formatMessage(messages.hosting),
 		to: '/hosting/manage/',
 		visual: { type: 'icon', component: ServerStackIcon },
 	} satisfies BreadcrumbDefinition

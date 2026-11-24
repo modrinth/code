@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Bỏ qua"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "Mở bản cài đặt"
-  },
   "app.action-bar.install.retry": {
     "message": "Thử lại"
   },
@@ -691,9 +688,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Bản cài đặt"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "dự án"
   },
   "app.instance.mods.freeze-content": {
     "message": "Cố định phiên bản"

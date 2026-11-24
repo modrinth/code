@@ -59,7 +59,7 @@
 				:disabled="isInstallingSelected"
 				@click="installSelected"
 			>
-				<PlusIcon />
+				<PlusIcon aria-hidden="true" />
 				{{ installButtonText }}
 			</Button>
 		</div>
@@ -76,7 +76,7 @@ import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import type { BrowseSelection } from '../../types'
+import type { BrowseSelection } from '../types'
 
 const { formatMessage } = useVIntl()
 
@@ -132,6 +132,6 @@ function installSelected() {
 
 <style scoped>
 :deep(.selected-project-avatar) {
-	background-color: var(--color-button-bg);
+	background-color: var(--surface-4);
 }
 </style>

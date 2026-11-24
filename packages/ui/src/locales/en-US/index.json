@@ -446,6 +446,9 @@
   "content.card.frozen": {
     "defaultMessage": "This project is locked to its current version until unfrozen."
   },
+  "content.card.installing-progress": {
+    "defaultMessage": "Installing... ({progress, number}%)"
+  },
   "content.card.override-file": {
     "defaultMessage": "Override file"
   },
@@ -489,7 +492,7 @@
     "defaultMessage": "Delete {itemType}"
   },
   "content.confirm-disable.header": {
-    "defaultMessage": "Disable {itemType}"
+    "defaultMessage": "Disable {itemType, select, mod {{count, plural, one {mod} other {mods}}} plugin {{count, plural, one {plugin} other {plugins}}} resourcepack {{count, plural, one {resource pack} other {resource packs}}} datapack {{count, plural, one {data pack} other {data packs}}} shader {{count, plural, one {shader} other {shaders}}} other {{count, plural, one {project} other {projects}}}}"
   },
   "content.confirm-environment.admonition-title": {
     "defaultMessage": "This content may be incompatible"
@@ -843,7 +846,7 @@
     "defaultMessage": "Browse content"
   },
   "content.page-layout.empty.browse-type": {
-    "defaultMessage": "Browse {contentType}"
+    "defaultMessage": "Browse {contentType, select, mod {mods} plugin {plugins} resourcepack {resource packs} datapack {data packs} shader {shaders} other {content}}"
   },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "No content installed"
@@ -852,13 +855,13 @@
     "defaultMessage": "No extra content installed"
   },
   "content.page-layout.empty.no-type-installed": {
-    "defaultMessage": "No {contentType} installed"
+    "defaultMessage": "No {contentType, select, mod {mods} plugin {plugins} resourcepack {resource packs} datapack {data packs} shader {shaders} other {content}} installed"
   },
   "content.page-layout.empty.projects-hint": {
     "defaultMessage": "Upload or browse for content to get started."
   },
   "content.page-layout.empty.type-hint": {
-    "defaultMessage": "Upload or browse for {contentType} to get started."
+    "defaultMessage": "Upload or browse for {contentType, select, mod {mods} plugin {plugins} resourcepack {resource packs} datapack {data packs} shader {shaders} other {content}} to get started."
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Failed to load content"

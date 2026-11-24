@@ -1,11 +1,7 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="
-			formatMessage(messages.header, {
-				itemType: formatContentTypeSentence(formatMessage, visibleItemType, visibleCount),
-			})
-		"
+		:header="formatMessage(messages.header, { itemType: visibleItemType, count: visibleCount })"
 		fade="warning"
 		max-width="500px"
 	>
@@ -44,23 +40,24 @@ import Admonition from '#ui/components/base/Admonition.vue'
 import { Button } from '#ui/components/base/buttons'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
+import { commonMessages } from '#ui/utils/common-messages'
 
-import type { ContentActionWarning } from '../../types'
+import type { ContentActionWarning, ContentType } from '../../types'
 
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	header: {
 		id: 'content.confirm-disable.header',
-		defaultMessage: 'Disable {itemType}',
+		defaultMessage:
+			'Disable {itemType, select, mod {{count, plural, one {mod} other {mods}}} plugin {{count, plural, one {plugin} other {plugins}}} resourcepack {{count, plural, one {resource pack} other {resource packs}}} datapack {{count, plural, one {data pack} other {data packs}}} shader {{count, plural, one {shader} other {shaders}}} other {{count, plural, one {project} other {projects}}}}',
 	},
 })
 
 const props = withDefaults(
 	defineProps<{
 		count: number
-		itemType: string
+		itemType: ContentType | 'project'
 		warning?: ContentActionWarning | null
 		actionDisabled?: boolean
 		actionDisabledTooltip?: string

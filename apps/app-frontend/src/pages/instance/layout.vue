@@ -148,9 +148,21 @@ import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
+import { provideInstancePage } from '@/features/instances/instance-context'
 import { injectInstanceLaunchState } from '@/features/instances/launch-state'
 import { useLinkedServer } from '@/features/instances/linked-server/use-linked-server'
+import {
+	instanceContentQueryOptions,
+	instanceDetailQueryOptions,
+	instanceKeys,
+	instanceLinkedProjectQueryOptions,
+	instanceProcessesQueryOptions,
+} from '@/features/instances/queries'
 import InstanceSettingsModal from '@/features/instances/settings-modal/index.vue'
+import {
+	createSharedInstanceContext,
+	provideSharedInstance,
+} from '@/features/instances/shared-instance-context'
 import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import { serverStatusQueryOptions } from '@/features/servers/queries'
 import { trackEvent } from '@/helpers/analytics'
@@ -182,15 +194,6 @@ import { useRootBreadcrumb } from '@/shared/breadcrumbs'
 
 import InstanceAdmonitions from './components/admonitions/index.vue'
 import InstancePageHeader from './components/page-header/index.vue'
-import { provideInstancePage } from './instance-context'
-import {
-	instanceContentQueryOptions,
-	instanceDetailQueryOptions,
-	instanceKeys,
-	instanceLinkedProjectQueryOptions,
-	instanceProcessesQueryOptions,
-} from './query-options'
-import { createSharedInstanceContext, provideSharedInstance } from './shared-instance-context'
 
 dayjs.extend(relativeTime)
 

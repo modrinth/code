@@ -2,6 +2,7 @@ import type { InvitePlayersUser } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type Ref, ref } from 'vue'
 
+import { instanceKeys } from '@/features/instances/queries'
 import { get_user_many } from '@/helpers/cache.js'
 import {
 	get_shared_instance_users,
@@ -12,7 +13,6 @@ import {
 } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 
-import { instanceKeys } from '../query-options'
 import {
 	normalizeInviteKey,
 	SHARED_INSTANCE_USER_LIMIT,

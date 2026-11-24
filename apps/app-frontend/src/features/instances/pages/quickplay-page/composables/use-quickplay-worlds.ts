@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, onScopeDispose, watch } from 'vue'
 
 import { useAppEvent } from '@/composables/use-app-event'
+import { injectInstancePage } from '@/features/instances/instance-context'
 import { getServerAddress, normalizeServerAddress } from '@/features/servers/address'
 import {
 	ensureManagedServerWorldExists,
@@ -9,7 +10,6 @@ import {
 } from '@/features/worlds/managed-server'
 import { instanceWorldsQueryOptions, worldKeys } from '@/features/worlds/queries'
 import { sortWorlds } from '@/features/worlds/world-utils'
-import { injectInstancePage } from '@/pages/instance/instance-context'
 import { getSingleplayerWorld } from '@/platform/app-lib/worlds/commands'
 import type { ServerWorld, SingleplayerWorld, World } from '@/platform/app-lib/worlds/types'
 

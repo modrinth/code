@@ -105,7 +105,7 @@ watch(filters, (value) => {
 						apply-immediately
 					>
 						<template #add-button>
-							<FilterIcon />
+							<FilterIcon aria-hidden="true" />
 						</template>
 						<template #option="{ option, selected: optionSelected }">
 							<span

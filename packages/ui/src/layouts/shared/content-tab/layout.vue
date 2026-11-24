@@ -9,15 +9,16 @@ import { getProjectTypeIcon } from '#ui/utils/auto-icons'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import ContentTable from './components/content-table/index.vue'
+import type { ContentTableAction } from './components/content-table/types'
 import ContentSelectionBar from './components/ContentSelectionBar.vue'
-import DeleteFlow from './components/flows/delete-flow.vue'
-import ToggleFlow from './components/flows/toggle-flow.vue'
+import ContentToolbar from './components/ContentToolbar.vue'
+import DeleteFlow from './components/flows/DeleteFlow.vue'
+import ToggleFlow from './components/flows/ToggleFlow.vue'
 import type { ContentFlowState } from './components/flows/types'
-import UpdateAllFlow from './components/flows/update-all-flow.vue'
-import UpdateFlow from './components/flows/update-flow.vue'
+import UpdateAllFlow from './components/flows/UpdateAllFlow.vue'
+import UpdateFlow from './components/flows/UpdateFlow.vue'
 import ManagedContentCard from './components/managed-content-card/index.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
-import ContentToolbar from './components/toolbar.vue'
 import {
 	useBulkOperation,
 	useChangingItems,
@@ -77,15 +78,18 @@ const messages = defineMessages({
 	},
 	noTypeInstalled: {
 		id: 'content.page-layout.empty.no-type-installed',
-		defaultMessage: 'No {contentType} installed',
+		defaultMessage:
+			'No {contentType, select, mod {mods} plugin {plugins} resourcepack {resource packs} datapack {data packs} shader {shaders} other {content}} installed',
 	},
 	typeHint: {
 		id: 'content.page-layout.empty.type-hint',
-		defaultMessage: 'Upload or browse for {contentType} to get started.',
+		defaultMessage:
+			'Upload or browse for {contentType, select, mod {mods} plugin {plugins} resourcepack {resource packs} datapack {data packs} shader {shaders} other {content}} to get started.',
 	},
 	browseType: {
 		id: 'content.page-layout.empty.browse-type',
-		defaultMessage: 'Browse {contentType}',
+		defaultMessage:
+			'Browse {contentType, select, mod {mods} plugin {plugins} resourcepack {resource packs} datapack {data packs} shader {shaders} other {content}}',
 	},
 	browseContent: {
 		id: 'content.page-layout.empty.browse-content',
@@ -167,6 +171,9 @@ const addTooltip = computed(
 	() => busyMessage.value ?? (ctx.canAdd.value ? undefined : ctx.addDeniedReason),
 )
 const supportsUpdateAll = computed(() => !!ctx.applyUpdates)
+const rowActions: ContentTableAction[] = ctx.installVersion
+	? ['update', 'switchVersion', 'toggle', 'remove']
+	: ['toggle', 'remove']
 const hasOutdatedItems = computed(() => getUpdateCandidates(typeItems.value).length > 0)
 const toggleableSelectedItems = computed(() =>
 	selectedItems.value.filter((item) => ctx.permissions(item).toggle),
@@ -179,9 +186,6 @@ const searchPlaceholder = computed(() =>
 		count: typeItems.value.length,
 		contentType: formatContentTypeSentence(formatMessage, activeType.value, typeItems.value.length),
 	}),
-)
-const activeTypePlural = computed(() =>
-	formatContentTypeSentence(formatMessage, activeType.value, 2),
 )
 
 watch(
@@ -333,8 +337,8 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 					<EmptyState
 						v-if="typeItems.length === 0"
 						:icon="getProjectTypeIcon(activeType)"
-						:heading="formatMessage(messages.noTypeInstalled, { contentType: activeTypePlural })"
-						:description="formatMessage(messages.typeHint, { contentType: activeTypePlural })"
+						:heading="formatMessage(messages.noTypeInstalled, { contentType: activeType })"
+						:description="formatMessage(messages.typeHint, { contentType: activeType })"
 					>
 						<template #actions>
 							<Button
@@ -356,7 +360,7 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 								@click="ctx.browse(activeType)"
 							>
 								<CompassIcon />
-								{{ formatMessage(messages.browseType, { contentType: activeTypePlural }) }}
+								{{ formatMessage(messages.browseType, { contentType: activeType }) }}
 							</Button>
 						</template>
 					</EmptyState>
@@ -368,7 +372,7 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 						:columns="{
 							selection: true,
 							enabledFor: !!ctx.setEnabledFor,
-							actions: ['update', 'switchVersion', 'toggle', 'remove'],
+							actions: rowActions,
 						}"
 						:highlighted-item-id="highlightedItemId"
 						@toggle="toggleItem"
@@ -448,7 +452,7 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 					type="quiet"
 					color="green"
 					:disabled="isBusy || !!updateAllFlow?.loading"
-					class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+					interaction="filled"
 					@click="updateAllFlow?.promptUpdate(selectedItems)"
 					@mouseenter="prefetchUpdates(selectedItems)"
 					@focus="prefetchUpdates(selectedItems)"
@@ -467,7 +471,7 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 					type="quiet"
 					color="red"
 					:disabled="isBusy"
-					class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+					interaction="filled"
 					@click="deleteFlow?.promptDelete([...selectedItems], $event)"
 				>
 					<TrashIcon />

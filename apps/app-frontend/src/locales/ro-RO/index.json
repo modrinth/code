@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Ignoră"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "Instanța nouă"
-  },
   "app.action-bar.install.retry": {
     "message": "Reîncearcă"
   },
@@ -679,9 +676,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instanță"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "proiect"
   },
   "app.instance.mods.freeze-content": {
     "message": "Îngheață versiunea"

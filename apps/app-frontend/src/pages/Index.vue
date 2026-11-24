@@ -10,7 +10,7 @@ import {
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
-import { computed, inject, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 
 import LibrarySection from '@/components/ui/library/index.vue'
@@ -18,11 +18,12 @@ import { libraryScrollTop } from '@/components/ui/library/view-state'
 import WelcomeScreen from '@/components/ui/WelcomeScreen.vue'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { injectInstanceCreation } from '@/features/instances/instance-creation-context'
+import { instanceListQueryOptions } from '@/features/instances/queries'
 import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import { prefetchSharedInstanceLibrary } from '@/features/library/shared-instances/queries'
 import { useUninstalledSharedInstances } from '@/features/library/shared-instances/use-uninstalled-shared-instances'
 import { traceStartupStep } from '@/helpers/startup-debug'
-import { instanceListQueryOptions } from '@/pages/instance/query-options'
 import { injectOnboardingChecklist } from '@/providers/onboarding-checklist'
 import { useRootBreadcrumb } from '@/shared/breadcrumbs'
 
@@ -33,7 +34,7 @@ defineOptions({
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 const { hasCreatedInstance, isReady } = injectOnboardingChecklist()
-const showCreationModal = inject<() => void>('showCreationModal')
+const instanceCreation = injectInstanceCreation(null)
 const pageOptions = ref<InstanceType<typeof ContextMenu>>()
 const appSettings = useAppSettings()
 const { hiddenIds: hiddenInstanceIds } = useHiddenInstances()
@@ -115,7 +116,7 @@ function openPageContextMenu(event: MouseEvent) {
 			id: 'new_instance',
 			label: formatMessage(messages.newInstance),
 			icon: PlusIcon,
-			action: () => showCreationModal?.(),
+			action: () => instanceCreation?.showCreationModal(),
 		},
 	])
 }

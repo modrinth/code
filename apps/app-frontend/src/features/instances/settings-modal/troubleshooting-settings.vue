@@ -17,21 +17,20 @@ import {
 	SplitButton,
 	useVIntl,
 } from '@modrinth/ui'
+import { useMutation } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
-import {
-	exportDebugInfo,
-	isExportingDebugInfo,
-} from '@/components/ui/download-manager/debug-info-export'
+import { injectDebugInfoExports } from '@/features/debug-info/context'
 import { type ContentListFormat, getContentList } from '@/platform/app-lib/instances/commands'
 import { useCopyAsPaste } from '@/shared/composables/use-copy-as-paste'
 
-import { injectInstanceSettings } from '../instance-settings-context'
+import { injectInstanceSettings } from './instance-settings-context'
 
 const { formatMessage } = useVIntl()
 const copyAsPaste = useCopyAsPaste()
 const { addNotification, handleError } = injectNotificationManager()
 const { instance } = injectInstanceSettings()
+const debugInfoExports = injectDebugInfoExports()
 
 const messages = defineMessages({
 	contentListTitle: {
@@ -93,13 +92,13 @@ const messages = defineMessages({
 	},
 })
 
-const exportingContentList = ref(false)
 const copiedContentList = ref(false)
 
-async function copyContentListLink(format: ContentListFormat) {
-	exportingContentList.value = true
-	try {
-		const url = await copyAsPaste(await getContentList(instance.value.id, { format }))
+const { mutate: copyContentListLink, isPending: copyingContentList } = useMutation({
+	networkMode: 'always',
+	mutationFn: async (format: ContentListFormat) =>
+		copyAsPaste(await getContentList(instance.value.id, { format })),
+	onSuccess: (url) => {
 		addNotification(
 			url
 				? {
@@ -118,12 +117,9 @@ async function copyContentListLink(format: ContentListFormat) {
 		setTimeout(() => {
 			copiedContentList.value = false
 		}, 1500)
-	} catch (error) {
-		handleError(error as Error)
-	} finally {
-		exportingContentList.value = false
-	}
-}
+	},
+	onError: (error) => handleError(error),
+})
 
 const formatOptions = computed<ButtonMenuOption[]>(() => [
 	{
@@ -152,14 +148,16 @@ const formatOptions = computed<ButtonMenuOption[]>(() => [
 	},
 ])
 
-const exportingDebugInfo = computed(() => isExportingDebugInfo(instance.value.id))
+const exportingDebugInfo = computed(() => debugInfoExports.isExporting(instance.value.id))
 
 async function handleExportDebugInfo() {
-	await exportDebugInfo(formatMessage(messages.exportDebugInfo), {
-		id: instance.value.id,
-		name: instance.value.name,
-		iconPath: instance.value.icon_path ?? null,
-	}).catch(handleError)
+	await debugInfoExports
+		.exportDebugInfo(formatMessage(messages.exportDebugInfo), {
+			id: instance.value.id,
+			name: instance.value.name,
+			iconPath: instance.value.icon_path ?? null,
+		})
+		.catch(handleError)
 }
 </script>
 
@@ -173,11 +171,11 @@ async function handleExportDebugInfo() {
 				class="w-fit"
 				:options="formatOptions"
 				:menu-label="formatMessage(messages.moreCopyOptions)"
-				:disabled="exportingContentList"
+				:disabled="copyingContentList"
 				@click="copyContentListLink('detailed')"
 			>
 				<LoaderCircleIcon
-					v-if="exportingContentList"
+					v-if="copyingContentList"
 					class="motion-safe:animate-spin"
 					aria-hidden="true"
 				/>

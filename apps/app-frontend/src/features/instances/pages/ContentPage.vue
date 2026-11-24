@@ -29,7 +29,7 @@
 				<ConfirmDisableModal
 					ref="managedDisableConfirmModal"
 					:count="pendingManagedDisableItems.length"
-					:item-type="formatMessage(messages.contentTypeProject)"
+					item-type="project"
 					:warning="policy.disableWarning(pendingManagedDisableItems)"
 					:action-disabled="isInstanceBusy"
 					@disable="confirmManagedDisable"
@@ -48,27 +48,16 @@
 import {
 	ConfirmDisableModal,
 	ContentPageLayout,
-	defineMessages,
 	ManagedContentModal,
 	provideContentManager,
 	ReadyTransition,
 	UnknownFileWarningModal,
-	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
 
 import ExportModal from '@/components/ui/ExportModal.vue'
 import SyncedContentModal from '@/components/ui/instance/SyncedContentModal.vue'
 import { useInstanceContentManager } from '@/features/instances/content/use-instance-content-manager'
-
-const messages = defineMessages({
-	contentTypeProject: {
-		id: 'app.instance.mods.content-type-project',
-		defaultMessage: 'project',
-	},
-})
-
-const { formatMessage } = useVIntl()
 
 const {
 	context,

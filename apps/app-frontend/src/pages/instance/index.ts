@@ -1,4 +1,5 @@
-import Content from './content/index.vue'
+import Content from '@/features/instances/pages/ContentPage.vue'
+
 import Files from './files/index.vue'
 import Index from './layout.vue'
 import Logs from './logs/index.vue'

@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "ปิด"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "เปิด Instance"
-  },
   "app.action-bar.install.retry": {
     "message": "ลองอีกครั้ง"
   },
@@ -538,9 +535,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "โปรแกรม"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "โปรเจกต์"
   },
   "app.instance.mods.locked-content": {
     "message": "ไม่สามารถเปลี่ยนแปลงเนื้อหาในชุดเซิร์ฟเวอร์ที่ถูกล็อกได้"

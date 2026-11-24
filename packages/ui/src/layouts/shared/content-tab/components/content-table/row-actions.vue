@@ -118,7 +118,7 @@ const deleteLabel = computed(() =>
 				color="green"
 				:label="actionLabel(formatMessage(commonMessages.updateButton))"
 				:disabled="disabled"
-				class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+				interaction="filled"
 				@click="emit('update')"
 				@mouseenter="emit('prefetch')"
 				@focus="emit('prefetch')"

@@ -17,6 +17,7 @@ import {
 	QUICK_INSTANCE_LIMIT_MAX,
 	useQuickInstanceLimit,
 } from '@/composables/use-quick-instance-limit.ts'
+import { screenshotKeys } from '@/features/instances/queries.ts'
 import { injectAppSettingsModal } from '@/features/settings/app-settings-modal/context'
 import { type GlobalSyncedOptions, set_global_synced_option } from '@/helpers/instance.ts'
 import {
@@ -27,7 +28,6 @@ import {
 	set,
 } from '@/helpers/settings.ts'
 import { globalSyncedOptionsQueryOptions, syncedOptionsKeys } from '@/helpers/synced-options'
-import { screenshotKeys } from '@/pages/instance/query-options.ts'
 
 const appSettings = useAppSettings()
 const { formatMessage } = useVIntl()

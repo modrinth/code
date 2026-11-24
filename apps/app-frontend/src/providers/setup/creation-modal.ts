@@ -4,13 +4,14 @@ import type {
 	CreationFlowContextValue,
 	CreationFlowModal,
 } from '@modrinth/ui'
-import { provide, ref, useTemplateRef } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 import { useRouter } from 'vue-router'
 
 import type UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import type ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { provideInstanceCreation } from '@/features/instances/instance-creation-context'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_search_results } from '@/helpers/cache.js'
 import { import_instance } from '@/helpers/import.js'
@@ -50,12 +51,14 @@ export function setupCreationModal(
 		return instances?.map((i) => i.name) ?? []
 	}
 
-	provide('showCreationModal', () => {
-		installationModal.value?.show()
-	})
-	provide('showImportModal', async () => {
-		await installationModal.value?.show()
-		installationModal.value?.ctx.setImportMode()
+	provideInstanceCreation({
+		showCreationModal: () => {
+			installationModal.value?.show()
+		},
+		showImportModal: async () => {
+			await installationModal.value?.show()
+			installationModal.value?.ctx.setImportMode()
+		},
 	})
 
 	async function navigateToCreatedInstance(

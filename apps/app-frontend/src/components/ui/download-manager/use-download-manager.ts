@@ -9,6 +9,7 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, onMounted, onScopeDispose, ref, watch } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings'
+import { type DebugInfoExportTask, injectDebugInfoExports } from '@/features/debug-info/context'
 import { toError } from '@/helpers/errors'
 import {
 	install_job_cancel,
@@ -31,7 +32,6 @@ import { openExternalUrl } from '@/platform/external-links'
 import { injectAppEvents } from '@/providers/app-events'
 import { useCopyAsPaste } from '@/shared/composables/use-copy-as-paste'
 
-import { debugInfoExports, type DebugInfoExportTask } from './debug-info-export'
 import { createDownloadTransferTracker } from './download-transfer'
 import {
 	externalFileDownloads,
@@ -116,6 +116,7 @@ function getIconUrl(icon: string | null | undefined): string | null {
 export function useDownloadManager() {
 	const events = injectAppEvents()
 	const { handleError } = injectNotificationManager()
+	const { tasks: debugInfoExports } = injectDebugInfoExports()
 	const appSettings = useAppSettings()
 	const copyAsPaste = useCopyAsPaste()
 	const display = useInstallJobDisplay()

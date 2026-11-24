@@ -88,6 +88,10 @@ const messages = defineMessages({
 		defaultMessage:
 			'Some synced copies are waiting for changes. An instance may be running, have a frozen or incompatible version, or already contain its own copy.',
 	},
+	installingProgress: {
+		id: 'content.card.installing-progress',
+		defaultMessage: 'Installing... ({progress, number}%)',
+	},
 })
 
 const compactVersionNumberRef = ref<HTMLElement | null>(null)
@@ -121,7 +125,9 @@ const clientWarningMessage = computed(() => {
 const installTooltip = computed(() => {
 	if (!props.installing) return undefined
 	if (props.installProgress == null) return formatMessage(commonMessages.installingLabel)
-	return `${formatMessage(commonMessages.installingLabel)} (${Math.round(props.installProgress)}%)`
+	return formatMessage(messages.installingProgress, {
+		progress: Math.round(props.installProgress),
+	})
 })
 
 function linkTarget(link: unknown) {

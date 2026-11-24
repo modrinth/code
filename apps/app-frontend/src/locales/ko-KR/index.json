@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "무시"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "인스턴스 열기"
-  },
   "app.action-bar.install.retry": {
     "message": "재시도"
   },
@@ -739,9 +736,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "인스턴스"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "프로젝트"
   },
   "app.instance.mods.freeze-content": {
     "message": "버전 고정"

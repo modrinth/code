@@ -3,9 +3,9 @@ import { defineMessages, injectNotificationManager, Toggle, useVIntl } from '@mo
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
+import { instanceKeys } from '@/features/instances/queries'
 import { edit, get_global_synced_options } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
-import { instanceKeys } from '@/pages/instance/query-options'
 
 import { injectInstanceSettings } from './instance-settings-context'
 

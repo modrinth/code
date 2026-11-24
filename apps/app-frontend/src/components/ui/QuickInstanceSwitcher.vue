@@ -23,12 +23,12 @@ import {
 	QUICK_INSTANCE_LIMIT_MAX,
 	useQuickInstanceLimit,
 } from '@/composables/use-quick-instance-limit.ts'
+import { instanceListQueryOptions } from '@/features/instances/queries'
 import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import { trackEvent } from '@/helpers/analytics'
 import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
 import { showInstanceInFolder } from '@/helpers/utils'
-import { instanceListQueryOptions } from '@/pages/instance/query-options'
 
 const ITEM_SIZE = 52
 const SYNC_DEBOUNCE_MS = 1000

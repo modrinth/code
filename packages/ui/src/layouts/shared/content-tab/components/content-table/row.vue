@@ -7,8 +7,8 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { truncatedTooltip } from '#ui/utils/truncate'
 
 import type { ContentCardTableItem, ContentSide } from '../../types'
-import ContentItemSummary from '../content-item-summary.vue'
 import ContentEnabledFor from '../ContentEnabledFor.vue'
+import ContentItemSummary from '../ContentItemSummary.vue'
 import RowActions from './row-actions.vue'
 import type { ContentTableAction, ContentTableLayout } from './types'
 

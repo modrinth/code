@@ -5,20 +5,20 @@ import { useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
+import PageHeaderBackButton from '#ui/components/base/page-header/back-button.vue'
 import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
-import PageHeaderBackButton from '#ui/components/base/page-header/page-header-back-button.vue'
 import TagIcon from '#ui/components/base/TagIcon.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
-import ServerHeaderMetadataItems from '#ui/components/servers/server-header/server-header-metadata-items.vue'
+import ServerHeaderMetadataItems from '#ui/components/servers/server-header/ServerHeaderMetadataItems.vue'
 import { formatServerUptime, useServerUptime } from '#ui/composables/server-uptime'
 import { useServerIcon } from '#ui/composables/use-server-icon'
 import { injectModrinthClient } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import type { BrowseSelection, BrowseTarget } from '../types'
-import SelectedProjectsLeaveModal from './selection/leave-modal.vue'
+import SelectedProjectsLeaveModal from './SelectedProjectsLeaveModal.vue'
 
 const MEDAL_ICON_URL = 'https://cdn.modrinth.com/medal_icon.webp'
 

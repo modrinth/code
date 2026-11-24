@@ -18,14 +18,11 @@ import {
 } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
-import {
-	exportDebugInfo,
-	exportingDebugInfo,
-} from '@/components/ui/download-manager/debug-info-export'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { injectDebugInfoExports } from '@/features/debug-info/context'
 import { get_ads_debug_state } from '@/helpers/ads.js'
 import { purge_cache_types } from '@/helpers/cache.js'
 import { appSettingsKeys, get, set } from '@/helpers/settings.ts'
@@ -36,6 +33,8 @@ const { addNotification, handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const { adConsentAvailable } = injectPageContext()
 const appSettings = useAppSettings()
+const debugInfoExports = injectDebugInfoExports()
+const exportingDebugInfo = computed(() => debugInfoExports.isExporting())
 const copyAsPaste = useCopyAsPaste()
 const queryClient = useQueryClient()
 const clearCacheConfirmModal = ref<InstanceType<typeof ConfirmModalWrapper> | null>(null)
@@ -182,7 +181,7 @@ async function openDbBackupsFolder() {
 }
 
 async function handleExportDebugInfo() {
-	await exportDebugInfo(formatMessage(messages.exportDebugInfo)).catch(handleError)
+	await debugInfoExports.exportDebugInfo(formatMessage(messages.exportDebugInfo)).catch(handleError)
 }
 
 function openSupport() {

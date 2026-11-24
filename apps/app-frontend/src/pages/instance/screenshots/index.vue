@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import ScreenshotsPage from '@/components/ui/screenshots-page/index.vue'
-
-import { injectInstancePage } from '../instance-context'
+import { injectInstancePage } from '@/features/instances/instance-context'
 
 const instancePage = injectInstancePage()
 </script>

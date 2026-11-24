@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
+import { instanceListQueryOptions } from '@/features/instances/queries'
 import type { LibraryInstance } from '@/features/library/library-instance'
 import { useUninstalledSharedInstances } from '@/features/library/shared-instances/use-uninstalled-shared-instances'
-import { instanceListQueryOptions } from '@/pages/instance/query-options'
 
 import { useHiddenInstances } from './use-hidden-instances'
 

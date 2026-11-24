@@ -3,12 +3,12 @@ import { injectNotificationManager } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import type { Ref } from 'vue'
 
+import { instanceKeys } from '@/features/instances/queries'
 import { trackEvent } from '@/helpers/analytics'
 import { remove_project, set_project_locked, toggle_disable_project } from '@/helpers/instance'
 import type { InstanceContentData } from '@/helpers/instance-content'
 import { set_synced_pack_enabled, syncedPackKeys } from '@/helpers/synced-packs'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
-import { instanceKeys } from '@/pages/instance/query-options'
 
 import { analyticsProjectType, fileNameFromPath, matchesContentItem } from './content-items'
 import type { ContentOperation, ContentOperations } from './use-content-operations'

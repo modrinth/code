@@ -2,7 +2,7 @@ import { type Archon, GenericModrinthClient } from '@modrinth/api-client'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import PageHeaderMetadata from '../../components/base/page-header/metadata/index.vue'
-import ServerHeaderMetadataItems from '../../components/servers/server-header/server-header-metadata-items.vue'
+import ServerHeaderMetadataItems from '../../components/servers/server-header/ServerHeaderMetadataItems.vue'
 import { provideModrinthClient } from '../../providers'
 
 function createMockClient(serverId: string) {

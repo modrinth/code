@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { injectInstancePage } from '@/features/instances/instance-context'
 import { showWorldInFolder } from '@/features/worlds/actions'
 import { gameVersionsQueryOptions } from '@/features/worlds/queries'
 import {
@@ -21,7 +22,6 @@ import {
 	hasWorldQuickPlaySupport,
 } from '@/features/worlds/world-utils'
 import WorldItem from '@/features/worlds/WorldItem.vue'
-import { injectInstancePage } from '@/pages/instance/instance-context'
 import type { ServerWorld, World } from '@/platform/app-lib/worlds/types'
 
 import AddServerModal from './components/AddServerModal.vue'

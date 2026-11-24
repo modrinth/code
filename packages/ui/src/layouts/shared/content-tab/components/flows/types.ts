@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
 
 import type { BulkOperationState } from '../../composables/bulk-operations'
-import type { ContentItem } from '../../types'
+import type { ContentItem, ContentType } from '../../types'
 
 export interface ContentFlowState {
 	selectedItems: Readonly<Ref<ContentItem[]>>
@@ -11,5 +11,5 @@ export interface ContentFlowState {
 	markChanging: (id: string) => void
 	unmarkChanging: (id: string) => void
 	retain: (id: string) => void
-	itemType: Readonly<Ref<string>>
+	itemType: Readonly<Ref<ContentType>>
 }

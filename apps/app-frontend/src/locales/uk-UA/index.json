@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Відхилити"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "Відкрити примірник"
-  },
   "app.action-bar.install.retry": {
     "message": "Повторити"
   },
@@ -730,9 +727,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Примірник"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "проєкт"
   },
   "app.instance.mods.freeze-content": {
     "message": "Заморозити версію"

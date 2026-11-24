@@ -8,19 +8,17 @@ import {
 	ContextMenu,
 	CreationFlowModal,
 	defineMessages,
-	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
 import { ref } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import InstanceMetadataItems from '@/features/instances/instance-metadata-items.vue'
+import InstanceMetadataItems from '@/features/instances/InstanceMetadataItems.vue'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 
-import StickyBrowseHeader from './sticky-browse-header.vue'
-import { loadBrowseTags, useAppBrowseManager } from './use-app-browse-manager'
-import { useAppBrowseTargets } from './use-app-browse-targets'
+import StickyBrowseHeader from '../StickyBrowseHeader.vue'
+import { useAppBrowseManager, useBrowseTags } from '../use-app-browse-manager'
+import { useAppBrowseTargets } from '../use-app-browse-targets'
 
 const messages = defineMessages({
 	projectActionsLabel: {
@@ -30,19 +28,18 @@ const messages = defineMessages({
 })
 
 const { formatMessage } = useVIntl()
-const { handleError } = injectNotificationManager()
 const appSettings = useAppSettings()
-const queryClient = useQueryClient()
 
 const setupModal = ref<ServerSetupModalHandle | null>(null)
+const browseTags = useBrowseTags()
 const targets = useAppBrowseTargets({ setupModal })
 const { active, server, target } = targets
 const { instance } = targets.instanceTarget
 const { serverInstall } = server
 
-const [tags] = await Promise.all([loadBrowseTags(queryClient, handleError), targets.ready()])
+await Promise.all([browseTags.ready(), targets.ready()])
 
-const { contextMenuRef } = useAppBrowseManager({ tags, targets })
+const { contextMenuRef } = useAppBrowseManager({ tags: browseTags.tags, targets })
 </script>
 
 <template>

@@ -2,10 +2,10 @@ import { injectNotificationManager } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import type { ComputedRef } from 'vue'
 
+import { instanceKeys } from '@/features/instances/queries'
 import { worldKeys } from '@/features/worlds/queries'
 import { sortWorlds } from '@/features/worlds/world-utils'
 import { set_synced_option } from '@/helpers/instance'
-import { instanceKeys } from '@/pages/instance/query-options'
 import {
 	addServerToInstance,
 	deleteWorld,

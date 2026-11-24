@@ -23,7 +23,7 @@ import {
 	useBrowseViewState,
 	useVIntl,
 } from '@modrinth/ui'
-import { type QueryClient, useQueryClient } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useEventListener } from '@vueuse/core'
 import type { Ref } from 'vue'
 import { computed, ref, watch } from 'vue'
@@ -35,7 +35,7 @@ import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 
-import { browseTagsQueryOptions } from './query-options'
+import { browseTagsQueryOptions, settleQuery } from './queries'
 import type { AppBrowseTargets } from './use-app-browse-targets'
 import { useAppServerBrowse } from './use-app-server-browse'
 
@@ -124,16 +124,24 @@ const messages = defineMessages({
 	serversProjectType: { id: 'app.browse.project-type.servers', defaultMessage: 'Servers' },
 })
 
-export async function loadBrowseTags(
-	queryClient: QueryClient,
-	handleError: (error: unknown) => void,
-) {
-	const tags = await queryClient.ensureQueryData(browseTagsQueryOptions()).catch(handleError)
-	return ref<BrowseTags>({
-		categories: tags?.categories ?? [],
-		loaders: tags?.loaders ?? [],
-		gameVersions: tags?.gameVersions ?? [],
+export function useBrowseTags() {
+	const { handleError } = injectNotificationManager()
+	const tagsQuery = useQuery(browseTagsQueryOptions())
+
+	watch(tagsQuery.error, (error) => {
+		if (error) handleError(error)
 	})
+
+	const tags = computed<BrowseTags>(() => ({
+		categories: tagsQuery.data.value?.categories ?? [],
+		loaders: tagsQuery.data.value?.loaders ?? [],
+		gameVersions: tagsQuery.data.value?.gameVersions ?? [],
+	}))
+
+	return {
+		tags,
+		ready: () => settleQuery(tagsQuery),
+	}
 }
 
 async function getInstallProjectVersions(projectId: string) {

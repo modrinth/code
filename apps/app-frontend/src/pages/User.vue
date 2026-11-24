@@ -96,6 +96,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
+import { useServerInstallContent } from '@/features/browse/server-install-content'
 import { injectSettingsActions } from '@/features/settings/settings-actions'
 import { get_project, get_version_many } from '@/helpers/cache.js'
 import {
@@ -110,7 +111,6 @@ import {
 	patch_user,
 	unblock_user,
 } from '@/helpers/users'
-import { useServerInstallContent } from '@/platform/adapters/browse/server-install-content'
 import { injectContentInstall } from '@/providers/content-install'
 import { useBreadcrumb } from '@/shared/breadcrumbs'
 

@@ -11,8 +11,8 @@ import { commonMessages } from '#ui/utils/common-messages'
 import type { ContentSortField, ContentSortMode } from '../composables/content-sort'
 import type { ContentMetadataFilterValue } from '../composables/use-content-metadata-filters'
 import type { ContentType } from '../types'
-import SortMenu from './sort-menu.vue'
-import TypeTabs from './type-tabs.vue'
+import ContentSortMenu from './ContentSortMenu.vue'
+import ContentTypeTabs from './ContentTypeTabs.vue'
 
 const props = defineProps<{
 	searchPlaceholder: string
@@ -86,7 +86,7 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 <template>
 	<div class="flex flex-col gap-4">
 		<div class="flex items-center justify-between gap-2">
-			<TypeTabs v-if="types.length > 1" v-model="type" :types="types" />
+			<ContentTypeTabs v-if="types.length > 1" v-model="type" :types="types" />
 			<SplitButton
 				v-tooltip="addTooltip"
 				type="colored"
@@ -110,7 +110,7 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 			:filter-categories="filterCategories"
 		>
 			<template #controls>
-				<SortMenu v-model="sort" :fields="sortFields" />
+				<ContentSortMenu v-model="sort" :fields="sortFields" />
 			</template>
 			<template #actions>
 				<Transition name="update-all">
@@ -122,7 +122,7 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 							size="lg"
 							:label="updateAllLabel"
 							:disabled="updateAllDisabled"
-							class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
+							interaction="filled"
 							@click="emit('updateAll')"
 							@mouseenter="emit('prefetchUpdateAll')"
 							@focus="emit('prefetchUpdateAll')"

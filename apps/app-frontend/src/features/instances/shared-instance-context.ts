@@ -17,7 +17,7 @@ import {
 	instanceKeys,
 	sharedInstanceLockQueryOptions,
 	sharedInstanceUpdatePreviewQueryOptions,
-} from './query-options'
+} from './queries'
 
 export type SharedInstanceManager =
 	| {

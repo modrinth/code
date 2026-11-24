@@ -28,25 +28,25 @@ import {
 	normalizeProjectType,
 } from '#ui/utils/common-messages'
 
-import { getClientWarningType } from '../../composables/content-filtering'
-import { type ContentSortMode, useContentSort } from '../../composables/content-sort'
+import { getClientWarningType } from '../composables/content-filtering'
+import { type ContentSortMode, useContentSort } from '../composables/content-sort'
 import {
 	type ContentMetadataFilterValue,
 	useContentMetadataFilters,
-} from '../../composables/use-content-metadata-filters'
-import { contentTypeOf, contentTypeOrder } from '../../composables/use-content-view-state'
+} from '../composables/use-content-metadata-filters'
+import { contentTypeOf, contentTypeOrder } from '../composables/use-content-view-state'
 import type {
 	ContentCardProject,
 	ContentCardTableItem,
 	ContentItem,
 	ContentSide,
 	ContentType,
-} from '../../types'
-import ContentTable from '../content-table/index.vue'
-import type { ContentTableColumns } from '../content-table/types'
-import ContentSelectionBar from '../ContentSelectionBar.vue'
-import SortMenu from '../sort-menu.vue'
-import TypeTabs from '../type-tabs.vue'
+} from '../types'
+import ContentTable from './content-table/index.vue'
+import type { ContentTableColumns } from './content-table/types'
+import ContentSelectionBar from './ContentSelectionBar.vue'
+import ContentSortMenu from './ContentSortMenu.vue'
+import ContentTypeTabs from './ContentTypeTabs.vue'
 
 const { formatMessage } = useVIntl()
 const pageContext = injectPageContext(null)
@@ -581,7 +581,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 								{{ formatMessage(commonMessages.allProjectType) }}
 							</template>
 						</FilterPills>
-						<TypeTabs
+						<ContentTypeTabs
 							v-else-if="types.length > 1"
 							v-model="activeType"
 							:types="types"
@@ -589,7 +589,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 						/>
 					</template>
 					<template #controls>
-						<SortMenu v-model="sortMode" :fields="sortFields" />
+						<ContentSortMenu v-model="sortMode" :fields="sortFields" />
 					</template>
 				</ListToolbar>
 			</div>

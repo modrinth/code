@@ -2,12 +2,12 @@ import type { AbstractModrinthClient, Labrinth } from '@modrinth/api-client'
 import { serverKeys } from '@modrinth/ui'
 import { queryOptions, type UseQueryReturnType } from '@tanstack/vue-query'
 
+import { instanceKeys } from '@/features/instances/queries'
 import {
 	get_installed_project_ids as getInstalledProjectIds,
 	list as listInstances,
 } from '@/helpers/instance'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { instanceKeys } from '@/pages/instance/query-options'
 import { getInstanceWorlds } from '@/platform/app-lib/worlds/commands'
 
 export function browseTagsQueryOptions() {
@@ -23,6 +23,7 @@ export function browseTagsQueryOptions() {
 			return { categories, loaders, gameVersions }
 		},
 		staleTime: Infinity,
+		retry: false,
 	})
 }
 

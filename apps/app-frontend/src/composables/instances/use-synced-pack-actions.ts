@@ -10,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { type Ref, watch } from 'vue'
 
 import type SyncedContentModal from '@/components/ui/instance/SyncedContentModal.vue'
+import { instanceKeys } from '@/features/instances/queries'
 import { set_synced_option } from '@/helpers/instance'
 import { globalSyncedOptionsQueryOptions } from '@/helpers/synced-options'
 import {
@@ -21,7 +22,6 @@ import {
 	syncedPackKeys,
 } from '@/helpers/synced-packs'
 import type { GameInstance } from '@/helpers/types'
-import { instanceKeys } from '@/pages/instance/query-options'
 
 export function useSyncedPackActions(
 	instance: Ref<GameInstance>,

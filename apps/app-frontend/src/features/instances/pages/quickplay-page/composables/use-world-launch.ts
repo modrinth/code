@@ -1,9 +1,9 @@
 import { ref, shallowRef, watch } from 'vue'
 
 import { handleSevereError } from '@/composables/use-error.js'
+import { injectInstancePage } from '@/features/instances/instance-context'
 import { getWorldIdentifier } from '@/features/worlds/world-utils'
 import { trackEvent } from '@/helpers/analytics'
-import { injectInstancePage } from '@/pages/instance/instance-context'
 import { startJoinServer, startJoinSingleplayerWorld } from '@/platform/app-lib/worlds/commands'
 import type { ServerWorld, World } from '@/platform/app-lib/worlds/types'
 import { injectServerInstall } from '@/providers/server-install'

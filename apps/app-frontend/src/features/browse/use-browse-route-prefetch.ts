@@ -7,13 +7,13 @@ import { type RouteLocationNormalized, useRouter } from 'vue-router'
 import {
 	instanceDetailQueryOptions,
 	instanceLinkedProjectQueryOptions,
-} from '@/pages/instance/query-options'
+} from '@/features/instances/queries'
 
 import {
 	browseServerContentQueryOptions,
 	browseTagsQueryOptions,
 	installedProjectIdsQueryOptions,
-} from './query-options'
+} from './queries'
 import { readQueryString } from './server-install-content'
 
 export function useBrowseRoutePrefetch(client: AbstractModrinthClient) {

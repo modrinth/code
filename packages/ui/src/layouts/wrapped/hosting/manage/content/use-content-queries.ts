@@ -6,6 +6,7 @@ import {
 	addonToggleKey,
 	applyPendingAddonToggle,
 } from '#ui/composables/server-content-toggle-state'
+import { serverKeys } from '#ui/composables/server-queries'
 import type { ContentItem } from '#ui/layouts/shared/content-tab/types'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 
@@ -19,8 +20,10 @@ export function useContentQueries(serverId: string) {
 	const queryClient = useQueryClient()
 	const { worldId } = injectModrinthServerContext()
 
-	const queryKey = computed(() => ['content', 'list', 'v1', serverId])
-	const modpackContentQueryKey = computed(() => ['content', 'list', 'v1', serverId, 'modpack'])
+	const queryKey = computed(() => serverKeys.content(serverId))
+	const modpackContentQueryKey = computed(
+		() => [...serverKeys.content(serverId), 'modpack'] as const,
+	)
 
 	async function fetchAddons(fromModpack: boolean) {
 		const targetWorldId = worldId.value!
@@ -89,7 +92,7 @@ export function useContentQueries(serverId: string) {
 			.sort(),
 	)
 	const contentProjectsQuery = useQuery({
-		queryKey: computed(() => ['labrinth', 'projects', 'v2', contentProjectIds.value]),
+		queryKey: computed(() => ['labrinth', 'projects', 'v2', contentProjectIds.value] as const),
 		queryFn: async () => {
 			const ids = contentProjectIds.value
 			const batches = []

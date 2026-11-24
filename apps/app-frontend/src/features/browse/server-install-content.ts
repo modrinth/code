@@ -17,7 +17,7 @@ import { useRoute } from 'vue-router'
 import { config as appConfig } from '@/config'
 import { useBreadcrumbServerId } from '@/shared/breadcrumbs'
 
-import { browseServerContentQueryOptions, settleQuery } from './query-options'
+import { browseServerContentQueryOptions, settleQuery } from './queries'
 
 export function readQueryString(value: unknown): string | null {
 	if (Array.isArray(value)) return value[0] ?? null

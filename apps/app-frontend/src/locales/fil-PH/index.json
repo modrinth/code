@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Ibasura"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "Buksan ang instansiya"
-  },
   "app.action-bar.install.retry": {
     "message": "Subukan muli"
   },
@@ -307,9 +304,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instansiya"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "proyekto"
   },
   "app.instance.mods.project-was-added": {
     "message": "Ang \"{name}\" ay nadagdag"

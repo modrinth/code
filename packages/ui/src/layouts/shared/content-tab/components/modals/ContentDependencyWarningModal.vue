@@ -198,7 +198,7 @@ import { useScrollIndicator } from '#ui/composables/scroll-indicator'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import type { ContentCardTableItem } from '../../types'
-import ContentItemSummary from '../content-item-summary.vue'
+import ContentItemSummary from '../ContentItemSummary.vue'
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
 export interface ContentDependencyWarningDependent {
