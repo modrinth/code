@@ -3,57 +3,6 @@
 		<AiImageWarningModal ref="aiImageWarningModal" />
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<SettingsSection :title="formatMessage(messages.title)" class="mb-3" />
-		<Accordion
-			v-if="mounted"
-			class="mb-4 min-w-0 rounded-2xl border border-solid border-surface-4 bg-surface-3 px-4 pb-1"
-			button-class="m-0 flex w-full cursor-pointer items-center gap-2 border-0 bg-transparent px-0 pb-3 pt-4 text-left text-base font-semibold text-contrast"
-			content-class="pb-3 text-sm leading-relaxed text-primary"
-			:open-by-default="guidanceOpen"
-			@on-open="guidanceOpen = true"
-			@on-close="guidanceOpen = false"
-		>
-			<template #button="{ open }">
-				<InfoIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
-				<span class="min-w-0 flex-1 [overflow-wrap:anywhere]">
-					{{ formatMessage(messages.guidanceTitle) }}
-				</span>
-				<ChevronDownIcon
-					class="mr-1.5 size-5 shrink-0 text-secondary transition-transform duration-300 motion-reduce:transition-none"
-					:class="{ 'rotate-180': open }"
-					aria-hidden="true"
-				/>
-			</template>
-			<p class="m-0">
-				{{
-					formatMessage(isServerProject ? messages.serverGuidanceIntro : messages.guidanceIntro, {
-						contentType,
-					})
-				}}
-			</p>
-			<p class="mb-0 mt-3">{{ formatMessage(messages.guidelinesHeading) }}</p>
-			<ul class="my-3 list-none space-y-2 p-0" role="list">
-				<li v-for="guideline in guidelines" :key="guideline.id" class="flex items-start gap-2">
-					<CheckIcon class="mt-1 size-4 shrink-0 text-green" aria-hidden="true" />
-					<span>{{ formatMessage(guideline, { contentType }) }}</span>
-				</li>
-			</ul>
-			<p class="m-0">{{ formatMessage(messages.mistakesHeading) }}</p>
-			<ul class="my-3 list-none space-y-2 p-0" role="list">
-				<li v-for="mistake in mistakes" :key="mistake.id" class="flex items-start gap-2">
-					<XCircleIcon class="mt-1 size-4 shrink-0 text-red" aria-hidden="true" />
-					<span>{{ formatMessage(mistake, { contentType }) }}</span>
-				</li>
-			</ul>
-			<p class="m-0">
-				<IntlFormatted :message-id="messages.guidanceRules">
-					<template #rules="{ children }">
-						<NuxtLink class="font-semibold text-link" target="_blank" to="/legal/rules"
-							><component :is="() => children"
-						/></NuxtLink>
-					</template>
-				</IntlFormatted>
-			</p>
-		</Accordion>
 		<div
 			class="[&_.cm-editor]:text-sm"
 			data-project-field="description"
@@ -68,6 +17,58 @@
 				/>
 				<ValidationMessage :check="saveValidation.forField('description')" />
 			</div>
+
+			<Accordion
+				v-if="mounted"
+				class="mb-4 min-w-0 rounded-2xl border border-solid border-surface-4 bg-surface-3 px-4 pb-1"
+				button-class="m-0 flex w-full cursor-pointer items-center gap-2 border-0 bg-transparent px-0 pb-3 pt-4 text-left text-base font-semibold text-contrast"
+				content-class="pb-3 text-sm leading-relaxed text-primary"
+				:open-by-default="guidanceOpen"
+				@on-open="guidanceOpen = true"
+				@on-close="guidanceOpen = false"
+			>
+				<template #button="{ open }">
+					<InfoIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
+					<span class="min-w-0 flex-1 [overflow-wrap:anywhere]">
+						{{ formatMessage(messages.guidanceTitle) }}
+					</span>
+					<ChevronDownIcon
+						class="mr-1.5 size-5 shrink-0 text-secondary transition-transform duration-300 motion-reduce:transition-none"
+						:class="{ 'rotate-180': open }"
+						aria-hidden="true"
+					/>
+				</template>
+				<p class="m-0">
+					{{
+						formatMessage(isServerProject ? messages.serverGuidanceIntro : messages.guidanceIntro, {
+							contentType,
+						})
+					}}
+				</p>
+				<p class="mb-0 mt-3">{{ formatMessage(messages.guidelinesHeading) }}</p>
+				<ul class="my-3 list-none space-y-2 p-0" role="list">
+					<li v-for="guideline in guidelines" :key="guideline.id" class="flex items-start gap-2">
+						<CheckIcon class="mt-1 size-4 shrink-0 text-green" aria-hidden="true" />
+						<span>{{ formatMessage(guideline, { contentType }) }}</span>
+					</li>
+				</ul>
+				<p class="m-0">{{ formatMessage(messages.mistakesHeading) }}</p>
+				<ul class="my-3 list-none space-y-2 p-0" role="list">
+					<li v-for="mistake in mistakes" :key="mistake.id" class="flex items-start gap-2">
+						<XCircleIcon class="mt-1 size-4 shrink-0 text-red" aria-hidden="true" />
+						<span>{{ formatMessage(mistake, { contentType }) }}</span>
+					</li>
+				</ul>
+				<p class="m-0">
+					<IntlFormatted :message-id="messages.guidanceRules">
+						<template #rules="{ children }">
+							<NuxtLink class="font-semibold text-link" target="_blank" to="/legal/rules"
+								><component :is="() => children"
+							/></NuxtLink>
+						</template>
+					</IntlFormatted>
+				</p>
+			</Accordion>
 
 			<DescriptionMarkdownEditor
 				v-model="current.description"

@@ -112,11 +112,10 @@ onScopeDispose(() => clearTimeout(debounceTimer))
 const validations = computed(() => {
 	if (validationIsStale.value) return []
 
-	return Array.isArray(displayedCheck.value)
-		? displayedCheck.value
-		: displayedCheck.value
-			? [displayedCheck.value]
-			: []
+	const check = displayedCheck.value
+	if (!Array.isArray(check)) return check ? [check] : []
+
+	return check.toSorted((a, b) => Number(b.severity === 'error') - Number(a.severity === 'error'))
 })
 </script>
 
