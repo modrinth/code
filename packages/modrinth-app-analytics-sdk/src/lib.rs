@@ -31,8 +31,10 @@ pub const MAX_QUEUED_EVENTS: usize = 32 * MAX_EVENTS_PER_BATCH;
 
 /// Creates an event, timestamped now.
 ///
-/// `source` is where in the app the action was initiated from, such as
-/// `browse`.
+/// `source` is where in the app the action was initiated from, as a PascalCase
+/// identifier such as `BrowseTab`. [`AppAnalytics::add_event`] drops events
+/// whose source fails
+/// [`is_valid_source`](types::http::extract::is_valid_source).
 pub fn create_event(
     source: impl Into<SmolStr>,
     event: types::event::AppEventType,

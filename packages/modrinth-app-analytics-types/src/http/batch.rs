@@ -33,7 +33,9 @@ pub struct AppEvent {
     /// Event ID (UUIDv7)
     pub id: Uuid,
     pub timestamp: DateTime<Utc>,
-    /// Where in the app the action was initiated from, such as `browse`
+    /// Where in the app the action was initiated from, as a PascalCase
+    /// identifier such as `BrowseTab`. See
+    /// [`is_valid_source`](crate::http::extract::is_valid_source).
     pub source: SmolStr,
     pub event: AppEventType,
 }

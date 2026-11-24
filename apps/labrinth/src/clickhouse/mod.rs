@@ -221,9 +221,8 @@ pub async fn run_migrations_on_database(
         .execute()
         .await?;
 
-    // Deduplication is eventual and only covers retries received on the same
-    // UTC day, so queries should count `uniqExact(client_installation_id, event_id)`
-    // or use `LIMIT 1 BY client_installation_id, event_id`.
+    // Duplicate events are merged eventually, and only when their corrected
+    // timestamps fall on the same UTC day, so rows may still be duplicated.
     client
         .query(&format!(
             "
