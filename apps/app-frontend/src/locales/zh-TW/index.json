@@ -1031,23 +1031,8 @@
   "app.library.context-menu.create-instance": {
     "message": "新增實例"
   },
-  "app.library.filter.add": {
-    "message": "新增篩選條件"
-  },
-  "app.library.filter.clear": {
-    "message": "清除篩選條件"
-  },
   "app.library.filter.game-version": {
     "message": "遊戲版本"
-  },
-  "app.library.filter.install-state": {
-    "message": "安裝狀態"
-  },
-  "app.library.filter.install-state.installed": {
-    "message": "已安裝"
-  },
-  "app.library.filter.install-state.not-installed": {
-    "message": "未安裝"
   },
   "app.library.filter.instance-type": {
     "message": "實例類型"
@@ -1060,9 +1045,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "伺服器"
-  },
-  "app.library.filter.label": {
-    "message": "篩選依據"
   },
   "app.library.filter.loader": {
     "message": "載入器"
@@ -1304,9 +1286,6 @@
   "app.library.search.no-results.title": {
     "message": "沒有實例符合你的搜尋字詞。"
   },
-  "app.library.search.placeholder": {
-    "message": "搜尋"
-  },
   "app.library.selection.aria-label": {
     "message": "已選取實例"
   },
@@ -1333,9 +1312,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "遊玩時數"
-  },
-  "app.library.sort.label": {
-    "message": "排序依據"
   },
   "app.library.sort.last-played": {
     "message": "最後遊玩時間"

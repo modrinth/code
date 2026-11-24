@@ -12,10 +12,6 @@ export async function get_project_v3(id, cacheBehaviour) {
 	return await invoke('plugin:cache|get_project_v3', { id, cacheBehaviour })
 }
 
-export async function get_project_v3_many(ids, cacheBehaviour) {
-	return await invoke('plugin:cache|get_project_v3_many', { ids, cacheBehaviour })
-}
-
 export async function get_version(id, cacheBehaviour) {
 	return await invoke('plugin:cache|get_version', { id, cacheBehaviour })
 }

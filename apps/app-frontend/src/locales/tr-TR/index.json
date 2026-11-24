@@ -1016,23 +1016,8 @@
   "app.library.context-menu.create-instance": {
     "message": "Yeni kurulum"
   },
-  "app.library.filter.add": {
-    "message": "Filtre ekle"
-  },
-  "app.library.filter.clear": {
-    "message": "Filtreleri temizle"
-  },
   "app.library.filter.game-version": {
     "message": "Oyun sürümü"
-  },
-  "app.library.filter.install-state": {
-    "message": "Yükleme durumu"
-  },
-  "app.library.filter.install-state.installed": {
-    "message": "Yüklü"
-  },
-  "app.library.filter.install-state.not-installed": {
-    "message": "Yüklü değil"
   },
   "app.library.filter.instance-type": {
     "message": "Kurulum türü"
@@ -1045,9 +1030,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "Sunucu"
-  },
-  "app.library.filter.label": {
-    "message": "Filtrele"
   },
   "app.library.filter.loader": {
     "message": "Yükleyici"
@@ -1298,9 +1280,6 @@
   "app.library.search.no-results.title": {
     "message": "Aramanızla eşleşen kurulum yok."
   },
-  "app.library.search.placeholder": {
-    "message": "Ara"
-  },
   "app.library.selection.aria-label": {
     "message": "Seçilmiş kurulumlar"
   },
@@ -1330,9 +1309,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "Oynanan saat"
-  },
-  "app.library.sort.label": {
-    "message": "Sırala"
   },
   "app.library.sort.last-played": {
     "message": "En son oynanma"

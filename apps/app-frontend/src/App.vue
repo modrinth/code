@@ -112,9 +112,9 @@ import {
 	instanceListQueryOptions,
 	screenshotKeys,
 } from '@/features/instances/queries'
+import SharedInstanceLockNotice from '@/features/instances/SharedInstanceLockNotice.vue'
 import { maxMemoryQueryOptions } from '@/features/java/queries'
-import SharedInstanceLockNotice from '@/features/library/shared-instances/shared-instance-lock-notice.vue'
-import SharedInstanceModals from '@/features/library/shared-instances/shared-instance-modals.vue'
+import SharedInstanceModals from '@/features/library/shared-instances/SharedInstanceModals.vue'
 import { provideMinecraftAccounts } from '@/features/minecraft-accounts/context'
 import AppSettingsModal from '@/features/settings/app-settings-modal/index.vue'
 import { provideSettingsActions } from '@/features/settings/settings-actions'

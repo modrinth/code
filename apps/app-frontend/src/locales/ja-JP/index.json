@@ -1046,23 +1046,8 @@
   "app.library.context-menu.create-instance": {
     "message": "新しいインスタンス"
   },
-  "app.library.filter.add": {
-    "message": "フィルターを追加"
-  },
-  "app.library.filter.clear": {
-    "message": "フィルターを削除"
-  },
   "app.library.filter.game-version": {
     "message": "ゲームバージョン"
-  },
-  "app.library.filter.install-state": {
-    "message": "インストール状況"
-  },
-  "app.library.filter.install-state.installed": {
-    "message": "インストール済み"
-  },
-  "app.library.filter.install-state.not-installed": {
-    "message": "インストールされていません"
   },
   "app.library.filter.instance-type": {
     "message": "インスタンスの種類"
@@ -1075,9 +1060,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "サーバー"
-  },
-  "app.library.filter.label": {
-    "message": "フィルター条件"
   },
   "app.library.filter.loader": {
     "message": "ローダー"
@@ -1328,9 +1310,6 @@
   "app.library.search.no-results.title": {
     "message": "該当するインスタンスがありません。"
   },
-  "app.library.search.placeholder": {
-    "message": "検索"
-  },
   "app.library.selection.aria-label": {
     "message": "選択中のインスタンス"
   },
@@ -1360,9 +1339,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "プレイ時間"
-  },
-  "app.library.sort.label": {
-    "message": "並び替え"
   },
   "app.library.sort.last-played": {
     "message": "最終プレイ"

@@ -1094,6 +1094,15 @@
   "app.library.context-menu.create-instance": {
     "message": "New instance"
   },
+  "app.library.drag.already-in-group": {
+    "message": "Already in this group"
+  },
+  "app.library.drag.duplicate-into-group": {
+    "message": "{count, plural, one {Duplicate into group} other {Duplicate # instances to group}}"
+  },
+  "app.library.drag.duplicate-to-group": {
+    "message": "Duplicate to group"
+  },
   "app.library.empty.available.description": {
     "message": "Instances shared with you or by you that you haven't installed yet will appear here."
   },
@@ -1175,6 +1184,9 @@
   "app.library.group.create.cancel": {
     "message": "Cancel"
   },
+  "app.library.group.default-name": {
+    "message": "Group {number}"
+  },
   "app.library.group.delete": {
     "message": "Delete group"
   },
@@ -1196,11 +1208,17 @@
   "app.library.group.instance.add": {
     "message": "Add"
   },
+  "app.library.group.instance.add-with-name": {
+    "message": "Add {name}"
+  },
   "app.library.group.instance.added": {
     "message": "Added"
   },
   "app.library.group.instances-modal.add": {
     "message": "Add"
+  },
+  "app.library.group.instances-modal.add-with-name": {
+    "message": "Add {name}"
   },
   "app.library.group.instances-modal.added": {
     "message": "Added"
@@ -1213,6 +1231,9 @@
   },
   "app.library.group.instances-modal.title": {
     "message": "Add instances to \"{groupName}\""
+  },
+  "app.library.group.instances-modal.title-ungrouped": {
+    "message": "Add instances to \"Ungrouped\""
   },
   "app.library.group.move-down": {
     "message": "Move group down"
@@ -1434,7 +1455,7 @@
     "message": "Unpublishing and leaving shared instances"
   },
   "app.library.unpublish-and-leave-shared-instances.modal.header": {
-    "message": "Unpublish and leave {count} shared instances"
+    "message": "{count, plural, one {Unpublish and leave # shared instance} other {Unpublish and leave # shared instances}}"
   },
   "app.library.unpublish-shared-instance.modal.admonition-body": {
     "message": "{count, plural, one {This deletes the shared instance from Modrinth's servers. People using it in the Modrinth App will stop receiving updates, and it will be removed from your library.} other {This deletes these shared instances from Modrinth's servers. People using them in the Modrinth App will stop receiving updates, and they will be removed from your library.}}"

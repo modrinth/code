@@ -77,7 +77,7 @@ import {
 	type ScreenshotKey,
 	set_screenshot_group_memberships,
 } from '@/helpers/instance'
-import { MAX_INSTANCE_GROUP_NAME_LENGTH } from '@/helpers/instance-groups'
+import { MAX_INSTANCE_GROUP_NAME_LENGTH } from '@/platform/app-lib/instance-groups/types'
 
 import ScreenshotDragGather from './drag-gather.vue'
 import ScreenshotDragPreview from './drag-preview.vue'

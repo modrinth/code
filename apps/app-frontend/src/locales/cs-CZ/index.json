@@ -1013,23 +1013,8 @@
   "app.library.context-menu.create-instance": {
     "message": "Nová instance"
   },
-  "app.library.filter.add": {
-    "message": "Přidat filtr"
-  },
-  "app.library.filter.clear": {
-    "message": "Vymazat filtry"
-  },
   "app.library.filter.game-version": {
     "message": "Verze hry"
-  },
-  "app.library.filter.install-state": {
-    "message": "Stav instalace"
-  },
-  "app.library.filter.install-state.installed": {
-    "message": "Nainstalováno"
-  },
-  "app.library.filter.install-state.not-installed": {
-    "message": "Nenainstalováno"
   },
   "app.library.filter.instance-type": {
     "message": "Typ instance"
@@ -1042,9 +1027,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "Server"
-  },
-  "app.library.filter.label": {
-    "message": "Filtrovat podle"
   },
   "app.library.filter.loader": {
     "message": "Loader"
@@ -1295,9 +1277,6 @@
   "app.library.search.no-results.title": {
     "message": "Žádné instance neodpovídají vašemu vyhledávání."
   },
-  "app.library.search.placeholder": {
-    "message": "Vyhledat"
-  },
   "app.library.selection.aria-label": {
     "message": "Vybrané instance"
   },
@@ -1327,9 +1306,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "Odehráno hodin"
-  },
-  "app.library.sort.label": {
-    "message": "Třídit podle"
   },
   "app.library.sort.last-played": {
     "message": "Naposledy hráno"

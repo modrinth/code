@@ -8,7 +8,7 @@ export default new createRouter({
 		{
 			path: '/',
 			name: 'Home',
-			component: () => import('@/pages/Index.vue'),
+			component: () => import('@/features/library/pages/library-page/index.vue'),
 			meta: {
 				manualScroll: true,
 			},

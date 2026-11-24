@@ -3,13 +3,11 @@ import { useQueries, useQuery } from '@tanstack/vue-query'
 import { computed, type MaybeRefOrGetter, toValue, watch } from 'vue'
 
 import type { GameInstance } from '@/helpers/types'
-import { getCachedSharedInstanceLibrary } from '@/platform/app-lib/shared-instances/commands'
 
 import {
-	fromCachedSummary,
+	sharedInstanceCachedLibraryQueryOptions,
 	sharedInstanceDetailQueryOptions,
 	sharedInstanceIdsQueryOptions,
-	sharedInstanceLibraryKeys,
 } from './queries'
 import type { UninstalledSharedInstance } from './types'
 
@@ -18,13 +16,12 @@ export function useUninstalledSharedInstances(instances: MaybeRefOrGetter<GameIn
 	const client = injectModrinthClient()
 	const userId = computed(() => auth.user.value?.id ?? null)
 
-	const cachedQuery = useQuery({
-		networkMode: 'always' as const,
-		queryKey: computed(() => sharedInstanceLibraryKeys.cached(userId.value)),
-		queryFn: async () => (await getCachedSharedInstanceLibrary()).map(fromCachedSummary),
-		enabled: computed(() => !!userId.value),
-		staleTime: Infinity,
-	})
+	const cachedQuery = useQuery(
+		computed(() => ({
+			...sharedInstanceCachedLibraryQueryOptions(userId.value),
+			enabled: !!userId.value,
+		})),
+	)
 
 	const idsQuery = useQuery(
 		computed(() => ({

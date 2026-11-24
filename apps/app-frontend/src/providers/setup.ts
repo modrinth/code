@@ -8,7 +8,7 @@ import {
 	provideManagedContentModalMemory,
 } from '@/features/instances/content/managed-content-modal-memory'
 import { setupInstanceActionsProvider } from '@/features/instances/instance-actions/context'
-import { setupSharedInstanceActionsProvider } from '@/features/library/shared-instances/actions-context'
+import { setupSharedInstanceActionsProvider } from '@/features/library/shared-instances/setup-shared-instance-actions'
 
 import type { AppEvents } from './app-events'
 import { setupOnboardingChecklistProvider } from './onboarding-checklist'

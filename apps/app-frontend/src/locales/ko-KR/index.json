@@ -1046,23 +1046,8 @@
   "app.library.context-menu.create-instance": {
     "message": "새 인스턴스"
   },
-  "app.library.filter.add": {
-    "message": "필터 추가"
-  },
-  "app.library.filter.clear": {
-    "message": "필터 초기화"
-  },
   "app.library.filter.game-version": {
     "message": "게임 버전"
-  },
-  "app.library.filter.install-state": {
-    "message": "설치 상태"
-  },
-  "app.library.filter.install-state.installed": {
-    "message": "설치됨"
-  },
-  "app.library.filter.install-state.not-installed": {
-    "message": "설치되지 않음"
   },
   "app.library.filter.instance-type": {
     "message": "인스턴스 유형"
@@ -1075,9 +1060,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "서버"
-  },
-  "app.library.filter.label": {
-    "message": "필터링 기준"
   },
   "app.library.filter.loader": {
     "message": "로더"
@@ -1328,9 +1310,6 @@
   "app.library.search.no-results.title": {
     "message": "검색과 일치하는 인스턴스가 없어요."
   },
-  "app.library.search.placeholder": {
-    "message": "검색"
-  },
   "app.library.selection.aria-label": {
     "message": "선택한 인스턴스"
   },
@@ -1360,9 +1339,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "플레이한 시간"
-  },
-  "app.library.sort.label": {
-    "message": "정렬 기준"
   },
   "app.library.sort.last-played": {
     "message": "마지막 플레이"

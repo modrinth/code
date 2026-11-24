@@ -6,7 +6,10 @@ import { hiddenInstanceIdsQueryOptions } from '@/features/library/hidden-instanc
 import { get_user, get_user_many } from '@/helpers/cache.js'
 import { install_get_shared_instance_preview } from '@/helpers/install'
 import type { InstanceLoader } from '@/helpers/types'
-import type { CachedSharedInstanceSummary } from '@/platform/app-lib/shared-instances/commands'
+import {
+	type CachedSharedInstanceSummary,
+	getCachedSharedInstanceLibrary,
+} from '@/platform/app-lib/shared-instances/commands'
 
 import type { UninstalledSharedInstance } from './types'
 
@@ -54,6 +57,13 @@ export const toCachedSummary = (
 	icon_url: instance.icon_path ?? null,
 	game_version: instance.game_version,
 	loader: instance.loader,
+})
+
+export const sharedInstanceCachedLibraryQueryOptions = (userId: string | null) => ({
+	networkMode: 'always' as const,
+	queryKey: sharedInstanceLibraryKeys.cached(userId),
+	queryFn: async () => (await getCachedSharedInstanceLibrary()).map(fromCachedSummary),
+	staleTime: Infinity,
 })
 
 export const sharedInstanceIdsQueryOptions = (client: ModrinthClient, userId: string) => ({
@@ -134,6 +144,7 @@ export async function prefetchSharedInstanceLibrary(
 	userId: string,
 ) {
 	void queryClient.prefetchQuery(hiddenInstanceIdsQueryOptions(userId))
+	void queryClient.prefetchQuery(sharedInstanceCachedLibraryQueryOptions(userId))
 	const sharedInstanceIds = await queryClient.ensureQueryData(
 		sharedInstanceIdsQueryOptions(client, userId),
 	)

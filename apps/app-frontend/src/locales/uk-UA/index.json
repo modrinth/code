@@ -1037,23 +1037,8 @@
   "app.library.context-menu.create-instance": {
     "message": "Новий примірник"
   },
-  "app.library.filter.add": {
-    "message": "Додати фільтр"
-  },
-  "app.library.filter.clear": {
-    "message": "Очистити фільтри"
-  },
   "app.library.filter.game-version": {
     "message": "Версія гри"
-  },
-  "app.library.filter.install-state": {
-    "message": "Статус установки"
-  },
-  "app.library.filter.install-state.installed": {
-    "message": "Установлено"
-  },
-  "app.library.filter.install-state.not-installed": {
-    "message": "Не встановлено"
   },
   "app.library.filter.instance-type": {
     "message": "Тип примірника"
@@ -1066,9 +1051,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "Сервер"
-  },
-  "app.library.filter.label": {
-    "message": "Упорядковувати за"
   },
   "app.library.filter.loader": {
     "message": "Завантажувач"
@@ -1319,9 +1301,6 @@
   "app.library.search.no-results.title": {
     "message": "За вашим запитом не знайдено жодного примірника."
   },
-  "app.library.search.placeholder": {
-    "message": "Пошук"
-  },
   "app.library.selection.aria-label": {
     "message": "Виділені примірники"
   },
@@ -1351,9 +1330,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "Годин зіграно"
-  },
-  "app.library.sort.label": {
-    "message": "Упорядкування"
   },
   "app.library.sort.last-played": {
     "message": "Востаннє зіграно"

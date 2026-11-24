@@ -944,12 +944,6 @@
   "app.library.context-menu.create-instance": {
     "message": "Bản cài đặt mới"
   },
-  "app.library.filter.add": {
-    "message": "Thêm bộ lọc"
-  },
-  "app.library.filter.clear": {
-    "message": "Xóa bộ lọc"
-  },
   "app.library.filter.game-version": {
     "message": "Phiên bản trò chơi"
   },
@@ -964,9 +958,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "Máy chủ"
-  },
-  "app.library.filter.label": {
-    "message": "Lọc theo"
   },
   "app.library.filter.loader": {
     "message": "Bộ nạp"
@@ -1154,9 +1145,6 @@
   "app.library.search.no-results.title": {
     "message": "Không có bản cài đặt nào khớp với tìm kiếm của bạn."
   },
-  "app.library.search.placeholder": {
-    "message": "Tìm kiếm"
-  },
   "app.library.selection.aria-label": {
     "message": "Các bản cài đặt đã chọn"
   },
@@ -1183,9 +1171,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "Số giờ đã chơi"
-  },
-  "app.library.sort.label": {
-    "message": "Sắp xếp theo"
   },
   "app.library.sort.last-played": {
     "message": "Lần chơi gần nhất"

@@ -1,0 +1,714 @@
+<script setup lang="ts">
+import { useDroppable } from '@dnd-kit/vue'
+import {
+	DropdownIcon,
+	EditIcon,
+	PlusIcon,
+	SquarePlusIcon,
+	TrashIcon,
+	XIcon,
+} from '@modrinth/assets'
+import {
+	Accordion,
+	Button,
+	commonMessages,
+	ContextMenu,
+	defineMessages,
+	IconButton,
+	injectNotificationManager,
+	InlineEditableText,
+	NewModal,
+	TagItem,
+	useDebugLogger,
+	useScrollViewport,
+	useVIntl,
+} from '@modrinth/ui'
+import { useElementSize, useWindowSize } from '@vueuse/core'
+import { computed, nextTick, onErrorCaptured, onMounted, onUnmounted, ref, watch } from 'vue'
+
+import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { injectInstanceCreation } from '@/features/instances/instance-creation-context'
+import { isUninstalledSharedInstance } from '@/features/library/library-instance'
+import {
+	FAVORITES_GROUP_ID,
+	MAX_INSTANCE_GROUP_NAME_LENGTH,
+} from '@/platform/app-lib/instance-groups/types'
+
+import {
+	injectInstanceGroupDrag,
+	injectLibraryActions,
+	injectLibraryGroups,
+	injectLibraryView,
+} from '../../library-context'
+import { type InstanceGroup as InstanceGroupType, UNGROUPED_GROUP_ID } from '../../types'
+import GroupActionButtons from './group-action-buttons.vue'
+import InstanceCard from './instance-card.vue'
+import UninstalledSharedInstanceCard from './uninstalled-shared-instance-card.vue'
+
+const INSTANCE_GRID_OBSERVER_ACTIVATION_DELAY = 500
+
+const props = withDefaults(
+	defineProps<{
+		animationsReady?: boolean
+		canDragReorder?: boolean
+		hideHeader?: boolean
+		instanceGroup: InstanceGroupType
+		selectionAnchorInstanceId?: string | null
+	}>(),
+	{
+		animationsReady: false,
+		canDragReorder: false,
+		hideHeader: false,
+		selectionAnchorInstanceId: null,
+	},
+)
+
+const { formatMessage } = useVIntl()
+const appSettings = useAppSettings()
+const compactMode = computed(() => appSettings.compactInstanceCards)
+const { addNotification } = injectNotificationManager()
+const { isSectionCollapsed, setSectionCollapsed, isSearching, displayState } = injectLibraryView()
+const {
+	deleteGroup,
+	renameGroup,
+	canMoveGroupUp,
+	canMoveGroupDown,
+	moveGroup,
+	groupIdPendingNameEdit,
+	completePendingGroupNameEdit,
+} = injectLibraryGroups()
+const { activeInstanceGroupDrag, instanceGroupDragTarget, getInstanceGroupDropState } =
+	injectInstanceGroupDrag()
+const { openGroupInstancesModal } = injectLibraryActions()
+const instanceCreation = injectInstanceCreation()
+
+const groupDropTarget = ref<HTMLElement>()
+const groupAccordion = ref<InstanceType<typeof Accordion>>()
+const groupOptions = ref<InstanceType<typeof ContextMenu>>()
+const groupNameInput = ref<InstanceType<typeof InlineEditableText>>()
+const confirmDeleteGroupModal = ref<InstanceType<typeof NewModal>>()
+const {
+	listContainer: instanceGridContent,
+	scrollTop,
+	containerOffset,
+	viewportHeight,
+	syncScrollState,
+} = useScrollViewport()
+const { width: gridWidth } = useElementSize(instanceGridContent)
+const { width: windowWidth } = useWindowSize()
+const focusedInstanceId = ref<string | null>(null)
+const enteringInstanceIds = ref(new Set<string>())
+const animateCardMoves = ref(false)
+let cardMoveTimer: ReturnType<typeof setTimeout> | undefined
+const groupDebug = useDebugLogger('LibraryGroup')
+onErrorCaptured((error, _instance, info) => {
+	groupDebug('error captured', {
+		group: props.instanceGroup.id,
+		info,
+		message: error instanceof Error ? error.message : String(error),
+		stack: error instanceof Error ? error.stack : undefined,
+	})
+})
+watch(
+	() => props.instanceGroup.instances.map((instance) => instance.id),
+	(ids, previousIds) => {
+		groupDebug('instance ids changed', {
+			group: props.instanceGroup.id,
+			count: ids.length,
+			previousCount: previousIds.length,
+		})
+		if (!props.animationsReady) return
+		if (ids.length === previousIds.length && ids.every((id, index) => id === previousIds[index]))
+			return
+		clearTimeout(cardMoveTimer)
+		animateCardMoves.value = true
+		cardMoveTimer = setTimeout(() => {
+			animateCardMoves.value = false
+		}, 250)
+		const previous = new Set(previousIds)
+		enteringInstanceIds.value = new Set(ids.filter((id) => !previous.has(id)))
+	},
+)
+watch(
+	gridWidth,
+	() => {
+		animateCardMoves.value = false
+		clearTimeout(cardMoveTimer)
+	},
+	{ flush: 'sync' },
+)
+const remSize = ref(16)
+const gap = computed(() => remSize.value * 0.75)
+const columnCount = computed(() => {
+	const minWidth = remSize.value * (compactMode.value ? 15 : windowWidth.value < 1280 ? 8 : 10)
+	return Math.max(1, Math.floor((gridWidth.value + gap.value) / (minWidth + gap.value)))
+})
+const cardWidth = computed(
+	() => (gridWidth.value - gap.value * (columnCount.value - 1)) / columnCount.value,
+)
+const cardHeight = computed(() =>
+	compactMode.value
+		? remSize.value * 3.875 + 2
+		: Math.max(0, cardWidth.value) + remSize.value * 3.375,
+)
+const gridHeight = computed(() =>
+	Math.max(
+		45,
+		Math.ceil(props.instanceGroup.instances.length / columnCount.value) *
+			(cardHeight.value + gap.value) -
+			gap.value,
+	),
+)
+const visibleInstances = computed(() => {
+	if (gridWidth.value <= 0) return []
+	if (!props.hideHeader && isSectionCollapsed(props.instanceGroup.id) && !isSearching.value)
+		return []
+	const top = scrollTop.value - containerOffset.value
+	const stride = cardHeight.value + gap.value
+	const first = Math.max(0, Math.floor((top - 300) / stride)) * columnCount.value
+	const end =
+		Math.max(0, Math.ceil((top + (viewportHeight.value || 800) + 300) / stride)) * columnCount.value
+	const dragging = activeInstanceGroupDrag.value
+	return props.instanceGroup.instances.flatMap((instance, index) => {
+		const inViewport = index >= first && index < end
+		const focused = focusedInstanceId.value === instance.id
+		const dragged =
+			dragging &&
+			(dragging.fromGroup ?? UNGROUPED_GROUP_ID) === props.instanceGroup.id &&
+			dragging.primaryInstanceId === instance.id
+		return inViewport || focused || dragged ? [{ instance, index }] : []
+	})
+})
+
+function instancePosition(index: number) {
+	return {
+		position: 'absolute' as const,
+		width: `${cardWidth.value}px`,
+		left: `${(index % columnCount.value) * (cardWidth.value + gap.value)}px`,
+		top: `${Math.floor(index / columnCount.value) * (cardHeight.value + gap.value)}px`,
+	}
+}
+
+const focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+async function handleCardTab(event: KeyboardEvent, index: number) {
+	if (event.key !== 'Tab' || event.defaultPrevented) return
+	const card = event.currentTarget as HTMLElement
+	const controls = [...card.querySelectorAll<HTMLElement>(focusableSelector)]
+	const boundary = event.shiftKey ? controls[0] : controls.at(-1)
+	if (event.target !== boundary) return
+	const nextIndex = index + (event.shiftKey ? -1 : 1)
+	const nextInstance = props.instanceGroup.instances[nextIndex]
+	if (!nextInstance) return
+	event.preventDefault()
+	focusedInstanceId.value = nextInstance.id
+	await nextTick()
+	const nextCard = instanceGridContent.value?.querySelector(`[data-instance-index="${nextIndex}"]`)
+	const nextControls = [...(nextCard?.querySelectorAll<HTMLElement>(focusableSelector) ?? [])]
+	const target = event.shiftKey ? nextControls.at(-1) : nextControls[0]
+	target?.focus()
+}
+
+function handleCardBlur(event: FocusEvent, instanceId: string) {
+	if ((event.currentTarget as HTMLElement).contains(event.relatedTarget as Node | null)) return
+	if (focusedInstanceId.value === instanceId) focusedInstanceId.value = null
+}
+
+const instanceGridHeight = ref<number>()
+const deletingGroup = ref(false)
+const groupName = ref(props.instanceGroup.key)
+const isUngrouped = computed(() => props.instanceGroup.id === UNGROUPED_GROUP_ID)
+const isFavorites = computed(() => props.instanceGroup.id === FAVORITES_GROUP_ID)
+const isCustomGroup = computed(
+	() => displayState.value.group === 'Group' && !isUngrouped.value && !isFavorites.value,
+)
+const isReorderableGroup = computed(
+	() => displayState.value.group === 'Group' && !isFavorites.value,
+)
+const groupContextMenuOpen = ref(false)
+const isGroupToggleBlocked = computed(
+	() => isSearching.value || groupContextMenuOpen.value || Boolean(groupNameInput.value?.isEditing),
+)
+let shouldSkipGroupToggle = false
+let groupToggleEventToSkip: MouseEvent | undefined
+let instanceGridResizeObserver: ResizeObserver | undefined
+let libraryResizeObserver: ResizeObserver | undefined
+let instanceGridObserverActivationTimeout: ReturnType<typeof setTimeout> | undefined
+
+const emit = defineEmits<{
+	(e: 'toggle-selection', instanceId: string, shiftKey: boolean): void
+}>()
+
+useDroppable({
+	id: computed(() => `instance-group:${props.instanceGroup.id}`),
+	element: groupDropTarget,
+	disabled: computed(() => displayState.value.group !== 'Group'),
+	data: computed(() => ({
+		groupId: props.instanceGroup.id,
+	})),
+})
+
+const messages = defineMessages({
+	ungrouped: {
+		id: 'app.library.group.ungrouped',
+		defaultMessage: 'Ungrouped',
+	},
+	favorites: {
+		id: 'app.library.group.favorites',
+		defaultMessage: 'Favorites',
+	},
+	collapseGroup: { id: 'app.library.group.collapse', defaultMessage: 'Collapse group' },
+	expandGroup: { id: 'app.library.group.expand', defaultMessage: 'Expand group' },
+	deleteGroup: {
+		id: 'app.library.group.delete',
+		defaultMessage: 'Delete group',
+	},
+	editGroupName: {
+		id: 'app.library.group.edit-name',
+		defaultMessage: 'Edit group name',
+	},
+	renameGroupFailed: {
+		id: 'app.library.group.rename-failed',
+		defaultMessage: 'Unable to rename group',
+	},
+	groupNameEmpty: {
+		id: 'app.library.group.name-empty',
+		defaultMessage: 'Group names cannot be empty.',
+	},
+	groupNameTooLong: {
+		id: 'app.library.group.name-too-long',
+		defaultMessage: 'Group names cannot be longer than {maxLength} characters.',
+	},
+	groupNameReserved: {
+		id: 'app.library.group.name-reserved',
+		defaultMessage: '"None" is reserved and cannot be used as a group name.',
+	},
+	deleteGroupDescription: {
+		id: 'app.library.group.delete-description',
+		defaultMessage: 'Instances in this group will be ungrouped.',
+	},
+	newInstance: {
+		id: 'app.library.context-menu.create-instance',
+		defaultMessage: 'New instance',
+	},
+	addToGroup: {
+		id: 'app.library.group.context-menu.add-to-group',
+		defaultMessage: 'Add to group',
+	},
+	emptyGroup: {
+		id: 'app.library.group.empty',
+		defaultMessage: 'Drag and drop to add instances.',
+	},
+	groupActionsLabel: {
+		id: 'app.library.group.actions.label',
+		defaultMessage: 'Group actions',
+	},
+})
+
+async function removeGroup() {
+	if (deletingGroup.value) return
+
+	deletingGroup.value = true
+	const deleted = await deleteGroup(props.instanceGroup.id)
+	deletingGroup.value = false
+
+	if (deleted) {
+		confirmDeleteGroupModal.value?.hide()
+	}
+}
+
+function requestGroupDeletion() {
+	if (isUngrouped.value || isFavorites.value) return
+
+	if (props.instanceGroup.instances.length > 0) {
+		confirmDeleteGroupModal.value?.show()
+	} else {
+		void removeGroup()
+	}
+}
+
+function openGroupContextMenu(event: MouseEvent) {
+	groupContextMenuOpen.value = true
+	groupOptions.value?.open(event, [
+		{
+			id: 'new_instance',
+			label: formatMessage(messages.newInstance),
+			icon: PlusIcon,
+			action: () => instanceCreation.showCreationModal(),
+		},
+		{
+			id: 'add_instances',
+			label: formatMessage(messages.addToGroup),
+			icon: SquarePlusIcon,
+			shown: isCustomGroup.value,
+			action: () => openGroupInstancesModal(props.instanceGroup.id),
+		},
+		{
+			id: 'edit_name',
+			label: formatMessage(messages.editGroupName),
+			icon: EditIcon,
+			shown: isCustomGroup.value,
+			action: () => void groupNameInput.value?.startEditing(),
+		},
+		{ type: 'divider', shown: isCustomGroup.value },
+		{
+			id: 'delete_group',
+			label: formatMessage(messages.deleteGroup),
+			icon: TrashIcon,
+			shown: isCustomGroup.value,
+			tone: 'red',
+			hoverFilledOnly: true,
+			action: requestGroupDeletion,
+		},
+	])
+}
+
+function prepareGroupToggle(event: PointerEvent) {
+	const editor = groupNameInput.value
+	const contextMenuWasOpen = groupContextMenuOpen.value
+	if (contextMenuWasOpen) {
+		groupOptions.value?.close()
+	}
+
+	shouldSkipGroupToggle = Boolean(
+		contextMenuWasOpen ||
+		(editor?.isEditing && event.target instanceof Node && !editor.$el.contains(event.target)),
+	)
+}
+
+function captureGroupClick(event: MouseEvent) {
+	groupToggleEventToSkip = shouldSkipGroupToggle ? event : undefined
+	shouldSkipGroupToggle = false
+}
+
+function toggleGroup(event: MouseEvent) {
+	if (event === groupToggleEventToSkip) {
+		groupToggleEventToSkip = undefined
+		return
+	}
+	if (isSearching.value) return
+
+	if (groupAccordion.value?.isOpen) {
+		groupAccordion.value.close()
+	} else {
+		groupAccordion.value?.open()
+	}
+}
+
+function validateGroupName(value: string) {
+	const normalizedGroupName = value.trim()
+	let reason: string | undefined
+
+	if (normalizedGroupName.length === 0) {
+		reason = formatMessage(messages.groupNameEmpty)
+	} else if (normalizedGroupName.length > MAX_INSTANCE_GROUP_NAME_LENGTH) {
+		reason = formatMessage(messages.groupNameTooLong, {
+			maxLength: MAX_INSTANCE_GROUP_NAME_LENGTH,
+		})
+	} else if (normalizedGroupName.toLowerCase() === 'none') {
+		reason = formatMessage(messages.groupNameReserved)
+	}
+
+	if (reason) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.renameGroupFailed),
+			text: reason,
+		})
+		return false
+	}
+
+	return true
+}
+
+async function updateGroupName(value: string) {
+	return await renameGroup(props.instanceGroup.id, value)
+}
+
+watch(
+	() => props.instanceGroup.key,
+	(value) => {
+		groupName.value = value
+	},
+)
+
+watch(
+	[() => props.instanceGroup.id, groupIdPendingNameEdit],
+	async ([groupId, pendingGroupId]) => {
+		if (groupId !== pendingGroupId) return
+
+		await nextTick()
+		groupDropTarget.value?.scrollIntoView({ block: 'nearest' })
+		await groupNameInput.value?.startEditing()
+		completePendingGroupNameEdit(groupId)
+	},
+	{ immediate: true, flush: 'post' },
+)
+
+watch(
+	() => props.hideHeader,
+	(hideHeader) => {
+		if (hideHeader) {
+			groupAccordion.value?.open()
+		}
+	},
+	{ flush: 'post' },
+)
+
+function stopInstanceGridResizeObserver() {
+	clearTimeout(instanceGridObserverActivationTimeout)
+	instanceGridResizeObserver?.disconnect()
+}
+
+function startInstanceGridResizeObserver() {
+	stopInstanceGridResizeObserver()
+	instanceGridHeight.value = undefined
+	instanceGridObserverActivationTimeout = setTimeout(() => {
+		instanceGridObserverActivationTimeout = undefined
+
+		const gridContent = instanceGridContent.value
+		if (!gridContent?.isConnected) return
+
+		instanceGridHeight.value = gridContent.getBoundingClientRect().height
+		instanceGridResizeObserver = new ResizeObserver(() => {
+			if (!gridContent.isConnected) return
+			instanceGridHeight.value = gridContent.getBoundingClientRect().height
+		})
+		instanceGridResizeObserver.observe(gridContent)
+	}, INSTANCE_GRID_OBSERVER_ACTIVATION_DELAY)
+}
+
+onUnmounted(() => {
+	clearTimeout(cardMoveTimer)
+	stopInstanceGridResizeObserver()
+	libraryResizeObserver?.disconnect()
+})
+onMounted(() => {
+	remSize.value = parseFloat(getComputedStyle(document.documentElement).fontSize)
+	startInstanceGridResizeObserver()
+	const library = groupDropTarget.value?.closest('[data-library-page-background]')
+	if (library) {
+		libraryResizeObserver = new ResizeObserver(syncScrollState)
+		libraryResizeObserver.observe(library)
+	}
+})
+watch([gridHeight, () => props.instanceGroup.instances], () => {
+	groupDebug('sync scroll state', {
+		group: props.instanceGroup.id,
+		gridHeight: gridHeight.value,
+		gridWidth: gridWidth.value,
+		columnCount: columnCount.value,
+		count: props.instanceGroup.instances.length,
+	})
+	return nextTick(syncScrollState)
+})
+</script>
+
+<template>
+	<div
+		ref="groupDropTarget"
+		class="instance-group group/instance-container relative select-none pb-3"
+		@contextmenu.prevent.stop="openGroupContextMenu"
+	>
+		<Transition
+			enter-active-class="transition-opacity duration-150 ease-out"
+			enter-from-class="!opacity-0"
+			enter-to-class="opacity-100"
+			leave-active-class="transition-opacity duration-150 ease-in"
+			leave-from-class="opacity-100"
+			leave-to-class="!opacity-0"
+		>
+			<div
+				v-if="
+					activeInstanceGroupDrag &&
+					instanceGroupDragTarget === instanceGroup.id &&
+					getInstanceGroupDropState(instanceGroup.id).canDrop
+				"
+				class="pointer-events-none absolute -inset-2 inset-y-0 z-20 rounded-xl border-2 opacity-40 border-dashed border-contrast bg-transparent"
+			/>
+		</Transition>
+		<div
+			v-if="!hideHeader"
+			class="group/header h-10 flex w-full items-center gap-2 border-0 border-b border-solid border-b-surface-5"
+			:class="{
+				'instance-group-reorder-handle': isReorderableGroup && canDragReorder,
+			}"
+		>
+			<div
+				class="group/open-target flex min-w-0 items-center gap-2"
+				:class="isGroupToggleBlocked ? 'cursor-default' : 'cursor-pointer'"
+				@click="toggleGroup"
+				@click.capture="captureGroupClick"
+				@pointerdown.capture="prepareGroupToggle"
+			>
+				<IconButton
+					type="quiet"
+					size="xs"
+					interaction="none"
+					class="shrink-0"
+					:class="isGroupToggleBlocked ? 'cursor-default' : 'cursor-pointer'"
+					:aria-expanded="groupAccordion?.isOpen"
+					:label="
+						formatMessage(groupAccordion?.isOpen ? messages.collapseGroup : messages.expandGroup)
+					"
+					@click.stop="toggleGroup"
+				>
+					<DropdownIcon
+						aria-hidden="true"
+						class="text-secondary transition-all duration-300 group-hover/open-target:text-primary"
+						:class="{ 'rotate-180': groupAccordion?.isOpen }"
+					/>
+				</IconButton>
+				<InlineEditableText
+					v-if="!isUngrouped && !isFavorites"
+					ref="groupNameInput"
+					v-model="groupName"
+					activation-mode="manual"
+					class="text-base font-semibold !h-10 text-primary select-none group-hover/open-target:text-contrast"
+					:edit-label="formatMessage(commonMessages.renameButton)"
+					max-width="24rem"
+					icon-text-class="select-none"
+					:max-length="MAX_INSTANCE_GROUP_NAME_LENGTH"
+					:on-change="updateGroupName"
+					:validate="validateGroupName"
+				/>
+				<span
+					v-else-if="isUngrouped"
+					class="text-base font-semibold text-primary select-none group-hover/open-target:text-contrast"
+				>
+					{{ formatMessage(messages.ungrouped) }}
+				</span>
+				<span
+					v-else
+					class="flex items-center gap-1.5 text-base font-semibold text-primary select-none group-hover/open-target:text-contrast"
+				>
+					{{ formatMessage(messages.favorites) }}
+				</span>
+				<TagItem
+					v-if="instanceGroup.instances.length"
+					class="shrink-0 border-surface-3 bg-surface-2"
+				>
+					{{ instanceGroup.instances.length }}
+				</TagItem>
+			</div>
+			<div class="min-w-0 flex-1" />
+			<GroupActionButtons
+				v-if="isCustomGroup || isUngrouped"
+				:can-move-down="canMoveGroupDown(instanceGroup.id)"
+				:can-move-up="canMoveGroupUp(instanceGroup.id)"
+				:deleting="deletingGroup"
+				:on-add-to-group="() => openGroupInstancesModal(instanceGroup.id)"
+				:on-delete-group="requestGroupDeletion"
+				:on-edit-group-name="() => groupNameInput?.startEditing()"
+				:on-move-down="() => moveGroup(instanceGroup.id, 1)"
+				:on-move-up="() => moveGroup(instanceGroup.id, -1)"
+				:show-delete="!isUngrouped"
+				:show-edit="!isUngrouped"
+			/>
+		</div>
+		<Accordion
+			ref="groupAccordion"
+			:open-by-default="hideHeader || !isSectionCollapsed(instanceGroup.id)"
+			:force-open="isSearching"
+			class="w-full"
+			@on-open="setSectionCollapsed(instanceGroup.id, false)"
+			@on-close="setSectionCollapsed(instanceGroup.id, true)"
+		>
+			<div
+				class="mt-2.5 overflow-hidden transition-[height] duration-200 ease-out motion-reduce:transition-none"
+				:style="{
+					height: instanceGridHeight === undefined ? undefined : `${instanceGridHeight}px`,
+				}"
+			>
+				<div ref="instanceGridContent" :style="{ height: `${gridHeight}px` }">
+					<TransitionGroup
+						tag="section"
+						:css="animationsReady"
+						class="relative min-h-[45px] w-full h-full"
+						:move-class="
+							animateCardMoves
+								? 'transition-transform duration-200 ease-out motion-reduce:transition-none'
+								: 'transition-none'
+						"
+						enter-active-class="transition-[opacity,transform] duration-[150ms] ease-out motion-reduce:transition-none"
+						enter-from-class="data-[animate-entry=true]:opacity-0"
+						enter-to-class="opacity-100 scale-100"
+						@after-enter="
+							(element: Element) =>
+								enteringInstanceIds.delete(element.getAttribute('data-instance-id') ?? '')
+						"
+					>
+						<div
+							v-for="{ instance, index } in visibleInstances"
+							:key="instance.id"
+							:data-instance-index="index"
+							:data-instance-id="instance.id"
+							:data-animate-entry="enteringInstanceIds.has(instance.id)"
+							class="min-w-0 w-full"
+							:style="instancePosition(index)"
+							@focusin="focusedInstanceId = instance.id"
+							@focusout="handleCardBlur($event, instance.id)"
+							@keydown="handleCardTab($event, index)"
+						>
+							<UninstalledSharedInstanceCard
+								v-if="isUninstalledSharedInstance(instance)"
+								:instance="instance"
+								:instance-group-id="instanceGroup.id"
+								:is-selection-anchor="selectionAnchorInstanceId === instance.id"
+								@toggle-selection="
+									(shiftKey: boolean) => emit('toggle-selection', instance.id, shiftKey)
+								"
+							/>
+							<InstanceCard
+								v-else
+								:instance="instance"
+								:instance-group-id="instanceGroup.id"
+								:is-selection-anchor="selectionAnchorInstanceId === instance.id"
+								@toggle-selection="
+									(shiftKey: boolean) => emit('toggle-selection', instance.id, shiftKey)
+								"
+							/>
+						</div>
+						<p
+							v-if="instanceGroup.instances.length === 0"
+							key="empty-group"
+							class="col-span-full m-0 pt-1 pl-0.5 text-base font-base text-secondary opacity-80"
+						>
+							{{ formatMessage(messages.emptyGroup) }}
+						</p>
+					</TransitionGroup>
+				</div>
+			</div>
+		</Accordion>
+	</div>
+
+	<ContextMenu
+		ref="groupOptions"
+		:label="formatMessage(messages.groupActionsLabel)"
+		@close="groupContextMenuOpen = false"
+	/>
+
+	<NewModal
+		ref="confirmDeleteGroupModal"
+		:header="formatMessage(messages.deleteGroup)"
+		fade="danger"
+		width="500px"
+	>
+		<p class="m-0 text-base text-primary">
+			{{ formatMessage(messages.deleteGroupDescription) }}
+		</p>
+
+		<template #actions>
+			<div class="flex justify-end gap-2">
+				<Button type="outlined" @click="confirmDeleteGroupModal?.hide()">
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="red" :loading="deletingGroup" @click="removeGroup">
+					<TrashIcon aria-hidden="true" />
+					{{ formatMessage(messages.deleteGroup) }}
+				</Button>
+			</div>
+		</template>
+	</NewModal>
+</template>

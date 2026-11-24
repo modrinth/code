@@ -845,12 +845,6 @@
   "app.library.context-menu.create-instance": {
     "message": "Nova instância"
   },
-  "app.library.filter.add": {
-    "message": "Adicionar filtro"
-  },
-  "app.library.filter.clear": {
-    "message": "Limpar filtros"
-  },
   "app.library.filter.game-version": {
     "message": "Versão do jogo"
   },
@@ -865,9 +859,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "Servidor"
-  },
-  "app.library.filter.label": {
-    "message": "Filtrar por"
   },
   "app.library.filter.loader": {
     "message": "Carregador"

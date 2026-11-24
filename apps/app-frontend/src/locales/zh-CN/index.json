@@ -1046,23 +1046,8 @@
   "app.library.context-menu.create-instance": {
     "message": "新建实例"
   },
-  "app.library.filter.add": {
-    "message": "添加筛选"
-  },
-  "app.library.filter.clear": {
-    "message": "清空筛选"
-  },
   "app.library.filter.game-version": {
     "message": "游戏版本"
-  },
-  "app.library.filter.install-state": {
-    "message": "安装状态"
-  },
-  "app.library.filter.install-state.installed": {
-    "message": "已安装"
-  },
-  "app.library.filter.install-state.not-installed": {
-    "message": "未安装"
   },
   "app.library.filter.instance-type": {
     "message": "实例类型"
@@ -1075,9 +1060,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "服务器"
-  },
-  "app.library.filter.label": {
-    "message": "筛选条件"
   },
   "app.library.filter.loader": {
     "message": "模组加载器"
@@ -1325,9 +1307,6 @@
   "app.library.search.no-results.title": {
     "message": "没有与搜索匹配的实例。"
   },
-  "app.library.search.placeholder": {
-    "message": "搜索"
-  },
   "app.library.selection.aria-label": {
     "message": "选中的实例"
   },
@@ -1357,9 +1336,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "累计游玩时长"
-  },
-  "app.library.sort.label": {
-    "message": "排序方式"
   },
   "app.library.sort.last-played": {
     "message": "最后游玩时间"
