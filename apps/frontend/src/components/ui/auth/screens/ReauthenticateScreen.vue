@@ -8,7 +8,7 @@
 		<template v-else-if="flow">
 			<div class="flex flex-col gap-4" :aria-busy="twoFactorPending">
 				<div class="flex w-full flex-col gap-1.5">
-					<label for="two-factor-code">
+					<label for="two-factor-code" class="flex flex-col">
 						<span id="two-factor-label" class="label__title">
 							{{ formatMessage(messages.twoFactorCodeLabel) }}
 						</span>
