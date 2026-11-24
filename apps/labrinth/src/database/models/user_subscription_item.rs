@@ -4,8 +4,8 @@ use crate::database::models::{
 use crate::models::billing::{
     PriceDuration, ProductMetadata, SubscriptionMetadata, SubscriptionStatus,
 };
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use itertools::Itertools;
 use std::convert::{TryFrom, TryInto};
 
@@ -69,7 +69,7 @@ impl DBUserSubscription {
     ) -> Result<Option<DBUserSubscription>> {
         Ok(Self::get_many(&[id], exec)
             .await
-            .wrap_err("fetching user subscription")?
+            .context("fetching user subscription")?
             .into_iter()
             .next())
     }
@@ -86,13 +86,13 @@ impl DBUserSubscription {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching user subscriptions")?;
+        .context("fetching user subscriptions")?;
 
         results
             .into_iter()
             .map(TryInto::try_into)
             .collect::<std::result::Result<Vec<_>, _>>()
-            .wrap_err("deserializing user subscription metadata")
+            .context("deserializing user subscription metadata")
     }
 
     pub async fn get_all_user(
@@ -106,13 +106,13 @@ impl DBUserSubscription {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching user subscriptions for user")?;
+        .context("fetching user subscriptions for user")?;
 
         results
             .into_iter()
             .map(TryInto::try_into)
             .collect::<std::result::Result<Vec<_>, _>>()
-            .wrap_err("deserializing user subscription metadata")
+            .context("deserializing user subscription metadata")
     }
 
     pub async fn get_all_servers(
@@ -132,13 +132,13 @@ impl DBUserSubscription {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching server subscriptions")?;
+        .context("fetching server subscriptions")?;
 
         results
             .into_iter()
             .map(TryInto::try_into)
             .collect::<std::result::Result<Vec<_>, _>>()
-            .wrap_err("deserializing user subscription metadata")
+            .context("deserializing user subscription metadata")
     }
 
     pub async fn upsert(
@@ -167,11 +167,11 @@ impl DBUserSubscription {
             self.created,
             self.status.as_str(),
             serde_json::to_value(&self.metadata)
-                .wrap_err("serializing user subscription metadata")?,
+                .context("serializing user subscription metadata")?,
         )
         .execute(exec)
         .await
-        .wrap_err("upserting user subscription")?;
+        .context("upserting user subscription")?;
 
         Ok(())
     }
@@ -195,13 +195,13 @@ impl DBUserSubscription {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching user subscriptions by server ID")?;
+        .context("fetching user subscriptions by server ID")?;
 
         results
             .into_iter()
             .map(TryInto::try_into)
             .collect::<std::result::Result<Vec<_>, _>>()
-            .wrap_err("deserializing user subscription metadata")
+            .context("deserializing user subscription metadata")
     }
 }
 

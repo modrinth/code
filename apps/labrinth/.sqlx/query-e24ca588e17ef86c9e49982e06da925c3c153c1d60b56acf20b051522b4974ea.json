@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE mods\n            SET organization_id = NULL, slug = COALESCE($1, slug), in_review = FALSE\n            WHERE id = $2\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e24ca588e17ef86c9e49982e06da925c3c153c1d60b56acf20b051522b4974ea"
+}

@@ -8,7 +8,7 @@ use crate::models::{
         UserSubscriptionId,
     },
     notifications::{Notification, NotificationAction, NotificationBody},
-    projects::ProjectStatus,
+    projects::LegacyProjectStatus,
 };
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
@@ -89,8 +89,8 @@ pub enum LegacyNotificationBody {
     },
     StatusChange {
         project_id: ProjectId,
-        old_status: ProjectStatus,
-        new_status: ProjectStatus,
+        old_status: LegacyProjectStatus,
+        new_status: LegacyProjectStatus,
     },
     ModeratorMessage {
         thread_id: ThreadId,
@@ -154,8 +154,8 @@ pub enum LegacyNotificationBody {
     },
     ProjectStatusNeutral {
         project_id: ProjectId,
-        old_status: ProjectStatus,
-        new_status: ProjectStatus,
+        old_status: LegacyProjectStatus,
+        new_status: LegacyProjectStatus,
     },
     ProjectTransferred {
         project_id: ProjectId,

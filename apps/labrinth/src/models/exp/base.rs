@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use crate::models::{ids::OrganizationId, projects::ProjectStatus};
+use crate::models::{ids::OrganizationId, projects::ProjectVisibility};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
 pub struct Project {
@@ -23,10 +23,16 @@ pub struct Project {
     /// A long description of the project, in markdown.
     #[validate(length(max = 65536))]
     pub description: String,
-    /// What status the user would like the project to be in after review.
-    pub requested_status: ProjectStatus,
+    /// The visibility requested by the project owner.
+    #[serde(default = "default_visibility")]
+    pub visibility: ProjectVisibility,
+    pub requested_status: Option<crate::models::v2::projects::ProjectStatus>,
     /// What organization the project belongs to.
     pub organization_id: Option<OrganizationId>,
+}
+
+fn default_visibility() -> ProjectVisibility {
+    ProjectVisibility::Public
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]

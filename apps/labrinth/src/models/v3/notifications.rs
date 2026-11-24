@@ -7,8 +7,9 @@ use crate::models::ids::{
     NotificationId, ProjectId, ReportId, TeamId, ThreadId, ThreadMessageId,
     VersionId,
 };
-use crate::models::projects::ProjectStatus;
+use crate::models::projects::LegacyProjectStatus;
 use crate::routes::ApiError;
+use anyhow::anyhow;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -199,8 +200,8 @@ pub enum NotificationBody {
     },
     StatusChange {
         project_id: ProjectId,
-        old_status: ProjectStatus,
-        new_status: ProjectStatus,
+        old_status: LegacyProjectStatus,
+        new_status: LegacyProjectStatus,
     },
     /// This is for website notifications only. Email notifications have `ModerationMessageReceived`.
     ModeratorMessage {
@@ -229,8 +230,8 @@ pub enum NotificationBody {
     },
     ProjectStatusNeutral {
         project_id: ProjectId,
-        old_status: ProjectStatus,
-        new_status: ProjectStatus,
+        old_status: LegacyProjectStatus,
+        new_status: LegacyProjectStatus,
     },
     ProjectTransferred {
         project_id: ProjectId,
@@ -794,8 +795,8 @@ impl NotificationDeliveryStatus {
             NotificationDeliveryStatus::Delivered => Ok(()),
             NotificationDeliveryStatus::SkippedPreferences |
             NotificationDeliveryStatus::SkippedDefault |
-            NotificationDeliveryStatus::Pending => Err(ApiError::Request(eyre::eyre!("An error occurred while sending an email to your email address. Please try again later.".to_owned()))),
-            NotificationDeliveryStatus::PermanentlyFailed => Err(ApiError::Request(eyre::eyre!("This email address doesn't exist! Please try another one.".to_owned()))),
+            NotificationDeliveryStatus::Pending => Err(ApiError::Request(anyhow!("An error occurred while sending an email to your email address. Please try again later.".to_owned()))),
+            NotificationDeliveryStatus::PermanentlyFailed => Err(ApiError::Request(anyhow!("This email address doesn't exist! Please try another one.".to_owned()))),
         }
     }
 

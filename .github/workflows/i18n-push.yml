@@ -21,10 +21,14 @@ concurrency:
 env:
   pnpm_config_color: always
 
+permissions: {}
+
 jobs:
   push_translations:
     name: Push sources to Crowdin
     runs-on: namespace-profile-small-amd64
+    permissions:
+      contents: read
     if: github.ref == 'refs/heads/main'
     concurrency:
       group: i18n-push:${{ github.ref }}
@@ -63,11 +67,13 @@ jobs:
         with:
           ref: ${{ github.ref }}
           fetch-depth: 2
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
+          package-manager-cache: false
 
       - name: Enable Corepack
         run: corepack enable
@@ -99,7 +105,8 @@ jobs:
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
 
       - name: Clear stale ICU translations in Crowdin
-        run: pnpm scripts i18n-icu-contract clear-crowdin-changed --base-ref HEAD^ --crowdin-branch "[${{ github.repository_owner }}.${{ github.event.repository.name }}] ${{ steps.branch-name.outputs.safe_branch_name }}"
+        run: pnpm scripts i18n-icu-contract clear-crowdin-changed --base-ref HEAD^ --crowdin-branch "$CROWDIN_BRANCH_NAME"
         env:
+          CROWDIN_BRANCH_NAME: '[${{ github.repository_owner }}.${{ github.event.repository.name }}] ${{ steps.branch-name.outputs.safe_branch_name }}'
           CROWDIN_PROJECT_ID: ${{ vars.CROWDIN_PROJECT_ID }}
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}

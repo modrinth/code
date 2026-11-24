@@ -6,11 +6,11 @@ rust-version.workspace = true
 repository.workspace = true
 
 [dependencies]
+anyhow = { workspace = true }
 ariadne = { workspace = true }
 chrono = { workspace = true }
 dashmap = { workspace = true }
 deadpool-redis = { workspace = true, features = ["cluster-async"] }
-eyre = { workspace = true }
 futures = { workspace = true }
 lz4_flex = { workspace = true }
 postcard = { workspace = true }

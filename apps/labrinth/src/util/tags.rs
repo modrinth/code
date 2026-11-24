@@ -55,7 +55,7 @@ pub async fn valid_download_tags(
 
     let loaders = Loader::list(pool, redis)
         .await
-        .wrap_internal_err("failed to fetch loaders")?
+        .internal_context("failed to fetch loaders")?
         .into_iter()
         .map(|loader| loader.loader)
         .collect();

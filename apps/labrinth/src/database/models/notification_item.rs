@@ -3,8 +3,8 @@ use crate::database::PgTransaction;
 use crate::models::notifications::{
     NotificationBody, NotificationChannel, NotificationDeliveryStatus,
 };
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
@@ -42,7 +42,7 @@ impl NotificationBuilder {
     ) -> Result<()> {
         self.insert_many(vec![user], transaction, redis)
             .await
-            .wrap_err("inserting notification")?;
+            .context("inserting notification")?;
         Ok(())
     }
 
@@ -54,10 +54,10 @@ impl NotificationBuilder {
         let notification_ids =
             generate_many_notification_ids(users.len(), &mut *transaction)
                 .await
-                .wrap_err("generating notification ids")?;
+                .context("generating notification ids")?;
 
         let body = serde_json::value::to_value(&self.body)
-            .wrap_err("serializing notification body")?;
+            .context("serializing notification body")?;
         let bodies = notification_ids
             .iter()
             .map(|_| body.clone())
@@ -80,7 +80,7 @@ impl NotificationBuilder {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting notification records")?;
+        .context("inserting notification records")?;
 
         Ok(notification_ids)
     }
@@ -94,7 +94,7 @@ impl NotificationBuilder {
         let notification_ids = self
             .insert_many_records(&users, transaction)
             .await
-            .wrap_err("inserting notification records")?;
+            .context("inserting notification records")?;
 
         let users_raw_ids = users.iter().map(|x| x.0).collect::<Vec<_>>();
         let notification_ids_raw =
@@ -114,7 +114,7 @@ impl NotificationBuilder {
             &users,
         )
         .await
-        .wrap_err("inserting notification deliveries")?;
+        .context("inserting notification deliveries")?;
 
         Ok(notification_ids)
     }
@@ -130,10 +130,10 @@ impl NotificationBuilder {
         let notification_ids = self
             .insert_many_records(&users, transaction)
             .await
-            .wrap_err("inserting notification records without delivery")?;
+            .context("inserting notification records without delivery")?;
         DBNotification::clear_user_notifications_cache(&users, redis)
             .await
-            .wrap_err("clearing notification caches")?;
+            .context("clearing notification caches")?;
         Ok(notification_ids)
     }
 
@@ -225,11 +225,11 @@ impl NotificationBuilder {
         query
             .execute(&mut *transaction)
             .await
-            .wrap_err("inserting notification deliveries")?;
+            .context("inserting notification deliveries")?;
 
         DBNotification::clear_user_notifications_cache(users, redis)
             .await
-            .wrap_err(
+            .context(
                 "clearing notification caches after inserting deliveries",
             )?;
 
@@ -351,7 +351,7 @@ impl DBNotification {
             })
             .try_collect::<Vec<DBNotification>>()
             .await
-            .wrap_err("fetching all user notifications")?;
+            .context("fetching all user notifications")?;
 
         Ok(db_notifications)
     }
@@ -369,14 +369,14 @@ impl DBNotification {
             let mut redis = redis
                 .connect()
                 .await
-                .wrap_err("connecting to redis for user notifications")?;
+                .context("connecting to redis for user notifications")?;
             let key =
                 redis.key().entity(USER_NOTIFICATIONS_NAMESPACE, user_id.0);
 
             let cached_notifications: Option<Vec<DBNotification>> = redis
                 .get_deserialized(&key)
                 .await
-                .wrap_err("fetching cached user notifications")?;
+                .context("fetching cached user notifications")?;
 
             if let Some(notifications) = cached_notifications {
                 return Ok(notifications);
@@ -426,18 +426,18 @@ impl DBNotification {
             })
             .try_collect::<Vec<DBNotification>>()
             .await
-            .wrap_err("fetching site-exposed user notifications")?;
+            .context("fetching site-exposed user notifications")?;
 
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to cache user notifications")?;
+            .context("connecting to redis to cache user notifications")?;
         let key = redis.key().entity(USER_NOTIFICATIONS_NAMESPACE, user_id.0);
 
         redis
             .set_serialized(&key, &db_notifications, None)
             .await
-            .wrap_err("caching site-exposed user notifications")?;
+            .context("caching site-exposed user notifications")?;
 
         Ok(db_notifications)
     }
@@ -449,7 +449,7 @@ impl DBNotification {
     ) -> Result<Option<()>> {
         Self::read_many(&[id], transaction, redis)
             .await
-            .wrap_err("marking notification as read")
+            .context("marking notification as read")
     }
 
     pub async fn read_many(
@@ -473,14 +473,14 @@ impl DBNotification {
         .map_ok(|x| DBUserId(x.user_id))
         .try_collect::<Vec<_>>()
         .await
-        .wrap_err("marking notifications as read")?;
+        .context("marking notifications as read")?;
 
         DBNotification::clear_user_notifications_cache(
             affected_users.iter(),
             redis,
         )
         .await
-        .wrap_err(
+        .context(
             "clearing notification caches after marking notifications as read",
         )?;
 
@@ -494,7 +494,7 @@ impl DBNotification {
     ) -> Result<Option<()>> {
         Self::remove_many(&[id], transaction, redis)
             .await
-            .wrap_err("removing notification")
+            .context("removing notification")
     }
 
     pub async fn remove_many(
@@ -514,7 +514,7 @@ impl DBNotification {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("removing notification deliveries")?;
+        .context("removing notification deliveries")?;
 
         sqlx::query!(
             "
@@ -525,7 +525,7 @@ impl DBNotification {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("removing notification actions")?;
+        .context("removing notification actions")?;
 
         let affected_users = sqlx::query!(
             "
@@ -539,16 +539,14 @@ impl DBNotification {
         .map_ok(|x| DBUserId(x.user_id))
         .try_collect::<Vec<_>>()
         .await
-        .wrap_err("removing notifications")?;
+        .context("removing notifications")?;
 
         DBNotification::clear_user_notifications_cache(
             affected_users.iter(),
             redis,
         )
         .await
-        .wrap_err(
-            "clearing notification caches after removing notifications",
-        )?;
+        .context("clearing notification caches after removing notifications")?;
 
         Ok(Some(()))
     }
@@ -575,7 +573,7 @@ impl DBNotification {
         .map_ok(|x| DBNotificationId(x.id))
         .try_collect::<Vec<_>>()
         .await
-        .wrap_err("fetching notifications matching body")?;
+        .context("fetching notifications matching body")?;
 
         if ids.is_empty() {
             return Ok(0);
@@ -583,7 +581,7 @@ impl DBNotification {
 
         Self::remove_many(&ids, transaction, redis)
             .await
-            .wrap_err("removing notifications matching body")?;
+            .context("removing notifications matching body")?;
 
         Ok(ids.len())
     }
@@ -595,7 +593,7 @@ impl DBNotification {
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to clear notification caches")?;
+            .context("connecting to redis to clear notification caches")?;
         let keys = user_ids
             .into_iter()
             .map(|id| redis.key().entity(USER_NOTIFICATIONS_NAMESPACE, id.0))
@@ -604,7 +602,7 @@ impl DBNotification {
         redis
             .delete_many(&keys)
             .await
-            .wrap_err("clearing notification caches")?;
+            .context("clearing notification caches")?;
 
         Ok(())
     }

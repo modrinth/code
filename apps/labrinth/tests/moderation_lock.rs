@@ -16,21 +16,18 @@ use tokio::sync::Barrier;
 
 pub mod common;
 
-/// Force a project into `processing` status directly in the database.
-/// Clears the Redis project row so `DBProject::get` used by PATCH sees the new status.
+/// Queue a project for review directly in the database.
+/// Clears the Redis project row so `DBProject::get` used by PATCH sees the new state.
 async fn set_project_processing(
     project_id: i64,
     project_slug: &str,
     pool: &labrinth::database::PgPool,
     redis: &xredis::RedisPool,
 ) {
-    sqlx::query!(
-        "UPDATE mods SET status = 'processing' WHERE id = $1",
-        project_id
-    )
-    .execute(pool)
-    .await
-    .expect("failed to set project to processing status");
+    sqlx::query!("UPDATE mods SET in_review = TRUE WHERE id = $1", project_id)
+        .execute(pool)
+        .await
+        .expect("failed to set project to processing status");
 
     DBProject::clear_cache(
         DBProjectId(project_id),
@@ -788,7 +785,7 @@ async fn test_complete_review_without_lock_succeeds() {
         let req = actix_web::test::TestRequest::patch()
             .uri(&format!("/v3/project/{alpha_id}"))
             .append_header(("Authorization", MOD_USER_PAT.unwrap()))
-            .set_json(json!({ "status": "approved" }))
+            .set_json(json!({ "review_outcome": "approved", "in_review": false }))
             .to_request();
 
         let resp = api.call(req).await;
@@ -833,7 +830,9 @@ async fn test_complete_review_blocked_when_other_holds_lock() {
             let req = actix_web::test::TestRequest::patch()
                 .uri(&format!("/v3/project/{alpha_id}"))
                 .append_header(("Authorization", MOD_USER_PAT.unwrap()))
-                .set_json(json!({ "status": "approved" }))
+                .set_json(
+                    json!({ "review_outcome": "approved", "in_review": false }),
+                )
                 .to_request();
 
             let resp = api.call(req).await;
@@ -881,7 +880,7 @@ async fn test_complete_review_succeeds_when_other_lock_expired() {
             let req = actix_web::test::TestRequest::patch()
                 .uri(&format!("/v3/project/{alpha_id}"))
                 .append_header(("Authorization", MOD_USER_PAT.unwrap()))
-                .set_json(json!({ "status": "approved" }))
+                .set_json(json!({ "review_outcome": "approved", "in_review": false }))
                 .to_request();
 
             let resp = api.call(req).await;
@@ -925,7 +924,9 @@ async fn test_complete_review_with_lock_succeeds() {
             let req = actix_web::test::TestRequest::patch()
                 .uri(&format!("/v3/project/{alpha_id}"))
                 .append_header(("Authorization", MOD_USER_PAT.unwrap()))
-                .set_json(json!({ "status": "approved" }))
+                .set_json(
+                    json!({ "review_outcome": "approved", "in_review": false }),
+                )
                 .to_request();
 
             let resp = api.call(req).await;
@@ -951,7 +952,7 @@ async fn test_non_processing_status_change_does_not_require_lock() {
             let req = actix_web::test::TestRequest::patch()
                 .uri(&format!("/v3/project/{alpha_id}"))
                 .append_header(("Authorization", MOD_USER_PAT.unwrap()))
-                .set_json(json!({ "status": "unlisted" }))
+                .set_json(json!({ "visibility": "unlisted" }))
                 .to_request();
 
             let resp = api.call(req).await;
@@ -987,7 +988,9 @@ async fn test_admin_can_complete_without_lock() {
             let req = actix_web::test::TestRequest::patch()
                 .uri(&format!("/v3/project/{alpha_id}"))
                 .append_header(("Authorization", ADMIN_USER_PAT.unwrap()))
-                .set_json(json!({ "status": "approved" }))
+                .set_json(
+                    json!({ "review_outcome": "approved", "in_review": false }),
+                )
                 .to_request();
 
             let resp = api.call(req).await;

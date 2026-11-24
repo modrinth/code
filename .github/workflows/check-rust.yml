@@ -10,13 +10,19 @@ env:
   CARGO_INCREMENTAL: 0
   SQLX_OFFLINE: true
 
+permissions: {}
+
 jobs:
   shear:
     if: ${{ !github.event.pull_request.draft }}
     runs-on: namespace-profile-untrusted-tiny-arm64
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca # stable
       - uses: cargo-bins/cargo-binstall@851112458b5f28a29e5bc14a690c3f283d9dcc6f # v1.26.2
-      - run: cargo binstall --no-confirm cargo-shear
+      - run: cargo binstall --no-confirm --locked cargo-shear@1.13.0
       - run: cargo shear

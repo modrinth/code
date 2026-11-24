@@ -78,7 +78,7 @@ pub struct InitialVersionData {
 
 pub(super) fn parse_mrpack_loaders(
     loaders: &[Loader],
-) -> Result<Vec<MrpackLoader>, eyre::Report> {
+) -> Result<Vec<MrpackLoader>, anyhow::Error> {
     loaders.iter().map(|loader| loader.0.parse()).collect()
 }
 
