@@ -27,6 +27,8 @@ public class SandboxAgent {
             OpenUriTransformation.register(transformerMap, minecraftVersionInfo);
             // Replaces running open commands (xdg-open, rundll32, etc.) with sandbox api call
             ProcessBuilderTransformation.register(transformerMap);
+            // Replaces awt Desktop#browse/open with sandbox api call
+            DesktopTransformation.register(transformerMap);
         }
         if (System.getProperty("modrinth.sandboxagent.transform.dragdrop", "").equals("true")) {
             // Requests access to certain files outside the sandbox when drag-dropping

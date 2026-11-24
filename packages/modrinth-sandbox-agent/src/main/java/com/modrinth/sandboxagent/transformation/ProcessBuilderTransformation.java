@@ -19,15 +19,9 @@ public class ProcessBuilderTransformation {
         transformerMap.registerMethod("java/lang/ProcessBuilder", "start", "()Ljava/lang/Process;", ProcessBuilderTransformation::transform);
     }
 
-    // ProcessBuilder is loaded by the bootstrap class loader, so it can't reference our classes directly
-    // Instead, we create the handler through the system class loader
     private static boolean transform(ListIterator<AbstractInsnNode> it, boolean isStatic) {
         final LabelNode after = new LabelNode();
-        it.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/ClassLoader", "getSystemClassLoader", "()Ljava/lang/ClassLoader;"));
-        it.add(new LdcInsnNode(StartHandler.class.getName()));
-        it.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/ClassLoader", "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;"));
-        it.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "newInstance", "()Ljava/lang/Object;"));
-        it.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/util/function/Function"));
+        Transformation.createHandlerForSystemClassloader(it, StartHandler.class, Function.class);
         it.add(new VarInsnNode(Opcodes.ALOAD, 0));
         it.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "java/util/function/Function", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;"));
         it.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Process"));

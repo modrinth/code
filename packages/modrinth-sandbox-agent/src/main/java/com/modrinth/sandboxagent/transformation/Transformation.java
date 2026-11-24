@@ -135,6 +135,17 @@ public class Transformation {
         it.add(after);
     }
 
+    // Creates an instance of the handler, which must be public and have a public constructor without arguments
+    // Classes loaded by the bootstrap class loader can't reference our classes directly, so this uses the
+    // system class loader and casts to an interface that they can reference
+    public static void createHandlerForSystemClassloader(ListIterator<AbstractInsnNode> it, Class<?> handler, Class<?> handlerInterface) {
+        it.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/ClassLoader", "getSystemClassLoader", "()Ljava/lang/ClassLoader;"));
+        it.add(new LdcInsnNode(handler.getName()));
+        it.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/ClassLoader", "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;"));
+        it.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "newInstance", "()Ljava/lang/Object;"));
+        it.add(new TypeInsnNode(Opcodes.CHECKCAST, Type.getInternalName(handlerInterface)));
+    }
+
     private static void loadArguments(ListIterator<AbstractInsnNode> it, boolean isStatic, Type methodType) {
         int index = isStatic ? 0 : 1;
         for (Type argumentType : methodType.getArgumentTypes()) {
