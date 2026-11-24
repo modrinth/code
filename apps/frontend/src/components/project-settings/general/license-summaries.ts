@@ -1,4 +1,6 @@
 /**
+ * No i18n pass here.
+ *
  * License summaries and rule descriptions adapted from github/choosealicense.com.
  * Source: https://github.com/github/choosealicense.com/tree/7ae29dd78100be78e3f334ab08a9ecb85f48d4e1
  * Imported from _licenses/*.txt and _data/rules.yml; full license texts are fetched separately.
