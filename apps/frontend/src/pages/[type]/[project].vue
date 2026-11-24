@@ -135,6 +135,7 @@
 							:project-v3="projectV3"
 							:versions="versions ?? undefined"
 							:current-member="currentMember"
+							:can-bypass-validation="isStaff(auth.user)"
 							:collapsed="collapsedChecklist"
 							:route-name="route.name"
 							:tags="tags"

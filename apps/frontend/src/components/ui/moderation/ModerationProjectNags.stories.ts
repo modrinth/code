@@ -1,6 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { type Nag, nagDefinitions, toProjectNag } from '@modrinth/moderation'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+
 import { ref } from 'vue'
 
 import { DEFAULT_FEATURE_FLAGS } from '../../../composables/featureFlags'
@@ -250,6 +251,7 @@ const meta = {
 		versions: [],
 		collapsed: false,
 		disableHorizontalScroll: true,
+
 		routeName: 'type-project',
 		tags,
 	},
@@ -284,6 +286,7 @@ export const EntirePublishingChecklist: Story = {
 		},
 	},
 }
+
 
 export const EveryNag: Story = {
 	args: {

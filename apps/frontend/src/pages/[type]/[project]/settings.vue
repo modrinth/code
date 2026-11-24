@@ -27,6 +27,7 @@ import { computed } from 'vue'
 
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import NavStack from '~/components/ui/NavStack.vue'
+import { useAuthState } from '~/composables/auth'
 
 const { formatMessage } = useVIntl()
 
@@ -42,6 +43,7 @@ const {
 } = injectProjectPageContext()
 
 const flags = useFeatureFlags()
+const auth = useAuthState()
 
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 const isStaffMember = computed(() => isStaff(currentMember.value?.user))
@@ -177,6 +179,7 @@ const moderatorSeeUserUi = computed<boolean>({
 			:project-v3="projectV3"
 			:versions="versions ?? undefined"
 			:current-member="currentMember"
+			:can-bypass-validation="isStaff(auth.user)"
 			:collapsed="collapsedChecklist"
 			:route-name="route.name as string"
 			:tags="tags"
