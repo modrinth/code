@@ -1,3 +1,6 @@
+ALTER TABLE project_flags
+    DROP CONSTRAINT project_flags_run_id_fkey;
+
 DELETE FROM project_flag_run_results;
 DELETE FROM project_flag_runs;
 
@@ -33,9 +36,6 @@ DROP TABLE project_flag_run_pending_jobs;
 
 ALTER TABLE project_flag_run_results
     DROP CONSTRAINT project_flag_run_results_run_id_fkey;
-
-ALTER TABLE project_flags
-    DROP CONSTRAINT project_flags_run_id_fkey;
 
 DROP TABLE project_flag_runs;
 
