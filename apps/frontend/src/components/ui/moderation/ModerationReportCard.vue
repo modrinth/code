@@ -19,12 +19,7 @@
 						<span class="hidden text-secondary sm:inline">by</span>
 						<span class="text-secondary sm:hidden">Reporter:</span>
 						<ModerationOwnerLink :owner="reporter" />
-						<CreatorStatusStats
-							v-if="cardRequested"
-							:id="reporter.id"
-							kind="user"
-							class="!mt-0"
-						/>
+						<CreatorStatusStats v-if="cardRequested" :id="reporter.id" kind="user" class="!mt-0" />
 					</div>
 				</div>
 

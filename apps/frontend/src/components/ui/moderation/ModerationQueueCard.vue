@@ -60,11 +60,7 @@
 							</span>
 						</div>
 					</div>
-					<div
-						v-if="queueEntry.ownership"
-						ref="ownerRow"
-						class="flex flex-wrap items-center gap-2"
-					>
+					<div v-if="queueEntry.ownership" ref="ownerRow" class="flex flex-wrap items-center gap-2">
 						<NuxtLink
 							:to="`/${queueEntry.ownership.kind}/${queueEntry.ownership.id}`"
 							target="_blank"
