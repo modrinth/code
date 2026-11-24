@@ -19,6 +19,7 @@ pub async fn run(
     redis: RedisPool,
     file_host: Arc<dyn FileHost>,
     project_flags: ProjectFlags,
+    kafka: actix_web::web::Data<crate::util::kafka::KafkaClientState>,
 ) -> Result<()> {
     let runtime = Runtime::from_current_tokio(
         temporalio_sdk::runtime::RuntimeOptions::default(),
@@ -36,6 +37,7 @@ pub async fn run(
             redis,
             file_host,
             temporal.client,
+            kafka,
         )?,
     )
     .context("creating temporal worker")?;

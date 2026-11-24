@@ -95,6 +95,7 @@ impl BackgroundTask {
                 redis_pool,
                 file_host.into_inner(),
                 config.project_flags,
+                kafka_client,
             )
             .await
             .map_err(|error| anyhow::anyhow!(error)),

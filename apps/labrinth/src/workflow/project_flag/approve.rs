@@ -13,7 +13,7 @@ use xredis::RedisPool;
 
 use super::{
     PROJECT_FLAG_TASK_QUEUE, ProjectFlagActivities, ReconcileRulesInput,
-    image_scan, project_in_review, text_scan,
+    image_scan, text_scan,
 };
 use crate::{database::PgPool, env::ProjectFlags, models::v3::ids::ProjectId};
 
@@ -450,6 +450,7 @@ pub struct ApprovalActivities {
     pub pool: PgPool,
     pub redis: RedisPool,
     pub temporal: temporalio_client::Client,
+    pub kafka: actix_web::web::Data<crate::util::kafka::KafkaClientState>,
 }
 
 #[activities]
@@ -507,10 +508,7 @@ impl ApprovalActivities {
         &self,
         input: &ReconcileRulesInput,
     ) -> Result<bool, ActivityError> {
-        if !project_in_review(&self.pool, input.project_id).await? {
-            return Ok(false);
-        }
-        crate::routes::v3::projects::mutation::delayed_auto_approval_eligible(
+        let eligible = crate::routes::v3::projects::mutation::delayed_auto_approval_eligible(
             input.project_id.into(),
             &self.pool,
             &self.redis,
@@ -519,7 +517,16 @@ impl ApprovalActivities {
             None,
         )
         .await
-        .map_err(|error| ActivityError::from(anyhow::anyhow!("{error}")))
+        .map_err(|error| ActivityError::from(anyhow::anyhow!("{error}")))?;
+        crate::routes::v3::projects::mutation::publish_automatic_review_search_update(
+            input.project_id.into(),
+            &self.pool,
+            &self.redis,
+            self.kafka.clone(),
+        )
+        .await
+        .map_err(|error| ActivityError::from(anyhow::anyhow!("{error}")))?;
+        Ok(eligible)
     }
 }
 

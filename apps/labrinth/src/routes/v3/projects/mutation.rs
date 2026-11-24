@@ -31,6 +31,148 @@ use crate::validate::project::{
     ProjectNagSeverity, validate_with_context as validate_project,
 };
 
+/// Replays the persisted search state even when a retried activity made no mutation.
+/// Each attempt owns its buffer so a failed removal cannot suppress a later upsert.
+pub(crate) async fn publish_automatic_review_search_update(
+    project_id: DBProjectId,
+    pool: &PgPool,
+    redis: &RedisPool,
+    kafka: actix_web::web::Data<crate::util::kafka::KafkaClientState>,
+) -> Result<(), ApiError> {
+    let state = sqlx::query!(
+        r#"SELECT visibility, review_outcome, slug FROM mods WHERE id = $1"#,
+        project_id.0,
+    )
+    .fetch_optional(pool)
+    .await
+    .internal_context("reading persisted automatic review search state")?;
+    db_models::DBProject::clear_cache(
+        project_id,
+        state.as_ref().and_then(|state| state.slug.clone()),
+        Some(true),
+        redis,
+    )
+    .await
+    .internal_context("clearing automatic review search cache")?;
+    let state = state.map(|state| {
+        (
+            ProjectVisibility::from_string(&state.visibility),
+            ProjectReviewOutcome::from_string(&state.review_outcome),
+        )
+    });
+    publish_review_search_action(
+        project_id.into(),
+        state,
+        |action| async move {
+            use crate::search::incremental::{
+                IncrementalSearchQueue, SearchProjectIndexQueueEventData,
+            };
+            let queue = IncrementalSearchQueue::new(kafka);
+            match action {
+                SearchProjectIndexQueueEventData::ChangeWithAllVersions {
+                    project_id,
+                } => {
+                    queue
+                        .push_project_with_all_versions_change(project_id)
+                        .await;
+                }
+                SearchProjectIndexQueueEventData::Removal { project_id } => {
+                    queue.push_project_removal(project_id).await;
+                }
+                _ => unreachable!(),
+            }
+            queue.drain().await
+        },
+    )
+    .await
+    .internal_context("publishing automatic review search update")
+}
+
+async fn publish_review_search_action<F, Fut>(
+    project_id: ProjectId,
+    state: Option<(ProjectVisibility, ProjectReviewOutcome)>,
+    publish: F,
+) -> anyhow::Result<()>
+where
+    F: FnOnce(
+        crate::search::incremental::SearchProjectIndexQueueEventData,
+    ) -> Fut,
+    Fut: std::future::Future<Output = anyhow::Result<()>>,
+{
+    use crate::search::incremental::SearchProjectIndexQueueEventData;
+    let searchable = state.is_some_and(|(visibility, outcome)| {
+        db_models::DBProject::calculate_effective_visibility(
+            visibility, outcome,
+        ) == ProjectVisibility::Public
+    });
+    let action = if searchable {
+        SearchProjectIndexQueueEventData::ChangeWithAllVersions { project_id }
+    } else {
+        SearchProjectIndexQueueEventData::Removal { project_id }
+    };
+    publish(action).await
+}
+
+#[cfg(test)]
+mod automatic_review_search_tests {
+    use super::*;
+    use crate::search::incremental::SearchProjectIndexQueueEventData;
+    use std::cell::RefCell;
+
+    #[actix_rt::test]
+    async fn persisted_visibility_selects_search_action_on_every_attempt() {
+        let project_id = DBProjectId(1).into();
+        for visibility in [
+            ProjectVisibility::Public,
+            ProjectVisibility::Unlisted,
+            ProjectVisibility::Private,
+        ] {
+            for outcome in [
+                ProjectReviewOutcome::NeverReviewed,
+                ProjectReviewOutcome::Approved,
+                ProjectReviewOutcome::Rejected,
+                ProjectReviewOutcome::Withheld,
+            ] {
+                let attempts = RefCell::new(Vec::new());
+                for fail in [true, false, false] {
+                    let result = publish_review_search_action(
+                        project_id,
+                        Some((visibility, outcome)),
+                        |action| {
+                            attempts.borrow_mut().push(action);
+                            std::future::ready(if fail {
+                                Err(anyhow!("mock queue delivery failure"))
+                            } else {
+                                Ok(())
+                            })
+                        },
+                    )
+                    .await;
+                    assert_eq!(result.is_err(), fail);
+                }
+                assert_eq!(attempts.borrow().len(), 3);
+                for action in attempts.into_inner() {
+                    if visibility == ProjectVisibility::Public
+                        && outcome == ProjectReviewOutcome::Approved
+                    {
+                        assert!(
+                            matches!(action, SearchProjectIndexQueueEventData::ChangeWithAllVersions { project_id: id } if id == project_id)
+                        );
+                    } else {
+                        assert!(
+                            matches!(action, SearchProjectIndexQueueEventData::Removal { project_id: id } if id == project_id)
+                        );
+                    }
+                }
+            }
+        }
+        publish_review_search_action(project_id, None, |action| async move {
+            assert!(matches!(action, SearchProjectIndexQueueEventData::Removal { project_id: id } if id == project_id));
+            Ok(())
+        }).await.unwrap();
+    }
+}
+
 pub(crate) fn legacy_status(
     visibility: ProjectVisibility,
     in_review: bool,

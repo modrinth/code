@@ -529,6 +529,20 @@ pub async fn start_run(
             .into_iter()
             .map(crate::database::models::DBProjectId)
             .collect();
+    let mut transaction = pool
+        .begin()
+        .await
+        .internal_context("starting project flag run ruleset freeze")?;
+    let ruleset_id = crate::database::models::project_flag_item::freeze_project_flag_ruleset(
+        crate::database::models::DBUserId::from(user.user.id),
+        &mut transaction,
+    )
+    .await
+    .internal_context("freezing project flag run ruleset")?;
+    transaction
+        .commit()
+        .await
+        .internal_context("committing project flag run ruleset")?;
     let id = ProjectFlagRunId(uuid::Uuid::now_v7());
     let input = run::RunInput::new(
         id,
@@ -537,6 +551,7 @@ pub async fn start_run(
             id: user.user.id,
             username: user.user.username.clone(),
         },
+        ruleset_id,
     );
     run::start(&temporal, input).await.internal_context(format!(
         "starting project flag run {}; check Temporal workflow `{}` before retrying an ambiguous start", id.0, run::workflow_id(id)

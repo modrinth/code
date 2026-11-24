@@ -21,8 +21,7 @@ use crate::{
     database::{
         PgPool,
         models::{
-            DBProjectId, DBUserId, ProjectFlagRunId,
-            project_flag_item::DBProjectFlagRule,
+            DBProjectId, ProjectFlagRunId, project_flag_item::DBProjectFlagRule,
         },
     },
     queue::moderation::project_flag::ProjectFlagEngine,
@@ -139,7 +138,7 @@ pub struct RunMetadata {
     pub started_by: ProjectFlagRunUser,
     pub total_projects: i64,
     pub started_at: chrono::DateTime<chrono::Utc>,
-    pub ruleset_id: Option<uuid::Uuid>,
+    pub ruleset_id: uuid::Uuid,
 }
 
 pub use crate::database::models::project_flag_item::ProjectFlagRunUser;
@@ -175,31 +174,6 @@ impl ProjectFlagRunWorkflow {
         ctx: &mut WorkflowContext<Self>,
         mut input: RunInput,
     ) -> WorkflowResult<()> {
-        if input.metadata.ruleset_id.is_none() {
-            let snapshot = ctx
-                .execute_activity(
-                    RunActivities::snapshot,
-                    (),
-                    ActivityOptions::start_to_close_timeout(
-                        Duration::from_secs(60),
-                    ),
-                )
-                .await?;
-            let ruleset_id = ctx
-                .execute_activity(
-                    RunActivities::freeze,
-                    (input.metadata.started_by.id, snapshot),
-                    ActivityOptions::start_to_close_timeout(
-                        Duration::from_secs(60),
-                    ),
-                )
-                .await?;
-            input.metadata.ruleset_id = Some(ruleset_id);
-            ctx.upsert_memo([(
-                RUN_MEMO,
-                Some(temporalio_common::MemoValue::new(input.metadata.clone())),
-            )])?;
-        }
         for _ in 0..BATCHES_PER_EXECUTION {
             let end = (input.offset + BATCH_SIZE).min(input.projects.len());
             let projects = input.projects[input.offset..end].to_vec();
@@ -210,10 +184,7 @@ impl ProjectFlagRunWorkflow {
                 RunActivities::evaluate_batch,
                 BatchInput {
                     id: input.metadata.id,
-                    ruleset_id: input
-                        .metadata
-                        .ruleset_id
-                        .expect("initialized ruleset"),
+                    ruleset_id: input.metadata.ruleset_id,
                     projects,
                 },
                 ActivityOptions::start_to_close_timeout(Duration::from_secs(
@@ -242,6 +213,7 @@ impl RunInput {
         id: ProjectFlagRunId,
         mut projects: Vec<DBProjectId>,
         started_by: ProjectFlagRunUser,
+        ruleset_id: uuid::Uuid,
     ) -> Self {
         projects.sort_unstable_by_key(|id| id.0);
         projects.dedup_by_key(|id| id.0);
@@ -251,7 +223,7 @@ impl RunInput {
                 started_by,
                 total_projects: projects.len() as i64,
                 started_at: chrono::Utc::now(),
-                ruleset_id: None,
+                ruleset_id,
             },
             projects,
             offset: 0,
@@ -274,55 +246,6 @@ pub struct RunActivities {
 
 #[activities]
 impl RunActivities {
-    #[activity]
-    pub async fn snapshot(
-        self: Arc<Self>,
-        _ctx: ActivityContext,
-        _input: (),
-    ) -> Result<RunSnapshot, ActivityError> {
-        let row = sqlx::query!(r#"
-            SELECT
-                COALESCE((SELECT jsonb_agg(to_jsonb(rules) ORDER BY rules.id) FROM project_flag_rules AS rules), '[]'::jsonb) AS "rules!",
-                COALESCE((SELECT jsonb_object_agg(name, script) FROM project_flag_modules), '{}'::jsonb) AS "modules!"
-        "#).fetch_one(&self.pool).await.map_err(|e| ActivityError::from(anyhow!(e)))?;
-        Ok(RunSnapshot {
-            rules: serde_json::from_value(row.rules)
-                .map_err(|e| ActivityError::from(anyhow!(e)))?,
-            modules: serde_json::from_value(row.modules)
-                .map_err(|e| ActivityError::from(anyhow!(e)))?,
-        })
-    }
-
-    #[activity]
-    pub async fn freeze(
-        self: Arc<Self>,
-        _ctx: ActivityContext,
-        input: (ariadne::ids::UserId, RunSnapshot),
-    ) -> Result<uuid::Uuid, ActivityError> {
-        let (user, snapshot) = input;
-        let hash = snapshot.content_hash()?.to_hex().to_string();
-        let mut transaction = self
-            .pool
-            .begin()
-            .await
-            .map_err(|e| ActivityError::from(anyhow!(e)))?;
-        let inserted = sqlx::query_scalar!(r#"
-            INSERT INTO project_flag_rulesets (id, content_hash, rules, modules, created_by)
-            VALUES ($1, $2, $3, $4, $5)
-            ON CONFLICT (content_hash) DO NOTHING
-            RETURNING id
-        "#, uuid::Uuid::now_v7(), hash, serde_json::to_value(snapshot.rules)?, serde_json::to_value(snapshot.modules)?, DBUserId::from(user).0)
-            .fetch_optional(&mut transaction).await.map_err(|e| ActivityError::from(anyhow!(e)))?;
-        let id = match inserted { Some(id) => id, None => sqlx::query_scalar!(
-            r#"SELECT id FROM project_flag_rulesets WHERE content_hash = $1"#, hash
-        ).fetch_one(&mut transaction).await.map_err(|e| ActivityError::from(anyhow!(e)))? };
-        transaction
-            .commit()
-            .await
-            .map_err(|e| ActivityError::from(anyhow!(e)))?;
-        Ok(id)
-    }
-
     #[activity]
     pub async fn evaluate_batch(
         self: Arc<Self>,
@@ -441,7 +364,7 @@ fn decode_run(
     );
     Ok(TemporalRun {
         id: metadata.id,
-        ruleset_id: metadata.ruleset_id,
+        ruleset_id: Some(metadata.ruleset_id),
         status: info.status.into(),
         total_projects: metadata.total_projects,
         started_by: Some(metadata.started_by),
@@ -739,6 +662,7 @@ pub async fn num_scanning(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::database::models::DBUserId;
     #[test]
     fn selection_is_sorted_deduplicated_and_round_trips() {
         let input = RunInput::new(
@@ -748,6 +672,7 @@ mod tests {
                 id: DBUserId(42).into(),
                 username: "moderator".into(),
             },
+            uuid::Uuid::now_v7(),
         );
         let restored: RunInput =
             serde_json::from_slice(&serde_json::to_vec(&input).unwrap())
@@ -755,6 +680,13 @@ mod tests {
         assert_eq!(restored.projects, vec![DBProjectId(1), DBProjectId(3)]);
         assert_eq!(restored.metadata.total_projects, 2);
         assert_eq!(restored.metadata.id, input.metadata.id);
+        assert_eq!(restored.metadata.ruleset_id, input.metadata.ruleset_id);
+        let mut missing_ruleset = serde_json::to_value(&input).unwrap();
+        missing_ruleset["metadata"]
+            .as_object_mut()
+            .unwrap()
+            .remove("ruleset_id");
+        assert!(serde_json::from_value::<RunInput>(missing_ruleset).is_err());
     }
     #[test]
     fn continuation_preserves_original_metadata() {
@@ -765,8 +697,8 @@ mod tests {
                 id: DBUserId(42).into(),
                 username: "moderator".into(),
             },
+            uuid::Uuid::now_v7(),
         );
-        input.metadata.ruleset_id = Some(uuid::Uuid::now_v7());
         let metadata = serde_json::to_value(&input.metadata).unwrap();
         input.projects.drain(..1);
         let restored: RunInput =
@@ -775,6 +707,41 @@ mod tests {
         assert_eq!(restored.projects, vec![DBProjectId(2)]);
         assert_eq!(serde_json::to_value(restored.metadata).unwrap(), metadata);
     }
+    #[test]
+    fn queued_run_memo_exposes_submitted_ruleset() {
+        let id = ProjectFlagRunId(uuid::Uuid::now_v7());
+        let ruleset_id = uuid::Uuid::now_v7();
+        let input = RunInput::new(
+            id,
+            vec![DBProjectId(1)],
+            ProjectFlagRunUser {
+                id: DBUserId(42).into(),
+                username: "moderator".into(),
+            },
+            ruleset_id,
+        );
+        let metadata = serde_json::from_value(
+            serde_json::to_value(&input.metadata).unwrap(),
+        )
+        .unwrap();
+        let run = decode_run(
+            WorkflowExecutionInfo {
+                execution: Some(
+                    temporalio_common::protos::temporal::api::common::v1::WorkflowExecution {
+                        workflow_id: workflow_id(id),
+                        run_id: uuid::Uuid::now_v7().to_string(),
+                    },
+                ),
+                status: 1,
+                ..Default::default()
+            },
+            metadata,
+        )
+        .unwrap();
+        assert_eq!(run.ruleset_id, Some(ruleset_id));
+        assert_eq!(run.status, RunStatus::Running);
+    }
+
     #[test]
     fn statuses_come_from_temporal_not_progress_counts() {
         for (raw, expected) in [

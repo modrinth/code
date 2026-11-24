@@ -40,6 +40,7 @@ pub fn project_flag_worker_options(
     redis: RedisPool,
     file_host: Arc<dyn FileHost>,
     temporal: temporalio_client::Client,
+    kafka: actix_web::web::Data<crate::util::kafka::KafkaClientState>,
 ) -> Result<WorkerOptions> {
     let engine =
         crate::queue::moderation::project_flag::ProjectFlagEngine::new(
@@ -63,15 +64,18 @@ pub fn project_flag_worker_options(
         .context("registering delayed project approval workflow")?
         .register_activities(approve::ApprovalActivities {
             config: config.clone(),
+            kafka: kafka.clone(),
             pool: pool.clone(),
             redis: redis.clone(),
             temporal: temporal.clone(),
         })
         .register_activities(ProjectFlagActivities {
-            scanner: ModelScanner::new(config, redis, file_host),
+            scanner: ModelScanner::new(config, redis.clone(), file_host),
+            redis,
             pool,
             engine,
             temporal,
+            kafka,
         })
         .build())
 }
@@ -275,10 +279,12 @@ mod review_state_tests {
 }
 
 pub struct ProjectFlagActivities {
+    pub redis: RedisPool,
     pub scanner: ModelScanner,
     pub pool: PgPool,
     pub engine: crate::queue::moderation::project_flag::ProjectFlagEngine,
     pub temporal: temporalio_client::Client,
+    pub kafka: actix_web::web::Data<crate::util::kafka::KafkaClientState>,
 }
 
 #[activities]
@@ -322,7 +328,17 @@ impl ProjectFlagActivities {
         )
         .await
         {
-            Ok(()) => Ok(true),
+            Ok(()) => {
+                crate::routes::v3::projects::mutation::publish_automatic_review_search_update(
+                    input.project_id().into(),
+                    &self.pool,
+                    &self.redis,
+                    self.kafka.clone(),
+                )
+                .await
+                .map_err(|error| ActivityError::from(anyhow::anyhow!("{error}")))?;
+                Ok(true)
+            }
             Err(error)
                 if error.is::<run_rules::ReconciliationInputsChanged>() =>
             {
