@@ -47,6 +47,7 @@ pub struct ProjectHistoryEntry {
 pub enum ProjectDelta {
     Created,
     Deleted,
+    AutoApprovalCancelled,
     AutoApprovalScheduled {
         provenance: ApprovalProvenance,
         scheduled_for: DateTime<Utc>,
@@ -632,6 +633,7 @@ mod project_state_tests {
         for delta in [
             ProjectDelta::Created,
             ProjectDelta::Deleted,
+            ProjectDelta::AutoApprovalCancelled,
             ProjectDelta::AutoApprovalScheduled {
                 provenance: provenance.clone(),
                 scheduled_for: "2026-11-24T12:00:00Z".parse().unwrap(),

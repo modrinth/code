@@ -1085,6 +1085,7 @@ export namespace Labrinth {
 			export type ProjectDelta =
 				| { kind: 'created' }
 				| { kind: 'deleted' }
+				| { kind: 'auto_approval_cancelled' }
 				| { kind: 'change_visibility'; from: ProjectVisibility; to: ProjectVisibility }
 				| { kind: 'change_in_review'; from: boolean; to: boolean }
 				| {

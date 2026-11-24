@@ -162,7 +162,7 @@ async fn cancel_auto_approval(
     session_queue: &AuthQueue,
     temporal: &crate::util::temporal::TemporalClient,
 ) -> Result<crate::workflow::project_flag::approve::ApprovalStatus, ApiError> {
-    get_user_from_headers(
+    let actor = get_user_from_headers(
         &req,
         pool,
         redis,
@@ -232,10 +232,35 @@ async fn cancel_auto_approval(
         .await
         .internal_context("waiting for approval cancellation acknowledgement")?
         .internal_context("reading approval cancellation acknowledgement")?;
+    let latest = sqlx::query_scalar!(
+        r#"
+        SELECT delta->>'kind' AS kind
+        FROM project_history
+        WHERE project_id = $1
+            AND delta->>'kind' IN ('auto_approval_scheduled', 'auto_approval_cancelled')
+        ORDER BY occurred_at DESC, id DESC
+        LIMIT 1
+        "#,
+        id.0
+    )
+    .fetch_optional(&mut transaction)
+    .await
+    .internal_context("reading approval cancellation history")?
+    .flatten();
+    if latest.as_deref() != Some("auto_approval_cancelled") {
+        DBProject::record_history(
+            id,
+            Some(actor.user.id.into()),
+            crate::models::v3::projects::ProjectDelta::AutoApprovalCancelled,
+            &mut transaction,
+        )
+        .await
+        .internal_context("recording approval cancellation")?;
+    }
     transaction
         .commit()
         .await
-        .internal_context("releasing approval cancellation lock")?;
+        .internal_context("committing approval cancellation history")?;
     Ok(state)
 }
 
