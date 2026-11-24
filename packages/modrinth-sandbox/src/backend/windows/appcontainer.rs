@@ -1,8 +1,12 @@
 use std::{
     collections::HashSet,
     ffi::{OsStr, OsString},
+    fs::OpenOptions,
     io::{Error, ErrorKind},
-    os::windows::ffi::{OsStrExt, OsStringExt},
+    os::windows::{
+        ffi::{OsStrExt, OsStringExt},
+        fs::OpenOptionsExt,
+    },
     path::{Path, PathBuf},
     sync::Arc,
 };
@@ -20,7 +24,7 @@ use windows::{
             NetworkIsolationSetAppContainerConfig,
         },
         Security::{
-            ACE_HEADER, ACL,
+            ACCESS_ALLOWED_ACE, ACCESS_DENIED_ACE, ACE_HEADER, ACL,
             Authorization::{
                 ConvertSidToStringSidW, ConvertStringSidToSidW,
                 EXPLICIT_ACCESS_W, GRANT_ACCESS, GetNamedSecurityInfoW,
@@ -32,7 +36,7 @@ use windows::{
             },
             CONTAINER_INHERIT_ACE, CreateWellKnownSid,
             DACL_SECURITY_INFORMATION, DeriveCapabilitySidsFromName, EqualSid,
-            FreeSid, GetAce, GetSecurityDescriptorControl,
+            FreeSid, GetAce, GetSecurityDescriptorControl, INHERITED_ACE,
             InitializeSecurityDescriptor,
             Isolation::{
                 CreateAppContainerProfile,
@@ -49,15 +53,19 @@ use windows::{
             WinCapabilityPrivateNetworkClientServerSid,
         },
         Storage::FileSystem::{
-            DELETE, FILE_GENERIC_EXECUTE, FILE_GENERIC_READ,
-            FILE_GENERIC_WRITE, FILE_TRAVERSE, READ_CONTROL, WRITE_DAC,
+            DELETE, FILE_FLAG_BACKUP_SEMANTICS, FILE_GENERIC_EXECUTE,
+            FILE_GENERIC_READ, FILE_GENERIC_WRITE, FILE_TRAVERSE, READ_CONTROL,
+            WRITE_DAC,
         },
         System::{
             Com::CoTaskMemFree,
             Memory::{GetProcessHeap, HEAP_FLAGS, HeapFree},
             Registry::KEY_READ,
             StationsAndDesktops::OpenWindowStationW,
-            SystemServices::{SE_GROUP_ENABLED, SECURITY_DESCRIPTOR_REVISION},
+            SystemServices::{
+                ACCESS_ALLOWED_ACE_TYPE, ACCESS_DENIED_ACE_TYPE,
+                SE_GROUP_ENABLED, SECURITY_DESCRIPTOR_REVISION,
+            },
             Threading::PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITIES,
         },
         UI::WindowsAndMessaging::WINSTA_WRITEATTRIBUTES,
@@ -387,7 +395,28 @@ fn spawn(
                     "unable to grant sandbox access to registry key {path:?}: {err:#}"
                 );
             } else if is_access_denied(&err) {
-                match grant.permission {
+                let mut permission = grant.permission;
+                if permission == PermissionType::Write
+                    && !can_access_ourselves(&path, permission)
+                {
+                    tracing::warn!(
+                        "unable to grant sandbox write access to {path:?}, since we can't write to it ourselves, falling back to read access"
+                    );
+                    permission = PermissionType::Read;
+                }
+                if !can_access_ourselves(&path, permission) {
+                    tracing::warn!(
+                        "unable to grant sandbox {permission:?} access to {path:?}, since we don't have access ourselves"
+                    );
+                    continue;
+                }
+                // Otherwise the user would be prompted for every launch
+                if is_already_granted(&app_container_sid, &path, permission)
+                    .unwrap_or(false)
+                {
+                    continue;
+                }
+                match permission {
                     PermissionType::Traverse => parents_to_elevate.push(path),
                     PermissionType::Read => read_paths_to_elevate.push(path),
                     PermissionType::Write => write_paths_to_elevate.push(path),
@@ -583,11 +612,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
             // Save dialogs return paths which may not exist, creating
             // an empty file allows us to grant permission to that file
             // rather than the whole parent directory
-            match std::fs::OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .open(path)
-            {
+            match OpenOptions::new().write(true).create_new(true).open(path) {
                 Ok(_) => {}
                 Err(err) if err.kind() == ErrorKind::AlreadyExists => {}
                 Err(err) => {
@@ -973,6 +998,106 @@ fn add_writeattributes_to_winsta(app_container: &PSID) -> Result<()> {
     Ok(())
 }
 
+fn access_rights(permission: PermissionType) -> u32 {
+    const TRAVERSE: u32 = FILE_GENERIC_READ.0 | FILE_TRAVERSE.0;
+    const READ: u32 = TRAVERSE | FILE_GENERIC_EXECUTE.0;
+    const WRITE: u32 = READ | FILE_GENERIC_WRITE.0 | DELETE.0;
+
+    match permission {
+        PermissionType::Traverse => TRAVERSE,
+        PermissionType::Read => READ,
+        PermissionType::Write => WRITE,
+    }
+}
+
+/// Prevents elevation from giving the sandbox access to something that the user
+/// can't normally access.
+fn can_access_ourselves(path: &Path, permission: PermissionType) -> bool {
+    let result = OpenOptions::new()
+        .access_mode(access_rights(permission))
+        .custom_flags(FILE_FLAG_BACKUP_SEMANTICS.0)
+        .open(path);
+    // Other errors, such as the file being in use, aren't related to permissions
+    !result.is_err_and(|err| err.kind() == ErrorKind::PermissionDenied)
+}
+
+/// Checks for an entry that exactly matches what [`set_acl`] would add.
+fn is_already_granted(
+    app_container: &PSID,
+    path: &Path,
+    permission: PermissionType,
+) -> Result<bool> {
+    let encoded_path = path
+        .as_os_str()
+        .encode_wide()
+        .chain([0])
+        .collect::<Vec<_>>();
+    let mut acl = std::ptr::null_mut();
+    let mut descriptor = PSECURITY_DESCRIPTOR::default();
+    unsafe {
+        GetNamedSecurityInfoW(
+            PCWSTR(encoded_path.as_ptr()),
+            SE_FILE_OBJECT,
+            DACL_SECURITY_INFORMATION,
+            None,
+            None,
+            Some(&raw mut acl),
+            None,
+            &raw mut descriptor,
+        )
+        .ok()?;
+    }
+    scopeguard::defer! {
+        unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(descriptor.0))) };
+    }
+    let Some(acl_ref) = (unsafe { acl.as_ref() }) else {
+        return Ok(false);
+    };
+
+    // Windows removes the inheritance flags from files
+    let expected_flags =
+        if permission == PermissionType::Traverse || !path.is_dir() {
+            0
+        } else {
+            (OBJECT_INHERIT_ACE | CONTAINER_INHERIT_ACE).0
+        };
+    let expected_mask = access_rights(permission);
+
+    let mut granted = false;
+    for index in 0..acl_ref.AceCount {
+        let mut ace = std::ptr::null_mut();
+        unsafe { GetAce(acl, u32::from(index), &raw mut ace)? };
+        let header = unsafe { ace.cast::<ACE_HEADER>().read() };
+        let ace_type = u32::from(header.AceType);
+        let ace_flags = u32::from(header.AceFlags);
+
+        if ace_flags & INHERITED_ACE.0 != 0 {
+            continue; // Skip inherited ACEs
+        }
+
+        if ace_type == ACCESS_ALLOWED_ACE_TYPE {
+            let ace = ace.cast::<ACCESS_ALLOWED_ACE>();
+            let sid = PSID(unsafe { &raw mut (*ace).SidStart }.cast());
+            if unsafe { EqualSid(sid, *app_container) }.is_err() {
+                continue;
+            }
+            let mask = unsafe { (*ace).Mask };
+            if ace_flags == expected_flags && mask == expected_mask {
+                granted = true;
+            } else {
+                return Ok(false);
+            }
+        } else if ace_type == ACCESS_DENIED_ACE_TYPE {
+            let ace = ace.cast::<ACCESS_DENIED_ACE>();
+            let sid = PSID(unsafe { &raw mut (*ace).SidStart }.cast());
+            if unsafe { EqualSid(sid, *app_container) }.is_ok() {
+                return Ok(false);
+            }
+        }
+    }
+    Ok(granted)
+}
+
 fn set_acl(
     app_container: &PSID,
     path: &Path,
@@ -1008,18 +1133,9 @@ fn set_acl(
         unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(old_descriptor.0))) };
     }
 
-    const TRAVERSE_PERMISSIONS: u32 = FILE_GENERIC_READ.0 | FILE_TRAVERSE.0;
-    const READ_PERMISSIONS: u32 = TRAVERSE_PERMISSIONS | FILE_GENERIC_EXECUTE.0;
-    const WRITE_PERMISSIONS: u32 =
-        READ_PERMISSIONS | FILE_GENERIC_WRITE.0 | DELETE.0;
-
     let mut ea = EXPLICIT_ACCESS_W::default();
     ea.grfAccessMode = SET_ACCESS;
-    ea.grfAccessPermissions = match perms {
-        PermissionType::Traverse => TRAVERSE_PERMISSIONS,
-        PermissionType::Read => READ_PERMISSIONS,
-        PermissionType::Write => WRITE_PERMISSIONS,
-    };
+    ea.grfAccessPermissions = access_rights(perms);
     ea.grfInheritance = if matches!(perms, PermissionType::Traverse) {
         NO_INHERITANCE
     } else {
