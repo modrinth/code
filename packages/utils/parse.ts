@@ -15,6 +15,22 @@ export const setMarkdownUserCountryResolver = (resolver: MarkdownUserCountryReso
 	resolveMarkdownUserCountry = resolver
 }
 
+type MarkdownIframeSourceRewriter = (url: URL) => string | null | undefined
+
+let rewriteMarkdownIframeSource: MarkdownIframeSourceRewriter = () => undefined
+
+export const setMarkdownIframeSourceRewriter = (rewriter: MarkdownIframeSourceRewriter) => {
+	rewriteMarkdownIframeSource = rewriter
+}
+
+const getIframeSource = (url: URL) => {
+	try {
+		return rewriteMarkdownIframeSource(url) ?? url.toString()
+	} catch {
+		return url.toString()
+	}
+}
+
 const shouldProxyImgur = () => {
 	try {
 		const country = resolveMarkdownUserCountry()
@@ -109,7 +125,7 @@ export const configuredXss = new FilterXSS({
 					})
 
 					url.search = newSearchParams.toString()
-					return `${name}="${escapeAttrValue(url.toString())}"`
+					return `${name}="${escapeAttrValue(getIframeSource(url))}"`
 				}
 			} catch {
 				// ..

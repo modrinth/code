@@ -70,7 +70,7 @@
 			/>
 		</div>
 		<div :class="['px-6', { 'shrink-0': isFixedRender }]">
-			<Collapsible :collapsed="browseTransition.active" :duration-ms="200" overflow-visible fade>
+			<Collapsible :collapsed="searchTransitionActive" :duration-ms="200" overflow-visible fade>
 				<div class="pb-4">
 					<NavTabs :links="tabs" />
 				</div>
@@ -271,6 +271,10 @@ useQuery(
 )
 const instance = computed(() => instanceQuery.data.value)
 const browseTransition = useRouteLinkTransition((route) => route.query.i === instanceId.value)
+const searchTransitionActive = computed(
+	() =>
+		browseTransition.value.active && !!browseTransition.value.route?.path.startsWith('/browse'),
+)
 
 const {
 	hiddenIds: hiddenInstanceIds,

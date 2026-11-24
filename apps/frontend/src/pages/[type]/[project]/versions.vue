@@ -1,5 +1,5 @@
 <template>
-	<section class="overflow-visible">
+	<section class="overflow-visible pt-1">
 		<!-- Loading state -->
 		<div v-if="showVersionsLoadingState" class="flex items-center justify-center gap-2 py-8">
 			<SpinnerIcon class="animate-spin" />
@@ -34,6 +34,7 @@
 				:loaders="tags.loaders"
 				:game-versions="tags.gameVersions"
 				:base-id="baseDropdownId"
+				:refresh="invalidate"
 				:version-link="
 					(version) =>
 						`/${project.project_type}/${

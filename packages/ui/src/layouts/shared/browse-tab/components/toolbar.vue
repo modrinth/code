@@ -21,6 +21,7 @@ import {
 } from '#ui/components/base/buttons'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
+import ListToolbar from '#ui/components/base/ListToolbar.vue'
 import Pagination from '#ui/components/base/Pagination.vue'
 import ToolbarTabs, { type ToolbarTab } from '#ui/components/base/ToolbarTabs.vue'
 import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
@@ -109,6 +110,13 @@ const filterTypes = computed(() => {
 	]
 })
 
+const providedFilters = computed(() =>
+	view.isServerType.value ? [] : (ctx.providedFilters?.value ?? []),
+)
+const overriddenProvidedFilterTypes = computed(() =>
+	view.isServerType.value ? [] : view.overriddenProvidedFilterTypes.value,
+)
+
 const selectedFilters = computed<FilterValue[]>({
 	get: () => [...environmentSelection.value, ...view.filters.value],
 	set: (filters) => {
@@ -118,6 +126,17 @@ const selectedFilters = computed<FilterValue[]>({
 		}
 		view.filters.value = filters.filter((filter) => filter.type !== SERVER_ENVIRONMENT_FILTER_ID)
 	},
+})
+
+const hasFilterPills = computed(() => {
+	const typeIds = new Set(filterTypes.value.map((type) => type.id))
+	return (
+		selectedFilters.value.some((filter) => typeIds.has(filter.type)) ||
+		providedFilters.value.some(
+			(filter) =>
+				typeIds.has(filter.type) && !overriddenProvidedFilterTypes.value.includes(filter.type),
+		)
+	)
 })
 
 function hrefPath(href: string) {
@@ -189,8 +208,8 @@ const searchPlaceholder = computed(() =>
 			class="self-start"
 		/>
 
-		<div class="flex flex-col gap-2">
-			<div v-if="stacked" class="flex flex-col gap-4">
+		<div v-if="stacked" class="flex flex-col gap-2">
+			<div class="flex flex-col gap-4">
 				<Input
 					v-model="view.query.value"
 					:icon="SearchIcon"
@@ -256,91 +275,84 @@ const searchPlaceholder = computed(() =>
 				</div>
 			</div>
 
-			<div v-else class="flex flex-wrap items-center gap-x-4 gap-y-2">
-				<Input
-					v-model="view.query.value"
-					:icon="SearchIcon"
-					type="text"
-					autocomplete="off"
-					:spellcheck="false"
-					:placeholder="searchPlaceholder"
-					clearable
-					size="medium"
-					wrapper-class="min-w-[12rem] flex-1"
-					@clear="view.clearSearch()"
-				/>
-
-				<div class="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
-					<IconButton
-						v-if="ctx.filtersMenuOpen && !ctx.filtersMenuOpen.value"
-						v-tooltip="formatMessage(messages.filterResults)"
-						type="quiet"
-						size="lg"
-						class="lg:hidden"
-						:label="formatMessage(messages.filterResults)"
-						@click="ctx.filtersMenuOpen.value = true"
-					>
-						<FilterIcon aria-hidden="true" />
-					</IconButton>
-
-					<TeleportOverflowMenu
-						:tooltip="formatMessage(messages.resultsPerPage)"
-						type="quiet"
-						size="lg"
-						:label="formatMessage(messages.resultsPerPageCurrent, { count: view.maxResults.value })"
-						:options="maxResultsOptions"
-						:icon-only="false"
-						animate-width
-					>
-						<SlidersVerticalIcon aria-hidden="true" />
-						{{ view.maxResults.value }}
-					</TeleportOverflowMenu>
-
-					<IconButton
-						v-if="ctx.display"
-						v-tooltip="formatMessage(messages.changeDisplayMode)"
-						type="quiet"
-						size="lg"
-						:label="formatMessage(messages.changeDisplayMode)"
-						@click="ctx.display.cycle()"
-					>
-						<component :is="displayModeIcon" aria-hidden="true" />
-					</IconButton>
-
-					<TeleportOverflowMenu
-						type="quiet"
-						size="lg"
-						:label="formatMessage(messages.sortCurrent, { mode: view.sort.value.display })"
-						:options="sortOptions"
-						:icon-only="false"
-						animate-width
-					>
-						<ArrowUpDownIcon aria-hidden="true" />
-						{{ view.sort.value.display }}
-					</TeleportOverflowMenu>
-
-					<template v-if="view.pageCount.value > 1">
-						<div class="h-6 w-px bg-surface-4" aria-hidden="true" />
-						<Pagination
-							:page="view.page.value"
-							:count="view.pageCount.value"
-							animate-width
-							@switch-page="view.setPage"
-						/>
-					</template>
-				</div>
-			</div>
-
 			<SearchFilterControl
 				v-model:selected-filters="selectedFilters"
 				:filters="filterTypes"
-				:provided-filters="view.isServerType.value ? [] : (ctx.providedFilters?.value ?? [])"
-				:overridden-provided-filter-types="
-					view.isServerType.value ? [] : view.overriddenProvidedFilterTypes.value
-				"
+				:provided-filters="providedFilters"
+				:overridden-provided-filter-types="overriddenProvidedFilterTypes"
 				:provided-message="view.isServerType.value ? undefined : lockedMessages?.providedBy"
 			/>
 		</div>
+
+		<ListToolbar
+			v-else
+			v-model:search="view.query.value"
+			:search-placeholder="searchPlaceholder"
+			:page="view.page.value"
+			:page-count="view.pageCount.value"
+			:filters-shown="hasFilterPills"
+			@clear-search="view.clearSearch()"
+			@switch-page="view.setPage"
+		>
+			<template #controls>
+				<IconButton
+					v-if="ctx.filtersMenuOpen && !ctx.filtersMenuOpen.value"
+					v-tooltip="formatMessage(messages.filterResults)"
+					type="quiet"
+					size="lg"
+					class="lg:hidden"
+					:label="formatMessage(messages.filterResults)"
+					@click="ctx.filtersMenuOpen.value = true"
+				>
+					<FilterIcon aria-hidden="true" />
+				</IconButton>
+
+				<TeleportOverflowMenu
+					:tooltip="formatMessage(messages.resultsPerPage)"
+					type="quiet"
+					size="lg"
+					:label="formatMessage(messages.resultsPerPageCurrent, { count: view.maxResults.value })"
+					:options="maxResultsOptions"
+					:icon-only="false"
+					animate-width
+				>
+					<SlidersVerticalIcon aria-hidden="true" />
+					{{ view.maxResults.value }}
+				</TeleportOverflowMenu>
+
+				<IconButton
+					v-if="ctx.display"
+					v-tooltip="formatMessage(messages.changeDisplayMode)"
+					type="quiet"
+					size="lg"
+					:label="formatMessage(messages.changeDisplayMode)"
+					@click="ctx.display.cycle()"
+				>
+					<component :is="displayModeIcon" aria-hidden="true" />
+				</IconButton>
+
+				<TeleportOverflowMenu
+					type="quiet"
+					size="lg"
+					:label="formatMessage(messages.sortCurrent, { mode: view.sort.value.display })"
+					:options="sortOptions"
+					:icon-only="false"
+					animate-width
+				>
+					<ArrowUpDownIcon aria-hidden="true" />
+					{{ view.sort.value.display }}
+				</TeleportOverflowMenu>
+			</template>
+			<template #filters>
+				<SearchFilterControl
+					v-model:selected-filters="selectedFilters"
+					:filters="filterTypes"
+					:provided-filters="providedFilters"
+					:overridden-provided-filter-types="overriddenProvidedFilterTypes"
+					:provided-message="view.isServerType.value ? undefined : lockedMessages?.providedBy"
+				/>
+			</template>
+		</ListToolbar>
 
 		<Admonition
 			v-if="view.linkOverridesAdvancedPrefs.value"

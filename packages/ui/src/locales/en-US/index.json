@@ -887,9 +887,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Search {count, number} {contentType}..."
   },
-  "content.page-layout.sort.current-mode": {
-    "defaultMessage": "Sort: {field, select, author {Author} updated {Last updated} added {Date added} other {Name}}, {direction, select, za {Z-A} newest {Newest first} oldest {Oldest first} other {A-Z}}"
-  },
   "content.page-layout.sort.direction.alphabetical-ascending": {
     "defaultMessage": "A-Z"
   },
@@ -4988,14 +4985,26 @@
   "project.versions.filter.channel": {
     "defaultMessage": "Channel"
   },
-  "project.versions.filter.selected-count": {
-    "defaultMessage": "{count, number} selected"
-  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Toggle filter for {filter}"
   },
   "project.versions.platform.modloader.short": {
     "defaultMessage": "ModLoader"
+  },
+  "project.versions.refreshing": {
+    "defaultMessage": "Refreshing..."
+  },
+  "project.versions.search-placeholder": {
+    "defaultMessage": "Search {count, number} versions..."
+  },
+  "project.versions.sort.downloads": {
+    "defaultMessage": "Downloads"
+  },
+  "project.versions.sort.published": {
+    "defaultMessage": "Date published"
+  },
+  "project.versions.sort.version": {
+    "defaultMessage": "Version number"
   },
   "project.versions.version.withheld": {
     "defaultMessage": "Withheld"
@@ -5548,12 +5557,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "Role could not be updated"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "All"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Role: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "Editor"
@@ -7843,6 +7846,15 @@
   },
   "skins.select-named": {
     "defaultMessage": "Select {name}"
+  },
+  "sort-menu.current-mode": {
+    "defaultMessage": "Sort: {field}, {direction}"
+  },
+  "sort-menu.direction.numeric-ascending": {
+    "defaultMessage": "Lowest first"
+  },
+  "sort-menu.direction.numeric-descending": {
+    "defaultMessage": "Highest first"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"

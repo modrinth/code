@@ -20,9 +20,9 @@ import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import { prefetchSharedInstanceLibrary } from '@/features/library/shared-instances/queries'
+import { useUninstalledSharedInstances } from '@/features/library/shared-instances/use-uninstalled-shared-instances'
 import { traceStartupStep } from '@/helpers/startup-debug'
 import { instanceListQueryOptions } from '@/pages/instance/query-options'
-import { skipCreateInstanceOnboarding } from '@/platform/app-lib/onboarding-checklist/commands'
 import { injectOnboardingChecklist } from '@/providers/onboarding-checklist'
 import { useRootBreadcrumb } from '@/shared/breadcrumbs'
 
@@ -78,10 +78,6 @@ watch(
 	{ immediate: true },
 )
 
-function skipWelcomeScreen() {
-	skipCreateInstanceOnboarding().catch(handleError)
-}
-
 const instancesQuery = useQuery(instanceListQueryOptions())
 const instances = computed(() => instancesQuery.data.value ?? [])
 if (hasCreatedInstance.value) {
@@ -89,6 +85,14 @@ if (hasCreatedInstance.value) {
 		handleError,
 	)
 }
+
+const { sharedInstances } = useUninstalledSharedInstances(instances)
+const showWelcomeScreen = computed(
+	() =>
+		isReady.value &&
+		!hasCreatedInstance.value &&
+		!sharedInstances.value.some((instance) => !hiddenInstanceIds.value.has(instance.id)),
+)
 
 const recentInstances = computed(() =>
 	instances.value
@@ -118,7 +122,7 @@ function openPageContextMenu(event: MouseEvent) {
 </script>
 
 <template>
-	<WelcomeScreen v-if="isReady && !hasCreatedInstance" @skip="skipWelcomeScreen" />
+	<WelcomeScreen v-if="showWelcomeScreen" />
 	<div
 		v-else-if="isReady"
 		data-library-page-background

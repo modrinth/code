@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { DownloadIcon, PlusIcon, RefreshCwIcon, SearchIcon, UploadIcon } from '@modrinth/assets'
+import { DownloadIcon, PlusIcon, RefreshCwIcon, UploadIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import { type ButtonMenuOption, IconButton, SplitButton } from '#ui/components/base/buttons'
 import type { DropdownFilterBarCategory } from '#ui/components/base/DropdownFilterBar.vue'
-import Input from '#ui/components/base/inputs/Input.vue'
+import ListToolbar from '#ui/components/base/ListToolbar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import type { ContentSortField, ContentSortMode } from '../composables/content-sort'
 import type { ContentMetadataFilterValue } from '../composables/use-content-metadata-filters'
 import type { ContentType } from '../types'
-import FilterRow from './filter-row.vue'
+import SortMenu from './sort-menu.vue'
 import TypeTabs from './type-tabs.vue'
 
 const props = defineProps<{
@@ -103,26 +103,14 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 			</SplitButton>
 		</div>
 
-		<FilterRow
-			v-model:type="type"
+		<ListToolbar
+			v-model:search="search"
 			v-model:filters="filters"
-			v-model:sort="sort"
-			:types="types"
+			:search-placeholder="searchPlaceholder"
 			:filter-categories="filterCategories"
-			:sort-fields="sortFields"
 		>
-			<template #leading>
-				<Input
-					v-model="search"
-					:icon="SearchIcon"
-					type="text"
-					autocomplete="off"
-					:spellcheck="false"
-					size="medium"
-					wrapper-class="flex-1 min-w-0"
-					clearable
-					:placeholder="searchPlaceholder"
-				/>
+			<template #controls>
+				<SortMenu v-model="sort" :fields="sortFields" />
 			</template>
 			<template #actions>
 				<Transition name="update-all">
@@ -159,7 +147,7 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 				</IconButton>
 				-->
 			</template>
-		</FilterRow>
+		</ListToolbar>
 	</div>
 </template>
 

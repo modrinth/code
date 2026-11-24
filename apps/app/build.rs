@@ -150,10 +150,7 @@ fn main() {
             .plugin(
                 "onboarding-checklist",
                 InlinedPlugin::new()
-                    .commands(&[
-                        "get_onboarding_checklist",
-                        "skip_create_instance_onboarding",
-                    ])
+                    .commands(&["get_onboarding_checklist"])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),

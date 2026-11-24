@@ -105,6 +105,7 @@ pub enum FeatureFlag {
     ServerProjectQa,
     I18nDebug,
     LocalhostSignIn,
+    UseLocalYoutubeEmbeds,
 }
 
 impl Settings {

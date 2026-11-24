@@ -10,20 +10,16 @@
 		</div>
 
 		<template v-else>
-			<div class="mb-3 flex">
-				<VersionFilterControl
-					:versions="versions ?? []"
-					:game-versions="tags.gameVersions"
-					@update:query="updateQuery"
-				/>
-				<Pagination
-					:page="currentPage"
-					:count="Math.ceil(filteredVersions.length / 20)"
-					class="ml-auto mt-auto"
-					:link-function="(page) => `?page=${page}`"
-					@switch-page="switchPage"
-				/>
-			</div>
+			<VersionFilterControl
+				class="mb-3"
+				:versions="versions ?? []"
+				:game-versions="tags.gameVersions"
+				:page="currentPage"
+				:page-count="Math.ceil(filteredVersions.length / 20)"
+				:page-link="(page) => `?page=${page}`"
+				@update:query="updateQuery"
+				@switch-page="switchPage"
+			/>
 			<div class="card changelog-wrapper">
 				<template v-if="paginatedVersions && !isLoadingVersions">
 					<div v-for="version in paginatedVersions" :key="version.id" class="changelog-item">

@@ -18,6 +18,7 @@ import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { ButtonLink } from '#ui/components/base/buttons'
 import FilterPills from '#ui/components/base/FilterPills.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
+import ListToolbar from '#ui/components/base/ListToolbar.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectPageContext } from '#ui/providers/page-context'
@@ -44,7 +45,8 @@ import type {
 import ContentTable from '../content-table/index.vue'
 import type { ContentTableColumns } from '../content-table/types'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
-import FilterRow from '../filter-row.vue'
+import SortMenu from '../sort-menu.vue'
+import TypeTabs from '../type-tabs.vue'
 
 const { formatMessage } = useVIntl()
 const pageContext = injectPageContext(null)
@@ -564,17 +566,13 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					clearable
 				/>
 
-				<FilterRow
-					v-model:type="activeType"
+				<ListToolbar
 					v-model:filters="selectedMetadataFilters"
-					v-model:sort="sortMode"
-					:types="types"
 					:filter-categories="metadataFilterCategories"
-					:sort-fields="sortFields"
-					flat
 				>
-					<template v-if="filterMode === 'status'" #leading>
+					<template #leading>
 						<FilterPills
+							v-if="filterMode === 'status'"
 							:model-value="selectedFilters"
 							:options="statusFilterOptions"
 							@update:model-value="updateFilters"
@@ -583,8 +581,17 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 								{{ formatMessage(commonMessages.allProjectType) }}
 							</template>
 						</FilterPills>
+						<TypeTabs
+							v-else-if="types.length > 1"
+							v-model="activeType"
+							:types="types"
+							class="!shadow-none"
+						/>
 					</template>
-				</FilterRow>
+					<template #controls>
+						<SortMenu v-model="sortMode" :fields="sortFields" />
+					</template>
+				</ListToolbar>
 			</div>
 
 			<div class="flex min-h-0 flex-col overflow-hidden">

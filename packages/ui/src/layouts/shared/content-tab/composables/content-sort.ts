@@ -14,13 +14,6 @@ export interface ContentSortMode {
 
 export const contentSortFields: readonly ContentSortField[] = ['name', 'author', 'updated', 'added']
 
-export const contentSortDefaultDirections: Record<ContentSortField, ContentSortDirection> = {
-	name: 'asc',
-	author: 'asc',
-	updated: 'desc',
-	added: 'desc',
-}
-
 export const defaultContentSortMode: ContentSortMode = { field: 'name', direction: 'asc' }
 
 export function isContentSortMode(value: unknown): value is ContentSortMode {

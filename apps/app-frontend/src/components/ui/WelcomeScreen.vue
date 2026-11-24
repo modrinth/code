@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import { CircleSlashIcon, ImportIcon, PlusIcon } from '@modrinth/assets'
-import { Button, defineMessages, IntlFormatted, SplitButton, useVIntl } from '@modrinth/ui'
-import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
+import { ImportIcon, PlusIcon } from '@modrinth/assets'
+import { Button, defineMessages, IntlFormatted, useVIntl } from '@modrinth/ui'
+import { inject, onMounted, onUnmounted, ref } from 'vue'
 
 import modrinthSocialIcon from '../../assets/welcome/modrinth-social-icon.png'
 
 const showCreationModal = inject<() => void>('showCreationModal')
 const showImportModal = inject<() => void>('showImportModal')
-
-const emit = defineEmits<{
-	skip: []
-}>()
 
 const { formatMessage } = useVIntl()
 
@@ -27,14 +23,6 @@ const messages = defineMessages({
 		id: 'app.welcome-screen.create-instance',
 		defaultMessage: 'Create an instance',
 	},
-	moreOptions: {
-		id: 'app.welcome-screen.more-options',
-		defaultMessage: 'More options',
-	},
-	skip: {
-		id: 'app.welcome-screen.skip',
-		defaultMessage: 'Skip',
-	},
 	quickCreateHint: {
 		id: 'app.welcome-screen.quick-create-hint',
 		defaultMessage: 'Press <shortcut>N</shortcut> to quick create an instance',
@@ -50,15 +38,6 @@ const messages = defineMessages({
 })
 
 const offline = ref(!navigator.onLine)
-
-const createOptions = computed(() => [
-	{
-		id: 'skip',
-		label: formatMessage(messages.skip),
-		icon: CircleSlashIcon,
-		action: () => emit('skip'),
-	},
-])
 
 function handleOffline() {
 	offline.value = true
@@ -121,19 +100,17 @@ onUnmounted(() => {
 					</p>
 				</div>
 				<div class="flex w-72 flex-col items-center gap-4">
-					<SplitButton
+					<Button
 						type="colored"
 						color="brand"
 						size="lg"
 						class="!shadow-none"
-						:options="createOptions"
-						:menu-label="formatMessage(messages.moreOptions)"
-						:primary-disabled="offline"
+						:disabled="offline"
 						@click="showCreationModal?.()"
 					>
 						<PlusIcon />
 						{{ formatMessage(messages.createInstance) }}
-					</SplitButton>
+					</Button>
 					<span class="flex items-center gap-1 text-sm leading-5 text-secondary">
 						<IntlFormatted :message-id="messages.quickCreateHint">
 							<template #shortcut="{ children }">

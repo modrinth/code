@@ -5,6 +5,7 @@
 			:game-versions="gameVersionTags"
 			:versions="versions"
 			:project="project"
+			:refresh="refreshVersions"
 			:show-environment-column="appSettings.featureFlags.show_version_environment_column"
 			:version-link="(version) => buildProjectHref(`/project/${project.id}/version/${version.id}`)"
 		>
@@ -105,6 +106,10 @@ defineProps({
 	versions: {
 		type: Array,
 		required: true,
+	},
+	refreshVersions: {
+		type: Function,
+		default: null,
 	},
 	install: {
 		type: Function,
