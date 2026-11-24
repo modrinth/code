@@ -23,6 +23,8 @@ pub struct AppEventBatch<E = AppEvent> {
     pub arch: AppArch,
     /// App version
     pub app_version: SmolStr,
+    /// Event source variant, such as `app`
+    pub source: SmolStr,
     /// List of events to be processed
     pub events: Vec<E>,
 }

@@ -141,6 +141,7 @@ pub fn extract_events<K: AsRef<str>, V: AsRef<str>>(
             os: batch.os,
             arch: batch.arch,
             app_version: batch.app_version.clone(),
+            source: batch.source.clone(),
             data: event.event,
         })
     }
@@ -195,11 +196,7 @@ fn extract_headers<K: AsRef<str>, V: AsRef<str>>(
     }
 
     ExtractedHeaderData {
-        ip_country: match (cf_ipcountry, alt_ipcountry) {
-            (Some(cf), _) => cf,
-            (_, Some(alt)) => alt,
-            _ => Country::UNKNOWN,
-        },
+        ip_country: alt_ipcountry.or(cf_ipcountry).unwrap_or(Country::UNKNOWN),
     }
 }
 
@@ -219,7 +216,7 @@ mod tests {
 
     fn body(events: &str) -> String {
         format!(
-            r#"{{"sent_at":"2026-11-23T11:59:59Z","installation_id":"{INSTALLATION_ID}","os":"linux","arch":"x86_64","app_version":"0.10.3","events":[{events}]}}"#
+            r#"{{"sent_at":"2026-11-23T11:59:59Z","installation_id":"{INSTALLATION_ID}","os":"linux","arch":"x86_64","app_version":"0.10.3","source":"app","events":[{events}]}}"#
         )
     }
 
@@ -297,5 +294,22 @@ mod tests {
         let err = extract_events(&body, NO_HEADERS, arrived_at()).unwrap_err();
 
         assert!(matches!(err, ExtractError::Deserialize(_)));
+    }
+
+    #[test]
+    fn prefers_alt_ipcountry_over_cf_ipcountry() {
+        let country = |headers: &[(&str, &str)]| {
+            extract_headers(headers.iter().copied()).ip_country
+        };
+
+        assert_eq!(
+            country(&[("CF-IPCountry", "FR"), ("Alt-IPCountry", "DE")]),
+            Country::parse("DE").unwrap()
+        );
+        assert_eq!(
+            country(&[("cf-ipcountry", "FR"), ("alt-ipcountry", "??")]),
+            Country::parse("FR").unwrap()
+        );
+        assert_eq!(country(&[]), Country::UNKNOWN);
     }
 }

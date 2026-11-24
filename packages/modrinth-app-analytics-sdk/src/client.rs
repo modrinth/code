@@ -32,6 +32,7 @@ impl AppAnalytics {
             os,
             arch,
             app_version,
+            source,
         }: AppAnalyticsParameters,
     ) -> AppAnalytics {
         assert_eq!(
@@ -59,6 +60,7 @@ impl AppAnalytics {
                 os,
                 arch,
                 app_version,
+                source,
             }),
         };
 
@@ -117,6 +119,8 @@ pub struct AppAnalyticsParameters {
     pub os: AppOs,
     pub arch: AppArch,
     pub app_version: SmolStr,
+    /// Event source variant, such as `app`
+    pub source: SmolStr,
 }
 
 /// State shared between [`AppAnalytics`] handles and the background task.
@@ -132,6 +136,7 @@ pub(crate) struct AnalyticsInner {
     os: AppOs,
     arch: AppArch,
     app_version: SmolStr,
+    source: SmolStr,
 }
 
 impl AnalyticsInner {
@@ -157,6 +162,7 @@ impl AnalyticsInner {
             os: self.os,
             arch: self.arch,
             app_version: self.app_version.clone(), // should be cheap
+            source: self.source.clone(),
             events,
         };
 

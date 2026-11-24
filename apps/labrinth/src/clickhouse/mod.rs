@@ -229,7 +229,7 @@ pub async fn run_migrations_on_database(
             "
             CREATE TABLE IF NOT EXISTS {database}.{APP_EVENTS} {cluster_line}
             (
-                event_id               UInt128                       COMMENT 'Client-controlled event ID',
+                event_id               UUID                          COMMENT 'Client-controlled event ID',
                 client_installation_id UUID                          COMMENT 'Client-controlled installation ID',
                 event_type             LowCardinality(String)        COMMENT 'Type of event, validated at ingest',
                 event_ts               DateTime64(6, 'UTC')          COMMENT 'Event timestamp, corrected for client clock skew',
