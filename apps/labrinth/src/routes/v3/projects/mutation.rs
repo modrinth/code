@@ -135,13 +135,13 @@ impl SyncedProjectState {
         Ok(())
     }
 
-    pub(crate) async fn try_auto_approve(
+    pub(crate) async fn approve_after_delay(
         &mut self,
         cause: AutoApprovalCause,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<bool, ApiError> {
-        if !self.can_auto_approve() {
+        if !self.in_review() || !self.can_auto_approve() {
             return Ok(false);
         };
         let old_status = legacy_status(
@@ -298,15 +298,70 @@ impl SyncedProjectState {
     }
 }
 
+pub(crate) async fn delayed_auto_approval_eligible(
+    project_id: DBProjectId,
+    pool: &PgPool,
+    redis: &RedisPool,
+    approve_without_ruleset: bool,
+) -> Result<bool, ApiError> {
+    let mut transaction = pool
+        .begin()
+        .await
+        .internal_context("starting delayed approval check")?;
+    let deployed = sqlx::query_scalar!(
+        r#"SELECT ruleset_id FROM project_flags_deployed WHERE singleton FOR SHARE"#
+    ).fetch_optional(&mut transaction).await.internal_context("locking delayed approval ruleset")?;
+    let in_review = sqlx::query_scalar!(
+        r#"SELECT in_review FROM mods WHERE id = $1 FOR UPDATE"#,
+        project_id.0,
+    )
+    .fetch_optional(&mut transaction)
+    .await
+    .internal_context("locking delayed approval project")?;
+    if in_review != Some(true) {
+        return Ok(false);
+    }
+    let technical_review = sqlx::query_scalar!(
+        r#"SELECT EXISTS(SELECT 1 FROM delphi_tech_review_queue WHERE project_id = $1) AS "exists!""#,
+        project_id.0,
+    ).fetch_one(&mut transaction).await.internal_context("checking delayed approval technical review")?;
+    let mut state = load_project_state_with_options(
+        project_id,
+        technical_review,
+        false,
+        &mut transaction,
+        pool,
+        redis,
+    )
+    .await?;
+    let eligible = state.in_review() && state.can_auto_approve();
+    if eligible && approve_without_ruleset && deployed.is_none() {
+        state
+            .approve_after_delay(
+                AutoApprovalCause::TechnicalReviewNoDetails,
+                &mut transaction,
+                redis,
+            )
+            .await?;
+        PreparedMutations {
+            states: vec![state],
+        }
+        .commit_without_reconciliation(transaction, redis)
+        .await?;
+        return Ok(false);
+    }
+    Ok(eligible)
+}
+
 pub(crate) async fn sync_project_state(
     project_id: DBProjectId,
     transaction: &mut PgTransaction<'_>,
     pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<SyncedProjectState, ApiError> {
-    let (exited_projects, queued_projects) =
+    let (_, queued_projects) =
         sync_technical_review(&[project_id], transaction).await?;
-    let mut state = load_project_state_with_membership(
+    let state = load_project_state_with_membership(
         project_id,
         queued_projects.contains(&project_id),
         transaction,
@@ -314,15 +369,6 @@ pub(crate) async fn sync_project_state(
         redis,
     )
     .await?;
-    if exited_projects.contains(&project_id) && state.in_review() {
-        state
-            .try_auto_approve(
-                AutoApprovalCause::TechnicalReviewNoDetails,
-                transaction,
-                redis,
-            )
-            .await?;
-    }
     Ok(state)
 }
 
@@ -683,13 +729,35 @@ fn ensure_reconciliation_sources_match(
 /// Revalidates the evaluated project, versions and file manifest under locks.
 /// Other rule context (teams, users, organizations, disclosures, attributions and
 /// moderation history) is included in the cache key, not transactionally reloaded.
-pub(crate) async fn apply_project_flag_reconciliation(
+#[cfg(test)]
+async fn apply_project_flag_reconciliation(
     context: &crate::queue::moderation::project_flag::FlagContext,
     result: &db_models::project_flag_item::DBProjectFlagRunResult,
     ruleset_id: uuid::Uuid,
     file_manifest_hash: blake3::Hash,
     pool: &PgPool,
     redis: &RedisPool,
+) -> Result<(), ApiError> {
+    apply_project_flag_reconciliation_after_delay(
+        context,
+        result,
+        ruleset_id,
+        file_manifest_hash,
+        pool,
+        redis,
+        false,
+    )
+    .await
+}
+
+pub(crate) async fn apply_project_flag_reconciliation_after_delay(
+    context: &crate::queue::moderation::project_flag::FlagContext,
+    result: &db_models::project_flag_item::DBProjectFlagRunResult,
+    ruleset_id: uuid::Uuid,
+    file_manifest_hash: blake3::Hash,
+    pool: &PgPool,
+    redis: &RedisPool,
+    approval_due: bool,
 ) -> Result<(), ApiError> {
     use db_models::project_flag_item::ProjectFlag;
     use std::collections::BTreeMap;
@@ -846,9 +914,17 @@ pub(crate) async fn apply_project_flag_reconciliation(
         &effective,
         false,
     );
-    let outcome = desired.filter(|outcome| {
-        *outcome != ProjectReviewOutcome::Approved || state.can_auto_approve()
-    });
+    let outcome =
+        desired.filter(|outcome| *outcome != ProjectReviewOutcome::Approved);
+    if approval_due && desired == Some(ProjectReviewOutcome::Approved) {
+        changed |= state
+            .approve_after_delay(
+                AutoApprovalCause::ProjectFlags { ruleset_id },
+                &mut transaction,
+                redis,
+            )
+            .await?;
+    }
     if let Some(outcome) =
         outcome.filter(|outcome| *outcome != state.review_outcome())
     {
@@ -952,7 +1028,7 @@ pub(crate) struct PreparedMutations {
 
 pub(crate) async fn prepare_technical_review_exits(
     project_ids: &[DBProjectId],
-    cause: AutoApprovalCause,
+    _cause: AutoApprovalCause,
     transaction: &mut PgTransaction<'_>,
     pool: &PgPool,
     redis: &RedisPool,
@@ -963,13 +1039,8 @@ pub(crate) async fn prepare_technical_review_exits(
 
     let mut states = Vec::with_capacity(project_ids.len());
     for project_id in project_ids {
-        let mut state =
+        let state =
             load_project_state(project_id, transaction, pool, redis).await?;
-        if state.in_review() {
-            state
-                .try_auto_approve(cause.clone(), transaction, redis)
-                .await?;
-        }
         states.push(state);
     }
 
@@ -987,14 +1058,14 @@ pub(crate) async fn prepare_mutations(
     project_ids.sort_by_key(|project_id| project_id.0);
     project_ids.dedup();
 
-    let (exited_projects, queued_projects) =
+    let (_, queued_projects) =
         sync_technical_review(&project_ids, transaction).await?;
     let queued_projects = queued_projects
         .into_iter()
         .collect::<std::collections::HashSet<_>>();
     let mut states = Vec::with_capacity(project_ids.len());
     for project_id in project_ids {
-        let mut state = load_project_state_with_membership(
+        let state = load_project_state_with_membership(
             project_id,
             queued_projects.contains(&project_id),
             transaction,
@@ -1002,15 +1073,6 @@ pub(crate) async fn prepare_mutations(
             redis,
         )
         .await?;
-        if exited_projects.contains(&project_id) && state.in_review() {
-            state
-                .try_auto_approve(
-                    AutoApprovalCause::TechnicalReviewNoDetails,
-                    transaction,
-                    redis,
-                )
-                .await?;
-        }
         states.push(state);
     }
 
@@ -1062,10 +1124,11 @@ impl PreparedMutations {
     ) -> Result<(), ApiError> {
         self.commit_without_reconciliation(transaction, redis)
             .await?;
-        for state in self.states.iter().filter(|state| state.in_review()) {
-            crate::workflow::project_flag::reconcile_project_flags(
+        for state in &self.states {
+            crate::workflow::project_flag::reconcile_project_review_state(
                 temporal,
                 state.data.inner.id.into(),
+                state.in_review(),
             )
             .await
             .internal_context("dispatching project flag reconciliation")?;
@@ -1160,10 +1223,11 @@ pub(crate) async fn finalize_project_edit(
         .internal_context("clearing previous project slug cache")?;
     }
 
-    if state.in_review() {
-        crate::workflow::project_flag::reconcile_project_flags(
+    if state.in_review() || original_in_review {
+        crate::workflow::project_flag::reconcile_project_review_state(
             temporal,
             project_id.into(),
+            state.in_review(),
         )
         .await
         .internal_context("dispatching project flag reconciliation")?;
@@ -1215,7 +1279,7 @@ mod tests {
             let manifest_hash = crate::workflow::project_flag::scan_cache::rules_input_hash(&manifest).unwrap();
 
             for (initial, flag, expected, exits_review) in [
-                (ProjectReviewOutcome::NeverReviewed, None, ProjectReviewOutcome::Approved, true),
+                (ProjectReviewOutcome::NeverReviewed, None, ProjectReviewOutcome::NeverReviewed, false),
                 (ProjectReviewOutcome::Approved, Some("withheld"), ProjectReviewOutcome::Withheld, true),
                 (ProjectReviewOutcome::Withheld, Some("withheld"), ProjectReviewOutcome::Withheld, false),
                 (ProjectReviewOutcome::NeverReviewed, Some("manual_review"), ProjectReviewOutcome::NeverReviewed, false),
@@ -1273,11 +1337,23 @@ mod tests {
                     assert!(added.iter().any(|entry| matches!(entry.delta, ProjectDelta::ChangeReviewOutcome { from, to, .. } if from == initial && to == expected)));
                     assert!(added.iter().any(|entry| matches!(entry.delta, ProjectDelta::ChangeInReview { from: true, to: false })));
                 }
+                if flag.is_none() {
+                    apply_project_flag_reconciliation(&context, &result, ruleset_id, manifest_hash, &env.db.pool, &env.db.redis_pool).await.unwrap();
+                    let pending = db_models::DBProject::get_id(project_id, &*env.db.ro_pool, &env.db.redis_pool).await.unwrap().unwrap();
+                    assert!(pending.inner.in_review);
+                    assert_eq!(pending.inner.review_outcome, initial);
+                    assert_eq!(db_models::DBProject::get_history(project_id, &env.db.ro_pool).await.unwrap().len(), history_before);
+                    apply_project_flag_reconciliation_after_delay(&context, &result, ruleset_id, manifest_hash, &env.db.pool, &env.db.redis_pool, true).await.unwrap();
+                    let approved = db_models::DBProject::get_id(project_id, &*env.db.ro_pool, &env.db.redis_pool).await.unwrap().unwrap();
+                    assert_eq!(approved.inner.review_outcome, ProjectReviewOutcome::Approved);
+                    assert!(!approved.inner.in_review);
+                    assert!(!delayed_auto_approval_eligible(project_id, &env.db.pool, &env.db.redis_pool, false).await.unwrap());
+                }
                 if flag == Some("manual_review") {
                     let mut context = context.clone();
                     context.project = project;
                     let result = DBProjectFlagRunResult { rules: BTreeMap::new(), ..result };
-                    apply_project_flag_reconciliation(&context, &result, ruleset_id, manifest_hash, &env.db.pool, &env.db.redis_pool).await.unwrap();
+                    apply_project_flag_reconciliation_after_delay(&context, &result, ruleset_id, manifest_hash, &env.db.pool, &env.db.redis_pool, true).await.unwrap();
                     let retained = db_models::DBProject::get_id(project_id, &*env.db.ro_pool, &env.db.redis_pool).await.unwrap().unwrap();
                     assert!(retained.inner.in_review);
                     assert_eq!(retained.inner.review_outcome, initial);

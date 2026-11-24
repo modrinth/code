@@ -9,17 +9,17 @@ use temporalio_sdk::{
 use url::Url;
 use xredis::RedisPool;
 
+use super::ProjectFlagActivities;
 use super::model_scan::ModelScanner;
 use super::scan_cache::{
     ProjectFlagScanKind, input_hash, load_scan, persist_scan,
 };
-use super::{ProjectFlagActivities, ReconcileProjectFlagsWorkflow};
 use crate::database::PgPool;
 use crate::database::models::DBProjectId;
 use crate::models::v3::ids::ProjectId;
 
-pub(super) async fn scan_project_images(
-    ctx: &WorkflowContext<ReconcileProjectFlagsWorkflow>,
+pub(super) async fn scan_project_images<W>(
+    ctx: &WorkflowContext<W>,
     project_id: ProjectId,
 ) -> WorkflowResult<()> {
     let images = ctx

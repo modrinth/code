@@ -833,9 +833,10 @@ impl ProjectFlagEngine {
         result: &crate::database::models::project_flag_item::DBProjectFlagRunResult,
         ruleset_id: uuid::Uuid,
         file_manifest_hash: blake3::Hash,
+        approval_due: bool,
     ) -> Result<()> {
-        crate::routes::v3::projects::mutation::apply_project_flag_reconciliation(
-            context, result, ruleset_id, file_manifest_hash, pool, &self.redis,
+        crate::routes::v3::projects::mutation::apply_project_flag_reconciliation_after_delay(
+            context, result, ruleset_id, file_manifest_hash, pool, &self.redis, approval_due,
         ).await.map_err(|error| match error {
             crate::routes::ApiError::Internal(report) => report.context("applying project flag reconciliation"),
             error => anyhow!("applying project flag reconciliation: {error}"),

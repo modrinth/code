@@ -4,11 +4,11 @@ use anyhow::{Context, Result, ensure};
 use serde::{Deserialize, Serialize};
 use temporalio_sdk::{WorkflowContext, WorkflowResult};
 
+use super::ProjectFlagActivities;
 use super::model_scan::ModelScanner;
 use super::scan_cache::{
     ProjectFlagScanKind, input_hash, load_scan, persist_scan,
 };
-use super::{ProjectFlagActivities, ReconcileProjectFlagsWorkflow};
 use crate::database::PgPool;
 use crate::database::models::{
     DBProjectId, project_flag_item::project_flag_ruleset_snapshot,
@@ -45,8 +45,8 @@ pub struct TextScanResult {
     pub probability: f64,
 }
 
-pub(super) async fn scan_project_text(
-    ctx: &WorkflowContext<ReconcileProjectFlagsWorkflow>,
+pub(super) async fn scan_project_text<W>(
+    ctx: &WorkflowContext<W>,
     input: super::ReconcileRulesInput,
 ) -> WorkflowResult<()> {
     let plan = ctx
@@ -132,6 +132,7 @@ pub(super) async fn text_input_is_current(
         super::ReconcileRulesInput {
             project_id: input.project_id,
             ruleset_id: input.ruleset_id,
+            approval_due: false,
         },
     )
     .await?;

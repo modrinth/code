@@ -26,9 +26,9 @@ use crate::models::link_platform::LinkPlatform;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    ApprovalReason, AutoApprovalCause, LegacyProjectStatus, MonetizationStatus,
-    Project, ProjectDelta, ProjectHistoryEntry, ProjectReviewOutcome,
-    ProjectVisibility, ReviewOutcomeReason, SideTypesMigrationReviewStatus,
+    ApprovalReason, LegacyProjectStatus, MonetizationStatus, Project,
+    ProjectDelta, ProjectHistoryEntry, ProjectReviewOutcome, ProjectVisibility,
+    ReviewOutcomeReason, SideTypesMigrationReviewStatus,
 };
 use crate::models::teams::{DEFAULT_ROLE, ProjectPermissions};
 use crate::models::threads::MessageBody;
@@ -1696,7 +1696,7 @@ async fn submit_project_for_review(
         .internal_context("failed to remove archival disclosure")?;
     }
 
-    let mut state = mutation::sync_project_state(
+    let state = mutation::sync_project_state(
         project.inner.id,
         transaction,
         pool,
@@ -1722,24 +1722,6 @@ async fn submit_project_for_review(
 
     if state.review_outcome() == ProjectReviewOutcome::Approved
         && project.inner.review_outcome != ProjectReviewOutcome::Approved
-    {
-        return Ok(true);
-    }
-
-    if !user.scopes.contains(Scopes::MODERATION_WRITE)
-        && matches!(
-            state.review_outcome(),
-            ProjectReviewOutcome::Rejected | ProjectReviewOutcome::Withheld
-        )
-        && state
-            .try_auto_approve(
-                AutoApprovalCause::Resubmission {
-                    user_id: user.user.id,
-                },
-                transaction,
-                redis,
-            )
-            .await?
     {
         return Ok(true);
     }

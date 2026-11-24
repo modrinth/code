@@ -2970,7 +2970,7 @@ async fn assert_no_technical_review_auto_approval(
 }
 
 #[actix_rt::test]
-async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
+async fn test_safe_technical_review_exit_defers_automatic_approval() {
     use labrinth::database::models::DBUserId;
     use labrinth::database::models::notification_item::DBNotification;
     use labrinth::routes::internal::delphi::tech_review_queue;
@@ -3096,13 +3096,13 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                         USER_USER_PAT,
                     )
                     .await;
-                assert_eq!(legacy_project_status(&after), requested_status);
+                assert_eq!(legacy_project_status(&after), LegacyProjectStatus::Processing);
                 assert_eq!(
                     serde_json::to_value(labrinth::models::v2::projects::ProjectStatus::from_visibility(after.visibility)).unwrap(),
                     requested_status.as_str(),
                 );
-                assert_eq!(after.review_outcome, labrinth::models::projects::ProjectReviewOutcome::Approved);
-                assert!(!after.in_review);
+                assert_eq!(after.review_outcome, before.review_outcome);
+                assert!(after.in_review);
                 let queued = sqlx::query_scalar!(
                     r#"
 		SELECT EXISTS (
@@ -3121,24 +3121,9 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                 assert_status!(&response, StatusCode::OK);
                 let thread: serde_json::Value =
                     test::read_body_json(response).await;
-                let auto_approvals = thread["messages"]
-                    .as_array()
-                    .unwrap()
-                    .iter()
-                    .filter(|message| {
-                        message["body"]["type"] == "auto_approval"
-                    })
-                    .collect::<Vec<_>>();
-                assert_eq!(auto_approvals.len(), 1);
-                assert_eq!(
-                    auto_approvals[0]["body"]["old_status"],
-                    json!(old_status)
-                );
-                assert_eq!(
-                    auto_approvals[0]["body"]["new_status"],
-                    json!(requested_status)
-                );
-                assert!(auto_approvals[0]["author_id"].is_null());
+                assert!(!thread["messages"]
+                    .as_array().unwrap().iter()
+                    .any(|message| message["body"]["type"] == "auto_approval"));
                 let facets = thread["issues"]
                     .as_array()
                     .unwrap()
@@ -3148,8 +3133,8 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                 assert_eq!(facets.len(), 3);
                 for facet in facets {
                     assert_eq!(facet["verdict"], "resolved");
-                    assert_eq!(facet["user_addressed"], true);
-                    assert_eq!(facet["moderator_verified"], true);
+                    assert_eq!(facet["user_addressed"], false);
+                    assert_eq!(facet["moderator_verified"], false);
                 }
 
                 let response = api
@@ -3166,14 +3151,7 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                             .any(|before| before["id"] == notification["id"])
                     })
                     .collect::<Vec<_>>();
-                assert_eq!(new_notifications.len(), 1);
-                assert!(new_notifications.iter().any(
-					|notification| notification["body"]
-						== json!({
-							"type": "status_change", "project_id": project.project_id,
-							"old_status": old_status, "new_status": requested_status,
-						})
-				));
+                assert!(new_notifications.iter().all(|notification| notification["body"]["type"] != "project_status_approved"));
                 let stored_notifications_after = DBNotification::get_all_user(
                     DBUserId(USER_USER_ID_PARSED),
                     &**test_env.db.ro_pool,
@@ -3188,13 +3166,8 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                             .any(|before| before.id == notification.id)
                     })
                     .collect::<Vec<_>>();
-                assert_eq!(new_stored_notifications.len(), 2);
-                assert!(new_stored_notifications.iter().any(|notification| {
-                    serde_json::to_value(&notification.body).unwrap()
-                        == json!({
-                            "type": "project_status_approved",
-                            "project_id": project.project_id,
-                        })
+                assert!(new_stored_notifications.iter().all(|notification| {
+                    serde_json::to_value(&notification.body).unwrap()["type"] != "project_status_approved"
                 }));
 
                 if old_status != LegacyProjectStatus::Processing {
@@ -3226,7 +3199,7 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                         .filter(|message| message["body"]["type"]
                             == "auto_approval")
                         .count(),
-                    1
+                    0
                 );
                 let response = api
                     .get_user_notifications(USER_USER_ID, USER_USER_PAT)

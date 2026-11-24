@@ -30,6 +30,7 @@ pub(super) async fn reconcile_rules(
     pool: &PgPool,
     project_id: DBProjectId,
     ruleset_id: Option<uuid::Uuid>,
+    approval_due: bool,
 ) -> Result<()> {
     if !super::project_in_review(pool, project_id.into()).await? {
         return Ok(());
@@ -47,6 +48,7 @@ pub(super) async fn reconcile_rules(
         vec![project_id],
         snapshot,
         Some(ruleset_id),
+        approval_due,
         None,
     )
     .await
@@ -74,6 +76,7 @@ pub(super) async fn scan_batch(
         project_ids,
         snapshot,
         None,
+        false,
         Some((temporal, ctx)),
     )
     .await
@@ -86,6 +89,7 @@ async fn scan_batch_inner(
     project_ids: Vec<DBProjectId>,
     snapshot: RunSnapshot,
     deployed_ruleset_id: Option<uuid::Uuid>,
+    approval_due: bool,
     guard: Option<(
         &temporalio_client::Client,
         &temporalio_sdk::activities::ActivityContext,
@@ -295,6 +299,7 @@ async fn scan_batch_inner(
                                 &result,
                                 ruleset_id,
                                 manifest_hash,
+                                approval_due,
                             )
                             .await?;
                     }

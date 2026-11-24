@@ -1,3 +1,4 @@
+mod approve;
 pub(crate) mod image_scan;
 mod model_scan;
 pub mod run;
@@ -52,12 +53,20 @@ pub fn project_flag_worker_options(
         .register_workflow::<run::ProjectFlagRunWorkflow>()
         .context("registering project flag run workflow")?
         .register_activities(run::RunActivities {
-            temporal,
+            temporal: temporal.clone(),
             pool: pool.clone(),
             engine: engine.clone(),
         })
         .register_workflow::<ReconcileProjectFlagsWorkflow>()
         .context("registering project flag reconciliation workflow")?
+        .register_workflow::<approve::ApproveProjectWorkflow>()
+        .context("registering delayed project approval workflow")?
+        .register_activities(approve::ApprovalActivities {
+            config: config.clone(),
+            pool: pool.clone(),
+            redis: redis.clone(),
+            temporal,
+        })
         .register_activities(ProjectFlagActivities {
             scanner: ModelScanner::new(config, redis, file_host),
             pool,
@@ -71,6 +80,17 @@ pub async fn reconcile_project_flags(
     temporal: &TemporalClient,
     project_id: ProjectId,
 ) -> Result<()> {
+    reconcile_project_review_state(temporal, project_id, true).await
+}
+
+pub(crate) async fn reconcile_project_review_state(
+    temporal: &TemporalClient,
+    project_id: ProjectId,
+    in_review: bool,
+) -> Result<()> {
+    if !in_review {
+        approve::update_approval(&temporal.client, project_id, false).await?;
+    }
     temporal
         .client
         .signal_with_start_workflow(
@@ -131,6 +151,7 @@ impl ReconcileProjectFlagsWorkflow {
             let input = ReconcileRulesInput {
                 project_id,
                 ruleset_id,
+                approval_due: false,
             };
             let (images, text) = futures::join!(
                 image_scan::scan_project_images(ctx, project_id),
@@ -145,7 +166,7 @@ impl ReconcileProjectFlagsWorkflow {
             let applied = ctx
                 .execute_activity(
                     ProjectFlagActivities::evaluate_and_apply_rules,
-                    input,
+                    input.clone(),
                     ActivityOptions::start_to_close_timeout(
                         Duration::from_secs(600),
                     ),
@@ -155,6 +176,17 @@ impl ReconcileProjectFlagsWorkflow {
                 continue;
             }
 
+            if ctx.state(|state| state.needs_reconcile) {
+                continue;
+            }
+            ctx.execute_activity(
+                approve::ApprovalActivities::schedule_approval,
+                input,
+                ActivityOptions::start_to_close_timeout(Duration::from_secs(
+                    60,
+                )),
+            )
+            .await?;
             if !ctx.state(|state| state.needs_reconcile) {
                 return Ok(());
             }
@@ -171,6 +203,8 @@ impl ReconcileProjectFlagsWorkflow {
 pub struct ReconcileRulesInput {
     project_id: ProjectId,
     ruleset_id: Option<uuid::Uuid>,
+    #[serde(default)]
+    approval_due: bool,
 }
 
 impl ReconcileRulesInput {
@@ -281,6 +315,7 @@ impl ProjectFlagActivities {
             &self.pool,
             input.project_id().into(),
             input.ruleset_id(),
+            input.approval_due,
         )
         .await
         {

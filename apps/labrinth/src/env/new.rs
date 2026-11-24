@@ -26,6 +26,10 @@ impl Config {
 #[derive(Debug, Clone, Deserialize)]
 #[serde(default)]
 pub struct ProjectFlags {
+    #[serde_as(as = "DurationSeconds<u64>")]
+    pub auto_approve_min_delay: Duration,
+    #[serde_as(as = "DurationSeconds<u64>")]
+    pub auto_approve_max_delay: Duration,
     pub infer_decisions: Option<DecisionsConfig>,
     pub infer_explicit_prompt: String,
     pub infer_ai_generated: Option<AiDetectConfig>,
@@ -39,6 +43,8 @@ pub struct ProjectFlags {
 impl Default for ProjectFlags {
     fn default() -> Self {
         Self {
+            auto_approve_min_delay: Duration::ZERO,
+            auto_approve_max_delay: Duration::ZERO,
             infer_decisions: None,
             infer_explicit_prompt: default_explicit_prompt(),
             infer_ai_generated: None,
