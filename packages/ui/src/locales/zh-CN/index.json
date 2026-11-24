@@ -1724,9 +1724,6 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "面包屑导航"
   },
-  "files.navbar.create-new": {
-    "defaultMessage": "新建……"
-  },
   "files.navbar.file-navigation": {
     "defaultMessage": "文件导航"
   },
@@ -1747,12 +1744,6 @@
   },
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "分享到 mclo.gs"
-  },
-  "files.navbar.upload-file": {
-    "defaultMessage": "上传文件"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": "从 .zip 文件导入"
   },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "通过 .zip 链接导入"

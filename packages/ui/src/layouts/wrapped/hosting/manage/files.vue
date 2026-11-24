@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { Kyros } from '@modrinth/api-client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, ref, watch } from 'vue'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import ConfigPushPromptModal from '#ui/components/servers/ConfigPushPromptModal.vue'
@@ -23,9 +22,10 @@ import {
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
+import { useFileRouteState } from '../../../shared/files-tab/composables/file-route-state'
 import FilePageLayout from '../../../shared/files-tab/layout.vue'
 import { provideFileManager } from '../../../shared/files-tab/providers/file-manager'
-import type { EditingFile, FileItem } from '../../../shared/files-tab/types'
+import type { FileItem } from '../../../shared/files-tab/types'
 
 const props = defineProps<{
 	showDebugInfo?: boolean
@@ -57,8 +57,6 @@ const { canWriteFiles, canUsePowerActions, canSetup, permissionDeniedMessage } =
 	useServerPermissions()
 const { pending: sharePending, runAction: runShareAction } = useServerShareReview()
 
-const route = useRoute()
-const router = useRouter()
 const queryClient = useQueryClient()
 
 const messages = defineMessages({
@@ -134,54 +132,7 @@ async function promptConfigPush(path: string) {
 	else if (choice === 'later') configPushDeferredPaths.add(configPath)
 }
 
-// Path & navigation
-const currentPath = computed(() => (typeof route.query.path === 'string' ? route.query.path : '/'))
-
-function navigateTo(path: string) {
-	const { editing: _, ...query } = route.query
-	router.push({ query: { ...query, path } })
-}
-
-// Editing state (synced with URL)
-const editingFile = ref<EditingFile | null>(null)
-
-function startEditing(file: EditingFile) {
-	editingFile.value = file
-	router.push({ query: { ...route.query, path: currentPath.value, editing: file.path } })
-}
-
-function stopEditing() {
-	editingFile.value = null
-	const newQuery = { ...route.query }
-	delete newQuery.editing
-	router.replace({ query: newQuery })
-}
-
-// Sync editing state from URL
-watch(
-	() => route.query,
-	(newQuery, oldQuery) => {
-		if (newQuery.editing && editingFile.value?.path !== newQuery.editing) {
-			editingFile.value = {
-				name: (newQuery.editing as string).split('/').pop() || '',
-				path: newQuery.editing as string,
-			}
-		} else if (oldQuery?.editing && !newQuery.editing) {
-			editingFile.value = null
-		}
-	},
-	{ deep: true },
-)
-
-// Initialize editing from URL on mount
-function initializeFileEdit() {
-	if (!route.query.editing) return
-	const filePath = route.query.editing as string
-	editingFile.value = {
-		name: filePath.split('/').pop() || '',
-		path: filePath,
-	}
-}
+const { currentPath, editingFile, navigateTo, startEditing, stopEditing } = useFileRouteState()
 
 // Directory listing query
 const {
@@ -534,10 +485,6 @@ watch(
 		refreshList()
 	},
 )
-
-onMounted(async () => {
-	initializeFileEdit()
-})
 
 // Restart
 async function restartServer() {

@@ -1,22 +1,6 @@
 <template>
-	<header
-		class="@container flex select-none flex-col gap-4"
-		:aria-label="formatMessage(messages.fileNavigation)"
-	>
-		<div v-if="!isEditing" class="flex items-center gap-2 @[800px]:hidden">
-			<Input
-				:model-value="searchQuery"
-				:icon="SearchIcon"
-				type="search"
-				name="search"
-				autocomplete="off"
-				:placeholder="formatMessage(messages.searchFiles)"
-				size="medium"
-				wrapper-class="flex-1 min-w-0"
-				@update:model-value="$emit('update:searchQuery', $event)"
-			/>
-		</div>
-		<div class="flex items-center justify-between gap-2">
+	<header class="flex select-none flex-col" :aria-label="formatMessage(messages.fileNavigation)">
+		<div class="flex min-h-10 items-center justify-between gap-2">
 			<nav
 				:aria-label="formatMessage(messages.breadcrumbNavigation)"
 				class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
@@ -93,118 +77,68 @@
 				</ol>
 			</nav>
 
-			<div v-if="!isEditing" class="flex flex-shrink-0 items-center gap-2">
-				<Input
-					id="search-folder"
-					:model-value="searchQuery"
-					:icon="SearchIcon"
-					type="search"
-					name="search"
-					autocomplete="off"
-					:placeholder="formatMessage(messages.searchFiles)"
-					class="hidden @[800px]:inline-flex"
-					size="medium"
-					wrapper-class="w-full sm:w-[280px]"
-					@update:model-value="$emit('update:searchQuery', $event)"
-				/>
-
-				<Button
-					v-if="showRefreshButton"
-					type="outlined"
-					native-type="button"
+			<Transition name="top-action" mode="out-in">
+				<SplitButton
+					v-if="!isEditing && !browseOnly"
+					v-tooltip="disabled ? disabledTooltip : undefined"
+					type="colored"
+					color="brand"
 					size="lg"
-					:disabled="refreshing"
-					@click="handleRefresh"
-				>
-					<RefreshCwIcon
-						aria-hidden="true"
-						class="h-5 w-5 transition-transform"
-						:class="refreshing ? 'animate-spin' : ''"
-					/>
-					{{ formatMessage(commonMessages.refreshButton) }}
-				</Button>
-
-				<TeleportOverflowMenu
-					v-if="!browseOnly"
-					type="outlined"
-					:label="formatMessage(messages.createNew)"
+					class="ml-auto shrink-0"
+					:options="createOptions"
+					:menu-label="formatMessage(messages.moreCreateOptions)"
 					:disabled="disabled"
-					:tooltip="disabled ? disabledTooltip : undefined"
-					size="lg"
-					class="justify-center gap-2 !w-auto !px-2.5 !rounded-xl"
-					:options="[
-						{
-							id: 'file',
-							label: formatMessage(messages.newFile),
-							action: () => $emit('create', 'file'),
-						},
-						{
-							id: 'directory',
-							label: formatMessage(messages.newFolder),
-							action: () => $emit('create', 'directory'),
-						},
-						{
-							id: 'upload',
-							label: formatMessage(messages.uploadFile),
-							action: () => $emit('upload'),
-						},
-						{ type: 'divider', shown: showInstallFromUrl ?? false },
-						{
-							id: 'upload-zip',
-							label: formatMessage(messages.uploadFromZip),
-							shown: false,
-							action: () => $emit('uploadZip'),
-						},
-						{
-							id: 'install-from-url',
-							label: formatMessage(messages.uploadFromZipUrl),
-							shown: showInstallFromUrl ?? false,
-							action: () => $emit('unzipFromUrl'),
-						},
-					]"
+					@click="$emit('upload')"
 				>
-					<PlusIcon aria-hidden="true" class="h-5 w-5" />
-					<DropdownIcon aria-hidden="true" class="h-5 w-5" />
-					<template #file>
-						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newFile) }}
-					</template>
-					<template #directory>
-						<FolderOpenIcon aria-hidden="true" /> {{ formatMessage(messages.newFolder) }}
-					</template>
-					<template #upload>
-						<UploadIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFile) }}
-					</template>
-					<template #upload-zip>
-						<FileArchiveIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZip) }}
-					</template>
-					<template #install-from-url>
-						<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZipUrl) }}
-					</template>
-				</TeleportOverflowMenu>
-			</div>
+					<UploadIcon aria-hidden="true" />
+					{{ formatMessage(messages.uploadFiles) }}
+				</SplitButton>
 
-			<div v-else-if="!isEditingImage" class="flex gap-2">
-				<IconButton
-					v-if="isLogFile && !browseOnly"
-					v-tooltip="formatMessage(messages.shareToMclogs)"
-					type="quiet"
-					:label="formatMessage(messages.shareToMclogs)"
-					@click="$emit('share')"
-				>
-					<ShareIcon />
-				</IconButton>
-				<IconButton
-					v-tooltip="formatMessage(messages.findInFile)"
-					:type="isEditorFindOpen ? 'colored' : 'quiet'"
-					:color="isEditorFindOpen ? 'brand' : undefined"
-					:label="formatMessage(messages.findInFile)"
-					:aria-pressed="isEditorFindOpen"
-					@click="$emit('find')"
-				>
-					<SearchIcon />
-				</IconButton>
-			</div>
+				<div v-else-if="isEditing && !isEditingImage" class="flex gap-2">
+					<IconButton
+						v-if="isLogFile && !browseOnly"
+						v-tooltip="formatMessage(messages.shareToMclogs)"
+						type="quiet"
+						:label="formatMessage(messages.shareToMclogs)"
+						@click="$emit('share')"
+					>
+						<ShareIcon />
+					</IconButton>
+					<IconButton
+						v-tooltip="formatMessage(messages.findInFile)"
+						:type="isEditorFindOpen ? 'colored' : 'quiet'"
+						:color="isEditorFindOpen ? 'brand' : undefined"
+						:label="formatMessage(messages.findInFile)"
+						:aria-pressed="isEditorFindOpen"
+						@click="$emit('find')"
+					>
+						<SearchIcon />
+					</IconButton>
+				</div>
+			</Transition>
 		</div>
+
+		<Collapsible :collapsed="isEditing" :duration-ms="200" overflow-visible fade>
+			<ListToolbar
+				class="pt-4"
+				:search="searchQuery"
+				:search-placeholder="formatMessage(messages.searchFiles)"
+				@update:search="$emit('update:searchQuery', $event ?? '')"
+			>
+				<template v-if="showRefreshButton" #actions>
+					<IconButton
+						v-tooltip="refreshLabel"
+						type="quiet"
+						size="lg"
+						:label="refreshLabel"
+						:disabled="refreshing"
+						@click="handleRefresh"
+					>
+						<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
+					</IconButton>
+				</template>
+			</ListToolbar>
+		</Collapsible>
 	</header>
 </template>
 
@@ -212,12 +146,9 @@
 import {
 	BoxIcon,
 	ChevronRightIcon,
-	DropdownIcon,
-	FileArchiveIcon,
 	FolderOpenIcon,
 	HomeIcon,
 	LinkIcon,
-	PlusIcon,
 	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
@@ -225,8 +156,9 @@ import {
 } from '@modrinth/assets'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
-import Input from '#ui/components/base/inputs/Input.vue'
+import { Button, type ButtonMenuOption, IconButton, SplitButton } from '#ui/components/base/buttons'
+import Collapsible from '#ui/components/base/Collapsible.vue'
+import ListToolbar from '#ui/components/base/ListToolbar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -253,9 +185,9 @@ const messages = defineMessages({
 		id: 'files.navbar.search-files',
 		defaultMessage: 'Search files',
 	},
-	createNew: {
-		id: 'files.navbar.create-new',
-		defaultMessage: 'Create new...',
+	moreCreateOptions: {
+		id: 'files.navbar.more-create-options',
+		defaultMessage: 'More ways to add files',
 	},
 	newFile: {
 		id: 'files.navbar.new-file',
@@ -265,13 +197,9 @@ const messages = defineMessages({
 		id: 'files.navbar.new-folder',
 		defaultMessage: 'New folder',
 	},
-	uploadFile: {
-		id: 'files.navbar.upload-file',
-		defaultMessage: 'Upload file',
-	},
-	uploadFromZip: {
-		id: 'files.navbar.upload-from-zip',
-		defaultMessage: 'Upload from .zip file',
+	uploadFiles: {
+		id: 'files.navbar.upload-files',
+		defaultMessage: 'Upload files',
 	},
 	uploadFromZipUrl: {
 		id: 'files.navbar.upload-from-zip-url',
@@ -285,6 +213,10 @@ const messages = defineMessages({
 		id: 'files.navbar.find-in-file',
 		defaultMessage: 'Find in file',
 	},
+	refreshing: {
+		id: 'files.navbar.refreshing',
+		defaultMessage: 'Refreshing...',
+	},
 })
 
 const props = defineProps<{
@@ -297,7 +229,6 @@ const props = defineProps<{
 	searchQuery: string
 	showRefreshButton?: boolean
 	showInstallFromUrl?: boolean
-	baseId: string
 	disabled?: boolean
 	disabledTooltip?: string
 	browseOnly?: boolean
@@ -310,7 +241,6 @@ const emit = defineEmits<{
 	'update:searchQuery': [value: string]
 	create: [type: 'file' | 'directory']
 	upload: []
-	uploadZip: []
 	unzipFromUrl: []
 	refresh: []
 	share: []
@@ -318,6 +248,33 @@ const emit = defineEmits<{
 }>()
 
 const refreshing = ref(false)
+
+const refreshLabel = computed(() =>
+	formatMessage(refreshing.value ? messages.refreshing : commonMessages.refreshButton),
+)
+
+const createOptions = computed<ButtonMenuOption[]>(() => [
+	{
+		id: 'file',
+		label: formatMessage(messages.newFile),
+		icon: BoxIcon,
+		action: () => emit('create', 'file'),
+	},
+	{
+		id: 'directory',
+		label: formatMessage(messages.newFolder),
+		icon: FolderOpenIcon,
+		action: () => emit('create', 'directory'),
+	},
+	{ type: 'divider', shown: props.showInstallFromUrl ?? false },
+	{
+		id: 'install-from-url',
+		label: formatMessage(messages.uploadFromZipUrl),
+		icon: LinkIcon,
+		shown: props.showInstallFromUrl ?? false,
+		action: () => emit('unzipFromUrl'),
+	},
+])
 
 function handleRefresh() {
 	emit('refresh')
@@ -397,6 +354,16 @@ const isLogFile = computed(() => {
 </script>
 
 <style scoped>
+.top-action-enter-active,
+.top-action-leave-active {
+	transition: opacity 150ms ease-in-out;
+}
+
+.top-action-enter-from,
+.top-action-leave-to {
+	opacity: 0;
+}
+
 .breadcrumb-move,
 .breadcrumb-enter-active,
 .breadcrumb-leave-active {

@@ -37,7 +37,6 @@
 					:search-query="searchQuery"
 					:show-refresh-button="showRefreshButton"
 					:show-install-from-url="ctx.showInstallFromUrl"
-					:base-id="baseId"
 					:disabled="isBusy"
 					:disabled-tooltip="busyTooltip"
 					:browse-only="ctx.browseOnly"
@@ -47,7 +46,6 @@
 					@update:search-query="searchQuery = $event"
 					@create="showCreateModal"
 					@upload="initiateFileUpload"
-					@upload-zip="() => {}"
 					@unzip-from-url="showUnzipFromUrlModal"
 					@refresh="ctx.refresh"
 					@share="() => fileEditorRef?.shareToMclogs()"
@@ -58,6 +56,7 @@
 					<FileUploadDragAndDrop
 						ref="fileUploadRef"
 						class="@container relative flex flex-col overflow-clip rounded-[20px] border border-solid border-surface-4 shadow-sm"
+						:class="{ 'border-t-0': isLabelBarStuck }"
 						:disabled="isBusy || ctx.browseOnly"
 						@drop-error="handleDropError"
 						@files-dropped="handleDroppedFiles"
@@ -115,21 +114,18 @@
 						</div>
 						<div
 							v-else-if="items.length === 0 && !ctx.error.value"
-							class="flex h-full w-full items-center justify-center rounded-b-[20px] bg-surface-2 p-20"
+							class="border-0 border-t border-solid border-surface-4 bg-surface-2"
 						>
-							<div class="flex flex-col items-center gap-4 text-center">
-								<FolderOpenIcon class="h-16 w-16 text-secondary" />
-								<h3 class="m-0 text-2xl font-bold text-contrast">
-									{{ formatMessage(messages.emptyFolderTitle) }}
-								</h3>
-								<p class="m-0 text-sm text-secondary">
-									{{ formatMessage(messages.emptyFolderDescription) }}
-								</p>
-							</div>
+							<EmptyState
+								:icon="FolderOpenIcon"
+								:heading="formatMessage(messages.emptyFolderTitle)"
+								:description="formatMessage(messages.emptyFolderDescription)"
+								hide-pattern
+							/>
 						</div>
 						<FileManagerError
 							v-else-if="ctx.error.value"
-							class="rounded-b-[20px]"
+							class="border-0 border-t border-solid border-surface-4 bg-surface-2"
 							:title="formatMessage(messages.errorTitle)"
 							:message="formatMessage(messages.errorMessage)"
 							@refetch="ctx.refresh"
@@ -220,6 +216,7 @@ import type { Component } from 'vue'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 
 import { Button, ContextMenu } from '#ui/components/base/buttons'
+import EmptyState from '#ui/components/base/EmptyState.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
@@ -310,8 +307,6 @@ import('vue3-ace-editor').then(async (mod) => {
 	await Promise.all([import('#ui/utils/ace-theme'), import('#ui/utils/ace-mode-log.ts')])
 	editorComponent.value = mod.VAceEditor
 })
-
-const baseId = `files-${Math.random().toString(36).slice(2, 9)}`
 
 const items = computed(() => ctx.items.value)
 const isEditing = computed(() => ctx.editingFile.value !== null)

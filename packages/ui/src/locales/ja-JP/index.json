@@ -1496,9 +1496,6 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "パンくずリスト"
   },
-  "files.navbar.create-new": {
-    "defaultMessage": "新しく追加…"
-  },
   "files.navbar.file-navigation": {
     "defaultMessage": "ファイルナビゲーション"
   },
@@ -1519,12 +1516,6 @@
   },
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "mclo.gsに公開"
-  },
-  "files.navbar.upload-file": {
-    "defaultMessage": "ファイルをアップロード"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": ".zipファイルからアップロード"
   },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": ".zip URLからアップロード"

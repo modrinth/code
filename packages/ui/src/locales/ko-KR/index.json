@@ -1751,9 +1751,6 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "브레드크럼 탐색"
   },
-  "files.navbar.create-new": {
-    "defaultMessage": "새로 만들기..."
-  },
   "files.navbar.file-navigation": {
     "defaultMessage": "파일 탐색"
   },
@@ -1774,12 +1771,6 @@
   },
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "mclo.gs에 공유"
-  },
-  "files.navbar.upload-file": {
-    "defaultMessage": "파일 업로드"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": ".zip 파일에서 업로드"
   },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": ".zip URL에서 업로드"

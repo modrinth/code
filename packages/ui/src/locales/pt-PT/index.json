@@ -644,9 +644,6 @@
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "Partilhar no mclo.gs"
   },
-  "files.navbar.upload-file": {
-    "defaultMessage": "Carregar ficheiro"
-  },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpack a partir de URL"
   },

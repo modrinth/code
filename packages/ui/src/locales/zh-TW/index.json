@@ -1652,9 +1652,6 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "麵包屑導覽"
   },
-  "files.navbar.create-new": {
-    "defaultMessage": "建立新的..."
-  },
   "files.navbar.file-navigation": {
     "defaultMessage": "檔案導覽"
   },
@@ -1675,12 +1672,6 @@
   },
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "分享至 mclo.gs"
-  },
-  "files.navbar.upload-file": {
-    "defaultMessage": "上傳檔案"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": "從 .zip 檔案上傳"
   },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "從 .zip 網址上傳"

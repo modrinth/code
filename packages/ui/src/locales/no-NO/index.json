@@ -497,12 +497,6 @@
   "files.move-modal.current-location": {
     "defaultMessage": "Nåværende plassering"
   },
-  "files.navbar.upload-file": {
-    "defaultMessage": "Last opp fil"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": "Last opp fra .zip fil"
-  },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Last opp fra .zip URL"
   },

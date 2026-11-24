@@ -785,9 +785,6 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "Navigație Breadcrumb"
   },
-  "files.navbar.create-new": {
-    "defaultMessage": "Creează o nouă..."
-  },
   "files.navbar.file-navigation": {
     "defaultMessage": "Navigație fișier"
   },

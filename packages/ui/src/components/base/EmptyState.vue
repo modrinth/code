@@ -1,8 +1,10 @@
 <template>
 	<div
-		class="relative mx-auto flex w-full max-w-[448px] flex-col items-center overflow-hidden px-4 pb-[63px] pt-[160px] text-center"
+		class="relative mx-auto flex w-full max-w-[448px] flex-col items-center overflow-hidden px-4 text-center"
+		:class="hidePattern ? 'py-16' : 'pb-[63px] pt-[160px]'"
 	>
 		<div
+			v-if="!hidePattern"
 			aria-hidden="true"
 			class="dot-pattern pointer-events-none absolute left-1/2 top-[-31px] h-[478px] w-[415px] -translate-x-1/2"
 		/>
@@ -36,6 +38,7 @@ defineProps<{
 	icon?: Component
 	heading?: string
 	description?: string
+	hidePattern?: boolean
 }>()
 </script>
 

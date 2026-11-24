@@ -1,17 +1,19 @@
 <template>
 	<div
 		aria-hidden="true"
-		class="sticky top-0 z-10 flex h-12 w-full select-none flex-row items-center justify-between gap-4 bg-surface-3 pl-3 pr-4 font-medium transition-[border-radius] duration-100"
+		class="sticky top-0 z-10 flex h-12 w-full select-none flex-row items-center justify-between gap-4 bg-surface-3 px-3 transition-[border-radius] duration-100"
 		:class="
 			isStuck
 				? 'rounded-none border-0 border-y border-solid border-surface-4 shadow-md before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-5 before:bg-surface-3'
 				: 'rounded-t-[20px]'
 		"
 	>
-		<div class="flex min-w-0 flex-[2.5_1_0%] items-center gap-3">
+		<div class="flex min-w-0 flex-[2.5_1_0%] items-center gap-4">
 			<Checkbox
 				:model-value="allSelected"
 				:indeterminate="someSelected && !allSelected"
+				:aria-label="formatMessage(commonMessages.selectAllLabel)"
+				class="shrink-0"
 				@update:model-value="$emit('toggle-all')"
 			/>
 			<button

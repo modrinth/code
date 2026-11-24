@@ -1532,9 +1532,6 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "Morzsanavigáció"
   },
-  "files.navbar.create-new": {
-    "defaultMessage": "Létrehozás…"
-  },
   "files.navbar.file-navigation": {
     "defaultMessage": "Fájl navigáció"
   },
@@ -1555,12 +1552,6 @@
   },
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "Megosztás az mclo.gs-en"
-  },
-  "files.navbar.upload-file": {
-    "defaultMessage": "Fájl feltöltése"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": "Feltöltés .zip fájlból"
   },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Feltöltés .zip URL-ből"
