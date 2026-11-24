@@ -25,7 +25,7 @@ pub struct NormalizedAppEvent {
     pub arch: AppArch,
     /// App version
     pub app_version: SmolStr,
-    /// Event source variant, such as `app`
+    /// Where in the app the action was initiated from, such as `browse`
     pub source: SmolStr,
     /// Event data
     pub data: AppEventType,

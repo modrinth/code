@@ -141,7 +141,7 @@ pub fn extract_events<K: AsRef<str>, V: AsRef<str>>(
             os: batch.os,
             arch: batch.arch,
             app_version: batch.app_version.clone(),
-            source: batch.source.clone(),
+            source: event.source,
             data: event.event,
         })
     }
@@ -216,13 +216,13 @@ mod tests {
 
     fn body(events: &str) -> String {
         format!(
-            r#"{{"sent_at":"2026-11-23T11:59:59Z","installation_id":"{INSTALLATION_ID}","os":"linux","arch":"x86_64","app_version":"0.10.3","source":"app","events":[{events}]}}"#
+            r#"{{"sent_at":"2026-11-23T11:59:59Z","installation_id":"{INSTALLATION_ID}","os":"linux","arch":"x86_64","app_version":"0.10.3","events":[{events}]}}"#
         )
     }
 
     fn event(id: &str, event: &str) -> String {
         format!(
-            r#"{{"id":"{id}","timestamp":"2026-11-23T11:00:00Z","event":{event}}}"#
+            r#"{{"id":"{id}","timestamp":"2026-11-23T11:00:00Z","source":"browse","event":{event}}}"#
         )
     }
 

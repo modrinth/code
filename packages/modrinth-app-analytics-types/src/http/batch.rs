@@ -23,8 +23,6 @@ pub struct AppEventBatch<E = AppEvent> {
     pub arch: AppArch,
     /// App version
     pub app_version: SmolStr,
-    /// Event source variant, such as `app`
-    pub source: SmolStr,
     /// List of events to be processed
     pub events: Vec<E>,
 }
@@ -35,12 +33,18 @@ pub struct AppEvent {
     /// Event ID (UUIDv7)
     pub id: Uuid,
     pub timestamp: DateTime<Utc>,
+    /// Where in the app the action was initiated from, such as `browse`
+    pub source: SmolStr,
     pub event: AppEventType,
 }
 
 impl AppEvent {
     #[inline]
-    pub fn new(ctx: &uuid::ContextV7, event: AppEventType) -> Self {
+    pub fn new(
+        ctx: &uuid::ContextV7,
+        source: SmolStr,
+        event: AppEventType,
+    ) -> Self {
         // this code is adapted from Utc::now()
         // these panics should not happen
 
@@ -63,6 +67,7 @@ impl AppEvent {
         AppEvent {
             id,
             timestamp,
+            source,
             event,
         }
     }
@@ -124,6 +129,7 @@ mod tests {
         AppEvent {
             id: Uuid::nil(),
             timestamp: time(timestamp),
+            source: "app".into(),
             event: AppEventType::MicrosoftSignIn {},
         }
         .corrected_timestamp_skew(&SkewCorrectionParameters {
