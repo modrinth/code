@@ -5,7 +5,7 @@ use std::{
 };
 
 /// Wrapper over Cow<'static OsStr> implementing conversions from str/String, OsStr/OsString and Path/PathBuf.
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SandboxArg(Cow<'static, OsStr>);
 
 impl SandboxArg {

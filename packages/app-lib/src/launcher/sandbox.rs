@@ -224,27 +224,28 @@ pub(super) fn prepare_command(
             }
         });
 
-    Ok(MinecraftCommand {
-        sandbox_api_child: session.child,
-        jre_path,
-        java_agent: Some(input.java_agent),
-        classpath,
-        natives_path: input.directories.version_natives_dir(input.version_jar),
-        assets_path: input.directories.assets_dir(),
-        logging_config,
-        instance_path: input.instance_path,
-        persistent_dir: input.directories.instance_data_dir(),
-        granted_paths: input.granted_paths,
-        jvm_args: jvm_args.into_iter().map(Into::into).collect(),
-        main_class: THESEUS_MINECRAFT_LAUNCHER_MAIN_CLASS.into(),
-        main_class_args: launcher_args,
-        extra_environment: env_args
-            .iter()
-            .cloned()
-            .map(|(key, value)| (key.into(), value.into()))
-            .collect(),
-        stdin: SandboxStdio::Null,
-        stdout: SandboxStdio::Pipe,
-        stderr: SandboxStdio::Pipe,
-    })
+    let mut command = MinecraftCommand::default();
+    command.sandbox_api_child = session.child;
+    command.jre_path = jre_path;
+    command.java_agent = Some(input.java_agent);
+    command.classpath = classpath;
+    command.natives_path =
+        input.directories.version_natives_dir(input.version_jar);
+    command.assets_path = input.directories.assets_dir();
+    command.logging_config = logging_config;
+    command.instance_path = input.instance_path;
+    command.persistent_dir = input.directories.instance_data_dir();
+    command.granted_paths = input.granted_paths;
+    command.jvm_args = jvm_args.into_iter().map(Into::into).collect();
+    command.main_class = THESEUS_MINECRAFT_LAUNCHER_MAIN_CLASS.into();
+    command.main_class_args = launcher_args;
+    command.extra_environment = env_args
+        .iter()
+        .cloned()
+        .map(|(key, value)| (key.into(), value.into()))
+        .collect();
+    command.stdin = SandboxStdio::Null;
+    command.stdout = SandboxStdio::Pipe;
+    command.stderr = SandboxStdio::Pipe;
+    Ok(command)
 }

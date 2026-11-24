@@ -1,5 +1,4 @@
 use std::{
-    collections::{BTreeMap, BTreeSet},
     ffi::OsString,
     io::{BufRead, BufReader, PipeReader, Write},
     path::PathBuf,
@@ -35,30 +34,23 @@ async fn main() -> Result<()> {
         .wrap_err("creating sandbox environment")?;
     info!("using environment {env:?}");
 
+    let mut command = SandboxCommand::default();
+    command.executable = cli.executable;
+    command.args = cli.args.into_iter().map(SandboxArg::from).collect();
+    command.read_only_paths = cli.read;
+    command.read_write_paths = cli.write;
+    command.working_directory = cli.cwd;
+    command.allow_network = true;
+    command.die_with_parent = true;
+    command.stdin = SandboxStdio::Null;
+    command.stdout = SandboxStdio::Pipe;
+    command.stderr = SandboxStdio::Pipe;
+    command.app_container_name = "ModrinthMinecraftSandbox".into();
+    command.app_container_description =
+        "Sandbox for Minecraft instances created by modrinth-sandbox".into();
+
     let mut child = env
-        .spawn(SandboxCommand {
-            executable: cli.executable,
-            args: cli.args.into_iter().map(SandboxArg::from).collect(),
-            ensure_dirs_exist: Vec::new(),
-            read_only_paths: cli.read,
-            read_write_paths: cli.write,
-            registry_read_keys: Vec::new(),
-            working_directory: cli.cwd,
-            passthrough_environment: BTreeSet::new(),
-            extra_environment: BTreeMap::new(),
-            allow_network: true,
-            is_jvm: false,
-            die_with_parent: true,
-            stdin: SandboxStdio::Null,
-            stdout: SandboxStdio::Pipe,
-            stderr: SandboxStdio::Pipe,
-            app_container_name: "ModrinthMinecraftSandbox".into(),
-            app_container_description:
-                "Sandbox for Minecraft instances created by modrinth-sandbox"
-                    .into(),
-            on_start: Vec::new(),
-            on_finish: Vec::new(),
-        })
+        .spawn(command)
         .await
         .wrap_err("spawning process in sandbox")?;
 

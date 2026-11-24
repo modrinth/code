@@ -136,6 +136,7 @@ impl SandboxEnv {
 /// - On Linux, you aren't allowed to mount any paths from the host under `/tmp`
 ///   since Flatpak doesn't support mounting those files. This applies to both
 ///   Bubblewrap and Flatpak, so your code stays portable across backends.
+#[non_exhaustive]
 pub struct SandboxCommand {
     /// Path to the executable to run.
     pub executable: PathBuf,
@@ -194,6 +195,32 @@ pub struct SandboxCommand {
     pub on_start: Vec<Box<dyn FnOnce(&mut SandboxChild) + Send + Sync>>,
     /// Vec of callbacks to be run when the process terminates or is dropped
     pub on_finish: Vec<Box<dyn FnOnce() + Send + Sync>>,
+}
+
+impl Default for SandboxCommand {
+    fn default() -> Self {
+        Self {
+            executable: PathBuf::new(),
+            args: Vec::new(),
+            ensure_dirs_exist: Vec::new(),
+            read_only_paths: Vec::new(),
+            read_write_paths: Vec::new(),
+            registry_read_keys: Vec::new(),
+            working_directory: None,
+            passthrough_environment: BTreeSet::new(),
+            extra_environment: BTreeMap::new(),
+            allow_network: false,
+            is_jvm: false,
+            die_with_parent: false,
+            stdin: SandboxStdio::Null,
+            stdout: SandboxStdio::Inherit,
+            stderr: SandboxStdio::Inherit,
+            app_container_name: SandboxArg::default(),
+            app_container_description: SandboxArg::default(),
+            on_start: Vec::new(),
+            on_finish: Vec::new(),
+        }
+    }
 }
 
 /// Describes what to do with a standard I/O stream for a child process when

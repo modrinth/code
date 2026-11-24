@@ -16,6 +16,7 @@ use crate::{
 };
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub struct MinecraftCommand {
     /// Child reference to the sandbox API service, created using
     /// [`SandboxApiService::start`]
@@ -60,6 +61,30 @@ pub struct MinecraftCommand {
     pub stdout: SandboxStdio,
     /// Default io behaviour for stderr.
     pub stderr: SandboxStdio,
+}
+
+impl Default for MinecraftCommand {
+    fn default() -> Self {
+        Self {
+            sandbox_api_child: None,
+            jre_path: PathBuf::new(),
+            java_agent: None,
+            classpath: Vec::new(),
+            natives_path: PathBuf::new(),
+            assets_path: PathBuf::new(),
+            logging_config: None,
+            instance_path: PathBuf::new(),
+            persistent_dir: PathBuf::new(),
+            granted_paths: Vec::new(),
+            jvm_args: Vec::new(),
+            main_class: SandboxArg::default(),
+            main_class_args: Vec::new(),
+            extra_environment: BTreeMap::new(),
+            stdin: SandboxStdio::Null,
+            stdout: SandboxStdio::Inherit,
+            stderr: SandboxStdio::Inherit,
+        }
+    }
 }
 
 #[derive(Debug)]
