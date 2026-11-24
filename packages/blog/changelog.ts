@@ -11,6 +11,28 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-11-24T20:34:37+00:00`,
+		product: 'app',
+		version: '0.23.5',
+		body: `## Security
+- Modrinth App will now swap out Minecraft libraries on instance launch that don't match what is recorded by the metadata service.`,
+	},
+	{
+		date: `2026-11-24T20:34:37+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Added feature to automatically restart servers when crashing after starting.
+
+## Changed
+- The "Memory" card now uses the more accurate Java heap memory number instead of container memory.`,
+	},
+	{
+		date: `2026-11-24T20:34:37+00:00`,
+		product: 'web',
+		body: `## Changed
+- Fixed loading spinner when re-focusing an org or collection page.`,
+	},
+	{
 		date: `2026-11-19T01:42:50+00:00`,
 		product: 'web',
 		body: `## Changed
