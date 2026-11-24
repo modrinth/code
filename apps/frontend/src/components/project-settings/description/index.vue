@@ -69,13 +69,11 @@
 				<ValidationMessage :check="saveValidation.forField('description')" />
 			</div>
 
-			<MarkdownEditor
+			<DescriptionMarkdownEditor
 				v-model="current.description"
 				:placeholder="formatMessage(messages.placeholder)"
 				:disabled="saving || !hasPermission"
 				:on-image-upload="onUploadHandler"
-				integrated
-				:min-height="480"
 			/>
 		</div>
 		<UnsavedChangesPopup
@@ -98,7 +96,6 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 	IntlFormatted,
-	MarkdownEditor,
 	UnsavedChangesPopup,
 	usePageLeaveSafety,
 	useSavable,
@@ -118,7 +115,8 @@ import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { projectCopyType } from '~/utils/project-messages'
 
-import SettingsSection from './settings-section.vue'
+import SettingsSection from '../settings-section.vue'
+import DescriptionMarkdownEditor from './description-markdown-editor.vue'
 
 const { projectV2: project, projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
 const isServerProject = computed(() => projectV3.value.minecraft_server != null)

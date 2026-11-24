@@ -2960,6 +2960,18 @@
   "layout.publish.email-verification-required.title": {
     "message": "Email verification required"
   },
+  "markdown-editor.mode": {
+    "message": "Editor mode"
+  },
+  "markdown-editor.mode.split": {
+    "message": "Split"
+  },
+  "markdown-editor.mode.write": {
+    "message": "Write"
+  },
+  "markdown-editor.preview-label": {
+    "message": "Preview"
+  },
   "messages.noResults": {
     "message": "No results found for your query!"
   },

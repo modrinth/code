@@ -1,7 +1,7 @@
 <template>
 	<template v-if="canAccess">
 		<div v-show="view === 'thread'" class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-			<ConversationThread
+			<ModerationThread
 				v-if="prefixedThread"
 				compact
 				:thread="prefixedThread"
@@ -23,7 +23,7 @@
 						</template>
 					</IntlFormatted>
 				</template>
-			</ConversationThread>
+			</ModerationThread>
 			<div
 				v-else
 				class="flex items-center justify-center gap-2 rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2 py-12"
@@ -56,7 +56,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, watch } from 'vue'
 
-import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
+import ModerationThread from '~/components/ui/thread/ModerationThread.vue'
 import { isApproved } from '~/helpers/projects.js'
 import { verifyThreadIssuesForApproval } from '~/helpers/thread-issues'
 import { injectProjectPublishing } from '~/providers/project-publishing'

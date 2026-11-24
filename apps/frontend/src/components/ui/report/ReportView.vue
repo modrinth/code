@@ -25,7 +25,7 @@
 				Make sure to include evidence of all claims you make, or your report may be closed without
 				action.
 			</p>
-			<ConversationThread
+			<ModerationThread
 				class="overflow-clip rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2"
 				:thread="thread"
 				:report="report"
@@ -41,7 +41,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import ReportInfo from '~/components/ui/report/ReportInfo.vue'
-import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
+import ModerationThread from '~/components/ui/thread/ModerationThread.vue'
 import { addReportMessage } from '~/helpers/threads.js'
 
 const props = defineProps({

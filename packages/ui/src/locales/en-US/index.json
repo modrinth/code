@@ -3458,15 +3458,6 @@
   "markdown-editor.max-length.value": {
     "defaultMessage": "{currentLength}/{maxLength}"
   },
-  "markdown-editor.mode": {
-    "defaultMessage": "Editor mode"
-  },
-  "markdown-editor.mode.split": {
-    "defaultMessage": "Split"
-  },
-  "markdown-editor.mode.write": {
-    "defaultMessage": "Write"
-  },
   "markdown-editor.placeholder": {
     "defaultMessage": "Write something..."
   },
@@ -3517,12 +3508,6 @@
   },
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Video"
-  },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "No file provided"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "No image upload handler provided"
   },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"

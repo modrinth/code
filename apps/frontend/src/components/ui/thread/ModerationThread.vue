@@ -152,48 +152,73 @@
 				</Button>
 			</div>
 			<template v-else-if="!report || !report.closed">
-				<div
+				<MarkdownEditor
+					ref="replyEditor"
+					v-model="replyBody"
 					:class="
 						compact
-							? 'mt-auto shrink-0 border-0 border-t border-solid border-divider px-4 pt-4 [&_.cm-content]:!min-h-[6lh] [&_.cm-editor]:text-sm [&_.cm-scroller]:!max-h-[6lh] [&_.cm-scroller]:![font-family:var(--font-standard)]'
-							: 'mx-4 mt-2'
+							? 'mt-auto shrink-0 !grow-0 border-0 border-t border-solid border-divider !px-5 !pt-5 [&_.cm-content]:!min-h-[6lh] [&_.cm-editor]:text-sm [&_.cm-scroller]:!max-h-[6lh] [&_.cm-scroller]:![font-family:var(--font-standard)]'
+							: 'mx-4 mt-2 !w-auto'
 					"
+					:hide-markdown-hint="compact"
+					:disabled="isLoading"
+					:placeholder="
+						formatMessage(
+							sortedMessages.length > 0
+								? messages.replyEditorPlaceholderReply
+								: messages.replyEditorPlaceholderSend,
+						)
+					"
+					:on-image-upload="onUploadImage"
 				>
-					<MarkdownEditor
-						ref="replyEditor"
-						v-model="replyBody"
-						:image-only-toolbar="compact ? 'external' : false"
-						:hide-markdown-hint="compact"
-						:disabled="isLoading"
-						:placeholder="
-							formatMessage(
-								sortedMessages.length > 0
-									? messages.replyEditorPlaceholderReply
-									: messages.replyEditorPlaceholderSend,
-							)
-						"
-						:on-image-upload="onUploadImage"
-					>
-						<template #preview="{ value }">
-							<IssueMessage :message="value" highlighted />
-						</template>
-					</MarkdownEditor>
-				</div>
-				<div v-if="replyFacets.length" class="mx-4 mt-3 flex flex-col gap-2">
-					<p class="m-0 text-sm text-secondary">
-						{{ formatMessage(messages.replyAddresses) }}
-					</p>
-					<Checkbox
-						v-for="facet in replyFacets"
-						:key="facet.id"
-						:model-value="selectedReplyFacetIds.includes(facet.id)"
-						:disabled="isLoading"
-						@update:model-value="selectReplyFacet(facet.id, $event)"
-					>
-						{{ facet.label }}
-					</Checkbox>
-				</div>
-
+					<template v-if="compact" #toolbar />
+					<template #preview="{ value }">
+						<IssueMessage :message="value" highlighted />
+					</template>
+					<template #footer="{ openImageModal }">
+						<div v-if="replyFacets.length" class="mx-4 mt-3 flex flex-col gap-2">
+							<p class="m-0 text-sm text-secondary">
+								{{ formatMessage(messages.replyAddresses) }}
+							</p>
+							<Checkbox
+								v-for="facet in replyFacets"
+								:key="facet.id"
+								:model-value="selectedReplyFacetIds.includes(facet.id)"
+								:disabled="isLoading"
+								@update:model-value="selectReplyFacet(facet.id, $event)"
+							>
+								{{ facet.label }}
+							</Checkbox>
+						</div>
+						<div
+							v-if="compact"
+							class="flex shrink-0 items-center justify-between gap-2 p-[18px] pb-4 pt-1.5"
+						>
+							<IconButton
+								v-tooltip="formatMessage(messages.actionAttachImage)"
+								:label="formatMessage(messages.actionAttachImage)"
+								:disabled="isLoading"
+								@click="openImageModal()"
+							>
+								<ImageIcon aria-hidden="true" />
+							</IconButton>
+							<div class="flex flex-wrap items-center justify-end gap-2">
+								<TeleportOverflowMenu
+									v-if="isStaff(auth.user) && moderationMenuOptions.length"
+									:label="formatMessage(commonMessages.moreOptionsButton)"
+									:options="moderationMenuOptions"
+									:disabled="isLoading"
+									:circular="false"
+									placement="top-end"
+								>
+									<MoreHorizontalIcon aria-hidden="true" />
+								</TeleportOverflowMenu>
+								<PrivateNoteAction v-if="isStaff(auth.user)" />
+								<SendAction />
+							</div>
+						</div>
+					</template>
+				</MarkdownEditor>
 				<div
 					v-if="!compact"
 					class="flex shrink-0 flex-wrap items-center justify-between gap-4 p-4 pt-2"
@@ -233,33 +258,6 @@
 								{{ formatMessage(messages.actionCloseThread) }}
 							</Button>
 						</template>
-					</div>
-				</div>
-				<div
-					v-if="compact"
-					class="flex shrink-0 items-center justify-between gap-2 p-[18px] pb-4 pt-1.5"
-				>
-					<IconButton
-						v-tooltip="formatMessage(messages.actionAttachImage)"
-						:label="formatMessage(messages.actionAttachImage)"
-						:disabled="isLoading"
-						@click="replyEditor?.openImageModal?.()"
-					>
-						<ImageIcon aria-hidden="true" />
-					</IconButton>
-					<div class="flex flex-wrap items-center justify-end gap-2">
-						<TeleportOverflowMenu
-							v-if="isStaff(auth.user) && moderationMenuOptions.length"
-							:label="formatMessage(commonMessages.moreOptionsButton)"
-							:options="moderationMenuOptions"
-							:disabled="isLoading"
-							:circular="false"
-							placement="top-end"
-						>
-							<MoreHorizontalIcon aria-hidden="true" />
-						</TeleportOverflowMenu>
-						<PrivateNoteAction v-if="isStaff(auth.user)" />
-						<SendAction />
 					</div>
 				</div>
 			</template>

@@ -90,7 +90,8 @@ export { default as IntlFormatted } from './IntlFormatted.vue'
 export { default as LoadingBar } from './LoadingBar.vue'
 export { default as LoadingIndicator } from './LoadingIndicator.vue'
 export { default as ManySelect } from './ManySelect.vue'
-export { default as MarkdownEditor } from './MarkdownEditor.vue'
+export type { MarkdownEditorMode } from './markdown-editor'
+export { MarkdownEditor, MarkdownEditorToolbar } from './markdown-editor'
 export type {
 	MultiSelectItem,
 	MultiSelectOption,
