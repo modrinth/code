@@ -7,6 +7,7 @@ export { default as PhotosensitivityWarningModal } from './PhotosensitivityWarni
 export { default as ShareModal } from './ShareModal.vue'
 export type { Tab as TabbedModalTab } from './TabbedModal.vue'
 export { default as TabbedModal } from './TabbedModal.vue'
+export { default as UnknownFileSandboxNotice } from './UnknownFileSandboxNotice.vue'
 export { default as UnknownFileWarningModal } from './UnknownFileWarningModal.vue'
 export { default as UpdateAllModal } from './update-all-modal/index.vue'
 export type {

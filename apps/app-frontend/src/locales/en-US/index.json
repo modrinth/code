@@ -1487,6 +1487,9 @@
   "app.modal.install-to-play.reviewed-files": {
     "message": "Files that aren't published to Modrinth aren't reviewed."
   },
+  "app.modal.install-to-play.sandbox-and-install": {
+    "message": "Sandbox and install"
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Shared instance"
   },
@@ -1548,7 +1551,7 @@
     "message": "Update required"
   },
   "app.modal.update-to-play.update-required-description": {
-    "message": "An update is required to play {name}. Please update to latest version to launch the game."
+    "message": "An update is required to play <name>{name}</name>. Please update to the latest version to launch the game."
   },
   "app.nav.add-account": {
     "message": "Add account"
@@ -3128,14 +3131,41 @@
   "app.settings.resource-management.store.unused.label": {
     "message": "Orphaned"
   },
-  "app.settings.sandbox.always": {
-    "message": "Always"
-  },
-  "app.settings.sandbox.always.description": {
-    "message": "Run instances always in the sandbox."
-  },
   "app.settings.sandbox.description": {
-    "message": "Runs Minecraft in an isolated environment, so mods can only access your .minecraft folder and anything you allow below."
+    "message": "Launch instances in a sandbox to restrict what mods can access."
+  },
+  "app.settings.sandbox.disable.confirm": {
+    "message": "Disable sandbox"
+  },
+  "app.settings.sandbox.disable.description": {
+    "message": "If someone online or a mod asks you to disable the sandbox, they may be trying to gain access to your personal data. Before disabling it, confirm that you understand the risks below."
+  },
+  "app.settings.sandbox.disable.header": {
+    "message": "Disable the sandbox?"
+  },
+  "app.settings.sandbox.disable.help": {
+    "message": "If you have any questions, <support>contact support</support> or read our <article>help article</article> before continuing."
+  },
+  "app.settings.sandbox.disable.risk.account.description": {
+    "message": "Someone could gain access to your account, impersonate you, or lock you out."
+  },
+  "app.settings.sandbox.disable.risk.account.title": {
+    "message": "Take over your Minecraft account"
+  },
+  "app.settings.sandbox.disable.risk.files.description": {
+    "message": "Your documents, photos, and other files could be stolen or erased."
+  },
+  "app.settings.sandbox.disable.risk.files.title": {
+    "message": "Read, change, or delete your files"
+  },
+  "app.settings.sandbox.disable.risk.passwords.description": {
+    "message": "Your Discord, browser passwords, and banking credentials could be stolen."
+  },
+  "app.settings.sandbox.disable.risk.passwords.title": {
+    "message": "Steal your passwords and logins"
+  },
+  "app.settings.sandbox.disable.risks-title": {
+    "message": "A malicious mod could:"
   },
   "app.settings.sandbox.documents": {
     "message": "Access documents folder"
@@ -3164,17 +3194,14 @@
   "app.settings.sandbox.folders.placeholder": {
     "message": "Path to folder..."
   },
-  "app.settings.sandbox.instance.always.description": {
-    "message": "Always run this instance in the sandbox."
+  "app.settings.sandbox.info": {
+    "message": "The sandbox isolates Minecraft, limiting mods to your system files, .minecraft, and anything we allow or you allow below. Some mods may not work if the sandbox blocks access they need. <link>Learn more</link>"
   },
-  "app.settings.sandbox.instance.never.description": {
-    "message": "Run this instance with full access to your computer."
+  "app.settings.sandbox.instance.description": {
+    "message": "Launch this instance in a sandbox to restrict what mods can access."
   },
   "app.settings.sandbox.instance.title": {
     "message": "Sandbox instance"
-  },
-  "app.settings.sandbox.instance.unrecognized.description": {
-    "message": "Sandbox this instance if it contains files not from Modrinth."
   },
   "app.settings.sandbox.network": {
     "message": "Access network"
@@ -3182,26 +3209,14 @@
   "app.settings.sandbox.network.description": {
     "message": "Allows connections to the internet, multiplayer servers, and online services."
   },
-  "app.settings.sandbox.never": {
-    "message": "Never"
-  },
-  "app.settings.sandbox.never.description": {
-    "message": "Run instances with full access to your computer."
+  "app.settings.sandbox.settings-title": {
+    "message": "Sandbox settings"
   },
   "app.settings.sandbox.title": {
     "message": "Sandbox instances"
   },
   "app.settings.sandbox.unavailable": {
     "message": "Sandboxing is unavailable on this system, so instances that need the sandbox will not launch: {reason}"
-  },
-  "app.settings.sandbox.unrecognized": {
-    "message": "Unrecognized files"
-  },
-  "app.settings.sandbox.unrecognized.description": {
-    "message": "Sandbox instances containing files not from Modrinth."
-  },
-  "app.settings.sandbox.warning": {
-    "message": "Some mods may not work if they require access blocked by the sandbox."
   },
   "app.settings.sidebar.label.instance-defaults": {
     "message": "Instance defaults"
@@ -4397,8 +4412,14 @@
   "instance.settings.tabs.sandbox": {
     "message": "Sandboxing"
   },
-  "instance.settings.tabs.sandbox.default-settings-description": {
-    "message": "Your instance uses the default sandbox permissions unless you override them here."
+  "instance.settings.tabs.sandbox.custom.description": {
+    "message": "Use custom sandbox settings for this instance instead of following App settings."
+  },
+  "instance.settings.tabs.sandbox.custom.title": {
+    "message": "Use custom settings"
+  },
+  "instance.settings.tabs.sandbox.default-settings": {
+    "message": "Default settings"
   },
   "instance.settings.tabs.sharing": {
     "message": "Sharing"

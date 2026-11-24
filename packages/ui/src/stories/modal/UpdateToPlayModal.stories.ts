@@ -64,29 +64,102 @@ const diffs: ContentDiffItem[] = [
 	},
 ]
 
-export const ExternalFiles: Story = {
+const description =
+	'An update is required to play Epic Modrinth Pack. Please update to the latest version to launch the game.'
+
+const regularDiffs: ContentDiffItem[] = [
+	{
+		type: 'updated',
+		projectName: 'Fabric API',
+		currentVersionName: '0.128.2+1.21.10',
+		newVersionName: '0.139.2+1.21.11',
+	},
+	{
+		type: 'removed',
+		projectName: 'Optifine',
+		currentVersionName: '1.0.2-forge-mc1.14.4',
+	},
+	{
+		type: 'updated',
+		projectName: 'Cloth Config API',
+		currentVersionName: '18.0.145+neoforge',
+		newVersionName: '20.0.149+neoforge',
+	},
+	{
+		type: 'added',
+		projectName: 'Sodium',
+		newVersionName: '1.21.10-0.7.3-neoforge',
+	},
+	{
+		type: 'updated',
+		projectName: 'Iris Shaders',
+		currentVersionName: '1.8.8+1.21.8-neoforge',
+		newVersionName: '1.9.6+1.21.10-neoforge',
+	},
+	{
+		type: 'updated',
+		projectName: 'Entity Culling',
+		currentVersionName: '1.8.1',
+		newVersionName: '1.9.3',
+	},
+]
+
+export const NoExternalFiles: Story = {
 	render: () => ({
 		components: { ContentDiffModal, Button },
 		setup() {
 			const modalRef = ref<InstanceType<typeof ContentDiffModal> | null>(null)
-			return { diffs, DownloadIcon, modalRef }
+			return { diffs: regularDiffs, description, DownloadIcon, modalRef }
 		},
 		template: /* html */ `
-			<Button type="colored" color="brand" @click="modalRef?.show()">Open update warning</Button>
+			<Button type="colored" color="brand" @click="modalRef?.show()">Open update</Button>
 			<ContentDiffModal
 				ref="modalRef"
 				header="Update to play"
-				description="An update is required to play Epic Modrinth Pack. Please update to the latest version to launch the game."
+				:description="description"
 				:diffs="diffs"
 				version-date="November 25, 2025"
-				show-external-warnings
-				confirm-label="Update"
+				confirm-label="Install"
 				:confirm-icon="DownloadIcon"
 				removed-label="Removed"
 			/>
 		`,
 	}),
 }
+
+function externalFilesStory(name: string, offerSandbox: boolean): Story {
+	return {
+		name,
+		render: () => ({
+			components: { ContentDiffModal, Button },
+			setup() {
+				const modalRef = ref<InstanceType<typeof ContentDiffModal> | null>(null)
+				return { diffs, description, offerSandbox, DownloadIcon, modalRef }
+			},
+			template: /* html */ `
+				<Button type="colored" color="brand" @click="modalRef?.show()">Open update warning</Button>
+				<ContentDiffModal
+					ref="modalRef"
+					header="Update to play"
+					:description="description"
+					:diffs="diffs"
+					version-date="November 25, 2025"
+					show-external-warnings
+					:offer-sandbox="offerSandbox"
+					confirm-label="Update"
+					:confirm-icon="DownloadIcon"
+					removed-label="Removed"
+				/>
+			`,
+		}),
+	}
+}
+
+export const ExternalFilesSandboxOff = externalFilesStory('External files (sandbox off)', true)
+export const ExternalFilesSandboxOn = externalFilesStory(
+	'External files (sandbox on or unavailable)',
+	false,
+)
 
 const configFileNames = [
 	'options.txt',

@@ -193,9 +193,12 @@
 				</Transition>
 			</div>
 
-			<p v-if="!reportMode && showExternalFilesWarning" class="m-0 text-primary">
-				{{ formatMessage(messages.reviewedFiles) }}
-			</p>
+			<template v-if="!reportMode && showExternalFilesWarning">
+				<UnknownFileSandboxNotice v-if="offerSandbox" />
+				<p v-else class="m-0 text-primary">
+					{{ formatMessage(messages.reviewedFiles) }}
+				</p>
+			</template>
 			<div v-if="!reportMode" class="flex w-full items-center justify-between gap-2">
 				<Button
 					v-if="!isOwner"
@@ -208,10 +211,30 @@
 				</Button>
 				<div class="ml-auto flex items-center gap-2">
 					<template v-if="showExternalFilesWarning">
-						<Button type="quiet" color="orange" :disabled="installing" @click="accept">
+						<Button
+							type="quiet"
+							:color="offerSandbox ? undefined : 'orange'"
+							:disabled="installing"
+							@click="accept"
+						>
 							{{ formatMessage(messages.installAnyway) }}
 						</Button>
-						<Button type="colored" color="brand" :disabled="installing" @click="handleCancel">
+						<Button
+							v-if="offerSandbox"
+							type="colored"
+							color="brand"
+							:disabled="installing"
+							@click="accept"
+						>
+							<ShieldCheckIcon />{{ formatMessage(messages.sandboxAndInstall) }}
+						</Button>
+						<Button
+							v-else
+							type="colored"
+							color="brand"
+							:disabled="installing"
+							@click="handleCancel"
+						>
 							<BanIcon />{{ formatMessage(messages.dontInstall) }}
 						</Button>
 					</template>
@@ -254,7 +277,15 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { BanIcon, DownloadIcon, ReportIcon, SendIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import {
+	BanIcon,
+	DownloadIcon,
+	ReportIcon,
+	SendIcon,
+	ShieldCheckIcon,
+	SpinnerIcon,
+	XIcon,
+} from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import {
 	Admonition,
@@ -276,6 +307,7 @@ import {
 	NewModal,
 	Table,
 	type TableColumn,
+	UnknownFileSandboxNotice,
 	useScrollIndicator,
 	useVIntl,
 } from '@modrinth/ui'
@@ -283,6 +315,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, ref } from 'vue'
 
+import { useOfferSandbox } from '@/composables/use-offer-sandbox'
 import { config } from '@/config'
 import { toError } from '@/helpers/errors'
 import type { SharedInstanceInstallPreview } from '@/helpers/install'
@@ -325,6 +358,7 @@ const emit = defineEmits<{
 	reported: [deleteInstance: boolean]
 }>()
 const { formatMessage } = useVIntl()
+const offerSandbox = useOfferSandbox()
 const auth = injectAuth()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -626,6 +660,10 @@ const messages = defineMessages({
 	dontInstall: {
 		id: 'app.modal.install-to-play.external-files-dont-install',
 		defaultMessage: "Don't install",
+	},
+	sandboxAndInstall: {
+		id: 'app.modal.install-to-play.sandbox-and-install',
+		defaultMessage: 'Sandbox and install',
 	},
 	installButton: { id: 'app.modal.install-to-play.install-button', defaultMessage: 'Install' },
 })

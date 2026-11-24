@@ -523,7 +523,10 @@ fn edit_to_core(edit_instance: EditInstance) -> Result<CoreEditInstance> {
             sandbox: edit_instance.sandbox,
             visible_tabs: edit_instance.visible_tabs,
         }),
-        content_set_patch: Some(AppliedContentSetPatch {
+        content_set_patch: (edit_instance.game_version.is_some()
+            || edit_instance.loader.is_some()
+            || edit_instance.loader_version.is_some())
+        .then(|| AppliedContentSetPatch {
             source_kind: None,
             game_version: edit_instance.game_version,
             protocol_version: Some(None),
