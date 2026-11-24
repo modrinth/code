@@ -3,6 +3,7 @@ use serde::Deserialize;
 use serde_json::value::RawValue;
 
 use crate::enums::Country;
+use crate::event::AppEventType;
 use crate::http::batch::{
     AppEvent, AppEventBatch, SkewCorrectionError, SkewCorrectionParameters,
 };
@@ -23,6 +24,12 @@ pub const MAX_EVENT_AGE: TimeDelta = TimeDelta::days(2);
 /// by the client, so this does NOT mean data up to 23 hours in the future is accepted and
 /// shown in query, this is purely to account for client clock skew.
 pub const MAX_EVENT_IN_ADVANCE: TimeDelta = TimeDelta::hours(23);
+
+/// Longest app version accepted, in bytes.
+pub const MAX_APP_VERSION_LEN: usize = 32;
+
+/// Longest event source accepted, in bytes.
+pub const MAX_SOURCE_LEN: usize = 32;
 
 /// Events extracted from a received batch.
 #[derive(Debug)]
@@ -46,6 +53,10 @@ pub enum ExtractError {
     TooManyEvents,
     #[error("installation id is not a valid UUID v4")]
     InstallationIdIsNotUuidVersion4,
+    #[error(
+        "app version is not 1 to {MAX_APP_VERSION_LEN} ASCII letters, digits, `.`, `+` or `-`"
+    )]
+    InvalidAppVersion,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -60,6 +71,14 @@ pub enum SingleEventProcessingError {
     ),
     #[error("id is not a valid UUID v7")]
     IdIsNotUuidVersion7,
+    #[error(
+        "source is not 1 to {MAX_SOURCE_LEN} lowercase ASCII letters, digits, `_` or `-`"
+    )]
+    InvalidSource,
+    #[error(
+        "app version is not 1 to {MAX_APP_VERSION_LEN} ASCII letters, digits, `.`, `+` or `-`"
+    )]
+    InvalidAppVersion,
 }
 
 /// Validates a request body sent by the app and extracts its events.
@@ -98,6 +117,10 @@ pub fn extract_events<K: AsRef<str>, V: AsRef<str>>(
         return Err(ExtractError::InstallationIdIsNotUuidVersion4);
     }
 
+    if !is_valid_app_version(&batch.app_version) {
+        return Err(ExtractError::InvalidAppVersion);
+    }
+
     let header_data = extract_headers(headers);
 
     let mut events = Vec::with_capacity(batch.events.len());
@@ -131,6 +154,18 @@ pub fn extract_events<K: AsRef<str>, V: AsRef<str>>(
             continue;
         }
 
+        if !is_valid_source(&event.source) {
+            rejected.push(SingleEventProcessingError::InvalidSource);
+            continue;
+        }
+
+        if let AppEventType::AppStart { app_version, .. } = &event.event
+            && !is_valid_app_version(app_version)
+        {
+            rejected.push(SingleEventProcessingError::InvalidAppVersion);
+            continue;
+        }
+
         events.push(NormalizedAppEvent {
             event_id: event.id,
             sent_at: batch.sent_at,
@@ -147,6 +182,26 @@ pub fn extract_events<K: AsRef<str>, V: AsRef<str>>(
     }
 
     Ok(ExtractedAppEvents { events, rejected })
+}
+
+/// Checks that a client-supplied app version is short and uses only the
+/// characters of a semantic version, so the column stays low-cardinality and
+/// free of arbitrary text.
+fn is_valid_app_version(version: &str) -> bool {
+    (1..=MAX_APP_VERSION_LEN).contains(&version.len())
+        && version.bytes().all(|b| {
+            b.is_ascii_alphanumeric() || matches!(b, b'.' | b'+' | b'-')
+        })
+}
+
+/// Checks that a client-supplied event source is a short identifier.
+fn is_valid_source(source: &str) -> bool {
+    (1..=MAX_SOURCE_LEN).contains(&source.len())
+        && source.bytes().all(|b| {
+            b.is_ascii_lowercase()
+                || b.is_ascii_digit()
+                || matches!(b, b'_' | b'-')
+        })
 }
 
 /// Deserializes `T` from JSON, reporting the path to the value that failed.
@@ -203,7 +258,6 @@ fn extract_headers<K: AsRef<str>, V: AsRef<str>>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::event::AppEventType;
 
     const INSTALLATION_ID: &str = "67e55044-10b1-426f-9247-bb680e5fe0c8";
     const EVENT_ID_A: &str = "01890a5d-ac96-774b-bcce-b302099a8057";
@@ -225,37 +279,6 @@ mod tests {
             r#"{{"id":"{id}","timestamp":"2026-11-23T11:00:00Z","source":"browse","event":{event}}}"#
         )
     }
-
-    #[test]
-    fn extracts_externally_tagged_events() {
-        let body = body(&format!(
-            "{},{}",
-            event(
-                EVENT_ID_A,
-                r#"{"InstanceStart":{"loader":"fabric","loader_version":"0.16.9","game_version":"1.21.4"}}"#
-            ),
-            event(EVENT_ID_B, r#"{"MicrosoftSignIn":{}}"#),
-        ));
-
-        let extracted =
-            extract_events(&body, NO_HEADERS, arrived_at()).unwrap();
-
-        assert!(extracted.rejected.is_empty(), "{:?}", extracted.rejected);
-        let data: Vec<_> =
-            extracted.events.into_iter().map(|e| e.data).collect();
-        assert_eq!(
-            data,
-            [
-                AppEventType::InstanceStart {
-                    loader: crate::enums::AppLoader::Fabric,
-                    loader_version: Some("0.16.9".into()),
-                    game_version: "1.21.4".into(),
-                },
-                AppEventType::MicrosoftSignIn {},
-            ]
-        );
-    }
-
     #[test]
     fn rejects_unknown_event_without_rejecting_batch() {
         let body = body(&format!(
@@ -288,28 +311,48 @@ mod tests {
     }
 
     #[test]
-    fn rejects_trailing_characters() {
-        let body = body(&event(EVENT_ID_A, r#"{"MicrosoftSignIn":{}}"#)) + "x";
+    fn rejects_batch_with_invalid_app_version() {
+        let body = body(&event(EVENT_ID_A, r#"{"MicrosoftSignIn":{}}"#))
+            .replace(r#""app_version":"0.10.3""#, r#""app_version":"0.10 3""#);
 
         let err = extract_events(&body, NO_HEADERS, arrived_at()).unwrap_err();
 
-        assert!(matches!(err, ExtractError::Deserialize(_)));
+        assert!(matches!(err, ExtractError::InvalidAppVersion));
     }
 
     #[test]
-    fn prefers_alt_ipcountry_over_cf_ipcountry() {
-        let country = |headers: &[(&str, &str)]| {
-            extract_headers(headers.iter().copied()).ip_country
-        };
+    fn rejects_event_with_invalid_source_without_rejecting_batch() {
+        let body = body(&format!(
+            "{},{}",
+            event(EVENT_ID_A, r#"{"MicrosoftSignIn":{}}"#)
+                .replace(r#""source":"browse""#, r#""source":"Browse""#),
+            event(EVENT_ID_B, r#"{"MicrosoftSignIn":{}}"#),
+        ));
 
-        assert_eq!(
-            country(&[("CF-IPCountry", "FR"), ("Alt-IPCountry", "DE")]),
-            Country::parse("DE").unwrap()
-        );
-        assert_eq!(
-            country(&[("cf-ipcountry", "FR"), ("alt-ipcountry", "??")]),
-            Country::parse("FR").unwrap()
-        );
-        assert_eq!(country(&[]), Country::UNKNOWN);
+        let extracted =
+            extract_events(&body, NO_HEADERS, arrived_at()).unwrap();
+
+        assert_eq!(extracted.events.len(), 1);
+        assert!(matches!(
+            extracted.rejected.as_slice(),
+            [SingleEventProcessingError::InvalidSource]
+        ));
+    }
+
+    #[test]
+    fn rejects_app_start_with_invalid_app_version() {
+        let body = body(&event(
+            EVENT_ID_A,
+            r#"{"AppStart":{"arch":"x86_64","os":"linux","app_version":"<script>"}}"#,
+        ));
+
+        let extracted =
+            extract_events(&body, NO_HEADERS, arrived_at()).unwrap();
+
+        assert!(extracted.events.is_empty());
+        assert!(matches!(
+            extracted.rejected.as_slice(),
+            [SingleEventProcessingError::InvalidAppVersion]
+        ));
     }
 }

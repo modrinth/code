@@ -54,6 +54,8 @@ enum Command {
     /// Take processed information from the database, produce JSON manifests
     /// from them, and upload them to the public file store
     Export,
+    /// Apply pending database migrations, then exit
+    Migrate,
 }
 
 pub fn main() -> Result<()> {
@@ -130,6 +132,10 @@ async fn main_(config: Config) -> Result<()> {
         .await?;
     info!("applied {} migrations", report.applied());
 
+    if matches!(cli.command, Command::Migrate) {
+        return Ok(());
+    }
+
     let fastly = if let Some(config) = config.fastly {
         fastly::Client::builder()
             .http(http.clone())
@@ -192,6 +198,7 @@ async fn main_(config: Config) -> Result<()> {
                 .context(info_span!("export"))
                 .await
         }
+        Command::Migrate => Ok(()),
     }
 }
 
