@@ -1025,9 +1025,6 @@
   "app.screenshots.heading": {
     "message": "Capturas de ecrã"
   },
-  "app.screenshots.search": {
-    "message": "Pesquisar"
-  },
   "app.screenshots.selection.selected-count": {
     "message": "{count} selecionados"
   },

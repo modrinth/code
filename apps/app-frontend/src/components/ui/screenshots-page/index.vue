@@ -25,7 +25,6 @@ import {
 	Avatar,
 	Button,
 	type ButtonMenuOption,
-	type ComboboxOption,
 	commonMessages,
 	ConfirmModal,
 	ContextMenu,
@@ -37,6 +36,7 @@ import {
 	type ImageViewerEditorSavePayload,
 	injectNotificationManager,
 	ReadyTransition,
+	type SortMode,
 	useDebugLogger,
 	useFormatDateTime,
 	useReadyState,
@@ -83,10 +83,8 @@ import ScreenshotDragGather from './drag-gather.vue'
 import ScreenshotDragPreview from './drag-preview.vue'
 import ScreenshotGroupSection from './group.vue'
 import ScreenshotToolbar from './toolbar.vue'
+import type { ScreenshotGroupBy, ScreenshotSortField } from './types'
 import { type ActiveScreenshotDrag, useScreenshotDragGather } from './use-screenshot-drag-gather'
-
-type ScreenshotSort = 'newest' | 'oldest' | 'name'
-type ScreenshotGroupBy = 'custom' | 'instance' | 'date' | 'none'
 
 type LegacyCustomScreenshotGrouping = {
 	groups: ScreenshotGroup[]
@@ -149,20 +147,11 @@ const props = withDefaults(
 const isGlobal = computed(() => !props.instanceId)
 const storageSuffix = props.instanceId ? 'instance' : 'global'
 const search = ref('')
-const sort = useStorage<ScreenshotSort>(`screenshots-sort-${storageSuffix}`, 'newest')
+const sort = useStorage<SortMode<ScreenshotSortField>>(`screenshots-sort-v2-${storageSuffix}`, {
+	field: 'date',
+	direction: 'desc',
+})
 const groupBy = useStorage<ScreenshotGroupBy>(`screenshots-group-v2-${storageSuffix}`, 'date')
-const sortModel = computed<string>({
-	get: () => sort.value,
-	set: (value) => {
-		sort.value = value as ScreenshotSort
-	},
-})
-const groupByModel = computed<string>({
-	get: () => groupBy.value,
-	set: (value) => {
-		groupBy.value = value as ScreenshotGroupBy
-	},
-})
 const collapsedGroups = useStorage<Record<string, boolean>>(
 	`screenshots-collapsed-groups-${storageSuffix}`,
 	{},
@@ -247,13 +236,6 @@ const messages = defineMessages({
 		id: 'app.screenshots.error-heading',
 		defaultMessage: 'Failed to load screenshots',
 	},
-	newest: { id: 'app.screenshots.sort.newest', defaultMessage: 'Newest' },
-	oldest: { id: 'app.screenshots.sort.oldest', defaultMessage: 'Oldest' },
-	name: { id: 'app.screenshots.sort.name', defaultMessage: 'Name' },
-	custom: { id: 'app.screenshots.group.custom', defaultMessage: 'Custom group' },
-	instance: { id: 'app.screenshots.group.instance', defaultMessage: 'Instance' },
-	date: { id: 'app.screenshots.group.date', defaultMessage: 'Date' },
-	none: { id: 'app.screenshots.group.none', defaultMessage: 'No grouping' },
 	today: { id: 'app.screenshots.group.today', defaultMessage: 'Today' },
 	yesterday: { id: 'app.screenshots.group.yesterday', defaultMessage: 'Yesterday' },
 	thisWeek: { id: 'app.screenshots.group.this-week', defaultMessage: 'This week' },
@@ -395,17 +377,8 @@ const {
 } = useScreenshotDragGather(screenshots)
 const isNarrowingResults = computed(() => search.value.trim().length > 0)
 
-const sortOptions = computed<ComboboxOption<string>[]>(() => [
-	{ value: 'newest', label: formatMessage(messages.newest) },
-	{ value: 'oldest', label: formatMessage(messages.oldest) },
-	{ value: 'name', label: formatMessage(messages.name) },
-])
-const groupOptions = computed<ComboboxOption<string>[]>(() => [
-	{ value: 'custom', label: formatMessage(messages.custom) },
-	...(isGlobal.value ? [{ value: 'instance', label: formatMessage(messages.instance) }] : []),
-	{ value: 'date', label: formatMessage(messages.date) },
-	{ value: 'none', label: formatMessage(messages.none) },
-])
+const sortSign = computed(() => (sort.value.direction === 'asc' ? 1 : -1))
+const dateSortSign = computed(() => (sort.value.field === 'date' ? sortSign.value : -1))
 
 const filteredScreenshots = computed(() => {
 	const query = search.value.trim().toLocaleLowerCase()
@@ -419,9 +392,9 @@ const filteredScreenshots = computed(() => {
 	})
 
 	return filtered.sort((a, b) => {
-		if (sort.value === 'name') return a.file_name.localeCompare(b.file_name)
+		if (sort.value.field === 'name') return a.file_name.localeCompare(b.file_name) * sortSign.value
 		const difference = new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-		return sort.value === 'oldest' ? difference : -difference
+		return difference * sortSign.value
 	})
 })
 
@@ -523,7 +496,7 @@ const groupedScreenshots = computed((): ScreenshotGroupData[] => {
 		const bTime = Math.max(
 			...b.screenshots.map((screenshot) => new Date(screenshot.created_at).getTime()),
 		)
-		return sort.value === 'oldest' ? aTime - bTime : bTime - aTime
+		return (aTime - bTime) * dateSortSign.value
 	})
 })
 
@@ -1495,16 +1468,13 @@ onBeforeUnmount(() => {
 		:class="{ 'justify-center pb-[20vh]': screenshots.length === 0 && !groupIdPendingNameEdit }"
 	>
 		<template v-if="screenshots.length > 0 || groupIdPendingNameEdit">
-			<h1 v-if="showHeading" class="m-0 text-2xl font-bold text-contrast">
-				{{ formatMessage(messages.heading) }}
-			</h1>
-
 			<ScreenshotToolbar
 				v-model:search="search"
-				v-model:sort="sortModel"
-				v-model:group="groupByModel"
-				:sort-options="sortOptions"
-				:group-options="groupOptions"
+				v-model:sort="sort"
+				v-model:group="groupBy"
+				:heading="showHeading ? formatMessage(messages.heading) : undefined"
+				:screenshot-count="screenshots.length"
+				:show-instance-grouping="isGlobal"
 				@new-group="createCustomGroup"
 			/>
 		</template>

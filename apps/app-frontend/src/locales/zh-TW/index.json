@@ -1694,9 +1694,6 @@
   "app.screenshots.preview.instance-and-date": {
     "message": "{instance} · {date}"
   },
-  "app.screenshots.search": {
-    "message": "搜尋"
-  },
   "app.screenshots.select": {
     "message": "選取 {name}"
   },
@@ -1733,17 +1730,8 @@
   "app.screenshots.show-in-folder": {
     "message": "開啟資料夾"
   },
-  "app.screenshots.sort-by": {
-    "message": "排序依據"
-  },
   "app.screenshots.sort.name": {
     "message": "名稱"
-  },
-  "app.screenshots.sort.newest": {
-    "message": "由新到舊"
-  },
-  "app.screenshots.sort.oldest": {
-    "message": "由舊到新"
   },
   "app.server-sharing-update.notification.description": {
     "message": "邀請好友一同遊玩由你的伺服器管理的實例。"

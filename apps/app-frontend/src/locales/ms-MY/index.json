@@ -413,17 +413,8 @@
   "app.screenshots.group.today": {
     "message": "Hari ini"
   },
-  "app.screenshots.search": {
-    "message": "Cari"
-  },
   "app.screenshots.sort.name": {
     "message": "Nama"
-  },
-  "app.screenshots.sort.newest": {
-    "message": "Paling baharu"
-  },
-  "app.screenshots.sort.oldest": {
-    "message": "Paling lama"
   },
   "app.settings.default-instance-options.height.title": {
     "message": "Tinggi"

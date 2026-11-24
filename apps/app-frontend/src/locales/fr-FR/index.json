@@ -1694,9 +1694,6 @@
   "app.screenshots.preview.instance-and-date": {
     "message": "{instance} · {date}"
   },
-  "app.screenshots.search": {
-    "message": "Rechercher"
-  },
   "app.screenshots.select": {
     "message": "Sélectionner {name}"
   },
@@ -1733,17 +1730,8 @@
   "app.screenshots.show-in-folder": {
     "message": "Afficher dans le dossier"
   },
-  "app.screenshots.sort-by": {
-    "message": "Trier par"
-  },
   "app.screenshots.sort.name": {
     "message": "Nom"
-  },
-  "app.screenshots.sort.newest": {
-    "message": "Les plus récents"
-  },
-  "app.screenshots.sort.oldest": {
-    "message": "Les plus anciens"
   },
   "app.server-sharing-update.notification.dismiss": {
     "message": "Ignorer"
