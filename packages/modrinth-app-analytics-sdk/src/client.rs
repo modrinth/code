@@ -105,7 +105,7 @@ impl AppAnalytics {
         matches!(tokio::time::timeout(timeout, rx).await, Ok(Ok(true)))
     }
 
-    pub fn set_telemetry_opt_out(&mut self, opted_out: bool) {
+    pub fn set_telemetry_opt_out(&self, opted_out: bool) {
         if opted_out {
             // drops the http_pool and closes connections to the analytics server
             *self.inner.backend.lock() = AnalyticsBackend::OptedOut;

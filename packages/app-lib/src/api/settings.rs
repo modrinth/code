@@ -73,6 +73,12 @@ pub async fn set(settings: Settings) -> crate::Result<()> {
         };
     settings.update(&state.pool).await?;
 
+    if current_settings.telemetry != settings.telemetry
+        && let Some(analytics) = &state.analytics
+    {
+        analytics.set_telemetry_opt_out(!settings.telemetry);
+    }
+
     if shared_fullscreen_changed {
         let result =
             crate::api::instance::sync_all_participating_instances(&state)

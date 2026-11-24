@@ -70,6 +70,8 @@ pub(crate) use self::synced_options::SyncedOptions;
 mod tunnel;
 pub use self::tunnel::*;
 
+mod app_analytics;
+
 pub mod db;
 pub(crate) mod db_backup;
 mod mr_auth;
@@ -110,6 +112,10 @@ pub struct State {
     pub(crate) synced_options: SyncedOptions,
 
     pub presence: Presence,
+
+    /// App analytics client, `None` on platforms analytics don't support or
+    /// when it failed to start.
+    pub analytics: Option<modrinth_app_analytics_sdk::AppAnalytics>,
 
     /// Process manager
     pub process_manager: ProcessManager,
@@ -344,6 +350,8 @@ impl State {
 
         let presence = Presence::init()?;
 
+        let analytics = app_analytics::init(&pool, settings.telemetry).await;
+
         tracing::info!("Initializing file watcher");
         let file_watcher = instances::watcher::init_watcher().await?;
 
@@ -360,6 +368,7 @@ impl State {
             instance_locks: InstanceLocks::default(),
             synced_options: SyncedOptions::default(),
             presence,
+            analytics,
             process_manager,
             restart_after_pending_update: AtomicBool::new(false),
             pool,

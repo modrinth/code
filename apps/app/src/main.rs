@@ -371,6 +371,18 @@ fn main() {
                     );
                 }
 
+                if matches!(&event, tauri::RunEvent::ExitRequested { .. })
+                    && !tauri::async_runtime::block_on(
+                        theseus::analytics::drain_events(
+                            std::time::Duration::from_secs(2),
+                        ),
+                    )
+                {
+                    tracing::warn!(
+                        "Failed to send queued analytics events before exit"
+                    );
+                }
+
                 #[cfg(feature = "updater")]
                 if matches!(&event, tauri::RunEvent::Exit) {
                     let update_data = app.state::<PendingUpdateData>().inner();

@@ -1,4 +1,5 @@
 //! API for interacting with Theseus
+pub mod analytics;
 pub mod cache;
 pub mod debug_info;
 pub mod friends;
