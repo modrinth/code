@@ -936,12 +936,9 @@ fn expose_files(
     files
         .into_iter()
         .filter_map(|file| {
-            // Exposing a missing path for writing would create it
-            if !file.exists() {
-                warn!(file = %file.display(), "dropped file doesn't exist");
-                return None;
-            }
-            match sandbox.expose_path(&file, can_expose_for_writing(&file)) {
+            let resolved = file.canonicalize().ok()?;
+            match sandbox.expose_path(&file, can_expose_for_writing(&resolved))
+            {
                 Ok(ExposedPath::Direct) => Some(file),
                 Ok(ExposedPath::Proxied(proxied)) => Some(proxied),
                 Err(err) => {

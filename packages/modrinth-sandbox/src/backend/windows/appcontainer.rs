@@ -63,7 +63,7 @@ use windows::{
 use async_trait::async_trait;
 use derive_more::Debug;
 use eyre::{Context, Result, bail, ensure, eyre};
-use parking_lot::{Mutex, RwLock};
+use parking_lot::Mutex;
 use uuid::Uuid;
 
 use crate::{
@@ -558,9 +558,20 @@ impl SandboxHandleOp for WindowsSandboxHandle {
             }
         }
 
+        let original_path = path;
         let path = path
             .canonicalize()
             .wrap_err_with(|| format!("canonicalizing path {path:?}"))?;
+
+        let simplified = strip_verbatim_prefix(&path);
+        let exposed = if paths_equal(
+            &simplified.to_string_lossy(),
+            &strip_verbatim_prefix(original_path).to_string_lossy(),
+        ) {
+            ExposedPath::Direct
+        } else {
+            ExposedPath::Proxied(simplified)
+        };
 
         // Grants on directories are inherited by everything inside them, so
         // granting a whole drive would be extremely slow and far too broad
@@ -578,7 +589,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
         let _expose_guard = self.expose_lock.lock();
 
         if is_accessible(&path) {
-            return Ok(ExposedPath::Direct);
+            return Ok(exposed);
         }
 
         let mut grants =
@@ -644,7 +655,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
         } else {
             self.path_set.lock().insert_readable(path);
         }
-        Ok(ExposedPath::Direct)
+        Ok(exposed)
     }
 
     fn is_path_readable(&self, path: &Path) -> bool {
@@ -653,6 +664,21 @@ impl SandboxHandleOp for WindowsSandboxHandle {
 
     fn is_path_writeable(&self, path: &Path) -> bool {
         self.path_set.lock().can_write(path.to_path_buf())
+    }
+}
+
+/// Some applications, including Java, don't support the verbatim prefix that
+/// canonical paths have.
+fn strip_verbatim_prefix(path: &Path) -> PathBuf {
+    let Some(path_str) = path.to_str() else {
+        return path.to_owned();
+    };
+    if let Some(rest) = path_str.strip_prefix(r"\\?\UNC\") {
+        PathBuf::from(format!(r"\\{rest}"))
+    } else if let Some(rest) = path_str.strip_prefix(r"\\?\") {
+        PathBuf::from(rest)
+    } else {
+        path.to_owned()
     }
 }
 
