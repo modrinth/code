@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use smol_str::SmolStr;
 use uuid::Uuid;
 
-use crate::enums::{AppOs, Country};
+use crate::enums::{AppArch, AppOs, Country};
 use crate::event::AppEventType;
 
 #[derive(Debug, Clone)]
@@ -21,6 +21,8 @@ pub struct NormalizedAppEvent {
     pub installation_id: Uuid,
     /// Client OS
     pub os: AppOs,
+    /// Client CPU arch
+    pub arch: AppArch,
     /// App version
     pub app_version: SmolStr,
     /// Event data

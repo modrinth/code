@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use chrono::{DateTime, TimeDelta, Utc};
 use serde::Deserialize;
 use serde_json::value::RawValue;
@@ -66,16 +64,16 @@ pub enum SingleEventProcessingError {
 
 /// Validates a request body sent by the app and extracts its events.
 ///
-/// `headers` are the request headers, used for the client's country. Header
-/// names are matched case-insensitively.
+/// `headers` are the request headers as name and value pairs, used for the
+/// client's country. Header names are matched case-insensitively.
 ///
 /// # Errors
 ///
 /// Errors if the batch as a whole is invalid. Individual invalid events are
 /// returned in [`ExtractedAppEvents::rejected`] instead.
-pub fn extract_events(
+pub fn extract_events<K: AsRef<str>, V: AsRef<str>>(
     body: &str,
-    headers: &HashMap<String, String>,
+    headers: impl IntoIterator<Item = (K, V)>,
     arrived_at: DateTime<Utc>,
 ) -> Result<ExtractedAppEvents, ExtractError> {
     // in the happy path, with no JSON escapes and strings that fit inline in a `SmolStr`,
@@ -141,6 +139,7 @@ pub fn extract_events(
             ip_country: header_data.ip_country,
             installation_id: batch.installation_id,
             os: batch.os,
+            arch: batch.arch,
             app_version: batch.app_version.clone(),
             data: event.event,
         })
@@ -180,11 +179,14 @@ struct ExtractedHeaderData {
     pub ip_country: Country,
 }
 
-fn extract_headers(headers: &HashMap<String, String>) -> ExtractedHeaderData {
+fn extract_headers<K: AsRef<str>, V: AsRef<str>>(
+    headers: impl IntoIterator<Item = (K, V)>,
+) -> ExtractedHeaderData {
     let mut cf_ipcountry = None;
     let mut alt_ipcountry = None;
 
     for (k, v) in headers {
+        let (k, v) = (k.as_ref(), v.as_ref());
         if k.eq_ignore_ascii_case("cf-ipcountry") {
             cf_ipcountry = Country::parse(v);
         } else if k.eq_ignore_ascii_case("alt-ipcountry") {
@@ -209,6 +211,7 @@ mod tests {
     const INSTALLATION_ID: &str = "67e55044-10b1-426f-9247-bb680e5fe0c8";
     const EVENT_ID_A: &str = "01890a5d-ac96-774b-bcce-b302099a8057";
     const EVENT_ID_B: &str = "01890a5d-ac96-774b-bcce-b302099a8058";
+    const NO_HEADERS: [(&str, &str); 0] = [];
 
     fn arrived_at() -> DateTime<Utc> {
         "2026-11-23T12:00:00Z".parse().unwrap()
@@ -238,7 +241,7 @@ mod tests {
         ));
 
         let extracted =
-            extract_events(&body, &HashMap::new(), arrived_at()).unwrap();
+            extract_events(&body, NO_HEADERS, arrived_at()).unwrap();
 
         assert!(extracted.rejected.is_empty(), "{:?}", extracted.rejected);
         let data: Vec<_> =
@@ -265,7 +268,7 @@ mod tests {
         ));
 
         let extracted =
-            extract_events(&body, &HashMap::new(), arrived_at()).unwrap();
+            extract_events(&body, NO_HEADERS, arrived_at()).unwrap();
 
         assert_eq!(extracted.events.len(), 1);
         assert!(matches!(
@@ -279,8 +282,7 @@ mod tests {
         let body = body(&event(EVENT_ID_A, r#"{"MicrosoftSignIn":{}}"#))
             .replace(r#""os":"linux""#, r#""os":"beos""#);
 
-        let err =
-            extract_events(&body, &HashMap::new(), arrived_at()).unwrap_err();
+        let err = extract_events(&body, NO_HEADERS, arrived_at()).unwrap_err();
 
         assert!(matches!(
             err,
@@ -292,8 +294,7 @@ mod tests {
     fn rejects_trailing_characters() {
         let body = body(&event(EVENT_ID_A, r#"{"MicrosoftSignIn":{}}"#)) + "x";
 
-        let err =
-            extract_events(&body, &HashMap::new(), arrived_at()).unwrap_err();
+        let err = extract_events(&body, NO_HEADERS, arrived_at()).unwrap_err();
 
         assert!(matches!(err, ExtractError::Deserialize(_)));
     }
