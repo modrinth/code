@@ -9,6 +9,7 @@ use crate::queue::server_ping;
 pub const DOWNLOADS: &str = "downloads";
 pub const PLAYTIME: &str = "playtime";
 pub const MINECRAFT_SERVER_PLAYS: &str = "minecraft_server_plays";
+pub const APP_EVENTS: &str = "app_events";
 
 pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
     init_client_with_database(&ENV.CLICKHOUSE_DATABASE).await
@@ -73,11 +74,23 @@ pub async fn run_migrations_on_database(
         "MergeTree()"
     };
 
+    let replacing_engine = if clickhouse_replicated {
+        "ReplicatedReplacingMergeTree('/clickhouse/{installation}/{cluster}/tables/{shard}/{database}/{table}', '{replica}', recorded_ts)"
+    } else {
+        "ReplacingMergeTree(recorded_ts)"
+    };
+
     // For the Clickhouse database on the staging environment, set a TTL to avoid accumulating too much data
     let ttl = if database == "staging_analytics" {
         "TTL toDateTime(recorded) + INTERVAL 1 DAY"
     } else {
         ""
+    };
+
+    let app_events_ttl = if database == "staging_analytics" {
+        "TTL toDateTime(recorded_ts) + INTERVAL 3 DAY"
+    } else {
+        "TTL toStartOfMonth(event_ts) + INTERVAL 25 MONTH"
     };
 
     client
@@ -203,6 +216,38 @@ pub async fn run_migrations_on_database(
             {ttl}
             PRIMARY KEY (project_id, recorded)
             SETTINGS index_granularity = 8192
+            "
+        ))
+        .execute()
+        .await?;
+
+    // Deduplication is eventual and only covers retries received on the same
+    // UTC day, so queries should count `uniqExact(client_installation_id, event_id)`
+    // or use `LIMIT 1 BY client_installation_id, event_id`.
+    client
+        .query(&format!(
+            "
+            CREATE TABLE IF NOT EXISTS {database}.{APP_EVENTS} {cluster_line}
+            (
+                event_id               UInt128                       COMMENT 'Client-controlled event ID',
+                client_installation_id UUID                          COMMENT 'Client-controlled installation ID',
+                event_type             LowCardinality(String)        COMMENT 'Type of event, validated at ingest',
+                event_ts               DateTime64(6, 'UTC')          COMMENT 'Event timestamp, corrected for client clock skew',
+                client_ts              DateTime64(6, 'UTC')          COMMENT 'Informational, client-side event timestamp',
+                recorded_ts            DateTime64(6, 'UTC')          COMMENT 'Informational, server receive timestamp',
+                source                 String                        COMMENT 'Event source variant',
+                app_version            String                        COMMENT 'App version',
+                os                     LowCardinality(String)        COMMENT 'Client operating system, validated at ingest',
+                arch                   LowCardinality(String)        COMMENT 'Client CPU architecture, validated at ingest',
+                ip_country             FixedString(2)                COMMENT 'ISO 3166-1 alpha-2 client country, XX for unknown and T1 for Tor',
+                metadata               JSON(max_dynamic_paths = 256) COMMENT 'Event metadata, schema validated at ingest'
+            )
+            ENGINE = {replacing_engine}
+            PARTITION BY toYYYYMM(event_ts)
+            ORDER BY (toDate(event_ts), event_type, cityHash64(client_installation_id), event_id)
+            SAMPLE BY cityHash64(client_installation_id)
+            {app_events_ttl}
+            SETTINGS index_granularity = 8192, ttl_only_drop_parts = 1
             "
         ))
         .execute()

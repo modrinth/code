@@ -1,0 +1,16 @@
+[package]
+name = "modrinth-app-analytics-sdk"
+edition.workspace = true
+
+[dependencies]
+chrono = { workspace = true }
+modrinth-app-analytics-types = { workspace = true }
+parking_lot = { workspace = true }
+reqwest = { workspace = true, features = ["json", "rustls-no-provider"] }
+smol_str = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt", "sync", "time"] }
+tracing = { workspace = true }
+uuid = { workspace = true, features = ["v7"] }
+
+[lints]
+workspace = true

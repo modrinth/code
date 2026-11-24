@@ -10,6 +10,8 @@ members = [
   "packages/component-derive",
   "packages/minecraft-meta-manifest",
   "packages/minecraft-meta-model",
+  "packages/modrinth-app-analytics-sdk",
+  "packages/modrinth-app-analytics-types",
   "packages/modrinth-content-management",
   "packages/modrinth-log",
   "packages/modrinth-skin-rendering",
@@ -150,6 +152,7 @@ lz4_flex = { version = "0.14.0", default-features = false, features = [
 ] }
 minecraft-meta-manifest = { path = "packages/minecraft-meta-manifest" }
 minecraft-meta-model = { path = "packages/minecraft-meta-model" }
+modrinth-app-analytics-types = { path = "packages/modrinth-app-analytics-types" }
 modrinth-content-management = { path = "packages/modrinth-content-management" }
 modrinth-log = { path = "packages/modrinth-log" }
 modrinth-skin-rendering = { path = "packages/modrinth-skin-rendering" }
@@ -221,6 +224,7 @@ sha1_smol = { version = "1.0.1", features = ["std"] }
 sha2 = "0.11.1"
 shlex = "2.0.1"
 smallvec = "1.16.3"
+smol_str = "0.3.7"
 spdx = "0.13.6"
 sqlx = { version = "0.9.0", default-features = false }
 sqlx-tracing = { path = "packages/sqlx-tracing" }
