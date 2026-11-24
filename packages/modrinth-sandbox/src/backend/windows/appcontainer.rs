@@ -31,16 +31,19 @@ use windows::{
             },
             CONTAINER_INHERIT_ACE, CreateWellKnownSid,
             DACL_SECURITY_INFORMATION, DeriveCapabilitySidsFromName, EqualSid,
-            FreeSid, GetAce, InitializeSecurityDescriptor,
+            FreeSid, GetAce, GetSecurityDescriptorControl,
+            InitializeSecurityDescriptor,
             Isolation::{
                 CreateAppContainerProfile,
                 DeriveAppContainerSidFromAppContainerName,
                 GetAppContainerFolderPath,
             },
             NO_INHERITANCE, OBJECT_INHERIT_ACE, PSECURITY_DESCRIPTOR, PSID,
-            SECURITY_CAPABILITIES, SID_AND_ATTRIBUTES, SetFileSecurityW,
-            SetSecurityDescriptorDacl, WELL_KNOWN_SID_TYPE,
-            WinCapabilityInternetClientServerSid,
+            SE_DACL_AUTO_INHERIT_REQ, SE_DACL_AUTO_INHERITED,
+            SE_DACL_PROTECTED, SECURITY_CAPABILITIES,
+            SECURITY_DESCRIPTOR_CONTROL, SID_AND_ATTRIBUTES, SetFileSecurityW,
+            SetSecurityDescriptorControl, SetSecurityDescriptorDacl,
+            WELL_KNOWN_SID_TYPE, WinCapabilityInternetClientServerSid,
             WinCapabilityInternetClientSid,
             WinCapabilityPrivateNetworkClientServerSid,
         },
@@ -951,6 +954,7 @@ fn set_acl(
         .chain([0])
         .collect::<Vec<_>>();
     let mut old_acl = std::ptr::null_mut();
+    let mut old_descriptor = PSECURITY_DESCRIPTOR::default();
     let err = unsafe {
         GetNamedSecurityInfoW(
             PCWSTR(encoded_path.as_ptr()),
@@ -960,7 +964,7 @@ fn set_acl(
             None,
             Some(&mut old_acl),
             None,
-            std::ptr::null_mut(),
+            &mut old_descriptor,
         )
     };
     if err != ERROR_SUCCESS {
@@ -968,6 +972,10 @@ fn set_acl(
             err.0,
         ))
         .into());
+    }
+
+    scopeguard::defer! {
+        unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(old_descriptor.0))) };
     }
 
     const TRAVERSE_PERMISSIONS: u32 = FILE_GENERIC_READ.0 | FILE_TRAVERSE.0;
@@ -1046,6 +1054,32 @@ fn set_acl(
                 true,
                 Some(new_acl),
                 false,
+            )?;
+        }
+
+        // SetFileSecurityW clears these flags unless they're requested. Without
+        // SE_DACL_AUTO_INHERITED, anything created in the directory won't inherit
+        // from its new parent after being moved. Without SE_DACL_PROTECTED, the
+        // directory can inherit from its parent even if the user disabled that
+        let mut old_control = 0;
+        let mut revision = 0;
+        unsafe {
+            GetSecurityDescriptorControl(
+                old_descriptor,
+                &mut old_control,
+                &mut revision,
+            )?;
+        }
+        let preserved = SE_DACL_AUTO_INHERITED | SE_DACL_PROTECTED;
+        let mut flags = SECURITY_DESCRIPTOR_CONTROL(old_control) & preserved;
+        if flags.contains(SE_DACL_AUTO_INHERITED) {
+            flags |= SE_DACL_AUTO_INHERIT_REQ;
+        }
+        unsafe {
+            SetSecurityDescriptorControl(
+                PSECURITY_DESCRIPTOR(security_buf.as_mut_ptr() as *mut _),
+                preserved | SE_DACL_AUTO_INHERIT_REQ,
+                flags,
             )?;
         }
 
