@@ -223,17 +223,30 @@
 					v-if="collection.id !== 'following'"
 					:title="formatMessage(messages.curatedByLabel)"
 				>
-					<nuxt-link
-						class="group flex w-fit items-center gap-2 leading-[1.2] text-primary"
-						:to="`/user/${creator.username}`"
-					>
-						<Avatar :src="creator.avatar_url" :alt="creator.username" size="32px" circle />
-						<div class="flex flex-col">
-							<span class="flex w-full flex-nowrap items-center gap-1 group-hover:underline">
-								<span class="min-w-0 overflow-hidden truncate">{{ creator.username }}</span>
-							</span>
+					<div class="flex items-center gap-2">
+						<nuxt-link
+							:to="`/user/${creator.username}`"
+							aria-hidden="true"
+							tabindex="-1"
+							class="flex shrink-0"
+						>
+							<Avatar :src="creator.avatar_url" size="32px" circle />
+						</nuxt-link>
+						<div class="flex min-w-0 flex-col gap-0.5">
+							<nuxt-link
+								:to="`/user/${creator.username}`"
+								class="truncate leading-[1.2] text-primary hover:underline"
+							>
+								{{ creator.username }}
+							</nuxt-link>
+							<CreatorStatusStats
+								v-if="showCreatorStats && creator?.id"
+								:id="creator.id"
+								kind="user"
+								class="!mt-0"
+							/>
 						</div>
-					</nuxt-link>
+					</div>
 				</SidebarCard>
 				<AdPlaceholder v-if="!auth.user" />
 				<SidebarCard
@@ -384,7 +397,9 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { onServerPrefetch } from 'vue'
 
+import CreatorStatusStats from '~/components/CreatorStatusStats.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
+import { useShowCreatorStatsOnPublicPages } from '~/composables/creator-project-stats'
 
 useSeoMeta({
 	robots: 'noindex',
@@ -405,6 +420,7 @@ const formatDateTime = useFormatDateTime({
 const route = useNativeRoute()
 const router = useRouter()
 const auth = await useAuth()
+const showCreatorStats = useShowCreatorStatsOnPublicPages()
 const cosmetics = useCosmetics()
 const queryClient = useQueryClient()
 async function fetchProjectsByIds(projectIds) {

@@ -1,7 +1,22 @@
 import type { AbstractModrinthClient } from '@modrinth/api-client'
+import { moderationSettings } from '@modrinth/moderation'
 import { getRemovedScopes, injectModrinthClient, useVIntl } from '@modrinth/ui'
+import { isStaff } from '@modrinth/utils'
 import { useQueries, useQuery } from '@tanstack/vue-query'
 import { computed, type Ref } from 'vue'
+
+import { useAuthState } from './auth'
+import { useModerationSettings } from './moderation'
+
+export function useShowCreatorStatsOnPublicPages() {
+	const auth = useAuthState()
+	const settings = useModerationSettings()
+	return computed(
+		() =>
+			isStaff(auth.value.user) &&
+			settings.value.get(moderationSettings.General.ShowCreatorStatsOnPublicPages),
+	)
+}
 
 export const creatorProjectStatsQueryOptions = {
 	memberAccount: (id: string, client: AbstractModrinthClient) => ({
