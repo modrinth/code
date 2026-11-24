@@ -1,0 +1,94 @@
+import {
+	defineMessages,
+	type DropdownFilterBarCategory,
+	formatLoader,
+	useVIntl,
+} from '@modrinth/ui'
+import { computed } from 'vue'
+
+import { useLibrary } from '@/components/ui/library/use-library'
+import { isSharedLibraryInstance } from '@/features/library/library-instance'
+
+const messages = defineMessages({
+	instanceType: { id: 'app.library.filter.instance-type', defaultMessage: 'Instance type' },
+	modpack: { id: 'app.library.filter.instance-type.modpack', defaultMessage: 'Modpack' },
+	server: { id: 'app.library.filter.instance-type.server', defaultMessage: 'Server' },
+	custom: { id: 'app.library.filter.instance-type.custom', defaultMessage: 'Custom' },
+	gameVersion: { id: 'app.library.filter.game-version', defaultMessage: 'Game version' },
+	loader: { id: 'app.library.filter.loader', defaultMessage: 'Loader' },
+	sharing: { id: 'app.library.filter.sharing', defaultMessage: 'Sharing' },
+	shared: { id: 'app.library.filter.sharing.shared', defaultMessage: 'Shared' },
+	notShared: { id: 'app.library.filter.sharing.not-shared', defaultMessage: 'Not shared' },
+	owner: { id: 'app.library.filter.owner', defaultMessage: 'Owner' },
+	ownerMe: { id: 'app.library.filter.owner.me', defaultMessage: 'You' },
+	ownerOthers: { id: 'app.library.filter.owner.others', defaultMessage: 'Others' },
+})
+
+export function useLibraryFilterCategories() {
+	const { filters, tabInstances } = useLibrary()
+	const { formatMessage } = useVIntl()
+
+	const hasSharedInstances = computed(() => tabInstances.value.some(isSharedLibraryInstance))
+	const hasUnsharedInstances = computed(() =>
+		tabInstances.value.some((instance) => !isSharedLibraryInstance(instance)),
+	)
+
+	return computed<DropdownFilterBarCategory[]>(() => {
+		const gameVersions = [...new Set(tabInstances.value.map((instance) => instance.game_version))]
+
+		return [
+			{
+				key: 'instanceType',
+				label: formatMessage(messages.instanceType),
+				options: [
+					{ value: 'modpack', label: formatMessage(messages.modpack) },
+					{ value: 'server', label: formatMessage(messages.server) },
+					{ value: 'custom', label: formatMessage(messages.custom) },
+				],
+			},
+			{
+				key: 'gameVersion',
+				label: formatMessage(messages.gameVersion),
+				searchable: gameVersions.length > 5,
+				options: gameVersions
+					.sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
+					.map((version) => ({ value: version, label: version })),
+			},
+			{
+				key: 'loader',
+				label: formatMessage(messages.loader),
+				options: [...new Set(tabInstances.value.map((instance) => instance.loader))]
+					.map((loader) => ({
+						value: loader,
+						label: formatLoader(formatMessage, loader),
+					}))
+					.sort((a, b) => a.label.localeCompare(b.label)),
+			},
+			...((hasSharedInstances.value && hasUnsharedInstances.value) ||
+			filters.value.sharing.length > 0
+				? [
+						{
+							key: 'sharing',
+							label: formatMessage(messages.sharing),
+							options: [
+								{ value: 'shared', label: formatMessage(messages.shared) },
+								{ value: 'not_shared', label: formatMessage(messages.notShared) },
+							],
+						},
+					]
+				: []),
+			...(hasSharedInstances.value || filters.value.owner.length > 0
+				? [
+						{
+							key: 'owner',
+							label: formatMessage(messages.owner),
+							options: [
+								{ value: 'me', label: formatMessage(messages.ownerMe) },
+								{ value: 'others', label: formatMessage(messages.ownerOthers) },
+							],
+						},
+					]
+				: []),
+		]
+	})
+}

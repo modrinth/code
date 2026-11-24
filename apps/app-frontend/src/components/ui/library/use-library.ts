@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import type { ButtonMenuOption } from '@modrinth/ui'
+import type { ButtonMenuOption, SortDirection, SortKind, SortMode } from '@modrinth/ui'
 import { formatLoader, injectNotificationManager, useDebugLogger, useVIntl } from '@modrinth/ui'
 import { keepPreviousData, useQuery } from '@tanstack/vue-query'
 import { useEventListener, useStorage } from '@vueuse/core'
@@ -37,7 +37,7 @@ import {
 } from '@/helpers/instance-groups'
 import type { GameInstance } from '@/helpers/types'
 
-import { librarySearch } from './view-state'
+import { librarySearch, libraryTab } from './view-state'
 
 export const librarySortOptions = [
 	'Name',
@@ -57,6 +57,19 @@ export const libraryGroupOptions = [
 	{ value: 'None', label: 'No grouping' },
 ] as const
 
+export const librarySortKinds: Record<(typeof librarySortOptions)[number], SortKind> = {
+	Name: 'alphabetical',
+	'Last played': 'date',
+	'Hours played': 'numeric',
+	'Date created': 'date',
+	'Date modified': 'date',
+	Loader: 'alphabetical',
+	'Game version': 'numeric',
+}
+
+const getDefaultSortDirection = (kind: SortKind): SortDirection =>
+	kind === 'alphabetical' ? 'asc' : 'desc'
+
 const libraryInstanceTypeLabels = {
 	custom: 'Custom',
 	modpack: 'Modpack',
@@ -72,7 +85,7 @@ const libraryLoaderPriority: Record<string, number> = {
 export type LibrarySort = (typeof librarySortOptions)[number]
 export type LibraryGroupBy = (typeof libraryGroupOptions)[number]['value']
 export type LibraryFilters = Record<
-	'instanceType' | 'gameVersion' | 'loader' | 'installState' | 'sharing' | 'owner',
+	'instanceType' | 'gameVersion' | 'loader' | 'sharing' | 'owner',
 	string[]
 >
 
@@ -123,7 +136,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			instanceType: [],
 			gameVersion: [],
 			loader: [],
-			installState: [],
 			sharing: [],
 			owner: [],
 		},
@@ -167,7 +179,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				instanceType: [],
 				gameVersion: [],
 				loader: [],
-				installState: [],
 				sharing: ['shared'],
 				owner: ['me'],
 			}
@@ -206,6 +217,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const displayState = useStorage<{
 		group: LibraryGroupBy
 		sortBy: LibrarySort
+		sortDirection?: SortDirection
 		collapsedGroups: string[]
 		ungroupedGroupPosition: number
 	}>(
@@ -227,6 +239,19 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	if (!libraryGroupOptions.some((option) => option.value === displayState.value.group)) {
 		displayState.value.group = 'Group'
 	}
+
+	const sortMode = computed<SortMode<LibrarySort>>({
+		get: () => ({
+			field: displayState.value.sortBy,
+			direction:
+				displayState.value.sortDirection ??
+				getDefaultSortDirection(librarySortKinds[displayState.value.sortBy]),
+		}),
+		set: ({ field, direction }) => {
+			displayState.value.sortBy = field
+			displayState.value.sortDirection = direction
+		},
+	})
 
 	const linkedInstances = computed(() => instances.value.filter((instance) => instance.link))
 	const isSearching = computed(() => search.value.length > 0)
@@ -351,8 +376,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		if (serverProjectIds.value.has(instance.link.project_id ?? '')) return 'server'
 		return 'modpack'
 	}
-	const getInstanceInstallState = (instance: LibraryInstance) =>
-		isUninstalledSharedInstance(instance) ? 'not_installed' : 'installed'
 	const getEffectiveInstanceGroupIds = (instance: LibraryInstance) =>
 		isUninstalledSharedInstance(instance)
 			? []
@@ -399,11 +422,16 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 	const { getSharedInstanceOwner } = useSharedInstanceOwners(libraryInstances)
 
+	const activeTab = libraryTab
+
+	const tabInstances = computed(() =>
+		libraryInstances.value.filter(
+			(instance) => isUninstalledSharedInstance(instance) === (activeTab.value === 'available'),
+		),
+	)
+
 	const filteredInstances = computed(() =>
-		libraryInstances.value.filter((instance) => {
-			const installStateMatches =
-				filters.value.installState.length === 0 ||
-				filters.value.installState.includes(getInstanceInstallState(instance))
+		tabInstances.value.filter((instance) => {
 			const sharingMatches =
 				filters.value.sharing.length === 0 ||
 				filters.value.sharing.includes(isSharedLibraryInstance(instance) ? 'shared' : 'not_shared')
@@ -420,7 +448,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				filters.value.loader.length === 0 || filters.value.loader.includes(instance.loader)
 
 			return (
-				installStateMatches &&
 				sharingMatches &&
 				ownerMatches &&
 				instanceTypeMatches &&
@@ -435,41 +462,24 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			instance.name.toLowerCase().includes(search.value.toLowerCase()),
 		)
 
-		switch (displayState.value.sortBy) {
-			case 'Name':
-				visibleInstances.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
-				break
-			case 'Loader':
-				visibleInstances.sort((a, b) =>
-					formatLoader(formatMessage, a.loader).localeCompare(
-						formatLoader(formatMessage, b.loader),
-					),
-				)
-				break
-			case 'Game version':
-				visibleInstances.sort((a, b) =>
+		const compareInstances: Record<LibrarySort, (a: LibraryInstance, b: LibraryInstance) => number> =
+			{
+				Name: (a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }),
+				Loader: (a, b) =>
+					formatLoader(formatMessage, a.loader).localeCompare(formatLoader(formatMessage, b.loader)),
+				'Game version': (a, b) =>
 					a.game_version.localeCompare(b.game_version, undefined, { numeric: true }),
-				)
-				break
-			case 'Last played':
-				visibleInstances.sort((a, b) =>
-					getInstalledTimestamp(b, 'last_played').diff(getInstalledTimestamp(a, 'last_played')),
-				)
-				break
-			case 'Hours played':
-				visibleInstances.sort((a, b) => getTimePlayed(b) - getTimePlayed(a))
-				break
-			case 'Date created':
-				visibleInstances.sort((a, b) =>
-					getInstalledTimestamp(b, 'created').diff(getInstalledTimestamp(a, 'created')),
-				)
-				break
-			case 'Date modified':
-				visibleInstances.sort((a, b) =>
-					getInstalledTimestamp(b, 'modified').diff(getInstalledTimestamp(a, 'modified')),
-				)
-				break
-		}
+				'Last played': (a, b) =>
+					getInstalledTimestamp(a, 'last_played').diff(getInstalledTimestamp(b, 'last_played')),
+				'Hours played': (a, b) => getTimePlayed(a) - getTimePlayed(b),
+				'Date created': (a, b) =>
+					getInstalledTimestamp(a, 'created').diff(getInstalledTimestamp(b, 'created')),
+				'Date modified': (a, b) =>
+					getInstalledTimestamp(a, 'modified').diff(getInstalledTimestamp(b, 'modified')),
+			}
+		const compare = compareInstances[sortMode.value.field]
+		const sign = sortMode.value.direction === 'asc' ? 1 : -1
+		visibleInstances.sort((a, b) => sign * compare(a, b))
 
 		const groupedInstances = new Map<string, { name: string; instances: LibraryInstance[] }>()
 		const addToGroup = (id: string, name: string, instance: LibraryInstance) => {
@@ -517,7 +527,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			}
 		}
 
-		if (displayState.value.group === 'Group') {
+		if (displayState.value.group === 'Group' && activeTab.value === 'installed') {
 			if (!groupedInstances.has('group:none')) {
 				groupedInstances.set('group:none', { name: 'None', instances: [] })
 			}
@@ -963,6 +973,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	}
 
 	watch(() => displayState.value.group, clearLibraryInstanceSelection)
+	watch(activeTab, clearLibraryInstanceSelection)
 
 	const setSelectedLibraryInstances = (selections: Iterable<LibraryInstanceSelection>) => {
 		selectedLibraryInstances.value = new Map(
@@ -1230,6 +1241,8 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	return {
 		instances,
 		libraryInstances,
+		tabInstances,
+		activeTab,
 		getSharedInstanceOwner,
 		libraryGroups,
 		libraryGroupsLoaded,
@@ -1237,6 +1250,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		isSearching,
 		filters,
 		displayState,
+		sortMode,
 		instanceGroups,
 		isNewGroupModalOpen,
 		newGroupName,

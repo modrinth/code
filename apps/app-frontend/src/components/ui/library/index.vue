@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LibraryIcon, PlusIcon, StarIcon } from '@modrinth/assets'
+import { LibraryIcon, PlusIcon, StarIcon, UserPlusIcon } from '@modrinth/assets'
 import { Button, ContextMenu, defineMessages, EmptyState, useVIntl } from '@modrinth/ui'
 import { computed, nextTick, onDeactivated, onUnmounted, ref, toRef, watch } from 'vue'
 import Draggable from 'vuedraggable'
@@ -43,6 +43,14 @@ const messages = defineMessages({
 		id: 'app.library.empty.description',
 		defaultMessage: 'Create an instance to start playing.',
 	},
+	emptyAvailableHeading: {
+		id: 'app.library.empty.available.heading',
+		defaultMessage: 'No shared instances available',
+	},
+	emptyAvailableDescription: {
+		id: 'app.library.empty.available.description',
+		defaultMessage: "Instances shared with you or by you that you haven't installed yet will appear here.",
+	},
 	newInstance: {
 		id: 'app.library.context-menu.create-instance',
 		defaultMessage: 'New instance',
@@ -53,7 +61,8 @@ const instanceCreation = injectInstanceCreation(null)
 
 const {
 	instanceGroups,
-	libraryInstances,
+	tabInstances,
+	activeTab,
 	libraryGroupsLoaded,
 	isSearching,
 	displayState,
@@ -266,13 +275,19 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 
 <template>
 	<InstanceGroupDnd :instances="instances">
-		<section data-library-page-background class="flex flex-col gap-3 pb-16 min-h-[500px]">
+		<section data-library-page-background class="flex flex-col gap-4 pb-16 min-h-[500px]">
 			<h2 class="m-0 text-2xl font-semibold text-contrast">
 				{{ formatMessage(messages.library) }}
 			</h2>
 			<LibraryToolbar />
 			<EmptyState
-				v-if="libraryGroupsLoaded && libraryInstances.length === 0"
+				v-if="libraryGroupsLoaded && activeTab === 'available' && tabInstances.length === 0"
+				:icon="UserPlusIcon"
+				:heading="formatMessage(messages.emptyAvailableHeading)"
+				:description="formatMessage(messages.emptyAvailableDescription)"
+			/>
+			<EmptyState
+				v-else-if="libraryGroupsLoaded && tabInstances.length === 0"
 				:icon="LibraryIcon"
 				:heading="formatMessage(messages.emptyHeading)"
 				:description="formatMessage(messages.emptyDescription)"

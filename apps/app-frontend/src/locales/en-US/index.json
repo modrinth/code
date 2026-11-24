@@ -1094,29 +1094,20 @@
   "app.library.context-menu.create-instance": {
     "message": "New instance"
   },
+  "app.library.empty.available.description": {
+    "message": "Instances shared with you or by you that you haven't installed yet will appear here."
+  },
+  "app.library.empty.available.heading": {
+    "message": "No shared instances available"
+  },
   "app.library.empty.description": {
     "message": "Create an instance to start playing."
   },
   "app.library.empty.heading": {
     "message": "No instances yet"
   },
-  "app.library.filter.add": {
-    "message": "Add filter"
-  },
-  "app.library.filter.clear": {
-    "message": "Clear filters"
-  },
   "app.library.filter.game-version": {
     "message": "Game version"
-  },
-  "app.library.filter.install-state": {
-    "message": "Install status"
-  },
-  "app.library.filter.install-state.installed": {
-    "message": "Installed"
-  },
-  "app.library.filter.install-state.not-installed": {
-    "message": "Not installed"
   },
   "app.library.filter.instance-type": {
     "message": "Instance type"
@@ -1129,9 +1120,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "Server"
-  },
-  "app.library.filter.label": {
-    "message": "Filter by"
   },
   "app.library.filter.loader": {
     "message": "Loader"
@@ -1379,11 +1367,14 @@
   "app.library.leave-shared-instance.modal.header": {
     "message": "{count, plural, one {Leave shared instance} other {Leave # shared instances}}"
   },
+  "app.library.search.instances-placeholder": {
+    "message": "Search {count, plural, one {# instance} other {# instances}}..."
+  },
+  "app.library.search.label": {
+    "message": "Search instances"
+  },
   "app.library.search.no-results.title": {
     "message": "No instances match your search."
-  },
-  "app.library.search.placeholder": {
-    "message": "Search"
   },
   "app.library.selection.aria-label": {
     "message": "Selected instances"
@@ -1415,9 +1406,6 @@
   "app.library.sort.hours-played": {
     "message": "Hours played"
   },
-  "app.library.sort.label": {
-    "message": "Sort by"
-  },
   "app.library.sort.last-played": {
     "message": "Last played"
   },
@@ -1426,6 +1414,15 @@
   },
   "app.library.sort.name": {
     "message": "Name"
+  },
+  "app.library.tabs.available": {
+    "message": "Available"
+  },
+  "app.library.tabs.installed": {
+    "message": "Installed"
+  },
+  "app.library.tabs.label": {
+    "message": "Library sections"
   },
   "app.library.title": {
     "message": "Library"
