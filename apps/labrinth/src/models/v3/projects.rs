@@ -47,6 +47,10 @@ pub struct ProjectHistoryEntry {
 pub enum ProjectDelta {
     Created,
     Deleted,
+    AutoApprovalScheduled {
+        provenance: ApprovalProvenance,
+        scheduled_for: DateTime<Utc>,
+    },
     ChangeVisibility {
         from: ProjectVisibility,
         to: ProjectVisibility,
@@ -62,7 +66,7 @@ pub enum ProjectDelta {
     },
 }
 
-/// Evidence captured when a project is automatically approved.
+/// Evidence captured when automatic approval is scheduled or performed.
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ApprovalProvenance {
     pub trigger: AutoApprovalCause,
@@ -628,6 +632,10 @@ mod project_state_tests {
         for delta in [
             ProjectDelta::Created,
             ProjectDelta::Deleted,
+            ProjectDelta::AutoApprovalScheduled {
+                provenance: provenance.clone(),
+                scheduled_for: "2026-11-24T12:00:00Z".parse().unwrap(),
+            },
             ProjectDelta::ChangeInReview {
                 from: false,
                 to: true,

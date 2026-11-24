@@ -41,30 +41,20 @@ pub(super) async fn update_approval(
     Ok(())
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct ApprovalToken {
-    pub run_id: String,
-    pub generation: u64,
-}
-
 #[derive(
     Debug, Clone, serde::Serialize, serde::Deserialize, utoipa::ToSchema,
 )]
 pub struct ApprovalStatus {
     pub auto_approve_blocked: bool,
     pub eligible: bool,
-    pub generation: u64,
     pub finished: bool,
     pub deadline: Option<chrono::DateTime<chrono::Utc>>,
     pub phase: String,
 }
 
 impl ApprovalStatus {
-    fn permits_generation(&self, generation: u64) -> bool {
-        !self.finished
-            && !self.auto_approve_blocked
-            && self.eligible
-            && self.generation == generation
+    fn permits_approval(&self) -> bool {
+        !self.finished && !self.auto_approve_blocked && self.eligible
     }
 }
 
@@ -82,7 +72,6 @@ fn publish_state(
 #[derive(Debug, serde::Serialize, utoipa::ToSchema)]
 pub struct ApprovalQueueEntry {
     pub workflow_id: String,
-    pub run_id: String,
     pub state: Option<ApprovalStatus>,
 }
 
@@ -98,7 +87,6 @@ pub async fn queue(
     while let Some(execution) = executions.try_next().await? {
         entries.push(ApprovalQueueEntry {
             workflow_id: execution.id().to_owned(),
-            run_id: execution.run_id().to_owned(),
             state: execution.memo().get("auto_approval")?,
         });
     }
@@ -193,44 +181,30 @@ pub async fn status(
     }
 }
 
-pub struct ApprovalGuard {
-    pub temporal: temporalio_client::Client,
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ApprovalSchedule {
     pub project_id: ProjectId,
-    pub token: ApprovalToken,
+    pub scheduled_for: chrono::DateTime<chrono::Utc>,
 }
 
-impl ApprovalGuard {
-    /// Must be checked while holding the project mutation lock, shared with the block endpoint.
-    pub async fn permits_approval(&self) -> Result<bool> {
-        let Some(handle) =
-            current_execution(&self.temporal, self.project_id).await?
-        else {
-            return Ok(false);
-        };
-        if handle.run_id() != Some(self.token.run_id.as_str()) {
-            return Ok(false);
-        }
-        let state = handle
-            .query(
-                ApproveProjectWorkflow::status,
-                (),
-                temporalio_client::WorkflowQueryOptions::default(),
-            )
-            .await?;
-        Ok(state.permits_generation(self.token.generation))
-    }
+/// Checked under the project lock shared with cancellation.
+pub async fn approval_permitted(
+    temporal: &temporalio_client::Client,
+    project_id: ProjectId,
+) -> Result<bool> {
+    Ok(status(temporal, project_id)
+        .await?
+        .is_some_and(|state| state.permits_approval()))
 }
 
 #[workflow]
 #[derive(Default, Clone)]
 pub struct ApproveProjectWorkflow {
     eligible: bool,
-    generation: u64,
     auto_approve_blocked: bool,
     finished: bool,
     deadline: Option<chrono::DateTime<chrono::Utc>>,
     phase: String,
-    recheck_requested: bool,
 }
 
 #[workflow_methods]
@@ -241,11 +215,11 @@ impl ApproveProjectWorkflow {
         project_id: ProjectId,
     ) -> WorkflowResult<()> {
         loop {
-            let generation = ctx.state(|state| state.generation);
+            let cancelled = ctx.state(|state| state.auto_approve_blocked);
             tokio::select! {
                 biased;
                 result = ctx.wait_condition(|state| state.finished) => { result?; return Ok(()); }
-                result = ctx.wait_condition(|state| state.generation != generation) => { result?; }
+                result = ctx.wait_condition(|state| state.auto_approve_blocked), if !cancelled => { result?; }
                 result = Self::approval_loop(ctx, project_id) => return result,
             }
         }
@@ -256,29 +230,6 @@ impl ApproveProjectWorkflow {
         project_id: ProjectId,
     ) -> WorkflowResult<()> {
         loop {
-            if ctx.state(|state| {
-                state.recheck_requested && !state.auto_approve_blocked
-            }) {
-                ctx.state_mut(|state| state.recheck_requested = false);
-                let generation = ctx.state(|state| state.generation);
-                let eligible = ctx
-                    .execute_activity(
-                        ApprovalActivities::auto_approval_eligible,
-                        ReconcileRulesInput {
-                            project_id,
-                            ruleset_id: None,
-                            approval_due: false,
-                            approval_token: None,
-                        },
-                        ActivityOptions::start_to_close_timeout(
-                            Duration::from_secs(60),
-                        ),
-                    )
-                    .await?;
-                if ctx.state(|state| state.generation == generation) {
-                    ctx.state_mut(|state| state.eligible = eligible);
-                }
-            }
             if !ctx.state(|state| state.eligible && !state.auto_approve_blocked)
             {
                 ctx.state_mut(|state| {
@@ -290,10 +241,12 @@ impl ApproveProjectWorkflow {
                     .into();
                 });
                 publish_state(ctx)?;
-                let generation = ctx.state(|state| state.generation);
                 tokio::select! {
                     _ = ctx.timer(Duration::from_secs(300)) => {}
-                    result = ctx.wait_condition(|state| state.generation != generation) => { result?; continue; }
+                    result = ctx.wait_condition(|state| state.eligible && !state.auto_approve_blocked) => {
+                        result?;
+                        continue;
+                    }
                 }
                 if !ctx
                     .execute_activity(
@@ -309,30 +262,61 @@ impl ApproveProjectWorkflow {
                 }
                 continue;
             }
-            let generation = ctx.state(|state| state.generation);
-            let delay = ctx
+            if ctx.state(|state| state.deadline.is_none()) {
+                let delay = ctx
+                    .execute_activity(
+                        ApprovalActivities::auto_approval_delay,
+                        (),
+                        ActivityOptions::start_to_close_timeout(
+                            Duration::from_secs(60),
+                        ),
+                    )
+                    .await?;
+                ctx.state_mut(|state| {
+                    if !state.auto_approve_blocked {
+                        state.deadline = Some(
+                            (ctx.workflow_time()
+                                .expect("workflow time is available")
+                                + delay)
+                                .into(),
+                        );
+                    }
+                });
+            }
+            if ctx.state(|state| state.auto_approve_blocked || !state.eligible)
+            {
+                continue;
+            }
+            let deadline = ctx.state(|state| {
+                state.deadline.expect("eligible review has a deadline")
+            });
+            ctx.state_mut(|state| state.phase = "waiting".into());
+            publish_state(ctx)?;
+            let recorded = ctx
                 .execute_activity(
-                    ApprovalActivities::auto_approval_delay,
-                    (),
+                    ApprovalActivities::record_approval_schedule,
+                    ApprovalSchedule {
+                        project_id,
+                        scheduled_for: deadline,
+                    },
                     ActivityOptions::start_to_close_timeout(
                         Duration::from_secs(60),
                     ),
                 )
                 .await?;
-            if ctx.state(|state| state.generation != generation) {
+            if !recorded {
+                ctx.state_mut(|state| state.eligible = false);
                 continue;
             }
-            let deadline =
-                ctx.workflow_time().expect("workflow time is available")
-                    + delay;
-            ctx.state_mut(|state| {
-                state.deadline = Some(deadline.into());
-                state.phase = "waiting".into();
-            });
-            publish_state(ctx)?;
+            let remaining = (deadline
+                - chrono::DateTime::<chrono::Utc>::from(
+                    ctx.workflow_time().expect("workflow time is available"),
+                ))
+            .to_std()
+            .unwrap_or_default();
             tokio::select! {
-                _ = ctx.timer(delay) => {}
-                result = ctx.wait_condition(|state| state.generation != generation) => {
+                _ = ctx.timer(remaining) => {}
+                result = ctx.wait_condition(|state| state.auto_approve_blocked || !state.eligible) => {
                     result?;
                     continue;
                 }
@@ -352,10 +336,6 @@ impl ApproveProjectWorkflow {
                 project_id,
                 ruleset_id,
                 approval_due: true,
-                approval_token: Some(ApprovalToken {
-                    run_id: ctx.info().run_id().to_owned(),
-                    generation,
-                }),
             };
             let (images, text) = futures::join!(
                 image_scan::scan_project_images(ctx, project_id),
@@ -407,12 +387,8 @@ impl ApproveProjectWorkflow {
     }
 
     #[signal]
-    pub fn set_blocked(
-        &mut self,
-        ctx: &mut SyncWorkflowContext<Self>,
-        blocked: bool,
-    ) {
-        self.change_block(blocked);
+    pub fn cancel(&mut self, ctx: &mut SyncWorkflowContext<Self>, _input: ()) {
+        self.cancel_approval();
         ctx.upsert_memo([(
             "auto_approval",
             Some(temporalio_sdk::MemoValue::new(self.snapshot())),
@@ -440,31 +416,21 @@ impl ApproveProjectWorkflow {
         self.finished = true;
         self.deadline = None;
         self.phase = "completed".into();
-        self.generation += 1;
     }
 
-    fn change_block(&mut self, blocked: bool) {
-        self.auto_approve_blocked = blocked;
-        self.recheck_requested = !blocked;
+    fn cancel_approval(&mut self) {
+        if self.finished {
+            return;
+        }
+        self.auto_approve_blocked = true;
         self.eligible = false;
         self.deadline = None;
-        self.phase = if blocked { "blocked" } else { "checking" }.into();
-        self.generation += 1;
+        self.phase = "blocked".into();
     }
 
     fn change_eligibility(&mut self, eligible: bool) {
-        if self.auto_approve_blocked || self.finished {
-            return;
-        }
-        if eligible && self.phase == "scanning" {
-            self.recheck_requested = true;
-        }
-        if self.eligible != eligible {
+        if !self.auto_approve_blocked && !self.finished {
             self.eligible = eligible;
-            if !eligible {
-                self.deadline = None;
-            }
-            self.generation += 1;
         }
     }
 
@@ -472,7 +438,6 @@ impl ApproveProjectWorkflow {
         ApprovalStatus {
             auto_approve_blocked: self.auto_approve_blocked,
             eligible: self.eligible,
-            generation: self.generation,
             finished: self.finished,
             deadline: self.deadline,
             phase: self.phase.clone(),
@@ -489,6 +454,24 @@ pub struct ApprovalActivities {
 
 #[activities]
 impl ApprovalActivities {
+    #[activity]
+    pub async fn record_approval_schedule(
+        self: Arc<Self>,
+        _ctx: ActivityContext,
+        input: ApprovalSchedule,
+    ) -> Result<bool, ActivityError> {
+        crate::routes::v3::projects::mutation::delayed_auto_approval_eligible(
+            input.project_id.into(),
+            &self.pool,
+            &self.redis,
+            false,
+            Some(&self.temporal),
+            Some(&input),
+        )
+        .await
+        .map_err(|error| ActivityError::from(anyhow::anyhow!("{error}")))
+    }
+
     #[activity]
     pub async fn auto_approval_delay(
         self: Arc<Self>,
@@ -532,15 +515,8 @@ impl ApprovalActivities {
             &self.pool,
             &self.redis,
             input.approval_due && input.ruleset_id.is_none(),
-            input
-                .approval_token
-                .clone()
-                .map(|token| ApprovalGuard {
-                    temporal: self.temporal.clone(),
-                    project_id: input.project_id,
-                    token,
-                })
-                .as_ref(),
+            input.approval_due.then_some(&self.temporal),
+            None,
         )
         .await
         .map_err(|error| ActivityError::from(anyhow::anyhow!("{error}")))
@@ -563,90 +539,47 @@ mod approval_delay_tests {
     use super::*;
 
     #[test]
-    fn block_survives_eligibility_changes_in_the_same_review() {
+    fn cancellation_holds_current_review_even_before_eligibility() {
         let mut state = ApproveProjectWorkflow::default();
-        state.change_eligibility(true);
-        state.change_block(true);
-        let generation = state.generation;
+        state.cancel_approval();
         for eligible in [true, false, true] {
             state.change_eligibility(eligible);
         }
         assert!(state.auto_approve_blocked);
         assert!(!state.finished);
-        assert!(!state.eligible);
-        assert_eq!(state.generation, generation);
+        assert!(!state.snapshot().permits_approval());
         assert!(state.deadline.is_none());
     }
 
     #[test]
-    fn temporary_ineligibility_does_not_finish_review() {
-        let mut state = ApproveProjectWorkflow::default();
-        state.change_eligibility(true);
-        let generation = state.generation;
-        state.change_eligibility(false);
-        assert!(!state.finished);
-        assert!(!state.eligible);
-        assert!(state.generation > generation);
-        state.change_eligibility(true);
-        assert!(state.eligible);
-    }
-
-    #[test]
-    fn unblock_requires_a_fresh_check_and_timer() {
-        let mut state = ApproveProjectWorkflow::default();
-        state.change_block(true);
-        state.change_block(false);
-        assert!(!state.auto_approve_blocked);
-        assert!(!state.eligible);
-        assert!(state.recheck_requested);
-        assert!(state.deadline.is_none());
-    }
-
-    #[test]
-    fn unchanged_eligibility_keeps_existing_timer() {
+    fn temporary_ineligibility_preserves_original_deadline() {
         let mut state = ApproveProjectWorkflow::default();
         state.change_eligibility(true);
         state.deadline = Some(chrono::Utc::now());
-        let generation = state.generation;
         let deadline = state.deadline;
+        state.change_eligibility(false);
+        assert!(!state.finished);
+        assert!(!state.snapshot().permits_approval());
+        assert_eq!(state.deadline, deadline);
         state.change_eligibility(true);
-        assert_eq!(state.generation, generation);
+        assert!(state.snapshot().permits_approval());
         assert_eq!(state.deadline, deadline);
     }
 
     #[test]
-    fn block_and_unblock_invalidate_in_flight_approval() {
+    fn cancellation_stops_existing_timer_and_completion_ends_veto() {
         let mut state = ApproveProjectWorkflow::default();
         state.change_eligibility(true);
-        let old_generation = state.generation;
-        assert!(state.snapshot().permits_generation(old_generation));
-        state.change_block(true);
-        assert!(!state.snapshot().permits_generation(old_generation));
-        state.change_block(false);
-        state.change_eligibility(true);
-        assert!(!state.snapshot().permits_generation(old_generation));
-        assert!(state.snapshot().permits_generation(state.generation));
-    }
-
-    #[test]
-    fn completed_review_cannot_be_rearmed_and_next_review_is_unblocked() {
-        let mut state = ApproveProjectWorkflow::default();
-        state.change_block(true);
+        state.deadline = Some(chrono::Utc::now());
+        state.cancel_approval();
+        assert!(state.deadline.is_none());
+        assert!(!state.finished);
         state.finish_review();
         state.change_eligibility(true);
-        assert!(!state.snapshot().permits_generation(state.generation));
+        assert!(!state.snapshot().permits_approval());
         let next_review = ApproveProjectWorkflow::default();
         assert!(!next_review.auto_approve_blocked);
         assert!(!next_review.finished);
-    }
-
-    #[test]
-    fn reconciliation_during_due_attempt_requests_fresh_check() {
-        let mut state = ApproveProjectWorkflow::default();
-        state.change_eligibility(true);
-        state.phase = "scanning".into();
-        state.change_eligibility(true);
-        assert!(state.recheck_requested);
     }
 
     #[test]

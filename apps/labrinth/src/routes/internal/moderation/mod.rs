@@ -32,6 +32,7 @@ pub mod copyright_archives;
 pub mod external_license;
 mod ownership;
 pub mod project_flag;
+mod queue;
 pub mod tech_review;
 pub mod user_restrictions;
 
@@ -39,9 +40,9 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.configure(user_restrictions::config)
         .configure(copyright_archives::config)
         .service(get_projects)
+        .configure(queue::config)
         .service(get_project_auto_approve)
-        .service(block_project_auto_approve)
-        .service(unblock_project_auto_approve)
+        .service(cancel_project_auto_approve)
         .service(get_auto_approve_queue)
         .service(get_project_ids)
         .service(get_project_meta)
@@ -121,7 +122,7 @@ pub async fn get_project_auto_approve(
     Ok(web::Json(diagnostics))
 }
 
-/// Block delayed automatic approval for the current review, waiting for workflow acknowledgement.
+/// Cancel delayed automatic approval for the current review, waiting for workflow acknowledgement.
 #[utoipa::path(
     context_path = "/moderation",
     tag = "moderation",
@@ -129,8 +130,8 @@ pub async fn get_project_auto_approve(
     params(("id" = ProjectId, Path)),
     responses((status = OK, body = crate::workflow::project_flag::approve::ApprovalStatus), (status = CONFLICT), (status = NOT_FOUND))
 )]
-#[post("/project-auto-approve/{id}/block")]
-pub async fn block_project_auto_approve(
+#[post("/project-auto-approve/{id}/cancel")]
+pub async fn cancel_project_auto_approve(
     req: HttpRequest,
     path: web::Path<ProjectId>,
     pool: web::Data<PgPool>,
@@ -141,60 +142,25 @@ pub async fn block_project_auto_approve(
     web::Json<crate::workflow::project_flag::approve::ApprovalStatus>,
     ApiError,
 > {
-    set_auto_approve_block(
+    cancel_auto_approval(
         req,
         path.into_inner(),
         &pool,
         &redis,
         &session_queue,
         &temporal,
-        true,
     )
     .await
     .map(web::Json)
 }
 
-/// Unblock automatic approval and request fresh eligibility checks and a new delay.
-#[utoipa::path(
-    context_path = "/moderation",
-    tag = "moderation",
-    security(("bearer_auth" = [])),
-    params(("id" = ProjectId, Path)),
-    responses((status = OK, body = crate::workflow::project_flag::approve::ApprovalStatus), (status = CONFLICT), (status = NOT_FOUND))
-)]
-#[delete("/project-auto-approve/{id}/block")]
-pub async fn unblock_project_auto_approve(
-    req: HttpRequest,
-    path: web::Path<ProjectId>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    temporal: web::Data<crate::util::temporal::TemporalClient>,
-) -> Result<
-    web::Json<crate::workflow::project_flag::approve::ApprovalStatus>,
-    ApiError,
-> {
-    set_auto_approve_block(
-        req,
-        path.into_inner(),
-        &pool,
-        &redis,
-        &session_queue,
-        &temporal,
-        false,
-    )
-    .await
-    .map(web::Json)
-}
-
-async fn set_auto_approve_block(
+async fn cancel_auto_approval(
     req: HttpRequest,
     project_id: ProjectId,
     pool: &PgPool,
     redis: &RedisPool,
     session_queue: &AuthQueue,
     temporal: &crate::util::temporal::TemporalClient,
-    blocked: bool,
 ) -> Result<crate::workflow::project_flag::approve::ApprovalStatus, ApiError> {
     get_user_from_headers(
         &req,
@@ -208,7 +174,7 @@ async fn set_auto_approve_block(
     let mut transaction = pool
         .begin()
         .await
-        .internal_context("starting approval block operation")?;
+        .internal_context("starting approval cancellation operation")?;
     let id = DBProjectId::from(project_id);
     let in_review = sqlx::query_scalar!(
         r#"SELECT in_review FROM mods WHERE id = $1 FOR UPDATE"#,
@@ -231,8 +197,8 @@ async fn set_auto_approve_block(
         .signal_with_start_workflow(
             ApproveProjectWorkflow::run,
             project_id,
-            ApproveProjectWorkflow::set_blocked,
-            blocked,
+            ApproveProjectWorkflow::cancel,
+            (),
             temporalio_client::WorkflowStartOptions::new(
                 PROJECT_FLAG_TASK_QUEUE,
                 format!("approve-project:{project_id}"),
@@ -246,7 +212,7 @@ async fn set_auto_approve_block(
             .build(),
         )
         .await
-        .internal_context("updating approval block")?;
+        .internal_context("updating approval cancellation")?;
     let state =
         tokio::time::timeout(std::time::Duration::from_secs(60), async {
             loop {
@@ -257,19 +223,19 @@ async fn set_auto_approve_block(
                         temporalio_client::WorkflowQueryOptions::default(),
                     )
                     .await?;
-                if state.auto_approve_blocked == blocked && !state.finished {
+                if state.auto_approve_blocked && !state.finished {
                     return anyhow::Ok(state);
                 }
                 tokio::time::sleep(std::time::Duration::from_millis(50)).await;
             }
         })
         .await
-        .internal_context("waiting for approval block acknowledgement")?
-        .internal_context("reading approval block acknowledgement")?;
+        .internal_context("waiting for approval cancellation acknowledgement")?
+        .internal_context("reading approval cancellation acknowledgement")?;
     transaction
         .commit()
         .await
-        .internal_context("releasing approval block lock")?;
+        .internal_context("releasing approval cancellation lock")?;
     Ok(state)
 }
 

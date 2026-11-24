@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO project_history (project_id, done_by, delta)\n            VALUES ($1, NULL, $2::jsonb)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "063c6c7dd60f99d84a72cf37b81414d6329a2124e77ae9ba1758b1a7ad160924"
+}

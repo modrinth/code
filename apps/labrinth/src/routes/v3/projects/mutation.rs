@@ -303,9 +303,8 @@ pub(crate) async fn delayed_auto_approval_eligible(
     pool: &PgPool,
     redis: &RedisPool,
     approve_without_ruleset: bool,
-    approval_guard: Option<
-        &crate::workflow::project_flag::approve::ApprovalGuard,
-    >,
+    approval_workflow: Option<&temporalio_client::Client>,
+    schedule: Option<&crate::workflow::project_flag::approve::ApprovalSchedule>,
 ) -> Result<bool, ApiError> {
     let mut transaction = pool
         .begin()
@@ -338,14 +337,61 @@ pub(crate) async fn delayed_auto_approval_eligible(
     )
     .await?;
     let eligible = state.in_review() && state.can_auto_approve();
+    if let Some(schedule) = schedule {
+        if !eligible
+            || !match approval_workflow {
+                Some(temporal) => {
+                    crate::workflow::project_flag::approve::approval_permitted(
+                        temporal,
+                        project_id.into(),
+                    )
+                    .await
+                    .internal_context(
+                        "checking workflow scheduling permission",
+                    )?
+                }
+                None => false,
+            }
+        {
+            return Ok(false);
+        }
+        let provenance = ApprovalProvenance {
+            trigger: deployed
+                .map(|ruleset_id| AutoApprovalCause::ProjectFlags {
+                    ruleset_id,
+                })
+                .unwrap_or(AutoApprovalCause::TechnicalReviewNoDetails),
+            resolved_issue_ids: state
+                .thread_issues
+                .iter()
+                .map(|issue| issue.id.into())
+                .collect(),
+        };
+        let delta = serde_json::to_value(ProjectDelta::AutoApprovalScheduled {
+            provenance,
+            scheduled_for: schedule.scheduled_for,
+        })
+        .internal_context("serializing project approval schedule")?;
+        record_approval_schedule_history(project_id, delta, &mut transaction)
+            .await?;
+        transaction
+            .commit()
+            .await
+            .internal_context("committing project approval schedule")?;
+        return Ok(true);
+    }
     if eligible
         && approve_without_ruleset
         && deployed.is_none()
-        && match approval_guard {
-            Some(guard) => guard
-                .permits_approval()
+        && match approval_workflow {
+            Some(temporal) => {
+                crate::workflow::project_flag::approve::approval_permitted(
+                    temporal,
+                    project_id.into(),
+                )
                 .await
-                .internal_context("checking workflow approval permission")?,
+                .internal_context("checking workflow approval permission")?
+            }
             None => false,
         }
     {
@@ -364,6 +410,26 @@ pub(crate) async fn delayed_auto_approval_eligible(
         return Ok(false);
     }
     Ok(eligible)
+}
+
+/// The caller must hold the project's mutation lock until commit.
+async fn record_approval_schedule_history(
+    project_id: DBProjectId,
+    delta: serde_json::Value,
+    transaction: &mut PgTransaction<'_>,
+) -> Result<(), ApiError> {
+    sqlx::query!(
+        r#"
+            INSERT INTO project_history (project_id, done_by, delta)
+            VALUES ($1, NULL, $2::jsonb)
+            "#,
+        project_id.0,
+        delta,
+    )
+    .execute(&mut *transaction)
+    .await
+    .internal_context("recording project approval schedule")?;
+    Ok(())
 }
 
 pub(crate) async fn sync_project_state(
@@ -775,9 +841,7 @@ pub(crate) async fn apply_project_flag_reconciliation_after_delay(
     pool: &PgPool,
     redis: &RedisPool,
     approval_due: bool,
-    approval_guard: Option<
-        &crate::workflow::project_flag::approve::ApprovalGuard,
-    >,
+    approval_workflow: Option<&temporalio_client::Client>,
 ) -> Result<(), ApiError> {
     use db_models::project_flag_item::ProjectFlag;
     use std::collections::BTreeMap;
@@ -938,11 +1002,15 @@ pub(crate) async fn apply_project_flag_reconciliation_after_delay(
         desired.filter(|outcome| *outcome != ProjectReviewOutcome::Approved);
     if approval_due
         && desired == Some(ProjectReviewOutcome::Approved)
-        && match approval_guard {
-            Some(guard) => guard
-                .permits_approval()
+        && match approval_workflow {
+            Some(temporal) => {
+                crate::workflow::project_flag::approve::approval_permitted(
+                    temporal,
+                    project_id.into(),
+                )
                 .await
-                .internal_context("checking workflow approval permission")?,
+                .internal_context("checking workflow approval permission")?
+            }
             None => false,
         }
     {
@@ -1315,6 +1383,68 @@ mod tests {
     use serde_json::json;
 
     #[actix_rt::test]
+    async fn approval_schedule_history_records_each_event() {
+        use crate::test::{
+            api_v3::ApiV3,
+            environment::{TestEnvironment, with_test_environment},
+        };
+        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+            let project_id =
+                DBProjectId::from(env.dummy.project_alpha.project_id_parsed);
+            let before =
+                db_models::DBProject::get_history(project_id, &env.db.ro_pool)
+                    .await
+                    .unwrap()
+                    .len();
+            let mut transaction = env.db.pool.begin().await.unwrap();
+            sqlx::query_scalar!(
+                r#"SELECT in_review FROM mods WHERE id = $1 FOR UPDATE"#,
+                project_id.0
+            )
+            .fetch_one(&mut transaction)
+            .await
+            .unwrap();
+            for deadline in [
+                "2026-11-24T12:00:00Z",
+                "2026-11-24T12:00:00Z",
+                "2026-11-24T13:00:00Z",
+            ] {
+                let delta =
+                    serde_json::to_value(ProjectDelta::AutoApprovalScheduled {
+                        provenance: ApprovalProvenance {
+                            trigger:
+                                AutoApprovalCause::TechnicalReviewNoDetails,
+                            resolved_issue_ids: vec![],
+                        },
+                        scheduled_for: deadline.parse().unwrap(),
+                    })
+                    .unwrap();
+                record_approval_schedule_history(
+                    project_id,
+                    delta,
+                    &mut transaction,
+                )
+                .await
+                .unwrap();
+            }
+            transaction.commit().await.unwrap();
+            let history =
+                db_models::DBProject::get_history(project_id, &env.db.ro_pool)
+                    .await
+                    .unwrap();
+            assert_eq!(history.len(), before + 3);
+            assert!(history[before..].iter().all(
+                |entry| entry.done_by.is_none()
+                    && matches!(
+                        entry.delta,
+                        ProjectDelta::AutoApprovalScheduled { .. }
+                    )
+            ));
+        })
+        .await;
+    }
+
+    #[actix_rt::test]
     async fn reconciliation_completes_only_changed_review_outcomes() {
         use crate::database::models::project_flag_item::{
             DBProjectFlagRunResult, ProjectFlag, ProjectFlagRuleResult,
@@ -1425,7 +1555,7 @@ mod tests {
                     let approved = db_models::DBProject::get_id(project_id, &*env.db.ro_pool, &env.db.redis_pool).await.unwrap().unwrap();
                     assert_eq!(approved.inner.review_outcome, ProjectReviewOutcome::Approved);
                     assert!(!approved.inner.in_review);
-                    assert!(!delayed_auto_approval_eligible(project_id, &env.db.pool, &env.db.redis_pool, false, None).await.unwrap());
+                    assert!(!delayed_auto_approval_eligible(project_id, &env.db.pool, &env.db.redis_pool, false, None, None).await.unwrap());
                 }
                 if flag == Some("manual_review") {
                     let mut context = context.clone();

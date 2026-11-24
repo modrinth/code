@@ -153,7 +153,6 @@ impl ReconcileProjectFlagsWorkflow {
                 project_id,
                 ruleset_id,
                 approval_due: false,
-                approval_token: None,
             };
             let (images, text) = futures::join!(
                 image_scan::scan_project_images(ctx, project_id),
@@ -207,8 +206,6 @@ pub struct ReconcileRulesInput {
     ruleset_id: Option<uuid::Uuid>,
     #[serde(default)]
     approval_due: bool,
-    #[serde(default)]
-    approval_token: Option<approve::ApprovalToken>,
 }
 
 impl ReconcileRulesInput {
@@ -321,11 +318,7 @@ impl ProjectFlagActivities {
             input.project_id().into(),
             input.ruleset_id(),
             input.approval_due,
-            input.approval_token.map(|token| approve::ApprovalGuard {
-                temporal: self.temporal.clone(),
-                project_id: input.project_id,
-                token,
-            }),
+            input.approval_due.then(|| self.temporal.clone()),
         )
         .await
         {
