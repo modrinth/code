@@ -1,0 +1,21 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT EXISTS(\n\t\t\tSELECT 1\n\t\t\tFROM instance_content_groups\n\t\t\tWHERE id = ? AND instance_id = ? AND content_type = ?\n\t\t) AS \"exists!: bool\"\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "exists!: bool",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "9be72f3188e539ddb7be1a81140e30061ec2bbe273c9472230a960de491052b6"
+}

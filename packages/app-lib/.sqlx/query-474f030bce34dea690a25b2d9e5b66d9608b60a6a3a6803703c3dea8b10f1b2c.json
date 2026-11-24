@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT group_id, item_key\n\t\tFROM instance_content_group_memberships\n\t\tWHERE instance_id = ?\n\t\tORDER BY item_key\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "group_id",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_group_memberships",
+            "name": "group_id"
+          }
+        }
+      },
+      {
+        "name": "item_key",
+        "ordinal": 1,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_group_memberships",
+            "name": "item_key"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "474f030bce34dea690a25b2d9e5b66d9608b60a6a3a6803703c3dea8b10f1b2c"
+}

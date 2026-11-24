@@ -86,6 +86,6 @@ const resolvedSrc = computed(
 		:tint-by="tintBy"
 		size="3rem"
 		no-shadow
-		class="rounded-2xl border border-surface-5"
+		class="!rounded-[14px] !outline-white/10"
 	/>
 </template>

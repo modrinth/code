@@ -20,6 +20,7 @@ defineProps<{
 	showEnabledFor: boolean
 	showVersion: boolean
 	showActions: boolean
+	dragHandle?: boolean
 	enabledForLabel: string
 	enabledForDescription: string
 }>()
@@ -48,6 +49,7 @@ defineExpose({ element })
 		]"
 	>
 		<div role="row" class="flex min-w-0 items-center gap-4" :class="{ 'col-span-full': stacked }">
+			<span v-if="dragHandle" aria-hidden="true" class="size-5 shrink-0" />
 			<Checkbox
 				v-if="selection"
 				:model-value="allSelected"

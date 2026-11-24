@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_content_groups (id, instance_id, content_type, name, display_order)\n\t\tVALUES (?, ?, ?, ?, 0)\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "df47ab74bb17836a07f7e12692743b82b9cd7735ed64bfba99dc1b06dc362a9a"
+}

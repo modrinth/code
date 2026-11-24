@@ -719,6 +719,60 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Install this content on your server."
   },
+  "content.groups.collapse": {
+    "defaultMessage": "Collapse group"
+  },
+  "content.groups.default-name": {
+    "defaultMessage": "Group {number}"
+  },
+  "content.groups.delete": {
+    "defaultMessage": "Delete group"
+  },
+  "content.groups.delete-description": {
+    "defaultMessage": "Content in \"{name}\" will become ungrouped. Nothing will be removed from your instance."
+  },
+  "content.groups.delete-modal.header": {
+    "defaultMessage": "Delete group"
+  },
+  "content.groups.derived.this-month": {
+    "defaultMessage": "This month"
+  },
+  "content.groups.derived.this-week": {
+    "defaultMessage": "This week"
+  },
+  "content.groups.derived.today": {
+    "defaultMessage": "Today"
+  },
+  "content.groups.derived.uncategorized": {
+    "defaultMessage": "Uncategorized"
+  },
+  "content.groups.derived.unknown-author": {
+    "defaultMessage": "Unknown author"
+  },
+  "content.groups.derived.unknown-date": {
+    "defaultMessage": "Unknown date"
+  },
+  "content.groups.derived.unknown-license": {
+    "defaultMessage": "Unknown license"
+  },
+  "content.groups.derived.yesterday": {
+    "defaultMessage": "Yesterday"
+  },
+  "content.groups.expand": {
+    "defaultMessage": "Expand group"
+  },
+  "content.groups.move-down": {
+    "defaultMessage": "Move group down"
+  },
+  "content.groups.move-up": {
+    "defaultMessage": "Move group up"
+  },
+  "content.groups.rename": {
+    "defaultMessage": "Rename group"
+  },
+  "content.groups.ungrouped": {
+    "defaultMessage": "Ungrouped"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Creating backup..."
   },
@@ -875,8 +929,41 @@
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
   },
+  "content.page-layout.group-by": {
+    "defaultMessage": "Group by"
+  },
+  "content.page-layout.group-by.author": {
+    "defaultMessage": "Author"
+  },
+  "content.page-layout.group-by.category": {
+    "defaultMessage": "Category"
+  },
+  "content.page-layout.group-by.custom": {
+    "defaultMessage": "Custom groups"
+  },
+  "content.page-layout.group-by.date-added": {
+    "defaultMessage": "Date added"
+  },
+  "content.page-layout.group-by.license": {
+    "defaultMessage": "License"
+  },
+  "content.page-layout.group-by.none": {
+    "defaultMessage": "No grouping"
+  },
+  "content.page-layout.groups.empty": {
+    "defaultMessage": "Drag content here to add it to this group"
+  },
+  "content.page-layout.groups.new-group": {
+    "defaultMessage": "New group"
+  },
+  "content.page-layout.groups.remove-from-group": {
+    "defaultMessage": "Remove from group"
+  },
   "content.page-layout.more-add-options": {
     "defaultMessage": "More ways to add content"
+  },
+  "content.page-layout.new-group": {
+    "defaultMessage": "New group"
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "No content found."
@@ -973,6 +1060,12 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} selected"
+  },
+  "content.table.section.collapse": {
+    "defaultMessage": "Collapse group"
+  },
+  "content.table.section.expand": {
+    "defaultMessage": "Expand group"
   },
   "content.update-flow.failed-to-load-changelog": {
     "defaultMessage": "Failed to load changelog"

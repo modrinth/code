@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import ContentTable from '../../layouts/shared/content-tab/components/content-table/index.vue'
 import type { ContentTableColumns } from '../../layouts/shared/content-tab/components/content-table/types'
@@ -310,6 +310,65 @@ export const LabelledSections: Story = {
 		],
 		columns: instanceColumns,
 	},
+}
+
+export const DraggableGroups: Story = {
+	render: () => ({
+		components: { ContentTable },
+		setup() {
+			const groups = ref([
+				{ id: 'performance', label: 'Performance', items: [sodiumItem.id] },
+				{ id: 'empty', label: 'Empty group', items: [] as string[] },
+				{
+					id: 'ungrouped',
+					label: 'Ungrouped',
+					items: [updateAvailableItem.id, fabricApiItem.id, modMenuItem.id],
+				},
+			])
+			const collapsed = ref<Record<string, boolean>>({})
+			const selectedIds = ref<string[]>([])
+			const itemsById = new Map(
+				[sodiumItem, updateAvailableItem, fabricApiItem, modMenuItem].map((item) => [
+					item.id,
+					item,
+				]),
+			)
+			const sections = computed(() =>
+				groups.value.map((group) => ({
+					id: group.id,
+					label: group.label,
+					collapsed: !!collapsed.value[group.id],
+					emptyLabel:
+						group.id === 'ungrouped' ? undefined : 'Drag content here to add it to this group',
+					items: group.items.map((id) => itemsById.get(id)!),
+				})),
+			)
+			function setCollapsed(id: string, value: boolean) {
+				collapsed.value = { ...collapsed.value, [id]: value }
+			}
+			function moveRows(ids: string[], sectionId: string) {
+				groups.value = groups.value.map((group) => ({
+					...group,
+					items:
+						group.id === sectionId
+							? [...group.items.filter((id) => !ids.includes(id)), ...ids]
+							: group.items.filter((id) => !ids.includes(id)),
+				}))
+				selectedIds.value = []
+			}
+			return { sections, selectedIds, setCollapsed, moveRows, columns: instanceColumns }
+		},
+		template: /*html*/ `
+			<ContentTable
+				v-model:selected-ids="selectedIds"
+				:sections="sections"
+				:columns="columns"
+				draggable
+				@set-section-collapsed="setCollapsed"
+				@move-rows="moveRows"
+			/>
+		`,
+	}),
 }
 
 export const Highlighted: Story = {

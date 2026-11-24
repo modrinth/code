@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE instance_content_groups SET display_order = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "0373a83f6858f9cf9d86ec186028ed88f4d4c90f4fd3fc9b485cdf1c26caecd7"
+}

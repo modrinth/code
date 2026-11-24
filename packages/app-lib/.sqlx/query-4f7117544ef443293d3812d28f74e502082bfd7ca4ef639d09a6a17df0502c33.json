@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\t\t\tDELETE FROM instance_content_group_memberships\n\t\t\t\t\tWHERE instance_id = ? AND content_type = ? AND item_key = ?\n\t\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "4f7117544ef443293d3812d28f74e502082bfd7ca4ef639d09a6a17df0502c33"
+}

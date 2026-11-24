@@ -149,7 +149,7 @@ function linkTarget(link: unknown) {
 			/>
 			<div
 				v-if="installing"
-				class="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/20"
+				class="absolute inset-0 flex items-center justify-center rounded-[14px] bg-black/20"
 			>
 				<ProgressSpinner
 					v-if="installProgress != null && installProgress > 0"

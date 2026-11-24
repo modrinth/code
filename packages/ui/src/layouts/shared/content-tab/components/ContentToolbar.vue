@@ -1,14 +1,27 @@
 <script setup lang="ts">
-import { DownloadIcon, PlusIcon, RefreshCwIcon, UploadIcon } from '@modrinth/assets'
+import {
+	DownloadIcon,
+	LayoutGridIcon,
+	PlusIcon,
+	RefreshCwIcon,
+	SquarePlusIcon,
+	UploadIcon,
+} from '@modrinth/assets'
 import { computed } from 'vue'
 
-import { type ButtonMenuOption, IconButton, SplitButton } from '#ui/components/base/buttons'
+import {
+	type ButtonMenuOption,
+	IconButton,
+	SplitButton,
+	TeleportOverflowMenu,
+} from '#ui/components/base/buttons'
 import type { DropdownFilterBarCategory } from '#ui/components/base/DropdownFilterBar.vue'
 import ListToolbar from '#ui/components/base/ListToolbar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import type { ContentSortField, ContentSortMode } from '../composables/content-sort'
+import { type ContentGroupBy, contentGroupByOptions } from '../composables/use-content-grouping'
 import type { ContentMetadataFilterValue } from '../composables/use-content-metadata-filters'
 import type { ContentType } from '../types'
 import ContentSortMenu from './ContentSortMenu.vue'
@@ -26,12 +39,15 @@ const props = defineProps<{
 	busyTooltip?: string
 	filterCategories: DropdownFilterBarCategory[]
 	sortFields: ContentSortField[]
+	showGrouping: boolean
+	newGroupDisabled: boolean
 }>()
 
 const search = defineModel<string>('search', { required: true })
 const type = defineModel<ContentType>('type', { required: true })
 const filters = defineModel<ContentMetadataFilterValue>('filters', { required: true })
 const sort = defineModel<ContentSortMode>('sort', { required: true })
+const groupBy = defineModel<ContentGroupBy>('groupBy', { required: true })
 
 const emit = defineEmits<{
 	add: []
@@ -39,6 +55,7 @@ const emit = defineEmits<{
 	updateAll: []
 	prefetchUpdateAll: []
 	refresh: []
+	newGroup: [event: MouseEvent]
 }>()
 
 const { formatMessage } = useVIntl()
@@ -64,7 +81,61 @@ const messages = defineMessages({
 		id: 'content.page-layout.refreshing',
 		defaultMessage: 'Refreshing...',
 	},
+	groupBy: {
+		id: 'content.page-layout.group-by',
+		defaultMessage: 'Group by',
+	},
+	customGroups: {
+		id: 'content.page-layout.group-by.custom',
+		defaultMessage: 'Custom groups',
+	},
+	category: {
+		id: 'content.page-layout.group-by.category',
+		defaultMessage: 'Category',
+	},
+	author: {
+		id: 'content.page-layout.group-by.author',
+		defaultMessage: 'Author',
+	},
+	dateAdded: {
+		id: 'content.page-layout.group-by.date-added',
+		defaultMessage: 'Date added',
+	},
+	license: {
+		id: 'content.page-layout.group-by.license',
+		defaultMessage: 'License',
+	},
+	noGrouping: {
+		id: 'content.page-layout.group-by.none',
+		defaultMessage: 'No grouping',
+	},
+	newGroup: {
+		id: 'content.page-layout.new-group',
+		defaultMessage: 'New group',
+	},
 })
+
+const groupByLabels: Record<ContentGroupBy, (typeof messages)[keyof typeof messages]> = {
+	custom: messages.customGroups,
+	category: messages.category,
+	author: messages.author,
+	date: messages.dateAdded,
+	license: messages.license,
+	none: messages.noGrouping,
+}
+
+const groupByOptions = computed<ButtonMenuOption[]>(() =>
+	contentGroupByOptions.map((option) => ({
+		id: option,
+		label: formatMessage(groupByLabels[option]),
+		selected: groupBy.value === option,
+		action: () => {
+			groupBy.value = option
+		},
+	})),
+)
+
+const newGroupLabel = computed(() => formatMessage(messages.newGroup))
 
 const updateAllLabel = computed(() => formatMessage(messages.updateAll))
 
@@ -110,10 +181,25 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 			:filter-categories="filterCategories"
 		>
 			<template #controls>
+				<Transition name="toolbar-item">
+					<div v-if="showGrouping" class="flex shrink-0">
+						<TeleportOverflowMenu
+							type="quiet"
+							size="lg"
+							:label="formatMessage(messages.groupBy)"
+							:options="groupByOptions"
+							:icon-only="false"
+							animate-width
+						>
+							<LayoutGridIcon aria-hidden="true" />
+							{{ formatMessage(groupByLabels[groupBy]) }}
+						</TeleportOverflowMenu>
+					</div>
+				</Transition>
 				<ContentSortMenu v-model="sort" :fields="sortFields" />
 			</template>
 			<template #actions>
-				<Transition name="update-all">
+				<Transition name="toolbar-item">
 					<div v-if="showUpdateAll" class="flex shrink-0">
 						<IconButton
 							v-tooltip="updateAllDisabled ? busyTooltip : updateAllLabel"
@@ -141,36 +227,45 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 				>
 					<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
 				</IconButton>
-				<!-- TODO: grouping
-				<IconButton type="quiet" size="lg" :label="formatMessage(messages.group)">
-					<SquarePlusIcon />
-				</IconButton>
-				-->
+				<Transition name="toolbar-item">
+					<div v-if="showGrouping" class="flex shrink-0">
+						<IconButton
+							v-tooltip="newGroupLabel"
+							type="quiet"
+							size="lg"
+							:label="newGroupLabel"
+							:disabled="newGroupDisabled"
+							@click="(event: MouseEvent) => emit('newGroup', event)"
+						>
+							<SquarePlusIcon />
+						</IconButton>
+					</div>
+				</Transition>
 			</template>
 		</ListToolbar>
 	</div>
 </template>
 
 <style scoped>
-.update-all-enter-active,
-.update-all-leave-active {
+.toolbar-item-enter-active,
+.toolbar-item-leave-active {
 	overflow: hidden;
 	transition:
-		width 200ms cubic-bezier(0.4, 0, 0.2, 1),
+		max-width 200ms cubic-bezier(0.4, 0, 0.2, 1),
 		margin-left 200ms cubic-bezier(0.4, 0, 0.2, 1),
 		opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.update-all-enter-from,
-.update-all-leave-to {
-	width: 0;
+.toolbar-item-enter-from,
+.toolbar-item-leave-to {
+	max-width: 0;
 	margin-left: -0.5rem;
 	opacity: 0;
 }
 
-.update-all-enter-to,
-.update-all-leave-from {
-	width: 2.5rem;
+.toolbar-item-enter-to,
+.toolbar-item-leave-from {
+	max-width: 16rem;
 	margin-left: 0;
 	opacity: 1;
 }

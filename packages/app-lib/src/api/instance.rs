@@ -1,6 +1,7 @@
 //! Theseus instance management interface
 
 mod content;
+mod content_groups;
 mod content_list;
 mod export_mrpack;
 mod files;
@@ -31,6 +32,11 @@ pub use self::content::{
     get_install_candidates, get_installed_project_ids,
     get_linked_modpack_content, get_linked_modpack_info, get_projects,
     list_content_sets, refresh_content_updates, sync_content_files,
+};
+pub use self::content_groups::{
+    InstanceContentGroup, create_content_group, delete_content_group,
+    list_content_groups, rename_content_group, set_content_group_memberships,
+    set_content_group_order,
 };
 pub(crate) use self::content_list::InstanceContentSnapshot;
 pub use self::content_list::{
