@@ -481,7 +481,7 @@ pub async fn setup_minecraft_command(
 
 fn create_sandbox_java_agent(agent_dir: &Path) -> eyre::Result<PathBuf> {
     const BYTES: &[u8] =
-        include_bytes!("../../modrinth-sandbox-agent/SandboxAgent.jar");
+        include_bytes!(concat!(env!("OUT_DIR"), "/SandboxAgent.jar"));
     let hash_bytes = Sha1::digest(BYTES);
     let hash_str = hex::encode(hash_bytes);
 

@@ -16,10 +16,6 @@ plugins {
 group = "com.modrinth"
 version = "1.0.0"
 
-base {
-    archivesName.set("SandboxAgent")
-}
-
 repositories {
     mavenCentral()
 }
@@ -33,21 +29,29 @@ dependencies {
 }
 
 shadowJar {
+    archiveFileName = "SandboxAgent.jar"
+    manifest {
+        attributes["Premain-Class"] = "com.modrinth.sandboxagent.SandboxAgent"
+        attributes["Can-Retransform-Classes"] = "true"
+    }
     configurations = [project.configurations.shadow]
     relocate("org.objectweb.asm", "com.modrinth.sandboxagent.org.objectweb.asm")
     relocate("com.google", "com.modrinth.sandboxagent.com.google")
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(8))
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 8
 }
 
 tasks.jar {
-    dependsOn(shadowJar)
-    manifest {
-        attributes["Premain-Class"] = "com.modrinth.sandboxagent.SandboxAgent"
-        attributes["Can-Retransform-Classes"] = "true"
-    }
+    enabled = false
+}
+
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
 }

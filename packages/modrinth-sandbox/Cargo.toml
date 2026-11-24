@@ -42,6 +42,9 @@ async_zip = { workspace = true, features = [
   "zstd",
 ] }
 
+[build-dependencies]
+dunce = { workspace = true }
+
 [dev-dependencies]
 tokio = { workspace = true, features = ["full"] }
 tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
