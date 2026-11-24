@@ -1,10 +1,10 @@
 use crate::auth::checks::{is_visible_organization, is_visible_project};
-use crate::auth::get_user_from_headers;
+use crate::auth::{UserWithScopes, get_user_from_headers};
 use crate::database::DBProject;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::team_item::TeamAssociationId;
 use crate::database::models::{
-    DBOrganization, DBProjectId, DBTeam, DBTeamMember, DBUser,
+    DBOrganization, DBProjectId, DBTeam, DBTeamId, DBTeamMember, DBUser,
 };
 use crate::database::{PgPool, PgTransaction};
 use crate::models::ids::TeamId;
@@ -31,6 +31,59 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(add_team_member_route)
         .service(join_team_route)
         .service(transfer_ownership_route);
+}
+
+// A team's visibility is the visibility of the resource it belongs to, so that
+// team membership cannot be read for hidden projects or organizations
+async fn team_is_visible(
+    team_id: DBTeamId,
+    current_user: &Option<UserWithScopes>,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<bool, ApiError> {
+    let association = DBTeam::get_association(team_id, pool)
+        .await
+        .wrap_internal_err("fetching team association from database")?;
+
+    match association {
+        Some(TeamAssociationId::Project(project_id)) => {
+            let project = DBProject::get_id(project_id, pool, redis)
+                .await
+                .wrap_internal_err("fetching project from database")?;
+
+            match project {
+                Some(project) => {
+                    is_visible_project(
+                        &project.inner,
+                        current_user,
+                        pool,
+                        false,
+                    )
+                    .await
+                }
+                None => Ok(false),
+            }
+        }
+        Some(TeamAssociationId::Organization(organization_id)) => {
+            let organization = DBOrganization::get_id(organization_id, pool)
+                .await
+                .wrap_internal_err("fetching organization from database")?;
+
+            match organization {
+                Some(organization) => {
+                    is_visible_organization(
+                        &organization,
+                        current_user,
+                        pool,
+                        redis,
+                    )
+                    .await
+                }
+                None => Ok(false),
+            }
+        }
+        None => Ok(false),
+    }
 }
 
 async fn affected_project_ids(
@@ -282,6 +335,20 @@ pub async fn team_members_get(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
+    let current_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .ok();
+
+    if !team_is_visible(id.into(), &current_user, &pool, &redis).await? {
+        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+    }
+
     let members_data =
         DBTeamMember::get_from_team_full(id.into(), &**pool, &redis)
             .await
@@ -294,15 +361,6 @@ pub async fn team_members_get(
     .await
     .internal_context("fetching users from database")?;
 
-    let current_user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_READ,
-    )
-    .await
-    .ok();
     let user_id = current_user.as_ref().map(|x| x.user.id.into());
 
     let logged_in = current_user
@@ -372,6 +430,29 @@ pub async fn teams_get(
         .map(|x| x.into())
         .collect::<Vec<crate::database::models::ids::DBTeamId>>();
 
+    let current_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .ok();
+
+    let visibility =
+        futures::future::try_join_all(team_ids.iter().map(|team_id| {
+            team_is_visible(*team_id, &current_user, &pool, &redis)
+        }))
+        .await?;
+
+    let team_ids = team_ids
+        .into_iter()
+        .zip(visibility)
+        .filter(|(_, visible)| *visible)
+        .map(|(team_id, _)| team_id)
+        .collect::<Vec<_>>();
+
     let teams_data =
         DBTeamMember::get_from_team_full_many(&team_ids, &**pool, &redis)
             .await
@@ -383,16 +464,6 @@ pub async fn teams_get(
     )
     .await
     .internal_context("fetching users from database")?;
-
-    let current_user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_READ,
-    )
-    .await
-    .ok();
 
     let teams_groups = teams_data.into_iter().chunk_by(|data| data.team_id.0);
 
