@@ -1,6 +1,6 @@
 <template>
 	<header class="flex select-none flex-col" :aria-label="formatMessage(messages.fileNavigation)">
-		<div class="flex min-h-10 items-center justify-between gap-2">
+		<div class="flex min-h-[42px] items-center justify-between gap-2">
 			<nav
 				:aria-label="formatMessage(messages.breadcrumbNavigation)"
 				class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
