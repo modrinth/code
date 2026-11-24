@@ -1083,7 +1083,7 @@ pub async fn test_patch_project() {
                 .edit_project(
                     alpha_project_slug,
                     json!({
-                        "summary": "",
+                        "summary": "a".repeat(257),
                     }),
                     USER_USER_PAT,
                 )
