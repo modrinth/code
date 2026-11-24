@@ -90,7 +90,7 @@ pub async fn run_migrations_on_database(
     let app_events_ttl = if database == "staging_analytics" {
         "TTL toDateTime(recorded_ts) + INTERVAL 3 DAY"
     } else {
-        "TTL toStartOfMonth(event_ts) + INTERVAL 25 MONTH"
+        ""
     };
 
     client
