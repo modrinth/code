@@ -72,7 +72,6 @@ const messages = defineMessages({
 			<DisclosureExplanation
 				v-model="model.note"
 				:title="formatMessage(commonMessages.explanationLabel)"
-				title-for="archived-disclosure-note"
 				optional
 				:variant="variant"
 				:resize="showLockControls ? 'vertical' : 'none'"

@@ -12,7 +12,7 @@ import {
 } from '@modrinth/ui'
 import { isAdmin } from '@modrinth/utils'
 import { useMutation, useQuery } from '@tanstack/vue-query'
-import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, ref, useId, useTemplateRef } from 'vue'
 
 import ConfirmTransferProjectModal from '~/components/ui/ConfirmTransferProjectModal.vue'
 import ProjectOwnerCombobox from '~/components/ui/ProjectOwnerCombobox.vue'
@@ -49,6 +49,7 @@ const messages = defineMessages({
 		defaultMessage: 'Take ownership of this project and remove it from {organization}.',
 	},
 })
+const transferTargetId = useId()
 const auth = await useAuth()
 const selectedTarget = ref('')
 const selectionModal = useTemplateRef('selectionModal')
@@ -175,7 +176,7 @@ function confirmRemoveFromOrganization() {
 </script>
 
 <template>
-	<div id="ownership" class="danger-zone-row">
+	<div class="danger-zone-row">
 		<div>
 			<h3 class="mb-1 mt-0 text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.transferOwnership) }}
@@ -210,11 +211,11 @@ function confirmRemoveFromOrganization() {
 				<p v-if="organization" class="m-0 text-secondary">
 					This project is managed by {{ organization.name }}.
 				</p>
-				<Field label="Member or organization" input-id="project-transfer-target">
+				<Field label="Member or organization" :input-id="transferTargetId">
 					<ProjectOwnerCombobox
 						v-model="selectedTarget"
 						:options="targets"
-						input-id="project-transfer-target"
+						:input-id="transferTargetId"
 						:disabled="transfer.isPending.value"
 						hide-chevron
 					/>

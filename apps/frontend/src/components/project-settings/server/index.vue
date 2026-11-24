@@ -7,7 +7,7 @@
 			<div class="flex flex-col gap-6">
 				<Field
 					:label="formatMessage(messages.regionLabel)"
-					input-id="server-region"
+					:input-id="regionInputId"
 					data-project-field="server-region"
 					class="max-w-[600px]"
 				>
@@ -15,7 +15,7 @@
 						v-model="region"
 						:options="regionOptions"
 						searchable
-						:search-input-attrs="{ id: 'server-region' }"
+						:search-input-attrs="{ id: regionInputId }"
 						:placeholder="formatMessage(messages.selectRegionPlaceholder)"
 						:disabled="!hasPermission"
 					/>
@@ -39,7 +39,6 @@
 					<template #default="{ labelId }">
 						<div role="group" :aria-labelledby="labelId">
 							<MultiSelect
-								id="server-language"
 								v-model="languages"
 								:options="languageOptions"
 								searchable
@@ -68,12 +67,12 @@
 
 				<Field
 					:label="formatMessage(messages.javaAddressLabel)"
-					input-id="java-address"
+					:input-id="javaAddressInputId"
 					data-project-field="java-address"
 					class="max-w-[600px]"
 				>
 					<Input
-						id="java-address"
+						:id="javaAddressInputId"
 						v-model="javaAddress"
 						:placeholder="formatMessage(messages.enterAddressPlaceholder)"
 						:disabled="!hasPermission"
@@ -109,12 +108,12 @@
 
 				<Field
 					:label="formatMessage(messages.bedrockAddressLabel)"
-					input-id="bedrock-address"
+					:input-id="bedrockAddressInputId"
 					label-optional
 					class="max-w-[600px]"
 				>
 					<Input
-						id="bedrock-address"
+						:id="bedrockAddressInputId"
 						v-model="bedrockAddress"
 						:placeholder="formatMessage(messages.enterAddressPlaceholder)"
 						:disabled="!hasPermission"
@@ -179,6 +178,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin } from '@modrinth/utils'
+import { useId } from 'vue'
 
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
@@ -193,6 +193,9 @@ import JavaPingStatus from './java-ping-status.vue'
 import { messages } from './messages'
 
 const { formatMessage, locale } = useVIntl()
+const regionInputId = useId()
+const javaAddressInputId = useId()
+const bedrockAddressInputId = useId()
 
 const { addNotification } = injectNotificationManager()
 const { projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()

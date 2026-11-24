@@ -6,7 +6,7 @@
 			<Field
 				id="project-settings-field-title"
 				label="Name"
-				input-id="project-name"
+				:input-id="nameInputId"
 				data-project-field="title"
 				class="max-w-[600px]"
 			>
@@ -14,7 +14,7 @@
 					<span class="text-xs text-secondary">{{ name.length }} / 64</span>
 				</template>
 				<Input
-					id="project-name"
+					:id="nameInputId"
 					v-model="name"
 					:maxlength="64"
 					wrapper-class="w-full"
@@ -34,7 +34,7 @@
 			<Field
 				id="project-settings-field-summary"
 				label="Summary"
-				input-id="project-summary"
+				:input-id="summaryInputId"
 				data-project-field="summary"
 				class="max-w-[600px]"
 			>
@@ -42,7 +42,7 @@
 					<span class="text-xs text-secondary">{{ summary.length }} / 256</span>
 				</template>
 				<Textarea
-					id="project-summary"
+					:id="summaryInputId"
 					v-model="summary"
 					:maxlength="256"
 					:disabled="!hasPermission"
@@ -87,7 +87,6 @@
 							<div class="flex max-w-full flex-col gap-2">
 								<div class="flex items-center gap-2">
 									<FileButton
-										id="project-icon"
 										:max-size="globals?.max_project_icon_size"
 										accept="image/png,image/jpeg,image/gif,image/webp"
 										class="button-like choose-image"
@@ -193,12 +192,12 @@
 			<Field
 				id="project-settings-field-slug"
 				label="URL"
-				input-id="project-slug"
+				:input-id="slugInputId"
 				data-project-field="slug"
 				class="max-w-[600px]"
 			>
 				<Input
-					id="project-slug"
+					:id="slugInputId"
 					v-model="slug"
 					:maxlength="64"
 					autocomplete="off"
@@ -226,7 +225,7 @@
 				</template>
 			</Field>
 
-			<Field id="visibility" :label="formatMessage(commonMessages.visibilityLabel)" class="w-full">
+			<Field :label="formatMessage(commonMessages.visibilityLabel)" class="w-full">
 				<template #default="{ labelId }">
 					<div
 						role="radiogroup"
@@ -259,7 +258,7 @@
 								<a
 									:href="checklistHref"
 									class="font-semibold text-link"
-									aria-controls="project-moderation-drawer"
+									:aria-controls="moderationDrawerId"
 									@click.exact.prevent="openModerationChecklist"
 								>
 									<component :is="() => children" />
@@ -295,6 +294,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { fileIsValid, isAdmin } from '@modrinth/utils'
+import { useId } from 'vue'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
@@ -320,7 +320,10 @@ const props = defineProps({ pageSaving: Boolean })
 const { data: globals } = useGlobals()
 
 const { formatMessage } = useVIntl()
-const { openModerationChecklist } = injectProjectSettingsNavigation()
+const { moderationDrawerId, openModerationChecklist } = injectProjectSettingsNavigation()
+const nameInputId = useId()
+const summaryInputId = useId()
+const slugInputId = useId()
 const route = useRoute()
 const router = useRouter()
 const checklistHref = computed(

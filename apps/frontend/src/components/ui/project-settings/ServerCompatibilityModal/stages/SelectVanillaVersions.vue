@@ -13,7 +13,7 @@
 					/>
 				</template>
 			</Field>
-			<Field label="Recommended MC version" input-id="compatibility-recommended-version">
+			<Field label="Recommended MC version" :input-id="recommendedVersionInputId">
 				<Combobox
 					v-model="recommendedGameVersion"
 					v-tooltip="
@@ -23,7 +23,7 @@
 					"
 					:options="recommendedOptions"
 					searchable
-					:search-input-attrs="{ id: 'compatibility-recommended-version' }"
+					:search-input-attrs="{ id: recommendedVersionInputId }"
 					:display-name="(val: string) => val"
 					placeholder="Select version"
 					:disabled="!recommendedOptions.length"
@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import { Combobox, Field } from '@modrinth/ui'
-import { computed, watch } from 'vue'
+import { computed, useId, watch } from 'vue'
 
 import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
 import { useGeneratedState } from '~/composables/generated'
@@ -48,6 +48,7 @@ import DataLossWarningBanner from '../DataLossWarningBanner.vue'
 
 const { supportedGameVersions, recommendedGameVersion } = injectServerCompatibilityContext()
 
+const recommendedVersionInputId = useId()
 const generatedState = useGeneratedState()
 const gameVersions = generatedState.value.gameVersions
 

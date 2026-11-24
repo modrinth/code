@@ -21,7 +21,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
-import { computed } from 'vue'
+import { computed, useId } from 'vue'
 
 import NavStack, { type NavStackEntry } from '~/components/ui/NavStack.vue'
 
@@ -154,6 +154,7 @@ const navItems = computed(() => {
 		})
 })
 
+const moderatorSeeUserUiId = useId()
 const moderatorSeeUserUi = computed<boolean>({
 	get() {
 		return flags.value.showModeratorProjectMemberUi
@@ -168,8 +169,8 @@ const moderatorSeeUserUi = computed<boolean>({
 <template>
 	<NavStack :items="navItems" />
 	<div v-if="isStaffMember" class="mt-4 flex items-center gap-2">
-		<Toggle id="moderator-see-user-ui-toggle" v-model="moderatorSeeUserUi" small />
-		<label for="moderator-see-user-ui-toggle">
+		<Toggle :id="moderatorSeeUserUiId" v-model="moderatorSeeUserUi" small />
+		<label :for="moderatorSeeUserUiId">
 			{{ formatMessage(messages.showMemberUi) }}
 		</label>
 	</div>

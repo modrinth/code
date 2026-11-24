@@ -208,7 +208,6 @@ function setOptionalField(
 				</Field>
 				<DisclosureExplanation
 					:title="formatMessage(messages.noteLabel)"
-					:title-for="`derivative-note-${id}`"
 					:variant="variant"
 					:model-value="source.note ?? undefined"
 					:resize="showLockControls ? 'vertical' : 'none'"

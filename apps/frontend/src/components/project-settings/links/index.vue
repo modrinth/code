@@ -172,6 +172,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin } from '@modrinth/utils'
+import { useId } from 'vue'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
@@ -292,10 +293,11 @@ const linkColumns = computed<TableColumn<'name' | 'url'>[]>(() => [
 		cellClass: 'py-3 pl-1',
 	},
 ])
+const linkInputId = useId()
 const linkRows = computed<LinkTableRow[]>(() => [
 	...visibleFields.value.map((field) => ({
 		id: field,
-		inputId: 'project-link-' + field,
+		inputId: `${linkInputId}-${field}`,
 		name: formatMessage(fieldMessages.value[field].title),
 		description: formatMessage(fieldMessages.value[field].description),
 		value: current.value[field] ?? '',

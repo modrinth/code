@@ -47,7 +47,6 @@ const messages = defineMessages({
 			<DisclosureExplanation
 				v-model="model.note"
 				:title="formatMessage(commonMessages.explanationLabel)"
-				title-for="ai-functionality-disclosure-note"
 				optional
 				:variant="variant"
 				:resize="showLockControls ? 'vertical' : 'none'"

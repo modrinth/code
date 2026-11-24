@@ -61,7 +61,7 @@
 			<Field
 				v-if="licenseType === 'standard'"
 				:label="formatMessage(messages.select)"
-				input-id="license-multiselect"
+				:input-id="licenseSelectId"
 				class="max-w-[600px]"
 			>
 				<Combobox
@@ -76,7 +76,7 @@
 					:placeholder="formatMessage(messages.selectPlaceholder)"
 					:search-placeholder="formatMessage(messages.selectPlaceholder)"
 					:searchable="true"
-					:search-input-attrs="{ id: 'license-multiselect' }"
+					:search-input-attrs="{ id: licenseSelectId }"
 					sync-with-selection
 					select-search-text-on-focus
 					:disabled="saving || !hasPermission"
@@ -105,7 +105,6 @@
 				class="flex min-w-0 max-w-[600px] flex-col gap-2"
 			>
 				<Checkbox
-					id="or-later-checkbox"
 					v-model="current.allowOrLater"
 					:disabled="saving || !hasPermission"
 					:description="formatMessage(messages.allowLater)"
@@ -120,11 +119,11 @@
 			<Field
 				v-if="current.license.friendly === 'Custom'"
 				:label="formatMessage(messages.name)"
-				input-id="license-name"
+				:input-id="licenseNameId"
 				class="max-w-[600px]"
 			>
 				<Input
-					id="license-name"
+					:id="licenseNameId"
 					v-model="current.license.short"
 					wrapper-class="w-full"
 					:maxlength="128"
@@ -159,13 +158,13 @@
 				<Field
 					v-if="licenseType !== 'standard' || current.useStandardLicenseUrl"
 					:label="formatMessage(messages.url)"
-					input-id="license-url"
+					:input-id="licenseUrlId"
 				>
 					<template v-if="licenseType === 'standard'" #label>
 						<span class="sr-only">{{ formatMessage(messages.url) }}</span>
 					</template>
 					<Input
-						id="license-url"
+						:id="licenseUrlId"
 						v-model="current.licenseUrl"
 						type="url"
 						:maxlength="2048"
@@ -221,7 +220,7 @@
 			<SettingsSection
 				v-if="licenseSummary"
 				:title="formatMessage(messages.whatItMeans)"
-				title-id="license-meaning-title"
+				:title-id="licenseMeaningTitleId"
 				heading="h3"
 			>
 				<div class="rounded-xl border border-solid border-surface-4 bg-surface-2 p-4">
@@ -268,7 +267,7 @@
 			<SettingsSection
 				v-if="showLicenseText"
 				:title="formatMessage(messages.licenseText)"
-				title-id="license-text-title"
+				:title-id="licenseTextTitleId"
 				heading="h3"
 			>
 				<div
@@ -357,7 +356,7 @@ import {
 } from '@modrinth/ui'
 import { defaultLicenseIds, isAdmin, TeamMemberPermission } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { computed, shallowRef, useTemplateRef } from 'vue'
+import { computed, shallowRef, useId, useTemplateRef } from 'vue'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
@@ -379,6 +378,11 @@ const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const licenseTextModal = useTemplateRef('licenseTextModal')
+const licenseSelectId = useId()
+const licenseNameId = useId()
+const licenseUrlId = useId()
+const licenseMeaningTitleId = useId()
+const licenseTextTitleId = useId()
 const messages = defineMessages({
 	url: { id: 'project.settings.license.url', defaultMessage: 'License URL' },
 	removeUrl: {

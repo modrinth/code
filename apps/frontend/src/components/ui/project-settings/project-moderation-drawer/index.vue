@@ -412,7 +412,7 @@ useEventListener('keydown', (event) => {
 			:state="publishingState"
 			:remaining="remaining"
 			:expanded="open"
-			controls="project-moderation-drawer"
+			:controls="settingsNavigation.moderationDrawerId"
 			:submitting="submitting"
 			@open="openPublishingDetails"
 			@submit="setProcessing"
@@ -426,7 +426,7 @@ useEventListener('keydown', (event) => {
 			class="fixed right-0 top-[47.5%] z-30 -translate-y-1/2"
 			:state="publishingState"
 			:remaining="remaining"
-			controls="project-moderation-drawer"
+			:controls="settingsNavigation.moderationDrawerId"
 			@open="show()"
 			@hover="showOnHover"
 		/>
@@ -439,7 +439,7 @@ useEventListener('keydown', (event) => {
 			<Transition name="moderation-drawer" appear>
 				<aside
 					v-show="open"
-					id="project-moderation-drawer"
+					:id="settingsNavigation.moderationDrawerId"
 					ref="panel"
 					tabindex="-1"
 					aria-label="Review and publishing"

@@ -1,10 +1,11 @@
 import { createContext } from '@modrinth/ui'
 import { useMutationObserver } from '@vueuse/core'
-import { nextTick, onScopeDispose, type Ref, watch } from 'vue'
+import { nextTick, onScopeDispose, type Ref, useId, watch } from 'vue'
 import { isNavigationFailure, NavigationFailureType } from 'vue-router'
 
 const [injectNavigation, provideNavigation] = createContext<{
 	reveal: (path: string, field?: string) => Promise<void>
+	moderationDrawerId: string
 	openModerationChecklist: () => void
 }>('ProjectSettingsNavigation')
 
@@ -15,6 +16,7 @@ export function provideProjectSettingsNavigation(
 	openModerationChecklist: () => void,
 ) {
 	const router = useRouter()
+	const moderationDrawerId = useId()
 	let pendingField: string | undefined
 	let pendingPath: string | undefined
 	let sequence = 0
@@ -86,6 +88,7 @@ export function provideProjectSettingsNavigation(
 		clearHighlight?.()
 	})
 	provideNavigation({
+		moderationDrawerId,
 		openModerationChecklist,
 		async reveal(path, field) {
 			const request = ++sequence

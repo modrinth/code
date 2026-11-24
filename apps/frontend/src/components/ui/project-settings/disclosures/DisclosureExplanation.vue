@@ -5,7 +5,6 @@ import { useId } from 'vue'
 defineProps<{
 	variant?: 'settings' | 'review'
 	title: string
-	titleFor?: string
 	optional?: boolean
 	disabled?: boolean
 	placeholder?: string
@@ -16,9 +15,9 @@ const inputId = useId()
 </script>
 
 <template>
-	<Field :label="title" :input-id="titleFor ?? inputId" :label-optional="optional">
+	<Field :label="title" :input-id="inputId" :label-optional="optional">
 		<Textarea
-			:id="titleFor ?? inputId"
+			:id="inputId"
 			v-model="model"
 			:rows="3"
 			:resize="resize"

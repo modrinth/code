@@ -58,7 +58,6 @@
 			:current-member="!!currentMember"
 			:loaders="tags.loaders"
 			:game-versions="tags.gameVersions"
-			:base-id="baseDropdownId"
 			:version-link="
 				(version: any) =>
 					`/${project.project_type}/${
@@ -330,8 +329,6 @@ const versionsWithDisplayUrl = computed(() =>
 )
 
 const emit = defineEmits(['onDownload'])
-
-const baseDropdownId = useId()
 
 function getPrimaryFile(version: Labrinth.Versions.v3.Version) {
 	return version.files?.find((x) => x.primary) || version.files?.[0]

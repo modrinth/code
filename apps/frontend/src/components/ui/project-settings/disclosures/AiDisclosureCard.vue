@@ -136,7 +136,6 @@ function setUse(use: AiUsage, enabled: boolean) {
 			<DisclosureExplanation
 				v-model="model.note"
 				:title="formatMessage(commonMessages.explanationLabel)"
-				title-for="ai-disclosure-note"
 				optional
 				:variant="variant"
 				:resize="showLockControls ? 'vertical' : 'none'"

@@ -5,14 +5,14 @@
 			<div class="font-semibold text-contrast">Select modpack</div>
 
 			<div class="flex flex-col gap-6 rounded-2xl border border-solid border-surface-5 p-4">
-				<Field label="Project" input-id="compatibility-modpack-project">
+				<Field label="Project" :input-id="projectInputId">
 					<ProjectCombobox
 						v-model="selectedProjectId"
 						:project-types="['modpack']"
 						:exclude-project-ids="[currentProjectId]"
 						placeholder="Select modpack"
 						search-placeholder="Search by name or paste ID..."
-						:search-input-attrs="{ id: 'compatibility-modpack-project' }"
+						:search-input-attrs="{ id: projectInputId }"
 						loading-message="Loading..."
 						no-results-message="No results found"
 						include-user-unlisted-projects
@@ -20,13 +20,13 @@
 					/>
 				</Field>
 
-				<Field v-if="selectedProjectId" label="Version" input-id="compatibility-modpack-version">
+				<Field v-if="selectedProjectId" label="Version" :input-id="versionInputId">
 					<Combobox
 						v-model="selectedVersionId"
 						placeholder="Select version"
 						:options="versionOptions"
 						:searchable="true"
-						:search-input-attrs="{ id: 'compatibility-modpack-version' }"
+						:search-input-attrs="{ id: versionInputId }"
 						search-placeholder="Search versions..."
 						:no-options-message="versionsLoading ? 'Loading...' : 'No results found'"
 					/>
@@ -75,7 +75,7 @@ import {
 	TagItem,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, useId, watch } from 'vue'
 
 import { injectServerCompatibilityContext } from '~/providers/manage-server-compatibility-modal'
 
@@ -85,6 +85,8 @@ const { project, selectedProjectId, selectedVersionId } = injectServerCompatibil
 const currentProjectId = computed(() => project.value?.id)
 const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
+const projectInputId = useId()
+const versionInputId = useId()
 const auth = await useAuth()
 
 interface VersionInfo {

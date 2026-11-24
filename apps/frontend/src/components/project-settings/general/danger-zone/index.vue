@@ -1,5 +1,5 @@
 <template>
-	<SettingsSection :title="formatMessage(messages.dangerZone)" title-id="danger-zone-title" danger>
+	<SettingsSection :title="formatMessage(messages.dangerZone)" :title-id="dangerZoneTitleId" danger>
 		<ConfirmModal
 			ref="confirmModal"
 			:title="formatMessage(messages.deleteConfirmationTitle)"
@@ -44,6 +44,7 @@ import {
 	injectProjectPageContext,
 	useVIntl,
 } from '@modrinth/ui'
+import { useId } from 'vue'
 
 import { ensurePrivileged, isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
 
@@ -53,6 +54,7 @@ import OwnershipActions from './ownership-actions.vue'
 import DangerZonePanel from './panel.vue'
 
 const { formatMessage } = useVIntl()
+const dangerZoneTitleId = useId()
 const { addNotification } = injectNotificationManager()
 const { projectV3: project, currentMember } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()

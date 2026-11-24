@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CheckIcon, SERVER_CATEGORY_ICON_MAP, StarIcon } from '@modrinth/assets'
 import { Button, formatCategory, FormattedTag, TagIcon, useVIntl } from '@modrinth/ui'
+import { useId } from 'vue'
 
 import SettingsSection from '../settings-section.vue'
 import type { Category, CategoryGroup } from './types'
@@ -14,6 +15,7 @@ defineProps<{
 }>()
 const emit = defineEmits<{ toggle: [tag: string] }>()
 const { formatMessage } = useVIntl()
+const groupTitleId = useId()
 
 function categoryIconName(category: Category) {
 	return category.project_type === 'minecraft_java_server'
@@ -32,7 +34,7 @@ function categoryIconName(category: Category) {
 			v-for="group in groups"
 			:key="group.id"
 			:title="group.title"
-			:title-id="`tags-${group.id}`"
+			:title-id="`${groupTitleId}-${group.id}`"
 			:subtitle="group.description"
 			heading="h3"
 		>
