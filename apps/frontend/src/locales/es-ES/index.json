@@ -9,7 +9,7 @@
     "message": "Aceptar todos"
   },
   "ads-consent.body": {
-    "message": "Los anuncios hace Modrinth posible y financian pagos a creadores. Nuestros socios pueden almacenar o acceder cookies en el sitio para personalizar anuncios y medir el rendimiento."
+    "message": "Los anuncios hacen posible a Modrinth y financian los pagos a los creadores. Nuestros socios pueden almacenar o acceder a cookies en el sitio para personalizar los anuncios y medir su rendimiento"
   },
   "ads-consent.manage": {
     "message": "Gestionar preferencias"
@@ -18,7 +18,7 @@
     "message": "Rechazar todos"
   },
   "ads-consent.title": {
-    "message": "Tu privacidad y como anuncios soportan Modrinth"
+    "message": "Tu privacidad y cómo los anuncios sustentan a Modrinth"
   },
   "analytics.action.add": {
     "message": "Añadir"
@@ -51,7 +51,7 @@
     "message": "Descargar fuente"
   },
   "analytics.breakdown.game-version": {
-    "message": "Versión de juego"
+    "message": "Versión del juego"
   },
   "analytics.breakdown.generic": {
     "message": "Desglose"
@@ -87,7 +87,7 @@
     "message": "Mostrar menos"
   },
   "analytics.chart.action.show-top-eight": {
-    "message": "Mostrar top 8"
+    "message": "Mostrar los 8 principales"
   },
   "analytics.chart.axis.playtime-hours": {
     "message": "{hours} h"
@@ -99,16 +99,16 @@
     "message": "Anotaciones"
   },
   "analytics.chart.controls.aria": {
-    "message": "Control de gráficos de las estadísticas, {activeCount}"
+    "message": "Control de gráficos de analíticas, {activeCount}"
   },
   "analytics.chart.controls.button": {
     "message": "Controles"
   },
   "analytics.chart.controls.dialog-aria": {
-    "message": "Controles de gráficos de Estadísticas"
+    "message": "Controles de gráficos de analíticas"
   },
   "analytics.chart.controls.display": {
-    "message": "Visualizador"
+    "message": "Visualización"
   },
   "analytics.chart.controls.modrinth-events": {
     "message": "Eventos de Modrinth"
@@ -120,19 +120,19 @@
     "message": "No hay eventos de proyecto en el gráfico."
   },
   "analytics.chart.controls.previous-period": {
-    "message": "Periodo previo"
+    "message": "Periodo anterior"
   },
   "analytics.chart.controls.project-events": {
-    "message": "Eventos de proyecto"
+    "message": "Eventos del proyecto"
   },
   "analytics.chart.controls.ratio": {
     "message": "Intervalo"
   },
   "analytics.chart.empty.select-table-items": {
-    "message": "Selecciona ítems de la tabla inferior para ver tus datos."
+    "message": "Selecciona elementos de la tabla inferior para ver tus datos."
   },
   "analytics.chart.events.count-aria": {
-    "message": "{count, plural, one {# evento de estadisticas} other {# eventos de estadisticas}}"
+    "message": "{count, plural, one {# evento de analíticas} other {# eventos de analíticas}}"
   },
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>: {title}"
@@ -141,22 +141,22 @@
     "message": "Ver anuncio"
   },
   "analytics.chart.legend.monetization-details.aria": {
-    "message": "Ver detalles de las estadísticas de monetización"
+    "message": "Ver detalles de las analíticas de monetización"
   },
   "analytics.chart.legend.monetization-details.description": {
-    "message": "Solo las vistas y descargas hechas por Modrinth contarán para la monetización, y las descargas requieren que los usuarios tengan su sesión iniciada."
+    "message": "Solo las visitas y descargas realizadas a través de Modrinth contarán para la monetización. Además, las descargas requieren que los usuarios hayan iniciado sesión."
   },
   "analytics.chart.legend.monetization-details.title": {
-    "message": "Detalles de las estadísticas de Monetización"
+    "message": "Detalles de las analíticas de monetización"
   },
   "analytics.chart.legend.previous-period-suffix": {
-    "message": "{name} (Per. Prev.)"
+    "message": "{name} (Per. anterior)"
   },
   "analytics.chart.render-limit.description": {
     "message": "Mostrar todas las líneas seleccionadas de la tabla puede causar problemas de rendimiento en la página."
   },
   "analytics.chart.render-limit.header": {
-    "message": "¿Mostrar todas las {count} líneas en el gráfico?"
+    "message": "¿Mostrar las {count} líneas en el gráfico?"
   },
   "analytics.chart.table-selection.all": {
     "message": "Mostrando {itemType, select, project {{count, plural, one {el proyecto} other {todos los proyectos}}} country {{count, plural, one {el país} other {todos los países}}} monetization {{count, plural, one {el valor de monetización} other {todos los valores de monetización}}} downloadSource {{count, plural, one {la fuente de descarga} other {todas las fuentes de descarga}}} downloadReason {{count, plural, one {el motivo de descarga} other {todos los motivos de descarga}}} member {{count, plural, one {el miembro} other {todos los miembros}}} projectVersion {{count, plural, one {la versión del proyecto} other {todas las versiones del proyecto}}} loader {{count, plural, one {el cargador} other {todos los cargadores}}} gameVersion {{count, plural, one {la versión del juego} other {todas las versiones del juego}}} other {{count, plural, one {el elemento} other {todos los elementos}}}} de la tabla"
