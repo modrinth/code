@@ -351,6 +351,7 @@ pub async fn setup_minecraft_command(
         #[cfg(not(target_os = "macos"))]
         {
             args.push("-Dmodrinth.sandboxagent.transform.openuri=true".into());
+            #[cfg(not(windows))]
             args.push("-Dmodrinth.sandboxagent.transform.dragdrop=true".into());
             args.push(
                 "-Dmodrinth.sandboxagent.transform.filedialog=true".into(),

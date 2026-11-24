@@ -67,15 +67,19 @@ use parking_lot::{Mutex, RwLock};
 use uuid::Uuid;
 
 use crate::{
-    SandboxArg, SandboxCommand,
+    SandboxArg, SandboxCommand, SandboxExitStatus,
     backend::{
-        Backend, ExposedPath, SandboxChild, SandboxEnv, SandboxHandle,
-        SandboxHandleOp, pathset::ReadWritePathSet,
+        Backend, ExposedPath, SandboxChild, SandboxChildOp, SandboxEnv,
+        SandboxHandle, SandboxHandleOp, pathset::ReadWritePathSet,
     },
     helper::MakeHelper,
 };
 
-use super::acl::{AppliedAclLedger, Grant, PermissionType, paths_equal};
+use super::{
+    WindowsChild,
+    acl::{AppliedAclLedger, Grant, PermissionType, paths_equal},
+    drag_intercept::DragInterceptHandle,
+};
 
 #[derive(Debug)]
 pub struct AppContainer;
@@ -428,18 +432,28 @@ fn spawn(
         .wrap_err("activating AppContainer ACL instance")?;
     drop(prepared);
 
+    let handle = WindowsSandboxHandle {
+        path_set: Arc::new(Mutex::new(path_set)),
+        app_container_sid: Arc::new(app_container_sid_string),
+        acl_instance_id,
+        expose_lock: Arc::new(Mutex::new(())),
+    };
+    let drag_intercept = start_drag_intercept(
+        &child,
+        &command.app_container_name.as_os_str().to_string_lossy(),
+        handle.clone(),
+    );
+
     let mut child = crate::SandboxChild {
         stdin: pipes.stdin,
         stdout: pipes.stdout,
         stderr: pipes.stderr,
         on_finish: command.on_finish,
-        handle: SandboxHandle::AppContainer(WindowsSandboxHandle {
-            path_set: Arc::new(Mutex::new(path_set)),
-            app_container_sid: Arc::new(app_container_sid_string),
-            acl_instance_id,
-            expose_lock: Arc::new(Mutex::new(())),
+        handle: SandboxHandle::AppContainer(handle),
+        imp: SandboxChild::AppContainer(AppContainerChild {
+            _drag_intercept: drag_intercept,
+            child,
         }),
-        imp: SandboxChild::AppContainer(child),
     };
 
     for on_start in command.on_start {
@@ -447,6 +461,46 @@ fn spawn(
     }
 
     Ok(child)
+}
+
+fn start_drag_intercept(
+    child: &WindowsChild,
+    name: &str,
+    sandbox: WindowsSandboxHandle,
+) -> Option<DragInterceptHandle> {
+    match DragInterceptHandle::start(child.id()?, name, sandbox) {
+        Ok(handle) => Some(handle),
+        Err(err) => {
+            tracing::error!("unable to start drag intercept: {err:#}");
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct AppContainerChild {
+    /// Must be dropped before `child`, as its process ID can be reused after that.
+    _drag_intercept: Option<DragInterceptHandle>,
+    child: WindowsChild,
+}
+
+#[async_trait]
+impl SandboxChildOp for AppContainerChild {
+    fn id(&self) -> Option<u32> {
+        self.child.id()
+    }
+
+    fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>> {
+        self.child.try_wait()
+    }
+
+    async fn wait(&mut self) -> Result<SandboxExitStatus> {
+        self.child.wait().await
+    }
+
+    async fn kill(&mut self) -> Result<()> {
+        self.child.kill().await
+    }
 }
 
 #[derive(Clone)]
@@ -470,6 +524,20 @@ impl SandboxHandleOp for WindowsSandboxHandle {
         path: &Path,
         allow_write: bool,
     ) -> eyre::Result<ExposedPath> {
+        let is_accessible = |path: &Path| {
+            if allow_write {
+                self.is_path_writeable(path)
+            } else {
+                self.is_path_readable(path)
+            }
+        };
+
+        // The sandboxed process could have replaced anything it can write to
+        // with a link, so this has to be checked before resolving the path
+        if is_accessible(path) {
+            return Ok(ExposedPath::Direct);
+        }
+
         if allow_write {
             // Try create an empty file if one doesn't exist yet
             // Save dialogs return paths which may not exist, creating
@@ -509,12 +577,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
 
         let _expose_guard = self.expose_lock.lock();
 
-        let already_accessible = if allow_write {
-            self.path_set.lock().can_write(path.to_path_buf())
-        } else {
-            self.path_set.lock().can_read(path.to_path_buf())
-        };
-        if already_accessible {
+        if is_accessible(&path) {
             return Ok(ExposedPath::Direct);
         }
 
@@ -533,10 +596,6 @@ impl SandboxHandleOp for WindowsSandboxHandle {
 
         let acl_ledger = AppliedAclLedger::open(&self.app_container_sid)
             .wrap_err("opening AppContainer ACL ledger")?;
-        let changed_grants = acl_ledger
-            .add_grants(self.acl_instance_id, grants)
-            .wrap_err("recording dynamic AppContainer ACL grants")?;
-
         let sid = self
             .app_container_sid
             .encode_wide()
@@ -557,16 +616,28 @@ impl SandboxHandleOp for WindowsSandboxHandle {
             unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(app_container_sid.0))) };
         }
 
-        for grant in changed_grants {
-            let grant_path = PathBuf::from(&grant.path);
-            set_acl(&app_container_sid, &grant_path, grant.permission)
-                .wrap_err_with(|| {
-                    format!(
-                        "granting dynamic sandbox {:?} access to {grant_path:?}",
-                        grant.permission
+        acl_ledger
+            .add_grants(
+                self.acl_instance_id,
+                grants,
+                |grant| {
+                    set_acl(
+                        &app_container_sid,
+                        Path::new(&grant.path),
+                        grant.permission,
                     )
-                })?;
-        }
+                    .wrap_err_with(|| {
+                        format!(
+                            "granting dynamic sandbox {:?} access to {:?}",
+                            grant.permission, grant.path
+                        )
+                    })
+                },
+                |grant| {
+                    remove_from_acl(&app_container_sid, Path::new(&grant.path))
+                },
+            )
+            .wrap_err("adding dynamic AppContainer ACL grants")?;
 
         if allow_write {
             self.path_set.lock().insert_writeable(path);
@@ -746,7 +817,7 @@ fn try_set_network_isolation(app_container: &PSID) -> Result<()> {
     Ok(())
 }
 
-fn is_access_denied(err: &eyre::Report) -> bool {
+pub(super) fn is_access_denied(err: &eyre::Report) -> bool {
     err.downcast_ref::<std::io::Error>().is_some_and(|err| {
         err.kind() == ErrorKind::PermissionDenied
             || err.raw_os_error().unwrap_or(0)

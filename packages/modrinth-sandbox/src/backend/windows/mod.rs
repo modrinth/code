@@ -56,8 +56,10 @@ use crate::{
 
 mod acl;
 pub(crate) mod appcontainer;
+mod drag_intercept;
 pub(crate) mod runas;
 
+pub(crate) use appcontainer::AppContainerChild;
 pub use appcontainer::WindowsSandboxHandle;
 
 pub(crate) struct ProcThreadAttribute {

@@ -954,11 +954,24 @@ impl SandboxApiService {
         }
     }
 
+    /// Exposes a file which was drag-dropped on the game.
+    ///
+    /// This is only necessary on Linux X11.
+    /// On Windows, the drag_intercept.rs code intercepts the drop, grants access, and forwards it.
+    /// On macOS, the OS grants access before sending the drop
+    /// On Wayland, the game receives a FD which it can use with the xdg document portal to
+    /// receive access to the file through FUSE.
+    ///
+    /// Since this is only necessary on Linux, we return 403 for the other platforms
     async fn handle_request_request_access(
         self,
         params: &str,
         child_state: Option<ServiceChildState>,
     ) -> Result<PathBuf, RequestStatus> {
+        if cfg!(any(windows, target_os = "macos")) {
+            return Err(RequestStatus::Forbidden);
+        }
+
         let Some(child_state) = child_state else {
             return Err(RequestStatus::InternalServerError);
         };

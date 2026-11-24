@@ -73,6 +73,8 @@ use windows::{
 };
 use winreg::{RegKey, enums::HKEY_CURRENT_USER};
 
+use super::appcontainer::is_access_denied;
+
 const REGISTRY_BASE: &str = r"Software\MinecraftSandbox";
 const GRANT_VALUE: &str = "Grant";
 const SYNCHRONIZE_PROCESS: PROCESS_ACCESS_RIGHTS =
@@ -182,42 +184,70 @@ impl AppliedAclLedger {
         LockedAclLedger::open(&self.key, mutex)
     }
 
+    /// Records `grants` for an instance, and calls `apply` for each grant whose
+    /// ACL entry needs to be added or upgraded.
+    ///
+    /// If this fails, grants which weren't applied are removed again. Otherwise
+    /// they would be treated as if they were applied, and the next instance to
+    /// be spawned would apply them, possibly using the elevated helper.
+    ///
+    /// `revoke` is called to clean up a grant which may be partially applied.
     pub fn add_grants(
         &self,
         instance_id: Uuid,
         grants: Vec<Grant>,
-    ) -> Result<Vec<Grant>> {
+        apply: impl Fn(&Grant) -> Result<()>,
+        revoke: impl Fn(&Grant) -> Result<()>,
+    ) -> Result<()> {
         let mut ledger = self.lock()?;
         let old_effective = effective_union(&ledger.state, |_| true);
-        let instance = ledger
-            .state
-            .instances
-            .iter_mut()
-            .find(|instance| instance.id == instance_id)
-            .ok_or_else(|| {
-                io::Error::new(
-                    io::ErrorKind::NotFound,
-                    "active ACL instance not found",
-                )
-            })?;
-        instance.grants.extend(grants);
-        instance.grants = normalize_grants(instance.grants.iter());
-        let desired_effective = effective_union(&ledger.state, |_| true);
-        let changed = desired_effective
-            .iter()
-            .filter(|desired| {
-                old_effective
-                    .iter()
-                    .find(|old| paths_equal(&old.path, &desired.path))
-                    .is_none_or(|old| {
-                        permission_strength(desired.permission)
-                            > permission_strength(old.permission)
-                    })
+        let old_grants = ledger.instance_mut(instance_id)?.grants.clone();
+        ledger.instance_mut(instance_id)?.grants =
+            normalize_grants(old_grants.iter().chain(&grants));
+
+        let find_old = |grant: &Grant| {
+            old_effective
+                .iter()
+                .find(|old| paths_equal(&old.path, &grant.path))
+        };
+        let mut pending = effective_union(&ledger.state, |_| true);
+        pending.retain(|grant| {
+            find_old(grant).is_none_or(|old| {
+                permission_strength(grant.permission)
+                    > permission_strength(old.permission)
             })
-            .cloned()
-            .collect();
+        });
         ledger.persist()?;
-        Ok(changed)
+
+        for (index, grant) in pending.iter().enumerate() {
+            let Err(err) = apply(grant) else {
+                continue;
+            };
+
+            let mut applied = &pending[..index];
+            // Traverse isn't inherited, so it can't be partially applied
+            if grant.permission != PermissionType::Traverse {
+                // Revoke first in order to ensure any partially applied permissions
+                // are cleaned up before applying the old grant
+                let reverted = revoke(grant)
+                    .and_then(|_| find_old(grant).map_or(Ok(()), &apply));
+                if let Err(revert_err) = reverted
+                    && !is_access_denied(&revert_err)
+                {
+                    tracing::error!(
+                        path = grant.path,
+                        "unable to revert failed ACL grant: {revert_err:#}"
+                    );
+                    applied = &pending[..=index];
+                }
+            }
+
+            ledger.instance_mut(instance_id)?.grants =
+                normalize_grants(old_grants.iter().chain(applied));
+            ledger.persist()?;
+            return Err(err);
+        }
+        Ok(())
     }
 }
 
@@ -248,6 +278,20 @@ impl<'a> LockedAclLedger<'a> {
             state,
             _mutex: mutex,
         })
+    }
+
+    fn instance_mut(&mut self, id: Uuid) -> Result<&mut Instance> {
+        Ok(self
+            .state
+            .instances
+            .iter_mut()
+            .find(|instance| instance.id == id)
+            .ok_or_else(|| {
+                io::Error::new(
+                    io::ErrorKind::NotFound,
+                    "ACL instance not found",
+                )
+            })?)
     }
 
     /// Removes stale instances, and prepares the ledger to add a new instance.
@@ -332,24 +376,9 @@ impl PreparedInstance<'_> {
     }
 
     pub fn activate(&mut self, process: ProcessIdentity) -> Result<()> {
-        let instance = self.instance_mut()?;
+        let instance = self.ledger.instance_mut(self.id)?;
         instance.state = InstanceState::Running { process };
         self.ledger.persist()
-    }
-
-    fn instance_mut(&mut self) -> Result<&mut Instance> {
-        Ok(self
-            .ledger
-            .state
-            .instances
-            .iter_mut()
-            .find(|instance| instance.id == self.id)
-            .ok_or_else(|| {
-                io::Error::new(
-                    io::ErrorKind::NotFound,
-                    "pending ACL instance not found",
-                )
-            })?)
     }
 }
 

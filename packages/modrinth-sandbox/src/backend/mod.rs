@@ -168,7 +168,7 @@ pub enum SandboxChild {
     #[cfg(target_os = "macos")]
     Macos(macos::MacosChild),
     #[cfg(target_os = "windows")]
-    AppContainer(windows::WindowsChild),
+    AppContainer(windows::AppContainerChild),
 }
 
 /// Describes the result of a process after it has terminated.
