@@ -29,7 +29,7 @@ defineProps<{
 				</component>
 				<slot name="actions" />
 			</div>
-			<p v-if="subtitle || $slots.subtitle" class="mb-0 mt-2 text-secondary">
+			<p v-if="subtitle || $slots.subtitle" class="mb-0 mt-2 leading-tight text-secondary">
 				<slot name="subtitle">{{ subtitle }}</slot>
 			</p>
 		</div>
