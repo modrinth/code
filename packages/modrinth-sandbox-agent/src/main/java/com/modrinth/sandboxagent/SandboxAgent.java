@@ -21,9 +21,12 @@ public class SandboxAgent {
         String minecraftVersionJson = readResourceToString("/version.json");
         MinecraftVersionInfo minecraftVersionInfo = new MinecraftVersionInfo(minecraftVersionJson);
 
-        if (System.getProperty("modrinth.sandboxagent.transform.openuri", "").equals("true")) {
+        boolean transformOpenUri = System.getProperty("modrinth.sandboxagent.transform.openuri", "").equals("true");
+        if (transformOpenUri) {
             // Replaces Util$OS#openUri with sandbox api call
             OpenUriTransformation.register(transformerMap, minecraftVersionInfo);
+            // Replaces running open commands (xdg-open, rundll32, etc.) with sandbox api call
+            ProcessBuilderTransformation.register(transformerMap);
         }
         if (System.getProperty("modrinth.sandboxagent.transform.dragdrop", "").equals("true")) {
             // Requests access to certain files outside the sandbox when drag-dropping
@@ -40,7 +43,17 @@ public class SandboxAgent {
             AuthTransformation.register(transformerMap, minecraftVersionInfo);
         }
 
-		inst.addTransformer(transformerMap);
+		inst.addTransformer(transformerMap, true);
+
+        if (transformOpenUri) {
+            // ProcessBuilder might have been loaded before our transformer was added
+            try {
+                inst.retransformClasses(ProcessBuilder.class);
+            } catch (Throwable t) {
+                System.err.println("Unable to transform ProcessBuilder");
+                t.printStackTrace();
+            }
+        }
 	}
 
     public static String readResourceToString(String file) {

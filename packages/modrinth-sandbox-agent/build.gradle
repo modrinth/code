@@ -48,5 +48,6 @@ tasks.jar {
     dependsOn(shadowJar)
     manifest {
         attributes["Premain-Class"] = "com.modrinth.sandboxagent.SandboxAgent"
+        attributes["Can-Retransform-Classes"] = "true"
     }
 }
