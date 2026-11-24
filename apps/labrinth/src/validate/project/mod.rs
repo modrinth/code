@@ -49,6 +49,7 @@ pub enum ProjectNagKind {
     ProjectSummaryNonStandardText,
     ProjectSummaryNonEnglish,
     ProjectSummaryMatchesTitle,
+    AddSummary,
     SummaryTooShort,
     ProjectSummarySpam,
     SummarySpecialFormatting,

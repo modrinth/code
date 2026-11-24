@@ -76,10 +76,12 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
         ));
     }
     let summary_length = js_string_length(&normalized_summary);
-    if !summary.is_empty()
-        && !contains_link
-        && summary_length < MIN_SUMMARY_CHARS
-    {
+    if normalized_summary.is_empty() {
+        nags.push(ProjectNag::new(
+            ProjectNagKind::AddSummary,
+            ProjectNagSeverity::Required,
+        ));
+    } else if !contains_link && summary_length < MIN_SUMMARY_CHARS {
         nags.push(
             ProjectNag::new(
                 ProjectNagKind::SummaryTooShort,

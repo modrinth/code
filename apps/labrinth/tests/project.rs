@@ -1477,6 +1477,63 @@ async fn test_leaving_review_skips_validation() {
 }
 
 #[actix_rt::test]
+async fn test_project_summary_nags_after_edit() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let slug = &test_env.dummy.project_alpha.project_slug;
+
+            for (summary, expected_nag) in [
+                ("", Some("add_summary")),
+                ("  ", Some("add_summary")),
+                ("Hi", Some("summary_too_short")),
+                ("Adds configurable tools for exploring new worlds.", None),
+            ] {
+                let response = api
+                    .edit_project(
+                        slug,
+                        json!({ "summary": summary }),
+                        USER_USER_PAT,
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::NO_CONTENT);
+
+                let request = test::TestRequest::get()
+                    .uri(&format!("/v3/project/{slug}/validate"))
+                    .append_pat(USER_USER_PAT)
+                    .to_request();
+                let response = api.call(request).await;
+                assert_status!(&response, StatusCode::OK);
+                let validation: serde_json::Value =
+                    test::read_body_json(response).await;
+                let summary_nags: Vec<_> = validation["nags"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .filter(|nag| {
+                        matches!(
+                            nag["kind"].as_str(),
+                            Some("add_summary" | "summary_too_short")
+                        )
+                    })
+                    .map(|nag| {
+                        assert_eq!(nag["severity"], "required");
+                        nag["kind"].as_str().unwrap()
+                    })
+                    .collect();
+                assert_eq!(
+                    summary_nags,
+                    Vec::from_iter(expected_nag),
+                    "{summary:?}"
+                );
+            }
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
 async fn test_description_similarity_to_summary() {
     with_test_environment(
 		None,
