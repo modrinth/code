@@ -226,6 +226,14 @@ pub async fn rate_limit_middleware(
         return Ok(next.call(req).await?.map_into_left_body());
     }
 
+    let is_cors_preflight = req.method() == actix_web::http::Method::OPTIONS
+        && req.headers().contains_key(
+            actix_web::http::header::ACCESS_CONTROL_REQUEST_METHOD,
+        );
+    if is_cors_preflight {
+        return Ok(next.call(req).await?.map_into_left_body());
+    }
+
     if let Some(key) = req.headers().get("x-ratelimit-key")
         && key.to_str().ok() == Some(&ENV.RATE_LIMIT_IGNORE_KEY)
     {

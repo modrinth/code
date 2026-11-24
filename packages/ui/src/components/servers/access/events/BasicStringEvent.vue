@@ -53,6 +53,10 @@ const messages = defineMessages({
 		id: 'servers.audit-log.event.server-killed',
 		defaultMessage: 'Killed server',
 	},
+	serverCrashRestarted: {
+		id: 'servers.audit-log.event.server-crash-restarted',
+		defaultMessage: 'Server automatically restarted after a crash',
+	},
 	sftpLogin: {
 		id: 'servers.audit-log.event.sftp-login',
 		defaultMessage: 'Logged in via SFTP',
@@ -81,6 +85,7 @@ const actionMessages: Record<string, MessageDescriptor> = {
 	server_stopped: messages.serverStopped,
 	server_restarted: messages.serverRestarted,
 	server_killed: messages.serverKilled,
+	server_crash_restarted: messages.serverCrashRestarted,
 	sftp_login: messages.sftpLogin,
 	sftp_credentials_rolled: messages.sftpCredentialsRolled,
 	console_cleared: messages.consoleCleared,

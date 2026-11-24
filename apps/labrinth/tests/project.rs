@@ -1606,7 +1606,7 @@ async fn test_plugin_and_datapack_validation_use_mod_tags() {
                 .filter(|category| category.project_type == "mod")
                 .map(|category| category.name)
                 .collect::<Vec<_>>();
-            assert!(mod_categories.len() > 3);
+            assert!(mod_categories.len() > 8);
 
             for (project_type, loader, file) in [
                 ("plugin", "bukkit", TestFile::build_random_plugin()),
@@ -1641,9 +1641,8 @@ async fn test_plugin_and_datapack_validation_use_mod_tags() {
                 assert_status!(&response, StatusCode::OK);
                 let validation: serde_json::Value =
                     test::read_body_json(response).await;
-                let all_tags_selected = validation["nags"]
-                    .as_array()
-                    .unwrap()
+                let nags = validation["nags"].as_array().unwrap();
+                let all_tags_selected = nags
                     .iter()
                     .find(|nag| nag["kind"] == "all_tags_selected")
                     .expect("all shared mod tags should be detected as selected");
@@ -1652,6 +1651,7 @@ async fn test_plugin_and_datapack_validation_use_mod_tags() {
                     all_tags_selected["details"]["total_available_tags"],
                     mod_categories.len()
                 );
+                assert!(nags.iter().all(|nag| nag["kind"] != "too_many_tags"));
             }
         },
     )

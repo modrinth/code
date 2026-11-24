@@ -268,6 +268,10 @@ export const actionLogActionMessages = defineMessages({
 		id: 'servers.access-page.activity-log-filter.action.server-killed',
 		defaultMessage: 'Killed server',
 	},
+	server_crash_restarted: {
+		id: 'servers.access-page.activity-log-filter.action.server-crash-restarted',
+		defaultMessage: 'Server automatically restarted after a crash',
+	},
 	port_allocation_added: {
 		id: 'servers.access-page.activity-log-filter.action.port-allocation-added',
 		defaultMessage: 'Added port allocation',
