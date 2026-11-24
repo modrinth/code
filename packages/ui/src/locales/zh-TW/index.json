@@ -731,9 +731,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "請待操作完成後再進行編輯。"
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "在這個模組包之上新增額外內容"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "未安裝內容"
   },
@@ -4643,9 +4640,6 @@
   "project.versions.filter.channel": {
     "defaultMessage": "更新通道"
   },
-  "project.versions.filter.selected-count": {
-    "defaultMessage": "已選取 {count, number} 項"
-  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "切換篩選 {filter}"
   },
@@ -5161,12 +5155,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "無法更新身分"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "全部"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "身分：{role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "編輯者"

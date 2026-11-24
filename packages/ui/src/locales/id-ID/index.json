@@ -383,9 +383,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Mohon tunggu hingga proses selesai sebelum menyunting konten."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Tambahkan konten tambahan di atas paket mod ini"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Belum ada konten yang terpasang"
   },

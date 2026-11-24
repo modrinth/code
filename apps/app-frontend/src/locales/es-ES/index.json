@@ -3620,14 +3620,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "¿Escapando de otro lanzador?"
   },
-  "app.welcome-screen.more-options": {
-    "message": "Más opciones"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Pulsa <shortcut>N</shortcut> para crear rápidamente una instancia"
-  },
-  "app.welcome-screen.skip": {
-    "message": "Omitir"
   },
   "app.welcome-screen.title": {
     "message": "Bienvenido a Modrinth"

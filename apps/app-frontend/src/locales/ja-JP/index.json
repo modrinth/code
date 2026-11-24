@@ -3743,14 +3743,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "別のランチャーから移行中ですか？"
   },
-  "app.welcome-screen.more-options": {
-    "message": "その他のオプション"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "<shortcut>N</shortcut>を押してインスタンスをクイック作成"
-  },
-  "app.welcome-screen.skip": {
-    "message": "スキップ"
   },
   "app.welcome-screen.title": {
     "message": "Modrinthへようこそ"

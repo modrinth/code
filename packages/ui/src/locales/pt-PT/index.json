@@ -455,9 +455,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Aguarde essa operação ser finalizada antes de editar o conteúdo."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Adicione mais conteúdo a este modpack"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Nenhum conteúdo instalado"
   },
@@ -2170,9 +2167,6 @@
   },
   "servers.access-page.notification.remove-failed.title": {
     "defaultMessage": "Acesso não conseguiu ser removido"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Todos"
   },
   "servers.access-page.role.owner": {
     "defaultMessage": "Dono"

@@ -3692,14 +3692,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "Меняете лаунчер?"
   },
-  "app.welcome-screen.more-options": {
-    "message": "Дополнительно"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Нажмите <shortcut>Т</shortcut> быстрого создания сборки"
-  },
-  "app.welcome-screen.skip": {
-    "message": "Пропустить"
   },
   "app.welcome-screen.title": {
     "message": "Добро пожаловать в Modrinth"

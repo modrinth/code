@@ -3740,14 +3740,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "In fuga da un altro launcher?"
   },
-  "app.welcome-screen.more-options": {
-    "message": "Altre opzioni"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Premi <shortcut>N</shortcut> per creare un'istanza rapidamente"
-  },
-  "app.welcome-screen.skip": {
-    "message": "Salta"
   },
   "app.welcome-screen.title": {
     "message": "Modrinth ti dà il benvenuto"

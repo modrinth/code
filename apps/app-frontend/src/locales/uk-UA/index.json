@@ -3734,14 +3734,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "Змінили запускач?"
   },
-  "app.welcome-screen.more-options": {
-    "message": "Додаткові опції"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Натисніть <shortcut>N</shortcut> для створення примірника"
-  },
-  "app.welcome-screen.skip": {
-    "message": "Пропустити"
   },
   "app.welcome-screen.title": {
     "message": "Вітаємо в Modrinth"

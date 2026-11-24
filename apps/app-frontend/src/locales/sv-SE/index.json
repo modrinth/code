@@ -3329,9 +3329,6 @@
   "app.welcome-screen.quick-create-hint": {
     "message": "Tryck på <shortcut>N</shortcut> för att snabbt skapa en instans"
   },
-  "app.welcome-screen.skip": {
-    "message": "Hoppa över"
-  },
   "app.welcome-screen.title": {
     "message": "Välkommen till Modrinth"
   },

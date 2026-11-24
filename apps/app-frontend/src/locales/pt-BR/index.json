@@ -3743,14 +3743,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "Escapando de outro inicializador?"
   },
-  "app.welcome-screen.more-options": {
-    "message": "Mais opções"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Pressione <shortcut>N</shortcut> para criar rapidamente uma instância"
-  },
-  "app.welcome-screen.skip": {
-    "message": "Ignorar"
   },
   "app.welcome-screen.title": {
     "message": "Bem-vindo ao Modrinth"

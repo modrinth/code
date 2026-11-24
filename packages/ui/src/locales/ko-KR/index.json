@@ -797,9 +797,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "작업이 완료될 때까지 기다린 후 콘텐츠를 편집하세요."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "이 모드팩에 추가 콘텐츠 추가"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "설치된 콘텐츠 없음"
   },
@@ -4856,9 +4853,6 @@
   "project.versions.filter.channel": {
     "defaultMessage": "채널"
   },
-  "project.versions.filter.selected-count": {
-    "defaultMessage": "{count, number}개 선택됨"
-  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "{filter} 필터 전환"
   },
@@ -5407,12 +5401,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "역할을 업데이트할 수 없습니다"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "모두"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "역할: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "편집자"

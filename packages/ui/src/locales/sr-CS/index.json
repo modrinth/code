@@ -611,9 +611,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Molimo sačekaj da se operacija završi pre nego što promeniš sadržaj."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Dodaj dodatni sadržaj preko ovog modpacka"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Nije instaliran sadržaj"
   },
@@ -4363,12 +4360,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "Uloga nije mogla biti ažuirana"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Sve"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Uloga: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "Urednik"

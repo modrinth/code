@@ -611,9 +611,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "يرجى الانتظار حتى تكتمل العملية قبل تعديل المحتوى."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "إضافة محتوى إضافي إلى المودباك هذا"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "لا يوجد محتوى مثبت"
   },

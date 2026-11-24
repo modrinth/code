@@ -611,9 +611,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Odota toiminnon valmistumista ennen sisällön muokkausta."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Lisää lisäsisältöä modipaketin päälle"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Ei asennettua sisältöä"
   },

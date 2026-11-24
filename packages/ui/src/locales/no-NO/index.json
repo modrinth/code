@@ -389,9 +389,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Vær så snill å vent til operasjonen er fullført før du redigerer innhold."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Legg til yttligere innhold på toppen av denne modpakka"
-  },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Søk etter {count, number} {contentType}..."
   },
@@ -1987,12 +1984,6 @@
   },
   "servers.access-page.notification.member-removed.title": {
     "defaultMessage": "Tilgang fjerna"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Alle"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Rolle: {role}"
   },
   "servers.audit-log.actor.support": {
     "defaultMessage": "Støtte"

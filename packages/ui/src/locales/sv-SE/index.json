@@ -674,9 +674,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Vänta på att operationen klaras innan du redigerar innehåll."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Lägg till ytterligare innehåll över modpaketet"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Inget innehåll installerat"
   },
@@ -4247,9 +4244,6 @@
   "project.versions.filter.channel": {
     "defaultMessage": "Kanal"
   },
-  "project.versions.filter.selected-count": {
-    "defaultMessage": "{count, number} markerade"
-  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Växla filter för {filter}"
   },
@@ -4714,12 +4708,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "Roll kunde inte uppdateras"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Alla"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Roll: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "Redigerare"

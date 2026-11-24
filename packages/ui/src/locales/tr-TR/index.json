@@ -722,9 +722,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Lütfen içeriği düzenlemeye devam etmeden önce işlemin nitmesini bekleyin."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Bu mod paketinin üzerine ek içerik ekle"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Hiç içerik kurulmamış"
   },
@@ -4139,9 +4136,6 @@
   "project.versions.filter.channel": {
     "defaultMessage": "Kanal"
   },
-  "project.versions.filter.selected-count": {
-    "defaultMessage": "{count, number} seçildi"
-  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "{filter} olarak filtrele"
   },
@@ -4639,12 +4633,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "Rol güncellenemedi"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Tüm"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Rol: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "Editör"

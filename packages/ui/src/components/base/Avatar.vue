@@ -58,10 +58,6 @@
 	</svg>
 </template>
 
-<script lang="ts">
-const detectionCache = new Map<string, { pixelated: boolean; transparentCorners?: boolean }>()
-</script>
-
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 
@@ -335,6 +331,10 @@ function hash(str: string): number {
 	}
 	return hash
 }
+</script>
+
+<script lang="ts">
+const detectionCache = new Map<string, { pixelated: boolean; transparentCorners?: boolean }>()
 </script>
 
 <style lang="scss" scoped>

@@ -209,9 +209,6 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Karagdagang kontento"
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Dargdagan ng karagdagang kontento sa itaas ng modpack na ito"
-  },
   "content.page-layout.please-wait": {
     "defaultMessage": "Mangyaring maghintay"
   },
@@ -1924,9 +1921,6 @@
   },
   "servers.access-page.activity-log-filter.users": {
     "defaultMessage": "Tagagamit"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Lahat"
   },
   "servers.access-page.role.owner": {
     "defaultMessage": "May-ari"

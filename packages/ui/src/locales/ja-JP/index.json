@@ -617,9 +617,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "コンテンツを編集する前に、操作の完了をお待ちください。"
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "このModパックに追加コンテンツを導入できます"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "コンテンツがインストールされていません"
   },
@@ -4582,12 +4579,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "役割を更新することができませんでした"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "すべて"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "役割: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "編集"

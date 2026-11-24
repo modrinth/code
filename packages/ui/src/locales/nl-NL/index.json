@@ -668,9 +668,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Wacht alsjeblieft tot de bewerking is voltooid voordat je de inhoud bewerkt."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Voeg extra inhoud toe aan dit modpack"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Geen inhoud geïnstalleerd"
   },
@@ -4220,9 +4217,6 @@
   "project.versions.filter.channel": {
     "defaultMessage": "Kanaal"
   },
-  "project.versions.filter.selected-count": {
-    "defaultMessage": "{count, number} geselecteerd"
-  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Filter voor {filter} in- of uitschakelen"
   },
@@ -4720,12 +4714,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "Rol kon niet worden bijgewerkt"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Alle"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Rol: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "Redacteur"

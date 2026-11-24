@@ -3725,14 +3725,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "想从其他启动器迁移实例？"
   },
-  "app.welcome-screen.more-options": {
-    "message": "更多选项"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "按 <shortcut>N</shortcut> 键快速创建实例"
-  },
-  "app.welcome-screen.skip": {
-    "message": "跳过"
   },
   "app.welcome-screen.title": {
     "message": "欢迎使用 Modrinth"

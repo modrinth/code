@@ -371,9 +371,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Sila tunggu sehingga operasi selesai sebelum menyunting kandungan."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Tambahkan kandungan tambahan di atas pek mod ini"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Tiada kandungan dipasang"
   },
@@ -3220,12 +3217,6 @@
   },
   "servers.access-page.notification.invite-sent.title": {
     "defaultMessage": "Jemputan dihantar"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Semua"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Peranan: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "Penyunting"

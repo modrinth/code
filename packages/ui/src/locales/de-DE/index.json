@@ -797,9 +797,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Bitte warte, bis der Vorgang abgeschlossen ist, bevor du Inhalte bearbeitest."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Füge zusätzliche Inhalte zu diesem Modpack hinzu"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Keine Inhalte installiert"
   },
@@ -4856,9 +4853,6 @@
   "project.versions.filter.channel": {
     "defaultMessage": "Kanal"
   },
-  "project.versions.filter.selected-count": {
-    "defaultMessage": "{count, number} ausgewählt"
-  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Filter für {filter} umschalten"
   },
@@ -5407,12 +5401,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "Rolle konnte nicht aktualisiert werden"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Alle"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Rolle: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "Bearbeiter"

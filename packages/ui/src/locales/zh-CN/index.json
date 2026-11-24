@@ -794,9 +794,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "请等待操作完成后再编辑内容。"
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "在这个整合包的基础上添加更多内容"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "没有安装内容"
   },
@@ -4727,9 +4724,6 @@
   "project.versions.filter.channel": {
     "defaultMessage": "版本频道"
   },
-  "project.versions.filter.selected-count": {
-    "defaultMessage": "已选择 {count, number} 项"
-  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "切换 {filter} 筛选器"
   },
@@ -5245,12 +5239,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "角色信息更新失败"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "全部"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "角色：{role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "编辑者"

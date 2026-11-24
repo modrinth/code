@@ -3743,14 +3743,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "다른 런처에서 오셨나요?"
   },
-  "app.welcome-screen.more-options": {
-    "message": "더 많은 옵션"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "<shortcut>N</shortcut> 키를 눌러 인스턴스를 빠르게 생성합니다"
-  },
-  "app.welcome-screen.skip": {
-    "message": "건너뛰기"
   },
   "app.welcome-screen.title": {
     "message": "Modrinth에 오신 것을 환영합니다"

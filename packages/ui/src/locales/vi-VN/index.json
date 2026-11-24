@@ -611,9 +611,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Vui lòng chờ quá trình xử lý hoàn tất trước khi chỉnh sửa nội dung."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Thêm mod vào modpack này"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Chưa cài đặt nội dung nào"
   },
@@ -4097,9 +4094,6 @@
   "project.versions.filter.channel": {
     "defaultMessage": "Kênh"
   },
-  "project.versions.filter.selected-count": {
-    "defaultMessage": "Đã chọn {count, number}"
-  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Bật/tắt bộ lọc {filter}"
   },
@@ -4600,12 +4594,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "Không thể cập nhật vai trò"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Tất cả"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Vai trò: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "Người chỉnh sửa"

@@ -767,9 +767,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Пожалуйста, дождитесь завершения операции перед редактированием."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Добавьте дополнительный контент поверх этой сборки"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Нет контента"
   },
@@ -4709,9 +4706,6 @@
   "project.versions.filter.channel": {
     "defaultMessage": "Канал"
   },
-  "project.versions.filter.selected-count": {
-    "defaultMessage": "{count, plural, one {# выбран} other {# выбрано}}"
-  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Переключить фильтр: {filter}"
   },
@@ -5245,12 +5239,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "Не удалось обновить роль"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Все"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Роль: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "Редактор"

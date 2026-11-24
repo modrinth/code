@@ -3578,14 +3578,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "Een andere lancering wordt ontwist?"
   },
-  "app.welcome-screen.more-options": {
-    "message": "Meer opties"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Druk op <shortcut>N</shortcut> om snel een instantie te maken"
-  },
-  "app.welcome-screen.skip": {
-    "message": "Overslaan"
   },
   "app.welcome-screen.title": {
     "message": "Welkom bij Modrinth"

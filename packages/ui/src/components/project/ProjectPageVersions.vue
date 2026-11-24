@@ -437,12 +437,7 @@
 	</div>
 
 	<div class="mt-3 flex">
-		<Pagination
-			:page="currentPage"
-			class="ml-auto"
-			:count="pageCount"
-			@switch-page="switchPage"
-		/>
+		<Pagination :page="currentPage" class="ml-auto" :count="pageCount" @switch-page="switchPage" />
 	</div>
 </template>
 <script setup lang="ts">

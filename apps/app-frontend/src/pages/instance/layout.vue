@@ -272,8 +272,7 @@ useQuery(
 const instance = computed(() => instanceQuery.data.value)
 const browseTransition = useRouteLinkTransition((route) => route.query.i === instanceId.value)
 const searchTransitionActive = computed(
-	() =>
-		browseTransition.value.active && !!browseTransition.value.route?.path.startsWith('/browse'),
+	() => browseTransition.value.active && !!browseTransition.value.route?.path.startsWith('/browse'),
 )
 
 const {

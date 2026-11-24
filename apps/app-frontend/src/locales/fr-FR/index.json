@@ -3650,14 +3650,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "Vous vous échappez d'un autre launcher ?"
   },
-  "app.welcome-screen.more-options": {
-    "message": "Plus d'options"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Appuyez sur <shortcut>N</shortcut> pour rapidement créer une instance"
-  },
-  "app.welcome-screen.skip": {
-    "message": "Passer"
   },
   "app.welcome-screen.title": {
     "message": "Bienvenue sur Modrinth"
