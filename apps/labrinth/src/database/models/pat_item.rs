@@ -2,10 +2,10 @@ use super::ids::*;
 use crate::database::PgTransaction;
 
 use crate::models::pats::Scopes;
+use anyhow::{Context, Result};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
-use eyre::{Result, WrapErr};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
@@ -53,7 +53,7 @@ impl DBPersonalAccessToken {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting personal access token")?;
+        .context("inserting personal access token")?;
 
         Ok(())
     }
@@ -72,7 +72,7 @@ impl DBPersonalAccessToken {
     {
         Self::get_many(&[id], exec, redis)
             .await
-            .wrap_err("fetching personal access token")
+            .context("fetching personal access token")
             .map(|x| x.into_iter().next())
     }
 
@@ -90,7 +90,7 @@ impl DBPersonalAccessToken {
             .collect::<Vec<_>>();
         DBPersonalAccessToken::get_many(&ids, exec, redis)
             .await
-            .wrap_err("fetching personal access tokens by ID")
+            .context("fetching personal access tokens by ID")
     }
 
     pub async fn get_many<
@@ -130,7 +130,7 @@ impl DBPersonalAccessToken {
                         &slugs,
                     )
                     .fetch(exec)
-                    .map_err(eyre::Report::from)
+                    .map_err(anyhow::Error::from)
                     .try_fold(DashMap::new(), |acc, x| {
                         let pat = DBPersonalAccessToken {
                             id: DBPatId(x.id),
@@ -144,15 +144,15 @@ impl DBPersonalAccessToken {
                         };
 
                         acc.insert(x.id, (Some(x.access_token), pat));
-                        async move { eyre::Ok(acc) }
+                        async move { anyhow::Ok(acc) }
                     })
                     .await
-                    .wrap_err("fetching personal access tokens from database")?;
-                    eyre::Ok(pats)
+                    .context("fetching personal access tokens from database")?;
+                    anyhow::Ok(pats)
                 },
             )
             .await
-            .wrap_err("fetching personal access tokens")?;
+            .context("fetching personal access tokens")?;
 
         Ok(val)
     }
@@ -169,7 +169,7 @@ impl DBPersonalAccessToken {
                 true,
                 &[access_token],
                 |_| async {
-                    eyre::Ok(DashMap::<
+                    anyhow::Ok(DashMap::<
                         i64,
                         (Option<String>, DBPersonalAccessToken),
                     >::new())
@@ -177,7 +177,7 @@ impl DBPersonalAccessToken {
             )
             .await
             .map(|x| x.into_iter().next())
-            .wrap_err("getting cached personal access token")
+            .context("getting cached personal access token")
     }
 
     pub async fn get_user_pats<'a, E>(
@@ -189,7 +189,7 @@ impl DBPersonalAccessToken {
         E: crate::database::Executor<'a, Database = sqlx::Postgres>,
     {
         {
-            let mut redis = redis.connect().await.wrap_err(
+            let mut redis = redis.connect().await.context(
                 "connecting to Redis for user personal access tokens",
             )?;
             let key = redis.key().entity(PATS_USERS_NAMESPACE, user_id.0);
@@ -197,7 +197,7 @@ impl DBPersonalAccessToken {
             let res = redis
                 .get_deserialized::<Vec<i64>>(&key)
                 .await
-                .wrap_err("fetching user personal access tokens from cache")?;
+                .context("fetching user personal access tokens from cache")?;
 
             if let Some(res) = res {
                 return Ok(res.into_iter().map(DBPatId).collect());
@@ -217,9 +217,9 @@ impl DBPersonalAccessToken {
         .map_ok(|x| DBPatId(x.id))
         .try_collect::<Vec<DBPatId>>()
         .await
-        .wrap_err("fetching user personal access tokens from database")?;
+        .context("fetching user personal access tokens from database")?;
 
-        let mut redis = redis.connect().await.wrap_err(
+        let mut redis = redis.connect().await.context(
             "connecting to Redis to cache user personal access tokens",
         )?;
         let key = redis.key().entity(PATS_USERS_NAMESPACE, user_id.0);
@@ -227,7 +227,7 @@ impl DBPersonalAccessToken {
         redis
             .set_serialized(&key, &db_pats, None)
             .await
-            .wrap_err("caching user personal access tokens")?;
+            .context("caching user personal access tokens")?;
         Ok(db_pats)
     }
 
@@ -235,7 +235,7 @@ impl DBPersonalAccessToken {
         clear_pats: Vec<(Option<DBPatId>, Option<String>, Option<DBUserId>)>,
         redis: &RedisPool,
     ) -> Result<()> {
-        let mut redis = redis.connect().await.wrap_err(
+        let mut redis = redis.connect().await.context(
             "connecting to Redis to clear personal access token cache",
         )?;
 
@@ -262,7 +262,7 @@ impl DBPersonalAccessToken {
         redis
             .delete_many(&keys)
             .await
-            .wrap_err("clearing personal access token cache")?;
+            .context("clearing personal access token cache")?;
 
         Ok(())
     }
@@ -279,7 +279,7 @@ impl DBPersonalAccessToken {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("removing personal access token")?;
+        .context("removing personal access token")?;
 
         Ok(Some(()))
     }
@@ -298,7 +298,7 @@ impl DBPersonalAccessToken {
         .map_ok(|x| (DBPatId(x.id), x.access_token))
         .try_collect()
         .await
-        .wrap_err("removing user personal access tokens")?;
+        .context("removing user personal access tokens")?;
 
         Ok(pats)
     }

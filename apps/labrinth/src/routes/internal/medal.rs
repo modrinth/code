@@ -1,5 +1,6 @@
 use crate::database::PgPool;
 use actix_web::{HttpResponse, post, web};
+use anyhow::anyhow;
 use ariadne::ids::UserId;
 use serde::{Deserialize, Serialize};
 
@@ -34,7 +35,7 @@ pub async fn verify(
     _pool: web::Data<PgPool>,
     web::Query(MedalQuery { username: _ }): web::Query<MedalQuery>,
 ) -> Result<HttpResponse, ApiError> {
-    Err(ApiError::Request(eyre::eyre!(
+    Err(ApiError::Request(anyhow!(
         "This offer is no longer available"
     )))
 
@@ -46,10 +47,10 @@ pub async fn verify(
             Offer::Medal,
         )
         .await
-        .wrap_internal_err("executing `RedeemalLookupFields::redeemal_status_by_username_and_offer`")?;
+        .internal_context("executing `RedeemalLookupFields::redeemal_status_by_username_and_offer`")?;
 
     match maybe_fields {
-        None => Err(ApiError::NotFound(eyre::eyre!("resource not found"))),
+        None => Err(ApiError::NotFound(anyhow!("resource not found"))),
         Some(fields) => Ok(HttpResponse::Ok().json(VerifyResponse {
             user_id: fields.user_id.into(),
             redeemed: fields.redeemal_status.is_some(),
@@ -73,7 +74,7 @@ pub async fn redeem(
     // Check the offer hasn't been redeemed yet, then insert into the table.
     // In a transaction to avoid double inserts.
 
-    Err(ApiError::Request(eyre::eyre!(
+    Err(ApiError::Request(anyhow!(
         "This offer is no longer available"
     )))
 
@@ -81,7 +82,7 @@ pub async fn redeem(
     let mut txn = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     let maybe_fields =
         RedeemalLookupFields::redeemal_status_by_username_and_offer(
@@ -90,15 +91,15 @@ pub async fn redeem(
             Offer::Medal,
         )
         .await
-        .wrap_internal_err("executing `RedeemalLookupFields::redeemal_status_by_username_and_offer`")?;
+        .internal_context("executing `RedeemalLookupFields::redeemal_status_by_username_and_offer`")?;
 
     let user_id = match maybe_fields {
         None => {
-            return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+            return Err(ApiError::NotFound(anyhow!("resource not found")));
         }
         Some(fields) => {
             if fields.redeemal_status.is_some() {
-                return Err(ApiError::Conflict(eyre::eyre!(
+                return Err(ApiError::Conflict(anyhow!(
                     "User already redeemed this offer",
                 )));
             }
@@ -121,11 +122,11 @@ pub async fn redeem(
     redeemal
         .insert(&mut txn)
         .await
-        .wrap_internal_err("inserting database records for `redeem`")?;
+        .internal_context("inserting database records for `redeem`")?;
 
     txn.commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     // Immediately try to process the redeemal
     if let Err(error) = try_process_user_redeemal(&pool, &redis, redeemal).await

@@ -79,7 +79,7 @@ pub async fn team_members_get_project(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<TeamMember>>(response).await {
         Ok(members) => {
@@ -118,7 +118,7 @@ pub async fn team_members_get(
         v3::teams::team_members_get(req, info, pool, redis, session_queue)
             .await
             .or_else(v2_reroute::flatten_404_error)
-            .wrap_api_err("flattening v2 not-found response")?;
+            .api_context("flattening v2 not-found response")?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<TeamMember>>(response).await {
         Ok(members) => {
@@ -166,7 +166,7 @@ pub async fn teams_get(
     .or_else(v2_reroute::flatten_404_error);
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Vec<TeamMember>>>(
-        response.wrap_api_err("extracting v2 response body")?,
+        response.api_context("extracting v2 response body")?,
     )
     .await
     {

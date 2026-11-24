@@ -1,5 +1,5 @@
 use super::ids::LoaderId;
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
@@ -35,12 +35,12 @@ impl Loader {
             let mut redis = redis
                 .connect()
                 .await
-                .wrap_err("connecting to redis for cached loader id")?;
+                .context("connecting to redis for cached loader id")?;
             let key = redis.key().metadata(LOADER_ID, name);
             let cached_id: Option<i32> = redis
                 .get_deserialized(&key)
                 .await
-                .wrap_err("fetching cached loader id")?;
+                .context("fetching cached loader id")?;
             if let Some(cached_id) = cached_id {
                 return Ok(Some(LoaderId(cached_id)));
             }
@@ -55,19 +55,19 @@ impl Loader {
         )
         .fetch_optional(exec)
         .await
-        .wrap_err("fetching loader id")?
+        .context("fetching loader id")?
         .map(|r| LoaderId(r.id));
 
         if let Some(result) = result {
             let mut redis = redis
                 .connect()
                 .await
-                .wrap_err("connecting to redis to cache loader id")?;
+                .context("connecting to redis to cache loader id")?;
             let key = redis.key().metadata(LOADER_ID, name);
             redis
                 .set_serialized(&key, &result.0, None)
                 .await
-                .wrap_err("caching loader id")?;
+                .context("caching loader id")?;
         }
 
         Ok(result)
@@ -81,12 +81,12 @@ impl Loader {
             let mut redis = redis
                 .connect()
                 .await
-                .wrap_err("connecting to redis for cached loaders")?;
+                .context("connecting to redis for cached loaders")?;
             let key = redis.key().metadata(LOADERS_LIST_NAMESPACE, "all");
             let cached_loaders: Option<Vec<Loader>> = redis
                 .get_deserialized(&key)
                 .await
-                .wrap_err("fetching cached loaders")?;
+                .context("fetching cached loaders")?;
             if let Some(cached_loaders) = cached_loaders {
                 return Ok(cached_loaders);
             }
@@ -122,18 +122,18 @@ impl Loader {
         })
         .try_collect::<Vec<_>>()
         .await
-        .wrap_err("fetching loaders")?;
+        .context("fetching loaders")?;
 
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to cache loaders")?;
+            .context("connecting to redis to cache loaders")?;
         let key = redis.key().metadata(LOADERS_LIST_NAMESPACE, "all");
 
         redis
             .set_serialized(&key, &result, None)
             .await
-            .wrap_err("caching loaders")?;
+            .context("caching loaders")?;
 
         Ok(result)
     }

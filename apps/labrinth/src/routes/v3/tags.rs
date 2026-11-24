@@ -1,5 +1,6 @@
 use crate::util::MinecraftMeta;
 use crate::util::error::Context as _;
+use anyhow::anyhow;
 use std::collections::HashMap;
 
 use super::ApiError;
@@ -54,7 +55,7 @@ pub async fn category_list(
 ) -> Result<HttpResponse, ApiError> {
     let results = Category::list(&**pool, &redis)
         .await
-        .wrap_internal_err("fetching category from Redis")?
+        .internal_context("fetching category from Redis")?
         .into_iter()
         .map(|x| CategoryData {
             icon: x.icon,
@@ -92,7 +93,7 @@ pub async fn loader_list(
 ) -> Result<HttpResponse, ApiError> {
     let loaders = Loader::list(&**pool, &redis)
         .await
-        .wrap_internal_err("fetching loader from Redis")?;
+        .internal_context("fetching loader from Redis")?;
 
     let mut results = loaders
         .into_iter()
@@ -202,7 +203,7 @@ pub async fn loader_fields_list(
             })
             .collect(),
         _ => {
-            return Err(ApiError::Request(eyre::eyre!(
+            return Err(ApiError::Request(anyhow!(
                 "`{}` is not a valid loader field",
                 query.loader_field
             )));
@@ -291,7 +292,7 @@ pub async fn license_text(
         }));
     }
 
-    Err(ApiError::Request(eyre::eyre!(
+    Err(ApiError::Request(anyhow!(
         "Invalid SPDX identifier specified",
     )))
 }
@@ -339,7 +340,7 @@ pub async fn report_type_list(
 ) -> Result<HttpResponse, ApiError> {
     let results = ReportType::list(&**pool, &redis)
         .await
-        .wrap_internal_err("reading HTTP response body")?;
+        .internal_context("reading HTTP response body")?;
     Ok(HttpResponse::Ok().json(results))
 }
 
@@ -358,6 +359,6 @@ pub async fn project_type_list(
 ) -> Result<HttpResponse, ApiError> {
     let results = ProjectType::list(&**pool, &redis)
         .await
-        .wrap_internal_err("fetching project type from Redis")?;
+        .internal_context("fetching project type from Redis")?;
     Ok(HttpResponse::Ok().json(results))
 }

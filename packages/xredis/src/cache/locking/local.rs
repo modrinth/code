@@ -1,9 +1,9 @@
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
+use anyhow::{Context, Result};
 use dashmap::DashMap;
 use dashmap::mapref::entry::Entry;
-use eyre::{Result, WrapErr};
 use tokio::sync::Notify;
 use tokio::time::{Instant, timeout_at};
 
@@ -90,7 +90,7 @@ impl LockWaiter {
 
             timeout_at(deadline, notified)
                 .await
-                .wrap_err("waiting for local Redis cache lock")?;
+                .context("waiting for local Redis cache lock")?;
         }
     }
 }

@@ -1,6 +1,7 @@
 use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
+use anyhow::anyhow;
 use std::collections::HashMap;
 
 use super::ApiError;
@@ -167,7 +168,7 @@ pub async fn version_list(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Version>>(response).await {
@@ -234,7 +235,7 @@ pub async fn version_project_get(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
         Ok(version) => {
@@ -300,7 +301,7 @@ pub async fn versions_get(
                     .featured
                     .map(|value| value.parse::<bool>())
                     .transpose()
-                    .wrap_request_err("deserializing `featured`")?,
+                    .request_context("deserializing `featured`")?,
                 version_type: query
                     .version_type
                     .map(|value| match value.as_str() {
@@ -313,26 +314,26 @@ pub async fn versions_get(
                         "alpha" => {
                             Ok(crate::models::projects::VersionType::Alpha)
                         }
-                        _ => Err(eyre::eyre!("invalid version type `{value}`")),
+                        _ => Err(anyhow!("invalid version type `{value}`")),
                     })
                     .transpose()
-                    .wrap_request_err("deserializing `version_type`")?,
+                    .request_context("deserializing `version_type`")?,
                 limit: query
                     .limit
                     .map(|value| value.parse::<usize>())
                     .transpose()
-                    .wrap_request_err("deserializing `limit`")?,
+                    .request_context("deserializing `limit`")?,
                 offset: query
                     .offset
                     .map(|value| value.parse::<usize>())
                     .transpose()
-                    .wrap_request_err("deserializing `offset`")?,
+                    .request_context("deserializing `offset`")?,
                 include_changelog: query.include_changelog,
             };
             let project_ids = serde_json::from_str::<Vec<String>>(&project_ids)
-                .wrap_request_err("deserializing `project_ids`")?;
+                .request_context("deserializing `project_ids`")?;
             if project_ids.len() > 100 {
-                return Err(ApiError::Request(eyre::eyre!(
+                return Err(ApiError::Request(anyhow!(
                     "`project_ids` must contain at most 100 projects"
                 )));
             }
@@ -342,7 +343,7 @@ pub async fn versions_get(
             ] {
                 if let Some(value) = value {
                     serde_json::from_str::<Vec<String>>(value)
-                        .wrap_request_err_with(|| {
+                        .request_context_with(|| {
                             format!("deserializing `{name}`")
                         })?;
                 }
@@ -352,7 +353,7 @@ pub async fn versions_get(
                 .as_deref()
                 .map(serde_json::from_str::<Vec<String>>)
                 .transpose()
-                .wrap_request_err("deserializing `loaders`")?;
+                .request_context("deserializing `loaders`")?;
             let user_option = crate::auth::get_user_from_headers(
                 &req,
                 &**pool,
@@ -368,7 +369,7 @@ pub async fn versions_get(
                 &redis,
             )
             .await
-            .wrap_internal_err("fetching projects from database")?;
+            .internal_context("fetching projects from database")?;
             let visible = crate::auth::checks::filter_visible_project_ids(
                 projects.iter().map(|p| &p.inner).collect(),
                 &user_option,
@@ -376,7 +377,7 @@ pub async fn versions_get(
                 false,
             )
             .await
-            .wrap_api_err("filtering visible projects")?;
+            .api_context("filtering visible projects")?;
             projects.retain(|p| visible.contains(&p.inner.id));
             let project_ids = projects
                 .iter()
@@ -388,7 +389,7 @@ pub async fn versions_get(
             )
             .fetch_all(&***ro_pool)
             .await
-            .wrap_internal_err("fetching project version ids from database")?
+            .internal_context("fetching project version ids from database")?
             .into_iter()
             .map(|version| crate::database::models::ids::DBVersionId(version.id))
             .collect::<Vec<_>>();
@@ -398,7 +399,7 @@ pub async fn versions_get(
                 &redis,
             )
             .await
-            .wrap_internal_err("fetching versions from database")?;
+            .internal_context("fetching versions from database")?;
             let mut grouped = HashMap::new();
             for version in versions {
                 if let Some(loaders) = &requested_loaders {
@@ -472,7 +473,7 @@ pub async fn versions_get(
                 &redis,
             )
             .await
-            .wrap_api_err("filtering visible versions")?;
+            .api_context("filtering visible versions")?;
             response.sort_by(|a, b| {
                 b.date_published
                     .cmp(&a.date_published)
@@ -492,7 +493,7 @@ pub async fn versions_get(
             return Ok(HttpResponse::Ok().json(response));
         }
         _ => {
-            return Err(ApiError::Request(eyre::eyre!(
+            return Err(ApiError::Request(anyhow!(
                 "exactly one of `ids` and `project_ids` is required"
             )));
         }
@@ -507,7 +508,7 @@ pub async fn versions_get(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Version>>(response).await {
@@ -560,7 +561,7 @@ pub async fn version_get(
     .await
     .map(|b| HttpResponse::Ok().json(b))
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
         Ok(version) => {
@@ -707,7 +708,7 @@ pub async fn version_edit(
     {
         component.mrpack_loaders = Some(
             super::version_creation::parse_mrpack_loaders(&values)
-                .wrap_request_err("parsing mrpack loaders")?,
+                .request_context("parsing mrpack loaders")?,
         );
     }
 
@@ -747,7 +748,7 @@ pub async fn version_edit(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("editing version through v3 route")?;
+    .api_context("editing version through v3 route")?;
     Ok(response)
 }
 

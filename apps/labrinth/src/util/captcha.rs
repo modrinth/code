@@ -2,6 +2,7 @@ use crate::env::ENV;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
 use actix_web::HttpRequest;
+use anyhow::anyhow;
 use serde::Deserialize;
 use std::collections::HashMap;
 use xredis::RedisPool;
@@ -32,7 +33,7 @@ pub async fn check_turnstile(
         conn_info.peer_addr()
     };
 
-    let ip_addr = ip_addr.wrap_request_err("captcha validation failed")?;
+    let ip_addr = ip_addr.request_context("captcha validation failed")?;
 
     let client = reqwest::Client::new();
 
@@ -52,11 +53,11 @@ pub async fn check_turnstile(
         .form(&form)
         .send()
         .await
-        .wrap_request_err("captcha validation failed")?
+        .request_context("captcha validation failed")?
         .json()
         .await
-        .map_err(|err| eyre::eyre!(err))
-        .wrap_request_err("captcha validation failed")?;
+        .map_err(|err| anyhow!(err))
+        .request_context("captcha validation failed")?;
 
     if !val.success {
         return Ok(false);
@@ -74,7 +75,7 @@ async fn mark_token_used(
     let mut conn = redis
         .connect()
         .await
-        .wrap_internal_err("connecting to Redis")?;
+        .internal_context("connecting to Redis")?;
     let key =
         conn.key()
             .with_slot(USED_TURNSTILE_NAMESPACE, challenge, challenge);
@@ -87,7 +88,7 @@ async fn mark_token_used(
         .arg(TURNSTILE_TOKEN_LIFETIME_SECS)
         .query_async(&mut conn)
         .await
-        .wrap_internal_err("marking captcha token as used")?;
+        .internal_context("marking captcha token as used")?;
 
     Ok(newly_set.is_some())
 }

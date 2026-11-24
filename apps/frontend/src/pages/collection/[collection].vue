@@ -620,24 +620,22 @@ const creatorHasPublicProjects = computed(
 const {
 	data: followedProjects,
 	refetch: refetchFollowedProjects,
-	isFetching: followedProjectsIsFetching,
+	isLoading: followedProjectsIsLoading,
 } = useQuery({
 	queryKey: computed(() => ['user', auth.value.user?.id, 'follows']),
 	queryFn: async () => fetchFollowedProjects(auth.value.user.id),
 	enabled: computed(() => isFollowingCollection.value && !!auth.value.user?.id),
-	placeholderData: [],
 })
 
 // Query for collection projects
 const {
 	data: collectionProjects,
 	refetch: refetchCollectionProjects,
-	isFetching: collectionProjectsIsFetching,
+	isLoading: collectionProjectsIsLoading,
 } = useQuery({
 	queryKey: computed(() => ['projects', collection.value?.projects]),
 	queryFn: () => fetchProjectsByIds(collection.value.projects),
 	enabled: computed(() => !isFollowingCollection.value && !!collection.value?.projects?.length),
-	placeholderData: [],
 })
 
 // Unified projects ref
@@ -650,9 +648,9 @@ const isLoading = computed(() => {
 	if (!import.meta.client) return false
 
 	if (isFollowingCollection.value) {
-		return followedProjectsIsFetching.value
+		return followedProjectsIsLoading.value
 	}
-	return collectionIsPending.value || creatorIsPending.value || collectionProjectsIsFetching.value
+	return collectionIsPending.value || creatorIsPending.value || collectionProjectsIsLoading.value
 })
 
 onServerPrefetch(async () => {

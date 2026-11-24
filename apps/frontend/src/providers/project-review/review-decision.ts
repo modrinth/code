@@ -52,6 +52,7 @@ export async function applyReviewDecision(
 	} else if (decision.status) {
 		await client.labrinth.projects_v3.edit(decision.projectId, {
 			status: decision.status,
+			review_reason: decision.body.trim() || undefined,
 		})
 	}
 	assertCurrent()

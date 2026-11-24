@@ -33,6 +33,11 @@ on:
         required: false
         type: string
         description: 'The persistent preview alias for the branch'
+    secrets:
+      CF_API_TOKEN:
+        required: true
+      CF_ACCOUNT_ID:
+        required: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.preview && 'preview' || 'push' }}
@@ -87,6 +92,7 @@ jobs:
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
+          package-manager-cache: false
 
       - name: Enable Corepack
         run: corepack enable
@@ -104,8 +110,10 @@ jobs:
 
       - name: Inject build variables
         working-directory: ./apps/frontend
+        env:
+          DEPLOY_ENV: ${{ steps.meta.outputs.env }}
         run: |
-          if [ "${{ steps.meta.outputs.env }}" == "staging" ]; then
+          if [ "$DEPLOY_ENV" == "staging" ]; then
             echo "Injecting staging variables from wrangler.jsonc..."
             jq -r '.env.staging.vars | to_entries[] | "\(.key)=\(.value)"' wrangler.jsonc >> $GITHUB_ENV
           else

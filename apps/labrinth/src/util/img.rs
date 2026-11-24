@@ -5,8 +5,8 @@ use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::images::ImageContext;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
+use anyhow::{Result, anyhow};
 use color_thief::ColorFormat;
-use eyre::{Result, eyre};
 use hex::ToHex;
 use image::imageops::FilterType;
 use image::{
@@ -56,7 +56,7 @@ pub async fn upload_image_optimized(
     file_host: &dyn FileHost,
 ) -> Result<UploadImageResult, ApiError> {
     let content_type = crate::util::ext::get_image_content_type(file_extension)
-        .wrap_request_err_with(|| {
+        .request_context_with(|| {
             format!("invalid format for image: {file_extension}")
         })?;
 
@@ -69,9 +69,9 @@ pub async fn upload_image_optimized(
         target_width,
         min_aspect_ratio,
     )
-    .wrap_request_err("processing uploaded image")?;
+    .request_context("processing uploaded image")?;
     let color = get_color_from_img(&bytes)
-        .wrap_request_err("extracting color from uploaded image")?;
+        .request_context("extracting color from uploaded image")?;
 
     // Only upload the processed image if it's smaller than the original
     let processed_upload_data = if processed_image.len() < bytes.len() {
@@ -90,7 +90,7 @@ pub async fn upload_image_optimized(
                     processed_image,
                 )
                 .await
-                .wrap_internal_err("uploading file to file host")?,
+                .internal_context("uploading file to file host")?,
         )
     } else {
         None
@@ -104,7 +104,7 @@ pub async fn upload_image_optimized(
             bytes,
         )
         .await
-        .wrap_internal_err("uploading file to file host")?;
+        .internal_context("uploading file to file host")?;
 
     let url = format!("{}/{}", cdn_url, upload_data.file_name);
     Ok(UploadImageResult {
@@ -135,11 +135,11 @@ fn process_image(
     }
 
     let mut img = image::load_from_memory(&image_bytes)
-        .wrap_err("loading image from memory")?;
+        .context("loading image from memory")?;
 
-    let webp_bytes = convert_to_webp(&img).wrap_err("converting to WebP")?;
+    let webp_bytes = convert_to_webp(&img).context("converting to WebP")?;
     img = image::load_from_memory(&webp_bytes)
-        .wrap_err("loading WebP image from memory")?;
+        .context("loading WebP image from memory")?;
 
     // Resize the image
     let (orig_width, orig_height) = img.dimensions();
@@ -165,7 +165,7 @@ fn process_image(
     // Optimize and compress
     let mut output = Vec::new();
     img.write_to(&mut Cursor::new(&mut output), ImageFormat::WebP)
-        .wrap_err("writing image")?;
+        .context("writing image")?;
 
     Ok((bytes::Bytes::from(output), "webp".to_string()))
 }
@@ -176,7 +176,7 @@ fn convert_to_webp(img: &DynamicImage) -> Result<Vec<u8>> {
     // Quality factor: 0-100, 75 is a good balance
     let webp = encoder
         .encode_simple(false, 75.0)
-        .map_err(|_| eyre!("encoding image"))?;
+        .map_err(|_| anyhow!("encoding image"))?;
     Ok(webp.to_vec())
 }
 
@@ -195,7 +195,7 @@ pub async fn delete_old_images(
             file_host
                 .delete_file(icon_path, publicity)
                 .await
-                .wrap_internal_err("deleting file from file host")?;
+                .internal_context("deleting file from file host")?;
         }
     }
 
@@ -206,7 +206,7 @@ pub async fn delete_old_images(
             file_host
                 .delete_file(icon_path, publicity)
                 .await
-                .wrap_internal_err("deleting file from file host")?;
+                .internal_context("deleting file from file host")?;
         }
     }
 
@@ -225,7 +225,7 @@ pub async fn delete_unused_images(
     let uploaded_images =
         database::models::DBImage::get_many_contexted(context, transaction)
             .await
-            .wrap_internal_err("fetching images from database")?;
+            .internal_context("fetching images from database")?;
 
     for image in uploaded_images {
         let mut should_delete = true;
@@ -239,10 +239,10 @@ pub async fn delete_unused_images(
         if should_delete {
             image_item::DBImage::remove(image.id, transaction, redis)
                 .await
-                .wrap_internal_err("deleting image from database")?;
+                .internal_context("deleting image from database")?;
             image_item::DBImage::clear_cache(image.id, redis)
                 .await
-                .wrap_internal_err("clearing cached data from Redis")?;
+                .internal_context("clearing cached data from Redis")?;
         }
     }
 

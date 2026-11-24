@@ -5223,7 +5223,7 @@
     "message": "Read user data"
   },
   "scopes.userReadEmail.description": {
-    "message": "Read your email"
+    "message": "Read your email address"
   },
   "scopes.userReadEmail.label": {
     "message": "Read user email"

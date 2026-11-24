@@ -1,4 +1,5 @@
 use actix_web::{HttpRequest, http::header::IF_MATCH};
+use anyhow::anyhow;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -38,7 +39,7 @@ pub struct PatchModerationNote {
 impl PatchModerationNote {
     pub fn validate_not_empty(&self) -> Result<(), ApiError> {
         if self.notes.is_none() && self.user_rating.is_none() {
-            return Err(ApiError::Request(eyre::eyre!(
+            return Err(ApiError::Request(anyhow!(
                 "must specify `notes` or `user_rating`",
             )));
         }
@@ -54,14 +55,12 @@ pub fn parse_if_match_header(
         return Ok(None);
     };
 
-    let value = value.to_str().wrap_request_err(
+    let value = value.to_str().request_context(
         "`if-match` header must be a valid integer".to_string(),
     )?;
 
     Some(value.parse::<i32>().map_err(|_| {
-        ApiError::Request(eyre::eyre!(
-            "`if-match` header must be a valid integer",
-        ))
+        ApiError::Request(anyhow!("`if-match` header must be a valid integer",))
     }))
     .transpose()
 }

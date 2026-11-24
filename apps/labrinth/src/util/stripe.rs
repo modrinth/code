@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use std::fmt::{Debug, Display, Write as _};
 
 use crate::routes::ApiError;
@@ -9,9 +10,9 @@ use crate::util::error::Context as _;
 /// returned, which can include the payment intent, payment method and client
 /// secret involved. Error chains end up in logs and in the `details` of API
 /// error responses, so only the type, codes and message are kept.
-pub fn stripe_error_report(error: ::stripe::StripeError) -> eyre::Report {
+pub fn stripe_error_report(error: ::stripe::StripeError) -> anyhow::Error {
     let ::stripe::StripeError::Stripe(error, status) = error else {
-        return eyre::Report::new(error);
+        return anyhow::Error::new(error);
     };
 
     let mut message = format!("Stripe returned {} ({status})", error.type_);
@@ -28,7 +29,7 @@ pub fn stripe_error_report(error: ::stripe::StripeError) -> eyre::Report {
         let _ = write!(message, ": {text}");
     }
 
-    eyre::eyre!(message)
+    anyhow!(message)
 }
 
 /// Adds context to the result of a Stripe request.
@@ -39,17 +40,17 @@ pub fn stripe_error_report(error: ::stripe::StripeError) -> eyre::Report {
 pub trait StripeContext<T>: Sized {
     /// Maps the error variant into an [`ApiError::FailedDependency`] with the
     /// given message, describing the Stripe error concisely.
-    fn wrap_stripe_err<D>(self, msg: D) -> Result<T, ApiError>
+    fn stripe_context<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static;
 }
 
 impl<T> StripeContext<T> for Result<T, ::stripe::StripeError> {
-    fn wrap_stripe_err<D>(self, msg: D) -> Result<T, ApiError>
+    fn stripe_context<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
         self.map_err(stripe_error_report)
-            .wrap_failed_dependency_err(msg)
+            .failed_dependency_context(msg)
     }
 }

@@ -41,13 +41,11 @@ export function useReviewQueue(
 	const preloadTechReview = computed(() =>
 		settings.value.get(moderationSettings.General.TechReviewMode),
 	)
+	const skipProcessedIds =
+		queue.currentQueue.skipProcessedIds ??
+		!settings.value.get(moderationSettings.General.IncludeNonProcessingProjects)
 	const prefetchKey = computed(() =>
-		JSON.stringify([
-			projectId.value,
-			remaining.value,
-			settings.value.get(moderationSettings.General.IncludeNonProcessingProjects),
-			preloadTechReview.value,
-		]),
+		JSON.stringify([projectId.value, remaining.value, !skipProcessedIds, preloadTechReview.value]),
 	)
 	let lastPrefetchKey = ''
 	let disposed = false
@@ -69,13 +67,7 @@ export function useReviewQueue(
 				return
 			lastPrefetchKey = key
 			const isCurrent = () => !disposed && prefetchKey.value === key
-			void findNextEligibleQueueProject(
-				client,
-				queue,
-				[...remaining.value],
-				true,
-				settings.value.get(moderationSettings.General.IncludeNonProcessingProjects),
-			)
+			void findNextEligibleQueueProject(client, queue, [...remaining.value], true)
 				.then(async (next) => {
 					if (next && isCurrent()) {
 						await prefetchReviewProject(
@@ -122,13 +114,7 @@ export function useReviewQueue(
 			if (!id || !inQueue.value || (completedProjectId && completedProjectId !== id)) return
 			if (completedProjectId && !completed.value) await queue.completeProject(id)
 			const candidates = remaining.value
-			const next = await findNextEligibleQueueProject(
-				client,
-				queue,
-				candidates,
-				true,
-				settings.value.get(moderationSettings.General.IncludeNonProcessingProjects),
-			)
+			const next = await findNextEligibleQueueProject(client, queue, candidates, true)
 			if (next) await queryClient.fetchQuery(projectQueryOptions.v3(next.project, client))
 			if (!completed.value) await queue.deferProject(id)
 			for (const excluded of next?.excluded ?? candidates) await queue.excludeProject(excluded)
