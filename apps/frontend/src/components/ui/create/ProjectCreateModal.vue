@@ -71,6 +71,7 @@
 					input-id="project-create-owner-search"
 					:options="ownerOptions"
 					:disabled="hasHitLimit"
+					hide-chevron
 				/>
 			</Field>
 			<Field :label="formatMessage(commonMessages.visibilityLabel)">
