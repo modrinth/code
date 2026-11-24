@@ -337,7 +337,6 @@ const disableCreate = computed(() => {
 	if (!name.value.trim() || !slug.value.trim()) return true
 	if (!manualSlug.value && checkingSlugSuggestions.value) return true
 	if (!manualSlug.value && !slugSuggestions.value.includes(slug.value)) return true
-	if (description.value.trim().length < 3) return true
 	if (owner.value !== 'self' && !organizations.value.find((org) => org.id === owner.value))
 		return true
 	return false
@@ -347,7 +346,6 @@ const missingFieldsTooltip = computed(() => {
 	const missingFields = []
 	if (!name.value.trim()) missingFields.push(formatMessage(messages.nameLabel))
 	if (!slug.value.trim()) missingFields.push(formatMessage(messages.urlLabel))
-	if (description.value.trim().length < 3) missingFields.push(formatMessage(messages.summaryLabel))
 	if (owner.value !== 'self' && !organizations.value.find((org) => org.id === owner.value))
 		missingFields.push(formatMessage(messages.ownerLabel))
 
