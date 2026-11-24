@@ -18,11 +18,11 @@ import { renderString } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
-import { Collapsible, ConfirmModal } from '#ui/components'
+import { Accordion, Collapsible, ConfirmModal, ProjectStatusBadge, Tooltip } from '#ui/components'
 import type { ButtonMenuOption } from '#ui/components/base'
 import { CopyCode } from '#ui/components/base'
 import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
-import { commonMessages } from '#ui/utils'
+import { commonMessages, getProjectStatusColor, getProjectStatusIcon } from '#ui/utils'
 
 import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
 import {
@@ -52,6 +52,7 @@ const props = withDefaults(
 	defineProps<{
 		projectId: string
 		group: Labrinth.Attribution.Internal.AttributionGroup
+		groupModrinthProjects: Labrinth.Projects.v3.Project[]
 		members?: Labrinth.Projects.v3.TeamMember[]
 		isModerator?: boolean
 		pixelated?: boolean
@@ -59,6 +60,7 @@ const props = withDefaults(
 	{
 		isModerator: false,
 		pixelated: undefined,
+		groupModrinthProjects: () => [],
 	},
 )
 
@@ -562,72 +564,125 @@ const visibleQuickReplies = computed<ButtonMenuOption[]>(() => {
 			class="border-0 border-solid border-t border-surface-5 rounded-b-2xl"
 		>
 			<div class="flex flex-col gap-3 p-4">
-				<span class="text-contrast font-semibold">
-					{{ formatMessage(messages.includedFiles) }}
-				</span>
-				<div class="grid grid-cols-2 gap-2">
-					<span
-						v-for="file in group.files"
-						:key="file.sha1"
-						class="pl-3 rounded-xl grid grid-cols-[auto_1fr_auto] gap-2 items-start border-[1px] border-solid border-surface-5 bg-surface-2"
+				<Accordion divider open-by-default force-open>
+					<template #title>
+						<span class="text-contrast font-semibold">
+							{{ formatMessage(messages.includedFiles) }}
+						</span>
+					</template>
+					<div class="grid grid-cols-2 gap-2">
+						<span
+							v-for="file in group.files"
+							:key="file.sha1"
+							class="pl-3 rounded-xl grid grid-cols-[auto_1fr_auto] gap-2 items-start border-[1px] border-solid border-surface-5 bg-surface-2"
+							:style="{
+								'border-color':
+									isModerator && file.moderation_external_license
+										? MODERATION_DB_BADGE[file.moderation_external_license?.status]?.color
+										: undefined,
+								color:
+									isModerator && file.moderation_external_license
+										? MODERATION_DB_BADGE[file.moderation_external_license?.status]?.color
+										: undefined,
+							}"
+						>
+							<FileIcon class="size-4 shrink-0 mt-2.5" />
+							<div class="min-w-0 flex flex-col gap-1 py-2">
+								<span class="truncate">
+									{{ file.name.split('/').pop() }}
+								</span>
+								<div
+									v-if="isModerator"
+									class="grid grid-cols-[max-content_minmax(0,1fr)] items-center gap-x-2 gap-y-1 text-xs"
+								>
+									<span class="text-secondary">SHA-1</span>
+									<CopyCode :text="file.sha1" class="max-w-full break-all" />
+									<template v-if="file.moderation_external_license_id != null">
+										<span class="text-secondary">{{ formatMessage(messages.fileDatabaseId) }}</span>
+										<CopyCode :text="String(file.moderation_external_license_id)" />
+									</template>
+								</div>
+							</div>
+							<div class="flex items-center gap-1 my-auto">
+								<IconButton
+									v-if="group.files.length > 1"
+									v-tooltip="formatMessage(messages.splitFile)"
+									class="m-1 !size-6"
+									size="xs"
+									:label="formatMessage(messages.splitFile)"
+									:disabled="splitFileMutation.isPending.value"
+									@click="handleSplitFile(file.sha1)"
+								>
+									<SpinnerIcon
+										v-if="splitFileMutation.isPending.value && pendingSplitSha1 === file.sha1"
+										class="size-4 shrink-0 animate-spin"
+									/>
+									<XIcon v-else class="size-4 shrink-0" />
+								</IconButton>
+							</div>
+						</span>
+						<div>
+							<Button @click="handleAddFilesToGroup($event)">
+								<PlusIcon class="size-4 shrink-0" /> {{ formatMessage(messages.addFilesToGroup) }}
+							</Button>
+						</div>
+					</div>
+				</Accordion>
+				<Accordion
+					v-if="groupModrinthProjects.length > 0 && isModerator"
+					divider
+					:open-by-default="groupModrinthProjects.some((project) => project.status !== 'draft')"
+				>
+					<template #title>
+						<span class="text-contrast font-semibold">Projects with Identical Files:</span>
+					</template>
+
+					<nuxt-link
+						v-for="project in groupModrinthProjects"
+						:key="project.id"
+						:to="`/project/${project.id}`"
+						target="_blank"
+						class="px-3 py-2 rounded-xl flex flex-row gap-2 border-[1px] border-solid border-surface-5 bg-surface-3 hover:bg-surface-4 w-min"
 						:style="{
-							'border-color':
-								isModerator && file.moderation_external_license
-									? MODERATION_DB_BADGE[file.moderation_external_license?.status]?.color
-									: undefined,
-							color:
-								isModerator && file.moderation_external_license
-									? MODERATION_DB_BADGE[file.moderation_external_license?.status]?.color
-									: undefined,
+							'border-color': `var(--color-${getProjectStatusColor(project.status)})`,
+							color: `var(--color-${getProjectStatusColor(project.status)})`,
 						}"
 					>
-						<FileIcon class="size-4 shrink-0 mt-2.5" />
-						<div class="min-w-0 flex flex-col gap-1 py-2">
-							<span class="truncate">
-								{{ file.name.split('/').pop() }}
-							</span>
-							<div
-								v-if="isModerator"
-								class="grid grid-cols-[max-content_minmax(0,1fr)] items-center gap-x-2 gap-y-1 text-xs"
-							>
-								<span class="text-secondary">SHA-1</span>
-								<CopyCode :text="file.sha1" class="max-w-full break-all" />
-								<template v-if="file.moderation_external_license_id != null">
-									<span class="text-secondary">{{ formatMessage(messages.fileDatabaseId) }}</span>
-									<CopyCode :text="String(file.moderation_external_license_id)" />
-								</template>
-							</div>
-						</div>
-						<div class="flex items-center gap-1 my-auto">
-							<IconButton
-								v-if="group.files.length > 1"
-								v-tooltip="formatMessage(messages.splitFile)"
-								class="m-1 !size-6"
-								size="xs"
-								:label="formatMessage(messages.splitFile)"
-								:disabled="splitFileMutation.isPending.value"
-								@click="handleSplitFile(file.sha1)"
-							>
-								<SpinnerIcon
-									v-if="splitFileMutation.isPending.value && pendingSplitSha1 === file.sha1"
-									class="size-4 shrink-0 animate-spin"
+						<Tooltip class="flex shrink-0">
+							<template #popper>
+								<ProjectStatusBadge
+									:status="project.status"
+									:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
 								/>
-								<XIcon v-else class="size-4 shrink-0" />
-							</IconButton>
-						</div>
-					</span>
-					<div>
-						<Button @click="handleAddFilesToGroup($event)">
-							<PlusIcon class="size-4 shrink-0" /> {{ formatMessage(messages.addFilesToGroup) }}
-						</Button>
-					</div>
-				</div>
-				<template v-if="(containingVersions?.length ?? 0) > 0">
-					<span class="text-contrast font-semibold">
-						{{
-							formatMessage(messages.includedInVersions, { count: containingVersions?.length ?? 0 })
-						}}
-					</span>
+							</template>
+							<component
+								:is="getProjectStatusIcon(project.status)"
+								class="size-4 shrink-0"
+								:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
+								aria-hidden="true"
+							/>
+						</Tooltip>
+						<span class="max-w-[22rem] truncate">
+							{{ project.name }}
+						</span>
+					</nuxt-link>
+				</Accordion>
+				<Accordion
+					v-if="(containingVersions?.length ?? 0) > 0"
+					divider
+					:open-by-default="!isModerator"
+					:force-open="!isModerator"
+				>
+					<template #title>
+						<span class="text-contrast font-semibold">
+							{{
+								formatMessage(messages.includedInVersions, {
+									count: containingVersions?.length ?? 0,
+								})
+							}}
+						</span>
+					</template>
+
 					<div class="flex flex-wrap gap-2">
 						<nuxt-link
 							v-for="version in containingVersions"
@@ -642,7 +697,7 @@ const visibleQuickReplies = computed<ButtonMenuOption[]>(() => {
 							</span>
 						</nuxt-link>
 					</div>
-				</template>
+				</Accordion>
 				<template v-else>
 					<span class="text-secondary text-sm">
 						{{ formatMessage(messages.notUsedInVersions) }}

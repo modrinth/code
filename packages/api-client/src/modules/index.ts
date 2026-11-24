@@ -23,7 +23,11 @@ import { KyrosFilesV1Module } from './kyros/files/v1'
 import { KyrosFlameAnvilV1Module } from './kyros/flameanvil/v1'
 import { KyrosLogsV1Module } from './kyros/logs/v1'
 import { KyrosUploadSessionsV1Module } from './kyros/upload-sessions/v1'
-import { LabrinthVersionsV2Module, LabrinthVersionsV3Module } from './labrinth'
+import {
+	LabrinthVersionFilesV3Module,
+	LabrinthVersionsV2Module,
+	LabrinthVersionsV3Module,
+} from './labrinth'
 import { LabrinthAnalyticsInternalModule } from './labrinth/analytics/internal'
 import { LabrinthAnalyticsV3Module } from './labrinth/analytics/v3'
 import { LabrinthAttributionInternalModule } from './labrinth/attribution/internal'
@@ -153,6 +157,7 @@ export const MODULE_REGISTRY = {
 	labrinth_users_v3: LabrinthUsersV3Module,
 	labrinth_versions_v2: LabrinthVersionsV2Module,
 	labrinth_versions_v3: LabrinthVersionsV3Module,
+	labrinth_version_files_v3: LabrinthVersionFilesV3Module,
 	paper_versions_v3: PaperVersionsV3Module,
 	paste_pastes_v0: PastePastesV0Module,
 	purpur_versions_v2: PurpurVersionsV2Module,
