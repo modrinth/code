@@ -67,7 +67,7 @@ pub async fn notifications_get(
     .await
     .or_else(v2_reroute::flatten_404_error);
     match v2_reroute::extract_ok_json::<Vec<Notification>>(
-        resp.wrap_api_err("extracting v2 response body")?,
+        resp.api_context("extracting v2 response body")?,
     )
     .await
     {
@@ -121,7 +121,7 @@ pub async fn notification_get(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
     match v2_reroute::extract_ok_json::<Notification>(response).await {
         Ok(notification) => {
             let notification = LegacyNotification::from(notification);

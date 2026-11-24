@@ -12,6 +12,7 @@ export interface PersistedModerationQueueState {
 		history?: string[]
 		activeProjectId?: string | null
 		lastUpdated: string
+		skipProcessedIds?: boolean
 	}
 	isQueueMode: boolean
 }
@@ -41,6 +42,8 @@ function isPersistedStateCandidate(value: unknown): value is PersistedModeration
 	if (queue.history !== undefined && !isStringArray(queue.history)) return false
 	if (queue.activeProjectId != null && typeof queue.activeProjectId !== 'string') return false
 	if (typeof queue.lastUpdated !== 'string') return false
+	if (queue.skipProcessedIds !== undefined && typeof queue.skipProcessedIds !== 'boolean')
+		return false
 
 	return true
 }
