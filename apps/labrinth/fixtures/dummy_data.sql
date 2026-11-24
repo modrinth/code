@@ -52,7 +52,9 @@ VALUES
 	(54, 'food', 1),
 	(55, 'magic', 1),
 	(56, 'mobs', 1),
-	(57, 'optimization', 1);
+	(57, 'optimization', 1),
+	(58, 'adventure', 1),
+	(59, 'technology', 1);
 
 INSERT INTO categories (id, category, project_type)
 VALUES
