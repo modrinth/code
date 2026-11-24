@@ -73,8 +73,7 @@ pub struct DecisionsConfig {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct AiDetectConfig {
-    /// Full Smaug prediction endpoint, e.g.
-    /// `https://inference.vin-prd.rinth.dev/v1/classify/image`.
+    /// Full Smaug prediction endpoint.
     /// Accepts a POST of raw image bytes with the matching image Content-Type
     /// and returns JSON containing `score`, an AI-generated probability in
     /// [0, 1]. Moderation rules apply their own thresholds, not `flagged`.

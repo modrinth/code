@@ -2490,6 +2490,7 @@ export namespace Labrinth {
 	export namespace Moderation {
 		export namespace Internal {
 			export type AutoApprovalStatus = {
+				project_id: string | null
 				auto_approve_blocked: boolean
 				eligible: boolean
 				finished: boolean

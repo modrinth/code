@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use actix_web::{HttpRequest, query, web};
 use chrono::{DateTime, Utc};
 use xredis::RedisPool;
@@ -7,9 +9,13 @@ use super::{
     listed_version_statuses, row_to_queue_project,
 };
 use crate::{
-    auth::get_user_from_headers, database::ReadOnlyPgPool,
-    models::pats::Scopes, queue::session::AuthQueue, routes::ApiError,
+    auth::get_user_from_headers,
+    database::ReadOnlyPgPool,
+    models::pats::Scopes,
+    queue::session::AuthQueue,
+    routes::ApiError,
     util::error::Context,
+    workflow::project_flag::approve::{self, ApprovalQueueEntry},
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -87,7 +93,7 @@ pub struct QueueResponse {
 }
 
 /// Query moderation cards. Empty filter lists select all; entries within each list are ORed.
-/// Scheduled membership and deadlines use the latest scheduling or cancellation event in project history.
+/// Scheduled membership and deadlines use eventually consistent active Temporal approval metadata.
 #[query("/queue")]
 async fn query_queue(
     req: HttpRequest,
@@ -95,6 +101,7 @@ async fn query_queue(
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<crate::util::temporal::TemporalClient>,
 ) -> Result<web::Json<QueueResponse>, ApiError> {
     get_user_from_headers(
         &req,
@@ -107,6 +114,17 @@ async fn query_queue(
     .auth_context("authenticating moderator")?;
     let query = query.into_inner();
     let scheduled = matches!(query.queue_kind, QueueKind::ScheduledForApproval);
+    let schedules = if scheduled {
+        scheduled_membership(
+            approve::queue(&temporal.client)
+                .await
+                .internal_context("listing scheduled approval workflows")?,
+        )
+    } else {
+        BTreeMap::new()
+    };
+    let (project_ids, deadlines): (Vec<_>, Vec<_>) =
+        schedules.into_iter().unzip();
     let types: Vec<String> =
         query.project_types.into_iter().map(|t| t.0).collect();
     let submission = query.submission_kind.map(|kind| match kind {
@@ -118,20 +136,15 @@ async fn query_queue(
     let rows = sqlx::query!(
         r#"
         WITH schedules AS (
-            SELECT DISTINCT ON (h.project_id) h.project_id AS id,
-                h.delta->>'kind' AS kind,
-                (h.delta->>'scheduled_for')::timestamptz AS scheduled_for
-            FROM project_history h
-            JOIN mods m ON m.id = h.project_id AND m.in_review
-            WHERE $1::boolean AND h.delta->>'kind' IN ('auto_approval_scheduled', 'auto_approval_cancelled')
-            ORDER BY h.project_id, h.occurred_at DESC, h.id DESC
+            SELECT id, scheduled_for
+            FROM UNNEST($9::bigint[], $10::timestamptz[]) AS s(id, scheduled_for)
         ), candidates AS (
             SELECT m.*, s.scheduled_for,
                 CASE WHEN jsonb_typeof(m.components -> 'minecraft_server') = 'object'
                     THEN array_append(array_remove(COALESCE(t.types, ARRAY[]::text[]), 'modpack'), 'minecraft_java_server')
                     ELSE COALESCE(t.types, ARRAY[]::text[]) END AS project_types
             FROM mods m
-            LEFT JOIN schedules s ON s.id = m.id AND s.kind = 'auto_approval_scheduled'
+            LEFT JOIN schedules s ON s.id = m.id
             LEFT JOIN LATERAL (
                 SELECT array_agg(DISTINCT pt.name::text) AS types
                 FROM versions v
@@ -203,6 +216,7 @@ async fn query_queue(
         scheduled, &statuses, submission,
         &query.project_flags, &types, newest,
         i64::from(query.limit.min(MAX_PROJECTS_PER_PAGE)), i64::from(query.offset),
+        &project_ids, &deadlines,
     ).fetch_all(&***ro_pool).await.internal_context("querying moderation queue")?;
     let total = rows.first().map_or(0, |row| row.total_count);
     let mut projects = Vec::new();
@@ -238,46 +252,148 @@ async fn query_queue(
     Ok(web::Json(QueueResponse { total, projects }))
 }
 
+fn scheduled_membership(
+    entries: Vec<ApprovalQueueEntry>,
+) -> BTreeMap<i64, DateTime<Utc>> {
+    let mut schedules = BTreeMap::new();
+    for entry in entries {
+        let Some(state) = entry.state else { continue };
+        let Some(project_id) = state.project_id else {
+            tracing::warn!(
+                workflow_id = entry.workflow_id,
+                "approval metadata is missing project id"
+            );
+            continue;
+        };
+        if state.finished || state.auto_approve_blocked || !state.eligible {
+            continue;
+        }
+        let Some(deadline) = state.deadline else {
+            continue;
+        };
+        schedules
+            .entry(project_id.0 as i64)
+            .and_modify(|existing: &mut DateTime<Utc>| {
+                *existing = (*existing).min(deadline)
+            })
+            .or_insert(deadline);
+    }
+    schedules
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::test::{
-        api_v3::ApiV3,
-        environment::{TestEnvironment, with_test_environment},
+    use super::*;
+    use crate::{
+        models::v3::ids::ProjectId,
+        workflow::project_flag::approve::ApprovalStatus,
     };
 
+    fn entry(id: u64, deadline: i64) -> ApprovalQueueEntry {
+        ApprovalQueueEntry {
+            workflow_id: "opaque-sdk-workflow-id".into(),
+            state: Some(ApprovalStatus {
+                project_id: Some(ProjectId(id)),
+                auto_approve_blocked: false,
+                eligible: true,
+                finished: false,
+                deadline: Some(DateTime::from_timestamp(deadline, 0).unwrap()),
+                phase: "waiting".into(),
+            }),
+        }
+    }
+
+    #[test]
+    fn membership_uses_explicit_metadata_and_deduplicates_deterministically() {
+        let mut rechecking = entry(2, 1);
+        rechecking.state.as_mut().unwrap().phase = "scanning".into();
+        let entries = vec![entry(1, 20), rechecking, entry(1, 10)];
+        let schedules = scheduled_membership(entries);
+        assert_eq!(schedules.keys().copied().collect::<Vec<_>>(), vec![1, 2]);
+        assert_eq!(schedules[&1].timestamp(), 10);
+        assert_eq!(schedules[&2].timestamp(), 1);
+        assert_eq!(
+            scheduled_membership(vec![entry(1, 10), entry(1, 20)])[&1]
+                .timestamp(),
+            10
+        );
+    }
+
+    #[test]
+    fn membership_excludes_blocked_ineligible_finished_and_missing_metadata() {
+        let mut entries = Vec::new();
+        for id in 1..=6 {
+            let mut item = entry(id, 10);
+            let state = item.state.as_mut().unwrap();
+            match id {
+                1 => state.auto_approve_blocked = true,
+                2 => state.eligible = false,
+                3 => state.finished = true,
+                4 => state.deadline = None,
+                5 => state.project_id = None,
+                _ => item.state = None,
+            }
+            entries.push(item);
+        }
+        assert!(scheduled_membership(entries).is_empty());
+    }
+
     #[actix_rt::test]
-    async fn latest_approval_event_controls_scheduled_membership() {
+    async fn sql_filters_counts_and_sorts_before_pagination() {
+        use crate::test::{
+            api_v3::ApiV3,
+            environment::{TestEnvironment, with_test_environment},
+        };
         with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-            let ids = sqlx::query_scalar!(
-                r#"
-                WITH history (project_id, id, occurred_at, kind) AS (
-                    VALUES
-                        (1, 1, 1, 'auto_approval_scheduled'),
-                        (1, 2, 2, 'auto_approval_cancelled'),
-                        (2, 3, 1, 'auto_approval_scheduled'),
-                        (2, 4, 2, 'auto_approval_cancelled'),
-                        (2, 5, 3, 'auto_approval_scheduled'),
-                        (3, 6, 1, 'auto_approval_scheduled'),
-                        (3, 7, 1, 'auto_approval_cancelled'),
-                        (4, 8, 1, 'auto_approval_cancelled'),
-                        (4, 9, 1, 'auto_approval_scheduled'),
-                        (5, 10, 1, 'auto_approval_cancelled')
-                ), latest AS (
-                    SELECT DISTINCT ON (project_id) project_id, kind
-                    FROM history
-                    WHERE kind IN ('auto_approval_scheduled', 'auto_approval_cancelled')
-                    ORDER BY project_id, occurred_at DESC, id DESC
-                )
-                SELECT project_id AS "project_id!"
-                FROM latest WHERE kind = 'auto_approval_scheduled'
-                ORDER BY project_id
-                "#
-            )
-            .fetch_all(&*env.db.ro_pool)
-            .await
-            .unwrap();
-            assert_eq!(ids, vec![2, 4]);
-        })
-        .await;
+            for newest in [false, true] {
+                for (limit, offset, expected) in [(1_i64, 0_i64, Some(if newest { 2 } else { 1 })), (1, 1, Some(if newest { 1 } else { 2 })), (0, 0, None), (1, 2, None)] {
+                    let rows = sqlx::query!(
+                        r#"
+                        WITH schedules AS (
+                            SELECT * FROM UNNEST(ARRAY[1,2,3,4,5,6]::bigint[],
+                                ARRAY['2026-01-01','2026-02-01','2025-01-01','2025-01-01','2025-01-01','2025-01-01']::timestamptz[])
+                                AS s(id, scheduled_for)
+                        ), projects(id, in_review, project_types, submission, flag) AS (
+                            VALUES (1::bigint, true, ARRAY['mod'], 'new', 'test'),
+                                (2, true, ARRAY['mod'], 'new', 'test'),
+                                (3, false, ARRAY['mod'], 'new', 'test'),
+                                (4, true, ARRAY['modpack'], 'new', 'test'),
+                                (5, true, ARRAY['mod'], 'resubmission', 'test'),
+                                (6, true, ARRAY['mod'], 'new', 'other')
+                        ), filtered AS (
+                            SELECT p.id, s.scheduled_for FROM projects p JOIN schedules s USING (id)
+                            WHERE p.in_review AND p.project_types && ARRAY['mod']
+                                AND p.submission = 'new' AND p.flag = 'test'
+                        ), total AS (
+                            SELECT count(*) AS count FROM filtered
+                        ), page AS (
+                            SELECT * FROM filtered
+                            ORDER BY CASE WHEN $1 THEN scheduled_for END DESC,
+                                CASE WHEN NOT $1 THEN scheduled_for END ASC, id ASC
+                            LIMIT $2 OFFSET $3
+                        )
+                        SELECT total.count AS "total!", page.id AS "id?"
+                        FROM total LEFT JOIN page ON true
+                        "#,
+                        newest, limit, offset,
+                    ).fetch_all(&*env.db.ro_pool).await.unwrap();
+                    assert_eq!(rows.len(), 1);
+                    assert_eq!(rows[0].total, 2);
+                    assert_eq!(rows[0].id, expected);
+                }
+            }
+        }).await;
+    }
+
+    #[test]
+    fn approval_metadata_round_trips_typed_project_id() {
+        let state = entry(123, 10).state.unwrap();
+        let json = serde_json::to_value(&state).unwrap();
+        assert_eq!(
+            json["project_id"],
+            serde_json::to_value(ProjectId(123)).unwrap()
+        );
+        let decoded: ApprovalStatus = serde_json::from_value(json).unwrap();
+        assert_eq!(decoded.project_id, Some(ProjectId(123)));
     }
 }

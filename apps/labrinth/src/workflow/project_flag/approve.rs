@@ -45,6 +45,9 @@ pub(super) async fn update_approval(
     Debug, Clone, serde::Serialize, serde::Deserialize, utoipa::ToSchema,
 )]
 pub struct ApprovalStatus {
+    /// Explicit project identity shared by workflow queries and visibility memos.
+    /// Absent before workflow initialization or in older visibility metadata.
+    pub project_id: Option<ProjectId>,
     pub auto_approve_blocked: bool,
     pub eligible: bool,
     pub finished: bool,
@@ -200,6 +203,7 @@ pub async fn approval_permitted(
 #[workflow]
 #[derive(Default, Clone)]
 pub struct ApproveProjectWorkflow {
+    project_id: Option<ProjectId>,
     eligible: bool,
     auto_approve_blocked: bool,
     finished: bool,
@@ -214,6 +218,7 @@ impl ApproveProjectWorkflow {
         ctx: &mut WorkflowContext<Self>,
         project_id: ProjectId,
     ) -> WorkflowResult<()> {
+        ctx.state_mut(|state| state.project_id = Some(project_id));
         loop {
             let cancelled = ctx.state(|state| state.auto_approve_blocked);
             tokio::select! {
@@ -436,6 +441,7 @@ impl ApproveProjectWorkflow {
 
     fn snapshot(&self) -> ApprovalStatus {
         ApprovalStatus {
+            project_id: self.project_id,
             auto_approve_blocked: self.auto_approve_blocked,
             eligible: self.eligible,
             finished: self.finished,
