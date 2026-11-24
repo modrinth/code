@@ -40,7 +40,7 @@ export function provideProjectSettingsNavigation(
 			behavior: reducedMotion ? 'instant' : 'smooth',
 			block: fitsViewport ? 'center' : 'start',
 		})
-		if (element.closest('[data-project-field-scroll-only]')) return
+		if (element.hasAttribute('data-project-field-scroll-only')) return
 
 		const outline = element.ownerDocument.createElement('span')
 		outline.className = 'project-field-highlight-outline'

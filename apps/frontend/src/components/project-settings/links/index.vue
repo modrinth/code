@@ -63,6 +63,7 @@
 					<template #cell-url="{ row }">
 						<div
 							:data-project-field="`link-${row.field ?? row.donation?.id}`"
+							data-project-field-scroll-only
 							class="flex min-w-0 items-center gap-2"
 						>
 							<Input

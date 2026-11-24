@@ -34,6 +34,7 @@
 					:label="formatMessage(messages.languagesLabel)"
 					label-optional
 					data-project-field="server-languages"
+					data-project-field-scroll-only
 					class="max-w-[600px]"
 				>
 					<template #default="{ labelId }">
