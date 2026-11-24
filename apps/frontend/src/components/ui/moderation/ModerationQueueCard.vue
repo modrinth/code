@@ -78,6 +78,7 @@
 							v-if="ownerStatsRequested"
 							:id="queueEntry.ownership.id"
 							:kind="queueEntry.ownership.kind"
+							:active="ownerRowVisible"
 							class="!mt-0"
 						/>
 					</div>
@@ -152,7 +153,7 @@ import {
 import { formatProjectType } from '@modrinth/utils'
 import { useIntersectionObserver } from '@vueuse/core'
 import dayjs from 'dayjs'
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, ref, shallowRef, useTemplateRef } from 'vue'
 
 import CreatorStatusStats from '~/components/CreatorStatusStats.vue'
 import type { ModerationProject } from '~/helpers/moderation'
@@ -181,10 +182,13 @@ const emit = defineEmits<{
 
 const ownerRow = useTemplateRef<HTMLDivElement>('ownerRow')
 const ownerStatsRequested = ref(false)
-const { stop: stopObservingOwner } = useIntersectionObserver(ownerRow, ([entry]) => {
-	if (!entry?.isIntersecting) return
-	ownerStatsRequested.value = true
-	stopObservingOwner()
+const visibleOwnerRow = shallowRef<Element | null>(null)
+const ownerRowVisible = computed(() => !!ownerRow.value && ownerRow.value === visibleOwnerRow.value)
+useIntersectionObserver(ownerRow, (entries) => {
+	const entry = entries.at(-1)
+	if (!entry || entry.target !== ownerRow.value) return
+	visibleOwnerRow.value = entry.isIntersecting ? entry.target : null
+	if (entry.isIntersecting) ownerStatsRequested.value = true
 })
 
 function getDaysQueued(date: Date): number {

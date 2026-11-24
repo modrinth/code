@@ -7,16 +7,21 @@ import { useCreatorProjectStats } from '~/composables/creator-project-stats'
 
 import ProjectStatusStats from './ProjectStatusStats.vue'
 
-const props = defineProps<{
-	id: string
-	kind: 'user' | 'organization'
-}>()
+const props = withDefaults(
+	defineProps<{
+		id: string
+		kind: 'user' | 'organization'
+		active?: boolean
+	}>(),
+	{ active: true },
+)
 const auth = useAuthState()
 const enabled = computed(() => isStaff(auth.value.user) && !!props.id)
 const { memberStats, organizationStats } = useCreatorProjectStats(
 	computed(() => (props.kind === 'user' ? [props.id] : [])),
 	computed(() => (props.kind === 'organization' ? props.id : '')),
 	enabled,
+	computed(() => props.active),
 )
 const stats = computed(() =>
 	props.kind === 'user' ? (memberStats.value[props.id] ?? []) : organizationStats.value,
