@@ -119,6 +119,19 @@ export class ArchonServersV1Module extends AbstractModule {
 	}
 
 	/**
+	 * Modify a server's settings
+	 * PATCH /v1/servers/:server_id
+	 */
+	public async patchServer(serverId: string, body: Archon.Servers.v1.PatchServer): Promise<void> {
+		await this.client.request(`/servers/${serverId}`, {
+			api: 'archon',
+			version: 1,
+			method: 'PATCH',
+			body,
+		})
+	}
+
+	/**
 	 * Modify a world
 	 * PATCH /v1/servers/:server_id/worlds/:world_id
 	 */
