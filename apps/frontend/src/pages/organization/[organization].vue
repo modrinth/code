@@ -323,7 +323,7 @@ const showCreatorStats = useShowCreatorStatsOnPublicPages()
 const { memberStats } = useCreatorProjectStats(
 	computed(() => acceptedMembers.value.map((member) => member.user.id)),
 	ref(''),
-	showCreatorStats,
+	computed(() => showCreatorStats.value && !routeHasSettings.value),
 )
 
 const isInvited = computed(() => {
