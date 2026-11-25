@@ -146,7 +146,7 @@
 			</template>
 		</ImageViewerEditor>
 		<div v-if="filteredGallery.length" class="@container">
-			<GalleryGrid
+			<SortableGalleryGrid
 				v-model:reordering="galleryReordering"
 				:project-id="project.id"
 				:images="filteredGallery"
@@ -164,7 +164,7 @@
 						:image-id="galleryImageId(image.url)"
 					/>
 				</template>
-			</GalleryGrid>
+			</SortableGalleryGrid>
 		</div>
 		<EmptyState
 			v-else
@@ -223,7 +223,7 @@ import {
 import { fileIsValid, isAdmin, isStaff, TeamMemberPermission } from '@modrinth/utils'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
-import GalleryGrid from '~/components/ui/project-gallery/gallery-grid.vue'
+import SortableGalleryGrid from '~/components/ui/project-gallery/sortable-gallery-grid.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'

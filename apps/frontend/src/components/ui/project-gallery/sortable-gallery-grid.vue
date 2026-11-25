@@ -47,6 +47,7 @@ const { formatMessage } = useVIntl()
 
 const orderedGallery = shallowRef<GalleryImage[]>([])
 const dragStartGallery = shallowRef<GalleryImage[] | null>(null)
+
 const mutationKey = computed(() => ['project', props.projectId, 'gallery-order'])
 const activeReorders = useIsMutating(() => ({ mutationKey: mutationKey.value }))
 

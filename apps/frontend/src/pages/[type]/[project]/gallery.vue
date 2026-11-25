@@ -104,7 +104,7 @@
 			</span>
 			<DropArea v-if="canUploadGallery" :accept="acceptFileTypes" @change="handleFiles" />
 		</div>
-		<GalleryGrid
+		<SortableGalleryGrid
 			v-if="filteredGallery.length"
 			v-model:reordering="galleryReordering"
 			:project-id="project.id"
@@ -146,7 +146,7 @@ import {
 import { fileIsValid, isAdmin, isStaff, TeamMemberPermission } from '@modrinth/utils'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
-import GalleryGrid from '~/components/ui/project-gallery/gallery-grid.vue'
+import SortableGalleryGrid from '~/components/ui/project-gallery/sortable-gallery-grid.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'

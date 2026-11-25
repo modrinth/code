@@ -1,29 +1,18 @@
 <script setup lang="ts">
 import { BoxIcon, PlusIcon } from '@modrinth/assets'
-import { Button, defineMessages, EmptyState, useVIntl } from '@modrinth/ui'
+import { Button, EmptyState, useVIntl } from '@modrinth/ui'
 
-import { versionActionMessages } from './messages'
+import { messages, versionActionMessages } from './messages'
 
 const emit = defineEmits<{ create: [] }>()
 const { formatMessage } = useVIntl()
-
-const messages = defineMessages({
-	title: {
-		id: 'project.settings.versions.empty.title',
-		defaultMessage: 'No versions created',
-	},
-	description: {
-		id: 'project.settings.versions.empty.description',
-		defaultMessage: 'Create your first project version.',
-	},
-})
 </script>
 
 <template>
 	<EmptyState
 		:icon="BoxIcon"
-		:heading="formatMessage(messages.title)"
-		:description="formatMessage(messages.description)"
+		:heading="formatMessage(messages.emptyTitle)"
+		:description="formatMessage(messages.emptyDescription)"
 	>
 		<template #actions>
 			<Button type="colored" color="green" size="lg" @click="emit('create')">
