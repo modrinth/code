@@ -13,6 +13,7 @@
 				<slot name="search-selection-affix" :option="selectedOption" />
 			</div>
 			<Input
+				:id="searchInputId"
 				ref="searchTriggerRef"
 				v-model="searchQuery"
 				:icon="showSearchIcon ? SearchIcon : undefined"
@@ -335,6 +336,7 @@ const props = withDefaults(
 		searchAutocorrect?: 'on' | 'off'
 		searchAutocapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters'
 		searchSpellcheck?: boolean
+		searchInputId?: string
 		searchInputAttrs?: Record<string, string | number | boolean | undefined>
 		searchInputVariant?: ComboboxSearchInputVariant
 	}>(),

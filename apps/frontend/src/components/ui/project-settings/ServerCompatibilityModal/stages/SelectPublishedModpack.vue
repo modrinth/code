@@ -12,7 +12,7 @@
 						:exclude-project-ids="[currentProjectId]"
 						:placeholder="formatMessage(messages.selectModpack)"
 						:search-placeholder="formatMessage(messages.searchModpacks)"
-						:search-input-attrs="{ id: projectInputId }"
+					:search-input-id="projectInputId"
 						:loading-message="formatMessage(commonMessages.loadingLabel)"
 						:no-results-message="formatMessage(messages.noResults)"
 						include-user-unlisted-projects
@@ -30,7 +30,7 @@
 						:placeholder="formatMessage(messages.selectVersion)"
 						:options="versionOptions"
 						:searchable="true"
-						:search-input-attrs="{ id: versionInputId }"
+					:search-input-id="versionInputId"
 						:search-placeholder="formatMessage(messages.searchVersions)"
 						:no-options-message="
 							formatMessage(versionsLoading ? commonMessages.loadingLabel : messages.noResults)

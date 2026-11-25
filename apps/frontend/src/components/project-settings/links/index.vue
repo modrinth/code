@@ -294,6 +294,11 @@ const linkColumns = computed<TableColumn<'name' | 'url'>[]>(() => [
 	},
 ])
 const linkInputId = useId()
+
+function donationInputId(key: number) {
+	return `${linkInputId}-donation-${key}`
+}
+
 const linkRows = computed<LinkTableRow[]>(() => [
 	...visibleFields.value.map((field) => ({
 		id: field,
@@ -308,7 +313,7 @@ const linkRows = computed<LinkTableRow[]>(() => [
 		? []
 		: donationLinks.value.map((donation) => ({
 				id: 'donation-' + donation.key,
-				inputId: 'donation-link-' + donation.key,
+				inputId: donationInputId(donation.key),
 				name: donationPlatformTitle(donation) ?? '',
 				description: formatMessage(messages.donationsDescription),
 				value: donation.input,
@@ -418,7 +423,7 @@ async function addDonation(platform: string) {
 	const row = makeRow(platform)
 	donationLinks.value.push(row)
 	await nextTick()
-	document.getElementById('donation-link-' + row.key)?.focus()
+	document.getElementById(donationInputId(row.key))?.focus()
 }
 
 function removeDonation(row: DonationRow) {

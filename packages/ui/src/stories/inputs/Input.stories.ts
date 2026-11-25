@@ -118,7 +118,7 @@ export const Search: Story = {
 		setup: () => ({ args }),
 		template: `
 			<label for="input-story-search">Search projects</label>
-			<Input v-bind="args" :input-attrs="{ id: 'input-story-search' }" />
+			<Input v-bind="args" id="input-story-search" />
 		`,
 	}),
 }

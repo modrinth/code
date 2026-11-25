@@ -37,8 +37,8 @@
 						>{{ hasValue ? model : placeholder || ' ' }}</span
 					>
 					<input
-						v-bind="mergeProps(controlAttrs(), inputAttrs ?? {})"
-						:id="id ?? inputAttrs?.id"
+						v-bind="mergeProps(controlAttrs(), { ...inputAttrs })"
+						:id="id"
 						ref="inputRef"
 						:type="type"
 						:value="model"

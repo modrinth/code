@@ -19,7 +19,7 @@ import {
 } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useObjectUrl } from '@vueuse/core'
-import { computed, ref, shallowRef, useTemplateRef, watch } from 'vue'
+import { computed, ref, shallowRef, useId, useTemplateRef, watch } from 'vue'
 
 import DangerZonePanel from '~/components/project-settings/general/danger-zone/panel.vue'
 import SettingsSection from '~/components/project-settings/settings-section.vue'
@@ -67,6 +67,11 @@ const { organization, canEditDetails, canDelete, deleteIcon, patchIcon, patchOrg
 	injectOrganizationContext()
 const orgId = useRouteId('organization')
 const confirmModal = useTemplateRef('confirmModal')
+const aboutTitleId = useId()
+const nameId = useId()
+const summaryId = useId()
+const slugId = useId()
+const dangerZoneTitleId = useId()
 
 const saved = computed(() => ({
 	name: organization.value?.name ?? '',
@@ -186,13 +191,13 @@ function confirmDelete() {
 
 <template>
 	<div v-if="organization" class="flex flex-col gap-8">
-		<SettingsSection :title="formatMessage(messages.about)" title-id="organization-about">
+		<SettingsSection :title="formatMessage(messages.about)" :title-id="aboutTitleId">
 			<div
 				class="flex flex-col gap-6 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4 sm:p-6"
 			>
 				<Field
 					:label="formatMessage(messages.name)"
-					input-id="organization-name"
+					:input-id="nameId"
 					class="max-w-[600px]"
 				>
 					<template #right>
@@ -206,7 +211,7 @@ function confirmDelete() {
 						</span>
 					</template>
 					<Input
-						id="organization-name"
+						:id="nameId"
 						v-model="current.name"
 						:maxlength="nameLimit"
 						wrapper-class="w-full"
@@ -216,7 +221,7 @@ function confirmDelete() {
 
 				<Field
 					:label="formatMessage(messages.summary)"
-					input-id="organization-summary"
+					:input-id="summaryId"
 					class="max-w-[600px]"
 				>
 					<template #right>
@@ -230,7 +235,7 @@ function confirmDelete() {
 						</span>
 					</template>
 					<Textarea
-						id="organization-summary"
+						:id="summaryId"
 						v-model="current.description"
 						:maxlength="summaryLimit"
 						:disabled="!canEditDetails || busy"
@@ -252,7 +257,6 @@ function confirmDelete() {
 							/>
 							<div class="flex flex-col items-start gap-2">
 								<FileButton
-									id="organization-icon"
 									:max-size="globals?.max_organization_icon_size"
 									accept="image/png,image/jpeg,image/gif,image/webp"
 									class="button-like choose-image"
@@ -277,11 +281,11 @@ function confirmDelete() {
 
 				<Field
 					:label="formatMessage(messages.url)"
-					input-id="organization-slug"
+					:input-id="slugId"
 					class="max-w-[600px]"
 				>
 					<Input
-						id="organization-slug"
+						:id="slugId"
 						v-model="current.slug"
 						:maxlength="64"
 						autocomplete="off"
@@ -300,7 +304,7 @@ function confirmDelete() {
 
 		<SettingsSection
 			:title="formatMessage(messages.dangerZone)"
-			title-id="organization-danger-zone"
+			:title-id="dangerZoneTitleId"
 			danger
 		>
 			<ConfirmModal

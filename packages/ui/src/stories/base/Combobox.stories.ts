@@ -9,6 +9,7 @@ import {
 	UserIcon,
 } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { useId } from 'vue'
 
 import Combobox from '../../components/base/Combobox.vue'
 
@@ -68,6 +69,14 @@ export const Searchable: Story = {
 		searchPlaceholder: 'Search loaders...',
 		selectSearchTextOnFocus: true,
 	},
+	render: (args) => ({
+		components: { Combobox },
+		setup: () => ({ args, searchInputId: useId() }),
+		template: `
+			<label :for="searchInputId">Loader</label>
+			<Combobox v-bind="args" :search-input-id="searchInputId" />
+		`,
+	}),
 }
 
 export const SearchableWithMoreResults: Story = {

@@ -24,7 +24,7 @@
 					"
 					:options="recommendedOptions"
 					searchable
-					:search-input-attrs="{ id: recommendedVersionInputId }"
+					:search-input-id="recommendedVersionInputId"
 					:display-name="(val: string) => val"
 					:placeholder="formatMessage(messages.selectVersion)"
 					:disabled="!recommendedOptions.length"

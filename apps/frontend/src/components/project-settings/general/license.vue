@@ -76,7 +76,7 @@
 					:placeholder="formatMessage(messages.selectPlaceholder)"
 					:search-placeholder="formatMessage(messages.selectPlaceholder)"
 					:searchable="true"
-					:search-input-attrs="{ id: licenseSelectId }"
+					:search-input-id="licenseSelectId"
 					sync-with-selection
 					select-search-text-on-focus
 					:disabled="saving || !hasPermission"
@@ -145,7 +145,6 @@
 
 			<div
 				v-if="licenseType === 'custom' || (licenseType === 'standard' && selectedLicense)"
-				id="project-settings-field-license-url"
 				data-project-field="license-url"
 				class="flex min-w-0 max-w-[600px] flex-col gap-2"
 			>

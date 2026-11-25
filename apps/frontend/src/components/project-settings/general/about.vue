@@ -4,7 +4,6 @@
 	<section class="universal-card settings-content-card">
 		<div class="flex flex-col gap-6">
 			<Field
-				id="project-settings-field-title"
 				:label="formatMessage(messages.name)"
 				:input-id="nameInputId"
 				data-project-field="title"
@@ -32,7 +31,6 @@
 			</Field>
 
 			<Field
-				id="project-settings-field-summary"
 				:label="formatMessage(messages.summary)"
 				:input-id="summaryInputId"
 				data-project-field="summary"
@@ -64,7 +62,6 @@
 
 			<div class="flex max-w-[600px] flex-wrap items-start gap-x-8 gap-y-6">
 				<Field
-					id="project-settings-field-icon"
 					:label="formatMessage(messages.icon)"
 					label-optional
 					data-project-field="icon"
@@ -199,7 +196,6 @@
 			</div>
 
 			<Field
-				id="project-settings-field-slug"
 				:label="formatMessage(messages.url)"
 				:input-id="slugInputId"
 				data-project-field="slug"

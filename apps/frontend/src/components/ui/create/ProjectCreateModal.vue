@@ -13,9 +13,9 @@
 			<RestrictedActionAlert v-model="isRestricted" scope="PROJECT_CREATE" @navigate="cancel" />
 			<CreateLimitAlert v-model="hasHitLimit" type="project" />
 
-			<Field :label="formatMessage(messages.nameLabel)" input-id="name">
+			<Field :label="formatMessage(messages.nameLabel)" :input-id="nameId">
 				<Input
-					id="name"
+					:id="nameId"
 					ref="nameInput"
 					v-model="name"
 					:maxlength="64"
@@ -28,12 +28,12 @@
 			</Field>
 			<Field
 				:label="formatMessage(messages.urlLabel)"
-				input-id="slug"
+				:input-id="slugId"
 				@focusin="onSlugSuggestionFocusIn"
 				@focusout="onSlugSuggestionFocusOut"
 			>
 				<Input
-					id="slug"
+					:id="slugId"
 					v-model="slug"
 					:maxlength="64"
 					class="w-full"
@@ -53,9 +53,9 @@
 					/>
 				</template>
 			</Field>
-			<Field :label="formatMessage(messages.summaryLabel)" input-id="additional-information">
+			<Field :label="formatMessage(messages.summaryLabel)" :input-id="summaryId">
 				<Textarea
-					id="additional-information"
+					:id="summaryId"
 					v-model="description"
 					:maxlength="256"
 					:placeholder="formatMessage(messages.summaryPlaceholder)"
@@ -65,10 +65,10 @@
 					{{ formatMessage(projectSummaryHelp) }}
 				</template>
 			</Field>
-			<Field :label="formatMessage(messages.ownerLabel)" input-id="project-create-owner-search">
+			<Field :label="formatMessage(messages.ownerLabel)" :input-id="ownerId">
 				<ProjectOwnerCombobox
 					v-model="owner"
-					input-id="project-create-owner-search"
+					:input-id="ownerId"
 					:options="ownerOptions"
 					:disabled="hasHitLimit"
 					hide-chevron
@@ -242,6 +242,10 @@ const { checking: checkingSlugSuggestions, suggestions: slugSuggestions } =
 const projectType = ref<ProjectType>('project')
 const owner = ref<string | undefined>('self')
 const organizations = ref<Labrinth.Projects.v3.Organization[]>([])
+const nameId = useId()
+const slugId = useId()
+const summaryId = useId()
+const ownerId = useId()
 const visibilityId = useId()
 type Visibility = keyof typeof projectVisibilityOptions
 const visibilityOptions = Object.keys(projectVisibilityOptions) as Visibility[]

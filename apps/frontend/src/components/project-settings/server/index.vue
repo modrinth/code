@@ -15,7 +15,7 @@
 						v-model="region"
 						:options="regionOptions"
 						searchable
-						:search-input-attrs="{ id: regionInputId }"
+						:search-input-id="regionInputId"
 						:placeholder="formatMessage(messages.selectRegionPlaceholder)"
 						:disabled="!hasPermission"
 					/>

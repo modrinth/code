@@ -13,8 +13,8 @@
 		search-autocorrect="off"
 		search-autocapitalize="none"
 		:search-spellcheck="false"
+		:search-input-id="inputId"
 		:search-input-attrs="{
-			id: inputId,
 			'data-1p-ignore': 'true',
 			'data-bwignore': 'true',
 			'data-form-type': 'other',
