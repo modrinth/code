@@ -181,8 +181,10 @@ function defaultLabel(setting: (typeof groups)[number]['settings'][number]) {
 	if (setting.type === 'color') {
 		return formatMessage(
 			setting.id === general.FloatingReviewPanelBorderColor.id
-				? messages.themeBorder : (setting.id === general.TechReviewBooleanColor.id ? messages.themeTechReviewBoolean :
-				messages.themeDefault),
+				? messages.themeBorder
+				: setting.id === general.TechReviewBooleanColor.id
+					? messages.themeTechReviewBoolean
+					: messages.themeDefault,
 		)
 	}
 	if (setting.type === 'toggle') return formatMessage(setting.default ? messages.on : messages.off)
@@ -269,7 +271,11 @@ const { style: floatingPanelStyle } = useFloatingReviewPanelAppearance()
 						:label="controlLabel(group.title, setting.title)"
 						:default-label="defaultLabel(setting)"
 						:reset-value="String(resetValue(setting))"
-						:default-color="setting.id === general.TechReviewBooleanColor.id ? 'var(--color-purple)' : 'var(--color-orange)'"
+						:default-color="
+							setting.id === general.TechReviewBooleanColor.id
+								? 'var(--color-purple)'
+								: 'var(--color-orange)'
+						"
 						:model-value="configuredSettings.get(setting)"
 						@update:model-value="(value) => configuredSettings.set(setting, value)"
 					/>

@@ -230,13 +230,15 @@ export function createReviewSubmission(
 					await client.labrinth.threads_v3.editIssueFacet(facet.id, facet.data)
 				}
 				assertPass()
-				client.labrinth.tech_review_internal.submitProject(id, { verdict: 'safe' }).catch(error => {
-					addNotification({
-						title: 'An error occurred',
-						text: error instanceof Error ? error.message : String(error),
-						type: 'error',
+				client.labrinth.tech_review_internal
+					.submitProject(id, { verdict: 'safe' })
+					.catch((error) => {
+						addNotification({
+							title: 'An error occurred',
+							text: error instanceof Error ? error.message : String(error),
+							type: 'error',
+						})
 					})
-				})
 				if (reply) {
 					await sendThreadReply(reply, client, () => {
 						assertCurrent(id)

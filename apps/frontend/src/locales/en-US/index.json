@@ -3311,11 +3311,17 @@
   "moderation.settings.search": {
     "message": "Search settings…"
   },
+  "moderation.settings.tech-review-section": {
+    "message": "Tech review"
+  },
   "moderation.settings.theme-border": {
     "message": "Theme orange (25% opacity)"
   },
   "moderation.settings.theme-default": {
     "message": "Theme orange"
+  },
+  "moderation.settings.theme-tech-review-boolean": {
+    "message": "Theme purple"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} per batch"

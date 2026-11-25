@@ -619,7 +619,7 @@ function fileActions(file: VersionFile): ButtonMenuOption[] {
 			icon: ClipboardCopyIcon,
 			disabled: !file.id,
 			action: () => navigator.clipboard.writeText(file.id),
-		}
+		},
 	]
 	for (const algorithm of ['sha1', 'sha512'] as const) {
 		const hash = file.hashes[algorithm]

@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { moderationSettings } from '@modrinth/moderation'
 import { computed, getCurrentInstance } from 'vue'
-import {moderationSettings} from "@modrinth/moderation";
-import {useModerationSettings} from "~/composables/moderation.ts";
+
+import { useModerationSettings } from '~/composables/moderation.ts'
 
 const settings = useModerationSettings()
 const TraceData = getCurrentInstance()!.type
@@ -79,7 +80,12 @@ const text = computed(() => {
 				:key="key"
 				class="min-w-0"
 				:class="item ? '' : 'text-primary opacity-50'"
-				:style="{ color: item ? (settings.get(moderationSettings.General.TechReviewBooleanColor) || 'var(--color-purple)') : undefined }"
+				:style="{
+					color: item
+						? settings.get(moderationSettings.General.TechReviewBooleanColor) ||
+							'var(--color-purple)'
+						: undefined,
+				}"
 			>
 				<dt class="max-w-40 truncate whitespace-nowrap font-medium" :title="`${key}: ${item}`">
 					{{ key }}

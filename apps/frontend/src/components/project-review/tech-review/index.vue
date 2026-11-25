@@ -551,10 +551,15 @@ provide(TECH_REVIEW_DECISIONS_KEY, decisions)
 const archiveMenu = ref<InstanceType<typeof FloatingMenu>>()
 const allArchivesMenu = ref<InstanceType<typeof FloatingMenu>>()
 provideTechReviewMenus()
-const uniqueFileCount = computed(() =>
-	new Set(pendingReports.value.map(report =>
-		[...new Set(report.issues.flatMap(issue => issue.details.map(detail => detail.key)))].sort().join('|')
-	)).size
+const uniqueFileCount = computed(
+	() =>
+		new Set(
+			pendingReports.value.map((report) =>
+				[...new Set(report.issues.flatMap((issue) => issue.details.map((detail) => detail.key)))]
+					.sort()
+					.join('|'),
+			),
+		).size,
 )
 const selectedFile = computed(
 	() =>
