@@ -64,7 +64,7 @@ pub async fn open_dir(path: PathBuf) {
 
 #[cfg(target_os = "macos")]
 fn reveal_in_finder(directory: &std::path::Path) {
-    use std::os::unix::ffi::OsStrExt;
+    use std::{fs::File, io::ErrorKind};
 
     // Unfortunately selectFile_inFileViewerRootedAtPath will execute
     // a .app bundle instead of opening it in Finder.
@@ -73,18 +73,18 @@ fn reveal_in_finder(directory: &std::path::Path) {
     //
     // Instead, we use activateFileViewerSelectingURLs which has the
     // unfortunate side effect of requiring a child to select.
-    // We scan for the first child in the folder, and fall back to
-    // opening the parent with the folder selected
+    // We use the hidden .DS_Store as the child, creating it if needed, so that
+    // empty folders work and nothing visible is selected. If we can't create
+    // it, we fall back to opening the parent with the folder selected
 
-    let first_visible_entry =
-        std::fs::read_dir(directory).ok().and_then(|entries| {
-            entries
-                .flatten()
-                .find(|entry| !entry.file_name().as_bytes().starts_with(b"."))
-                .map(|entry| entry.path())
-        });
+    let ds_store = directory.join(".DS_Store");
+    // This must be exclusive to avoid truncating the target of a symlink
+    let exists = match File::create_new(&ds_store) {
+        Ok(_) => true,
+        Err(err) => err.kind() == ErrorKind::AlreadyExists,
+    };
 
-    let path = first_visible_entry.as_deref().unwrap_or(directory);
+    let path = if exists { &ds_store } else { directory };
     let Some(url) = objc2_foundation::NSURL::from_file_path(path) else {
         return;
     };
