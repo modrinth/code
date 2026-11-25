@@ -13,6 +13,10 @@ impl AnalyticsBackend {
             AnalyticsBackend::Enabled { http_pool } => Some(http_pool.clone()),
         }
     }
+
+    pub(crate) fn is_enabled(&self) -> bool {
+        matches!(self, AnalyticsBackend::Enabled { .. })
+    }
 }
 
 #[track_caller]

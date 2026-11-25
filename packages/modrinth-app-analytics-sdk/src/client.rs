@@ -80,6 +80,10 @@ impl AppAnalytics {
             return;
         }
 
+        if !self.inner.backend.lock().is_enabled() {
+            return;
+        };
+
         self.inner.queue.push(event);
     }
 
