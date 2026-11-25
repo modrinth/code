@@ -5,7 +5,7 @@
 				:is="inputId ? 'label' : 'span'"
 				:id="labelId"
 				:for="inputId"
-				class="field-label font-semibold text-contrast empty:hidden"
+				class="field-label font-semibold text-lg text-contrast empty:hidden"
 			>
 				<slot name="label">{{ label }}</slot>
 				<span v-if="labelOptional" class="font-normal text-secondary">

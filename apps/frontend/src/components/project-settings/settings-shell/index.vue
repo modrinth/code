@@ -38,12 +38,11 @@ const drawerPinned = ref(false)
 
 <style scoped>
 .project-settings :deep(.project-field-highlight-anchor) {
-	position: relative;
+	@apply relative;
 }
 
 .project-settings :deep(.project-field-highlight-outline) {
-	@apply pointer-events-none absolute rounded-2xl border-2 border-solid border-orange;
-	inset: -12px;
+	@apply pointer-events-none absolute -inset-3 rounded-2xl border-2 border-solid border-orange;
 }
 
 .project-settings :deep(.settings-section-title) {
@@ -51,16 +50,12 @@ const drawerPinned = ref(false)
 }
 
 .project-settings :deep(.settings-content-card) {
-	margin-top: 0;
-	padding: 24px;
-	border: 1px solid var(--surface-5);
-	border-radius: 16px;
-	background: var(--surface-3);
+	@apply mt-0 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-6;
 }
 
 @media (max-width: 640px) {
 	.project-settings :deep(.settings-content-card) {
-		padding: 16px;
+		@apply p-4;
 	}
 }
 </style>
