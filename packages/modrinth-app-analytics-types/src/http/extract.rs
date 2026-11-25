@@ -3,7 +3,7 @@ use serde::Deserialize;
 use serde_json::value::RawValue;
 
 use crate::enums::Country;
-use crate::event::AppEventType;
+use crate::event::{AppEventType, InstanceInfo};
 use crate::http::batch::{
     AppEvent, AppEventBatch, SkewCorrectionError, SkewCorrectionParameters,
 };
@@ -178,27 +178,11 @@ pub fn extract_events<K: AsRef<str>, V: AsRef<str>>(
             continue;
         }
 
-        if let AppEventType::InstanceStart {
-            game_version,
-            loader_version,
-            ..
-        } = &event.event
+        if let AppEventType::InstanceStart { info } = &event.event
+            && let Err(err) = validate_instance_info(info)
         {
-            if !is_valid_instance_version_field(game_version.as_str()) {
-                rejected.push(
-                    SingleEventProcessingError::InvalidInstanceGameVersion,
-                );
-                continue;
-            }
-
-            if let Some(loader_version) = loader_version.as_ref() {
-                if !is_valid_instance_version_field(loader_version.as_str()) {
-                    rejected.push(
-                        SingleEventProcessingError::InvalidInstanceLoaderVersion,
-                    );
-                    continue;
-                }
-            }
+            rejected.push(err);
+            continue;
         }
 
         events.push(NormalizedAppEvent {
@@ -227,6 +211,24 @@ fn is_valid_app_version(version: &str) -> bool {
         && version.bytes().all(|b| {
             b.is_ascii_alphanumeric() || matches!(b, b'.' | b'+' | b'-')
         })
+}
+
+/// Checks that the client-supplied game and loader versions of an instance
+/// are within the accepted length.
+fn validate_instance_info(
+    info: &InstanceInfo,
+) -> Result<(), SingleEventProcessingError> {
+    if !is_valid_instance_version_field(&info.game_version) {
+        return Err(SingleEventProcessingError::InvalidInstanceGameVersion);
+    }
+
+    if let Some(loader_version) = &info.loader_version
+        && !is_valid_instance_version_field(loader_version)
+    {
+        return Err(SingleEventProcessingError::InvalidInstanceLoaderVersion);
+    }
+
+    Ok(())
 }
 
 fn is_valid_instance_version_field(version: &str) -> bool {

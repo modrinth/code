@@ -15,16 +15,22 @@ pub enum AppEventType {
     },
     /// An instance was launched.
     InstanceStart {
-        loader: AppLoader,
-        /// `None` for vanilla instances.
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        loader_version: Option<SmolStr>,
-        game_version: SmolStr,
+        #[serde(flatten)]
+        info: InstanceInfo,
     },
     /// The user signed in to a Microsoft account.
     MicrosoftSignIn {},
     /// Signing in to a Microsoft account failed.
     MicrosoftSignInFailed {},
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct InstanceInfo {
+    pub loader: AppLoader,
+    /// `None` for vanilla instances.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub loader_version: Option<SmolStr>,
+    pub game_version: SmolStr,
 }
 
 impl AppEventType {
