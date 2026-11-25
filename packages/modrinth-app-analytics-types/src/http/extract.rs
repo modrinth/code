@@ -178,7 +178,8 @@ pub fn extract_events<K: AsRef<str>, V: AsRef<str>>(
             continue;
         }
 
-        if let AppEventType::InstanceStart { info } = &event.event
+        if let AppEventType::InstanceStart { info }
+        | AppEventType::InstanceCreated { info } = &event.event
             && let Err(err) = validate_instance_info(info)
         {
             rejected.push(err);
@@ -307,6 +308,8 @@ mod tests {
     const EVENT_ID_A: &str = "01890a5d-ac96-774b-bcce-b302099a8057";
     const EVENT_ID_B: &str = "01890a5d-ac96-774b-bcce-b302099a8058";
     const NO_HEADERS: [(&str, &str); 0] = [];
+    const VALID_EVENT: &str =
+        r#"{"ModrinthSignOut":{"is_refresh_failed":false}}"#;
 
     fn arrived_at() -> DateTime<Utc> {
         "2026-11-23T12:00:00Z".parse().unwrap()
@@ -328,7 +331,7 @@ mod tests {
         let body = body(&format!(
             "{},{}",
             event(EVENT_ID_A, r#"{"NewThing":{"x":1}}"#),
-            event(EVENT_ID_B, r#"{"MicrosoftSignIn":{}}"#),
+            event(EVENT_ID_B, VALID_EVENT),
         ));
 
         let extracted =
@@ -343,7 +346,7 @@ mod tests {
 
     #[test]
     fn reports_path_of_invalid_batch_field() {
-        let body = body(&event(EVENT_ID_A, r#"{"MicrosoftSignIn":{}}"#))
+        let body = body(&event(EVENT_ID_A, VALID_EVENT))
             .replace(r#""os":"linux""#, r#""os":"beos""#);
 
         let err = extract_events(&body, NO_HEADERS, arrived_at()).unwrap_err();
@@ -356,7 +359,7 @@ mod tests {
 
     #[test]
     fn rejects_batch_with_invalid_app_version() {
-        let body = body(&event(EVENT_ID_A, r#"{"MicrosoftSignIn":{}}"#))
+        let body = body(&event(EVENT_ID_A, VALID_EVENT))
             .replace(r#""app_version":"0.10.3""#, r#""app_version":"0.10 3""#);
 
         let err = extract_events(&body, NO_HEADERS, arrived_at()).unwrap_err();
@@ -368,9 +371,9 @@ mod tests {
     fn rejects_event_with_invalid_source_without_rejecting_batch() {
         let body = body(&format!(
             "{},{}",
-            event(EVENT_ID_A, r#"{"MicrosoftSignIn":{}}"#)
+            event(EVENT_ID_A, VALID_EVENT)
                 .replace(r#""source":"BrowseTab""#, r#""source":"browse_tab""#),
-            event(EVENT_ID_B, r#"{"MicrosoftSignIn":{}}"#),
+            event(EVENT_ID_B, VALID_EVENT),
         ));
 
         let extracted =

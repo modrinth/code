@@ -142,3 +142,59 @@ impl Country {
         std::str::from_utf8(&self.0).unwrap_or_default()
     }
 }
+
+/// Step of the Microsoft, Xbox and Minecraft sign-in flow that a request
+/// failed during.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MinecraftAuthStep {
+    GetDeviceToken,
+    SisuAuthenticate,
+    GetOAuthToken,
+    RefreshOAuthToken,
+    SisuAuthorize,
+    XstsAuthorize,
+    MinecraftToken,
+    MinecraftEntitlements,
+    MinecraftProfile,
+}
+
+/// Why authenticating with Microsoft, Xbox or Minecraft services failed.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MinecraftAuthErrorCode {
+    /// The Microsoft refresh token expired or was revoked.
+    TokenExpired,
+    /// The client clock is too far from Xbox's.
+    ClockOutOfSync,
+    /// Minecraft services rate limited the request.
+    RateLimited,
+    /// Minecraft services returned a server error.
+    ServiceUnavailable,
+    /// The connection to an auth server was refused.
+    ConnectionRefused,
+    /// Any other network error.
+    Network,
+    /// The Xbox account needs age verification.
+    AgeVerification,
+    /// The Xbox account is banned.
+    Banned,
+    /// The Xbox account is restricted.
+    Restricted,
+    /// The Microsoft account has no Xbox profile.
+    NoXboxProfile,
+    /// The user hasn't accepted the Xbox terms.
+    TermsNotAccepted,
+    /// Xbox isn't available in the user's region.
+    RegionUnavailable,
+    /// The Xbox account needs adult verification.
+    AdultVerification,
+    /// The user is underage and must be added to a family.
+    Underage,
+    /// Xbox rejected the XSTS authorization for another reason. Optionally contains the specific error code.
+    XstsRejected(Option<u64>),
+    /// Any other authentication error, where we know the code.
+    OtherKnown(u64),
+    /// Any other authentication error.
+    OtherUnknown,
+}

@@ -28,7 +28,7 @@ pub struct AppEventBatch<E = AppEvent> {
 }
 
 /// A single event in an [`AppEventBatch`].
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppEvent {
     /// Event ID (UUIDv7)
     pub id: Uuid,
@@ -132,7 +132,9 @@ mod tests {
             id: Uuid::nil(),
             timestamp: time(timestamp),
             source: "app".into(),
-            event: AppEventType::MicrosoftSignIn {},
+            event: AppEventType::ModrinthSignOut {
+                is_refresh_failed: false,
+            },
         }
         .corrected_timestamp_skew(&SkewCorrectionParameters {
             client_sent_at: time(sent_at),
