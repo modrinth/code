@@ -33,8 +33,7 @@ use crate::{
 const DEFAULT_SESSION_JOIN: &str =
     "https://sessionserver.mojang.com/session/minecraft/join";
 
-/// macOS's sandbox handles opening links and file dialogs without any intervention.
-const ALLOW_OPEN_URI: bool = cfg!(not(target_os = "macos"));
+/// macOS's sandbox handles file dialogs without any intervention.
 const ALLOW_OPEN_FILE_DIALOG: bool = cfg!(not(target_os = "macos"));
 
 /// This is only necessary on Linux X11.
@@ -99,9 +98,9 @@ impl SandboxApiChild {
             format!("-Dmodrinth.sandboxagent.secret={}", self.0.secret),
             format!("-Dmodrinth.sandboxagent.port={port}"),
             "-Dmodrinth.sandboxagent.transform.auth=true".to_owned(),
+            "-Dmodrinth.sandboxagent.transform.openuri=true".to_owned(),
         ];
         for (transform, allowed) in [
-            ("openuri", ALLOW_OPEN_URI),
             ("dragdrop", ALLOW_REQUEST_ACCESS),
             ("filedialog", ALLOW_OPEN_FILE_DIALOG),
         ] {
@@ -445,10 +444,6 @@ impl SandboxApiService {
 
         match path {
             "/sandboxapi/open-uri" => {
-                if !ALLOW_OPEN_URI {
-                    RequestStatus::Forbidden.write(stream).await;
-                    return;
-                }
                 if request.method != Some("POST") {
                     RequestStatus::MethodNotAllowed.write(stream).await;
                     return;

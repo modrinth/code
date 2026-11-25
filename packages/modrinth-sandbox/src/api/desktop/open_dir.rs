@@ -6,10 +6,12 @@ pub async fn open_dir(path: PathBuf) {
     // Therefore, we use platform specific operations that are designed to specifically open a folder
     #[cfg(target_os = "macos")]
     {
-        let workspace = objc2_app_kit::NSWorkspace::sharedWorkspace();
-        let path =
-            objc2_foundation::NSString::from_str(&path.to_string_lossy());
-        workspace.selectFile_inFileViewerRootedAtPath(None, &path);
+        // Finder can take a long time to respond
+        let result =
+            tokio::task::spawn_blocking(move || reveal_in_finder(&path)).await;
+        if let Err(err) = result {
+            tracing::error!("SandboxAPI failed to reveal directory: {err}");
+        }
     }
     #[cfg(target_os = "windows")]
     {
@@ -58,4 +60,36 @@ pub async fn open_dir(path: PathBuf) {
             tracing::error!("SandboxAPI failed to send OpenDirectory: {err}");
         }
     }
+}
+
+#[cfg(target_os = "macos")]
+fn reveal_in_finder(directory: &std::path::Path) {
+    use std::os::unix::ffi::OsStrExt;
+
+    // Unfortunately selectFile_inFileViewerRootedAtPath will execute
+    // a .app bundle instead of opening it in Finder.
+    // Even explicitly passing Finder as the application doesn't work,
+    // Finder just executes the .app
+    //
+    // Instead, we use activateFileViewerSelectingURLs which has the
+    // unfortunate side effect of requiring a child to select.
+    // We scan for the first child in the folder, and fall back to
+    // opening the parent with the folder selected
+
+    let first_visible_entry =
+        std::fs::read_dir(directory).ok().and_then(|entries| {
+            entries
+                .flatten()
+                .find(|entry| !entry.file_name().as_bytes().starts_with(b"."))
+                .map(|entry| entry.path())
+        });
+
+    let path = first_visible_entry.as_deref().unwrap_or(directory);
+    let Some(url) = objc2_foundation::NSURL::from_file_path(path) else {
+        return;
+    };
+    objc2_app_kit::NSWorkspace::sharedWorkspace()
+        .activateFileViewerSelectingURLs(
+            &objc2_foundation::NSArray::from_slice(&[&*url]),
+        );
 }

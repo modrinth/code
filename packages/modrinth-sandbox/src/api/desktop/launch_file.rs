@@ -55,13 +55,7 @@ pub async fn launch_file_safe(path: PathBuf) {
 
 async fn launch_file(path: PathBuf) {
     #[cfg(target_os = "macos")]
-    {
-        let workspace = objc2_app_kit::NSWorkspace::sharedWorkspace();
-        if let Some(path) = objc2_foundation::NSURL::from_file_path(&path) {
-            workspace.openURL(&path);
-            return;
-        }
-    }
+    launch_file_macos(&path);
 
     #[cfg(target_os = "linux")]
     {
@@ -78,7 +72,61 @@ async fn launch_file(path: PathBuf) {
         }
     }
 
+    #[cfg(not(target_os = "macos"))]
     if let Err(err) = open::that_detached(path) {
         tracing::error!("SandboxAPI failed to open file: {err}");
     }
+}
+
+#[cfg(target_os = "macos")]
+fn launch_file_macos(path: &std::path::Path) {
+    use objc2_app_kit::{
+        NSRunningApplication, NSWorkspace, NSWorkspaceOpenConfiguration,
+    };
+    use objc2_foundation::{NSArray, NSError, NSString, NSURL};
+    use objc2_uniform_type_identifiers::UTType;
+
+    let Some(url) = NSURL::from_file_path(path) else {
+        return;
+    };
+    let Some(extension) = path.extension().and_then(|ext| ext.to_str()) else {
+        return;
+    };
+
+    // We explicitly look up the application ourselves to avoid exploits
+    // involving replacing the file with a symlink pointing at a different
+    // file type.
+    // If a malicious mod tries to replace `a.png` with a symlink
+    // pointing at `b.sh` then `b.sh` will end up being opened with Preview
+    // which will probably fail
+
+    let workspace = NSWorkspace::sharedWorkspace();
+    let application =
+        UTType::typeWithFilenameExtension(&NSString::from_str(extension))
+            .and_then(|content_type| {
+                workspace.URLForApplicationToOpenContentType(&content_type)
+            });
+    let Some(application) = application else {
+        tracing::warn!(
+            "SandboxAPI found no application to open .{extension} files"
+        );
+        return;
+    };
+
+    let configuration = NSWorkspaceOpenConfiguration::configuration();
+    configuration.setPromptsUserIfNeeded(false);
+
+    let completion_handler = block2::RcBlock::new(
+        |_: *mut NSRunningApplication, error: *mut NSError| {
+            if let Some(error) = unsafe { error.as_ref() } {
+                tracing::error!("SandboxAPI failed to open file: {error}");
+            }
+        },
+    );
+    workspace.openURLs_withApplicationAtURL_configuration_completionHandler(
+        &NSArray::from_slice(&[&*url]),
+        &application,
+        &configuration,
+        Some(&completion_handler),
+    );
 }

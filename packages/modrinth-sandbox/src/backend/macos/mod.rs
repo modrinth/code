@@ -318,7 +318,7 @@ static BASE_PROFILE: &str = r#"
 (deny nvram*)
 (deny process-info*)
 (deny file-link)
-(allow hid-control process-fork lsopen)
+(allow hid-control process-fork)
 (allow signal (target same-sandbox))
 (allow process-info-pidinfo)
 (allow
