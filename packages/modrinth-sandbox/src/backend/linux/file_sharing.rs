@@ -2266,18 +2266,27 @@ impl fuser::Filesystem for FileSharingFS {
             return reply.error(fuser::Errno::EBADF);
         };
 
-        if fs.reuse_buffer.len() < size as usize + 1 {
-            fs.reuse_buffer.resize(size as usize + 1, 0);
+        let size = size as usize;
+        if fs.reuse_buffer.len() < size {
+            fs.reuse_buffer.resize(size, 0);
+        }
+        let buffer = &mut fs.reuse_buffer[..size];
+
+        let mut num_bytes = 0;
+        while num_bytes < size {
+            match rustix::io::pread(
+                &fd,
+                &mut buffer[num_bytes..],
+                offset + num_bytes as u64,
+            ) {
+                Ok(0) => break,
+                Ok(read) => num_bytes += read,
+                Err(rustix::io::Errno::INTR) => {}
+                Err(errno) => return reply.error(to_fuser_errno(errno)),
+            }
         }
 
-        let num_bytes =
-            match rustix::io::pread(fd, fs.reuse_buffer.as_mut_slice(), offset)
-            {
-                Ok(num_bytes) => num_bytes,
-                Err(errno) => return reply.error(to_fuser_errno(errno)),
-            };
-
-        reply.data(&fs.reuse_buffer[..num_bytes]);
+        reply.data(&buffer[..num_bytes]);
     }
 
     fn write(
