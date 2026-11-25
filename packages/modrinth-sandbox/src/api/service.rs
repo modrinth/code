@@ -1002,7 +1002,9 @@ impl SandboxApiService {
                 return RequestStatus::Forbidden;
             }
 
-            tokio::task::spawn(super::desktop::open_url(url));
+            let sandbox_handle =
+                child_state.and_then(|child_state| child_state.handle);
+            tokio::task::spawn(super::desktop::open_url(url, sandbox_handle));
             RequestStatus::OK
         } else if url.scheme() == "file" && url.host_str().is_none() {
             let Ok(path) = url.to_file_path() else {
@@ -1024,7 +1026,10 @@ impl SandboxApiService {
                 if path.is_dir() {
                     tokio::task::spawn(super::desktop::open_dir(path));
                 } else {
-                    tokio::task::spawn(super::desktop::launch_file_safe(path));
+                    tokio::task::spawn(super::desktop::launch_file_safe(
+                        path,
+                        sandbox_handle,
+                    ));
                 }
             };
             // If the path doesn't exist, do nothing. This prevents enumeration of existing files

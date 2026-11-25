@@ -1,6 +1,8 @@
 use std::path::PathBuf;
 
-pub async fn launch_file_safe(path: PathBuf) {
+use crate::SandboxHandle;
+
+pub async fn launch_file_safe(path: PathBuf, sandbox_handle: SandboxHandle) {
     let Some(extension) = path.extension() else {
         return;
     };
@@ -50,12 +52,16 @@ pub async fn launch_file_safe(path: PathBuf) {
         return;
     }
 
-    launch_file(path).await
+    launch_file(path, sandbox_handle).await
 }
 
-async fn launch_file(path: PathBuf) {
+async fn launch_file(
+    path: PathBuf,
+    #[cfg_attr(not(target_os = "macos"), allow(unused))]
+    sandbox_handle: SandboxHandle,
+) {
     #[cfg(target_os = "macos")]
-    launch_file_macos(&path);
+    launch_file_macos(&path, &sandbox_handle);
 
     #[cfg(target_os = "linux")]
     {
@@ -79,11 +85,9 @@ async fn launch_file(path: PathBuf) {
 }
 
 #[cfg(target_os = "macos")]
-fn launch_file_macos(path: &std::path::Path) {
-    use objc2_app_kit::{
-        NSRunningApplication, NSWorkspace, NSWorkspaceOpenConfiguration,
-    };
-    use objc2_foundation::{NSArray, NSError, NSURL};
+fn launch_file_macos(path: &std::path::Path, sandbox_handle: &SandboxHandle) {
+    use objc2_app_kit::NSWorkspace;
+    use objc2_foundation::NSURL;
 
     let Some(url) = NSURL::from_file_path(path) else {
         return;
@@ -100,31 +104,19 @@ fn launch_file_macos(path: &std::path::Path) {
     // which will probably fail
 
     let workspace = NSWorkspace::sharedWorkspace();
-    let Some(application) =
-        find_application_for_extension(&workspace, extension)
-    else {
+    let Some(application) = find_application_for_extension(
+        &workspace, extension,
+    )
+    .and_then(|application| {
+        super::resolve_trusted_application(&application, sandbox_handle)
+    }) else {
         tracing::warn!(
-            "SandboxAPI found no application to open .{extension} files"
+            "SandboxAPI found no trusted application to open .{extension} files"
         );
         return;
     };
 
-    let configuration = NSWorkspaceOpenConfiguration::configuration();
-    configuration.setPromptsUserIfNeeded(false);
-
-    let completion_handler = block2::RcBlock::new(
-        |_: *mut NSRunningApplication, error: *mut NSError| {
-            if let Some(error) = unsafe { error.as_ref() } {
-                tracing::error!("SandboxAPI failed to open file: {error}");
-            }
-        },
-    );
-    workspace.openURLs_withApplicationAtURL_configuration_completionHandler(
-        &NSArray::from_slice(&[&*url]),
-        &application,
-        &configuration,
-        Some(&completion_handler),
-    );
+    super::open_with_application(&workspace, &url, &application);
 }
 
 #[cfg(target_os = "macos")]
