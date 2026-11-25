@@ -83,8 +83,7 @@ fn launch_file_macos(path: &std::path::Path) {
     use objc2_app_kit::{
         NSRunningApplication, NSWorkspace, NSWorkspaceOpenConfiguration,
     };
-    use objc2_foundation::{NSArray, NSError, NSString, NSURL};
-    use objc2_uniform_type_identifiers::UTType;
+    use objc2_foundation::{NSArray, NSError, NSURL};
 
     let Some(url) = NSURL::from_file_path(path) else {
         return;
@@ -101,12 +100,9 @@ fn launch_file_macos(path: &std::path::Path) {
     // which will probably fail
 
     let workspace = NSWorkspace::sharedWorkspace();
-    let application =
-        UTType::typeWithFilenameExtension(&NSString::from_str(extension))
-            .and_then(|content_type| {
-                workspace.URLForApplicationToOpenContentType(&content_type)
-            });
-    let Some(application) = application else {
+    let Some(application) =
+        find_application_for_extension(&workspace, extension)
+    else {
         tracing::warn!(
             "SandboxAPI found no application to open .{extension} files"
         );
@@ -129,4 +125,27 @@ fn launch_file_macos(path: &std::path::Path) {
         &configuration,
         Some(&completion_handler),
     );
+}
+
+#[cfg(target_os = "macos")]
+fn find_application_for_extension(
+    workspace: &objc2_app_kit::NSWorkspace,
+    extension: &str,
+) -> Option<objc2::rc::Retained<objc2_foundation::NSURL>> {
+    if objc2::available!(macos = 12.0) {
+        let content_type = super::content_type_for_extension(extension)?;
+        return unsafe {
+            objc2::msg_send![
+                workspace,
+                URLForApplicationToOpenContentType: &*content_type
+            ]
+        };
+    }
+
+    let placeholder = tempfile::Builder::new()
+        .suffix(&format!(".{extension}"))
+        .tempfile()
+        .ok()?;
+    let url = objc2_foundation::NSURL::from_file_path(placeholder.path())?;
+    workspace.URLForApplicationToOpenURL(&url)
 }

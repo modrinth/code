@@ -21,6 +21,7 @@
 		},
 		"longDescription": "",
 		"macOS": {
+			"minimumSystemVersion": "10.15",
 			"entitlements": "App.entitlements",
 			"exceptionDomain": "",
 			"frameworks": [],

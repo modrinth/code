@@ -60,9 +60,9 @@ directories =  { workspace = true }
 fuser = { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
+objc2 = { workspace = true }
 objc2-app-kit = { workspace = true }
 objc2-foundation = { workspace = true }
-objc2-uniform-type-identifiers = { workspace = true }
 dispatch2 = { workspace = true }
 block2 = { workspace = true }
 

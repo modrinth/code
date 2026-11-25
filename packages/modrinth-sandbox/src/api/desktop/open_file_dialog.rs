@@ -127,19 +127,7 @@ pub async fn open_file_dialog_macos(
 
         // Filters
         if !args.filters.is_empty() {
-            let filters = args.filters.iter().filter_map(|filter| {
-                let extension = objc2_foundation::NSString::from_str(&filter.extension);
-                objc2_uniform_type_identifiers::UTType::typeWithFilenameExtension(&extension)
-            }).collect::<Vec<_>>();
-            let filters =
-                filters.iter().map(|uttype| &**uttype).collect::<Vec<_>>();
-            if !filters.is_empty() {
-                let array = objc2_foundation::NSArray::from_slice(&filters);
-                panel.setAllowedContentTypes(&array);
-            }
-            if args.save {
-                panel.setShowsContentTypes(filters.len() >= 2);
-            }
+            set_panel_filters(&panel, &args.filters, args.save);
         }
 
         // Default location
@@ -211,6 +199,46 @@ pub async fn open_file_dialog_macos(
     result_receiver.await
         .map_err(|_| eyre!("channel closed unexpectedly while waiting for file dialog result"))
         .flatten()
+}
+
+#[cfg(target_os = "macos")]
+fn set_panel_filters(
+    panel: &objc2_app_kit::NSSavePanel,
+    filters: &[OpenFileDialogFilter],
+    save: bool,
+) {
+    use objc2_foundation::{NSArray, NSString};
+
+    if !objc2::available!(macos = 11.0) {
+        let file_types = filters
+            .iter()
+            .map(|filter| NSString::from_str(&filter.extension))
+            .collect::<Vec<_>>();
+        #[expect(
+            deprecated,
+            reason = "setAllowedContentTypes requires macOS 11"
+        )]
+        panel.setAllowedFileTypes(Some(&NSArray::from_retained_slice(
+            &file_types,
+        )));
+        return;
+    }
+
+    let content_types = filters
+        .iter()
+        .filter_map(|filter| {
+            super::content_type_for_extension(&filter.extension)
+        })
+        .collect::<Vec<_>>();
+    if !content_types.is_empty() {
+        let content_types = NSArray::from_retained_slice(&content_types);
+        let _: () = unsafe {
+            objc2::msg_send![panel, setAllowedContentTypes: &*content_types]
+        };
+    }
+    if save && objc2::available!(macos = 15.0) {
+        panel.setShowsContentTypes(content_types.len() >= 2);
+    }
 }
 
 #[cfg(target_os = "linux")]
