@@ -4,7 +4,7 @@ pub mod api;
 mod backend;
 pub mod ffi;
 #[cfg(target_os = "linux")]
-pub mod file_sharing;
+mod file_sharing;
 pub mod helper;
 pub mod minecraft;
 mod path_access;
@@ -236,7 +236,7 @@ impl Default for SandboxCommand {
 }
 
 /// Describes what to do with a standard I/O stream for a child process when
-/// passed to the [`stdin`], [`stdout`], and [`stderr`] methods of
+/// assigned to the [`stdin`], [`stdout`], and [`stderr`] fields of
 /// [`SandboxCommand`].
 ///
 /// This is analogous to [`std::process::Stdio`].
@@ -329,6 +329,7 @@ impl SandboxChild {
         res
     }
 
+    /// Returns a handle for managing which files the child can access.
     pub fn get_sandbox_handle(&self) -> SandboxHandle {
         SandboxHandle {
             imp: self.handle.clone(),
@@ -342,18 +343,32 @@ impl SandboxChild {
     }
 }
 
+/// Where a path exposed by [`SandboxHandle::expose_path`] is inside of the sandbox.
 #[derive(Clone, Debug)]
 pub enum ExposedPath {
+    /// The path is the same inside of the sandbox.
     Direct,
+    /// The path is only accessible using this other path.
     Proxied(PathBuf),
 }
 
+/// Handle for managing which files a running [`SandboxChild`] can access.
 #[derive(Clone, Debug)]
 pub struct SandboxHandle {
     imp: backend::SandboxHandle,
 }
 
 impl SandboxHandle {
+    /// Gives the sandbox access to a host path, such as a file selected by the user.
+    ///
+    /// The sandbox may only be given read access if [`SandboxCommand::path_rules`]
+    /// blocks writing to the path. On Windows, if the path doesn't exist and it can
+    /// be written to, this creates an empty file.
+    ///
+    /// # Errors
+    ///
+    /// Errors if the path is blocked by [`SandboxCommand::path_rules`], or if the
+    /// backend can't expose paths after the sandbox has started.
     pub fn expose_path(
         &self,
         path: &Path,
@@ -362,14 +377,18 @@ impl SandboxHandle {
         self.imp.expose_path(path, permission)
     }
 
+    /// Whether the sandbox already has read access to a path.
     pub fn is_path_readable(&self, path: &Path) -> bool {
         self.imp.is_path_readable(path)
     }
 
+    /// Whether the sandbox already has write access to a path.
     pub fn is_path_writeable(&self, path: &Path) -> bool {
         self.imp.is_path_writeable(path)
     }
 
+    /// Whether a path given by the sandboxed process shouldn't be accessed on its
+    /// behalf.
     pub fn is_path_risky_or_blocked(&self, path: &Path) -> bool {
         path_access::is_risky_path(path) || self.imp.is_path_blocked(path)
     }

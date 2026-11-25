@@ -45,7 +45,7 @@ const ALLOW_OPEN_FILE_DIALOG: bool = cfg!(not(target_os = "macos"));
 const ALLOW_REQUEST_ACCESS: bool = cfg!(not(any(windows, target_os = "macos")));
 
 #[derive(Default)]
-pub struct DiscoveredEndpoints {
+struct DiscoveredEndpoints {
     custom_session_join: Option<Url>,
     replace_authorization_header: HashMap<Arc<str>, Url>,
 }
@@ -63,7 +63,7 @@ pub trait SandboxApiLauncher: Send + Sync {
 #[derive(Clone)]
 pub struct SandboxApiChild(Arc<SandboxApiChildInner>);
 
-pub struct SandboxApiChildInner {
+struct SandboxApiChildInner {
     dummy_access_token: Arc<str>,
     secret: Arc<str>,
     port: u16,
@@ -1327,7 +1327,7 @@ struct MinecraftJoinRequest {
     server_id: Arc<str>,
 }
 
-pub fn skip_if_none<T>(value: &Option<T>) -> bool {
+fn skip_if_none<T>(value: &Option<T>) -> bool {
     value.is_none()
 }
 
@@ -1342,7 +1342,7 @@ enum RequestStatus {
     InternalServerError,
 }
 
-pub async fn write_json_response<T: Serialize>(
+async fn write_json_response<T: Serialize>(
     stream: &mut TcpStream,
     t: &T,
 ) -> serde_json::Result<()> {
@@ -1372,7 +1372,7 @@ fn is_hop_by_hop_header(lowercase_name: &str) -> bool {
     HOP_BY_HOP_HEADERS.contains(&lowercase_name)
 }
 
-pub async fn write_text_response(mut stream: TcpStream, t: &str) {
+async fn write_text_response(mut stream: TcpStream, t: &str) {
     let response = format!(
         "HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
         t.len(),

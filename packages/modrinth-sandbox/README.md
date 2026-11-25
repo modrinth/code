@@ -1,8 +1,8 @@
 Library for sandboxing Minecraft instances for modded game launchers
 
-```rs
+```rust,no_run
 use eyre::{Context, Result};
-use modrinth_sandbox::{minecraft::MinecraftCommand, SandboxEnv, SandboxOutput};
+use modrinth_sandbox::{minecraft::MinecraftCommand, SandboxEnv};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -15,13 +15,12 @@ async fn main() -> Result<()> {
 	let sandbox_env = SandboxEnv::new()
 		.await
 		.wrap_err("creating sandbox environment")?;
-	let command = MinecraftCommand {
-		jre_path: "/path/to/the/jre".into(),
-		classpath: vec!["/path/to/minecraft.jar".into()],
-		instance_path: "/path/to/instance".into(),
-		persistent_dir: "/path/to/instance-data".into(),
-		// etc.
-	};
+	let mut command = MinecraftCommand::default();
+	command.jre_path = "/path/to/the/jre".into();
+	command.classpath = vec!["/path/to/minecraft.jar".into()];
+	command.instance_path = "/path/to/instance".into();
+	command.persistent_dir = "/path/to/instance-data".into();
+	// etc.
 
 	// Spawn Minecraft.
 	let command = modrinth_sandbox::minecraft::setup_minecraft_command(command)
@@ -47,9 +46,9 @@ Sandboxing aims to be minimally invasive to the game, so most mods should contin
 
 We use OS-specific primitives to perform sandboxing, that is:
 - Windows [AppContainers]
-- MacOS [Seatbelt] and `sandbox-exec`
+- macOS [Seatbelt]
 - Linux
-	- In Flatpak: [`flatpak-spawn`]
+	- In Flatpak: the [`org.freedesktop.portal.Flatpak`] portal
 	- Outside of Flatpak: [Bubblewrap]
 
 Each platform has its own specific capabilities, but we abstract over that using the `SandboxCommand`, which is a platform-independent way to configure:
@@ -77,5 +76,5 @@ The general flow of spawning a sandboxed process is:
 
 [AppContainers]: https://learn.microsoft.com/en-us/windows/win32/secauthz/appcontainer-isolation
 [Seatbelt]: https://theapplewiki.com/wiki/Dev:Seatbelt
-[`flatpak-spawn`]: https://www.man7.org/linux/man-pages/man1/flatpak-spawn.1.html
+[`org.freedesktop.portal.Flatpak`]: https://docs.flatpak.org/en/latest/libflatpak-api-reference.html#gdbus-org.freedesktop.portal.Flatpak
 [Bubblewrap]: https://github.com/containers/bubblewrap

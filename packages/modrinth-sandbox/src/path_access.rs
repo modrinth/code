@@ -153,6 +153,7 @@ pub fn has_executable_extension(path: &Path) -> bool {
         .any(|executable| executable.eq_ignore_ascii_case(extension))
 }
 
+/// Which access the sandbox has to a path.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PathPermission {
     ReadOnly,
@@ -164,18 +165,22 @@ pub enum PathPermission {
 /// Rules also apply to everything inside of their path. If multiple rules apply to
 /// a path, the last one takes precedence.
 #[derive(Clone, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum PathRule {
     /// Can't be exposed at all, including by paths that the sandbox is explicitly
     /// given access to when it starts.
     HardBlock(PathBuf),
+    /// Like [`PathRule::HardBlock`], but doesn't affect whether the path can be read.
     HardBlockWrite(PathBuf),
     /// Can't be exposed after the sandbox has started. The sandbox can still be given
     /// access to this path, or paths inside of it, when it starts.
     SoftBlock(PathBuf),
+    /// Like [`PathRule::SoftBlock`], but doesn't affect whether the path can be read.
     SoftBlockWrite(PathBuf),
     /// Doesn't give the sandbox access to the path by itself,
     /// just permits access if selected by the user
     Unblock(PathBuf),
+    /// Like [`PathRule::Unblock`], but doesn't affect whether the path can be written to.
     UnblockRead(PathBuf),
 }
 

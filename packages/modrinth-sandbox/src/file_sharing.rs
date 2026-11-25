@@ -79,14 +79,15 @@ pub fn mount(mountpoint: PathBuf) -> eyre::Result<FileSharing> {
     filesystem.0.lock().files.delete_notifier = Some(delete_sender);
     Ok(FileSharing {
         filesystem,
-        session: Arc::new(session),
+        _session: Arc::new(session),
     })
 }
 
 #[derive(Clone, Debug)]
 pub struct FileSharing {
     filesystem: FileSharingFS,
-    session: Arc<fuser::BackgroundSession>,
+    /// Unmounts the filesystem when dropped.
+    _session: Arc<fuser::BackgroundSession>,
 }
 
 impl FileSharing {
@@ -226,11 +227,6 @@ impl FileSharing {
         path.push(&*filename);
 
         Ok(path)
-    }
-
-    pub fn join(self) -> eyre::Result<()> {
-        Arc::into_inner(self.session).unwrap().join()?;
-        Ok(())
     }
 }
 
