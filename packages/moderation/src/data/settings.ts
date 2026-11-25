@@ -29,6 +29,13 @@ const settings = {
 			step: 25,
 			unit: 'ms',
 		}),
+		TechReviewBooleanColor: setting.asColor({
+			type: 'color',
+			id: 'tech-review-boolean-color',
+			title: 'Trace Boolean Color',
+			description: 'Color for Boolean values in technical review traces',
+			default: '',
+		}),
 		TechReviewMode: setting.asToggle({
 			type: 'toggle',
 			id: 'tech-review-mode',
