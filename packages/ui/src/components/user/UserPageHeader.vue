@@ -292,7 +292,7 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		action: () => emit('manageProjects'),
 		shown: props.isSelf,
 	},
-	{ type: 'divider', shown: props.isSelf },
+	{ type: 'divider' },
 	{
 		id: 'report',
 		label: formatMessage(commonMessages.reportButton),
@@ -321,7 +321,7 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		icon: ClipboardCopyIcon,
 		action: () => emit('copyPermalink'),
 	},
-	{ type: 'divider', shown: props.showStaffActions && (props.isAdmin || props.isStaff) },
+	{ type: 'divider' },
 	{
 		id: 'open-info',
 		label: formatMessage(messages.infoButton),
@@ -346,7 +346,7 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		tone: 'orange',
 		shown: props.showStaffActions && props.isAdmin,
 	},
-	{ type: 'divider', shown: props.showStaffActions && (props.isAdmin || props.isStaff) },
+	{ type: 'divider' },
 	{
 		id: 'edit-user',
 		label: formatMessage(messages.editUserButton),
@@ -363,11 +363,7 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		tone: 'green',
 		shown: props.showStaffActions && props.isStaff,
 	},
-	{
-		type: 'divider',
-		shown:
-			props.showStaffActions && props.isAdmin && (props.user.role === 'developer' || !props.isSelf),
-	},
+	{ type: 'divider' },
 	{
 		id: 'toggle-lock',
 		label: formatMessage(props.user.lock ? messages.unlockButton : messages.lockButton),

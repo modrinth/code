@@ -372,7 +372,7 @@ function openGroupContextMenu(event: MouseEvent) {
 			shown: isCustomGroup.value,
 			action: () => void groupNameInput.value?.startEditing(),
 		},
-		{ type: 'divider', shown: isCustomGroup.value },
+		{ type: 'divider' },
 		{
 			id: 'delete_group',
 			label: formatMessage(messages.deleteGroup),

@@ -387,10 +387,7 @@ const overflowOptions = computed((): ButtonMenuOption[] => [
 		shown: props.world.type === 'singleplayer',
 		action: () => (props.world.type === 'singleplayer' ? emit('open-folder', props.world) : {}),
 	},
-	{
-		type: 'divider',
-		shown: !!props.instanceId,
-	},
+	{ type: 'divider' },
 	{
 		id: 'dont-show-on-home',
 		label: formatMessage(messages.dontShowOnHome),
@@ -415,10 +412,7 @@ const overflowOptions = computed((): ButtonMenuOption[] => [
 		shown: !!shortcutInstanceId.value && !props.launchBlocked,
 		action: () => createShortcut(),
 	},
-	{
-		type: 'divider',
-		shown: !props.instanceId,
-	},
+	{ type: 'divider' },
 	{
 		id: 'delete',
 		label: formatMessage(
@@ -457,7 +451,7 @@ const contextMenuOptions = computed((): ButtonMenuOption[] => [
 				tooltip: playTooltip.value ?? undefined,
 				action: () => emit('play'),
 			},
-	{ type: 'divider', shown: props.showPlayButton },
+	{ type: 'divider' },
 	...overflowOptions.value,
 ])
 

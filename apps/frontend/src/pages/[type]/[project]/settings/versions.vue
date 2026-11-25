@@ -123,7 +123,7 @@
 								auth.user ? reportVersion(version.id) : promptAuth(getSignInRouteObj(route)),
 							shown: !currentMember,
 						},
-						{ type: 'divider', shown: !!currentMember || flags.developerMode },
+						{ type: 'divider' },
 						{
 							id: 'copy-id',
 							label: formatMessage(messages.copyIdOption),
@@ -140,7 +140,7 @@
 							},
 							shown: flags.developerMode,
 						},
-						{ type: 'divider', shown: !!currentMember },
+						{ type: 'divider' },
 						{
 							id: 'edit-details',
 							label: formatMessage(messages.editDetailsOption),

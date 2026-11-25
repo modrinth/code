@@ -18,6 +18,7 @@ const options: ButtonMenuOption[] = [
 		id: 'download',
 		label: 'Download',
 		icon: DownloadIcon,
+		shortcut: 'Ctrl Alt D',
 		action: () => undefined,
 	},
 	{

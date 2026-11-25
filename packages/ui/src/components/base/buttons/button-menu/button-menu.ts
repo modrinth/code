@@ -60,8 +60,19 @@ export function isMenuRow(
 	return option.type !== 'divider' && option.type !== 'heading'
 }
 
-export function visibleOptions<T extends { shown?: boolean }>(options: T[]): T[] {
-	return options.filter((option) => option.shown !== false)
+export function visibleOptions<T extends { shown?: boolean; type?: string }>(options: T[]): T[] {
+	const visible: T[] = []
+
+	for (const option of options) {
+		if (option.shown === false) continue
+		if (option.type === 'divider' && visible.at(-1)?.type === 'divider') continue
+		visible.push(option)
+	}
+
+	while (visible[0]?.type === 'divider') visible.shift()
+	while (visible.at(-1)?.type === 'divider') visible.pop()
+
+	return visible
 }
 
 export function getButtonMenuItemAttrs(

@@ -141,7 +141,7 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		action: () => emit('manageProjects'),
 		shown: props.canManage,
 	},
-	{ type: 'divider', shown: props.canManage },
+	{ type: 'divider' },
 	{
 		id: 'copy-id',
 		label: formatMessage(commonMessages.copyIdButton),

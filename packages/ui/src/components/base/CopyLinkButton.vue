@@ -10,7 +10,8 @@
 			class="absolute transition-all ease-in-out"
 			:class="copied ? 'translate-y-0' : 'translate-y-7'"
 		/>
-		<LinkIcon
+		<component
+			:is="icon"
 			class="absolute transition-all ease-in-out"
 			:class="copied ? '-translate-y-7' : 'translate-y-0'"
 		/>
@@ -19,7 +20,7 @@
 
 <script setup lang="ts">
 import { CheckIcon, LinkIcon } from '@modrinth/assets'
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { type Component, computed, onBeforeUnmount, ref } from 'vue'
 
 import { defineMessage, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
@@ -33,11 +34,17 @@ const copiedToClipboardMessage = defineMessage({
 
 const { formatMessage } = useVIntl()
 
-const props = defineProps<{
-	url: string
-	copyLabel?: string
-	copiedLabel?: string
-}>()
+const props = withDefaults(
+	defineProps<{
+		url: string
+		copyLabel?: string
+		copiedLabel?: string
+		icon?: Component
+	}>(),
+	{
+		icon: () => LinkIcon,
+	},
+)
 
 const copied = ref(false)
 let copiedResetTimeout: ReturnType<typeof setTimeout> | undefined

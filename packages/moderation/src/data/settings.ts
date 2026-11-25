@@ -270,6 +270,20 @@ const settings = {
 				'Use this host for the "Open current page" shortcut when on production or staging. Enter a hostname or HTTP(S) URL, such as localhost:3000.',
 			default: '',
 		}),
+		ShowModerationHeaderRow: setting.asToggle({
+			type: 'toggle',
+			id: 'show-moderation-header-row',
+			title: 'Show moderation row',
+			description:
+				'Show moderation actions in a second row on project pages. When off, those actions move to the overflow menu.',
+			default: false,
+		}),
+		ShowCopyButtonsInModerationRow: setting.asToggle({
+			type: 'toggle',
+			id: 'show-copy-buttons-in-moderation-row',
+			title: 'Show copy buttons in moderation row',
+			default: true,
+		}),
 		EnableProjectKeybinds: setting.asToggle({
 			type: 'toggle',
 			id: 'checklist-always-allow-keybinds',

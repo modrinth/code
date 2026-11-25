@@ -353,7 +353,7 @@ function overflowOptions(backup: Backup): ButtonMenuOption[] {
 			shown: !!props.showCopyIdAction,
 			action: () => navigator.clipboard.writeText(backup.id),
 		},
-		{ type: 'divider', shown: !!props.showCopyIdAction },
+		{ type: 'divider' },
 		{
 			id: 'download',
 			label: formatMessage(commonMessages.downloadButton),

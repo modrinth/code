@@ -148,7 +148,7 @@
 							label: formatMessage(messages.uploadFile),
 							action: () => $emit('upload'),
 						},
-						{ type: 'divider', shown: showInstallFromUrl ?? false },
+						{ type: 'divider' },
 						{
 							id: 'upload-zip',
 							label: formatMessage(messages.uploadFromZip),
