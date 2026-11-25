@@ -15,7 +15,13 @@ const VERSIONS: VersionEntry[] = [
 		product: 'app',
 		version: '0.23.5',
 		body: `## Security
-- Modrinth App will now swap out Minecraft libraries on instance launch that don't match what is recorded by the metadata service.`,
+- Modrinth App will now swap out Minecraft libraries on instance launch that don't match what is recorded by the metadata service.
+
+## Added
+- Added a section on the sidebar of Create Aeronautic's page for the Game Awards nomination.
+
+## Changed
+- When searching for filter options, a "No results" message will now show when there are no filters available for the query.`,
 	},
 	{
 		date: `2026-11-24T20:34:37+00:00`,
@@ -37,16 +43,6 @@ const VERSIONS: VersionEntry[] = [
 		product: 'web',
 		body: `## Changed
 - Moved re-authentication prompt to before you perform actions so your state is not lost when you go to save.`,
-	},
-	{
-		date: `2026-11-18T20:04:02+00:00`,
-		product: 'app',
-		version: '0.23.5',
-		body: `## Added
-- Added a section on the sidebar of Create Aeronautic's page for the Game Awards nomination.
-
-## Changed
-- When searching for filter options, a "No results" message will now show when there are no filters available for the query.`,
 	},
 	{
 		date: `2026-11-18T20:04:02+00:00`,
