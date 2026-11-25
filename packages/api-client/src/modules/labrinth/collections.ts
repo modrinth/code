@@ -154,4 +154,40 @@ export class LabrinthCollectionsModule extends AbstractModule {
 			method: 'DELETE',
 		})
 	}
+
+	/**
+	 * Follow a collection as the authenticated user
+	 *
+	 * @param id - Collection ID
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.collections.follow('YV97U1kk')
+	 * ```
+	 */
+	public async follow(id: string): Promise<void> {
+		return this.client.request(`/collection/${id}/follow`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'POST',
+		})
+	}
+
+	/**
+	 * Unfollow a collection as the authenticated user
+	 *
+	 * @param id - Collection ID
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.collections.unfollow('YV97U1kk')
+	 * ```
+	 */
+	public async unfollow(id: string): Promise<void> {
+		return this.client.request(`/collection/${id}/follow`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'DELETE',
+		})
+	}
 }

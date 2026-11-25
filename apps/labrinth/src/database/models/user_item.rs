@@ -29,6 +29,12 @@ const USERS_NAMESPACE: &str = "users:v4";
 const USER_USERNAMES_NAMESPACE: &str = "users_usernames:v4";
 const USERS_PROJECTS_NAMESPACE: &str = "users_projects:v4";
 
+/// Entities whose caches must be cleared after a user removal commits.
+pub struct RemovedUser {
+    pub featured_projects: Vec<DBProjectId>,
+    pub followed_collections: Vec<DBCollectionId>,
+}
+
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct DBUser {
     pub id: DBUserId,
@@ -588,6 +594,31 @@ impl DBUser {
         Ok(projects)
     }
 
+    pub async fn get_collection_follows<'a, E>(
+        user_id: DBUserId,
+        exec: E,
+    ) -> std::result::Result<Vec<DBCollectionId>, sqlx::Error>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        use futures::stream::TryStreamExt;
+
+        let collections = sqlx::query!(
+            "
+            SELECT cf.collection_id FROM collection_follows cf
+            WHERE cf.follower_id = $1
+            ORDER BY cf.created DESC, cf.collection_id DESC
+            ",
+            user_id as DBUserId,
+        )
+        .fetch(exec)
+        .map_ok(|row| DBCollectionId(row.collection_id))
+        .try_collect::<Vec<DBCollectionId>>()
+        .await?;
+
+        Ok(collections)
+    }
+
     pub async fn get_reports<'a, E>(
         user_id: DBUserId,
         exec: E,
@@ -723,7 +754,7 @@ impl DBUser {
         id: DBUserId,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
-    ) -> Result<Option<Vec<DBProjectId>>> {
+    ) -> Result<Option<RemovedUser>> {
         let user = Self::get_id(id, &mut *transaction, redis)
             .await
             .context("failed to get user by ID")?;
@@ -1049,6 +1080,34 @@ impl DBUser {
             .execute(&mut *transaction)
             .await
             .context("failed to delete mod_follows")?;
+
+            let followed_collections = sqlx::query!(
+                r#"
+                UPDATE collections c
+                SET follows = GREATEST(c.follows - 1, 0)
+                FROM collection_follows cf
+                WHERE cf.follower_id = $1
+                  AND c.id = cf.collection_id
+                RETURNING c.id
+                "#,
+                id as DBUserId,
+            )
+            .fetch(&mut *transaction)
+            .map_ok(|row| DBCollectionId(row.id))
+            .try_collect::<Vec<_>>()
+            .await
+            .context("failed to decrement collection follows")?;
+
+            sqlx::query!(
+                "
+                DELETE FROM collection_follows
+                WHERE follower_id = $1
+                ",
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .context("failed to delete collection_follows")?;
 
             sqlx::query!(
                 "
@@ -1379,7 +1438,10 @@ impl DBUser {
             .await
             .context("failed to delete moderation_locks")?;
 
-            Ok(Some(featured_projects))
+            Ok(Some(RemovedUser {
+                featured_projects,
+                followed_collections,
+            }))
         } else {
             Ok(None)
         }

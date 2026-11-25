@@ -92,6 +92,9 @@ pub struct Collection {
     /// The date at which the collection was updated.
     pub updated: DateTime<Utc>,
 
+    /// The number of users following this collection.
+    pub follows: u32,
+
     /// A list of ProjectIds that are in this collection.
     pub projects: Vec<ProjectId>,
 }
@@ -111,6 +114,7 @@ impl From<database::models::DBCollection> for Collection {
             color: c.color,
             status: c.status,
             collection_flags: c.flags,
+            follows: c.follows as u32,
         }
     }
 }

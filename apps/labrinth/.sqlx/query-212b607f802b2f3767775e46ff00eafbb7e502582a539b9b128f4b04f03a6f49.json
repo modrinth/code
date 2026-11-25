@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE collections c\n                SET follows = GREATEST(c.follows - 1, 0)\n                FROM collection_follows cf\n                WHERE cf.follower_id = $1\n                  AND c.id = cf.collection_id\n                RETURNING c.id\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "collections",
+            "name": "id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "212b607f802b2f3767775e46ff00eafbb7e502582a539b9b128f4b04f03a6f49"
+}

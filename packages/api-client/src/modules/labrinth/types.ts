@@ -2660,6 +2660,7 @@ export namespace Labrinth {
 			collection_flags: number
 			created: string
 			updated: string
+			follows: number
 			projects: string[]
 		}
 

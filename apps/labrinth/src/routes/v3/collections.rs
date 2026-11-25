@@ -38,6 +38,8 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(collection_create)
         .service(collection_get)
         .service(collection_delete)
+        .service(collection_follow)
+        .service(collection_unfollow)
         .service(collection_edit)
         .service(collection_icon_edit)
         .service(delete_collection_icon);
@@ -177,6 +179,7 @@ pub async fn collection_create(
         color: None,
         status: collection_builder.status,
         collection_flags: collection_builder.flags,
+        follows: 0,
         projects: initial_project_ids,
     };
     transaction.commit().await?;
@@ -787,6 +790,191 @@ pub async fn collection_delete(
     } else {
         Err(ApiError::NotFound(anyhow!("resource not found")))
     }
+}
+
+#[utoipa::path(tag = "collections", responses((status = NO_CONTENT)))]
+#[post("/collection/{id}/follow")]
+pub async fn collection_follow(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<(), ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_WRITE,
+    )
+    .await
+    .auth_context("authenticating API request")?;
+
+    let user_id = database::models::DBUserId::from(user.user.id);
+    let id = database::models::DBCollectionId(
+        parse_base62(&info.into_inner().0)
+            .request_context("parsing collection ID")? as i64,
+    );
+    let collection = database::models::DBCollection::get(id, &**pool, &redis)
+        .await
+        .internal_context("fetching collection from database")?
+        .not_found_context("resource not found")?;
+    if !is_visible_collection(&collection, &Some(user), false)
+        .await
+        .api_context("checking collection visibility")?
+    {
+        return Err(ApiError::NotFound(anyhow!("resource not found")));
+    }
+    if collection.user_id == user_id {
+        return Err(ApiError::Request(anyhow!(
+            "you cannot follow your own collection"
+        )));
+    }
+
+    let mut transaction = pool
+        .begin()
+        .await
+        .internal_context("starting database transaction")?;
+
+    sqlx::query_scalar!(
+        "
+        SELECT id FROM collections
+        WHERE id = $1
+        FOR KEY SHARE
+        ",
+        collection.id as database::models::ids::DBCollectionId,
+    )
+    .fetch_optional(&mut transaction)
+    .await
+    .internal_context("locking collection")?
+    .not_found_context("resource not found")?;
+
+    let insert_result = sqlx::query!(
+        "
+        INSERT INTO collection_follows (follower_id, collection_id)
+        VALUES ($1, $2)
+        ON CONFLICT DO NOTHING
+        ",
+        user_id as database::models::ids::DBUserId,
+        collection.id as database::models::ids::DBCollectionId,
+    )
+    .execute(&mut transaction)
+    .await
+    .internal_context("following collection")?;
+
+    if insert_result.rows_affected() == 0 {
+        return Err(ApiError::Request(anyhow!(
+            "you are already following this collection"
+        )));
+    }
+
+    sqlx::query!(
+        "
+        UPDATE collections
+        SET follows = follows + 1
+        WHERE id = $1
+        ",
+        collection.id as database::models::ids::DBCollectionId,
+    )
+    .execute(&mut transaction)
+    .await
+    .internal_context("updating collection follow count")?;
+
+    transaction
+        .commit()
+        .await
+        .internal_context("committing database transaction")?;
+    database::models::DBCollection::clear_cache(collection.id, &redis)
+        .await
+        .internal_context("clearing cached collection")?;
+
+    Ok(())
+}
+
+#[utoipa::path(tag = "collections", responses((status = NO_CONTENT)))]
+#[delete("/collection/{id}/follow")]
+pub async fn collection_unfollow(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<(), ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_WRITE,
+    )
+    .await
+    .auth_context("authenticating API request")?;
+
+    let string = info.into_inner().0;
+    let id = database::models::DBCollectionId(
+        parse_base62(&string).request_context("parsing collection ID")? as i64,
+    );
+    let user_id = database::models::DBUserId::from(user.user.id);
+
+    let mut transaction = pool
+        .begin()
+        .await
+        .internal_context("starting database transaction")?;
+
+    let delete_result = sqlx::query!(
+        "
+        DELETE FROM collection_follows
+        WHERE follower_id = $1 AND collection_id = $2
+        ",
+        user_id as database::models::ids::DBUserId,
+        id as database::models::ids::DBCollectionId,
+    )
+    .execute(&mut transaction)
+    .await
+    .internal_context("unfollowing collection")?;
+
+    if delete_result.rows_affected() == 0 {
+        let visible =
+            match database::models::DBCollection::get(id, &**pool, &redis)
+                .await
+                .internal_context("fetching collection from database")?
+            {
+                Some(collection) => {
+                    is_visible_collection(&collection, &Some(user), false)
+                        .await
+                        .api_context("checking collection visibility")?
+                }
+                None => false,
+            };
+        return Err(if visible {
+            ApiError::Request(anyhow!("you are not following this collection"))
+        } else {
+            ApiError::NotFound(anyhow!("resource not found"))
+        });
+    }
+
+    sqlx::query!(
+        "
+        UPDATE collections
+        SET follows = GREATEST(follows - 1, 0)
+        WHERE id = $1
+        ",
+        id as database::models::ids::DBCollectionId,
+    )
+    .execute(&mut transaction)
+    .await
+    .internal_context("updating collection follow count")?;
+
+    transaction
+        .commit()
+        .await
+        .internal_context("committing database transaction")?;
+    database::models::DBCollection::clear_cache(id, &redis)
+        .await
+        .internal_context("clearing cached collection")?;
+
+    Ok(())
 }
 
 async fn collection_owner_id(

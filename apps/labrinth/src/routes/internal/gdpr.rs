@@ -59,6 +59,16 @@ pub async fn export(
             .map(crate::models::ids::ProjectId::from)
             .collect::<Vec<_>>();
 
+    let collection_follows =
+        crate::database::models::DBUser::get_collection_follows(
+            user_id, &**pool,
+        )
+        .await
+        .internal_context("fetching collection follows")?
+        .into_iter()
+        .map(crate::models::ids::CollectionId::from)
+        .collect::<Vec<_>>();
+
     let projects =
         crate::database::models::DBUser::get_projects(user_id, &**pool, &redis)
             .await
@@ -220,6 +230,7 @@ pub async fn export(
         "user": user.user,
         "collections": collections,
         "follows": follows,
+        "collection_follows": collection_follows,
         "projects": projects,
         "orgs": orgs,
         "notifs": notifs,

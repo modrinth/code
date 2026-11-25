@@ -10,7 +10,7 @@ use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
-const COLLECTIONS_NAMESPACE: &str = "collections:v6";
+const COLLECTIONS_NAMESPACE: &str = "collections:v7";
 
 #[derive(Clone)]
 pub struct CollectionBuilder {
@@ -40,6 +40,7 @@ impl CollectionBuilder {
             color: None,
             status: self.status,
             flags: self.flags,
+            follows: 0,
             projects: self.projects,
         };
         collection_struct
@@ -64,6 +65,7 @@ pub struct DBCollection {
     pub status: CollectionStatus,
     #[serde(default)]
     pub flags: CollectionFlags,
+    pub follows: i32,
     pub projects: Vec<DBProjectId>,
 }
 
@@ -145,6 +147,17 @@ impl DBCollection {
 
             sqlx::query!(
                 "
+                DELETE FROM collection_follows
+                WHERE collection_id = $1
+                ",
+                id as DBCollectionId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .context("deleting collection follows")?;
+
+            sqlx::query!(
+                "
                 DELETE FROM collections
                 WHERE id = $1
                 ",
@@ -195,7 +208,7 @@ impl DBCollection {
                         "
                     SELECT c.id id, c.name name, c.description description,
                     c.icon_url icon_url, c.raw_icon_url raw_icon_url, c.color color, c.created created, c.user_id user_id,
-                    c.updated updated, c.status status, c.flags flags,
+                    c.updated updated, c.status status, c.flags flags, c.follows follows,
                     ARRAY_AGG(DISTINCT cm.mod_id) filter (where cm.mod_id is not null) mods
                     FROM collections c
                     LEFT JOIN collections_mods cm ON cm.collection_id = c.id
@@ -218,6 +231,7 @@ impl DBCollection {
                             updated: m.updated,
                             status: CollectionStatus::from_string(&m.status),
                             flags: CollectionFlags::from_db(m.flags),
+                            follows: m.follows,
                             projects: m
                                 .mods
                                 .unwrap_or_default()
@@ -252,6 +266,29 @@ impl DBCollection {
             .delete(&key)
             .await
             .context("clearing collection cache")?;
+        Ok(())
+    }
+
+    pub async fn clear_many_caches(
+        ids: &[DBCollectionId],
+        redis: &RedisPool,
+    ) -> Result<()> {
+        if ids.is_empty() {
+            return Ok(());
+        }
+
+        let mut redis = redis
+            .connect()
+            .await
+            .context("connecting to redis to clear collection caches")?;
+        let keys = ids
+            .iter()
+            .map(|id| redis.key().entity(COLLECTIONS_NAMESPACE, id.0))
+            .collect::<Vec<_>>();
+        redis
+            .delete_many(&keys)
+            .await
+            .context("clearing collection caches")?;
         Ok(())
     }
 }

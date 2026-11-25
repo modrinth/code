@@ -142,6 +142,34 @@ export class LabrinthUsersV3Module extends AbstractModule {
 	}
 
 	/**
+	 * Get collections a user follows, most recently followed first.
+	 *
+	 * Only the user themself (or an admin) can read this list.
+	 *
+	 * @param idOrUsername - The user's ID or username
+	 * @returns Promise resolving to an array of followed collections
+	 *
+	 * GET /v3/user/{id}/follows/collections
+	 *
+	 * @example
+	 * ```typescript
+	 * const collections = await client.labrinth.users_v3.getFollowedCollections('my_user')
+	 * ```
+	 */
+	public async getFollowedCollections(
+		idOrUsername: string,
+	): Promise<Labrinth.Collections.Collection[]> {
+		return this.client.request<Labrinth.Collections.Collection[]>(
+			`/user/${encodeURIComponent(idOrUsername)}/follows/collections`,
+			{
+				api: 'labrinth',
+				version: 3,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
 	 * Get all projects the authenticated user can access directly or through
 	 * their organizations.
 	 *
