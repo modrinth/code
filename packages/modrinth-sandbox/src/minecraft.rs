@@ -4,6 +4,7 @@ use std::{
     fs,
     io::{ErrorKind, Write},
     path::{Path, PathBuf},
+    time::{Duration, SystemTime},
 };
 
 use eyre::{Context, OptionExt, Result, ensure};
@@ -43,8 +44,9 @@ pub struct MinecraftCommand {
     /// shared across all game instances. If this isn't set, the game doesn't have a
     /// home directory.
     pub persistent_dir: Option<PathBuf>,
-    /// Directory that temporary JARs are staged in, they are removed when the launched
-    /// process exits. Required if [`MinecraftCommand::sandbox_api_child`] is set.
+    /// Directory for files that the launcher uses to run the game, such as JARs created
+    /// by [`create_launcher_jar`]. Required if [`MinecraftCommand::sandbox_api_child`] is
+    /// set.
     ///
     /// The game can't be given write access to this directory, so it must not overlap
     /// with [`instance_path`], [`persistent_dir`], or the skins in [`assets_path`].
@@ -52,7 +54,7 @@ pub struct MinecraftCommand {
     /// [`instance_path`]: Self::instance_path
     /// [`persistent_dir`]: Self::persistent_dir
     /// [`assets_path`]: Self::assets_path
-    pub launcher_temp_dir: Option<PathBuf>,
+    pub launcher_files_dir: Option<PathBuf>,
     /// Extra host paths that can be read by the sandboxed application.
     /// Ignored if blocked by [`MinecraftCommand::path_rules`]
     pub read_only_paths: Vec<PathBuf>,
@@ -100,7 +102,7 @@ impl Default for MinecraftCommand {
             logging_config: None,
             instance_path: PathBuf::new(),
             persistent_dir: None,
-            launcher_temp_dir: None,
+            launcher_files_dir: None,
             read_only_paths: Vec::new(),
             read_write_paths: Vec::new(),
             path_rules: Vec::new(),
@@ -277,22 +279,9 @@ const PERSISTENT_ENVIRONMENT: &[(&str, &str)] = &[
     ("XDG_STATE_HOME", "state"),
 ];
 
-/// Creates unique launch staging storage under the configured root.
-/// Keep the returned directory alive until the launched process exits.
-pub fn create_launcher_temp_dir(root: &Path) -> Result<tempfile::TempDir> {
-    fs::create_dir_all(root).with_context(|| {
-        format!("creating launcher staging root {}", root.display())
-    })?;
-    tempfile::Builder::new()
-        .prefix("modrinth-minecraft-")
-        .tempdir_in(root)
-        .with_context(|| {
-            format!(
-                "creating Minecraft launcher staging storage in {}",
-                root.display()
-            )
-        })
-}
+/// Games can keep running after the launcher is closed when unsandboxed or on macOS,
+/// so this has to be longer than someone is likely to play for.
+const MAX_LAUNCHER_JAR_AGE: Duration = Duration::from_secs(7 * 24 * 60 * 60);
 
 pub async fn setup_minecraft_command(
     minecraft: MinecraftCommand,
@@ -396,21 +385,23 @@ pub async fn setup_minecraft_command(
         );
     }
 
-    let mut launcher_temp_keep_alive = None;
     // Setup sandbox java agent
     if let Some(child) = &minecraft.sandbox_api_child {
-        let launcher_temp_dir =
-            minecraft.launcher_temp_dir.clone().ok_or_eyre(
-                "launcher_temp_dir must be set to use the sandbox API",
+        const BYTES: &[u8] =
+            include_bytes!(concat!(env!("OUT_DIR"), "/SandboxAgent.jar"));
+
+        let launcher_files_dir =
+            minecraft.launcher_files_dir.clone().ok_or_eyre(
+                "launcher_files_dir must be set to use the sandbox API",
             )?;
-        let (agent_dir, sandbox_agent_path) =
-            tokio::task::spawn_blocking(move || {
-                let agent_dir = create_launcher_temp_dir(&launcher_temp_dir)?;
-                let path = create_sandbox_java_agent(agent_dir.path())?;
-                Ok::<_, eyre::Report>((agent_dir, path))
-            })
-            .await??;
-        launcher_temp_keep_alive = Some(agent_dir);
+        let sandbox_agent_path = tokio::task::spawn_blocking(move || {
+            create_launcher_jar(
+                &launcher_files_dir,
+                "ModrinthSandboxAgent",
+                BYTES,
+            )
+        })
+        .await??;
 
         classpath.push(sandbox_agent_path.clone());
         read_only_paths.push(sandbox_agent_path.clone());
@@ -458,8 +449,8 @@ pub async fn setup_minecraft_command(
     let mut path_rules = soft_path_rules();
     path_rules.extend(minecraft.path_rules);
     path_rules.extend(hard_path_rules());
-    if let Some(launcher_temp_dir) = minecraft.launcher_temp_dir {
-        let rule = PathRule::HardBlockWrite(launcher_temp_dir);
+    if let Some(launcher_files_dir) = minecraft.launcher_files_dir {
+        let rule = PathRule::HardBlockWrite(launcher_files_dir);
         // Check built-in read_write_paths (not minecraft.read_write_paths).
         // Downgrading these to read-only would break the game, so we
         // error instead
@@ -470,7 +461,7 @@ pub async fn setup_minecraft_command(
                     rules.calculate_bind_permission(path),
                     Ok(PathPermission::ReadOnly)
                 ),
-                "launcher_temp_dir must not overlap with {path:?}, since the game can write to it"
+                "launcher_files_dir must not overlap with {path:?}, since the game can write to it"
             );
         }
         path_rules.push(rule);
@@ -497,9 +488,6 @@ pub async fn setup_minecraft_command(
     let mut on_start: Vec<Box<dyn FnOnce(&mut SandboxChild) + Send + Sync>> =
         Vec::new();
     let mut on_finish: Vec<Box<dyn FnOnce() + Send + Sync>> = Vec::new();
-    if let Some(launcher_temp_dir) = launcher_temp_keep_alive {
-        on_finish.push(Box::new(move || drop(launcher_temp_dir)));
-    }
     if let Some(sandbox_api_child) = minecraft.sandbox_api_child {
         // Register handle
         on_start.push(Box::new({
@@ -550,27 +538,36 @@ pub async fn setup_minecraft_command(
     })
 }
 
-fn create_sandbox_java_agent(agent_dir: &Path) -> eyre::Result<PathBuf> {
-    const BYTES: &[u8] =
-        include_bytes!(concat!(env!("OUT_DIR"), "/SandboxAgent.jar"));
-    let hash_bytes = Sha1::digest(BYTES);
-    let hash_str = hex::encode(hash_bytes);
+/// Writes a JAR that's used to launch the game, unless it already exists, and returns
+/// its path. The directory must not be writeable by the game.
+///
+/// This also attempts to remove other versions of the JAR that haven't been used
+/// recently.
+pub fn create_launcher_jar(
+    dir: &Path,
+    name: &str,
+    bytes: &[u8],
+) -> Result<PathBuf> {
+    let hash_bytes = Sha1::digest(bytes);
+    let prefix = format!("{name}-");
+    let path = dir.join(format!("{prefix}{}.jar", hex::encode(hash_bytes)));
 
-    let path = agent_dir.join(format!("ModrinthSandboxAgent-{hash_str}.jar"));
+    fs::create_dir_all(dir)
+        .wrap_err_with(|| format!("creating {}", dir.display()))?;
+
+    if let Err(err) = remove_old_launcher_jars(dir, &prefix, &path) {
+        tracing::warn!("failed to remove old jars from {dir:?}: {err}");
+    }
 
     // Check that file exists and checksum matches
     if !check_sha1_hash(&path, &hash_bytes)? {
-        if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent)?;
-        }
-
         let mut temp = path.clone();
         temp.add_extension(format!("{}", rand::rng().next_u32()));
         temp.add_extension("new");
 
         let mut temp_file = fs::File::create(&temp)?;
 
-        temp_file.write_all(BYTES)?;
+        temp_file.write_all(bytes)?;
         temp_file.flush()?;
         temp_file.sync_all()?;
 
@@ -578,11 +575,62 @@ fn create_sandbox_java_agent(agent_dir: &Path) -> eyre::Result<PathBuf> {
 
         if let Err(err) = fs::rename(&temp, &path) {
             _ = fs::remove_file(&temp);
-            return Err(err.into());
+            // It may have been created by another launch at the same time
+            if !check_sha1_hash(&path, &hash_bytes)? {
+                return Err(err.into());
+            }
         }
     }
 
+    if let Err(err) = update_access_time(&path) {
+        tracing::warn!("failed to update access time of {path:?}: {err}");
+    }
     Ok(path)
+}
+
+fn update_access_time(path: &Path) -> std::io::Result<()> {
+    fs::File::options()
+        .write(true)
+        .open(path)?
+        .set_times(fs::FileTimes::new().set_accessed(SystemTime::now()))
+}
+
+fn remove_old_launcher_jars(
+    dir: &Path,
+    prefix: &str,
+    current: &Path,
+) -> std::io::Result<()> {
+    for entry in fs::read_dir(dir)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path == current
+            || !entry
+                .file_name()
+                .as_encoded_bytes()
+                .starts_with(prefix.as_bytes())
+        {
+            continue;
+        }
+
+        let result = fs::symlink_metadata(&path).and_then(|metadata| {
+            let last_used =
+                [metadata.accessed(), metadata.modified(), metadata.created()]
+                    .into_iter()
+                    .map(|time| time.unwrap_or(SystemTime::UNIX_EPOCH))
+                    .fold(SystemTime::UNIX_EPOCH, SystemTime::max);
+            let is_old = last_used
+                .elapsed()
+                .is_ok_and(|age| age > MAX_LAUNCHER_JAR_AGE);
+            if metadata.is_file() && is_old {
+                fs::remove_file(&path)?;
+            }
+            Ok(())
+        });
+        if let Err(err) = result {
+            tracing::warn!("failed to remove old jar {path:?}: {err}");
+        }
+    }
+    Ok(())
 }
 
 fn check_sha1_hash(path: &Path, expected_hash: &[u8]) -> eyre::Result<bool> {

@@ -24,7 +24,6 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::sync::{Arc, LazyLock};
 use std::time::{Duration, Instant};
-use tempfile::TempDir;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
 use tracing::info;
@@ -215,7 +214,6 @@ impl ProcessManager {
         post_exit_command: Option<String>,
         post_exit_env_vars: Vec<(String, String)>,
         xml_logging: bool,
-        main_class_keep_alive: TempDir,
         rpc_server: RpcServer,
         state: &Arc<State>,
         post_process_init: impl AsyncFnOnce(
@@ -331,7 +329,6 @@ impl ProcessManager {
             },
             child: mc_proc,
             rpc_server,
-            _main_class_keep_alive: main_class_keep_alive,
         };
         let metadata = process.metadata.clone();
 
@@ -550,7 +547,6 @@ pub struct ProcessMetadata {
 struct Process {
     metadata: ProcessMetadata,
     child: SandboxChild,
-    _main_class_keep_alive: TempDir,
     rpc_server: RpcServer,
 }
 

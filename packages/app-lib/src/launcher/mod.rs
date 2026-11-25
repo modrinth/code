@@ -1138,21 +1138,20 @@ pub async fn launch_minecraft(
         address.resolve().await?;
     }
 
-    let main_class_keep_alive =
-        modrinth_sandbox::minecraft::create_launcher_temp_dir(
-            &state.directories.launcher_temp_dir(),
+    let launcher_files_dir = state.directories.launcher_files_dir();
+    let main_class_path = tokio::task::spawn_blocking(move || {
+        modrinth_sandbox::minecraft::create_launcher_jar(
+            &launcher_files_dir,
+            "theseus",
+            include_bytes!(concat!(env!("JAVA_JARS_DIR"), "/theseus.jar")),
         )
-        .map_err(|error| {
-            crate::ErrorKind::LauncherError(format!(
-                "Could not create launcher staging directory: {error:#}"
-            ))
-        })?;
-    let main_class_path = main_class_keep_alive.path().join("theseus.jar");
-    io::write(
-        &main_class_path,
-        include_bytes!(concat!(env!("JAVA_JARS_DIR"), "/theseus.jar")),
-    )
-    .await?;
+    })
+    .await?
+    .map_err(|error| {
+        crate::ErrorKind::LauncherError(format!(
+            "Could not create launcher JAR: {error:#}"
+        ))
+    })?;
 
     let rpc_server = RpcServerBuilder::new().launch().await?;
 
@@ -1347,7 +1346,6 @@ pub async fn launch_minecraft(
             post_exit_hook,
             env_args,
             version_info.logging.is_some(),
-            main_class_keep_alive,
             rpc_server,
             state,
             async |process: &ProcessMetadata, rpc_server| {

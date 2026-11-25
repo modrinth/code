@@ -171,11 +171,11 @@ impl DirectoryInfo {
         self.config_dir.join(INSTANCES_FOLDER_NAME)
     }
 
-    /// Get the directory for files that are only used during a launch. This can't be
-    /// modified by sandboxed instances.
+    /// Get the directory for files that are used to launch the game, such as JARs. This
+    /// must not be modifiable by sandboxed instances.
     #[inline]
-    pub fn launcher_temp_dir(&self) -> PathBuf {
-        self.metadata_dir().join("launcher-temp")
+    pub fn launcher_files_dir(&self) -> PathBuf {
+        self.metadata_dir().join("launcher-files")
     }
 
     /// Get the persistent directory shared by sandboxed instances.
