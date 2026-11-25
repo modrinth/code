@@ -32,6 +32,9 @@ pub const MAX_APP_VERSION_LEN: usize = 32;
 /// Longest event source accepted, in bytes.
 pub const MAX_SOURCE_LEN: usize = 23;
 
+/// Longest game or loader version accepted, in bytes.
+pub const MAX_INSTANCE_VERSION_FIELD_LEN: usize = 64;
+
 /// Events extracted from a received batch.
 #[derive(Debug)]
 pub struct ExtractedAppEvents {
@@ -80,6 +83,14 @@ pub enum SingleEventProcessingError {
         "app version is not 1 to {MAX_APP_VERSION_LEN} ASCII letters, digits, `.`, `+` or `-`"
     )]
     InvalidAppVersion,
+    #[error(
+        "game version field is not 1 to {MAX_INSTANCE_VERSION_FIELD_LEN} bytes"
+    )]
+    InvalidInstanceGameVersion,
+    #[error(
+        "loader version field is not 1 to {MAX_INSTANCE_VERSION_FIELD_LEN} bytes"
+    )]
+    InvalidInstanceLoaderVersion,
 }
 
 /// Validates a request body sent by the app and extracts its events.
@@ -167,6 +178,29 @@ pub fn extract_events<K: AsRef<str>, V: AsRef<str>>(
             continue;
         }
 
+        if let AppEventType::InstanceStart {
+            game_version,
+            loader_version,
+            ..
+        } = &event.event
+        {
+            if !is_valid_instance_version_field(game_version.as_str()) {
+                rejected.push(
+                    SingleEventProcessingError::InvalidInstanceGameVersion,
+                );
+                continue;
+            }
+
+            if let Some(loader_version) = loader_version.as_ref() {
+                if !is_valid_instance_version_field(loader_version.as_str()) {
+                    rejected.push(
+                        SingleEventProcessingError::InvalidInstanceLoaderVersion,
+                    );
+                    continue;
+                }
+            }
+        }
+
         events.push(NormalizedAppEvent {
             event_id: event.id,
             sent_at: batch.sent_at,
@@ -193,6 +227,10 @@ fn is_valid_app_version(version: &str) -> bool {
         && version.bytes().all(|b| {
             b.is_ascii_alphanumeric() || matches!(b, b'.' | b'+' | b'-')
         })
+}
+
+fn is_valid_instance_version_field(version: &str) -> bool {
+    (1..=MAX_INSTANCE_VERSION_FIELD_LEN).contains(&version.len())
 }
 
 /// Checks that an event source is a short PascalCase identifier, such as
