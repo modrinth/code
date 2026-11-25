@@ -440,7 +440,18 @@ fn spawn(
 
     // Bind everything in $PATH
     if let Some(path) = std::env::var_os("PATH") {
+        let home = directories.home_dir();
+        let home = home.canonicalize().unwrap_or_else(|_| home.to_path_buf());
         for path in std::env::split_paths(&path) {
+            if !path.is_absolute() {
+                continue;
+            }
+            if path.canonicalize().is_ok_and(|path| home.starts_with(path)) {
+                tracing::warn!(
+                    "not exposing {path:?} from PATH, since it contains the home directory"
+                );
+                continue;
+            }
             builder.bind_if_exists(BindBehaviour::FollowRead, &path);
         }
     }
