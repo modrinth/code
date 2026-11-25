@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                WITH deleted AS (\n                    DELETE FROM collection_follows\n                    WHERE follower_id = $1\n                    RETURNING collection_id\n                )\n                UPDATE collections c\n                SET follows = GREATEST(c.follows - 1, 0)\n                FROM deleted\n                WHERE c.id = deleted.collection_id\n                RETURNING c.id\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "collections",
+            "name": "id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "2a8b9713bed755fed505e7bb914dd28d9414f5bf053734c393f9b78165352e80"
+}

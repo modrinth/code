@@ -127,6 +127,21 @@ impl DBCollection {
             .context("fetching collection to remove")?;
 
         if let Some(collection) = collection {
+            let locked = sqlx::query_scalar!(
+                "
+                SELECT id FROM collections
+                WHERE id = $1
+                FOR UPDATE
+                ",
+                id as DBCollectionId,
+            )
+            .fetch_optional(&mut *transaction)
+            .await
+            .context("locking collection to remove")?;
+            if locked.is_none() {
+                return Ok(None);
+            }
+
             let refresh_projects =
                 if is_public_featured(collection.status, collection.flags) {
                     collection.projects.clone()

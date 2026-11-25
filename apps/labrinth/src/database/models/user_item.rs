@@ -1083,11 +1083,15 @@ impl DBUser {
 
             let followed_collections = sqlx::query!(
                 r#"
+                WITH deleted AS (
+                    DELETE FROM collection_follows
+                    WHERE follower_id = $1
+                    RETURNING collection_id
+                )
                 UPDATE collections c
                 SET follows = GREATEST(c.follows - 1, 0)
-                FROM collection_follows cf
-                WHERE cf.follower_id = $1
-                  AND c.id = cf.collection_id
+                FROM deleted
+                WHERE c.id = deleted.collection_id
                 RETURNING c.id
                 "#,
                 id as DBUserId,
@@ -1095,17 +1099,6 @@ impl DBUser {
             .fetch(&mut *transaction)
             .map_ok(|row| DBCollectionId(row.id))
             .try_collect::<Vec<_>>()
-            .await
-            .context("failed to decrement collection follows")?;
-
-            sqlx::query!(
-                "
-                DELETE FROM collection_follows
-                WHERE follower_id = $1
-                ",
-                id as DBUserId,
-            )
-            .execute(&mut *transaction)
             .await
             .context("failed to delete collection_follows")?;
 
