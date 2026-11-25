@@ -10,10 +10,10 @@ use crate::client::AnalyticsInner;
 pub(crate) type DrainReceiver = mpsc::UnboundedReceiver<oneshot::Sender<bool>>;
 
 /// Background task that sends queued events and answers drain requests.
-pub(crate) async fn bg(
-    a: Arc<AnalyticsInner>,
-    mut drain_rx: DrainReceiver,
-) -> ! {
+///
+/// Returns once every [`AppAnalytics`](crate::AppAnalytics) handle is
+/// dropped, discarding any events still queued.
+pub(crate) async fn bg(a: Arc<AnalyticsInner>, mut drain_rx: DrainReceiver) {
     const BACKOFF_DEFAULT: Duration = Duration::from_secs(5);
     const BACKOFF_MAX: Duration = Duration::from_mins(5);
     let mut backoff = BACKOFF_DEFAULT;
@@ -25,7 +25,8 @@ pub(crate) async fn bg(
         tokio::select! {
             _ = flush.tick() => {}
             () = a.queue.full_batch.notified() => {}
-            Some(reply) = drain_rx.recv() => {
+            reply = drain_rx.recv() => {
+                let Some(reply) = reply else { return };
                 drain(&a, reply, &mut drain_rx).await;
                 continue;
             }
@@ -44,7 +45,8 @@ pub(crate) async fn bg(
 
                     tokio::select! {
                         () = sleep(backoff) => {}
-                        Some(reply) = drain_rx.recv() => {
+                        reply = drain_rx.recv() => {
+                            let Some(reply) = reply else { return };
                             drain(&a, reply, &mut drain_rx).await;
                         }
                     }

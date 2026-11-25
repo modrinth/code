@@ -20,6 +20,12 @@ use crate::worker::bg;
 #[derive(Clone)]
 pub struct AppAnalytics {
     inner: Arc<AnalyticsInner>,
+    /// Drain requests for the background task, answered with whether the
+    /// queue was emptied.
+    ///
+    /// Only handles hold a sender, so the channel closes and the background
+    /// task exits once the last handle is dropped.
+    drain_tx: mpsc::UnboundedSender<oneshot::Sender<bool>>,
 }
 
 impl AppAnalytics {
@@ -55,11 +61,11 @@ impl AppAnalytics {
                 push_url,
                 installation_id,
                 queue: EventQueue::new(),
-                drain_tx,
                 os,
                 arch,
                 app_version,
             }),
+            drain_tx,
         };
 
         tokio::spawn(bg(Arc::clone(&this.inner), drain_rx));
@@ -95,7 +101,7 @@ impl AppAnalytics {
     /// queued.
     pub async fn drain(&self, timeout: Duration) -> bool {
         let (tx, rx) = oneshot::channel();
-        if self.inner.drain_tx.send(tx).is_err() {
+        if self.drain_tx.send(tx).is_err() {
             return false;
         }
 
@@ -140,9 +146,6 @@ pub(crate) struct AnalyticsInner {
     push_url: Url,
     backend: Mutex<AnalyticsBackend>,
     pub(crate) queue: EventQueue,
-    /// Drain requests for the background task, answered with whether the
-    /// queue was emptied.
-    drain_tx: mpsc::UnboundedSender<oneshot::Sender<bool>>,
     user_agent: String,
     installation_id: Uuid,
     os: AppOs,
