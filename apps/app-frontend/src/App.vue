@@ -1152,7 +1152,7 @@ async function fetchCredentials() {
 			if (refreshId !== credentialsRefreshId) return
 
 			clearLiveNotifications()
-			await removeUser(creds.user_id).catch(handleError)
+			await removeUser(creds.user_id, true).catch(handleError)
 			if (refreshId !== credentialsRefreshId) return
 
 			credentials.value = null

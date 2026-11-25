@@ -52,6 +52,13 @@ impl ModrinthCredentials {
                 } else {
                     Self::remove(&creds.user_id, exec).await?;
 
+                    crate::analytics::add_event(
+                        crate::mr_auth::ANALYTICS_SOURCE,
+                        crate::analytics::AppEventType::ModrinthSignOut {
+                            is_refresh_failed: true,
+                        },
+                    );
+
                     Ok(None)
                 }
             } else {
