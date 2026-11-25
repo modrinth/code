@@ -57,6 +57,7 @@ export { default as DropzoneFileInput } from './DropzoneFileInput.vue'
 export { default as EmptyState } from './EmptyState.vue'
 export { default as EnvironmentIndicator } from './EnvironmentIndicator.vue'
 export { default as ErrorInformationCard } from './ErrorInformationCard.vue'
+export { default as Field } from './Field.vue'
 export { default as FileInput } from './FileInput.vue'
 export type { FileTreeSelectItem } from './FileTreeSelect.vue'
 export { default as FileTreeSelect } from './FileTreeSelect.vue'
@@ -80,7 +81,6 @@ export {
 	ColorPicker,
 	DateInput,
 	DatePicker,
-	Field,
 	Input,
 	InputClearButton,
 	InputFrame,
@@ -133,11 +133,9 @@ export { default as ReadyTransition } from './ReadyTransition.vue'
 export { default as ScrollablePanel } from './ScrollablePanel.vue'
 export { default as SegmentedControl } from './SegmentedControl.vue'
 export { default as ServerNotice } from './ServerNotice.vue'
-export { default as SettingsFormGroup } from './SettingsFormGroup.vue'
 export { default as SettingsInlineWarning } from './SettingsInlineWarning.vue'
 export { default as SettingsLabel } from './SettingsLabel.vue'
 export { default as SettingsOptionCard } from './SettingsOptionCard.vue'
-export { default as SettingsToggleCard } from './SettingsToggleCard.vue'
 export { default as SimpleBadge } from './SimpleBadge.vue'
 export { default as Slider } from './Slider.vue'
 export { default as SmartClickable } from './SmartClickable.vue'

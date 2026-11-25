@@ -4,13 +4,13 @@ import {
 	ArchivedProjectBanner,
 	commonMessages,
 	defineMessages,
-	SettingsFormGroup,
+	Field,
 	useVIntl,
 } from '@modrinth/ui'
 
-import DisclosureExplanation from './DisclosureExplanation.vue'
-import DisclosureToggleCard from './DisclosureToggleCard.vue'
-import type { DisclosureCardMetaProps, DisclosureLockStatus, NoteDisclosure } from './types'
+import DisclosureExplanation from '../DisclosureExplanation.vue'
+import DisclosureToggleCard from '../DisclosureToggleCard.vue'
+import type { DisclosureCardMetaProps, DisclosureLockStatus, NoteDisclosure } from '../types'
 
 const model = defineModel<NoteDisclosure>({ required: true })
 
@@ -78,9 +78,9 @@ const messages = defineMessages({
 				:disabled="disabled"
 				:placeholder="formatMessage(messages.notePlaceholder)"
 			/>
-			<SettingsFormGroup v-if="variant !== 'review'" :title="formatMessage(messages.bannerPreview)">
+			<Field v-if="variant !== 'review'" :label="formatMessage(messages.bannerPreview)">
 				<ArchivedProjectBanner :title="projectTitle" :reason="model.note" />
-			</SettingsFormGroup>
+			</Field>
 		</template>
 	</DisclosureToggleCard>
 </template>

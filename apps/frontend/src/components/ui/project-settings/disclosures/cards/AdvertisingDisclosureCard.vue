@@ -8,9 +8,9 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 
-import DisclosureExplanation from './DisclosureExplanation.vue'
-import DisclosureToggleCard from './DisclosureToggleCard.vue'
-import type { DisclosureCardMetaProps, DisclosureLockStatus, NoteDisclosure } from './types'
+import DisclosureExplanation from '../DisclosureExplanation.vue'
+import DisclosureToggleCard from '../DisclosureToggleCard.vue'
+import type { DisclosureCardMetaProps, DisclosureLockStatus, NoteDisclosure } from '../types'
 
 const model = defineModel<NoteDisclosure>({ required: true })
 

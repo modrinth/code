@@ -9,18 +9,17 @@ import {
 	Field,
 	IconButton,
 	Input,
-	SettingsFormGroup,
 	useVIntl,
 } from '@modrinth/ui'
 import { watch } from 'vue'
 
-import DisclosureToggleCard from './DisclosureToggleCard.vue'
+import DisclosureToggleCard from '../DisclosureToggleCard.vue'
 import type {
 	DisclosureCardMetaProps,
 	DisclosureLockStatus,
 	TelemetryConsent,
 	TelemetryDisclosure,
-} from './types'
+} from '../types'
 
 const model = defineModel<TelemetryDisclosure>({ required: true })
 
@@ -108,10 +107,10 @@ function removeEntry(index: number) {
 					/>
 				</template>
 			</Field>
-			<SettingsFormGroup
-				:title="formatMessage(messages.dataLabel)"
-				:description="formatMessage(messages.dataDescription)"
-			>
+			<Field :label="formatMessage(messages.dataLabel)">
+				<p class="m-0 leading-normal text-primary">
+					{{ formatMessage(messages.dataDescription) }}
+				</p>
 				<div v-for="(_, index) in model.entries" :key="index" class="flex items-center gap-2">
 					<Input
 						v-model="model.entries[index]"
@@ -128,7 +127,7 @@ function removeEntry(index: number) {
 						<TrashIcon />
 					</IconButton>
 				</div>
-			</SettingsFormGroup>
+			</Field>
 			<Button class="w-fit" :disabled="disabled" @click="addEntry">
 				<ListPlusIcon />
 				{{ formatMessage(commonMessages.addAnotherButton) }}

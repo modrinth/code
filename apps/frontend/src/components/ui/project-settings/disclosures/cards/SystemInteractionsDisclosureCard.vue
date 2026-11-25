@@ -2,13 +2,13 @@
 import { MonitorCogIcon } from '@modrinth/assets'
 import { defineMessages, useVIntl } from '@modrinth/ui'
 
-import DisclosureExplanation from './DisclosureExplanation.vue'
-import DisclosureToggleCard from './DisclosureToggleCard.vue'
+import DisclosureExplanation from '../DisclosureExplanation.vue'
+import DisclosureToggleCard from '../DisclosureToggleCard.vue'
 import type {
 	DisclosureCardMetaProps,
 	DisclosureLockStatus,
 	SystemInteractionsDisclosure,
-} from './types'
+} from '../types'
 
 const model = defineModel<SystemInteractionsDisclosure>({ required: true })
 

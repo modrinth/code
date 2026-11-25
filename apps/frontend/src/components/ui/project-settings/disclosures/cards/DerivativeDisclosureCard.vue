@@ -11,14 +11,14 @@ import {
 } from '@modrinth/ui'
 import { computed, toRaw, useId, watch } from 'vue'
 
-import DisclosureExplanation from './DisclosureExplanation.vue'
-import DisclosureToggleCard from './DisclosureToggleCard.vue'
+import DisclosureExplanation from '../DisclosureExplanation.vue'
+import DisclosureToggleCard from '../DisclosureToggleCard.vue'
 import type {
 	DerivativeDisclosure,
 	DerivativeSource,
 	DisclosureCardMetaProps,
 	DisclosureLockStatus,
-} from './types'
+} from '../types'
 
 const model = defineModel<DerivativeDisclosure>({ required: true })
 

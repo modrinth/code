@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { BrainCogIcon } from '@modrinth/assets'
+import { EyeIcon } from '@modrinth/assets'
 import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
 
-import DisclosureExplanation from './DisclosureExplanation.vue'
-import DisclosureToggleCard from './DisclosureToggleCard.vue'
-import type { DisclosureCardMetaProps, DisclosureLockStatus, NoteDisclosure } from './types'
+import DisclosureExplanation from '../DisclosureExplanation.vue'
+import DisclosureToggleCard from '../DisclosureToggleCard.vue'
+import type { DisclosureCardMetaProps, DisclosureLockStatus, NoteDisclosure } from '../types'
 
 const model = defineModel<NoteDisclosure>({ required: true })
 
@@ -18,17 +18,18 @@ const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	title: {
-		id: 'project.settings.disclosures.ai-functionality.title',
-		defaultMessage: 'Contains generative AI functionality',
+		id: 'project.settings.disclosures.photosensitivity.title',
+		defaultMessage: 'Photosensitivity warning',
 	},
 	description: {
-		id: 'project.settings.disclosures.ai-functionality.description',
+		id: 'project.settings.disclosures.photosensitivity.description',
 		defaultMessage:
-			'Must be enabled if the project has functionality that makes use of generative AI, such as an in-game chatbot or dynamically generated textures.',
+			'Enable this if your project contains anything that you think may be dangerous to certain people who are sensitive to flashing lights or patterns.',
 	},
 	notePlaceholder: {
-		id: 'project.settings.disclosures.ai-functionality.note-placeholder',
-		defaultMessage: 'e.g. The NPCs uses generative AI for dialogue options.',
+		id: 'project.settings.disclosures.photosensitivity.note-placeholder',
+		defaultMessage:
+			'e.g. It adds a flashlight item that has a strobe mode. It can be disabled in Accessibility settings in-game.',
 	},
 })
 </script>
@@ -37,17 +38,16 @@ const messages = defineMessages({
 	<DisclosureToggleCard
 		v-bind="props"
 		v-model="model.enabled"
-		:icon="BrainCogIcon"
+		:icon="EyeIcon"
 		:title="props.title ?? formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
-		info-link="https://support.modrinth.com/en/articles/16567675#h_9be39a38e2"
+		info-link="https://support.modrinth.com/en/articles/16567675#h_22ffae0bb1"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<template #expanded>
 			<DisclosureExplanation
 				v-model="model.note"
 				:title="formatMessage(commonMessages.explanationLabel)"
-				optional
 				:variant="variant"
 				:resize="showLockControls ? 'vertical' : 'none'"
 				:disabled="disabled"

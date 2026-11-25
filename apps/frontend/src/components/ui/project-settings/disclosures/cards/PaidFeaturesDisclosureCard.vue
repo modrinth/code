@@ -4,15 +4,15 @@ import {
 	Button,
 	commonMessages,
 	defineMessages,
+	Field,
 	IconButton,
 	Input,
-	SettingsFormGroup,
 	useVIntl,
 } from '@modrinth/ui'
 import { watch } from 'vue'
 
-import DisclosureToggleCard from './DisclosureToggleCard.vue'
-import type { DisclosureCardMetaProps, DisclosureLockStatus, PaidFeaturesDisclosure } from './types'
+import DisclosureToggleCard from '../DisclosureToggleCard.vue'
+import type { DisclosureCardMetaProps, DisclosureLockStatus, PaidFeaturesDisclosure } from '../types'
 
 const model = defineModel<PaidFeaturesDisclosure>({ required: true })
 
@@ -75,7 +75,7 @@ function removeFeature(index: number) {
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<template #expanded>
-			<SettingsFormGroup :title="formatMessage(messages.featuresDescription)">
+			<Field :label="formatMessage(messages.featuresDescription)">
 				<div v-for="(_, index) in model.features" :key="index" class="flex items-center gap-2">
 					<Input
 						v-model="model.features[index]"
@@ -92,7 +92,7 @@ function removeFeature(index: number) {
 						<XIcon />
 					</IconButton>
 				</div>
-			</SettingsFormGroup>
+			</Field>
 			<Button class="w-fit" :disabled="disabled" @click="addFeature">
 				<ListPlusIcon />
 				{{ formatMessage(commonMessages.addAnotherButton) }}

@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import Field from '../../components/base/inputs/Field.vue'
+import Field from '../../components/base/Field.vue'
 import Input from '../../components/base/inputs/Input.vue'
 
 const meta = {
-	title: 'Inputs/Field',
+	title: 'Base/Field',
 	component: Field,
 	args: {
 		label: 'Name',

@@ -5,15 +5,15 @@ import {
 	commonMessages,
 	defineMessages,
 	disclosureAiUsageMessages,
+	Field,
 	IntlFormatted,
 	normalizeChildren,
-	SettingsFormGroup,
 	useVIntl,
 } from '@modrinth/ui'
 
-import DisclosureExplanation from './DisclosureExplanation.vue'
-import DisclosureToggleCard from './DisclosureToggleCard.vue'
-import type { AiDisclosure, AiUsage, DisclosureCardMetaProps, DisclosureLockStatus } from './types'
+import DisclosureExplanation from '../DisclosureExplanation.vue'
+import DisclosureToggleCard from '../DisclosureToggleCard.vue'
+import type { AiDisclosure, AiUsage, DisclosureCardMetaProps, DisclosureLockStatus } from '../types'
 
 const model = defineModel<AiDisclosure>({ required: true })
 
@@ -119,7 +119,7 @@ function setUse(use: AiUsage, enabled: boolean) {
 			</IntlFormatted>
 		</p>
 		<template #expanded>
-			<SettingsFormGroup :title="formatMessage(messages.typesDescription)">
+			<Field :label="formatMessage(messages.typesDescription)">
 				<div class="flex flex-col gap-2">
 					<Checkbox
 						v-for="use in AI_USES"
@@ -132,7 +132,7 @@ function setUse(use: AiUsage, enabled: boolean) {
 						{{ formatMessage(disclosureAiUsageMessages[use]) }}
 					</Checkbox>
 				</div>
-			</SettingsFormGroup>
+			</Field>
 			<DisclosureExplanation
 				v-model="model.note"
 				:title="formatMessage(commonMessages.explanationLabel)"

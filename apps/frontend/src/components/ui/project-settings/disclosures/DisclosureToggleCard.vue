@@ -5,7 +5,7 @@ import {
 	IntlFormatted,
 	normalizeChildren,
 	SettingsInlineWarning,
-	SettingsToggleCard,
+	ToggleCard,
 	useVIntl,
 } from '@modrinth/ui'
 import type { Component } from 'vue'
@@ -38,7 +38,7 @@ const enabled = defineModel<boolean>({ required: true })
 
 const resolvedLockStatus = computed(() => props.lockStatus ?? 'unlocked')
 const showGuidance = computed(
-	() => props.variant !== 'review' && !props.hideDescription && !!props.guidanceTitle,
+	() => !props.hideDescription && !!props.guidanceTitle,
 )
 
 const messages = defineMessages({
@@ -88,8 +88,8 @@ function setLockStatus(status: DisclosureLockStatus) {
 </script>
 
 <template>
-	<component
-		:is="variant === 'review' ? ProjectReviewDisclosureCard : SettingsToggleCard"
+	<ProjectReviewDisclosureCard
+		v-if="variant === 'review'"
 		v-model="enabled"
 		:disabled="disabled"
 		:toggle-disabled="toggleDisabled"
@@ -105,10 +105,32 @@ function setLockStatus(status: DisclosureLockStatus) {
 		:title="title"
 		:description="hideDescription ? undefined : description"
 	>
-		<template v-if="!hideDescription && !showGuidance && $slots.default" #default>
+		<template v-if="!hideDescription && $slots.default" #default>
 			<slot />
 		</template>
-		<template #title-suffix>
+		<template v-if="$slots.expanded" #expanded>
+			<slot name="expanded" />
+		</template>
+		<template v-if="updatedAt" #updated-by>
+			<DisclosureUpdatedBy
+				:updated-at="updatedAt"
+				:updated-by="updatedBy"
+				:set-by-moderator="setByModerator"
+			/>
+		</template>
+		<template v-if="showModeratorLockControls" #lock-controls>
+			<DisclosureLockControls
+				compact
+				:lock-status="resolvedLockStatus"
+				:disabled="disabled"
+				@set-lock-status="setLockStatus"
+			/>
+		</template>
+	</ProjectReviewDisclosureCard>
+	<ToggleCard v-else v-model="enabled" :disabled="disabled" :toggle-disabled="toggleDisabled">
+		<h3 class="mb-1 mt-0 flex items-center gap-2 text-lg font-semibold text-contrast">
+			<component :is="icon" v-if="icon" class="size-5 shrink-0 text-primary" aria-hidden="true" />
+			{{ title }}
 			<a
 				v-if="infoLink"
 				v-tooltip="formatMessage(messages.infoTooltip)"
@@ -119,7 +141,14 @@ function setLockStatus(status: DisclosureLockStatus) {
 			>
 				<UnknownIcon class="size-5" />
 			</a>
-		</template>
+		</h3>
+		<div
+			v-if="!hideDescription && (description || (!showGuidance && $slots.default))"
+			class="flex flex-col gap-2 leading-normal [&>p]:m-0"
+		>
+			<p v-if="description">{{ description }}</p>
+			<slot v-if="!showGuidance" />
+		</div>
 		<template v-if="showGuidance && $slots.default" #after-summary>
 			<details class="disclosure-guidance group/guidance">
 				<summary
@@ -138,24 +167,11 @@ function setLockStatus(status: DisclosureLockStatus) {
 			</details>
 		</template>
 		<template v-if="$slots.expanded" #expanded>
-			<slot name="expanded" />
+			<div class="flex flex-col gap-4">
+				<slot name="expanded" />
+			</div>
 		</template>
-		<template v-if="variant === 'review' && updatedAt" #updated-by>
-			<DisclosureUpdatedBy
-				:updated-at="updatedAt"
-				:updated-by="updatedBy"
-				:set-by-moderator="setByModerator"
-			/>
-		</template>
-		<template v-if="variant === 'review' && showModeratorLockControls" #lock-controls>
-			<DisclosureLockControls
-				compact
-				:lock-status="resolvedLockStatus"
-				:disabled="disabled"
-				@set-lock-status="setLockStatus"
-			/>
-		</template>
-		<template v-if="variant !== 'review' && showFooter" #footer>
+		<template v-if="showFooter" #footer>
 			<div class="flex flex-col gap-3">
 				<SettingsInlineWarning v-if="showLockWarning && lockWarningMessage">
 					<IntlFormatted :message-id="lockWarningMessage">
@@ -189,7 +205,7 @@ function setLockStatus(status: DisclosureLockStatus) {
 				</div>
 			</div>
 		</template>
-	</component>
+	</ToggleCard>
 </template>
 
 <style scoped>

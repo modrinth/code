@@ -5,7 +5,7 @@
 				:is="inputId ? 'label' : 'span'"
 				:id="labelId"
 				:for="inputId"
-				class="font-semibold text-contrast empty:hidden"
+				class="field-label font-semibold text-contrast empty:hidden"
 			>
 				<slot name="label">{{ label }}</slot>
 				<span v-if="labelOptional" class="font-normal text-secondary">
@@ -25,8 +25,8 @@
 <script setup lang="ts">
 import { useId } from 'vue'
 
-import { commonMessages } from '../../../utils/common-messages'
-import IntlFormatted from '../IntlFormatted.vue'
+import { commonMessages } from '../../utils/common-messages'
+import IntlFormatted from './IntlFormatted.vue'
 
 withDefaults(
 	defineProps<{
