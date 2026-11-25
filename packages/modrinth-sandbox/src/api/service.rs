@@ -19,6 +19,7 @@ use serde::{Deserialize, Serialize};
 use tokio::{
     io::{AsyncReadExt, AsyncWriteExt},
     net::TcpStream,
+    sync::Semaphore,
     time::Instant,
 };
 use tracing::{error, info, warn};
@@ -32,6 +33,12 @@ use crate::{
 
 const DEFAULT_SESSION_JOIN: &str =
     "https://sessionserver.mojang.com/session/minecraft/join";
+
+const MAX_CONNECTIONS: usize = 64;
+
+const UPSTREAM_CONNECT_TIMEOUT: Duration = Duration::from_secs(15);
+const UPSTREAM_READ_TIMEOUT: Duration = Duration::from_secs(30);
+const WRITE_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// macOS's sandbox handles file dialogs without any intervention.
 const ALLOW_OPEN_FILE_DIALOG: bool = cfg!(not(target_os = "macos"));
@@ -164,6 +171,7 @@ pub struct SandboxApiService {
     http_client: reqwest::Client,
     launcher_api: Arc<dyn SandboxApiLauncher>,
     inner: Arc<Mutex<SandboxApiServiceInner>>,
+    connections: Arc<Semaphore>,
 }
 
 #[derive(Default, Clone, Debug)]
@@ -183,7 +191,12 @@ struct SandboxApiServiceInner {
 
 impl SandboxApiService {
     pub fn new(port: u16, launcher_api: Arc<dyn SandboxApiLauncher>) -> Self {
-        Self::new_with_client(port, launcher_api, reqwest::Client::default())
+        let http_client = reqwest::Client::builder()
+            .connect_timeout(UPSTREAM_CONNECT_TIMEOUT)
+            .read_timeout(UPSTREAM_READ_TIMEOUT)
+            .build()
+            .expect("client configuration should be valid");
+        Self::new_with_client(port, launcher_api, http_client)
     }
 
     pub fn new_with_client(
@@ -198,6 +211,7 @@ impl SandboxApiService {
             http_client,
             launcher_api,
             inner: Arc::default(),
+            connections: Arc::new(Semaphore::new(MAX_CONNECTIONS)),
         }
     }
 
@@ -271,11 +285,24 @@ impl SandboxApiService {
 
         loop {
             let notify = self.notify.clone().notified_owned();
+            let accept = async {
+                let permit = self
+                    .connections
+                    .clone()
+                    .acquire_owned()
+                    .await
+                    .expect("the semaphore is never closed");
+                (listener.accept().await, permit)
+            };
             let notified = tokio::select! {
-                res = listener.accept() => {
+                (res, permit) = accept => {
                     match res {
                         Ok((stream, _)) => {
-                            tokio::task::spawn(self.clone().handle_incoming(stream));
+                            let service = self.clone();
+                            tokio::task::spawn(async move {
+                                _ = service.handle_incoming(stream).await;
+                                drop(permit);
+                            });
                         }
                         Err(err) => {
                             // Errors are usually temporary, so keep the server running
@@ -815,8 +842,7 @@ impl SandboxApiService {
         builder.extend_from_slice(b"Connection: close\r\n\r\n");
         builder.extend_from_slice(&content);
 
-        _ = stream.write_all(&builder).await;
-        _ = stream.shutdown().await;
+        write_response(&mut stream, &builder).await;
     }
 
     async fn create_headers_with_replacement(
@@ -1352,8 +1378,7 @@ async fn write_json_response<T: Serialize>(
         raw.len(),
         raw
     );
-    _ = stream.write_all(response.as_bytes()).await;
-    _ = stream.shutdown().await;
+    write_response(stream, response.as_bytes()).await;
     Ok(())
 }
 
@@ -1378,8 +1403,16 @@ async fn write_text_response(mut stream: TcpStream, t: &str) {
         t.len(),
         t
     );
-    _ = stream.write_all(response.as_bytes()).await;
-    _ = stream.shutdown().await;
+    write_response(&mut stream, response.as_bytes()).await;
+}
+
+/// Gives up if the client isn't reading the response.
+async fn write_response(stream: &mut TcpStream, response: &[u8]) {
+    _ = tokio::time::timeout(WRITE_TIMEOUT, async {
+        stream.write_all(response).await?;
+        stream.shutdown().await
+    })
+    .await;
 }
 
 impl RequestStatus {
@@ -1407,7 +1440,6 @@ impl RequestStatus {
                 "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
             }
         };
-        _ = stream.write_all(response.as_bytes()).await;
-        _ = stream.shutdown().await;
+        write_response(&mut stream, response.as_bytes()).await;
     }
 }
