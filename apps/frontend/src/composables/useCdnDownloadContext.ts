@@ -1,6 +1,8 @@
 import type { FilterValue } from '@modrinth/ui'
 import { LOADER_FILTER_TYPES } from '@modrinth/ui'
 
+import { getCookieDomain } from '@/composables/cookie-domain.ts'
+
 const TEN_MINUTES = 600
 
 export type DownloadContext = {
@@ -55,6 +57,7 @@ export function useCdnDownloadContext() {
 	const cookieOptions = {
 		...cookieDefaults,
 		secure: config.public.cookieSecure,
+		domain: getCookieDomain(),
 	}
 
 	const filterGameVersionCookie = useCookie<string | null>('mr_download_filter_game_version', {

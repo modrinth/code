@@ -2,6 +2,7 @@ import { type KeybindDefinition, Keybinds, Settings } from '@modrinth/moderation
 import { computed } from 'vue'
 
 import type { CookieOptions } from '#app'
+import { getCookieDomain } from '@/composables/cookie-domain.ts'
 import {
 	type AppearanceValues,
 	defaultAppearance,
@@ -27,6 +28,7 @@ const getCookieOptions = <T>() =>
 		secure: useRuntimeConfig().public.cookieSecure,
 		httpOnly: false,
 		path: '/',
+		domain: getCookieDomain(),
 	}) satisfies CookieOptions<T>
 
 const useModerationCookies = () => {

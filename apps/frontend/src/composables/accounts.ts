@@ -5,6 +5,7 @@ import { nextTick } from 'vue'
 import { useAuthState } from '@/composables/auth.ts'
 import { useAuthCookie } from '@/composables/auth-cookie.ts'
 import { promptAuth } from '@/composables/auth-modal.ts'
+import { getCookieDomain } from '@/composables/cookie-domain.ts'
 import {
 	isIssuedWithinPrivilegedWindow,
 	sessionCreatedAt,
@@ -243,6 +244,7 @@ const accountsCookie = () => {
 	return useCookie<AccountPreview[]>(STORAGE_KEY, {
 		...COOKIE_OPTIONS,
 		secure: config.public.cookieSecure,
+		domain: getCookieDomain(),
 		default: () => [],
 		decode: (value) => {
 			try {
@@ -289,6 +291,7 @@ export function rememberSessionCreated(token: string, created: string | number) 
 		useCookie<{ token: string; created: number } | null>('auth-session-created', {
 			path: '/',
 			secure: useRuntimeConfig().public.cookieSecure,
+			domain: getCookieDomain(),
 		}).value = { token, created: at }
 		return
 	}
@@ -325,6 +328,7 @@ export const hydrateStoredAccounts = () => {
 		{
 			path: '/',
 			secure: useRuntimeConfig().public.cookieSecure,
+			domain: getCookieDomain(),
 		},
 	)
 	if (legacyStamp.value?.token && typeof legacyStamp.value.created === 'number') {

@@ -1,5 +1,7 @@
 import type { CookieOptions } from '#app'
 
+import { getCookieDomain } from '@/composables/cookie-domain.ts'
+
 const AUTH_COOKIE_NAME = 'auth-token'
 
 const AUTH_COOKIE_OPTIONS = {
@@ -15,5 +17,6 @@ export const useAuthCookie = () => {
 	return useCookie<string | null>(AUTH_COOKIE_NAME, {
 		...AUTH_COOKIE_OPTIONS,
 		secure: config.public.cookieSecure,
+		domain: getCookieDomain(),
 	})
 }

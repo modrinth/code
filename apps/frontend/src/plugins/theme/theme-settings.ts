@@ -1,3 +1,4 @@
+import { getCookieDomain } from '@/composables/cookie-domain.ts'
 import type { Theme } from './themes.ts'
 
 interface ThemeSettings {
@@ -16,6 +17,7 @@ export function useThemeSettings(getDefaultTheme?: () => Theme) {
 		secure: config.public.cookieSecure,
 		httpOnly: false,
 		path: '/',
+		domain: getCookieDomain(),
 	})
 
 	// reset theme settings to a default value if the cookie is missing or contains invalid value

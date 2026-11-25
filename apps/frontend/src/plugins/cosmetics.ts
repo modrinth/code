@@ -1,3 +1,4 @@
+import { getCookieDomain } from '@/composables/cookie-domain.ts'
 import type { DarkTheme } from './theme/index.ts'
 
 export type DisplayMode = 'list' | 'gallery' | 'grid'
@@ -35,6 +36,7 @@ export default defineNuxtPlugin({
 			secure: config.public.cookieSecure,
 			httpOnly: false,
 			path: '/',
+			domain: getCookieDomain(),
 			default: () => ({
 				rightSearchLayout: false,
 				leftContentLayout: false,

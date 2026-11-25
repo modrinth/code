@@ -1,5 +1,7 @@
 import type { CookieOptions } from '#app'
 
+import { getCookieDomain } from '@/composables/cookie-domain.ts'
+
 export type ProjectDisplayMode = 'list' | 'grid' | 'gallery'
 export type DarkColorTheme = 'dark' | 'oled' | 'retro'
 
@@ -76,6 +78,7 @@ const getCookieOptions = () =>
 		secure: useRuntimeConfig().public.cookieSecure,
 		httpOnly: false,
 		path: '/',
+		domain: getCookieDomain(),
 	}) satisfies CookieOptions<PartialFeatureFlags>
 
 export const useFeatureFlags = () =>
