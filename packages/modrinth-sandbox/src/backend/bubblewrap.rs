@@ -26,6 +26,7 @@ use crate::{
         unix::UnixChild,
     },
     file_sharing::FileSharing,
+    path_access::{PathPermission, PathRules},
     util::SandboxArg,
 };
 
@@ -550,7 +551,7 @@ fn spawn(
 
     // Bind custom paths
     // Read-only directories can contain a read-write, but not vice-versa. So we bind read then write
-    let path_set = command.take_paths()?;
+    let (path_set, path_rules) = command.take_paths()?;
     for path in path_set.iter_read_only() {
         builder.bind_if_exists(BindBehaviour::NoFollowRead, path);
     }
@@ -678,6 +679,7 @@ instance-id={instance_id}
         handle: super::SandboxHandle::Bubblewrap(BubblewrapSandboxHandle {
             file_sharing,
             path_set: Arc::new(path_set),
+            path_rules: Arc::new(path_rules),
         }),
         on_finish: command.on_finish,
     };
@@ -747,20 +749,25 @@ impl SandboxChildOp for BubblewrapChild {
 pub struct BubblewrapSandboxHandle {
     file_sharing: Option<FileSharing>,
     path_set: Arc<ReadWritePathSet>,
+    path_rules: Arc<PathRules>,
 }
 
 impl SandboxHandleOp for BubblewrapSandboxHandle {
     fn expose_path(
         &self,
         path: &Path,
-        allow_write: bool,
+        permission: PathPermission,
     ) -> eyre::Result<ExposedPath> {
-        let can_access = if allow_write {
-            self.is_path_writeable(path)
-        } else {
-            self.is_path_readable(path)
+        let is_accessible = |path: &Path, permission| match permission {
+            PathPermission::ReadOnly => self.is_path_readable(path),
+            PathPermission::ReadWrite => self.is_path_writeable(path),
         };
-        if can_access {
+        if is_accessible(path, permission) {
+            return Ok(ExposedPath::Direct);
+        }
+        let permission =
+            permission.min(self.path_rules.calculate_expose_permission(path)?);
+        if is_accessible(path, permission) {
             return Ok(ExposedPath::Direct);
         }
         let Some(file_sharing) = &self.file_sharing else {
@@ -769,7 +776,7 @@ impl SandboxHandleOp for BubblewrapSandboxHandle {
             );
         };
 
-        let proxied_path = file_sharing.add(path.to_path_buf(), allow_write)?;
+        let proxied_path = file_sharing.add(path.to_path_buf(), permission)?;
         Ok(ExposedPath::Proxied(proxied_path))
     }
 
@@ -779,6 +786,10 @@ impl SandboxHandleOp for BubblewrapSandboxHandle {
 
     fn is_path_writeable(&self, path: &Path) -> bool {
         self.path_set.can_write(path.to_path_buf())
+    }
+
+    fn is_path_blocked(&self, path: &Path) -> bool {
+        self.path_rules.is_blocked(path)
     }
 }
 

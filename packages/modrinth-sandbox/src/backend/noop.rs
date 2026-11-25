@@ -12,6 +12,7 @@ use crate::{
     backend::{
         Backend, ExposedPath, SandboxChildOp, SandboxEnv, SandboxHandleOp,
     },
+    path_access::PathPermission,
 };
 
 use super::SandboxHandle;
@@ -172,7 +173,7 @@ impl SandboxHandleOp for NoopSandboxHandle {
     fn expose_path(
         &self,
         _path: &Path,
-        _allow_write: bool,
+        _permission: PathPermission,
     ) -> eyre::Result<ExposedPath> {
         Ok(ExposedPath::Direct)
     }
@@ -183,6 +184,10 @@ impl SandboxHandleOp for NoopSandboxHandle {
 
     fn is_path_writeable(&self, _path: &Path) -> bool {
         true
+    }
+
+    fn is_path_blocked(&self, _path: &Path) -> bool {
+        false
     }
 }
 
@@ -202,6 +207,7 @@ mod tests {
             ensure_dirs_exist: Vec::new(),
             read_only_paths: Vec::new(),
             read_write_paths: Vec::new(),
+            path_rules: Vec::new(),
             registry_read_keys: Vec::new(),
             working_directory: None,
             passthrough_environment: BTreeSet::new(),

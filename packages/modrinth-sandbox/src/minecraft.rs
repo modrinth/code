@@ -11,7 +11,9 @@ use rand::Rng;
 use sha1::{Digest, Sha1};
 
 use crate::{
-    SandboxChild, SandboxCommand, SandboxStdio, api::SandboxApiChild,
+    PathPermission, PathRule, SandboxChild, SandboxCommand, SandboxStdio,
+    api::SandboxApiChild,
+    path_access::{PathRules, normalize_path, resolve_existing},
     util::SandboxArg,
 };
 
@@ -41,9 +43,22 @@ pub struct MinecraftCommand {
     /// shared across all game instances. Temporary launcher JARs are staged in
     /// its `tmp` subdirectory and removed when the launched process exits.
     pub persistent_dir: PathBuf,
-    /// Extra host directories exposed read-write at the same path in the
-    /// sandbox, such as folders the user has granted access to.
-    pub granted_paths: Vec<PathBuf>,
+    /// Extra host paths that can be read by the sandboxed application.
+    /// Ignored if blocked by [`MinecraftCommand::path_rules`]
+    pub read_only_paths: Vec<PathBuf>,
+    /// Extra host paths that can be read and written by the sandboxed application.
+    /// Ignored if blocked by [`MinecraftCommand::path_rules`].
+    /// If there is a read-only path rule then this will become a read only path
+    pub read_write_paths: Vec<PathBuf>,
+    /// Rules for which host paths can be exposed to the sandbox.
+    ///
+    /// [`read_only_paths`] and [`read_write_paths`] can be inside of a soft blocked
+    /// path, but can't be hard blocked or contain a blocked path. A read-write path
+    /// may be downgraded into a read-only path if a rule blocks writing
+    ///
+    /// [`read_only_paths`]: Self::read_only_paths
+    /// [`read_write_paths`]: Self::read_write_paths
+    pub path_rules: Vec<PathRule>,
     /// JVM arguments which do not contain sandbox-managed paths.
     ///
     /// Classpath, Java agent, native-library, and logging arguments are generated
@@ -75,7 +90,9 @@ impl Default for MinecraftCommand {
             logging_config: None,
             instance_path: PathBuf::new(),
             persistent_dir: PathBuf::new(),
-            granted_paths: Vec::new(),
+            read_only_paths: Vec::new(),
+            read_write_paths: Vec::new(),
+            path_rules: Vec::new(),
             jvm_args: Vec::new(),
             main_class: SandboxArg::default(),
             main_class_args: Vec::new(),
@@ -443,9 +460,6 @@ pub async fn setup_minecraft_command(
         ("XDG_STATE_HOME".into(), persistent_state.into()),
     ]);
 
-    read_only_paths.sort_unstable();
-    read_only_paths.dedup();
-
     let mut read_write_paths = vec![
         // .minecraft dir
         instance_path.clone(),
@@ -455,10 +469,29 @@ pub async fn setup_minecraft_command(
         // and so is the skin cache, but the game writes into the skin cache
         skins_path,
     ];
-    read_write_paths.extend(minecraft.granted_paths);
+
+    // Hard blocks have to be last, so that nothing else takes precedence over them
+    let mut path_rules = soft_path_rules();
+    path_rules.extend(minecraft.path_rules);
+    path_rules.extend(hard_path_rules());
+    let resolved_rules = PathRules::new(path_rules.clone());
+    for path in minecraft.read_only_paths {
+        match resolved_rules.calculate_bind_permission(&path) {
+            Ok(_) => read_only_paths.push(path),
+            Err(err) => tracing::warn!("ignoring read-only path: {err:#}"),
+        }
+    }
+    for path in minecraft.read_write_paths {
+        match resolved_rules.calculate_bind_permission(&path) {
+            Ok(PathPermission::ReadOnly) => {
+                tracing::warn!("only granting read access to {path:?}");
+                read_only_paths.push(path);
+            }
+            Ok(PathPermission::ReadWrite) => read_write_paths.push(path),
+            Err(err) => tracing::warn!("ignoring read-write path: {err:#}"),
+        }
+    }
     read_write_paths.extend(signalrgb_effects_dir());
-    read_write_paths.sort_unstable();
-    read_write_paths.dedup();
 
     let mut on_start: Vec<Box<dyn FnOnce(&mut SandboxChild) + Send + Sync>> =
         Vec::new();
@@ -482,12 +515,18 @@ pub async fn setup_minecraft_command(
         }));
     }
 
+    read_only_paths.sort_unstable();
+    read_only_paths.dedup();
+    read_write_paths.sort_unstable();
+    read_write_paths.dedup();
+
     Ok(SandboxCommand {
         executable: java_path,
         args,
         ensure_dirs_exist,
         read_only_paths,
         read_write_paths,
+        path_rules,
         registry_read_keys: vec![SIGNALRGB_REGISTRY_KEY.to_owned()],
         working_directory: Some(instance_path),
         passthrough_environment: MINECRAFT_PASSTHROUGH_ENVIRONMENT
@@ -573,6 +612,301 @@ fn replace_path_placeholder(argument: &str, path: &Path) -> OsString {
     result.push(path);
     result.push(suffix);
     result
+}
+
+/// Credentials of other programs, as well as files that could be used to run code
+/// outside of the sandbox. Users can't override these, so this only contains specific
+/// paths that the game has no reason to access.
+const HARD_BLOCKED_IN_HOME: &[&str] = &[
+    ".aws",
+    ".azure",
+    ".bash_history",
+    ".bash_login",
+    ".bash_logout",
+    ".bash_profile",
+    ".bashrc",
+    ".cargo/config.toml", // Can contain registry tokens, and commands that Cargo runs
+    ".cargo/credentials.toml",
+    ".config/BraveSoftware",
+    ".config/chromium",
+    ".config/discord",
+    ".config/gcloud", // Google Cloud credentials
+    ".config/gh",     // GitHub CLI tokens
+    ".config/google-chrome",
+    ".config/mozilla",           // Firefox profiles
+    ".docker",                   // Registry credentials
+    ".git-credentials",          // Passwords saved by Git's credential store
+    ".gitconfig", // Can contain tokens, and commands that Git runs
+    ".gnupg",     // GPG private keys
+    ".gradle/gradle.properties", // Can contain repository passwords and signing keys
+    ".gradle/init.d",            // Scripts which run for every Gradle build
+    ".kube",                     // Kubernetes credentials
+    ".local/share/PrismLauncher/accounts.json",
+    ".lunarclient/settings/game/accounts.json",
+    ".m2/settings.xml", // Maven repository passwords
+    ".mozilla",         // Firefox profiles
+    ".netrc",           // Passwords used by curl, Git, FTP clients, etc.
+    ".npmrc",           // npm registry tokens
+    ".password-store",  // Used by the pass password manager
+    ".profile",
+    ".pypirc", // PyPI tokens
+    ".ssh",
+    ".thunderbird",
+    ".var/app/com.discordapp.Discord",
+    ".var/app/com.google.Chrome",
+    ".var/app/org.mozilla.firefox",
+    ".var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/accounts.json",
+    ".zprofile",
+    ".zsh_history",
+    ".zshenv",
+    ".zshrc",
+    "_netrc", // Windows equivalent of .netrc
+    "snap/discord",
+    "snap/firefox",
+];
+
+#[cfg(windows)]
+const HARD_BLOCKED_IN_ROAMING_APP_DATA: &[&str] = &[
+    "discord",
+    "Microsoft/Credentials",
+    "Microsoft/Crypto",  // Private keys
+    "Microsoft/Protect", // Keys which encrypt the user's other credentials
+    "Microsoft/Vault",
+    "Microsoft/Windows/Start Menu", // Programs which run when logging in
+    "Mozilla",                      // Firefox profiles
+    "PrismLauncher/accounts.json",
+    "Thunderbird",
+];
+
+#[cfg(windows)]
+const HARD_BLOCKED_IN_LOCAL_APP_DATA: &[&str] = &[
+    "BraveSoftware",
+    "Google/Chrome",
+    "Microsoft/Credentials",
+    "Microsoft/Edge",
+    "Microsoft/Vault",
+];
+
+const HARD_BLOCKED_IN_VANILLA: &[&str] = &[
+    "launcher_accounts.json",
+    "launcher_accounts_microsoft_store.json",
+    "launcher_msa_credentials.bin",
+    "launcher_msa_credentials_microsoft_store.bin",
+];
+
+const UNBLOCKED_IN_VANILLA: &[&str] = &[
+    "resourcepacks",
+    "saves",
+    "schematics",
+    "screenshots",
+    "shaderpacks",
+];
+
+/// The game directory of the vanilla launcher.
+fn vanilla_dir() -> Option<PathBuf> {
+    if cfg!(windows) {
+        let app_data = std::env::var_os("APPDATA")?;
+        return Some(Path::new(&app_data).join(".minecraft"));
+    }
+    let home = std::env::home_dir()?;
+    Some(if cfg!(target_os = "macos") {
+        home.join("Library/Application Support/minecraft")
+    } else {
+        home.join(".minecraft")
+    })
+}
+
+/// Folders which can't be exposed unless the launcher or user explicitly gives
+/// access to something inside of them.
+fn soft_path_rules() -> Vec<PathRule> {
+    let mut rules = Vec::new();
+
+    #[cfg(windows)]
+    {
+        use windows::Win32::UI::Shell::{
+            FOLDERID_LocalAppData, FOLDERID_LocalAppDataLow, FOLDERID_Profile,
+            FOLDERID_ProgramData, FOLDERID_ProgramFiles,
+            FOLDERID_ProgramFilesX86, FOLDERID_RoamingAppData,
+            FOLDERID_Windows,
+        };
+
+        rules.extend(
+            [
+                FOLDERID_LocalAppData,
+                FOLDERID_LocalAppDataLow,
+                FOLDERID_RoamingAppData,
+            ]
+            .iter()
+            .filter_map(get_known_folder)
+            .map(PathRule::SoftBlock),
+        );
+        if let Some(profile) = get_known_folder(&FOLDERID_Profile) {
+            rules.push(PathRule::SoftBlock(profile.join("AppData")));
+        }
+        if let Some(local_app_data) = get_known_folder(&FOLDERID_LocalAppData) {
+            // Programs extract files to this folder when dragging out of an archive
+            rules.push(PathRule::Unblock(local_app_data.join("Temp")));
+        }
+        rules.extend(
+            [
+                FOLDERID_ProgramData,
+                FOLDERID_ProgramFiles,
+                FOLDERID_ProgramFilesX86,
+                FOLDERID_Windows,
+            ]
+            .iter()
+            .filter_map(get_known_folder)
+            .map(PathRule::SoftBlockWrite),
+        );
+    }
+
+    if let Some(home) = std::env::home_dir() {
+        // Data of many programs on Linux
+        rules.push(PathRule::SoftBlock(home.join(".config")));
+    }
+    if let Some(vanilla) = vanilla_dir() {
+        rules.push(PathRule::SoftBlock(vanilla.clone()));
+        rules.extend(
+            UNBLOCKED_IN_VANILLA
+                .iter()
+                .map(|name| PathRule::Unblock(vanilla.join(name))),
+        );
+    }
+    rules.extend(path_variable_rules());
+    rules
+}
+
+/// Known sensitive paths, which the launcher and user can't give access to.
+fn hard_path_rules() -> Vec<PathRule> {
+    let mut rules = Vec::new();
+
+    if let Some(home) = std::env::home_dir() {
+        rules.extend(
+            HARD_BLOCKED_IN_HOME
+                .iter()
+                .map(|name| PathRule::HardBlock(home.join(name))),
+        );
+    }
+    if let Some(vanilla) = vanilla_dir() {
+        rules.extend(
+            HARD_BLOCKED_IN_VANILLA
+                .iter()
+                .map(|name| PathRule::HardBlock(vanilla.join(name))),
+        );
+    }
+
+    #[cfg(windows)]
+    {
+        use windows::Win32::UI::Shell::{
+            FOLDERID_Documents, FOLDERID_LocalAppData, FOLDERID_RoamingAppData,
+        };
+
+        for (folder, names) in [
+            (FOLDERID_RoamingAppData, HARD_BLOCKED_IN_ROAMING_APP_DATA),
+            (FOLDERID_LocalAppData, HARD_BLOCKED_IN_LOCAL_APP_DATA),
+        ] {
+            if let Some(folder) = get_known_folder(&folder) {
+                rules.extend(
+                    names
+                        .iter()
+                        .map(|name| PathRule::HardBlock(folder.join(name))),
+                );
+            }
+        }
+        if let Some(documents) = get_known_folder(&FOLDERID_Documents) {
+            // Contains scripts which run when PowerShell starts
+            for name in ["PowerShell", "WindowsPowerShell"] {
+                rules.push(PathRule::HardBlockWrite(documents.join(name)));
+            }
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        // Contains the memory and environment of other processes
+        rules.push(PathRule::HardBlock("/proc".into()));
+
+        if let Some(directories) = directories::BaseDirs::new() {
+            // Default XDG directories may be moved, so also block the default ones
+            let home = directories.home_dir();
+            let default_data_dir = home.join(".local/share");
+            for data_dir in [default_data_dir.as_path(), directories.data_dir()]
+            {
+                // Passwords stored by GNOME and KDE
+                for name in ["keyrings", "kwalletd"] {
+                    rules.push(PathRule::HardBlock(data_dir.join(name)));
+                }
+                // Contain commands which run when opening an application, when a D-Bus
+                // service is used, or when logging in
+                for name in ["applications", "dbus-1", "systemd"] {
+                    rules.push(PathRule::HardBlockWrite(data_dir.join(name)));
+                }
+            }
+            let default_config_dir = home.join(".config");
+            for config_dir in
+                [default_config_dir.as_path(), directories.config_dir()]
+            {
+                // Contain commands which run, or environment variables that are set,
+                // when logging in
+                for name in ["autostart", "environment.d", "systemd"] {
+                    rules.push(PathRule::HardBlockWrite(config_dir.join(name)));
+                }
+            }
+            // Contains programs which are usually on the PATH
+            rules.push(PathRule::HardBlockWrite(home.join(".local/bin")));
+        } else {
+            tracing::error!("unable to determine base directories");
+        }
+    }
+
+    rules
+}
+
+/// Prevents programs in the folders of the `PATH` environment variable from being
+/// added or replaced.
+fn path_variable_rules() -> Vec<PathRule> {
+    let Some(variable) = std::env::var_os("PATH") else {
+        return Vec::new();
+    };
+    let home = std::env::home_dir()
+        .and_then(|home| resolve_existing(&home))
+        .map(normalize_path);
+    std::env::split_paths(&variable)
+        .filter(|path| path.is_absolute())
+        .filter(|path| {
+            // Ignore folders that are so broad that almost nothing could be written to
+            resolve_existing(path)
+                .map(normalize_path)
+                .is_some_and(|path| {
+                    path.parent().is_some()
+                        && !home
+                            .as_ref()
+                            .is_some_and(|home| home.starts_with(&path))
+                })
+        })
+        .map(PathRule::SoftBlockWrite)
+        .collect()
+}
+
+#[cfg(windows)]
+fn get_known_folder(id: &windows::core::GUID) -> Option<PathBuf> {
+    use std::os::windows::ffi::OsStringExt;
+    use windows::Win32::{
+        System::Com::CoTaskMemFree,
+        UI::Shell::{KF_FLAG_DONT_VERIFY, SHGetKnownFolderPath},
+    };
+
+    match unsafe { SHGetKnownFolderPath(id, KF_FLAG_DONT_VERIFY, None) } {
+        Ok(path) => {
+            let folder = OsString::from_wide(unsafe { path.as_wide() });
+            unsafe { CoTaskMemFree(Some(path.0.cast())) };
+            Some(folder.into())
+        }
+        Err(err) => {
+            tracing::error!("unable to get known folder {id:?}: {err}");
+            None
+        }
+    }
 }
 
 /// Used by the illuminate mod (https://github.com/creeperkatze/mc-mods/blob/main/illuminate/)

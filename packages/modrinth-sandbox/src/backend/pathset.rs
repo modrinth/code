@@ -1,5 +1,8 @@
 use std::path::PathBuf;
 
+#[cfg(windows)]
+use crate::path_access::normalize_path;
+
 #[derive(Debug, Default)]
 pub struct PathSet {
     paths: Vec<PathBuf>,
@@ -107,21 +110,6 @@ impl ReadWritePathSet {
     pub fn iter_read_write(&self) -> impl Iterator<Item = &PathBuf> {
         self.writeable.paths.iter()
     }
-}
-
-#[cfg(windows)]
-fn normalize_path(path: PathBuf) -> PathBuf {
-    let mut os_string = path.into_os_string();
-    os_string.make_ascii_lowercase();
-
-    let encoded_bytes = os_string.as_os_str().as_encoded_bytes();
-    if let Some(rest) = encoded_bytes.strip_prefix(b"\\\\?\\") {
-        return PathBuf::from(unsafe {
-            std::ffi::OsStr::from_encoded_bytes_unchecked(rest)
-        });
-    }
-
-    PathBuf::from(os_string)
 }
 
 #[cfg(test)]

@@ -7,6 +7,7 @@ pub mod ffi;
 pub mod file_sharing;
 pub mod helper;
 pub mod minecraft;
+mod path_access;
 mod util;
 
 use std::{
@@ -20,6 +21,7 @@ use derive_more::Debug;
 use eyre::Result;
 
 pub use backend::SandboxExitStatus;
+pub use path_access::{PathPermission, PathRule};
 pub use util::SandboxArg;
 
 use crate::{
@@ -149,6 +151,15 @@ pub struct SandboxCommand {
     pub read_only_paths: Vec<PathBuf>,
     /// Host paths mounted read-write at the same path in the sandbox.
     pub read_write_paths: Vec<PathBuf>,
+    /// Rules for which host paths can be exposed to the sandbox.
+    ///
+    /// [`read_only_paths`] and [`read_write_paths`] can be inside of a soft blocked
+    /// path, but can't be hard blocked or contain a blocked path. A read-write path
+    /// may be downgraded into a read-only path if a rule blocks writing
+    ///
+    /// [`read_only_paths`]: Self::read_only_paths
+    /// [`read_write_paths`]: Self::read_write_paths
+    pub path_rules: Vec<PathRule>,
     /// (Windows only) Registry keys inside of `HKEY_CURRENT_USER` which can be
     /// read in the sandbox.
     ///
@@ -205,6 +216,7 @@ impl Default for SandboxCommand {
             ensure_dirs_exist: Vec::new(),
             read_only_paths: Vec::new(),
             read_write_paths: Vec::new(),
+            path_rules: Vec::new(),
             registry_read_keys: Vec::new(),
             working_directory: None,
             passthrough_environment: BTreeSet::new(),
@@ -345,9 +357,9 @@ impl SandboxHandle {
     pub fn expose_path(
         &self,
         path: &Path,
-        writeable: bool,
+        permission: PathPermission,
     ) -> eyre::Result<ExposedPath> {
-        self.imp.expose_path(path, writeable)
+        self.imp.expose_path(path, permission)
     }
 
     pub fn is_path_readable(&self, path: &Path) -> bool {
@@ -356,5 +368,9 @@ impl SandboxHandle {
 
     pub fn is_path_writeable(&self, path: &Path) -> bool {
         self.imp.is_path_writeable(path)
+    }
+
+    pub fn is_path_risky_or_blocked(&self, path: &Path) -> bool {
+        path_access::is_risky_path(path) || self.imp.is_path_blocked(path)
     }
 }

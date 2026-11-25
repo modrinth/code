@@ -86,6 +86,7 @@ use crate::{
         SandboxHandle, SandboxHandleOp, pathset::ReadWritePathSet,
     },
     helper::MakeHelper,
+    path_access::{PathPermission, PathRule, PathRules},
 };
 
 use super::{
@@ -163,7 +164,11 @@ fn spawn(
         })?;
     }
 
-    let path_set = command.take_paths()?;
+    // The sandbox always has access to this
+    command
+        .path_rules
+        .push(PathRule::Unblock(app_container_folder.clone()));
+    let (path_set, path_rules) = command.take_paths()?;
     let real_home = std::env::home_dir();
     let home = real_home
         .clone()
@@ -287,7 +292,7 @@ fn spawn(
     if let Some(real_home) = &real_home
         && home == sandbox_home
     {
-        for path in path_set.iter_read_write() {
+        for path in path_set.iter_both() {
             if let Err(err) =
                 link_into_sandbox_home(path, real_home, &sandbox_home)
             {
@@ -503,6 +508,7 @@ fn spawn(
 
     let handle = WindowsSandboxHandle {
         path_set: Arc::new(Mutex::new(path_set)),
+        path_rules: Arc::new(path_rules),
         app_container_sid: Arc::new(app_container_sid_string),
         acl_instance_id,
         expose_lock: Arc::new(Mutex::new(())),
@@ -575,6 +581,7 @@ impl SandboxChildOp for AppContainerChild {
 #[derive(Clone)]
 pub struct WindowsSandboxHandle {
     path_set: Arc<Mutex<ReadWritePathSet>>,
+    path_rules: Arc<PathRules>,
     app_container_sid: Arc<OsString>,
     acl_instance_id: Uuid,
     expose_lock: Arc<Mutex<()>>,
@@ -591,23 +598,21 @@ impl SandboxHandleOp for WindowsSandboxHandle {
     fn expose_path(
         &self,
         path: &Path,
-        allow_write: bool,
+        permission: PathPermission,
     ) -> eyre::Result<ExposedPath> {
-        let is_accessible = |path: &Path| {
-            if allow_write {
-                self.is_path_writeable(path)
-            } else {
-                self.is_path_readable(path)
-            }
+        let is_accessible = |path: &Path, permission| match permission {
+            PathPermission::ReadOnly => self.is_path_readable(path),
+            PathPermission::ReadWrite => self.is_path_writeable(path),
         };
 
-        // The sandboxed process could have replaced anything it can write to
-        // with a link, so this has to be checked before resolving the path
-        if is_accessible(path) {
+        if is_accessible(path, permission) {
             return Ok(ExposedPath::Direct);
         }
 
-        if allow_write {
+        let permission =
+            permission.min(self.path_rules.calculate_expose_permission(path)?);
+
+        if permission == PathPermission::ReadWrite {
             // Try create an empty file if one doesn't exist yet
             // Save dialogs return paths which may not exist, creating
             // an empty file allows us to grant permission to that file
@@ -645,22 +650,16 @@ impl SandboxHandleOp for WindowsSandboxHandle {
             "refusing to expose a drive root: {path:?}"
         );
 
-        let permission = if allow_write {
-            PermissionType::Write
-        } else {
-            PermissionType::Read
-        };
-
         let _expose_guard = self.expose_lock.lock();
 
-        if is_accessible(&path) {
+        if is_accessible(&path, permission) {
             return Ok(exposed);
         }
 
         let mut grants =
-            vec![Grant::from_path(&path, permission)?.ok_or_else(|| {
-                eyre!("unable to canonicalize path: {path:?}")
-            })?];
+            vec![Grant::from_path(&path, permission.into())?.ok_or_else(
+                || eyre!("unable to canonicalize path: {path:?}"),
+            )?];
         let mut parent = path.parent();
         while let Some(parent_path) = parent {
             grants.extend(Grant::from_path(
@@ -708,11 +707,11 @@ impl SandboxHandleOp for WindowsSandboxHandle {
             )
             .wrap_err("adding dynamic AppContainer ACL grants")?;
 
-        if allow_write {
-            self.path_set.lock().insert_writeable(path);
-        } else {
-            self.path_set.lock().insert_readable(path);
-        }
+        let mut path_set = self.path_set.lock();
+        match permission {
+            PathPermission::ReadOnly => path_set.insert_readable(path),
+            PathPermission::ReadWrite => path_set.insert_writeable(path),
+        };
         Ok(exposed)
     }
 
@@ -722,6 +721,10 @@ impl SandboxHandleOp for WindowsSandboxHandle {
 
     fn is_path_writeable(&self, path: &Path) -> bool {
         self.path_set.lock().can_write(path.to_path_buf())
+    }
+
+    fn is_path_blocked(&self, path: &Path) -> bool {
+        self.path_rules.is_blocked(path)
     }
 }
 

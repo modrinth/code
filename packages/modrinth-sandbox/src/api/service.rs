@@ -27,7 +27,7 @@ use url::Url;
 use uuid::Uuid;
 
 use crate::{
-    ExposedPath, SandboxHandle,
+    ExposedPath, PathPermission, SandboxHandle,
     api::desktop::{OpenFileDialogArgs, OpenFileDialogFilter},
 };
 
@@ -399,7 +399,8 @@ impl SandboxApiService {
                     RequestStatus::MethodNotAllowed.write(stream).await;
                     return;
                 }
-                let status = self.handle_request_open_uri(params).await;
+                let status =
+                    self.handle_request_open_uri(params, child_state).await;
                 status.write(stream).await;
             }
             "/sandboxapi/request-access" => {
@@ -897,7 +898,11 @@ impl SandboxApiService {
         Err(RequestStatus::Unauthorized)
     }
 
-    async fn handle_request_open_uri(self, params: &str) -> RequestStatus {
+    async fn handle_request_open_uri(
+        self,
+        params: &str,
+        child_state: Option<ServiceChildState>,
+    ) -> RequestStatus {
         let mut uri = None;
         for (key, value) in
             params.split("&").filter_map(|arg| arg.split_once('='))
@@ -946,6 +951,18 @@ impl SandboxApiService {
             let Ok(path) = url.to_file_path() else {
                 return RequestStatus::BadRequest;
             };
+            let Some(sandbox_handle) =
+                child_state.and_then(|child_state| child_state.handle)
+            else {
+                return RequestStatus::InternalServerError;
+            };
+            if sandbox_handle.is_path_risky_or_blocked(&path) {
+                warn!(
+                    path = %path.display(),
+                    "refusing to open risky or blocked path"
+                );
+                return RequestStatus::OK;
+            }
             if let Ok(path) = path.canonicalize() {
                 if path.is_dir() {
                     tokio::task::spawn(super::desktop::open_dir(path));
@@ -1015,6 +1032,13 @@ impl SandboxApiService {
             path = %path.display(),
             "got request to access dropped file"
         );
+        if sandbox_handle.is_path_risky_or_blocked(path) {
+            warn!(
+                path = %path.display(),
+                "rejecting dropped-file access because the path is risky or blocked"
+            );
+            return Err(RequestStatus::Unauthorized);
+        }
         if !path.exists() {
             // This API should only be used for DnD file paths
             // Therefore, it should only ever be called for files that actually exist
@@ -1084,7 +1108,7 @@ impl SandboxApiService {
             path = %path.display(),
             "dropped file passed content validation"
         );
-        match sandbox_handle.expose_path(path, false) {
+        match sandbox_handle.expose_path(path, PathPermission::ReadOnly) {
             Ok(ExposedPath::Direct) => {
                 info!(
                     path = %path.display(),
@@ -1161,7 +1185,15 @@ impl SandboxApiService {
                     });
                 }
                 "default_location" => {
-                    open_args.default_location = Some(PathBuf::from(&*value));
+                    let path = Path::new(&*value);
+                    if sandbox_handle.is_path_risky_or_blocked(path) {
+                        warn!(
+                            path = %path.display(),
+                            "ignoring default location because the path is risky or blocked"
+                        );
+                    } else {
+                        open_args.default_location = Some(path.to_path_buf());
+                    }
                 }
                 _ => {
                     warn!("unrecognized option for open-file-dialog: {key}");
@@ -1180,7 +1212,9 @@ impl SandboxApiService {
 
         for path in &mut paths {
             if !sandbox_handle.is_path_writeable(path) {
-                match sandbox_handle.expose_path(path, true) {
+                match sandbox_handle
+                    .expose_path(path, PathPermission::ReadWrite)
+                {
                     Ok(ExposedPath::Direct) => {}
                     Ok(ExposedPath::Proxied(proxied)) => {
                         *path = proxied;

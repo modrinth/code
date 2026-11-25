@@ -16,6 +16,7 @@ use crate::{
         pathset::ReadWritePathSet,
         unix::{self, UnixChild},
     },
+    path_access::{PathPermission, PathRules},
     util::{RawStringVec, resolve_path},
 };
 
@@ -115,7 +116,7 @@ fn spawn(
             .wrap_err_with(|| format!("creating directory {path:?}"))?;
     }
 
-    let path_set = command.take_paths()?;
+    let (path_set, path_rules) = command.take_paths()?;
     for path in path_set.iter_read_only() {
         sandbox_profile.allow_read(path);
     }
@@ -150,6 +151,7 @@ fn spawn(
         on_finish: command.on_finish,
         handle: SandboxHandle::Macos(MacosSandboxHandle {
             path_set: Arc::new(path_set),
+            path_rules: Arc::new(path_rules),
         }),
         imp: SandboxChild::Macos(MacosChild {
             child,
@@ -192,13 +194,14 @@ impl SandboxChildOp for MacosChild {
 #[derive(Clone, Debug)]
 pub struct MacosSandboxHandle {
     path_set: Arc<ReadWritePathSet>,
+    path_rules: Arc<PathRules>,
 }
 
 impl SandboxHandleOp for MacosSandboxHandle {
     fn expose_path(
         &self,
         _path: &Path,
-        _allow_write: bool,
+        _permission: PathPermission,
     ) -> eyre::Result<ExposedPath> {
         Err(eyre::eyre!("unsupported"))
     }
@@ -209,6 +212,10 @@ impl SandboxHandleOp for MacosSandboxHandle {
 
     fn is_path_writeable(&self, path: &Path) -> bool {
         self.path_set.can_write(path.to_path_buf())
+    }
+
+    fn is_path_blocked(&self, path: &Path) -> bool {
+        self.path_rules.is_blocked(path)
     }
 }
 

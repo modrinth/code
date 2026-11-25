@@ -1294,7 +1294,7 @@ pub async fn launch_minecraft(
             granted_paths: if sandboxed {
                 sandbox::granted_paths(sandbox_settings)
             } else {
-                Vec::new()
+                sandbox::GrantedPaths::default()
             },
         },
         &env_args,

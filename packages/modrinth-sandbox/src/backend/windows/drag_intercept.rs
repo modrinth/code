@@ -91,7 +91,10 @@ use windows::{
 };
 
 use super::WindowsSandboxHandle;
-use crate::backend::{ExposedPath, SandboxHandleOp};
+use crate::{
+    backend::{ExposedPath, SandboxHandleOp},
+    path_access::{PathPermission, has_executable_extension},
+};
 
 const DRAG_IMAGE_CLASS: &str = "SysDragImage";
 
@@ -120,77 +123,6 @@ const DROPPED_FILES_FORMAT: FORMATETC = FORMATETC {
     lindex: -1,
     tymed: TYMED_HGLOBAL.0 as u32,
 };
-
-/// Types which Windows or a common runtime executes, installs or imports when
-/// they are opened.
-const EXECUTABLE_EXTENSIONS: &[&str] = &[
-    "appinstaller",
-    "application",
-    "appref-ms",
-    "appx",
-    "appxbundle",
-    "bat",
-    "chm",
-    "cmd",
-    "com",
-    "cpl",
-    "diagcab",
-    "dll",
-    "drv",
-    "exe",
-    "gadget",
-    "hlp",
-    "hta",
-    "inf",
-    "ins",
-    "isp",
-    "jar",
-    "jnlp",
-    "js",
-    "jse",
-    "library-ms",
-    "lnk",
-    "msc",
-    "msi",
-    "msix",
-    "msixbundle",
-    "msp",
-    "mst",
-    "ocx",
-    "pif",
-    "ps1",
-    "ps1xml",
-    "psc1",
-    "psd1",
-    "psm1",
-    "py",
-    "pyc",
-    "pyw",
-    "pyz",
-    "reg",
-    "scf",
-    "scr",
-    "sct",
-    "search-ms",
-    "settingcontent-ms",
-    "sh",
-    "shb",
-    "shs",
-    "sys",
-    "theme",
-    "themepack",
-    "url",
-    "vb",
-    "vbe",
-    "vbs",
-    "website",
-    "ws",
-    "wsc",
-    "wsf",
-    "wsh",
-    "xbap",
-    "xll",
-];
 
 /// Stops the drag intercept thread when dropped, without waiting for it.
 #[derive(Debug)]
@@ -937,8 +869,7 @@ fn expose_files(
         .into_iter()
         .filter_map(|file| {
             let resolved = file.canonicalize().ok()?;
-            match sandbox.expose_path(&file, can_expose_for_writing(&resolved))
-            {
+            match sandbox.expose_path(&file, get_drop_permission(&resolved)) {
                 Ok(ExposedPath::Direct) => Some(file),
                 Ok(ExposedPath::Proxied(proxied)) => Some(proxied),
                 Err(err) => {
@@ -955,19 +886,12 @@ fn expose_files(
 
 /// Prevents the sandboxed process from modifying anything which could later be
 /// executed outside of the sandbox.
-fn can_expose_for_writing(path: &Path) -> bool {
-    if path.is_dir() {
-        return false;
+fn get_drop_permission(path: &Path) -> PathPermission {
+    if path.is_dir() || has_executable_extension(path) {
+        PathPermission::ReadOnly
+    } else {
+        PathPermission::ReadWrite
     }
-    let Some(extension) = path.extension() else {
-        return true;
-    };
-    let Some(extension) = extension.to_str() else {
-        return false;
-    };
-    !EXECUTABLE_EXTENSIONS
-        .iter()
-        .any(|executable| executable.eq_ignore_ascii_case(extension))
 }
 
 fn post_drop_message(

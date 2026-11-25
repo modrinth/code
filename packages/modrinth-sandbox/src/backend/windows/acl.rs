@@ -73,6 +73,8 @@ use windows::{
 };
 use winreg::{RegKey, enums::HKEY_CURRENT_USER};
 
+use crate::path_access::PathPermission;
+
 use super::appcontainer::is_access_denied;
 
 const REGISTRY_BASE: &str = r"Software\MinecraftSandbox";
@@ -88,6 +90,15 @@ pub enum PermissionType {
     Traverse,
     Read,
     Write,
+}
+
+impl From<PathPermission> for PermissionType {
+    fn from(permission: PathPermission) -> Self {
+        match permission {
+            PathPermission::ReadOnly => Self::Read,
+            PathPermission::ReadWrite => Self::Write,
+        }
+    }
 }
 
 #[derive(

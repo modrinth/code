@@ -14,8 +14,9 @@ use eyre::{Context, Result};
 
 use crate::{
     ExposedPath, SandboxCommand,
-    backend::pathset::ReadWritePathSet,
+    backend::pathset::{PathSet, ReadWritePathSet},
     helper::MakeHelper,
+    path_access::{PathPermission, PathRules},
     util::{SandboxArg, resolve_path},
 };
 
@@ -84,19 +85,53 @@ pub async fn create_env(
 }
 
 impl SandboxCommand {
-    pub(crate) fn take_paths(&mut self) -> eyre::Result<ReadWritePathSet> {
+    /// Fails if any of the paths are hard blocked, or contain a blocked path.
+    pub(crate) fn take_paths(
+        &mut self,
+    ) -> eyre::Result<(ReadWritePathSet, PathRules)> {
         let mut read_only_paths = std::mem::take(&mut self.read_only_paths);
-        let read_write_paths = std::mem::take(&mut self.read_write_paths);
+        let mut requested_write_paths =
+            std::mem::take(&mut self.read_write_paths);
 
         read_only_paths.push(resolve_path(&self.executable)?);
         if let Some(working) = self.working_directory.clone() {
             read_only_paths.push(working);
         }
 
-        Ok(ReadWritePathSet::from_vecs(
-            read_only_paths,
-            read_write_paths,
-        ))
+        // Rules for parents have to be before rules for their children
+        read_only_paths.sort();
+        read_only_paths.dedup();
+        requested_write_paths.sort();
+        requested_write_paths.dedup();
+
+        // Paths inside of other read-only paths don't need their own rule
+        let mut read_only_set = PathSet::default();
+        for path in read_only_paths {
+            read_only_set.insert(path);
+        }
+        let mut read_only_paths =
+            read_only_set.iter().cloned().collect::<Vec<_>>();
+
+        let mut rules = PathRules::new(std::mem::take(&mut self.path_rules));
+        for path in &read_only_paths {
+            rules.add_bind(path, PathPermission::ReadOnly)?;
+        }
+        let mut read_write_paths = Vec::new();
+        for path in requested_write_paths {
+            match rules.add_bind(&path, PathPermission::ReadWrite)? {
+                PathPermission::ReadOnly => {
+                    tracing::warn!(
+                        "only giving the sandbox read access to {path:?}, since it is, or contains, a path that must not be written to"
+                    );
+                    read_only_paths.push(path);
+                }
+                PathPermission::ReadWrite => read_write_paths.push(path),
+            }
+        }
+
+        let path_set =
+            ReadWritePathSet::from_vecs(read_only_paths, read_write_paths);
+        Ok((path_set, rules))
     }
 
     pub(crate) fn take_environment(
@@ -210,10 +245,11 @@ pub trait SandboxHandleOp {
     fn expose_path(
         &self,
         path: &Path,
-        allow_write: bool,
+        permission: PathPermission,
     ) -> eyre::Result<ExposedPath>;
     fn is_path_readable(&self, path: &Path) -> bool;
     fn is_path_writeable(&self, path: &Path) -> bool;
+    fn is_path_blocked(&self, path: &Path) -> bool;
 }
 
 #[derive(Clone, Debug)]

@@ -20,6 +20,8 @@ use parking_lot::Mutex;
 use rand::RngExt;
 use rustix::fs::{AtFlags, OFlags, RenameFlags};
 
+use crate::path_access::PathPermission;
+
 const TTL: Duration = Duration::ZERO;
 const O_DEFAULT: OFlags = OFlags::NOFOLLOW.union(OFlags::CLOEXEC);
 
@@ -88,7 +90,12 @@ pub struct FileSharing {
 }
 
 impl FileSharing {
-    pub fn add(&self, path: PathBuf, mutable: bool) -> eyre::Result<PathBuf> {
+    pub fn add(
+        &self,
+        path: PathBuf,
+        permission: PathPermission,
+    ) -> eyre::Result<PathBuf> {
+        let mutable = permission == PathPermission::ReadWrite;
         let mut fs = self.filesystem.0.lock();
         if let Some(shutdown_reason) = fs.abort.get_abort_message() {
             bail!(shutdown_reason);

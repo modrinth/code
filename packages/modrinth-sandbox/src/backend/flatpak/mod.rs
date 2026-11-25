@@ -25,6 +25,7 @@ use crate::{
         pathset::ReadWritePathSet,
         unix,
     },
+    path_access::{PathPermission, PathRules},
 };
 
 mod dbus;
@@ -86,7 +87,7 @@ async fn spawn(
         })
         .collect::<Result<BTreeMap<_, _>>>()?;
 
-    let path_set = command.take_paths()?;
+    let (path_set, path_rules) = command.take_paths()?;
 
     let cwd_path = match command.working_directory {
         Some(path) => nul_terminate(
@@ -323,6 +324,7 @@ async fn spawn(
         on_finish: command.on_finish,
         handle: super::SandboxHandle::Flatpak(FlatpakSandboxHandle {
             path_set: Arc::new(path_set),
+            path_rules: Arc::new(path_rules),
         }),
         imp: SandboxChild::Flatpak(FlatpakChild {
             flatpak_pid,
@@ -360,13 +362,14 @@ fn open_dev_null() -> Result<std::fs::File> {
 #[derive(Clone, Debug)]
 pub struct FlatpakSandboxHandle {
     path_set: Arc<ReadWritePathSet>,
+    path_rules: Arc<PathRules>,
 }
 
 impl super::SandboxHandleOp for FlatpakSandboxHandle {
     fn expose_path(
         &self,
         _path: &std::path::Path,
-        _allow_write: bool,
+        _permission: PathPermission,
     ) -> Result<crate::ExposedPath> {
         bail!(
             "exposing additional paths to a running Flatpak sandbox is unsupported"
@@ -379,6 +382,10 @@ impl super::SandboxHandleOp for FlatpakSandboxHandle {
 
     fn is_path_writeable(&self, path: &std::path::Path) -> bool {
         self.path_set.can_write(path.to_path_buf())
+    }
+
+    fn is_path_blocked(&self, path: &std::path::Path) -> bool {
+        self.path_rules.is_blocked(path)
     }
 }
 

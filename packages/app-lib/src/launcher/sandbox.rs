@@ -12,7 +12,7 @@ use crate::state::{
 };
 use minecraft_meta_manifest::minecraft::{LoggingConfiguration, LoggingSide};
 use modrinth_sandbox::{
-    SandboxStdio,
+    PathRule, SandboxStdio,
     api::{SandboxApiChild, SandboxApiLauncher, SandboxApiService},
     minecraft::{MinecraftCommand, MinecraftLoggingConfig},
 };
@@ -98,40 +98,52 @@ pub(super) async fn should_sandbox(
     })
 }
 
-/// Host folders to expose read-write to a sandboxed instance.
-pub(super) fn granted_paths(settings: &SandboxSettings) -> Vec<PathBuf> {
-    let mut paths = Vec::new();
+/// Host folders to expose to a sandboxed instance.
+#[derive(Default)]
+pub(super) struct GrantedPaths {
+    pub read_only: Vec<PathBuf>,
+    pub read_write: Vec<PathBuf>,
+}
+
+pub(super) fn granted_paths(settings: &SandboxSettings) -> GrantedPaths {
+    // Read-only to prevent mods from modifying files that the user later runs
+    let mut read_only = Vec::new();
     if settings.allow_downloads
         && let Some(dir) = dirs::download_dir()
     {
-        paths.push(dir);
+        read_only.push(dir);
     }
     if settings.allow_documents
         && let Some(dir) = dirs::document_dir()
     {
-        paths.push(dir);
+        read_only.push(dir);
     }
-    paths.extend(
-        settings
-            .extra_paths
-            .iter()
-            .map(|path| path.trim())
-            .filter(|path| !path.is_empty())
-            .map(PathBuf::from),
-    );
-    paths.retain(|path| {
-        let exists = path.is_dir();
-        if !exists {
-            tracing::warn!(
-                "Skipping sandbox folder grant for missing directory {}",
-                path.display()
-            );
-        }
-        exists
-    });
-    paths.sort_unstable();
-    paths.dedup();
-    paths
+    let mut read_write = settings
+        .extra_paths
+        .iter()
+        .map(|path| path.trim())
+        .filter(|path| !path.is_empty())
+        .map(PathBuf::from)
+        .collect::<Vec<_>>();
+
+    for paths in [&mut read_only, &mut read_write] {
+        paths.retain(|path| {
+            let exists = path.is_dir();
+            if !exists {
+                tracing::warn!(
+                    "Skipping sandbox folder grant for missing directory {}",
+                    path.display()
+                );
+            }
+            exists
+        });
+        paths.sort_unstable();
+        paths.dedup();
+    }
+    GrantedPaths {
+        read_only,
+        read_write,
+    }
 }
 
 /// Picks the sandbox environment for a launch, failing if sandboxing was
@@ -164,7 +176,7 @@ pub(super) struct CommandInput<'a> {
     pub instance_path: PathBuf,
     pub jvm_args: Vec<String>,
     pub game_args: Vec<String>,
-    pub granted_paths: Vec<PathBuf>,
+    pub granted_paths: GrantedPaths,
 }
 
 pub(super) fn prepare_command(
@@ -235,7 +247,24 @@ pub(super) fn prepare_command(
     command.logging_config = logging_config;
     command.instance_path = input.instance_path;
     command.persistent_dir = input.directories.instance_data_dir();
-    command.granted_paths = input.granted_paths;
+    command.read_only_paths = input.granted_paths.read_only;
+    command
+        .read_only_paths
+        .push(input.directories.libraries_dir());
+    command.read_write_paths = input.granted_paths.read_write;
+    command.path_rules = vec![
+        PathRule::SoftBlock(input.directories.config_dir.clone()),
+        PathRule::HardBlock(input.directories.settings_dir.clone()),
+        // These can be inside of the settings directory, we need to downgrade
+        // the hard block into a soft block so our binds are accepted
+        PathRule::SoftBlock(input.directories.metadata_dir()),
+        PathRule::SoftBlock(input.directories.instance_data_dir()),
+        PathRule::SoftBlock(input.directories.synced_options_dir()),
+        PathRule::SoftBlock(input.directories.instances_dir()),
+        // We might want to drag-and-drop a resourcepack from one instance to another,
+        // so we unblock the other instance directories
+        PathRule::UnblockRead(input.directories.instances_dir()),
+    ];
     command.jvm_args = jvm_args.into_iter().map(Into::into).collect();
     command.main_class = THESEUS_MINECRAFT_LAUNCHER_MAIN_CLASS.into();
     command.main_class_args = launcher_args;
