@@ -341,6 +341,12 @@ impl SandboxChild {
     }
 }
 
+impl Drop for SandboxChild {
+    fn drop(&mut self) {
+        self.finish();
+    }
+}
+
 /// Where a path exposed by [`SandboxHandle::expose_path`] is inside of the sandbox.
 #[derive(Clone, Debug)]
 pub enum ExposedPath {
