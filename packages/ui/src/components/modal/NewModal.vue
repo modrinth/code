@@ -116,7 +116,7 @@
 							:class="[
 								'flex-1 min-h-0 overflow-y-auto',
 								props.noPadding ? '' : 'p-6',
-								{ '!pb-0': $slots.actions && !actionsDivider && !props.noPadding },
+								{ '!pb-1': $slots.actions && !actionsDivider && !props.noPadding },
 								{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 							]"
 							:style="{ maxHeight: maxContentHeight }"
@@ -149,7 +149,7 @@
 						:class="[
 							'min-h-0',
 							props.noPadding ? '' : 'overflow-y-auto p-6',
-							{ '!pb-0': $slots.actions && !actionsDivider && !props.noPadding },
+							{ '!pb-1': $slots.actions && !actionsDivider && !props.noPadding },
 							{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 						]"
 					>
@@ -158,7 +158,10 @@
 
 					<div
 						v-if="$slots.actions"
-						:class="{ 'pt-4 border-0 border-t border-solid border-surface-5': actionsDivider }"
+						:class="{
+						'pt-4 border-0 border-t border-solid border-surface-5': actionsDivider,
+						'pt-3': !actionsDivider && !props.noPadding,
+					}"
 						class="p-4"
 					>
 						<slot name="actions" />
