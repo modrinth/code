@@ -3,7 +3,7 @@ use std::{
     io::ErrorKind,
     os::{
         fd::{AsFd, OwnedFd},
-        unix::ffi::OsStringExt,
+        unix::{ffi::OsStringExt, fs::OpenOptionsExt},
     },
     sync::Arc,
 };
@@ -14,14 +14,19 @@ use eyre::{Context, OptionExt, Result, bail, ensure, eyre};
 use futures::{StreamExt, TryStreamExt, stream::FuturesUnordered};
 use libc::SIGKILL;
 use tokio::{fs, sync::oneshot};
-use tracing::error;
+use tracing::{error, warn};
 use zbus::Fd;
 
 use crate::{
     SandboxCommand, SandboxExitStatus, SandboxStdio,
     backend::{
-        Backend, SandboxChild, SandboxChildOp, SandboxEnv,
-        flatpak::dbus::{SandboxFlags, SpawnFlags, SpawnOptions},
+        Backend, SandboxChild, SandboxChildOp, SandboxEnv, SandboxHandle,
+        SandboxHandleOp,
+        linux::{
+            dbus_proxy::DbusProxy,
+            find_command,
+            flatpak::dbus::{SandboxFlags, SpawnFlags, SpawnOptions},
+        },
         pathset::ReadWritePathSet,
         unix,
     },
@@ -49,13 +54,18 @@ async fn init() -> Result<FlatpakEnv> {
     let flatpak_portal = dbus::FlatpakPortalProxy::new(&session_bus)
         .await
         .context("connecting to Flatpak portal")?;
-    Ok(FlatpakEnv { flatpak_portal })
+    let dev_null = unix::open_dev_null().wrap_err("opening /dev/null")?;
+    Ok(FlatpakEnv {
+        flatpak_portal,
+        dev_null,
+    })
 }
 
 #[derive(Debug)]
 #[debug("FlatpakEnv")]
 pub struct FlatpakEnv {
     flatpak_portal: dbus::FlatpakPortalProxy<'static>,
+    dev_null: libc::c_int,
 }
 
 #[async_trait]
@@ -64,7 +74,7 @@ impl SandboxEnv for FlatpakEnv {
         &self,
         command: SandboxCommand,
     ) -> Result<crate::SandboxChild> {
-        super::linux::ensure_valid_command(&command).await?;
+        super::ensure_valid_command(&command).await?;
         spawn(self, command).await
     }
 }
@@ -73,7 +83,7 @@ async fn spawn(
     env: &FlatpakEnv,
     mut command: SandboxCommand,
 ) -> Result<crate::SandboxChild> {
-    let envs = command
+    let mut envs = command
         .take_environment()
         .into_iter()
         .map(|(key, val)| {
@@ -219,7 +229,7 @@ async fn spawn(
         .try_collect::<Vec<_>>()
         .await?;
 
-    let sandbox_expose_fd_ro = path_set
+    let mut sandbox_expose_fd_ro = path_set
         .iter_read_only()
         .map(|path| async move {
             let file_result = fs::OpenOptions::new()
@@ -244,12 +254,27 @@ async fn spawn(
         .try_collect::<Vec<_>>()
         .await?;
 
+    let dbus_proxy = match start_dbus_proxy(env).await {
+        Ok((dbus_proxy, socket_fd, address)) => {
+            sandbox_expose_fd_ro.push(socket_fd);
+            envs.insert("DBUS_SESSION_BUS_ADDRESS".into(), address);
+            Some(dbus_proxy)
+        }
+        Err(err) => {
+            warn!(
+                "Unable to start dbus proxy, some functionality may be broken: {err:#}"
+            );
+            None
+        }
+    };
+
     let options = SpawnOptions {
+        // SESSION_BUS must not be used, since it allows using the Flatpak portal to
+        // spawn processes with all of the launcher's permissions
         sandbox_flags: Some(
             SandboxFlags::SHARE_DISPLAY
                 | SandboxFlags::SHARE_SOUND
                 | SandboxFlags::SHARE_GPU
-                | SandboxFlags::SESSION_BUS
                 | SandboxFlags::INPUT_DEVICES,
         ),
         sandbox_expose_fd: Some(sandbox_expose_fd),
@@ -322,7 +347,7 @@ async fn spawn(
         stdout,
         stderr,
         on_finish: command.on_finish,
-        handle: super::SandboxHandle::Flatpak(FlatpakSandboxHandle {
+        handle: SandboxHandle::Flatpak(FlatpakSandboxHandle {
             path_set: Arc::new(path_set),
             path_rules: Arc::new(path_rules),
         }),
@@ -331,6 +356,7 @@ async fn spawn(
             flatpak_portal: env.flatpak_portal.clone(),
             rx_exited: Some(rx_exited),
             exit_status: None,
+            _dbus_proxy: dbus_proxy,
         }),
     };
 
@@ -339,6 +365,57 @@ async fn spawn(
     }
 
     Ok(child)
+}
+
+/// Returns the proxy, a file descriptor for exposing its socket, and its address.
+async fn start_dbus_proxy(
+    env: &FlatpakEnv,
+) -> Result<(DbusProxy, zbus::OwnedFd, String)> {
+    let xdg_dbus_proxy = find_command("xdg-dbus-proxy")
+        .await
+        .wrap_err("searching for `xdg-dbus-proxy` executable")?;
+    let dev_null = env.dev_null;
+
+    crate::backend::run_on_spawn_thread(move || {
+        let directories = directories::BaseDirs::new()
+            .ok_or_eyre("unable to determine base directories")?;
+
+        // Flatpak can only expose the socket at the same path as on the host, so it
+        // can't be in $XDG_RUNTIME_DIR or /tmp, since the launcher has its own versions
+        // of those
+        let cache_dir = directories.cache_dir();
+        std::fs::create_dir_all(cache_dir)
+            .wrap_err("creating cache directory")?;
+        let cache_dir = cache_dir
+            .canonicalize()
+            .wrap_err("resolving cache directory")?;
+
+        let socket_path =
+            cache_dir.join(format!("bus-{:016x}", rand::random::<u64>()));
+        let address = socket_path
+            .to_str()
+            .map(|path| format!("unix:path={path}"))
+            .ok_or_eyre("socket path isn't valid UTF-8")?;
+
+        let dbus_proxy = DbusProxy::start(
+            xdg_dbus_proxy,
+            Vec::new(),
+            socket_path,
+            cache_dir,
+            Vec::new(),
+            dev_null,
+        )?;
+
+        let socket = std::fs::OpenOptions::new()
+            .read(true)
+            .custom_flags(libc::O_PATH | libc::O_NOFOLLOW)
+            .open(dbus_proxy.socket_path())
+            .wrap_err("opening dbus proxy socket")?;
+        let socket_fd = zbus::OwnedFd::from(OwnedFd::from(socket));
+
+        eyre::Ok((dbus_proxy, socket_fd, address))
+    })
+    .await?
 }
 
 fn nul_terminate(mut value: Vec<u8>, description: &str) -> Result<Vec<u8>> {
@@ -365,7 +442,7 @@ pub struct FlatpakSandboxHandle {
     path_rules: Arc<PathRules>,
 }
 
-impl super::SandboxHandleOp for FlatpakSandboxHandle {
+impl SandboxHandleOp for FlatpakSandboxHandle {
     fn expose_path(
         &self,
         _path: &std::path::Path,
@@ -396,6 +473,7 @@ pub struct FlatpakChild {
     flatpak_portal: dbus::FlatpakPortalProxy<'static>,
     rx_exited: Option<oneshot::Receiver<SandboxExitStatus>>,
     exit_status: Option<SandboxExitStatus>,
+    _dbus_proxy: Option<DbusProxy>,
 }
 
 #[async_trait]

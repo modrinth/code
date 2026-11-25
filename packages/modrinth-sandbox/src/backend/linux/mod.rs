@@ -1,3 +1,8 @@
+pub mod bubblewrap;
+mod dbus_proxy;
+mod file_sharing;
+pub mod flatpak;
+
 use std::{
     ffi::CStr,
     os::fd::{AsRawFd, FromRawFd, OwnedFd},
@@ -92,7 +97,7 @@ impl WritableMemoryFile {
 pub fn open_pipe() -> eyre::Result<(OwnedFd, OwnedFd)> {
     let mut fds = [0, 0];
     unsafe {
-        super::unix::cvt(libc::pipe2(&raw mut fds as *mut _, libc::O_CLOEXEC))?;
+        cvt(libc::pipe2(&raw mut fds as *mut _, libc::O_CLOEXEC))?;
         Ok((OwnedFd::from_raw_fd(fds[0]), OwnedFd::from_raw_fd(fds[1])))
     }
 }

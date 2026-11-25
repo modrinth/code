@@ -17,15 +17,17 @@ use parking_lot::Mutex;
 use uuid::Uuid;
 
 use crate::{
-    ExposedPath, SandboxStdio,
+    ExposedPath,
     backend::{
         Backend, SandboxChild, SandboxChildOp, SandboxCommand, SandboxEnv,
-        SandboxHandleOp,
-        linux::{WritableMemoryFile, find_command},
+        SandboxExitStatus, SandboxHandle, SandboxHandleOp,
+        linux::{
+            WritableMemoryFile, dbus_proxy::DbusProxy,
+            file_sharing::FileSharing, find_command,
+        },
         pathset::{PathSet, ReadWritePathSet},
-        unix::UnixChild,
+        unix::{self, UnixChild},
     },
-    file_sharing::FileSharing,
     path_access::{PathPermission, PathRules},
     util::SandboxArg,
 };
@@ -49,8 +51,7 @@ async fn init() -> Result<BubblewrapEnv> {
     let xdg_dbus_proxy = find_command("xdg-dbus-proxy")
         .await
         .wrap_err("searching for `xdg-dbus-proxy` executable")?;
-    let dev_null =
-        super::unix::open_dev_null().wrap_err("opening /dev/null")?;
+    let dev_null = unix::open_dev_null().wrap_err("opening /dev/null")?;
     Ok(BubblewrapEnv {
         bwrap,
         xdg_dbus_proxy,
@@ -72,7 +73,7 @@ impl SandboxEnv for BubblewrapEnv {
         &self,
         command: SandboxCommand,
     ) -> Result<crate::SandboxChild> {
-        super::linux::ensure_valid_command(&command).await?;
+        super::ensure_valid_command(&command).await?;
         let env = self.clone();
         crate::backend::run_on_spawn_thread(move || spawn(&env, command))
             .await?
@@ -364,7 +365,7 @@ fn spawn(
 
     let file_sharing_mountpoint = xdg_runtime_dir
         .join(format!("modrinth-file-sharing-{}", Uuid::now_v7()));
-    let file_sharing = match crate::file_sharing::mount(
+    let file_sharing = match super::file_sharing::mount(
         file_sharing_mountpoint.clone(),
     ) {
         Ok(file_sharing) => Some(file_sharing),
@@ -618,7 +619,7 @@ instance-id={instance_id}
     let dbus_proxy = match dbus_proxy_result {
         Ok(dbus_proxy) => {
             arguments.push("--bind".into());
-            arguments.push(dbus_proxy.proxy_session_path.clone().into());
+            arguments.push(dbus_proxy.socket_path().to_path_buf().into());
             let mapped_bus_dir = xdg_runtime_dir.join("bus");
             arguments.push(mapped_bus_dir.clone().into());
 
@@ -652,7 +653,7 @@ instance-id={instance_id}
         arguments.push(arg.into());
     }
 
-    let (pipes, child) = super::unix::spawn(
+    let (pipes, child) = unix::spawn(
         env.bwrap.clone().into(),
         arguments,
         environment,
@@ -676,7 +677,7 @@ instance-id={instance_id}
             instance_dir,
             _dbus_proxy: dbus_proxy,
         }),
-        handle: super::SandboxHandle::Bubblewrap(BubblewrapSandboxHandle {
+        handle: SandboxHandle::Bubblewrap(BubblewrapSandboxHandle {
             file_sharing,
             path_set: Arc::new(path_set),
             path_rules: Arc::new(path_rules),
@@ -732,11 +733,11 @@ impl SandboxChildOp for BubblewrapChild {
         self.child.id()
     }
 
-    fn try_wait(&mut self) -> Result<Option<super::SandboxExitStatus>> {
+    fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>> {
         self.child.try_wait()
     }
 
-    async fn wait(&mut self) -> Result<super::SandboxExitStatus> {
+    async fn wait(&mut self) -> Result<SandboxExitStatus> {
         self.child.wait().await
     }
 
@@ -793,214 +794,16 @@ impl SandboxHandleOp for BubblewrapSandboxHandle {
     }
 }
 
-#[derive(Debug)]
-struct DbusProxy {
-    proxy_session_path: PathBuf,
-    _keep_alive_read_fd: OwnedFd,
-}
-
-impl Drop for DbusProxy {
-    fn drop(&mut self) {
-        _ = std::fs::remove_file(&self.proxy_session_path);
-    }
-}
-
-/// Portals that can be used by the sandboxed process. Others aren't allowed because they
-/// could be used to escape the sandbox or bypass its restrictions:
-///
-/// - Open files or run programs outside of the sandbox: Background, DynamicLauncher,
-///   Email, OpenURI, Print, Wallpaper
-/// - Access files without being checked by [`PathRules`]: FileChooser, Trash
-/// - Control or record the desktop: Clipboard, InputCapture, RemoteDesktop, ScreenCast,
-///   Screenshot
-/// - Access devices or credentials: Usb, experimental.Credential
-const ALLOWED_DESKTOP_PORTALS: &[&str] = &[
-    "Account",
-    "Camera",
-    "GameMode",
-    "GlobalShortcuts",
-    "Inhibit",
-    "Location",
-    "MemoryMonitor",
-    "NetworkMonitor",
-    "Notification",
-    "PowerProfileMonitor",
-    "ProxyResolver",
-    "Realtime",
-    "Secret",
-    "Settings",
-];
-
-/// Creates arguments for xdg-dbus-proxy which allow access to specific services.
-fn dbus_proxy_rules() -> Vec<String> {
-    /// Allows calling specific methods, receiving specific signals, and reading the
-    /// properties of an object.
-    fn allow(
-        rules: &mut Vec<String>,
-        name: &str,
-        path: &str,
-        methods: &[&str],
-        signals: &[&str],
-    ) {
-        // --talk must not be used, since it allows calling any method of any object
-        // owned by the same process, even if there are --call rules
-
-        // Properties.Set isn't included since it could be used to change the state of
-        // something outside of the sandbox
-        const PROPERTY_METHODS: &[&str] = &[
-            "org.freedesktop.DBus.Properties.Get",
-            "org.freedesktop.DBus.Properties.GetAll",
-        ];
-        const PROPERTY_SIGNALS: &[&str] =
-            &["org.freedesktop.DBus.Properties.PropertiesChanged"];
-
-        for method in methods.iter().chain(PROPERTY_METHODS) {
-            rules.push(format!("--call={name}={method}@{path}"));
-        }
-        for signal in signals.iter().chain(PROPERTY_SIGNALS) {
-            rules.push(format!("--broadcast={name}={signal}@{path}"));
-        }
-    }
-
-    let mut rules = Vec::new();
-
-    allow(
-        &mut rules,
-        "com.feralinteractive.GameMode",
-        "/com/feralinteractive/GameMode",
-        &["com.feralinteractive.GameMode.*"],
-        &["com.feralinteractive.GameMode.*"],
-    );
-    allow(
-        &mut rules,
-        "org.kde.StatusNotifierWatcher",
-        "/StatusNotifierWatcher",
-        &["org.kde.StatusNotifierWatcher.*"],
-        &["org.kde.StatusNotifierWatcher.*"],
-    );
-    allow(
-        &mut rules,
-        "org.freedesktop.Notifications",
-        "/org/freedesktop/Notifications",
-        &[
-            "org.freedesktop.Notifications.CloseNotification",
-            "org.freedesktop.Notifications.GetCapabilities",
-            "org.freedesktop.Notifications.GetServerInformation",
-            "org.freedesktop.Notifications.Notify",
-        ],
-        &["org.freedesktop.Notifications.*"],
-    );
-    // Notably, this doesn't include OpenUri
-    allow(
-        &mut rules,
-        "org.mpris.MediaPlayer2.*",
-        "/org/mpris/MediaPlayer2",
-        &[
-            "org.mpris.MediaPlayer2.Player.Next",
-            "org.mpris.MediaPlayer2.Player.Pause",
-            "org.mpris.MediaPlayer2.Player.Play",
-            "org.mpris.MediaPlayer2.Player.PlayPause",
-            "org.mpris.MediaPlayer2.Player.Previous",
-            "org.mpris.MediaPlayer2.Player.Seek",
-            "org.mpris.MediaPlayer2.Player.SetPosition",
-            "org.mpris.MediaPlayer2.Player.Stop",
-        ],
-        &["org.mpris.MediaPlayer2.Player.Seeked"],
-    );
-
-    let desktop_portals = ALLOWED_DESKTOP_PORTALS
-        .iter()
-        .map(|portal| format!("org.freedesktop.portal.{portal}.*"))
-        .collect::<Vec<_>>();
-    let desktop_portals = desktop_portals
-        .iter()
-        .map(String::as_str)
-        .collect::<Vec<_>>();
-    allow(
-        &mut rules,
-        "org.freedesktop.portal.Desktop",
-        "/org/freedesktop/portal/desktop",
-        &desktop_portals,
-        &desktop_portals,
-    );
-    allow(
-        &mut rules,
-        "org.freedesktop.portal.Desktop",
-        "/org/freedesktop/portal/desktop/request/*",
-        &["org.freedesktop.portal.Request.*"],
-        &["org.freedesktop.portal.Request.*"],
-    );
-    allow(
-        &mut rules,
-        "org.freedesktop.portal.Desktop",
-        "/org/freedesktop/portal/desktop/session/*",
-        &["org.freedesktop.portal.Session.*"],
-        &["org.freedesktop.portal.Session.*"],
-    );
-
-    // Allows access to files which are dropped on the game
-    allow(
-        &mut rules,
-        "org.freedesktop.portal.Documents",
-        "/org/freedesktop/portal/documents",
-        &[
-            "org.freedesktop.portal.Documents.*",
-            "org.freedesktop.portal.FileTransfer.*",
-        ],
-        &["org.freedesktop.portal.FileTransfer.*"],
-    );
-
-    // Input methods
-    for path in ["/inputmethod", "/org/freedesktop/portal/inputmethod"] {
-        allow(
-            &mut rules,
-            "org.freedesktop.portal.Fcitx",
-            path,
-            &["org.fcitx.Fcitx.InputMethod1.*"],
-            &["org.fcitx.Fcitx.InputMethod1.*"],
-        );
-    }
-    allow(
-        &mut rules,
-        "org.freedesktop.portal.Fcitx",
-        "/org/freedesktop/portal/inputcontext/*",
-        &["org.fcitx.Fcitx.InputContext1.*"],
-        &["org.fcitx.Fcitx.InputContext1.*"],
-    );
-    allow(
-        &mut rules,
-        "org.freedesktop.portal.IBus",
-        "/org/freedesktop/IBus/*",
-        &[
-            // Used to configure the input context
-            "org.freedesktop.DBus.Properties.Set",
-            "org.freedesktop.IBus.InputContext.*",
-            "org.freedesktop.IBus.Portal.*",
-            "org.freedesktop.IBus.Service.*",
-        ],
-        &["org.freedesktop.IBus.InputContext.*"],
-    );
-
-    rules
-}
-
 fn start_dbus_proxy(
     env: &BubblewrapEnv,
     runtime_dir: &Path,
     flatpak_info: &CStr,
 ) -> Result<DbusProxy> {
-    const DBUS_ADDRESS_ENV: &str = "DBUS_SESSION_BUS_ADDRESS";
-
-    let (keep_alive_read_fd, keep_alive_write_fd) = super::linux::open_pipe()?;
-
-    let session_bus_address = std::env::var_os(DBUS_ADDRESS_ENV)
-        .ok_or_else(|| eyre!("reading `{DBUS_ADDRESS_ENV}`"))?;
-
     let mut builder = BubblewrapCommandBuilder::default();
 
     builder.push("--new-session");
 
-    let proxy_session_path = runtime_dir.join(format!(
+    let socket_path = runtime_dir.join(format!(
         "modrinth-xdg-dbus-proxy-session-{}",
         Uuid::now_v7()
     ));
@@ -1010,7 +813,7 @@ fn start_dbus_proxy(
     builder.bind_if_exists(BindBehaviour::FollowRead, Path::new("/nix/store"));
     builder.bind_if_exists(BindBehaviour::FollowWrite, &runtime_dir);
 
-    let (mut arguments, path_set) = builder.finish();
+    let (mut arguments, _) = builder.finish();
 
     let flatpak_info_fd1 =
         WritableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info1")
@@ -1034,51 +837,15 @@ fn start_dbus_proxy(
 
     arguments.push("--".into());
     arguments.push(env.xdg_dbus_proxy.clone().into());
-    arguments.push(session_bus_address.into());
-    arguments.push(proxy_session_path.clone().into());
-    arguments.push(format!("--fd={}", keep_alive_write_fd.as_raw_fd()).into());
-    arguments.push("--filter".into());
-    arguments.extend(dbus_proxy_rules().into_iter().map(SandboxArg::from));
 
-    let mut environment = BTreeMap::default();
-    for (arg, value) in std::env::vars_os() {
-        environment.insert(arg.into(), value.into());
-    }
-
-    super::unix::spawn(
-        env.bwrap.clone().into(),
+    DbusProxy::start(
+        env.bwrap.clone(),
         arguments,
-        environment,
-        SandboxStdio::Null,
-        SandboxStdio::Null,
-        SandboxStdio::Null,
-        Some(runtime_dir.to_path_buf()),
-        vec![flatpak_info_fd1, flatpak_info_fd2, keep_alive_write_fd],
+        socket_path,
+        runtime_dir.to_path_buf(),
+        vec![flatpak_info_fd1, flatpak_info_fd2],
         env.dev_null,
-        true,
-        false,
     )
-    .wrap_err("spawning dbus proxy child")?;
-
-    // Wait for proxy to start by reading from fd
-    let mut buf = 0 as libc::c_char;
-    unsafe {
-        let start = std::time::Instant::now();
-        if libc::read(
-            keep_alive_read_fd.as_raw_fd(),
-            &raw mut buf as *mut libc::c_char as *mut _,
-            1,
-        ) != 1
-        {
-            return Err(eyre!("syncing with xdg-dbus-proxy"));
-        }
-        tracing::info!("xdg-dbus-proxy took {:.1?} to start", start.elapsed());
-    }
-
-    eyre::Ok(DbusProxy {
-        proxy_session_path,
-        _keep_alive_read_fd: keep_alive_read_fd,
-    })
 }
 
 // Syscall allowlist copied from https://github.com/moby/profiles/blob/fa50b7287199d1c781284d1a34d1395a62e57f1e/seccomp/default.json

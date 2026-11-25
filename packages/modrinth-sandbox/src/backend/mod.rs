@@ -21,10 +21,6 @@ use crate::{
 };
 
 #[cfg(target_os = "linux")]
-mod bubblewrap;
-#[cfg(target_os = "linux")]
-mod flatpak;
-#[cfg(target_os = "linux")]
 mod linux;
 #[cfg(target_os = "macos")]
 mod macos;
@@ -67,9 +63,9 @@ pub async fn create_env(
                     .wrap_err("checking if `{FLATPAK_INFO_PATH}` exists")
             })?
         {
-            flatpak::Flatpak::init(make_helper).await
+            linux::flatpak::Flatpak::init(make_helper).await
         } else {
-            bubblewrap::Bubblewrap::init(make_helper).await
+            linux::bubblewrap::Bubblewrap::init(make_helper).await
         }
     }
 
@@ -197,9 +193,9 @@ pub trait SandboxChildOp {
 pub enum SandboxChild {
     Noop(noop::StdChild),
     #[cfg(target_os = "linux")]
-    Flatpak(flatpak::FlatpakChild),
+    Flatpak(linux::flatpak::FlatpakChild),
     #[cfg(target_os = "linux")]
-    Bubblewrap(bubblewrap::BubblewrapChild),
+    Bubblewrap(linux::bubblewrap::BubblewrapChild),
     #[cfg(target_os = "macos")]
     Macos(macos::MacosChild),
     #[cfg(target_os = "windows")]
@@ -257,9 +253,9 @@ pub trait SandboxHandleOp {
 pub enum SandboxHandle {
     Noop(noop::NoopSandboxHandle),
     #[cfg(target_os = "linux")]
-    Flatpak(flatpak::FlatpakSandboxHandle),
+    Flatpak(linux::flatpak::FlatpakSandboxHandle),
     #[cfg(target_os = "linux")]
-    Bubblewrap(bubblewrap::BubblewrapSandboxHandle),
+    Bubblewrap(linux::bubblewrap::BubblewrapSandboxHandle),
     #[cfg(target_os = "macos")]
     Macos(macos::MacosSandboxHandle),
     #[cfg(target_os = "windows")]
