@@ -8421,12 +8421,15 @@ version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f58d964098a5f9c6b63d0798e5372fd04708193510a7af313c22e9f29b7b620b"
 dependencies = [
- "cfg-if",
- "downcast",
- "fragile",
- "mockall_derive",
- "predicates",
- "predicates-tree",
+ "arc-swap",
+ "chrono",
+ "modrinth-app-analytics-types",
+ "parking_lot",
+ "reqwest 0.13.5",
+ "smol_str",
+ "tokio",
+ "tracing",
+ "uuid 1.28.0",
 ]
 
 [[package]]

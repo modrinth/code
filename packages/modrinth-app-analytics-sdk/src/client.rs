@@ -2,6 +2,7 @@ use std::fmt;
 use std::sync::Arc;
 use std::time::Duration;
 
+use arc_swap::ArcSwap;
 use chrono::Utc;
 use parking_lot::Mutex;
 use reqwest::Url;
@@ -40,11 +41,7 @@ impl AppAnalytics {
             app_version,
         }: AppAnalyticsParameters,
     ) -> AppAnalytics {
-        assert_eq!(
-            installation_id.get_version_num(),
-            4,
-            "installation_id must be a UUIDv4"
-        );
+        assert_installation_id(installation_id);
 
         let (drain_tx, drain_rx) = mpsc::unbounded_channel();
 
@@ -59,7 +56,7 @@ impl AppAnalytics {
                 }),
                 user_agent,
                 push_url,
-                installation_id,
+                installation_id: ArcSwap::from_pointee(installation_id),
                 queue: EventQueue::new(),
                 os,
                 arch,
@@ -119,6 +116,28 @@ impl AppAnalytics {
             };
         }
     }
+
+    /// Replaces the installation ID sent with every future batch.
+    ///
+    /// Events still queued are dropped, so none recorded under the old ID
+    /// are sent under the new one.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `installation_id` is not a UUIDv4.
+    pub fn set_installation_id(&self, installation_id: Uuid) {
+        assert_installation_id(installation_id);
+        self.inner.installation_id.store(Arc::new(installation_id));
+        self.inner.queue.clear();
+    }
+}
+
+fn assert_installation_id(installation_id: Uuid) {
+    assert_eq!(
+        installation_id.get_version_num(),
+        4,
+        "installation_id must be a UUIDv4"
+    );
 }
 
 impl fmt::Debug for AppAnalytics {
@@ -126,7 +145,7 @@ impl fmt::Debug for AppAnalytics {
         f.debug_struct("AppAnalytics")
             .field("push_url", &self.inner.push_url)
             .field("backend", &self.inner.backend)
-            .field("installation_id", &self.inner.installation_id)
+            .field("installation_id", &**self.inner.installation_id.load())
             .finish()
     }
 }
@@ -147,7 +166,7 @@ pub(crate) struct AnalyticsInner {
     backend: Mutex<AnalyticsBackend>,
     pub(crate) queue: EventQueue,
     user_agent: String,
-    installation_id: Uuid,
+    installation_id: ArcSwap<Uuid>,
     os: AppOs,
     arch: AppArch,
     app_version: SmolStr,
@@ -172,7 +191,7 @@ impl AnalyticsInner {
 
         let batch = AppEventBatch {
             sent_at: Utc::now(),
-            installation_id: self.installation_id,
+            installation_id: **self.installation_id.load(),
             os: self.os,
             arch: self.arch,
             app_version: self.app_version.clone(), // should be cheap
