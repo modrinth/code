@@ -4,6 +4,7 @@
 		:mode="externalFilesInModpack.length > 0 ? 'modpack' : 'mod'"
 		:file-name="fileName"
 		:external-files-in-modpack="externalFilesInModpack"
+		:offer-sandbox="offerSandbox"
 		@cancel="reset"
 		@continue="proceed"
 	/>
@@ -14,9 +15,10 @@ import { UnknownFileWarningModal } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { get as getSettings, set as setSettings } from '@/helpers/settings'
+import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
 
 const appSettings = useAppSettings()
+const offerSandbox = useOfferSandbox()
 
 const modal = useTemplateRef('modal')
 const onProceed = ref<() => Promise<void>>()
@@ -46,14 +48,7 @@ function reset() {
 	externalFilesInModpack.value = []
 }
 
-async function proceed(dontShowAgain: boolean) {
-	if (dontShowAgain) {
-		appSettings.warnOnUnknownModpacks = false
-		const settings = await getSettings()
-		settings.warn_on_unknown_modpacks = false
-		await setSettings(settings)
-	}
-
+function proceed() {
 	const createInstance = onProceed.value
 	reset()
 	if (createInstance) void createInstance()

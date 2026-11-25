@@ -138,10 +138,6 @@ export async function set(settings: AppSettings) {
 	return await invoke('plugin:settings|settings_set', { settings })
 }
 
-export async function getSandboxUnavailableReason(): Promise<string | null> {
-	return await invoke('plugin:settings|settings_sandbox_unavailable_reason')
-}
-
 export async function cancel_directory_change(): Promise<void> {
 	return await invoke('plugin:settings|cancel_directory_change')
 }

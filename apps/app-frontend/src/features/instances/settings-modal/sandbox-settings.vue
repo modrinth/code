@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { defineMessage, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
-import SandboxSettingsForm from '@/features/settings/instance-defaults/sandbox-settings-form.vue'
+import { sandboxUnavailableReasonQueryOptions } from '@/features/sandbox/queries'
+import SandboxSettingsForm from '@/features/sandbox/sandbox-settings-form/index.vue'
 import { edit } from '@/helpers/instance'
-import { appSettingsQueryOptions, getSandboxUnavailableReason } from '@/helpers/settings'
+import { appSettingsQueryOptions } from '@/helpers/settings'
 import type { SandboxOverrides, SandboxSettings } from '@/helpers/types'
 
 import DefaultSettingsIntro from './default-settings-intro.vue'
@@ -16,6 +17,14 @@ import { useInstanceSettingsDraft } from './use-instance-settings-draft'
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const { instance } = injectInstanceSettings()
+
+const messages = defineMessages({
+	defaultSettingsDescription: {
+		id: 'instance.settings.tabs.sandbox.default-settings-description',
+		defaultMessage:
+			'Your instance uses the default sandbox settings unless you override them here.',
+	},
+})
 
 const draft = useInstanceSettingsDraft<SandboxOverrides>(
 	() => ({
@@ -31,11 +40,7 @@ const draft = useInstanceSettingsDraft<SandboxOverrides>(
 const settingsQuery = useQuery(appSettingsQueryOptions())
 await settingsQuery.suspense().catch(handleError)
 
-const unavailableReason = useQuery({
-	queryKey: ['sandbox-unavailable-reason'],
-	queryFn: getSandboxUnavailableReason,
-	staleTime: Infinity,
-})
+const unavailableReason = useQuery(sandboxUnavailableReasonQueryOptions())
 
 const effective = computed<SandboxSettings | null>(() => {
 	const defaults = settingsQuery.data.value?.sandbox
@@ -49,38 +54,17 @@ const effective = computed<SandboxSettings | null>(() => {
 	}
 })
 
-function sameValue(a: unknown, b: unknown) {
-	return JSON.stringify(a) === JSON.stringify(b)
-}
-
-function setField<K extends keyof SandboxSettings>(key: K, value: SandboxSettings[K]) {
-	const defaultValue = settingsQuery.data.value?.sandbox[key]
-	const saved = (instance.value.sandbox?.[key] ?? null) as SandboxOverrides[K]
-	if (sameValue(value, saved ?? defaultValue)) {
-		draft.value[key] = saved
-	} else if (sameValue(value, defaultValue)) {
-		draft.value[key] = null
-	} else {
-		draft.value[key] = value
-	}
-}
-
 function applyPatch(patch: Partial<SandboxSettings>) {
-	for (const [key, value] of Object.entries(patch) as [keyof SandboxSettings, never][]) {
-		setField(key, value)
-	}
+	draft.value = { ...draft.value, ...patch }
 }
-
-const description = defineMessage({
-	id: 'instance.settings.tabs.sandbox.default-settings-description',
-	defaultMessage:
-		'Your instance uses the default sandbox permissions unless you override them here.',
-})
 </script>
 
 <template>
 	<div class="flex flex-col gap-6">
-		<DefaultSettingsIntro tab="sandbox" :description="formatMessage(description)" />
+		<DefaultSettingsIntro
+			tab="sandbox"
+			:description="formatMessage(messages.defaultSettingsDescription)"
+		/>
 		<SandboxSettingsForm
 			v-if="effective"
 			:settings="effective"
@@ -92,7 +76,7 @@ const description = defineMessage({
 				<ResetToDefaultButton
 					:disabled="draft[field] === null"
 					:setting="label"
-					@reset="draft[field] = null"
+					@reset="draft = { ...draft, [field]: null }"
 				/>
 			</template>
 		</SandboxSettingsForm>

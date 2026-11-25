@@ -7,8 +7,9 @@
 					ref="unknownFileWarningModal"
 					mode="mod"
 					:file-name="unknownFileName"
+					:offer-sandbox="offerSandbox"
 					@cancel="resolveUnknownFileWarning(false)"
-					@continue="handleUnknownFileContinue"
+					@continue="resolveUnknownFileWarning(true)"
 				/>
 				<ShareModalWrapper
 					ref="shareModal"
@@ -131,6 +132,7 @@ import { useManagedContentPolicy } from '@/composables/instances/use-managed-con
 import { useSyncedPackActions } from '@/composables/instances/use-synced-pack-actions'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version, get_version_many } from '@/helpers/cache.js'
 import { install_bulk_update_content } from '@/helpers/install'
@@ -149,7 +151,6 @@ import {
 } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import { listenNativeDragDrop } from '@/helpers/native-drag-drop'
-import { get as getSettings, set as setSettings } from '@/helpers/settings'
 import { set_synced_pack_enabled, syncedPackKeys } from '@/helpers/synced-packs'
 import type { CacheBehaviour } from '@/helpers/types'
 import { highlightModInInstance } from '@/helpers/utils.js'
@@ -229,6 +230,7 @@ const skipNonEssentialWarnings = computed(() => appSettings.skipNonEssentialWarn
 const instancePage = injectInstancePage()
 const sharedInstanceState = injectSharedInstance()
 const instance = instancePage.instance
+const offerSandbox = useOfferSandbox(() => instance.value?.sandbox)
 const isServerInstance = instancePage.isServerInstance
 const openSettings = () => instancePage.openSettings(1)
 const managedContentPolicy = useManagedContentPolicy(computed(() => instance.value))
@@ -806,20 +808,6 @@ function resolveUnknownFileWarning(confirmed: boolean) {
 	resolveUnknownFileConfirmation = null
 	unknownFileName.value = ''
 	resolve?.(confirmed)
-}
-
-async function handleUnknownFileContinue(dontShowAgain: boolean) {
-	if (dontShowAgain) {
-		appSettings.warnOnUnknownModpacks = false
-		try {
-			const settings = await getSettings()
-			settings.warn_on_unknown_modpacks = false
-			await setSettings(settings)
-		} catch (error) {
-			handleError(error as Error)
-		}
-	}
-	resolveUnknownFileWarning(true)
 }
 
 type ContentToggleVariables = {

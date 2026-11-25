@@ -629,6 +629,9 @@
   "content.diff-modal.reviewed-files": {
     "defaultMessage": "Files that aren't published to Modrinth aren't reviewed."
   },
+  "content.diff-modal.sandbox-and-install": {
+    "defaultMessage": "Sandbox and install"
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Some content on your server could not be analyzed and may be affected by this change."
   },
@@ -8297,20 +8300,23 @@
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Dismiss all"
   },
-  "unknown-file-warning-modal.dont-install": {
-    "defaultMessage": "Dont install"
+  "unknown-file-sandbox-notice.description": {
+    "defaultMessage": "The sandbox isolates Minecraft, limiting mods to your system files, .minecraft, and anything we allow or you allow below. Some mods may not work if the sandbox blocks access they need."
   },
-  "unknown-file-warning-modal.dont-show-again": {
-    "defaultMessage": "Don’t show this warning again"
+  "unknown-file-sandbox-notice.learn-more": {
+    "defaultMessage": "Learn more"
+  },
+  "unknown-file-sandbox-notice.title": {
+    "defaultMessage": "Limit mod access with a sandbox"
+  },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "Don’t install"
   },
   "unknown-file-warning-modal.header": {
     "defaultMessage": "Confirm installation"
   },
   "unknown-file-warning-modal.install-anyway": {
     "defaultMessage": "Install anyway"
-  },
-  "unknown-file-warning-modal.malware-warning": {
-    "defaultMessage": "Malware is often distributed through mod files by sharing them on platforms like Discord."
   },
   "unknown-file-warning-modal.mod-warning-body": {
     "defaultMessage": " isn’t published on Modrinth. We strongly recommend only installing files from sources you trust."
@@ -8326,6 +8332,9 @@
   },
   "unknown-file-warning-modal.reviewed-files": {
     "defaultMessage": "Files that aren't published to Modrinth aren't reviewed."
+  },
+  "unknown-file-warning-modal.sandbox-and-install": {
+    "defaultMessage": "Sandbox and install"
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Unrecognized files"

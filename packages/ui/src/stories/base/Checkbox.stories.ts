@@ -48,6 +48,14 @@ export const LabelClass: Story = {
 	},
 }
 
+export const White: Story = {
+	args: {
+		label: 'White checkbox',
+		modelValue: true,
+		color: 'white',
+	},
+}
+
 export const AllStates: StoryObj = {
 	render: () => ({
 		components: { Checkbox },
@@ -58,6 +66,9 @@ export const AllStates: StoryObj = {
 				<Checkbox label="Indeterminate" :model-value="false" :indeterminate="true" />
 				<Checkbox label="Disabled unchecked" :model-value="false" :disabled="true" />
 				<Checkbox label="Disabled checked" :model-value="true" :disabled="true" />
+				<Checkbox label="White unchecked" :model-value="false" color="white" />
+				<Checkbox label="White checked" :model-value="true" color="white" />
+				<Checkbox label="White indeterminate" :model-value="false" :indeterminate="true" color="white" />
 			</div>
 		`,
 	}),

@@ -1,20 +1,16 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
 
-import { getSandboxUnavailableReason } from '@/helpers/settings'
+import { sandboxUnavailableReasonQueryOptions } from '@/features/sandbox/queries'
+import SandboxSettingsForm from '@/features/sandbox/sandbox-settings-form/index.vue'
 
-import SandboxSettingsForm from './sandbox-settings-form.vue'
 import { useDefaultInstanceSettings } from './use-default-instance-settings'
 
 const { settings } = useDefaultInstanceSettings(
 	(value) => ({ ...value.sandbox, extra_paths: [...value.sandbox.extra_paths] }),
 	(value) => ({ sandbox: { ...value, extra_paths: [...value.extra_paths] } }),
 )
-const unavailableReason = useQuery({
-	queryKey: ['sandbox-unavailable-reason'],
-	queryFn: getSandboxUnavailableReason,
-	staleTime: Infinity,
-})
+const unavailableReason = useQuery(sandboxUnavailableReasonQueryOptions())
 </script>
 
 <template>

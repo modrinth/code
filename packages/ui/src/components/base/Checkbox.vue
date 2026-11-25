@@ -14,12 +14,22 @@
 		@click="toggle"
 	>
 		<span
-			class="w-5 h-5 aspect-square rounded-md flex shrink-0 items-center justify-center border-[1px] border-solid"
-			:class="{
-				'bg-brand border-button-border text-brand-inverted': modelValue,
-				'bg-surface-2 border-surface-5 text-primary': !modelValue,
-				'checkbox-shadow group-active:scale-95': !disabled,
-			}"
+			class="aspect-square flex shrink-0 items-center justify-center border-[1px] border-solid"
+			:class="[
+				color === 'white'
+					? {
+							'w-6 h-6 rounded-lg': true,
+							'bg-contrast border-contrast text-surface-4': modelValue,
+							'bg-transparent border-primary text-primary': !modelValue,
+							'group-active:scale-95': !disabled,
+						}
+					: {
+							'w-5 h-5 rounded-md': true,
+							'bg-brand border-button-border text-brand-inverted': modelValue,
+							'bg-surface-2 border-surface-5 text-primary': !modelValue,
+							'checkbox-shadow group-active:scale-95': !disabled,
+						},
+			]"
 		>
 			<MinusIcon v-if="indeterminate" aria-hidden="true" stroke-width="3" />
 			<CheckIcon v-else-if="modelValue" aria-hidden="true" stroke-width="3" />
@@ -48,6 +58,7 @@ const props = withDefaults(
 		modelValue: boolean
 		clickEvent?: () => void
 		indeterminate?: boolean
+		color?: 'brand' | 'white'
 	}>(),
 	{
 		label: '',
@@ -57,6 +68,7 @@ const props = withDefaults(
 		modelValue: false,
 		clickEvent: () => {},
 		indeterminate: false,
+		color: 'brand',
 	},
 )
 

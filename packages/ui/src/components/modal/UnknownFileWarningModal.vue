@@ -23,10 +23,6 @@
 				}}
 			</Admonition>
 
-			<p class="m-0 w-full leading-6 text-primary">
-				{{ formatMessage(messages.reviewedFiles) }}
-			</p>
-
 			<div v-if="mode === 'modpack'" class="relative w-full">
 				<div
 					ref="externalFileTableBody"
@@ -74,22 +70,37 @@
 				</Transition>
 			</div>
 
-			<p class="m-0 w-full font-medium leading-6 text-orange">
-				{{ formatMessage(messages.malwareWarning) }}
+			<UnknownFileSandboxNotice v-if="offerSandbox" />
+			<p v-else class="m-0 w-full leading-6 text-primary">
+				{{ formatMessage(messages.reviewedFiles) }}
 			</p>
 
-			<Checkbox
-				v-if="mode === 'mod'"
-				v-model="dontShowAgain"
-				class="w-full"
-				:label="formatMessage(messages.dontShowAgain)"
-			/>
-
 			<div class="flex items-center gap-2">
-				<Button type="quiet" color="orange" native-type="button" @click="continueInstallation">
+				<Button
+					type="quiet"
+					:color="offerSandbox ? undefined : 'orange'"
+					native-type="button"
+					@click="continueInstallation"
+				>
 					{{ formatMessage(messages.installAnyway) }}
 				</Button>
-				<Button type="colored" color="brand" native-type="button" @click="cancelInstallation">
+				<Button
+					v-if="offerSandbox"
+					type="colored"
+					color="brand"
+					native-type="button"
+					@click="continueInstallation"
+				>
+					<ShieldCheckIcon aria-hidden="true" />
+					{{ formatMessage(messages.sandboxAndInstall) }}
+				</Button>
+				<Button
+					v-else
+					type="colored"
+					color="brand"
+					native-type="button"
+					@click="cancelInstallation"
+				>
 					<BanIcon aria-hidden="true" />
 					{{ formatMessage(messages.dontInstall) }}
 				</Button>
@@ -99,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { BanIcon } from '@modrinth/assets'
+import { BanIcon, ShieldCheckIcon } from '@modrinth/assets'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
@@ -107,31 +118,32 @@ import { Button } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
 import Admonition from '../base/Admonition.vue'
-import Checkbox from '../base/Checkbox.vue'
 import Table, { type TableColumn } from '../base/Table.vue'
 import NewModal from './NewModal.vue'
+import UnknownFileSandboxNotice from './UnknownFileSandboxNotice.vue'
 
 const props = withDefaults(
 	defineProps<{
 		mode: 'modpack' | 'mod'
 		fileName: string
 		externalFilesInModpack?: string[]
+		offerSandbox?: boolean
 	}>(),
 	{
 		externalFilesInModpack: () => [],
+		offerSandbox: false,
 	},
 )
 
 const emit = defineEmits<{
 	cancel: []
-	continue: [dontShowAgain: boolean]
+	continue: []
 }>()
 
 const { formatMessage } = useVIntl()
 const modal = useTemplateRef('modal')
 const externalFileTableBody = ref<HTMLElement | null>(null)
-const dontShowAgain = ref(false)
-let pendingAction: { type: 'cancel' } | { type: 'continue'; dontShowAgain: boolean } | null = null
+let pendingAction: 'cancel' | 'continue' | null = null
 const {
 	showTopFade: showTableTopFade,
 	showBottomFade: showTableBottomFade,
@@ -170,22 +182,17 @@ const messages = defineMessages({
 		id: 'unknown-file-warning-modal.unrecognized-files',
 		defaultMessage: 'Unrecognized files',
 	},
-	malwareWarning: {
-		id: 'unknown-file-warning-modal.malware-warning',
-		defaultMessage:
-			'Malware is often distributed through mod files by sharing them on platforms like Discord.',
-	},
-	dontShowAgain: {
-		id: 'unknown-file-warning-modal.dont-show-again',
-		defaultMessage: 'Don’t show this warning again',
-	},
 	installAnyway: {
 		id: 'unknown-file-warning-modal.install-anyway',
 		defaultMessage: 'Install anyway',
 	},
+	sandboxAndInstall: {
+		id: 'unknown-file-warning-modal.sandbox-and-install',
+		defaultMessage: 'Sandbox and install',
+	},
 	dontInstall: {
 		id: 'unknown-file-warning-modal.dont-install',
-		defaultMessage: 'Dont install',
+		defaultMessage: 'Don’t install',
 	},
 })
 
@@ -210,7 +217,6 @@ const externalFileRows = computed<ExternalFileRow[]>(() =>
 )
 
 async function show() {
-	dontShowAgain.value = false
 	pendingAction = null
 	modal.value?.show()
 	await nextTick()
@@ -222,28 +228,27 @@ function hide() {
 }
 
 function handleHide() {
-	pendingAction ??= { type: 'cancel' }
+	pendingAction ??= 'cancel'
 }
 
 function handleAfterHide() {
 	const action = pendingAction
 	pendingAction = null
-	dontShowAgain.value = false
 
-	if (action?.type === 'continue') {
-		emit('continue', action.dontShowAgain)
+	if (action === 'continue') {
+		emit('continue')
 	} else {
 		emit('cancel')
 	}
 }
 
 function cancelInstallation() {
-	pendingAction = { type: 'cancel' }
+	pendingAction = 'cancel'
 	modal.value?.hide()
 }
 
 function continueInstallation() {
-	pendingAction = { type: 'continue', dontShowAgain: dontShowAgain.value }
+	pendingAction = 'continue'
 	modal.value?.hide()
 }
 
