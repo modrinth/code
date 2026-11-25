@@ -2960,6 +2960,15 @@
   "app.settings.privacy.telemetry.description": {
     "message": "Modrinth collects anonymized analytics and usage data to improve our user experience and customize your experience. By disabling this option, you opt out and your data will no longer be collected."
   },
+  "app.settings.privacy.telemetry.reset-installation-id": {
+    "message": "Reset installation ID"
+  },
+  "app.settings.privacy.telemetry.reset-installation-id.success.text": {
+    "message": "Future analytics will no longer be linked to your previous usage data."
+  },
+  "app.settings.privacy.telemetry.reset-installation-id.success.title": {
+    "message": "Installation ID reset"
+  },
   "app.settings.privacy.telemetry.title": {
     "message": "Telemetry"
   },

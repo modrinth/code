@@ -20,6 +20,21 @@ pub fn add_event(source: &'static str, event: AppEventType) {
     }
 }
 
+/// Replaces this installation's analytics ID with a new random one.
+///
+/// Events queued under the old ID are dropped.
+pub async fn reset_installation_id() -> crate::Result<()> {
+    let state = State::get().await?;
+    let id =
+        crate::state::app_analytics::reset_installation_id(&state.pool).await?;
+
+    if let Some(analytics) = &state.analytics {
+        analytics.set_installation_id(id);
+    }
+
+    Ok(())
+}
+
 /// Milliseconds since `start`, for an event's `duration_ms`.
 #[must_use]
 pub fn elapsed_ms(start: Instant) -> u64 {

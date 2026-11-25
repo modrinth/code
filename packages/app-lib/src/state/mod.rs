@@ -70,7 +70,7 @@ pub(crate) use self::synced_options::SyncedOptions;
 mod tunnel;
 pub use self::tunnel::*;
 
-mod app_analytics;
+pub(crate) mod app_analytics;
 
 pub mod db;
 pub(crate) mod db_backup;

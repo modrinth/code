@@ -47,6 +47,29 @@ pub(crate) async fn init(
     }
 }
 
+/// Replaces this installation's analytics ID with a new UUIDv4 and returns
+/// it.
+pub(crate) async fn reset_installation_id(
+    pool: &SqlitePool,
+) -> crate::Result<Uuid> {
+    let new_id = Uuid::new_v4();
+    let new_id_str = new_id.to_string();
+
+    sqlx::query!(
+        "
+        INSERT INTO app_analytics (id, installation_id)
+        VALUES (0, $1)
+        ON CONFLICT (id) DO UPDATE
+        SET installation_id = excluded.installation_id
+        ",
+        new_id_str,
+    )
+    .execute(pool)
+    .await?;
+
+    Ok(new_id)
+}
+
 /// Returns this installation's analytics ID, creating it on first use.
 ///
 /// The ID is a UUIDv4. A stored ID that isn't one is replaced.

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Settings2Icon } from '@modrinth/assets'
+import { RefreshCwIcon, Settings2Icon } from '@modrinth/assets'
 import {
 	Button,
 	defineMessages,
@@ -12,10 +12,10 @@ import { ref, watch } from 'vue'
 
 import { open_ads_consent_preferences } from '@/helpers/ads.js'
 import { optInAnalytics, optOutAnalytics } from '@/helpers/analytics'
-import { get, set } from '@/helpers/settings.ts'
+import { get, reset_analytics_installation_id, set } from '@/helpers/settings.ts'
 
 const { formatMessage } = useVIntl()
-const { handleError } = injectNotificationManager()
+const { addNotification, handleError } = injectNotificationManager()
 const { adConsentAvailable } = injectPageContext()
 const settings = ref(await get())
 
@@ -42,6 +42,18 @@ const messages = defineMessages({
 		defaultMessage:
 			'Modrinth collects anonymized analytics and usage data to improve our user experience and customize your experience. By disabling this option, you opt out and your data will no longer be collected.',
 	},
+	resetInstallationId: {
+		id: 'app.settings.privacy.telemetry.reset-installation-id',
+		defaultMessage: 'Reset installation ID',
+	},
+	resetInstallationIdSuccessTitle: {
+		id: 'app.settings.privacy.telemetry.reset-installation-id.success.title',
+		defaultMessage: 'Installation ID reset',
+	},
+	resetInstallationIdSuccessText: {
+		id: 'app.settings.privacy.telemetry.reset-installation-id.success.text',
+		defaultMessage: 'Future analytics will no longer be linked to your previous usage data.',
+	},
 	discordRichPresenceTitle: {
 		id: 'app.settings.privacy.discord-rich-presence.title',
 		defaultMessage: 'Discord Rich Presence',
@@ -55,6 +67,24 @@ const messages = defineMessages({
 
 async function manageAdsPreferences() {
 	await open_ads_consent_preferences().catch(handleError)
+}
+
+const resettingInstallationId = ref(false)
+
+async function resetInstallationId() {
+	resettingInstallationId.value = true
+	try {
+		await reset_analytics_installation_id()
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.resetInstallationIdSuccessTitle),
+			text: formatMessage(messages.resetInstallationIdSuccessText),
+		})
+	} catch (error) {
+		handleError(error as Error)
+	} finally {
+		resettingInstallationId.value = false
+	}
 }
 
 watch(
@@ -99,6 +129,10 @@ watch(
 		</div>
 		<Toggle id="opt-out-analytics" v-model="settings.telemetry" />
 	</div>
+	<Button class="mt-2.5" :disabled="resettingInstallationId" @click="resetInstallationId">
+		<RefreshCwIcon aria-hidden="true" />
+		{{ formatMessage(messages.resetInstallationId) }}
+	</Button>
 
 	<div class="mt-4 flex items-center justify-between gap-4">
 		<div>
