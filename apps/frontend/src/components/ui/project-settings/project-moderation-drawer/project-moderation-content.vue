@@ -18,7 +18,7 @@
 						<template #help-center-link="{ children }">
 							<a href="https://support.modrinth.com" target="_blank" class="text-link">
 								<component :is="() => children" />
-								<span class="sr-only"> (opens in a new tab)</span>
+								<span class="sr-only"> {{ formatMessage(messages.opensInNewTab) }}</span>
 							</a>
 						</template>
 					</IntlFormatted>
@@ -29,10 +29,10 @@
 				class="flex items-center justify-center gap-2 rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2 py-12"
 			>
 				<template v-if="pending">
-					<SpinnerIcon class="size-5 animate-spin" /> Loading messages
+					<SpinnerIcon class="size-5 animate-spin" /> {{ formatMessage(messages.loadingMessages) }}
 				</template>
 				<template v-else>
-					<p class="m-0 text-red">Failed to load messages</p>
+					<p class="m-0 text-red">{{ formatMessage(messages.loadingMessagesFailed) }}</p>
 				</template>
 			</div>
 		</div>
@@ -66,6 +66,34 @@ withDefaults(defineProps<{ view?: 'moderation' | 'thread' }>(), { view: 'thread'
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	opensInNewTab: {
+		id: 'project.moderation.thread.opens-in-new-tab',
+		defaultMessage: '(opens in a new tab)',
+	},
+	loadingMessages: {
+		id: 'project.moderation.thread.loading-messages',
+		defaultMessage: 'Loading messages',
+	},
+	loadingMessagesFailed: {
+		id: 'project.moderation.thread.loading-messages-failed',
+		defaultMessage: 'Failed to load messages',
+	},
+	approve: {
+		id: 'project.moderation.thread.approve',
+		defaultMessage: 'Approve',
+	},
+	reject: {
+		id: 'project.moderation.thread.reject',
+		defaultMessage: 'Reject',
+	},
+	withhold: {
+		id: 'project.moderation.thread.withhold',
+		defaultMessage: 'Withhold',
+	},
+	sendToReview: {
+		id: 'project.moderation.thread.send-to-review',
+		defaultMessage: 'Send to review',
+	},
 	approveWithReply: {
 		id: 'conversation-thread.action.approve-with-reply',
 		defaultMessage: 'Approve with reply',
@@ -183,7 +211,7 @@ type ModerationAction = Omit<ButtonMenuAction, 'action'> & {
 const moderationActions = computed<ModerationAction[]>(() => [
 	{
 		id: 'approve',
-		label: 'Approve',
+		label: formatMessage(messages.approve),
 		labelWithReply: formatMessage(messages.approveWithReply),
 		icon: CheckIcon,
 		tone: 'green',
@@ -198,7 +226,7 @@ const moderationActions = computed<ModerationAction[]>(() => [
 	},
 	{
 		id: 'reject',
-		label: 'Reject',
+		label: formatMessage(messages.reject),
 		labelWithReply: formatMessage(messages.rejectWithReply),
 		icon: XIcon,
 		tone: 'red',
@@ -207,7 +235,7 @@ const moderationActions = computed<ModerationAction[]>(() => [
 	},
 	{
 		id: 'withhold',
-		label: 'Withhold',
+		label: formatMessage(messages.withhold),
 		labelWithReply: formatMessage(messages.withholdWithReply),
 		icon: EyeOffIcon,
 		tone: 'orange',
@@ -216,7 +244,7 @@ const moderationActions = computed<ModerationAction[]>(() => [
 	},
 	{
 		id: 'send-to-review',
-		label: 'Send to review',
+		label: formatMessage(messages.sendToReview),
 		icon: ScaleIcon,
 		tone: 'orange',
 		disabled: project.value.status === 'processing' || !canSubmit.value,

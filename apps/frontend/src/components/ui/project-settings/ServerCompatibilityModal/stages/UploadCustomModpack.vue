@@ -2,12 +2,14 @@
 	<div class="flex w-full flex-col gap-6">
 		<DataLossWarningBanner />
 		<div class="flex w-full flex-col gap-4">
-			<div class="font-semibold text-contrast">Upload custom modpack</div>
+			<div class="font-semibold text-contrast">
+				{{ formatMessage(messages.uploadCustomModpack) }}
+			</div>
 
 			<DropzoneFileInput
 				v-if="!ctx.customModpackFile.value"
-				primary-prompt="Drag and drop your .mrpack file"
-				secondary-prompt="Or click to browse"
+				:primary-prompt="formatMessage(messages.dropModpack)"
+				:secondary-prompt="formatMessage(messages.browseFiles)"
 				accept=".mrpack"
 				size="medium"
 				@change="handleFileUpload"
@@ -27,7 +29,7 @@
 					</span>
 				</div>
 
-				<Button v-tooltip="'Replace file'" @click="fileInput?.click()">
+				<Button v-tooltip="formatMessage(messages.replaceFile)" @click="fileInput?.click()">
 					<ArrowLeftRightIcon aria-hidden="true" />
 					<input
 						ref="fileInput"
@@ -41,15 +43,18 @@
 
 			<Checkbox v-model="ctx.hasLicensePermission.value">
 				<span class="max-w-[90%] text-left text-primary">
-					Do you have the appropriate licenses to redistribute all content in this Modpack?
-					<NuxtLink
-						to="https://support.modrinth.com/en/articles/8797527-obtaining-modpack-permissions"
-						external
-						target="_blank"
-						class="font-medium text-blue underline"
-					>
-						Learn more
-					</NuxtLink>
+					<IntlFormatted :message-id="messages.licensePermission">
+						<template #permissions-link="{ children }">
+							<NuxtLink
+								to="https://support.modrinth.com/en/articles/8797527-obtaining-modpack-permissions"
+								external
+								target="_blank"
+								class="font-medium text-blue underline"
+							>
+								<component :is="() => children" />
+							</NuxtLink>
+						</template>
+					</IntlFormatted>
 				</span>
 			</Checkbox>
 		</div>
@@ -58,11 +63,14 @@
 
 <script setup lang="ts">
 import { ArrowLeftRightIcon, FileIcon } from '@modrinth/assets'
-import { Button, Checkbox, DropzoneFileInput } from '@modrinth/ui'
+import { Button, Checkbox, DropzoneFileInput, IntlFormatted, useVIntl } from '@modrinth/ui'
 
 import { injectServerCompatibilityContext } from '~/providers/manage-server-compatibility-modal'
 
 import DataLossWarningBanner from '../DataLossWarningBanner.vue'
+import { compatibilityMessages as messages } from '../messages'
+
+const { formatMessage } = useVIntl()
 
 const ctx = injectServerCompatibilityContext()
 

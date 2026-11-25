@@ -4199,6 +4199,9 @@
   "project.moderation.project-changed": {
     "message": "The selected project changed. Review it again."
   },
+  "project.moderation.thread.approve": {
+    "message": "Approve"
+  },
   "project.moderation.thread.approved-warning": {
     "message": "This thread is not actively monitored, but may be reviewed for information about your project if needed."
   },
@@ -4208,8 +4211,26 @@
   "project.moderation.thread.help-center-note.2": {
     "message": "If you need assistance or have additional inquiries, please visit the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble to contact support."
   },
+  "project.moderation.thread.loading-messages": {
+    "message": "Loading messages"
+  },
+  "project.moderation.thread.loading-messages-failed": {
+    "message": "Failed to load messages"
+  },
+  "project.moderation.thread.opens-in-new-tab": {
+    "message": "(opens in a new tab)"
+  },
+  "project.moderation.thread.reject": {
+    "message": "Reject"
+  },
+  "project.moderation.thread.send-to-review": {
+    "message": "Send to review"
+  },
   "project.moderation.thread.title": {
     "message": "Moderation messages"
+  },
+  "project.moderation.thread.withhold": {
+    "message": "Withhold"
   },
   "project.moderation.title": {
     "message": "Moderation"
@@ -4673,14 +4694,71 @@
   "project.settings.gallery.upload-title": {
     "message": "Add to gallery"
   },
+  "project.settings.general.about": {
+    "message": "About"
+  },
+  "project.settings.general.banner": {
+    "message": "Banner"
+  },
+  "project.settings.general.banner-dimensions": {
+    "message": "{ratio}, {width, number, ::group-off} × {height, number, ::group-off} px"
+  },
+  "project.settings.general.banner-preview": {
+    "message": "Banner preview"
+  },
+  "project.settings.general.banner-remove-failed": {
+    "message": "Failed to remove banner"
+  },
+  "project.settings.general.banner-removed": {
+    "message": "Banner removed"
+  },
+  "project.settings.general.banner-removed-description": {
+    "message": "Your project banner has been removed."
+  },
+  "project.settings.general.banner-update-failed": {
+    "message": "Failed to update banner"
+  },
+  "project.settings.general.banner-updated": {
+    "message": "Banner updated"
+  },
+  "project.settings.general.banner-updated-description": {
+    "message": "Your project banner has been updated."
+  },
+  "project.settings.general.icon": {
+    "message": "Icon"
+  },
+  "project.settings.general.icon-dimensions": {
+    "message": "Square, {size, number} px"
+  },
+  "project.settings.general.icon-removed": {
+    "message": "Project icon removed"
+  },
+  "project.settings.general.icon-removed-description": {
+    "message": "Your project's icon has been removed."
+  },
   "project.settings.general.limited-visibility-help": {
     "message": "Moderation has limited this {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s visibility to {maximumVisibility}. Your changes will only take effect if approved after <checklist-link>resubmitting the {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}</checklist-link>."
+  },
+  "project.settings.general.name": {
+    "message": "Name"
   },
   "project.settings.general.reduced-visibility-help": {
     "message": "Visibility only affects how users find your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}. Your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}} can still be played by users who’ve installed it."
   },
+  "project.settings.general.remove-banner": {
+    "message": "Remove banner"
+  },
   "project.settings.general.slug-help": {
     "message": "The end of your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s URL (aka the slug) can be customized to suit the {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}. This should match your {contentType, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} server {server} other {project}}’s name if possible."
+  },
+  "project.settings.general.summary": {
+    "message": "Summary"
+  },
+  "project.settings.general.upload-banner": {
+    "message": "Upload banner"
+  },
+  "project.settings.general.url": {
+    "message": "URL"
   },
   "project.settings.license.all-rights-reserved": {
     "message": "All Rights Reserved"
@@ -5003,6 +5081,9 @@
   "project.settings.members.full-access": {
     "message": "Full access"
   },
+  "project.settings.members.invite.already-member": {
+    "message": "Already a member"
+  },
   "project.settings.members.invite.button": {
     "message": "Invite"
   },
@@ -5029,6 +5110,9 @@
   },
   "project.settings.members.invite.organizations": {
     "message": "Your organizations"
+  },
+  "project.settings.members.invite.pending": {
+    "message": "Invite pending"
   },
   "project.settings.members.invite.user-not-found": {
     "message": "User does not exist"
@@ -5195,6 +5279,60 @@
   "project.settings.members.you": {
     "message": "You"
   },
+  "project.settings.monetization.allow": {
+    "message": "Allow monetization"
+  },
+  "project.settings.monetization.allow-description": {
+    "message": "Allow <strong>{project}</strong> to earn revenue from the Rewards Program again."
+  },
+  "project.settings.monetization.allow-restriction": {
+    "message": "This removes the moderation restriction. Project members will be able to manage monetization."
+  },
+  "project.settings.monetization.confirm-allow": {
+    "message": "Allow monetization?"
+  },
+  "project.settings.monetization.confirm-disable": {
+    "message": "Disable monetization?"
+  },
+  "project.settings.monetization.confirm-enable": {
+    "message": "Enable monetization?"
+  },
+  "project.settings.monetization.confirm-force-disable": {
+    "message": "Force disable?"
+  },
+  "project.settings.monetization.description": {
+    "message": "Projects on Modrinth are automatically enrolled in the <rewards-link>Rewards Program</rewards-link>. If you don’t want to (or can’t for legal reasons) earn revenue from this project, you can disable rewards here."
+  },
+  "project.settings.monetization.disable": {
+    "message": "Disable monetization"
+  },
+  "project.settings.monetization.disable-description": {
+    "message": "<strong>{project}</strong> will stop earning revenue from the Rewards Program. Earnings you’ve already made are not affected."
+  },
+  "project.settings.monetization.disable-restriction": {
+    "message": "You can turn monetization back on at any time."
+  },
+  "project.settings.monetization.disabled-by-moderator": {
+    "message": "Monetization has been disabled by a moderator. <support-link>Contact support</support-link> if you believe this is a mistake."
+  },
+  "project.settings.monetization.enable": {
+    "message": "Enable monetization"
+  },
+  "project.settings.monetization.enable-description": {
+    "message": "<strong>{project}</strong> will start earning revenue through the Rewards Program."
+  },
+  "project.settings.monetization.force-disable": {
+    "message": "Force disable"
+  },
+  "project.settings.monetization.force-disable-description": {
+    "message": "<strong>{project}</strong> will stop earning revenue from the Rewards Program. Earnings already made are not affected."
+  },
+  "project.settings.monetization.force-disable-restriction": {
+    "message": "Project members will not be able to re-enable monetization. Only a moderator can allow it again."
+  },
+  "project.settings.monetization.no-permission": {
+    "message": "You do not have permission to change monetization."
+  },
   "project.settings.navigation.content": {
     "message": "Content"
   },
@@ -5207,20 +5345,92 @@
   "project.settings.navigation.show-member-ui": {
     "message": "Show member UI"
   },
+  "project.settings.ownership.confirmation.confirmation": {
+    "message": "To confirm this transfer, type <project>{name}</project> below"
+  },
+  "project.settings.ownership.confirmation.confirmation-placeholder": {
+    "message": "Enter {name}"
+  },
+  "project.settings.ownership.confirmation.irreversible": {
+    "message": "This action cannot be undone"
+  },
+  "project.settings.ownership.confirmation.lose-access": {
+    "message": "You will immediately lose owner access to this project"
+  },
+  "project.settings.ownership.confirmation.member": {
+    "message": "Member"
+  },
+  "project.settings.ownership.confirmation.new-owner-access": {
+    "message": "The new owner can modify or delete the project at any time"
+  },
+  "project.settings.ownership.confirmation.scam-warning": {
+    "message": "Beware of scams"
+  },
+  "project.settings.ownership.confirmation.scam-warning-description": {
+    "message": "Do not transfer projects to buyers. This is a common scam and against our TOS. If you encounter a buyer, please <support-link>contact support</support-link>."
+  },
+  "project.settings.ownership.confirmation.title": {
+    "message": "<action>Transfer</action> <project>{name}</project>"
+  },
+  "project.settings.ownership.managed-by": {
+    "message": "This project is managed by {organization}."
+  },
+  "project.settings.ownership.missing-targets": {
+    "message": "Invite a member from the Members page or create an organization before transferring ownership."
+  },
+  "project.settings.ownership.organization": {
+    "message": "Organization"
+  },
+  "project.settings.ownership.organizations-load-failed": {
+    "message": "Organizations could not be loaded. Try again later."
+  },
+  "project.settings.ownership.owner": {
+    "message": "Owner"
+  },
+  "project.settings.ownership.remove-description": {
+    "message": "You will become the owner of this project and it will no longer be managed by the organization."
+  },
+  "project.settings.ownership.remove-failed": {
+    "message": "Unable to remove project"
+  },
   "project.settings.ownership.remove-from-organization": {
     "message": "Remove from organization"
   },
   "project.settings.ownership.remove-from-organization.description": {
     "message": "Take ownership of this project and remove it from {organization}."
   },
+  "project.settings.ownership.remove-title": {
+    "message": "Remove project from organization?"
+  },
   "project.settings.ownership.transfer": {
     "message": "Transfer ownership"
+  },
+  "project.settings.ownership.transfer-confirmation": {
+    "message": "The new owner will get full control of this project, including members, revenue, transferring, and deleting it. Only the new owner can transfer it back."
+  },
+  "project.settings.ownership.transfer-description": {
+    "message": "Give full control of this project to another member or an organization. You’ll stay on as a member, but only the new owner can transfer it back."
+  },
+  "project.settings.ownership.transfer-failed": {
+    "message": "Transfer failed"
+  },
+  "project.settings.ownership.transfer-target": {
+    "message": "Member or organization"
+  },
+  "project.settings.ownership.transfer-title": {
+    "message": "Transfer {project}"
   },
   "project.settings.ownership.transfer.in-progress": {
     "message": "An ownership transfer is in progress."
   },
   "project.settings.ownership.transfer.requires-owner": {
     "message": "Only the project owner can transfer ownership."
+  },
+  "project.settings.ownership.transferred": {
+    "message": "Ownership transferred"
+  },
+  "project.settings.ownership.transferred-description": {
+    "message": "Your project ownership has been updated."
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Please provide proof that you have permission to redistribute all of the following files. Once completed, withheld versions will be automatically published."
@@ -5324,6 +5534,15 @@
   "project.settings.review.automatic-check": {
     "message": "Automatic check"
   },
+  "project.settings.review.checklist": {
+    "message": "Checklist"
+  },
+  "project.settings.review.close-panel": {
+    "message": "Close moderation panel"
+  },
+  "project.settings.review.complete-required": {
+    "message": "Complete the required items to continue."
+  },
   "project.settings.review.completed": {
     "message": "Completed"
   },
@@ -5336,14 +5555,50 @@
   "project.settings.review.completed.write-summary": {
     "message": "Write a summary"
   },
+  "project.settings.review.drawer-label": {
+    "message": "Review and publishing"
+  },
+  "project.settings.review.mark-addressed": {
+    "message": "Mark addressed"
+  },
+  "project.settings.review.mark-addressed-failed": {
+    "message": "Could not mark issue addressed"
+  },
+  "project.settings.review.moderator-issue": {
+    "message": "Moderator issue"
+  },
   "project.settings.review.open-drawer": {
     "message": "Open moderation drawer{count, plural, =0 {} one { (# checklist item remaining)} other { (# checklist items remaining)}}"
   },
   "project.settings.review.open-thread": {
     "message": "Open moderation thread"
   },
+  "project.settings.review.pin-panel": {
+    "message": "Pin panel open"
+  },
   "project.settings.review.requested-by-moderator": {
     "message": "Requested by moderator"
+  },
+  "project.settings.review.suggestions": {
+    "message": "Suggestions"
+  },
+  "project.settings.review.thread": {
+    "message": "Thread"
+  },
+  "project.settings.review.todo": {
+    "message": "TODO"
+  },
+  "project.settings.review.unpin-panel": {
+    "message": "Unpin panel"
+  },
+  "project.settings.review.view-issue": {
+    "message": "View issue: {title}"
+  },
+  "project.settings.review.views-label": {
+    "message": "Review views"
+  },
+  "project.settings.review.warnings": {
+    "message": "Warnings"
   },
   "project.settings.server.bedrock-address-label": {
     "message": "Bedrock address"
@@ -5353,6 +5608,141 @@
   },
   "project.settings.server.cannot-save-title": {
     "message": "Cannot save"
+  },
+  "project.settings.server.compatibility.browse-files": {
+    "message": "Or click to browse"
+  },
+  "project.settings.server.compatibility.change-type": {
+    "message": "Change type"
+  },
+  "project.settings.server.compatibility.compatibility-type": {
+    "message": "Compatibility type"
+  },
+  "project.settings.server.compatibility.custom-modpack": {
+    "message": "Custom modpack"
+  },
+  "project.settings.server.compatibility.custom-modpack-description": {
+    "message": "A modded server using a custom modpack."
+  },
+  "project.settings.server.compatibility.custom-modpack-notice": {
+    "message": "Servers with custom modpacks should not be uploaded as separate modpack projects."
+  },
+  "project.settings.server.compatibility.data-loss-description": {
+    "message": "Changing the compatibility type will reset your previous compatibility settings and redistribute the new settings to users in the Modrinth App."
+  },
+  "project.settings.server.compatibility.data-loss-warning": {
+    "message": "Data loss warning"
+  },
+  "project.settings.server.compatibility.description": {
+    "message": "Select whether your server is vanilla or modded and which versions it supports. The Modrinth App uses this when a player joins."
+  },
+  "project.settings.server.compatibility.drop-modpack": {
+    "message": "Drag and drop your .mrpack file"
+  },
+  "project.settings.server.compatibility.failed-to-load-versions": {
+    "message": "Failed to load versions"
+  },
+  "project.settings.server.compatibility.game-version": {
+    "message": "Game version"
+  },
+  "project.settings.server.compatibility.license-permission": {
+    "message": "Do you have the appropriate licenses to redistribute all content in this Modpack? <permissions-link>Learn more</permissions-link>"
+  },
+  "project.settings.server.compatibility.no-project": {
+    "message": "No server project selected"
+  },
+  "project.settings.server.compatibility.no-results": {
+    "message": "No results found"
+  },
+  "project.settings.server.compatibility.project": {
+    "message": "Project"
+  },
+  "project.settings.server.compatibility.published-modpack": {
+    "message": "Published modpack"
+  },
+  "project.settings.server.compatibility.published-modpack-description": {
+    "message": "A modded server using a published modpack."
+  },
+  "project.settings.server.compatibility.recommended-mc-version": {
+    "message": "Recommended MC version"
+  },
+  "project.settings.server.compatibility.recommended-version": {
+    "message": "Recommended version"
+  },
+  "project.settings.server.compatibility.recommended-version-help": {
+    "message": "Players joining the server from the Modrinth App will connect using this version."
+  },
+  "project.settings.server.compatibility.replace-file": {
+    "message": "Replace file"
+  },
+  "project.settings.server.compatibility.required-modpack": {
+    "message": "Required modpack"
+  },
+  "project.settings.server.compatibility.required-version": {
+    "message": "Required version"
+  },
+  "project.settings.server.compatibility.save-failed": {
+    "message": "Failed to save server compatibility"
+  },
+  "project.settings.server.compatibility.saving": {
+    "message": "Saving…"
+  },
+  "project.settings.server.compatibility.search-modpacks": {
+    "message": "Search by name or paste ID..."
+  },
+  "project.settings.server.compatibility.search-versions": {
+    "message": "Search versions..."
+  },
+  "project.settings.server.compatibility.select-modpack": {
+    "message": "Select modpack"
+  },
+  "project.settings.server.compatibility.select-supported-versions": {
+    "message": "Set supported versions before selecting the recommended version"
+  },
+  "project.settings.server.compatibility.select-type": {
+    "message": "Select compatibility type"
+  },
+  "project.settings.server.compatibility.select-version": {
+    "message": "Select version"
+  },
+  "project.settings.server.compatibility.set-compatibility": {
+    "message": "Set compatibility"
+  },
+  "project.settings.server.compatibility.supported-mc-versions": {
+    "message": "Supported MC versions"
+  },
+  "project.settings.server.compatibility.supported-versions": {
+    "message": "Supported versions"
+  },
+  "project.settings.server.compatibility.switch-type": {
+    "message": "Switch type"
+  },
+  "project.settings.server.compatibility.title": {
+    "message": "Server compatibility"
+  },
+  "project.settings.server.compatibility.updating": {
+    "message": "Updating…"
+  },
+  "project.settings.server.compatibility.upload-custom-modpack": {
+    "message": "Upload custom modpack"
+  },
+  "project.settings.server.compatibility.uploading": {
+    "message": "Uploading {progress, number, percent}"
+  },
+  "project.settings.server.compatibility.vanilla-description": {
+    "message": "A vanilla server with no mods."
+  },
+  "project.settings.server.compatibility.vanilla-server": {
+    "message": "Vanilla server"
+  },
+  "project.settings.server.compatibility.vanilla-versions": {
+    "message": "Vanilla versions"
+  },
+  "project.settings.server.compatibility.version": {
+    "message": "Version"
+  },
+  "project.settings.server.compatibility.version-number": {
+    "message": "v{version}"
   },
   "project.settings.server.details-heading": {
     "message": "Server details"

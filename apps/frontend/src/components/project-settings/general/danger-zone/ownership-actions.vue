@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
 	Button,
+	commonMessages,
 	ConfirmModal,
 	defineMessages,
 	Field,
@@ -28,6 +29,70 @@ const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
+	transferDescription: {
+		id: 'project.settings.ownership.transfer-description',
+		defaultMessage:
+			'Give full control of this project to another member or an organization. You’ll stay on as a member, but only the new owner can transfer it back.',
+	},
+	transferTitle: {
+		id: 'project.settings.ownership.transfer-title',
+		defaultMessage: 'Transfer {project}',
+	},
+	transferConfirmation: {
+		id: 'project.settings.ownership.transfer-confirmation',
+		defaultMessage:
+			'The new owner will get full control of this project, including members, revenue, transferring, and deleting it. Only the new owner can transfer it back.',
+	},
+	managedBy: {
+		id: 'project.settings.ownership.managed-by',
+		defaultMessage: 'This project is managed by {organization}.',
+	},
+	transferTarget: {
+		id: 'project.settings.ownership.transfer-target',
+		defaultMessage: 'Member or organization',
+	},
+	missingTargets: {
+		id: 'project.settings.ownership.missing-targets',
+		defaultMessage:
+			'Invite a member from the Members page or create an organization before transferring ownership.',
+	},
+	organizationsLoadFailed: {
+		id: 'project.settings.ownership.organizations-load-failed',
+		defaultMessage: 'Organizations could not be loaded. Try again later.',
+	},
+	removeTitle: {
+		id: 'project.settings.ownership.remove-title',
+		defaultMessage: 'Remove project from organization?',
+	},
+	removeDescription: {
+		id: 'project.settings.ownership.remove-description',
+		defaultMessage:
+			'You will become the owner of this project and it will no longer be managed by the organization.',
+	},
+	organization: {
+		id: 'project.settings.ownership.organization',
+		defaultMessage: 'Organization',
+	},
+	owner: {
+		id: 'project.settings.ownership.owner',
+		defaultMessage: 'Owner',
+	},
+	transferred: {
+		id: 'project.settings.ownership.transferred',
+		defaultMessage: 'Ownership transferred',
+	},
+	transferredDescription: {
+		id: 'project.settings.ownership.transferred-description',
+		defaultMessage: 'Your project ownership has been updated.',
+	},
+	transferFailed: {
+		id: 'project.settings.ownership.transfer-failed',
+		defaultMessage: 'Transfer failed',
+	},
+	removeFailed: {
+		id: 'project.settings.ownership.remove-failed',
+		defaultMessage: 'Unable to remove project',
+	},
 	transferOwnership: {
 		id: 'project.settings.ownership.transfer',
 		defaultMessage: 'Transfer ownership',
@@ -100,7 +165,7 @@ const targets = computed(() => [
 			organizationId: org.id,
 			avatar_url: org.icon_url,
 			name: org.name,
-			role: 'Organization',
+			role: formatMessage(messages.organization),
 		})),
 ])
 const target = computed(() => targets.value.find((target) => target.value === selectedTarget.value))
@@ -121,14 +186,14 @@ const transfer = useMutation({
 		selectedTarget.value = ''
 		await invalidate()
 		addNotification({
-			title: 'Ownership transferred',
-			text: 'Your project ownership has been updated.',
+			title: formatMessage(messages.transferred),
+			text: formatMessage(messages.transferredDescription),
 			type: 'success',
 		})
 	},
 	onError: (error) =>
 		addNotification({
-			title: 'Transfer failed',
+			title: formatMessage(messages.transferFailed),
 			text: error.message,
 			type: 'error',
 		}),
@@ -156,7 +221,7 @@ const removeFromOrganization = useMutation({
 	},
 	onError: (error) =>
 		addNotification({
-			title: 'Unable to remove project',
+			title: formatMessage(messages.removeFailed),
 			text: error.message,
 			type: 'error',
 		}),
@@ -182,8 +247,7 @@ function confirmRemoveFromOrganization() {
 				{{ formatMessage(messages.transferOwnership) }}
 			</h3>
 			<p class="m-0 leading-normal text-secondary">
-				Give full control of this project to another member or an organization. You’ll stay on as a
-				member, but only the new owner can transfer it back.
+				{{ formatMessage(messages.transferDescription) }}
 			</p>
 		</div>
 		<div
@@ -202,16 +266,19 @@ function confirmRemoveFromOrganization() {
 				{{ formatMessage(messages.transferOwnership) }}
 			</Button>
 		</div>
-		<NewModal ref="selectionModal" :header="`Transfer ${project.title}`" width="550px">
+		<NewModal
+			ref="selectionModal"
+			:header="formatMessage(messages.transferTitle, { project: project.title })"
+			width="550px"
+		>
 			<div class="flex flex-col gap-4 pb-2">
 				<p class="m-0">
-					The new owner will get full control of this project, including members, revenue,
-					transferring, and deleting it. Only the new owner can transfer it back.
+					{{ formatMessage(messages.transferConfirmation) }}
 				</p>
 				<p v-if="organization" class="m-0 text-secondary">
-					This project is managed by {{ organization.name }}.
+					{{ formatMessage(messages.managedBy, { organization: organization.name }) }}
 				</p>
-				<Field label="Member or organization" :input-id="transferTargetId">
+				<Field :label="formatMessage(messages.transferTarget)" :input-id="transferTargetId">
 					<ProjectOwnerCombobox
 						v-model="selectedTarget"
 						:options="targets"
@@ -221,22 +288,23 @@ function confirmRemoveFromOrganization() {
 					/>
 				</Field>
 				<p v-if="!targets.length && !isError" class="m-0 text-secondary">
-					Invite a member from the Members page or create an organization before transferring
-					ownership.
+					{{ formatMessage(messages.missingTargets) }}
 				</p>
 				<p v-if="isError" role="alert" class="m-0 text-red">
-					Organizations could not be loaded. Try again later.
+					{{ formatMessage(messages.organizationsLoadFailed) }}
 				</p>
 			</div>
 			<template #actions
 				><div class="flex justify-end gap-2">
-					<Button @click="selectionModal?.hide()">Cancel</Button
+					<Button @click="selectionModal?.hide()">{{
+						formatMessage(commonMessages.cancelButton)
+					}}</Button
 					><Button
 						type="colored"
 						color="red"
 						:disabled="!target || transfer.isPending.value"
 						@click="confirmTarget($event)"
-						>Continue</Button
+						>{{ formatMessage(commonMessages.continueButton) }}</Button
 					>
 				</div></template
 			>
@@ -248,10 +316,11 @@ function confirmRemoveFromOrganization() {
 			:current-owner="{
 				avatar_url: (owner ? owner.user.avatar_url : organization?.icon_url) ?? null,
 				username: owner?.user.username ?? organization?.name ?? '',
-				role: owner?.role ?? 'Owner',
+				role: owner?.role ?? formatMessage(messages.owner),
 				organizationId: owner ? undefined : organization?.id,
 			}"
 			:transfer-to="target"
+			:confirm-label="formatMessage(messages.transferOwnership)"
 			:on-confirm="() => transfer.mutate()"
 		/>
 	</div>
@@ -279,9 +348,9 @@ function confirmRemoveFromOrganization() {
 		</Button>
 		<ConfirmModal
 			ref="removeModal"
-			title="Remove project from organization?"
-			description="You will become the owner of this project and it will no longer be managed by the organization."
-			proceed-label="Remove"
+			:title="formatMessage(messages.removeTitle)"
+			:description="formatMessage(messages.removeDescription)"
+			:proceed-label="formatMessage(commonMessages.removeButton)"
 			@proceed="confirmRemoveFromOrganization"
 		/>
 	</div>

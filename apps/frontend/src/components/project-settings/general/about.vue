@@ -1,11 +1,11 @@
 <template>
 	<AiImageWarningModal ref="aiImageWarningModal" />
-	<SettingsSection title="About" class="mb-3" />
+	<SettingsSection :title="formatMessage(messages.about)" class="mb-3" />
 	<section class="universal-card settings-content-card">
 		<div class="flex flex-col gap-6">
 			<Field
 				id="project-settings-field-title"
-				label="Name"
+				:label="formatMessage(messages.name)"
 				:input-id="nameInputId"
 				data-project-field="title"
 				class="max-w-[600px]"
@@ -33,7 +33,7 @@
 
 			<Field
 				id="project-settings-field-summary"
-				label="Summary"
+				:label="formatMessage(messages.summary)"
 				:input-id="summaryInputId"
 				data-project-field="summary"
 				class="max-w-[600px]"
@@ -65,7 +65,7 @@
 			<div class="flex max-w-[600px] flex-wrap items-start gap-x-8 gap-y-6">
 				<Field
 					id="project-settings-field-icon"
-					label="Icon"
+					:label="formatMessage(messages.icon)"
 					label-optional
 					data-project-field="icon"
 					:class="isServerProject ? 'min-w-32' : 'w-full'"
@@ -107,7 +107,9 @@
 										<TrashIcon aria-hidden="true" />
 									</IconButton>
 								</div>
-								<div class="leading-tight text-secondary">Square, 512 px</div>
+								<div class="leading-tight text-secondary">
+									{{ formatMessage(messages.iconDimensions, { size: 512 }) }}
+								</div>
 							</div>
 						</div>
 					</template>
@@ -125,7 +127,12 @@
 					</template>
 				</Field>
 
-				<Field v-if="isServerProject" label="Banner" label-optional class="w-[324px] max-w-full">
+				<Field
+					v-if="isServerProject"
+					:label="formatMessage(messages.banner)"
+					label-optional
+					class="w-[324px] max-w-full"
+				>
 					<label
 						class="relative flex h-[108px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl"
 						:class="{ 'border-2 border-dashed border-surface-5 bg-surface-2': !bannerSrc }"
@@ -133,7 +140,7 @@
 						<img
 							v-if="bannerSrc"
 							:src="bannerSrc"
-							alt="Banner preview"
+							:alt="formatMessage(messages.bannerPreview)"
 							class="absolute inset-0 h-full w-full object-contain"
 						/>
 						<ImageIcon v-else aria-hidden="true" class="h-8 w-8 text-secondary" />
@@ -168,7 +175,7 @@
 							:max-size="globals?.max_gallery_image_size"
 							accept="image/png,image/jpeg,image/gif,image/webp"
 							class="button-like"
-							prompt="Upload banner"
+							:prompt="formatMessage(messages.uploadBanner)"
 							:disabled="!globals?.max_gallery_image_size || !hasPermission"
 							@change="showBannerPreview"
 						>
@@ -177,7 +184,7 @@
 						<IconButton
 							v-if="bannerSrc"
 							class="shrink-0"
-							label="Remove banner"
+							:label="formatMessage(messages.removeBanner)"
 							:circular="false"
 							:disabled="!hasPermission"
 							@click="markBannerForDeletion"
@@ -185,13 +192,15 @@
 							<TrashIcon aria-hidden="true" />
 						</IconButton>
 					</div>
-					<template #subtext>3:1, 1920 × 640 px</template>
+					<template #subtext>{{
+						formatMessage(messages.bannerDimensions, { ratio: '3:1', width: 1920, height: 640 })
+					}}</template>
 				</Field>
 			</div>
 
 			<Field
 				id="project-settings-field-slug"
-				label="URL"
+				:label="formatMessage(messages.url)"
 				:input-id="slugInputId"
 				data-project-field="slug"
 				class="max-w-[600px]"
@@ -336,6 +345,82 @@ const checklistHref = computed(
 )
 
 const messages = defineMessages({
+	about: {
+		id: 'project.settings.general.about',
+		defaultMessage: 'About',
+	},
+	name: {
+		id: 'project.settings.general.name',
+		defaultMessage: 'Name',
+	},
+	summary: {
+		id: 'project.settings.general.summary',
+		defaultMessage: 'Summary',
+	},
+	icon: {
+		id: 'project.settings.general.icon',
+		defaultMessage: 'Icon',
+	},
+	banner: {
+		id: 'project.settings.general.banner',
+		defaultMessage: 'Banner',
+	},
+	bannerPreview: {
+		id: 'project.settings.general.banner-preview',
+		defaultMessage: 'Banner preview',
+	},
+	uploadBanner: {
+		id: 'project.settings.general.upload-banner',
+		defaultMessage: 'Upload banner',
+	},
+	removeBanner: {
+		id: 'project.settings.general.remove-banner',
+		defaultMessage: 'Remove banner',
+	},
+	url: {
+		id: 'project.settings.general.url',
+		defaultMessage: 'URL',
+	},
+	iconDimensions: {
+		id: 'project.settings.general.icon-dimensions',
+		defaultMessage: 'Square, {size, number} px',
+	},
+	bannerDimensions: {
+		id: 'project.settings.general.banner-dimensions',
+		defaultMessage: '{ratio}, {width, number, ::group-off} × {height, number, ::group-off} px',
+	},
+	bannerUpdated: {
+		id: 'project.settings.general.banner-updated',
+		defaultMessage: 'Banner updated',
+	},
+	bannerUpdatedDescription: {
+		id: 'project.settings.general.banner-updated-description',
+		defaultMessage: 'Your project banner has been updated.',
+	},
+	bannerUpdateFailed: {
+		id: 'project.settings.general.banner-update-failed',
+		defaultMessage: 'Failed to update banner',
+	},
+	bannerRemoved: {
+		id: 'project.settings.general.banner-removed',
+		defaultMessage: 'Banner removed',
+	},
+	bannerRemovedDescription: {
+		id: 'project.settings.general.banner-removed-description',
+		defaultMessage: 'Your project banner has been removed.',
+	},
+	bannerRemoveFailed: {
+		id: 'project.settings.general.banner-remove-failed',
+		defaultMessage: 'Failed to remove banner',
+	},
+	iconRemoved: {
+		id: 'project.settings.general.icon-removed',
+		defaultMessage: 'Project icon removed',
+	},
+	iconRemovedDescription: {
+		id: 'project.settings.general.icon-removed-description',
+		defaultMessage: "Your project's icon has been removed.",
+	},
 	slugHelp: {
 		id: 'project.settings.general.slug-help',
 		defaultMessage:
@@ -729,13 +814,13 @@ const uploadBanner = async () => {
 
 		await invalidate()
 		addNotification({
-			title: 'Banner updated',
-			text: 'Your project banner has been updated.',
+			title: formatMessage(messages.bannerUpdated),
+			text: formatMessage(messages.bannerUpdatedDescription),
 			type: 'success',
 		})
 	} catch (err) {
 		addNotification({
-			title: 'Failed to update banner',
+			title: formatMessage(messages.bannerUpdateFailed),
 			text: err.data?.description ?? String(err),
 			type: 'error',
 		})
@@ -749,14 +834,14 @@ const deleteBanner = async () => {
 			await labrinth.projects_v3.deleteGalleryImage(bannerImage.url)
 			await invalidate()
 			addNotification({
-				title: 'Banner removed',
-				text: 'Your project banner has been removed.',
+				title: formatMessage(messages.bannerRemoved),
+				text: formatMessage(messages.bannerRemovedDescription),
 				type: 'success',
 			})
 		}
 	} catch (err) {
 		addNotification({
-			title: 'Failed to remove banner',
+			title: formatMessage(messages.bannerRemoveFailed),
 			text: err.data?.description ?? String(err),
 			type: 'error',
 		})
@@ -773,8 +858,8 @@ const deleteIcon = async () => {
 	await labrinth.projects_v3.deleteIcon(project.value.id)
 	await invalidate()
 	addNotification({
-		title: 'Project icon removed',
-		text: "Your project's icon has been removed.",
+		title: formatMessage(messages.iconRemoved),
+		text: formatMessage(messages.iconRemovedDescription),
 		type: 'success',
 	})
 }

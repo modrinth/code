@@ -2,7 +2,7 @@
 	<div class="flex w-full flex-col gap-6">
 		<DataLossWarningBanner />
 		<div class="flex w-full flex-col gap-4">
-			<Field label="Supported MC versions">
+			<Field :label="formatMessage(messages.supportedMcVersions)">
 				<template #default="{ labelId }">
 					<McVersionPicker
 						v-model="supportedGameVersions"
@@ -13,23 +13,24 @@
 					/>
 				</template>
 			</Field>
-			<Field label="Recommended MC version" :input-id="recommendedVersionInputId">
+			<Field
+				:label="formatMessage(messages.recommendedMcVersion)"
+				:input-id="recommendedVersionInputId"
+			>
 				<Combobox
 					v-model="recommendedGameVersion"
 					v-tooltip="
-						!recommendedOptions.length
-							? 'Set supported versions before selecting the recommended version'
-							: undefined
+						!recommendedOptions.length ? formatMessage(messages.selectSupportedVersions) : undefined
 					"
 					:options="recommendedOptions"
 					searchable
 					:search-input-attrs="{ id: recommendedVersionInputId }"
 					:display-name="(val: string) => val"
-					placeholder="Select version"
+					:placeholder="formatMessage(messages.selectVersion)"
 					:disabled="!recommendedOptions.length"
 				/>
 				<template #subtext>
-					Players joining the server from the Modrinth App will connect using this version.
+					{{ formatMessage(messages.recommendedVersionHelp) }}
 				</template>
 			</Field>
 		</div>
@@ -37,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { Combobox, Field } from '@modrinth/ui'
+import { Combobox, Field, useVIntl } from '@modrinth/ui'
 import { computed, useId, watch } from 'vue'
 
 import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
@@ -45,6 +46,9 @@ import { useGeneratedState } from '~/composables/generated'
 import { injectServerCompatibilityContext } from '~/providers/manage-server-compatibility-modal'
 
 import DataLossWarningBanner from '../DataLossWarningBanner.vue'
+import { compatibilityMessages as messages } from '../messages'
+
+const { formatMessage } = useVIntl()
 
 const { supportedGameVersions, recommendedGameVersion } = injectServerCompatibilityContext()
 

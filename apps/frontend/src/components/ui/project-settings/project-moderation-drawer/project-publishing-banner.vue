@@ -23,6 +23,8 @@ import {
 	projectPublishingTones,
 } from '~/providers/project-publishing'
 
+import { publishingActionMessages } from './messages'
+
 const props = withDefaults(
 	defineProps<{
 		state: ProjectPublishingState
@@ -67,15 +69,9 @@ const underReviewThanks = defineMessage({
 const submitAction = computed(() => {
 	switch (props.state) {
 		case 'ready':
-			return defineMessage({
-				id: 'project.publishing.ready.action',
-				defaultMessage: 'Submit for review',
-			})
+			return publishingActionMessages.submit
 		case 'ready-to-resubmit':
-			return defineMessage({
-				id: 'project.publishing.resubmit.action',
-				defaultMessage: 'Resubmit for review',
-			})
+			return publishingActionMessages.resubmit
 	}
 	return undefined
 })

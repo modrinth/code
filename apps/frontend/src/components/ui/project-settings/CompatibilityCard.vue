@@ -3,10 +3,9 @@
 		<div class="flex flex-col gap-3">
 			<div class="flex items-start justify-between gap-4">
 				<div class="flex flex-col gap-1">
-					<div class="text-xl font-semibold text-contrast">Server compatibility</div>
+					<div class="text-xl font-semibold text-contrast">{{ formatMessage(messages.title) }}</div>
 					<div v-if="!content" class="text-sm text-secondary">
-						Select whether your server is vanilla or modded and which versions it supports. The
-						Modrinth App uses this when a player joins.
+						{{ formatMessage(messages.description) }}
 					</div>
 					<div v-else>
 						<div v-if="content.kind === 'vanilla'" class="flex items-center gap-1.5">
@@ -16,7 +15,7 @@
 								<BoxIcon class="h-4 w-4 shrink-0 text-secondary" />
 							</div>
 
-							Vanilla server
+							{{ formatMessage(messages.vanillaServer) }}
 						</div>
 						<div
 							v-else-if="content.kind === 'modpack' && !usingCustomMrpack"
@@ -27,7 +26,7 @@
 							>
 								<PackageIcon class="h-4 w-4 shrink-0 text-secondary" />
 							</div>
-							Published modpack
+							{{ formatMessage(messages.publishedModpack) }}
 						</div>
 						<div v-else class="flex items-center gap-1.5">
 							<div
@@ -35,7 +34,7 @@
 							>
 								<PackagePlusIcon class="h-4 w-4 shrink-0 text-secondary" />
 							</div>
-							Custom modpack
+							{{ formatMessage(messages.customModpack) }}
 						</div>
 					</div>
 				</div>
@@ -46,11 +45,11 @@
 					@click="handleSwitchCompatibility"
 				>
 					<ArrowLeftRightIcon />
-					Switch type
+					{{ formatMessage(messages.switchType) }}
 				</Button>
 				<Button v-else :disabled="!hasPermission" @click="handleSetCompatibility">
 					<ComponentIcon />
-					Set compatibility
+					{{ formatMessage(messages.setCompatibility) }}
 				</Button>
 			</div>
 
@@ -64,13 +63,17 @@
 					class="flex flex-col items-start justify-between gap-2.5"
 				>
 					<div class="flex flex-col gap-2">
-						<div class="font-medium text-secondary">Recommended version</div>
+						<div class="font-medium text-secondary">
+							{{ formatMessage(messages.recommendedVersion) }}
+						</div>
 						<div class="text-2xl font-semibold text-contrast">
 							{{ content.recommended_game_version ?? '—' }}
 						</div>
 					</div>
 					<div class="flex flex-col gap-2">
-						<div class="font-medium text-secondary">Supported versions</div>
+						<div class="font-medium text-secondary">
+							{{ formatMessage(messages.supportedVersions) }}
+						</div>
 						<div class="flex flex-wrap gap-1.5">
 							<TagItem
 								v-for="v in formatVersionsForDisplay(
@@ -91,7 +94,9 @@
 					class="flex w-full max-w-[500px] flex-col items-start justify-between gap-4"
 				>
 					<div class="flex w-full flex-col gap-2">
-						<div class="font-medium text-secondary">Required modpack</div>
+						<div class="font-medium text-secondary">
+							{{ formatMessage(messages.requiredModpack) }}
+						</div>
 						<div class="w-fullitems-center flex gap-3 rounded-2xl bg-surface-1 p-3">
 							<Avatar
 								v-if="!usingCustomMrpack"
@@ -140,10 +145,20 @@
 										:to="`/modpack/${modpackProject?.slug}/version/${modpackVersion.id}`"
 										class="hover:underline"
 									>
-										v{{ modpackVersion.version_number }}
+										{{
+											formatMessage(messages.versionNumber, {
+												version: modpackVersion.version_number,
+											})
+										}}
 									</NuxtLink>
 									<div v-else-if="modpackVersion" class="flex items-center gap-1.5">
-										<div>v{{ modpackVersion.version_number }}</div>
+										<div>
+											{{
+												formatMessage(messages.versionNumber, {
+													version: modpackVersion.version_number,
+												})
+											}}
+										</div>
 										<div class="h-1.5 w-1.5 rounded-full bg-surface-5"></div>
 										<a
 											v-if="modpackVersion.files?.length"
@@ -154,7 +169,7 @@
 											class="flex items-center gap-0.5 hover:underline"
 										>
 											<DownloadIcon />
-											Download
+											{{ formatMessage(commonMessages.downloadButton) }}
 										</a>
 									</div>
 								</div>
@@ -162,7 +177,9 @@
 						</div>
 					</div>
 					<div v-if="modpackVersion" class="flex flex-col gap-2">
-						<div class="font-medium text-secondary">Required version</div>
+						<div class="font-medium text-secondary">
+							{{ formatMessage(messages.requiredVersion) }}
+						</div>
 						<div class="flex flex-wrap gap-1.5">
 							<TagItem v-for="gv in modpackVersion.game_versions" :key="gv">
 								{{ gv }}
@@ -190,7 +207,7 @@
 					@click="handleUpdateContent"
 				>
 					<RefreshCwIcon />
-					Update
+					{{ formatMessage(commonMessages.updateButton) }}
 				</Button>
 			</div>
 		</div>
@@ -216,13 +233,24 @@ import {
 	PackagePlusIcon,
 	RefreshCwIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, FormattedTag, injectModrinthClient, TagItem } from '@modrinth/ui'
+import {
+	Avatar,
+	Button,
+	commonMessages,
+	FormattedTag,
+	injectModrinthClient,
+	TagItem,
+	useVIntl,
+} from '@modrinth/ui'
 import { formatVersionsForDisplay } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 import { useGeneratedState } from '~/composables/generated'
 
+import { compatibilityMessages as messages } from './ServerCompatibilityModal/messages'
 import ServerCompatibilityModal from './ServerCompatibilityModal/ServerCompatibilityModal.vue'
+
+const { formatMessage } = useVIntl()
 
 const serverCompatibilityModal = useTemplateRef<InstanceType<typeof ServerCompatibilityModal>>(
 	'serverCompatibilityModal',

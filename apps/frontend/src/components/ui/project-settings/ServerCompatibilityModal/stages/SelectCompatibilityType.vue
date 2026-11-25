@@ -2,7 +2,7 @@
 	<div class="flex flex-col gap-6">
 		<DataLossWarningBanner />
 		<div class="flex flex-col gap-4">
-			<div class="font-semibold text-contrast">Select compatibility type</div>
+			<div class="font-semibold text-contrast">{{ formatMessage(messages.selectType) }}</div>
 			<div class="flex w-full flex-col gap-2">
 				<button
 					v-for="option in options"
@@ -16,13 +16,13 @@
 						<component :is="option.icon" class="h-9 w-9 text-secondary" />
 					</div>
 					<div class="flex flex-col gap-0.5">
-						<span class="font-bold text-contrast">{{ option.label }}</span>
-						<span class="text-sm text-secondary">{{ option.description }}</span>
+						<span class="font-bold text-contrast">{{ formatMessage(option.label) }}</span>
+						<span class="text-sm text-secondary">{{ formatMessage(option.description) }}</span>
 					</div>
 				</button>
 			</div>
 			<div class="text-sm text-secondary">
-				Servers with custom modpacks should not be uploaded as separate modpack projects.
+				{{ formatMessage(messages.customModpackNotice) }}
 			</div>
 		</div>
 	</div>
@@ -30,6 +30,7 @@
 
 <script setup lang="ts">
 import { BoxIcon, PackageIcon, PackagePlusIcon } from '@modrinth/assets'
+import { useVIntl } from '@modrinth/ui'
 
 import {
 	type CompatibilityType,
@@ -37,26 +38,29 @@ import {
 } from '~/providers/manage-server-compatibility-modal'
 
 import DataLossWarningBanner from '../DataLossWarningBanner.vue'
+import { compatibilityMessages as messages } from '../messages'
+
+const { formatMessage } = useVIntl()
 
 const ctx = injectServerCompatibilityContext()
 
 const options = [
 	{
 		value: 'vanilla' as CompatibilityType,
-		label: 'Vanilla server',
-		description: 'A vanilla server with no mods.',
+		label: messages.vanillaServer,
+		description: messages.vanillaDescription,
 		icon: BoxIcon,
 	},
 	{
 		value: 'published-modpack' as CompatibilityType,
-		label: 'Published modpack',
-		description: 'A modded server using a published modpack.',
+		label: messages.publishedModpack,
+		description: messages.publishedModpackDescription,
 		icon: PackageIcon,
 	},
 	{
 		value: 'custom-modpack' as CompatibilityType,
-		label: 'Custom modpack',
-		description: 'A modded server using a custom modpack.',
+		label: messages.customModpack,
+		description: messages.customModpackDescription,
 		icon: PackagePlusIcon,
 	},
 ]

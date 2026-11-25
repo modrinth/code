@@ -51,6 +51,7 @@ import { injectProjectPublishing, isProjectChecklistVisible } from '~/providers/
 
 import ChecklistAccordion from './checklist-accordion.vue'
 import { moderationDrawerWidth } from './layout'
+import { publishingActionMessages } from './messages'
 import OpenDrawerButton from './open-drawer-button.vue'
 import ProjectModerationContent from './project-moderation-content.vue'
 import ProjectPublishingBanner from './project-publishing-banner.vue'
@@ -82,6 +83,66 @@ const showChecklist = computed(
 )
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
+	drawerLabel: {
+		id: 'project.settings.review.drawer-label',
+		defaultMessage: 'Review and publishing',
+	},
+	viewsLabel: {
+		id: 'project.settings.review.views-label',
+		defaultMessage: 'Review views',
+	},
+	closePanel: {
+		id: 'project.settings.review.close-panel',
+		defaultMessage: 'Close moderation panel',
+	},
+	unpinPanel: {
+		id: 'project.settings.review.unpin-panel',
+		defaultMessage: 'Unpin panel',
+	},
+	pinPanel: {
+		id: 'project.settings.review.pin-panel',
+		defaultMessage: 'Pin panel open',
+	},
+	markAddressed: {
+		id: 'project.settings.review.mark-addressed',
+		defaultMessage: 'Mark addressed',
+	},
+	markAddressedFailed: {
+		id: 'project.settings.review.mark-addressed-failed',
+		defaultMessage: 'Could not mark issue addressed',
+	},
+	moderatorIssue: {
+		id: 'project.settings.review.moderator-issue',
+		defaultMessage: 'Moderator issue',
+	},
+	viewIssue: {
+		id: 'project.settings.review.view-issue',
+		defaultMessage: 'View issue: {title}',
+	},
+	checklist: {
+		id: 'project.settings.review.checklist',
+		defaultMessage: 'Checklist',
+	},
+	thread: {
+		id: 'project.settings.review.thread',
+		defaultMessage: 'Thread',
+	},
+	todo: {
+		id: 'project.settings.review.todo',
+		defaultMessage: 'TODO',
+	},
+	warnings: {
+		id: 'project.settings.review.warnings',
+		defaultMessage: 'Warnings',
+	},
+	suggestions: {
+		id: 'project.settings.review.suggestions',
+		defaultMessage: 'Suggestions',
+	},
+	completeRequired: {
+		id: 'project.settings.review.complete-required',
+		defaultMessage: 'Complete the required items to continue.',
+	},
 	requestedByModerator: {
 		id: 'project.settings.review.requested-by-moderator',
 		defaultMessage: 'Requested by moderator',
@@ -147,7 +208,7 @@ async function markIssueAddressed(issue: Labrinth.Threads.v3.ThreadIssue) {
 		if (failure?.status === 'rejected') throw failure.reason
 	} catch (error) {
 		addNotification({
-			title: 'Could not mark issue addressed',
+			title: formatMessage(messages.markAddressedFailed),
 			text: error instanceof Error ? error.message : String(error),
 			type: 'error',
 		})
@@ -200,7 +261,7 @@ const issues = computed(() =>
 			verdict,
 			to: field ? settingsDestination(projectIssueSettingsPath(field), field) : undefined,
 			highlightField: field,
-			title: heading?.[1]?.trim() || source.why?.title || 'Moderator issue',
+			title: heading?.[1]?.trim() || source.why?.title || formatMessage(messages.moderatorIssue),
 			description: (heading ? message.slice(heading[0].length) : message).trim(),
 		}
 	}),
@@ -268,13 +329,14 @@ const completedItems = computed(() => {
 })
 const views = computed(() =>
 	[
-		{ value: 'moderation', label: 'Checklist', icon: ListTodoIcon },
-		{ value: 'thread', label: 'Thread', icon: MessagesSquareIcon },
+		{ value: 'moderation', label: formatMessage(messages.checklist), icon: ListTodoIcon },
+		{ value: 'thread', label: formatMessage(messages.thread), icon: MessagesSquareIcon },
 	].filter((tab) => showChecklist.value || tab.value === 'thread'),
 )
 const groups = computed(() => [
 	{
-		title: 'TODO',
+		id: 'todo',
+		title: formatMessage(messages.todo),
 		color: 'text-secondary',
 		icon: CircleIcon,
 		items: [
@@ -283,13 +345,15 @@ const groups = computed(() => [
 		],
 	},
 	{
-		title: 'Warnings',
+		id: 'warnings',
+		title: formatMessage(messages.warnings),
 		color: 'text-orange',
 		icon: CircleAlertIcon,
 		items: nags.value.filter((nag) => nag.severity === 'warning'),
 	},
 	{
-		title: 'Suggestions',
+		id: 'suggestions',
+		title: formatMessage(messages.suggestions),
 		color: 'text-purple',
 		icon: CircleIcon,
 		items: nags.value.filter((nag) => nag.severity === 'suggestion'),
@@ -442,7 +506,7 @@ useEventListener('keydown', (event) => {
 					:id="settingsNavigation.moderationDrawerId"
 					ref="panel"
 					tabindex="-1"
-					aria-label="Review and publishing"
+					:aria-label="formatMessage(messages.drawerLabel)"
 					class="absolute inset-0 flex flex-col overflow-hidden overscroll-y-contain border-0 border-l border-solid border-divider bg-surface-3 shadow-xl focus:outline-none"
 				>
 					<header
@@ -451,20 +515,20 @@ useEventListener('keydown', (event) => {
 						<Tabs
 							:value="view"
 							:tabs="views"
-							aria-label="Review views"
+							:aria-label="formatMessage(messages.viewsLabel)"
 							@update:value="selectedView = $event === 'thread' ? 'thread' : 'moderation'"
 						/>
 						<div class="ml-auto flex shrink-0 items-center gap-2">
 							<IconButton
 								type="quiet"
-								:label="pinned ? 'Unpin panel' : 'Pin panel open'"
+								:label="formatMessage(pinned ? messages.unpinPanel : messages.pinPanel)"
 								:aria-pressed="pinned"
 								:class="{ '!bg-bg-green !text-green': pinned }"
 								@click="pinned = !pinned"
 							>
 								<PinIcon />
 							</IconButton>
-							<IconButton type="quiet" label="Close moderation panel" @click="close">
+							<IconButton type="quiet" :label="formatMessage(messages.closePanel)" @click="close">
 								<XIcon />
 							</IconButton>
 						</div>
@@ -485,9 +549,9 @@ useEventListener('keydown', (event) => {
 						<div class="min-w-0 p-3 px-2.5 [overflow-wrap:anywhere]">
 							<ChecklistAccordion
 								v-for="group in groups.filter(
-									(group) => group.items.length || (group.title === 'TODO' && issueItems.length),
+									(group) => group.items.length || (group.id === 'todo' && issueItems.length),
 								)"
-								:key="group.title"
+								:key="group.id"
 								open-by-default
 								class="mb-4 last:mb-0"
 								button-class="group/checklist-heading m-0 flex w-full cursor-pointer items-center gap-1.5 border-0 bg-transparent px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-primary"
@@ -501,14 +565,14 @@ useEventListener('keydown', (event) => {
 										as="span"
 										class="relative bottom-px !bg-surface-4 !px-1.5 !py-px !text-xs"
 									>
-										{{ group.items.length + (group.title === 'TODO' ? issueItems.length : 0) }}
+										{{ group.items.length + (group.id === 'todo' ? issueItems.length : 0) }}
 									</TagItem>
 									<DropdownIcon
 										class="ml-auto size-5 transition-[transform,filter] duration-300 group-hover/checklist-heading:brightness-125 motion-reduce:transition-none"
 										:class="{ 'rotate-180': expanded }"
 									/>
 								</template>
-								<template v-if="group.title === 'TODO'">
+								<template v-if="group.id === 'todo'">
 									<div
 										v-for="issue in issueItems"
 										:key="issue.id"
@@ -537,7 +601,7 @@ useEventListener('keydown', (event) => {
 													:disabled="!!addressingIssueId || !addressableFacets(issue.source).length"
 													:loading="addressingIssueId === issue.id"
 													@click="markIssueAddressed(issue.source)"
-													>Mark addressed</Button
+													>{{ formatMessage(messages.markAddressed) }}</Button
 												>
 											</div>
 										</div>
@@ -554,7 +618,7 @@ useEventListener('keydown', (event) => {
 											<a
 												:href="href"
 												class="absolute inset-0 rounded-lg focus-visible:outline focus-visible:outline-brand"
-												:aria-label="`View issue: ${issue.title}`"
+												:aria-label="formatMessage(messages.viewIssue, { title: issue.title })"
 												@click="onItemClick($event, destination?.fullPath, issue.highlightField)"
 											/>
 										</NuxtLink>
@@ -687,7 +751,7 @@ useEventListener('keydown', (event) => {
 					>
 						<div
 							v-tooltip="
-								!canSubmit && remaining ? 'Complete the required items to continue.' : undefined
+								!canSubmit && remaining ? formatMessage(messages.completeRequired) : undefined
 							"
 						>
 							<Button
@@ -695,7 +759,11 @@ useEventListener('keydown', (event) => {
 								class="w-full"
 								:disabled="!canSubmit"
 								@click="setProcessing"
-								><SendIcon />{{ rejected ? 'Resubmit for review' : 'Submit for review' }}</Button
+								><SendIcon />{{
+									formatMessage(
+										rejected ? publishingActionMessages.resubmit : publishingActionMessages.submit,
+									)
+								}}</Button
 							>
 						</div>
 					</div>

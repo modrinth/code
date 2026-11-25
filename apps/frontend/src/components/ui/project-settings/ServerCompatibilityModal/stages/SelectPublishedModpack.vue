@@ -2,39 +2,45 @@
 	<div class="flex flex-col gap-6">
 		<DataLossWarningBanner />
 		<div class="flex flex-col gap-2">
-			<div class="font-semibold text-contrast">Select modpack</div>
+			<div class="font-semibold text-contrast">{{ formatMessage(messages.selectModpack) }}</div>
 
 			<div class="flex flex-col gap-6 rounded-2xl border border-solid border-surface-5 p-4">
-				<Field label="Project" :input-id="projectInputId">
+				<Field :label="formatMessage(messages.project)" :input-id="projectInputId">
 					<ProjectCombobox
 						v-model="selectedProjectId"
 						:project-types="['modpack']"
 						:exclude-project-ids="[currentProjectId]"
-						placeholder="Select modpack"
-						search-placeholder="Search by name or paste ID..."
+						:placeholder="formatMessage(messages.selectModpack)"
+						:search-placeholder="formatMessage(messages.searchModpacks)"
 						:search-input-attrs="{ id: projectInputId }"
-						loading-message="Loading..."
-						no-results-message="No results found"
+						:loading-message="formatMessage(commonMessages.loadingLabel)"
+						:no-results-message="formatMessage(messages.noResults)"
 						include-user-unlisted-projects
 						:user-id="auth?.user?.id"
 					/>
 				</Field>
 
-				<Field v-if="selectedProjectId" label="Version" :input-id="versionInputId">
+				<Field
+					v-if="selectedProjectId"
+					:label="formatMessage(messages.version)"
+					:input-id="versionInputId"
+				>
 					<Combobox
 						v-model="selectedVersionId"
-						placeholder="Select version"
+						:placeholder="formatMessage(messages.selectVersion)"
 						:options="versionOptions"
 						:searchable="true"
 						:search-input-attrs="{ id: versionInputId }"
-						search-placeholder="Search versions..."
-						:no-options-message="versionsLoading ? 'Loading...' : 'No results found'"
+						:search-placeholder="formatMessage(messages.searchVersions)"
+						:no-options-message="
+							formatMessage(versionsLoading ? commonMessages.loadingLabel : messages.noResults)
+						"
 					/>
 				</Field>
 			</div>
 			<div v-if="selectedVersion" class="flex flex-col gap-4 rounded-2xl bg-surface-2 p-4">
 				<div class="flex items-center justify-between">
-					<div class="text-secondary">Game version</div>
+					<div class="text-secondary">{{ formatMessage(messages.gameVersion) }}</div>
 					<div class="flex flex-wrap gap-1">
 						<TagItem v-for="gv in selectedVersion.game_versions" :key="gv">
 							{{ gv }}
@@ -46,7 +52,13 @@
 					v-if="selectedVersion.mrpack_loaders?.length"
 					class="flex items-center justify-between"
 				>
-					<div class="text-secondary">Platform</div>
+					<div class="text-secondary">
+						{{
+							formatMessage(projectCompatibilityMessages.platformsPlural, {
+								count: selectedVersion.mrpack_loaders.length,
+							})
+						}}
+					</div>
 					<div class="flex flex-wrap gap-1">
 						<TagItem
 							v-for="loader in selectedVersion.mrpack_loaders"
@@ -67,12 +79,15 @@
 import { getLoaderIcon } from '@modrinth/assets'
 import {
 	Combobox,
+	commonMessages,
 	Field,
 	FormattedTag,
 	injectModrinthClient,
 	injectNotificationManager,
 	ProjectCombobox,
+	projectCompatibilityMessages,
 	TagItem,
+	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, useId, watch } from 'vue'
@@ -80,6 +95,9 @@ import { computed, ref, useId, watch } from 'vue'
 import { injectServerCompatibilityContext } from '~/providers/manage-server-compatibility-modal'
 
 import DataLossWarningBanner from '../DataLossWarningBanner.vue'
+import { compatibilityMessages as messages } from '../messages'
+
+const { formatMessage } = useVIntl()
 
 const { project, selectedProjectId, selectedVersionId } = injectServerCompatibilityContext()
 const currentProjectId = computed(() => project.value?.id)
@@ -130,7 +148,7 @@ watch(
 		} catch (error: unknown) {
 			const err = error as { data?: { description?: string } }
 			addNotification({
-				title: 'Failed to load versions',
+				title: formatMessage(messages.failedToLoadVersions),
 				text: err.data?.description || String(error),
 				type: 'error',
 			})

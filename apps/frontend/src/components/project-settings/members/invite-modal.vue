@@ -224,9 +224,10 @@ const exactMatch = computed(() =>
 const selectableResults = computed(() =>
 	usernameResults.value.filter((user) => !props.teamMembersByUserId?.has(user.id)),
 )
-const highlightedUser = computed(() =>
-	selectableResults.value.find((user) => user.id === highlightedUserId.value) ??
-	selectableResults.value[0],
+const highlightedUser = computed(
+	() =>
+		selectableResults.value.find((user) => user.id === highlightedUserId.value) ??
+		selectableResults.value[0],
 )
 const resultsExpanded = computed(
 	() => props.canInvite && usernameFocused.value && usernameResults.value.length > 0,
@@ -391,7 +392,9 @@ async function show() {
 		selectedUser.value = undefined
 		role.value = defaultRole.value
 		permissions.value =
-			props.accessOptions && hasPermission(props.grantable, viewerPermissions) ? viewerPermissions : 0
+			props.accessOptions && hasPermission(props.grantable, viewerPermissions)
+				? viewerPermissions
+				: 0
 		modal.value.setStage('username')
 		isOpen.value = true
 		modal.value.show()
@@ -415,7 +418,7 @@ defineExpose({ show, isOpening })
 			:class="[
 				optionId
 					? 'gap-2.5 rounded-none px-4 py-2'
-					: 'gap-3 rounded-xl py-2 pl-3 pr-2 enabled:hover:bg-surface-3 focus-visible:bg-surface-3',
+					: 'gap-3 rounded-xl py-2 pl-3 pr-2 focus-visible:bg-surface-3 enabled:hover:bg-surface-3',
 				highlighted ? 'bg-surface-4 brightness-[115%]' : 'bg-transparent',
 			]"
 			:disabled="!canInvite || teamMembersByUserId?.has(user.id)"
@@ -476,7 +479,9 @@ defineExpose({ show, isOpening })
 					:aria-expanded="resultsExpanded"
 					:aria-controls="usernameResults.length ? usernameResultsId : undefined"
 					:aria-activedescendant="
-						resultsExpanded && highlightedUser ? `${usernameResultsId}-${highlightedUser.id}` : undefined
+						resultsExpanded && highlightedUser
+							? `${usernameResultsId}-${highlightedUser.id}`
+							: undefined
 					"
 					:disabled="!canInvite"
 					size="medium"
