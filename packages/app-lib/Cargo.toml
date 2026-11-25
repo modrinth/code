@@ -134,7 +134,7 @@ dunce = { workspace = true }
 cidre = { workspace = true, features = ["blocks", "nw"] }
 
 [target."cfg(unix)".dependencies]
-libc = { workspace = true }
+rustix = { workspace = true, features = ["fs"] }
 
 [target."cfg(windows)".dependencies]
 windows = { workspace = true, features = ["Networking_Connectivity", "Win32_Storage_FileSystem"] }

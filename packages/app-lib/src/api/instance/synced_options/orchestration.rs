@@ -1374,6 +1374,7 @@ async fn detach_option(
             detach_link(
                 &command_history_path(state),
                 &instance_dir.join(COMMAND_HISTORY_FILE),
+                state,
             )
             .await
         }
@@ -1385,7 +1386,7 @@ async fn detach_option(
                     generated_hotbar_path(state, family, &metadata.instance.id)
                 })
                 .unwrap_or_else(|| target.clone());
-            detach_link(&source, &target).await
+            detach_link(&source, &target, state).await
         }
         SyncedOption::MultiplayerServers => {
             synced_servers::detach_servers(metadata, state).await

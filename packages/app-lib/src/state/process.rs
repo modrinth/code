@@ -4,7 +4,7 @@ use crate::event::emit::{emit_instance, emit_process};
 use crate::event::{InstancePayloadType, ProcessPayloadType};
 #[cfg(feature = "tauri")]
 use crate::event::{LogEvent, LogPayload};
-use crate::util::io::IOError;
+use crate::util::io::{IOError, OpenMode, open_no_follow};
 use crate::util::rpc::RpcServer;
 use anyhow::Context;
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
@@ -19,9 +19,9 @@ use serde::Serialize;
 use sqlx::SqlitePool;
 use std::collections::VecDeque;
 use std::fmt::Debug;
-use std::fs::OpenOptions;
+use std::fs::File;
 use std::io::Write;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::{Arc, LazyLock};
 use std::time::{Duration, Instant};
 use tempfile::TempDir;
@@ -30,7 +30,8 @@ use tokio::process::Command;
 use tracing::info;
 use uuid::Uuid;
 
-const LAUNCHER_LOG_PATH: &str = "launcher_log.txt";
+/// Relative to the instance directory.
+const LAUNCHER_LOG_PATH: [&str; 2] = ["logs", "launcher_log.txt"];
 const LOG_BUFFER_CAPACITY: usize = 50_000;
 
 struct LogRingBuffer {
@@ -213,7 +214,6 @@ impl ProcessManager {
         wrapper: Option<Vec<String>>,
         post_exit_command: Option<String>,
         post_exit_env_vars: Vec<(String, String)>,
-        logs_folder: PathBuf,
         xml_logging: bool,
         main_class_keep_alive: TempDir,
         rpc_server: RpcServer,
@@ -229,35 +229,33 @@ impl ProcessManager {
             .to_string_lossy()
             .into_owned();
 
-        if !logs_folder.exists() {
-            tokio::fs::create_dir_all(&logs_folder)
-                .await
-                .map_err(|e| IOError::with_path(e, &logs_folder))?;
-        }
-
-        let log_path = logs_folder.join(LAUNCHER_LOG_PATH);
+        let instance_dir =
+            state.directories.instances_dir().join(instance_path);
+        let relative_log_path = PathBuf::from_iter(LAUNCHER_LOG_PATH);
+        let log_path = instance_dir.join(&relative_log_path);
 
         clear_log_buffer(instance_id);
 
-        {
-            let mut log_file = OpenOptions::new()
-                .write(true)
-                .create(true)
-                .truncate(true)
-                .open(&log_path)
-                .map_err(|e| IOError::with_path(e, &log_path))?;
-
-            let now = chrono::Local::now();
-            writeln!(
-                log_file,
-                "# Minecraft launcher log started at {}",
-                now.format("%Y-%m-%d %H:%M:%S")
-            )
-            .map_err(|e| IOError::with_path(e, &log_path))?;
-            writeln!(log_file, "# Instance: {instance_path} \n")
-                .map_err(|e| IOError::with_path(e, &log_path))?;
-            writeln!(log_file).map_err(|e| IOError::with_path(e, &log_path))?;
-        }
+        let log_header = format!(
+            "# Minecraft launcher log started at {}\n# Instance: {instance_path} \n\n\n",
+            chrono::Local::now().format("%Y-%m-%d %H:%M:%S")
+        );
+        let log_file = open_no_follow(
+            &instance_dir,
+            &relative_log_path,
+            OpenMode::Truncate,
+        )
+        .and_then(|mut file| {
+            file.write_all(log_header.as_bytes())?;
+            Ok(Arc::new(file))
+        })
+        .inspect_err(|error| {
+            tracing::warn!(
+                "Unable to write launcher log {}: {error}",
+                log_path.display()
+            );
+        })
+        .ok();
 
         let mut command =
             modrinth_sandbox::minecraft::setup_minecraft_command(mc_command)
@@ -338,7 +336,7 @@ impl ProcessManager {
         let metadata = process.metadata.clone();
 
         {
-            let log_path = log_path.clone();
+            let log_file = log_file.clone();
             let instance_id = metadata.instance_id.clone();
             let instance_path = metadata.instance_path.clone();
             let pool = state.pool.clone();
@@ -347,7 +345,7 @@ impl ProcessManager {
                     &instance_id,
                     &instance_path,
                     stdout,
-                    log_path,
+                    log_file,
                     xml_logging,
                     &pool,
                 )
@@ -356,7 +354,7 @@ impl ProcessManager {
         }
 
         {
-            let log_path = log_path.clone();
+            let log_file = log_file.clone();
             let instance_id = metadata.instance_id.clone();
             let instance_path = metadata.instance_path.clone();
             let pool = state.pool.clone();
@@ -365,7 +363,7 @@ impl ProcessManager {
                     &instance_id,
                     &instance_path,
                     stderr,
-                    log_path,
+                    log_file,
                     xml_logging,
                     &pool,
                 )
@@ -468,6 +466,7 @@ impl ProcessManager {
             post_exit_env_vars,
             metadata.uuid,
             persisted_process,
+            log_file,
             Arc::clone(state),
         ));
 
@@ -574,7 +573,7 @@ impl Process {
         instance_id: &str,
         _instance_path: &str,
         reader: R,
-        log_path: impl AsRef<Path>,
+        log_file: Option<Arc<File>>,
         xml_logging: bool,
         pool: &SqlitePool,
     ) where
@@ -670,7 +669,7 @@ impl Process {
                                     Self::format_log4j_entry(&current_event)
                                 {
                                     if let Err(e) = Process::append_to_log_file(
-                                        &log_path,
+                                        log_file.as_deref(),
                                         &formatted_log,
                                     ) {
                                         tracing::error!(
@@ -683,7 +682,8 @@ impl Process {
                                         current_event.throwable
                                         && let Err(e) =
                                             Process::append_to_log_file(
-                                                &log_path, throwable,
+                                                log_file.as_deref(),
+                                                throwable,
                                             )
                                     {
                                         tracing::error!(
@@ -708,7 +708,7 @@ impl Process {
                                         Self::format_log4j_entry(&current_event)
                                         && let Err(e) =
                                             Process::append_to_log_file(
-                                                &log_path,
+                                                log_file.as_deref(),
                                                 &formatted_log,
                                             )
                                     {
@@ -757,7 +757,7 @@ impl Process {
                         {
                             let text = e.xml11_content();
                             if let Err(e) = Process::append_to_log_file(
-                                &log_path,
+                                log_file.as_deref(),
                                 &format!("{text}\n"),
                             ) {
                                 tracing::error!(
@@ -786,7 +786,9 @@ impl Process {
                 }
 
                 if !line.is_empty() {
-                    if let Err(e) = Self::append_to_log_file(&log_path, &line) {
+                    if let Err(e) =
+                        Self::append_to_log_file(log_file.as_deref(), &line)
+                    {
                         tracing::warn!("Failed to write to log file: {}", e);
                     }
                     Self::emit_legacy_log(instance_id, line.trim_ascii_end());
@@ -893,14 +895,13 @@ impl Process {
     }
 
     fn append_to_log_file(
-        path: impl AsRef<Path>,
+        log_file: Option<&File>,
         line: &str,
     ) -> std::io::Result<()> {
-        let mut file =
-            OpenOptions::new().append(true).create(true).open(path)?;
-
-        file.write_all(line.as_bytes())?;
-        Ok(())
+        let Some(mut log_file) = log_file else {
+            return Ok(());
+        };
+        log_file.write_all(line.as_bytes())
     }
 
     async fn maybe_handle_server_join_logging(
@@ -1013,6 +1014,7 @@ impl Process {
         post_exit_env_vars: Vec<(String, String)>,
         uuid: Uuid,
         persisted_process: Option<(i64, i64)>,
+        log_file: Option<Arc<File>>,
         state: Arc<State>,
     ) -> crate::Result<()> {
         async fn update_playtime(
@@ -1122,17 +1124,13 @@ impl Process {
             }
         });
 
-        let logs_folder = state.directories.instance_logs_dir(&instance_path);
-        let log_path = logs_folder.join(LAUNCHER_LOG_PATH);
-
-        if log_path.exists()
-            && let Err(e) = Process::append_to_log_file(
-                &log_path,
-                &format!("\n# Process exited with status: {mc_exit_status}\n"),
-            )
-        {
+        if let Err(e) = Process::append_to_log_file(
+            log_file.as_deref(),
+            &format!("\n# Process exited with status: {mc_exit_status}\n"),
+        ) {
             tracing::warn!("Failed to write exit status to log file: {}", e);
         }
+        drop(log_file);
 
         let _ = state
             .presence

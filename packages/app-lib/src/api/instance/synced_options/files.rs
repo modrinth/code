@@ -150,19 +150,49 @@ pub(in crate::api::instance) async fn ensure_link(
     }
 }
 
+/// Replaces a link to `source` with a copy of it.
+///
+/// The game can modify both of these, so `target` could be a link to something else,
+/// and `source` could also be a link.
 pub(in crate::api::instance) async fn detach_link(
     source: &Path,
     target: &Path,
+    state: &State,
 ) -> crate::Result<()> {
-    if tokio::fs::symlink_metadata(target).await.is_err() {
+    let Ok(metadata) = tokio::fs::symlink_metadata(target).await else {
         return Ok(());
-    }
-    let contents = if target.exists() {
-        Some(io::read(target).await?)
-    } else if source.exists() {
-        Some(io::read(source).await?)
+    };
+    let contents = if !metadata.is_symlink() {
+        let (Some(instance_dir), Some(file_name)) =
+            (target.parent(), target.file_name())
+        else {
+            return Err(ErrorKind::InputError(format!(
+                "invalid link path {}",
+                target.display()
+            ))
+            .into());
+        };
+        Some(io::read_no_follow(instance_dir, Path::new(file_name)).await?)
     } else {
-        None
+        let synced_options_dir = state.directories.synced_options_dir();
+        let linked = tokio::fs::read_link(target).await.unwrap_or_default();
+        let synced_path = [linked.as_path(), source]
+            .into_iter()
+            .find_map(|path| path.strip_prefix(&synced_options_dir).ok());
+        match synced_path {
+            Some(path) => {
+                match io::read_no_follow(&synced_options_dir, path).await {
+                    Ok(contents) => Some(contents),
+                    Err(error)
+                        if error.kind() == std::io::ErrorKind::NotFound =>
+                    {
+                        None
+                    }
+                    Err(error) => return Err(error.into()),
+                }
+            }
+            None => None,
+        }
     };
     io::remove_file(target).await?;
     if let Some(contents) = contents {

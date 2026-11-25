@@ -177,7 +177,7 @@ pub(in crate::api::instance) async fn detach_servers(
 ) -> crate::Result<()> {
     let generated = generated_path(state, &metadata.instance.id);
     let local = instance_dir(metadata, state).join(SERVERS_FILE);
-    detach_link(&generated, &local).await
+    detach_link(&generated, &local, state).await
 }
 
 pub(in crate::api::instance) async fn reconcile_servers(

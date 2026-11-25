@@ -1346,7 +1346,6 @@ pub async fn launch_minecraft(
             wrapper,
             post_exit_hook,
             env_args,
-            state.directories.instance_logs_dir(&instance.path),
             version_info.logging.is_some(),
             main_class_keep_alive,
             rpc_server,
