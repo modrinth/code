@@ -412,7 +412,7 @@ export function createReviewSubmission(
 							threadId: current.thread_id,
 							body: draft.value,
 							images: [...uploadedImages.value],
-							privateMessage: false,
+							privateMessage: true,
 						}
 					: undefined,
 			})
