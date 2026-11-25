@@ -88,8 +88,24 @@ fn reveal_in_finder(directory: &std::path::Path) {
     let Some(url) = objc2_foundation::NSURL::from_file_path(path) else {
         return;
     };
-    objc2_app_kit::NSWorkspace::sharedWorkspace()
-        .activateFileViewerSelectingURLs(
-            &objc2_foundation::NSArray::from_slice(&[&*url]),
+    let workspace = objc2_app_kit::NSWorkspace::sharedWorkspace();
+    workspace.activateFileViewerSelectingURLs(
+        &objc2_foundation::NSArray::from_slice(&[&*url]),
+    );
+
+    // Revealing leaves the window behind the game, so we also need to bring
+    // Finder to the front. The directory must not be passed here, otherwise
+    // Finder would execute it if it's a .app
+    if let Some(finder) = workspace.URLForApplicationWithBundleIdentifier(
+        objc2_foundation::ns_string!("com.apple.finder"),
+    ) {
+        let configuration =
+            objc2_app_kit::NSWorkspaceOpenConfiguration::configuration();
+        configuration.setPromptsUserIfNeeded(false);
+        workspace.openApplicationAtURL_configuration_completionHandler(
+            &finder,
+            &configuration,
+            None,
         );
+    }
 }
