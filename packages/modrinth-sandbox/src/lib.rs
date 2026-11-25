@@ -2,6 +2,7 @@
 
 pub mod api;
 mod backend;
+mod default_path_rules;
 pub mod ffi;
 pub mod helper;
 pub mod minecraft;
