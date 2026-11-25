@@ -1140,7 +1140,7 @@ pub async fn launch_minecraft(
 
     let main_class_keep_alive =
         modrinth_sandbox::minecraft::create_launcher_temp_dir(
-            &state.directories.instance_data_dir().join("tmp"),
+            &state.directories.launcher_temp_dir(),
         )
         .map_err(|error| {
             crate::ErrorKind::LauncherError(format!(

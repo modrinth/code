@@ -246,7 +246,8 @@ pub(super) fn prepare_command(
     command.assets_path = input.directories.assets_dir();
     command.logging_config = logging_config;
     command.instance_path = input.instance_path;
-    command.persistent_dir = input.directories.instance_data_dir();
+    command.persistent_dir = Some(input.directories.instance_data_dir());
+    command.launcher_temp_dir = Some(input.directories.launcher_temp_dir());
     command.read_only_paths = input.granted_paths.read_only;
     command
         .read_only_paths

@@ -6,7 +6,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use eyre::{Context, Result, ensure};
+use eyre::{Context, OptionExt, Result, ensure};
 use rand::Rng;
 use sha1::{Digest, Sha1};
 
@@ -40,9 +40,19 @@ pub struct MinecraftCommand {
     /// Path to the Minecraft instance directory on the host.
     pub instance_path: PathBuf,
     /// Directory for persistent home, data, configuration, cache, and state,
-    /// shared across all game instances. Temporary launcher JARs are staged in
-    /// its `tmp` subdirectory and removed when the launched process exits.
-    pub persistent_dir: PathBuf,
+    /// shared across all game instances. If this isn't set, the game doesn't have a
+    /// home directory.
+    pub persistent_dir: Option<PathBuf>,
+    /// Directory that temporary JARs are staged in, they are removed when the launched
+    /// process exits. Required if [`MinecraftCommand::sandbox_api_child`] is set.
+    ///
+    /// The game can't be given write access to this directory, so it must not overlap
+    /// with [`instance_path`], [`persistent_dir`], or the skins in [`assets_path`].
+    ///
+    /// [`instance_path`]: Self::instance_path
+    /// [`persistent_dir`]: Self::persistent_dir
+    /// [`assets_path`]: Self::assets_path
+    pub launcher_temp_dir: Option<PathBuf>,
     /// Extra host paths that can be read by the sandboxed application.
     /// Ignored if blocked by [`MinecraftCommand::path_rules`]
     pub read_only_paths: Vec<PathBuf>,
@@ -89,7 +99,8 @@ impl Default for MinecraftCommand {
             assets_path: PathBuf::new(),
             logging_config: None,
             instance_path: PathBuf::new(),
-            persistent_dir: PathBuf::new(),
+            persistent_dir: None,
+            launcher_temp_dir: None,
             read_only_paths: Vec::new(),
             read_write_paths: Vec::new(),
             path_rules: Vec::new(),
@@ -251,6 +262,21 @@ const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
     "SDL_IM_MODULE",
 ];
 
+/// Environment variables which are set to a folder in
+/// [`MinecraftCommand::persistent_dir`].
+const PERSISTENT_ENVIRONMENT: &[(&str, &str)] = &[
+    #[cfg(unix)]
+    ("HOME", "home"),
+    #[cfg(target_os = "linux")]
+    ("XDG_DATA_HOME", "data"),
+    #[cfg(target_os = "linux")]
+    ("XDG_CONFIG_HOME", "config"),
+    #[cfg(target_os = "linux")]
+    ("XDG_CACHE_HOME", "cache"),
+    #[cfg(target_os = "linux")]
+    ("XDG_STATE_HOME", "state"),
+];
+
 /// Creates unique launch staging storage under the configured root.
 /// Keep the returned directory alive until the launched process exits.
 pub fn create_launcher_temp_dir(root: &Path) -> Result<tempfile::TempDir> {
@@ -286,16 +312,14 @@ pub async fn setup_minecraft_command(
         }
     };
 
-    #[cfg(unix)]
-    let persistent_home = minecraft.persistent_dir.join("home");
-    #[cfg(target_os = "linux")]
-    let persistent_data = minecraft.persistent_dir.join("data");
-    #[cfg(target_os = "linux")]
-    let persistent_config = minecraft.persistent_dir.join("config");
-    #[cfg(target_os = "linux")]
-    let persistent_cache = minecraft.persistent_dir.join("cache");
-    #[cfg(target_os = "linux")]
-    let persistent_state = minecraft.persistent_dir.join("state");
+    let mut persistent_environment = Vec::new();
+    if let Some(persistent_dir) = &minecraft.persistent_dir {
+        for (variable, folder) in PERSISTENT_ENVIRONMENT {
+            persistent_environment
+                .push((*variable, persistent_dir.join(folder)));
+        }
+    }
+
     let skins_path = minecraft.assets_path.join("skins");
     let mut classpath = minecraft.classpath;
     let mut read_only_paths = vec![
@@ -336,9 +360,19 @@ pub async fn setup_minecraft_command(
         #[cfg(target_os = "linux")]
         OsString::from(format!("{NETTY_NATIVE_WORKDIR_JVM_ARGUMENT}=/tmp"))
             .into(),
-        #[cfg(unix)]
-        jvm_path_argument(USER_HOME_JVM_ARGUMENT, "=", &persistent_home).into(),
     ]);
+
+    #[cfg(unix)]
+    if let Some(persistent_dir) = &minecraft.persistent_dir {
+        args.push(
+            jvm_path_argument(
+                USER_HOME_JVM_ARGUMENT,
+                "=",
+                &persistent_dir.join("home"),
+            )
+            .into(),
+        );
+    }
 
     if let Some(java_agent) = minecraft.java_agent.clone() {
         args.push(
@@ -365,7 +399,10 @@ pub async fn setup_minecraft_command(
     let mut launcher_temp_keep_alive = None;
     // Setup sandbox java agent
     if let Some(child) = &minecraft.sandbox_api_child {
-        let launcher_temp_dir = minecraft.persistent_dir.join("tmp");
+        let launcher_temp_dir =
+            minecraft.launcher_temp_dir.clone().ok_or_eyre(
+                "launcher_temp_dir must be set to use the sandbox API",
+            )?;
         let (agent_dir, sandbox_agent_path) =
             tokio::task::spawn_blocking(move || {
                 let agent_dir = create_launcher_temp_dir(&launcher_temp_dir)?;
@@ -392,50 +429,52 @@ pub async fn setup_minecraft_command(
     args.push(minecraft.main_class);
     args.extend(minecraft.main_class_args);
 
-    let ensure_dirs_exist = vec![
-        skins_path.clone(),
-        #[cfg(unix)]
-        persistent_home.clone(),
-        #[cfg(target_os = "linux")]
-        persistent_data.clone(),
-        #[cfg(target_os = "linux")]
-        persistent_config.clone(),
-        #[cfg(target_os = "linux")]
-        persistent_cache.clone(),
-        #[cfg(target_os = "linux")]
-        persistent_state.clone(),
-    ];
+    let mut ensure_dirs_exist = vec![skins_path.clone()];
+    ensure_dirs_exist
+        .extend(persistent_environment.iter().map(|(_, dir)| dir.clone()));
 
     let mut extra_environment = minecraft.extra_environment;
     extra_environment.extend([
         ("INSIDE_MODRINTH_SANDBOX".into(), "1".into()),
         ("JAVA_HOME".into(), minecraft.jre_path.into()),
-        #[cfg(unix)]
-        ("HOME".into(), persistent_home.into()),
-        #[cfg(target_os = "linux")]
-        ("XDG_DATA_HOME".into(), persistent_data.into()),
-        #[cfg(target_os = "linux")]
-        ("XDG_CONFIG_HOME".into(), persistent_config.into()),
-        #[cfg(target_os = "linux")]
-        ("XDG_CACHE_HOME".into(), persistent_cache.into()),
-        #[cfg(target_os = "linux")]
-        ("XDG_STATE_HOME".into(), persistent_state.into()),
     ]);
+    extra_environment.extend(
+        persistent_environment
+            .into_iter()
+            .map(|(variable, dir)| (variable.into(), dir.into())),
+    );
 
     let mut read_write_paths = vec![
         // .minecraft dir
         instance_path.clone(),
-        // global persistent dirs for all mods
-        minecraft.persistent_dir,
         // .minecraft assets/skins; assets/ is shared among instances,
         // and so is the skin cache, but the game writes into the skin cache
         skins_path,
     ];
+    // global persistent dirs for all mods
+    read_write_paths.extend(minecraft.persistent_dir);
 
     // Hard blocks have to be last, so that nothing else takes precedence over them
     let mut path_rules = soft_path_rules();
     path_rules.extend(minecraft.path_rules);
     path_rules.extend(hard_path_rules());
+    if let Some(launcher_temp_dir) = minecraft.launcher_temp_dir {
+        let rule = PathRule::HardBlockWrite(launcher_temp_dir);
+        // Check built-in read_write_paths (not minecraft.read_write_paths).
+        // Downgrading these to read-only would break the game, so we
+        // error instead
+        let rules = PathRules::new([rule.clone()]);
+        for path in &read_write_paths {
+            ensure!(
+                !matches!(
+                    rules.calculate_bind_permission(path),
+                    Ok(PathPermission::ReadOnly)
+                ),
+                "launcher_temp_dir must not overlap with {path:?}, since the game can write to it"
+            );
+        }
+        path_rules.push(rule);
+    }
     let resolved_rules = PathRules::new(path_rules.clone());
     for path in minecraft.read_only_paths {
         match resolved_rules.calculate_bind_permission(&path) {

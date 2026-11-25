@@ -19,7 +19,7 @@ async fn main() -> Result<()> {
 	command.jre_path = "/path/to/the/jre".into();
 	command.classpath = vec!["/path/to/minecraft.jar".into()];
 	command.instance_path = "/path/to/instance".into();
-	command.persistent_dir = "/path/to/instance-data".into();
+	command.persistent_dir = Some("/path/to/instance-data".into());
 	// etc.
 
 	// Spawn Minecraft.
