@@ -8435,10 +8435,14 @@ version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ca41ce716dda6a9be188b385aa78ee5260fc25cd3802cb2a8afdc6afbe6b6dbf"
 dependencies = [
- "cfg-if",
- "proc-macro2",
- "quote",
- "syn 2.0.119",
+ "chrono",
+ "serde",
+ "serde_json",
+ "serde_path_to_error",
+ "smol_str",
+ "strum 0.28.0",
+ "thiserror 2.0.21",
+ "uuid 1.28.0",
 ]
 
 [[package]]
