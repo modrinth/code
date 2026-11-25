@@ -12,7 +12,6 @@ use std::{
     time::Duration,
 };
 
-use futures::StreamExt;
 use parking_lot::Mutex;
 use rand::{RngExt, distr::Alphanumeric};
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
@@ -33,6 +32,17 @@ use crate::{
 
 const DEFAULT_SESSION_JOIN: &str =
     "https://sessionserver.mojang.com/session/minecraft/join";
+
+/// macOS's sandbox handles opening links and file dialogs without any intervention.
+const ALLOW_OPEN_URI: bool = cfg!(not(target_os = "macos"));
+const ALLOW_OPEN_FILE_DIALOG: bool = cfg!(not(target_os = "macos"));
+
+/// This is only necessary on Linux X11.
+/// On Windows, the drag_intercept.rs code intercepts the drop, grants access, and forwards it.
+/// On macOS, the OS grants access before sending the drop
+/// On Wayland, the game receives a FD which it can use with the xdg document portal to
+/// receive access to the file through FUSE.
+const ALLOW_REQUEST_ACCESS: bool = cfg!(not(any(windows, target_os = "macos")));
 
 #[derive(Default)]
 pub struct DiscoveredEndpoints {
@@ -79,6 +89,46 @@ impl SandboxApiChild {
 
     pub fn get_port(&self) -> u16 {
         self.0.port
+    }
+
+    /// Arguments which make the game use the sandbox api, when running it with the
+    /// sandbox agent.
+    pub fn get_jvm_arguments(&self) -> Vec<String> {
+        let port = self.0.port;
+        let mut args = vec![
+            format!("-Dmodrinth.sandboxagent.secret={}", self.0.secret),
+            format!("-Dmodrinth.sandboxagent.port={port}"),
+            "-Dmodrinth.sandboxagent.transform.auth=true".to_owned(),
+        ];
+        for (transform, allowed) in [
+            ("openuri", ALLOW_OPEN_URI),
+            ("dragdrop", ALLOW_REQUEST_ACCESS),
+            ("filedialog", ALLOW_OPEN_FILE_DIALOG),
+        ] {
+            if allowed {
+                args.push(format!(
+                    "-Dmodrinth.sandboxagent.transform.{transform}=true"
+                ));
+            }
+        }
+
+        args.extend([
+            "-Drealms.environment=local".to_owned(),
+            "-Dminecraft.api.env=sandboxauth".to_owned(),
+            // used in 26.3 (authlib 10)+
+            format!("-Dminecraft.api.discovery.host=http://127.0.0.1:{port}/sandboxauth/discovery"),
+            // used in 1.16 (authlib 2) - 26.2 (authlib 9)
+            format!("-Dminecraft.api.session.host=http://127.0.0.1:{port}/sandboxauth/session"),
+            // used in 1.16 (authlib 2) - 26.2 (authlib 9)
+            format!("-Dminecraft.api.services.host=http://127.0.0.1:{port}/sandboxauth/services"),
+            // used in 1.21.9 (authlib 7) - 26.2 (authlib 9)
+            "-Dminecraft.api.profiles.host=https://api.mojang.com".to_owned(),
+            // used in 1.16 (authlib 2) - 1.20.3 (authlib 5)
+            "-Dminecraft.api.account.host=https://api.mojang.com".to_owned(),
+            // used in 1.16 (authlib 2) - 1.20.2 (authlib 4)
+            "-Dminecraft.api.auth.host=https://authserver.mojang.com".to_owned(),
+        ]);
+        args
     }
 
     pub fn set_sandbox_handle(&self, sandbox_handle: crate::SandboxHandle) {
@@ -395,6 +445,10 @@ impl SandboxApiService {
 
         match path {
             "/sandboxapi/open-uri" => {
+                if !ALLOW_OPEN_URI {
+                    RequestStatus::Forbidden.write(stream).await;
+                    return;
+                }
                 if request.method != Some("POST") {
                     RequestStatus::MethodNotAllowed.write(stream).await;
                     return;
@@ -404,6 +458,10 @@ impl SandboxApiService {
                 status.write(stream).await;
             }
             "/sandboxapi/request-access" => {
+                if !ALLOW_REQUEST_ACCESS {
+                    RequestStatus::Forbidden.write(stream).await;
+                    return;
+                }
                 if request.method != Some("GET") {
                     RequestStatus::MethodNotAllowed.write(stream).await;
                     return;
@@ -420,6 +478,10 @@ impl SandboxApiService {
                 };
             }
             "/sandboxapi/open-file-dialog" => {
+                if !ALLOW_OPEN_FILE_DIALOG {
+                    RequestStatus::Forbidden.write(stream).await;
+                    return;
+                }
                 if request.method != Some("GET") {
                     RequestStatus::MethodNotAllowed.write(stream).await;
                     return;
@@ -978,23 +1040,11 @@ impl SandboxApiService {
     }
 
     /// Exposes a file which was drag-dropped on the game.
-    ///
-    /// This is only necessary on Linux X11.
-    /// On Windows, the drag_intercept.rs code intercepts the drop, grants access, and forwards it.
-    /// On macOS, the OS grants access before sending the drop
-    /// On Wayland, the game receives a FD which it can use with the xdg document portal to
-    /// receive access to the file through FUSE.
-    ///
-    /// Since this is only necessary on Linux, we return 403 for the other platforms
     async fn handle_request_request_access(
         self,
         params: &str,
         child_state: Option<ServiceChildState>,
     ) -> Result<PathBuf, RequestStatus> {
-        if cfg!(any(windows, target_os = "macos")) {
-            return Err(RequestStatus::Forbidden);
-        }
-
         let Some(child_state) = child_state else {
             return Err(RequestStatus::InternalServerError);
         };

@@ -377,7 +377,6 @@ pub async fn setup_minecraft_command(
 
         classpath.push(sandbox_agent_path.clone());
         read_only_paths.push(sandbox_agent_path.clone());
-        let port = child.get_port();
 
         let mut agent_argument = OsString::new();
         agent_argument.push(JAVA_AGENT_JVM_ARGUMENT);
@@ -385,44 +384,7 @@ pub async fn setup_minecraft_command(
         agent_argument.push(sandbox_agent_path.as_os_str());
         args.push(agent_argument.into());
 
-        args.push(
-            format!("-Dmodrinth.sandboxagent.secret={}", child.get_secret())
-                .into(),
-        );
-        args.push(format!("-Dmodrinth.sandboxagent.port={port}").into());
-        args.push("-Dmodrinth.sandboxagent.transform.auth=true".into());
-
-        // Don't do desktop (openuri, file dialog, etc.) changes on macos
-        // macos's sandbox handles these correctly without any intervention
-        #[cfg(not(target_os = "macos"))]
-        {
-            args.push("-Dmodrinth.sandboxagent.transform.openuri=true".into());
-            #[cfg(not(windows))]
-            args.push("-Dmodrinth.sandboxagent.transform.dragdrop=true".into());
-            args.push(
-                "-Dmodrinth.sandboxagent.transform.filedialog=true".into(),
-            );
-        }
-
-        args.push("-Drealms.environment=local".into());
-        args.push("-Dminecraft.api.env=sandboxauth".into());
-
-        // used in 26.3 (authlib 10)+
-        args.push(format!("-Dminecraft.api.discovery.host=http://127.0.0.1:{port}/sandboxauth/discovery").into());
-        // used in 1.16 (authlib 2) - 26.2 (authlib 9)
-        args.push(format!("-Dminecraft.api.session.host=http://127.0.0.1:{port}/sandboxauth/session").into());
-        // used in 1.16 (authlib 2) - 26.2 (authlib 9)
-        args.push(format!("-Dminecraft.api.services.host=http://127.0.0.1:{port}/sandboxauth/services").into());
-        // used in 1.21.9 (authlib 7) - 26.2 (authlib 9)
-        args.push(
-            "-Dminecraft.api.profiles.host=https://api.mojang.com".into(),
-        );
-        // used in 1.16 (authlib 2) - 1.20.3 (authlib 5)
-        args.push("-Dminecraft.api.account.host=https://api.mojang.com".into());
-        // used in 1.16 (authlib 2) - 1.20.2 (authlib 4)
-        args.push(
-            "-Dminecraft.api.auth.host=https://authserver.mojang.com".into(),
-        );
+        args.extend(child.get_jvm_arguments().into_iter().map(Into::into));
     }
 
     args.push(CLASSPATH_JVM_ARGUMENT.into());
