@@ -14418,7 +14418,6 @@ dependencies = [
  "json5",
  "libc",
  "minecraft-meta-manifest",
- "modrinth-app-analytics-sdk",
  "modrinth-content-management",
  "modrinth-skin-rendering",
  "notify",
