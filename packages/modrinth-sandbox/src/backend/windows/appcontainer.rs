@@ -368,6 +368,7 @@ fn spawn(
     let mut read_paths_to_elevate = Vec::new();
     let mut write_paths_to_elevate = Vec::new();
     let mut remove_paths_to_elevate = Vec::new();
+    let mut not_revoked = Vec::new();
 
     for grant in prepared.old_effective() {
         if !prepared
@@ -376,17 +377,20 @@ fn spawn(
             .any(|desired| paths_equal(&desired.path, &grant.path))
         {
             let path = PathBuf::from(&grant.path);
-            if let Err(err) = revoke_grant(&app_container_sid, grant) {
-                if grant.kind == GrantKind::RegistryKey {
-                    tracing::warn!(
-                        "unable to revoke sandbox access from registry key {path:?}: {err:#}"
-                    );
-                } else if is_access_denied(&err) {
+            // This has to be checked before revoking, since a failure could remove it
+            // from the path but not from everything inside of it
+            let was_listed =
+                is_grant_listed(&app_container_sid, grant).unwrap_or(true);
+            if let Err(err) = revoke_grant(&app_container_sid, grant)
+                && was_listed
+            {
+                if grant.kind == GrantKind::File && is_access_denied(&err) {
                     remove_paths_to_elevate.push(path);
                 } else {
-                    return Err(err).wrap_err_with(|| {
-                        format!("revoking sandbox access from {path:?}")
-                    });
+                    tracing::warn!(
+                        "unable to revoke sandbox access from {path:?}: {err:#}"
+                    );
+                    not_revoked.push(grant.clone());
                 }
             }
         }
@@ -481,7 +485,7 @@ fn spawn(
     }
 
     prepared
-        .finalize_pruning()
+        .finalize_pruning(&not_revoked)
         .wrap_err("finalizing AppContainer ACL pruning")?;
 
     let (pipes, child) = super::spawn(
@@ -1024,12 +1028,18 @@ fn can_access_ourselves(path: &Path, permission: PermissionType) -> bool {
     !result.is_err_and(|err| err.kind() == ErrorKind::PermissionDenied)
 }
 
-/// Checks for an entry that exactly matches what [`set_acl`] would add.
-fn is_already_granted(
+struct ExplicitAce {
+    ace_type: u32,
+    flags: u32,
+    mask: u32,
+}
+
+/// Finds the entries for an AppContainer in an ACL, other than inherited ones.
+fn find_explicit_aces(
     app_container: &PSID,
     path: &Path,
-    permission: PermissionType,
-) -> Result<bool> {
+    object_type: SE_OBJECT_TYPE,
+) -> Result<Vec<ExplicitAce>> {
     let encoded_path = path
         .as_os_str()
         .encode_wide()
@@ -1040,7 +1050,7 @@ fn is_already_granted(
     unsafe {
         GetNamedSecurityInfoW(
             PCWSTR(encoded_path.as_ptr()),
-            SE_FILE_OBJECT,
+            object_type,
             DACL_SECURITY_INFORMATION,
             None,
             None,
@@ -1054,8 +1064,50 @@ fn is_already_granted(
         unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(descriptor.0))) };
     }
     let Some(acl_ref) = (unsafe { acl.as_ref() }) else {
-        return Ok(false);
+        return Ok(Vec::new());
     };
+
+    let mut aces = Vec::new();
+    for index in 0..acl_ref.AceCount {
+        let mut ace = std::ptr::null_mut();
+        unsafe { GetAce(acl, u32::from(index), &raw mut ace)? };
+        let header = unsafe { ace.cast::<ACE_HEADER>().read() };
+        let ace_type = u32::from(header.AceType);
+        let flags = u32::from(header.AceFlags);
+
+        if flags & INHERITED_ACE.0 != 0 {
+            continue;
+        }
+
+        let (sid, mask) = match ace_type {
+            ACCESS_ALLOWED_ACE_TYPE => {
+                let ace = ace.cast::<ACCESS_ALLOWED_ACE>();
+                unsafe { (&raw mut (*ace).SidStart, (*ace).Mask) }
+            }
+            ACCESS_DENIED_ACE_TYPE => {
+                let ace = ace.cast::<ACCESS_DENIED_ACE>();
+                unsafe { (&raw mut (*ace).SidStart, (*ace).Mask) }
+            }
+            _ => continue,
+        };
+        if unsafe { EqualSid(PSID(sid.cast()), *app_container) }.is_ok() {
+            aces.push(ExplicitAce {
+                ace_type,
+                flags,
+                mask,
+            });
+        }
+    }
+    Ok(aces)
+}
+
+/// Checks for an entry that exactly matches what [`set_acl`] would add.
+fn is_already_granted(
+    app_container: &PSID,
+    path: &Path,
+    permission: PermissionType,
+) -> Result<bool> {
+    let aces = find_explicit_aces(app_container, path, SE_FILE_OBJECT)?;
 
     // Windows removes the inheritance flags from files
     let expected_flags =
@@ -1066,39 +1118,12 @@ fn is_already_granted(
         };
     let expected_mask = access_rights(permission);
 
-    let mut granted = false;
-    for index in 0..acl_ref.AceCount {
-        let mut ace = std::ptr::null_mut();
-        unsafe { GetAce(acl, u32::from(index), &raw mut ace)? };
-        let header = unsafe { ace.cast::<ACE_HEADER>().read() };
-        let ace_type = u32::from(header.AceType);
-        let ace_flags = u32::from(header.AceFlags);
-
-        if ace_flags & INHERITED_ACE.0 != 0 {
-            continue; // Skip inherited ACEs
-        }
-
-        if ace_type == ACCESS_ALLOWED_ACE_TYPE {
-            let ace = ace.cast::<ACCESS_ALLOWED_ACE>();
-            let sid = PSID(unsafe { &raw mut (*ace).SidStart }.cast());
-            if unsafe { EqualSid(sid, *app_container) }.is_err() {
-                continue;
-            }
-            let mask = unsafe { (*ace).Mask };
-            if ace_flags == expected_flags && mask == expected_mask {
-                granted = true;
-            } else {
-                return Ok(false);
-            }
-        } else if ace_type == ACCESS_DENIED_ACE_TYPE {
-            let ace = ace.cast::<ACCESS_DENIED_ACE>();
-            let sid = PSID(unsafe { &raw mut (*ace).SidStart }.cast());
-            if unsafe { EqualSid(sid, *app_container) }.is_ok() {
-                return Ok(false);
-            }
-        }
-    }
-    Ok(granted)
+    Ok(!aces.is_empty()
+        && aces.iter().all(|ace| {
+            ace.ace_type == ACCESS_ALLOWED_ACE_TYPE
+                && ace.flags == expected_flags
+                && ace.mask == expected_mask
+        }))
 }
 
 fn set_acl(
@@ -1341,11 +1366,28 @@ fn apply_grant(app_container: &PSID, grant: &Grant) -> Result<()> {
 }
 
 fn revoke_grant(app_container: &PSID, grant: &Grant) -> Result<()> {
-    let object_type = match grant.kind {
+    remove_from_acl(
+        app_container,
+        Path::new(&grant.path),
+        object_type(grant.kind),
+    )
+}
+
+/// Whether there's anything for [`revoke_grant`] to remove from the path itself.
+fn is_grant_listed(app_container: &PSID, grant: &Grant) -> Result<bool> {
+    let aces = find_explicit_aces(
+        app_container,
+        Path::new(&grant.path),
+        object_type(grant.kind),
+    )?;
+    Ok(!aces.is_empty())
+}
+
+fn object_type(kind: GrantKind) -> SE_OBJECT_TYPE {
+    match kind {
         GrantKind::File => SE_FILE_OBJECT,
         GrantKind::RegistryKey => SE_REGISTRY_KEY,
-    };
-    remove_from_acl(app_container, Path::new(&grant.path), object_type)
+    }
 }
 
 fn remove_from_acl(
@@ -1359,6 +1401,7 @@ fn remove_from_acl(
         .chain([0])
         .collect::<Vec<_>>();
     let mut old_acl = std::ptr::null_mut();
+    let mut old_descriptor = PSECURITY_DESCRIPTOR::default();
     let err = unsafe {
         GetNamedSecurityInfoW(
             PCWSTR(encoded_path.as_ptr()),
@@ -1368,7 +1411,7 @@ fn remove_from_acl(
             None,
             Some(&mut old_acl),
             None,
-            std::ptr::null_mut(),
+            &mut old_descriptor,
         )
     };
     if err == ERROR_FILE_NOT_FOUND || err == ERROR_PATH_NOT_FOUND {
@@ -1379,6 +1422,9 @@ fn remove_from_acl(
             err.0,
         ))
         .into());
+    }
+    scopeguard::defer! {
+        unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(old_descriptor.0))) };
     }
 
     let mut access = EXPLICIT_ACCESS_W::default();
@@ -1542,7 +1588,11 @@ pub fn run_helper(
 
     for path in std::env::split_paths(remove_paths.as_os_str()) {
         if !path.as_os_str().is_empty() {
-            remove_from_acl(&psid, &path, SE_FILE_OBJECT)?;
+            if let Err(err) = remove_from_acl(&psid, &path, SE_FILE_OBJECT) {
+                tracing::warn!(
+                    "unable to revoke sandbox access from {path:?}: {err:#}"
+                );
+            }
         }
     }
     apply_acl_paths(

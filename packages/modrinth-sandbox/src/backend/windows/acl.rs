@@ -400,11 +400,20 @@ impl PreparedInstance<'_> {
         &self.desired_effective
     }
 
-    pub fn finalize_pruning(&mut self) -> Result<()> {
-        self.ledger
-            .state
-            .instances
-            .retain(|instance| !self.dead_instances.contains(&instance.id));
+    /// Removes the grants of stale instances, except for `not_revoked`, which are kept
+    /// so that the next instance to be spawned tries to revoke them again.
+    pub fn finalize_pruning(&mut self, not_revoked: &[Grant]) -> Result<()> {
+        self.ledger.state.instances.retain_mut(|instance| {
+            if !self.dead_instances.contains(&instance.id) {
+                return true;
+            }
+            instance.grants.retain(|grant| {
+                not_revoked
+                    .iter()
+                    .any(|other| paths_equal(&other.path, &grant.path))
+            });
+            !instance.grants.is_empty()
+        });
         self.dead_instances.clear();
         self.ledger.persist()
     }
