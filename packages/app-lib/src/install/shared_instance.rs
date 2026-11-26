@@ -798,10 +798,9 @@ async fn desired_shared_instance_content(
     let mut content = DesiredSharedInstanceContent::default();
 
     for version_id in &data.modrinth_ids {
-        let version =
-            versions_by_id.get(version_id).ok_or(ErrorKind::InputError(
-                format!("shared instance version {version_id} was not found"),
-            ))?;
+        let Some(version) = versions_by_id.get(version_id) else {
+            continue;
+        };
         content.projects.insert(
             version.id.clone(),
             DesiredSharedInstanceProject {
@@ -867,9 +866,10 @@ async fn shared_instance_versions_by_id(
 
     for id in ids {
         if !versions_by_id.contains_key(id) {
-            bail!(ErrorKind::InputError(format!(
-                "shared instance version {id} was not found"
-            )));
+            tracing::warn!(
+                version_id = id,
+                "Skipping shared instance version that is unavailable to this user"
+            );
         }
     }
 
@@ -1270,18 +1270,15 @@ async fn install_shared_instance_downloads(
     let versions = shared_instance_versions_by_id(&version_ids, state).await?;
     let mut mods = mods
         .into_iter()
-        .map(|install| {
-            let size = versions
-                .get(install.version_id)
-                .and_then(|version| {
-                    version
-                        .files
-                        .iter()
-                        .find(|file| file.primary)
-                        .or_else(|| version.files.first())
-                })
+        .filter_map(|install| {
+            let version = versions.get(install.version_id)?;
+            let size = version
+                .files
+                .iter()
+                .find(|file| file.primary)
+                .or_else(|| version.files.first())
                 .map_or(0, |file| u64::from(file.size));
-            (install, size)
+            Some((install, size))
         })
         .collect::<Vec<_>>();
     mods.sort_by_key(|(_, size)| Reverse(*size));
