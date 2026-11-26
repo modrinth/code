@@ -632,7 +632,7 @@ useEventListener('keydown', (event) => {
 										</p>
 										<p
 											v-if="typeof nag.description !== 'function'"
-											class="mb-0 mt-1 text-sm leading-relaxed text-secondary"
+											class="mb-0 mt-1 leading-relaxed text-secondary"
 										>
 											{{
 												typeof nag.description === 'string'

@@ -128,12 +128,12 @@
 				class="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 overflow-y-auto overscroll-y-contain px-6 py-12 text-center"
 			>
 				<div
-					class="mb-1 flex size-12 items-center justify-center rounded-2xl bg-surface-2 text-secondary"
+					class="mb-1 flex size-14 items-center justify-center rounded-2xl bg-surface-2 text-secondary"
 				>
-					<MessagesSquareIcon class="size-6" />
+					<MessagesSquareIcon class="size-7" />
 				</div>
-				<p class="m-0 text-base font-medium leading-relaxed text-contrast">No messages yet.</p>
-				<p v-if="$slots['thread-help']" class="m-0 max-w-72 text-sm leading-relaxed text-secondary">
+				<p class="m-0 text-lg font-semibold leading-relaxed text-contrast">No messages yet.</p>
+				<p v-if="$slots['thread-help']" class="m-0 max-w-80 leading-relaxed text-secondary">
 					<slot name="thread-help" />
 				</p>
 			</div>

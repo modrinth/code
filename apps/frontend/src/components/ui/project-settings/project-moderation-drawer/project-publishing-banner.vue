@@ -238,13 +238,10 @@ const checklistProgressLabel = defineMessage({
 
 <template>
 	<div v-if="compact">
-		<h2 class="m-0 text-base font-semibold text-contrast">
+		<h2 class="m-0 text-lg font-semibold text-contrast">
 			{{ formatMessage(summaryCopy.title, { count: remaining }) }}
 		</h2>
-		<p
-			v-if="state !== 'todo' && summaryCopy.body"
-			class="mb-0 mt-1 text-sm leading-relaxed text-secondary"
-		>
+		<p v-if="state !== 'todo' && summaryCopy.body" class="mb-0 mt-1.5 leading-tight text-secondary">
 			{{ formatMessage(summaryCopy.body) }}
 		</p>
 		<div
