@@ -234,8 +234,13 @@ fn macos_java_executable(install_dir: &Path) -> crate::Result<PathBuf> {
     ))
 }
 
-/// Extracts a Java archive into place unless a working copy of the same
-/// package is already installed.
+const INCOMPLETE_INSTALL_MARKER: &str = ".modrinth-incomplete";
+
+/// Extracts a Java archive into place unless a complete, working copy of the
+/// same package is already installed.
+///
+/// A marker file inside the package directory flags an extraction in progress,
+/// so an install interrupted by a crash or a full disk is never reused.
 async fn install_java_archive(
     file: Bytes,
     archive_type: &'static str,
@@ -244,8 +249,10 @@ async fn install_java_archive(
 ) -> crate::Result<PathBuf> {
     io::create_dir_all(java_versions_dir).await?;
     let install_dir = java_versions_dir.join(directory_name);
+    let marker = install_dir.join(INCOMPLETE_INSTALL_MARKER);
     let _install_guard = JAVA_INSTALL_LOCK.lock().await;
-    if let Ok(java_path) = installed_java_executable(&install_dir)
+    if !marker.exists()
+        && let Ok(java_path) = installed_java_executable(&install_dir)
         && jre::check_java_at_filepath(&java_path).await.is_ok()
     {
         return Ok(java_path);
@@ -254,6 +261,38 @@ async fn install_java_archive(
         io::remove_dir_all(&install_dir).await?;
     }
 
+    io::create_dir_all(&install_dir).await?;
+    io::write(&marker, b"").await?;
+    let result = extract_java_archive(
+        file,
+        archive_type,
+        java_versions_dir,
+        &install_dir,
+    )
+    .await;
+    match result {
+        Ok(java_path) => {
+            io::remove_file(&marker).await?;
+            Ok(java_path)
+        }
+        Err(err) => {
+            if let Err(cleanup_err) = io::remove_dir_all(&install_dir).await {
+                tracing::warn!(
+                    "Failed to remove incomplete Java install at {}: {cleanup_err}",
+                    install_dir.display()
+                );
+            }
+            Err(err)
+        }
+    }
+}
+
+async fn extract_java_archive(
+    file: Bytes,
+    archive_type: &'static str,
+    java_versions_dir: &Path,
+    install_dir: &Path,
+) -> crate::Result<PathBuf> {
     let target = java_versions_dir.to_path_buf();
     tokio::task::spawn_blocking(move || {
         if archive_type == "tar.gz" {
@@ -276,7 +315,7 @@ async fn install_java_archive(
     })
     .await??;
 
-    installed_java_executable(&install_dir)
+    installed_java_executable(install_dir)
 }
 
 fn installed_java_executable(install_dir: &Path) -> crate::Result<PathBuf> {
@@ -581,7 +620,9 @@ pub async fn get_max_memory() -> crate::Result<u64> {
 mod tests {
     use super::JavaPackageQuery;
     #[cfg(unix)]
-    use super::{install_java_archive, java_executable};
+    use super::{
+        INCOMPLETE_INSTALL_MARKER, install_java_archive, java_executable,
+    };
     #[cfg(unix)]
     use bytes::Bytes;
     #[cfg(unix)]
@@ -698,6 +739,34 @@ mod tests {
             .unwrap();
         assert!(marker.exists());
         assert_only_package_installed(dir.path());
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn incomplete_install_is_replaced() {
+        let dir = tempfile::tempdir().unwrap();
+        write_java(dir.path(), WORKING_JAVA);
+        let marker = dir.path().join(PACKAGE).join(INCOMPLETE_INSTALL_MARKER);
+        std::fs::write(&marker, "").unwrap();
+        let stale = dir.path().join(PACKAGE).join("stale.txt");
+        std::fs::write(&stale, "stale").unwrap();
+        let file = tar_gz(&java_entry(), WORKING_JAVA);
+        install_java_archive(file, "tar.gz", PACKAGE, dir.path())
+            .await
+            .unwrap();
+        assert!(!stale.exists());
+        assert!(!marker.exists());
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn failed_extraction_leaves_no_partial_install() {
+        let dir = tempfile::tempdir().unwrap();
+        let file = tar_gz(&format!("{PACKAGE}/readme.txt"), b"no java here");
+        install_java_archive(file, "tar.gz", PACKAGE, dir.path())
+            .await
+            .unwrap_err();
+        assert!(!dir.path().join(PACKAGE).exists());
     }
 
     #[cfg(unix)]
