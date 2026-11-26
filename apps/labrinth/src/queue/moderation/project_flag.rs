@@ -848,10 +848,16 @@ impl ProjectFlagEngine {
         rules: &[DBProjectFlagRule],
     ) -> Result<()> {
         for rule in rules {
+            rule.params.validate_decision_questions()?;
             let rule_id = crate::models::ids::ProjectFlagRuleId::from(rule.id)
                 .to_string();
             for question in rule.params.decision_questions.keys() {
-                require_decision(&context.ai, &rule_id, question)?;
+                validate_reconciliation_decision(
+                    &context.ai,
+                    &rule_id,
+                    question,
+                    self.scanner_config.infer_decisions.is_some(),
+                )?;
             }
         }
         for image in &context.ai.images {
@@ -1102,6 +1108,25 @@ impl ProjectFlagEngine {
     }
 }
 
+fn validate_reconciliation_decision(
+    ai: &FlagAiContext,
+    rule_id: &str,
+    question: &str,
+    model_configured: bool,
+) -> Result<()> {
+    if model_configured
+        && ai
+            .decisions_by_rule
+            .get(rule_id)
+            .and_then(|answers| answers.get(question))
+            == Some(&None)
+    {
+        return Err(anyhow!(crate::workflow::project_flag::run_rules::ReconciliationInputsChanged)
+            .context(format!("missing current decision cache for rule `{rule_id}` question `{question}`")));
+    }
+    require_decision(ai, rule_id, question)
+}
+
 fn require_decision(
     ai: &FlagAiContext,
     rule_id: &str,
@@ -1130,6 +1155,95 @@ fn require_probability(answer: Option<f64>) -> Result<()> {
 #[cfg(test)]
 mod ai_context_tests {
     use super::*;
+
+    #[test]
+    fn reconciliation_replans_after_selected_context_changes_since_scan() {
+        use crate::database::models::project_flag_item::ContextField;
+        use crate::workflow::project_flag::{
+            run_rules::ReconciliationInputsChanged,
+            text_scan::{ProjectText, text_input_hash},
+        };
+
+        let mut content = ProjectText {
+            title: "scanned title".into(),
+            summary: String::new(),
+            description: String::new(),
+            links: serde_json::json!({}),
+            text_fields: BTreeMap::new(),
+        };
+        let question = DecisionQuestion {
+            question: "Question?".into(),
+            include_context: vec![ContextField::Title],
+        };
+        let scanned_hash = text_input_hash(&content, &question).unwrap();
+        let cache = HashMap::from([(scanned_hash, 0.5)]);
+        let mut ai = FlagAiContext::default();
+        for (title, replan) in
+            [("scanned title", false), ("edited title", true)]
+        {
+            content.title = title.into();
+            let hash = text_input_hash(&content, &question).unwrap();
+            ai.decisions_by_rule.insert(
+                "1".into(),
+                BTreeMap::from([(
+                    "question".into(),
+                    cache.get(&hash).copied(),
+                )]),
+            );
+            let result =
+                validate_reconciliation_decision(&ai, "1", "question", true);
+            if replan {
+                assert!(
+                    result.unwrap_err().is::<ReconciliationInputsChanged>()
+                );
+            } else {
+                result.unwrap();
+            }
+        }
+    }
+
+    #[test]
+    fn reconciliation_only_replans_expected_missing_enabled_answers() {
+        use crate::workflow::project_flag::run_rules::ReconciliationInputsChanged;
+
+        let mut ai = FlagAiContext::default();
+        assert!(
+            !validate_reconciliation_decision(&ai, "1", "question", true)
+                .unwrap_err()
+                .is::<ReconciliationInputsChanged>()
+        );
+        ai.decisions_by_rule
+            .insert("1".into(), BTreeMap::from([("question".into(), None)]));
+        assert!(
+            validate_reconciliation_decision(&ai, "1", "question", true)
+                .unwrap_err()
+                .is::<ReconciliationInputsChanged>()
+        );
+        assert!(
+            !validate_reconciliation_decision(&ai, "1", "question", false)
+                .unwrap_err()
+                .is::<ReconciliationInputsChanged>()
+        );
+        for value in [f64::NAN, -0.1, 1.1] {
+            ai.decisions_by_rule
+                .get_mut("1")
+                .unwrap()
+                .insert("question".into(), Some(value));
+            assert!(
+                !validate_reconciliation_decision(&ai, "1", "question", true)
+                    .unwrap_err()
+                    .is::<ReconciliationInputsChanged>()
+            );
+        }
+        ai.decisions_by_rule
+            .get_mut("1")
+            .unwrap()
+            .insert("question".into(), Some(0.5));
+        assert!(
+            validate_reconciliation_decision(&ai, "1", "question", true)
+                .is_ok()
+        );
+    }
 
     #[test]
     fn required_decisions_must_exist_in_the_correct_rule_namespace() {

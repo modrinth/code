@@ -357,16 +357,17 @@ impl ApproveProjectWorkflow {
                     ),
                 )
                 .await?;
-            if applied {
-                ctx.execute_activity(
-                    ApprovalActivities::auto_approval_eligible,
-                    input,
-                    ActivityOptions::start_to_close_timeout(
-                        Duration::from_secs(60),
-                    ),
-                )
-                .await?;
+            if !applied {
+                continue;
             }
+            ctx.execute_activity(
+                ApprovalActivities::auto_approval_eligible,
+                input,
+                ActivityOptions::start_to_close_timeout(Duration::from_secs(
+                    60,
+                )),
+            )
+            .await?;
             if !ctx
                 .execute_activity(
                     ProjectFlagActivities::project_in_review,

@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT delta->>'kind' AS kind\n        FROM project_history\n        WHERE project_id = $1\n            AND occurred_at >= (SELECT queued FROM mods WHERE id = $1)\n            AND delta->>'kind' IN ('auto_approval_scheduled', 'auto_approval_cancelled')\n        ORDER BY occurred_at DESC, id DESC\n        LIMIT 1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "kind",
+        "type_info": "Text",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "50aae58379790007c1671e3269964db3d29d63c5c1ed5f98378565adc05e1bf5"
+}

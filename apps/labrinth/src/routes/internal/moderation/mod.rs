@@ -237,6 +237,7 @@ async fn cancel_auto_approval(
         SELECT delta->>'kind' AS kind
         FROM project_history
         WHERE project_id = $1
+            AND occurred_at >= (SELECT queued FROM mods WHERE id = $1)
             AND delta->>'kind' IN ('auto_approval_scheduled', 'auto_approval_cancelled')
         ORDER BY occurred_at DESC, id DESC
         LIMIT 1
