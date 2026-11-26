@@ -10,10 +10,10 @@ import { edit } from '@/helpers/instance'
 import { appSettingsQueryOptions, parseEnvVars, serializeEnvVars } from '@/helpers/settings.ts'
 import { instanceRecommendedJavaQueryOptions } from '@/pages/instance/query-options'
 
-import DefaultSettingsIntro from './default-settings-intro.vue'
 import { injectInstanceSettings } from './instance-settings-context'
-import ResetToDefaultButton from './reset-to-default-button.vue'
+import SettingsSourceHeader from './settings-source-header.vue'
 import { useInstanceSettingsDraft } from './use-instance-settings-draft'
+import { useSettingsSource } from './use-settings-source'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -61,11 +61,17 @@ const defaultJavaArgs = computed(() => settingsQuery.data.value?.extra_launch_ar
 const defaultEnvVars = computed(() => serializeEnvVars(settingsQuery.data.value?.custom_env_vars))
 const defaultMemory = computed(() => settingsQuery.data.value?.memory.maximum ?? 0)
 
+const source = useSettingsSource(draft, () => ({
+	javaPath: defaultJavaPath.value,
+	javaArgs: defaultJavaArgs.value,
+	envVars: defaultEnvVars.value,
+	memory: defaultMemory.value,
+}))
+
 const messages = defineMessages({
-	defaultSettingsDescription: {
-		id: 'instance.settings.tabs.java.default-settings-description',
-		defaultMessage:
-			'Your instance uses the default Java and memory settings unless you override them here.',
+	settingsSource: {
+		id: 'instance.settings.tabs.java.settings-source',
+		defaultMessage: 'Java and memory settings source',
 	},
 	javaInstallation: {
 		id: 'instance.settings.tabs.java.java-installation',
@@ -108,35 +114,33 @@ const messages = defineMessages({
 
 <template>
 	<div class="flex flex-col gap-6">
-		<DefaultSettingsIntro
+		<SettingsSourceHeader
+			v-model="source"
 			tab="java"
-			:description="formatMessage(messages.defaultSettingsDescription)"
+			:title="formatMessage(messages.settingsSource)"
 		/>
 
-		<section class="flex flex-col">
-			<div class="flex items-center justify-between gap-4">
-				<h2 class="m-0 min-w-0 text-lg font-semibold text-contrast">
+		<div
+			class="flex flex-col gap-6 transition-opacity"
+			:class="{ 'opacity-60': source === 'app' }"
+			:inert="source === 'app'"
+		>
+			<section class="flex flex-col">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.javaMemory) }}
 				</h2>
-				<ResetToDefaultButton
-					:disabled="draft.memory === null"
-					:setting="formatMessage(messages.javaMemory)"
-					@reset="draft.memory = null"
-				/>
-			</div>
-			<div class="pt-3">
-				<MemorySlider
-					id="max-memory"
-					:model-value="draft.memory ?? defaultMemory"
-					:aria-label="formatMessage(messages.javaMemory)"
-					@update:model-value="(value) => (draft.memory = value)"
-				/>
-			</div>
-		</section>
+				<div class="pt-3">
+					<MemorySlider
+						id="max-memory"
+						:model-value="draft.memory ?? defaultMemory"
+						:aria-label="formatMessage(messages.javaMemory)"
+						@update:model-value="(value) => (draft.memory = value)"
+					/>
+				</div>
+			</section>
 
-		<section class="flex flex-col">
-			<div class="flex items-center justify-between gap-4">
-				<div class="flex min-w-0 flex-col gap-1">
+			<section class="flex flex-col">
+				<div class="flex flex-col gap-1">
 					<h2 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.javaInstallation) }}
 					</h2>
@@ -146,66 +150,47 @@ const messages = defineMessages({
 						}}
 					</p>
 				</div>
-				<ResetToDefaultButton
-					:disabled="draft.javaPath === null"
-					:setting="formatMessage(messages.javaInstallation)"
-					@reset="draft.javaPath = null"
-				/>
-			</div>
-			<div class="pt-3">
-				<JavaSelector
-					id="java-installation"
-					:model-value="{ path: draft.javaPath ?? defaultJavaPath }"
-					:placeholder="formatMessage(messages.javaPathPlaceholder)"
-					@update:model-value="(val) => (draft.javaPath = val?.path ?? '')"
-				/>
-			</div>
-		</section>
+				<div class="pt-3">
+					<JavaSelector
+						id="java-installation"
+						:model-value="{ path: draft.javaPath ?? defaultJavaPath }"
+						:placeholder="formatMessage(messages.javaPathPlaceholder)"
+						@update:model-value="(val) => (draft.javaPath = val?.path ?? '')"
+					/>
+				</div>
+			</section>
 
-		<section class="flex flex-col">
-			<div class="flex items-center justify-between gap-4">
-				<h2 class="m-0 min-w-0 text-lg font-semibold text-contrast">
+			<section class="flex flex-col">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.javaArguments) }}
 				</h2>
-				<ResetToDefaultButton
-					:disabled="draft.javaArgs === null"
-					:setting="formatMessage(messages.javaArguments)"
-					@reset="draft.javaArgs = null"
-				/>
-			</div>
-			<div class="pt-3">
-				<Input
-					id="java-args"
-					:model-value="draft.javaArgs ?? defaultJavaArgs"
-					autocomplete="off"
-					:placeholder="formatMessage(messages.enterJavaArguments)"
-					wrapper-class="w-full"
-					@update:model-value="(value) => (draft.javaArgs = String(value ?? ''))"
-				/>
-			</div>
-		</section>
+				<div class="pt-3">
+					<Input
+						id="java-args"
+						:model-value="draft.javaArgs ?? defaultJavaArgs"
+						autocomplete="off"
+						:placeholder="formatMessage(messages.enterJavaArguments)"
+						wrapper-class="w-full"
+						@update:model-value="(value) => (draft.javaArgs = String(value ?? ''))"
+					/>
+				</div>
+			</section>
 
-		<section class="flex flex-col">
-			<div class="flex items-center justify-between gap-4">
-				<h2 class="m-0 min-w-0 text-lg font-semibold text-contrast">
+			<section class="flex flex-col">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.javaEnvironmentVariables) }}
 				</h2>
-				<ResetToDefaultButton
-					:disabled="draft.envVars === null"
-					:setting="formatMessage(messages.javaEnvironmentVariables)"
-					@reset="draft.envVars = null"
-				/>
-			</div>
-			<div class="pt-3">
-				<Input
-					id="env-vars"
-					:model-value="draft.envVars ?? defaultEnvVars"
-					autocomplete="off"
-					:placeholder="formatMessage(messages.enterEnvironmentVariables)"
-					wrapper-class="w-full"
-					@update:model-value="(value) => (draft.envVars = String(value ?? ''))"
-				/>
-			</div>
-		</section>
+				<div class="pt-3">
+					<Input
+						id="env-vars"
+						:model-value="draft.envVars ?? defaultEnvVars"
+						autocomplete="off"
+						:placeholder="formatMessage(messages.enterEnvironmentVariables)"
+						wrapper-class="w-full"
+						@update:model-value="(value) => (draft.envVars = String(value ?? ''))"
+					/>
+				</div>
+			</section>
+		</div>
 	</div>
 </template>

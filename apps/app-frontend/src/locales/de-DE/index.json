@@ -3926,9 +3926,6 @@
   "instance.server-modal.resource-pack": {
     "message": "Ressourcenpaket"
   },
-  "instance.settings.defaults.open-app-settings": {
-    "message": "Standardeinstellungen verwalten"
-  },
   "instance.settings.sidebar.label.game": {
     "message": "Spiel"
   },
@@ -4055,9 +4052,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Aktualisierungskanal auswählen"
   },
-  "instance.settings.tabs.hooks.default-settings-description": {
-    "message": "Deine Instanz verwendet die vorgegebenen Start-Hooks, solange du diese hier nicht überschreibst."
-  },
   "instance.settings.tabs.hooks.label": {
     "message": "Start-Hooks"
   },
@@ -4117,9 +4111,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Installationseinstellungen sind nicht verfügbar, solange diese Instanz gesperrt ist."
-  },
-  "instance.settings.tabs.java.default-settings-description": {
-    "message": "Deine Instanz verwendet die vorgegebenen Einstellungen für Java und den Arbeitsspeicher, solange du diese hier nicht überschreibst."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Umgebungsvariablen eingeben..."
@@ -4210,9 +4201,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Synchronisierung"
-  },
-  "instance.settings.tabs.window.default-settings-description": {
-    "message": "Deine Instanz verwendet die vorgegebenen Fenstereinstellungen, solange du diese hier nicht überschreibst."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Vollbild"

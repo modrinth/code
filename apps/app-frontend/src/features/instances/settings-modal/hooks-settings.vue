@@ -6,10 +6,10 @@ import { computed } from 'vue'
 import { edit } from '@/helpers/instance'
 import { appSettingsQueryOptions } from '@/helpers/settings.ts'
 
-import DefaultSettingsIntro from './default-settings-intro.vue'
 import { injectInstanceSettings } from './instance-settings-context'
-import ResetToDefaultButton from './reset-to-default-button.vue'
+import SettingsSourceHeader from './settings-source-header.vue'
 import { useInstanceSettingsDraft } from './use-instance-settings-draft'
+import { useSettingsSource } from './use-settings-source'
 
 type HookKey = 'pre_launch' | 'wrapper' | 'post_exit'
 
@@ -43,10 +43,12 @@ const defaultHooks = computed<Record<HookKey, string>>(() => ({
 	post_exit: settingsQuery.data.value?.hooks.post_exit ?? '',
 }))
 
+const source = useSettingsSource(hooks, () => defaultHooks.value)
+
 const messages = defineMessages({
-	defaultSettingsDescription: {
-		id: 'instance.settings.tabs.hooks.default-settings-description',
-		defaultMessage: 'Your instance uses the default launch hooks unless you override them here.',
+	settingsSource: {
+		id: 'instance.settings.tabs.hooks.settings-source',
+		defaultMessage: 'Launch hooks settings source',
 	},
 	hookVariablesDescription: {
 		id: 'instance.settings.tabs.hooks.variables.description',
@@ -118,82 +120,68 @@ const messages = defineMessages({
 
 <template>
 	<div class="flex flex-col gap-6">
-		<DefaultSettingsIntro
+		<SettingsSourceHeader
+			v-model="source"
 			tab="hooks"
-			:description="formatMessage(messages.defaultSettingsDescription)"
+			:title="formatMessage(messages.settingsSource)"
 		/>
 
-		<section class="flex flex-col gap-2.5">
-			<div class="flex items-center justify-between gap-4">
-				<h2 class="m-0 min-w-0 text-lg font-semibold text-contrast">
+		<div
+			class="flex flex-col gap-6 transition-opacity"
+			:class="{ 'opacity-60': source === 'app' }"
+			:inert="source === 'app'"
+		>
+			<section class="flex flex-col gap-2.5">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.preLaunch) }}
 				</h2>
-				<ResetToDefaultButton
-					:disabled="hooks.pre_launch === null"
-					:setting="formatMessage(messages.preLaunch)"
-					@reset="hooks.pre_launch = null"
+				<Input
+					id="pre-launch"
+					:model-value="hooks.pre_launch ?? defaultHooks.pre_launch"
+					autocomplete="off"
+					:placeholder="formatMessage(messages.preLaunchEnter)"
+					wrapper-class="w-full"
+					@update:model-value="(value) => (hooks.pre_launch = String(value ?? ''))"
 				/>
-			</div>
-			<Input
-				id="pre-launch"
-				:model-value="hooks.pre_launch ?? defaultHooks.pre_launch"
-				autocomplete="off"
-				:placeholder="formatMessage(messages.preLaunchEnter)"
-				wrapper-class="w-full"
-				@update:model-value="(value) => (hooks.pre_launch = String(value ?? ''))"
-			/>
-			<p class="m-0">
-				{{ formatMessage(messages.preLaunchDescription) }}
-			</p>
-		</section>
+				<p class="m-0">
+					{{ formatMessage(messages.preLaunchDescription) }}
+				</p>
+			</section>
 
-		<section class="flex flex-col gap-2.5">
-			<div class="flex items-center justify-between gap-4">
-				<h2 class="m-0 min-w-0 text-lg font-semibold text-contrast">
+			<section class="flex flex-col gap-2.5">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.wrapper) }}
 				</h2>
-				<ResetToDefaultButton
-					:disabled="hooks.wrapper === null"
-					:setting="formatMessage(messages.wrapper)"
-					@reset="hooks.wrapper = null"
+				<Input
+					id="wrapper"
+					:model-value="hooks.wrapper ?? defaultHooks.wrapper"
+					autocomplete="off"
+					:placeholder="formatMessage(messages.wrapperEnter)"
+					wrapper-class="w-full"
+					@update:model-value="(value) => (hooks.wrapper = String(value ?? ''))"
 				/>
-			</div>
-			<Input
-				id="wrapper"
-				:model-value="hooks.wrapper ?? defaultHooks.wrapper"
-				autocomplete="off"
-				:placeholder="formatMessage(messages.wrapperEnter)"
-				wrapper-class="w-full"
-				@update:model-value="(value) => (hooks.wrapper = String(value ?? ''))"
-			/>
-			<p class="m-0">
-				{{ formatMessage(messages.wrapperDescription) }}
-			</p>
-		</section>
+				<p class="m-0">
+					{{ formatMessage(messages.wrapperDescription) }}
+				</p>
+			</section>
 
-		<section class="flex flex-col gap-2.5">
-			<div class="flex items-center justify-between gap-4">
-				<h2 class="m-0 min-w-0 text-lg font-semibold text-contrast">
+			<section class="flex flex-col gap-2.5">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.postExit) }}
 				</h2>
-				<ResetToDefaultButton
-					:disabled="hooks.post_exit === null"
-					:setting="formatMessage(messages.postExit)"
-					@reset="hooks.post_exit = null"
+				<Input
+					id="post-exit"
+					:model-value="hooks.post_exit ?? defaultHooks.post_exit"
+					autocomplete="off"
+					:placeholder="formatMessage(messages.postExitEnter)"
+					wrapper-class="w-full"
+					@update:model-value="(value) => (hooks.post_exit = String(value ?? ''))"
 				/>
-			</div>
-			<Input
-				id="post-exit"
-				:model-value="hooks.post_exit ?? defaultHooks.post_exit"
-				autocomplete="off"
-				:placeholder="formatMessage(messages.postExitEnter)"
-				wrapper-class="w-full"
-				@update:model-value="(value) => (hooks.post_exit = String(value ?? ''))"
-			/>
-			<p class="m-0">
-				{{ formatMessage(messages.postExitDescription) }}
-			</p>
-		</section>
+				<p class="m-0">
+					{{ formatMessage(messages.postExitDescription) }}
+				</p>
+			</section>
+		</div>
 
 		<div>
 			<div class="m-0">

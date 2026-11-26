@@ -3899,9 +3899,6 @@
   "instance.server-modal.resource-pack": {
     "message": "資源包"
   },
-  "instance.settings.defaults.open-app-settings": {
-    "message": "管理預設設定"
-  },
   "instance.settings.sidebar.label.game": {
     "message": "遊戲"
   },
@@ -4025,9 +4022,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "選擇更新通道"
   },
-  "instance.settings.tabs.hooks.default-settings-description": {
-    "message": "你的實例會使用預設的啟動掛勾，除非你在這裡覆寫這些設定。"
-  },
   "instance.settings.tabs.hooks.label": {
     "message": "啟動掛勾"
   },
@@ -4087,9 +4081,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "實例被鎖定時無法使用安裝設定選項。"
-  },
-  "instance.settings.tabs.java.default-settings-description": {
-    "message": "你的實例會使用預設的 Java 和記憶體設定，除非你在這裡覆寫這些設定。"
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "輸入環境變數..."
@@ -4180,9 +4171,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "同步"
-  },
-  "instance.settings.tabs.window.default-settings-description": {
-    "message": "你的實例會使用預設的視窗設定，除非你在這裡覆寫這些設定。"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "全螢幕"

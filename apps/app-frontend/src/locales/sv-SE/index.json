@@ -3473,9 +3473,6 @@
   "instance.server-modal.resource-pack": {
     "message": "Resurs pack"
   },
-  "instance.settings.defaults.open-app-settings": {
-    "message": "Hantera standardinställningar"
-  },
   "instance.settings.sidebar.label.game": {
     "message": "Spel"
   },

@@ -3866,9 +3866,6 @@
   "instance.server-modal.resource-pack": {
     "message": "Набор ресурсов"
   },
-  "instance.settings.defaults.open-app-settings": {
-    "message": "Управление настройками по умолчанию"
-  },
   "instance.settings.sidebar.label.game": {
     "message": "Игра"
   },
@@ -3992,9 +3989,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Выберите канал обновления"
   },
-  "instance.settings.tabs.hooks.default-settings-description": {
-    "message": "Сборка использует стандартные команды запуска если их не поменять."
-  },
   "instance.settings.tabs.hooks.label": {
     "message": "Команды запуска"
   },
@@ -4054,9 +4048,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Параметры установки недоступны, пока сборка заблокирована."
-  },
-  "instance.settings.tabs.java.default-settings-description": {
-    "message": "Ваша сборка использует стандартные параметры Java и памяти, пока вы не измените их здесь."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Введите переменные среды..."
@@ -4147,9 +4138,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Синхронизация"
-  },
-  "instance.settings.tabs.window.default-settings-description": {
-    "message": "Ваша сборка использует настройки окна по умолчанию, пока вы не замените их здесь."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Полноэкранный режим"

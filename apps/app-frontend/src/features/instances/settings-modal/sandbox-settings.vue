@@ -9,20 +9,19 @@ import { edit } from '@/helpers/instance'
 import { appSettingsQueryOptions } from '@/helpers/settings'
 import type { SandboxOverrides, SandboxSettings } from '@/helpers/types'
 
-import DefaultSettingsIntro from './default-settings-intro.vue'
 import { injectInstanceSettings } from './instance-settings-context'
-import ResetToDefaultButton from './reset-to-default-button.vue'
+import SettingsSourceHeader from './settings-source-header.vue'
 import { useInstanceSettingsDraft } from './use-instance-settings-draft'
+import { useSettingsSource } from './use-settings-source'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const { instance } = injectInstanceSettings()
 
 const messages = defineMessages({
-	defaultSettingsDescription: {
-		id: 'instance.settings.tabs.sandbox.default-settings-description',
-		defaultMessage:
-			'Your instance uses the default sandbox settings unless you override them here.',
+	settingsSource: {
+		id: 'instance.settings.tabs.sandbox.settings-source',
+		defaultMessage: 'Sandboxing settings source',
 	},
 })
 
@@ -39,6 +38,8 @@ const draft = useInstanceSettingsDraft<SandboxOverrides>(
 
 const settingsQuery = useQuery(appSettingsQueryOptions())
 await settingsQuery.suspense().catch(handleError)
+
+const source = useSettingsSource(draft, () => settingsQuery.data.value!.sandbox)
 
 const unavailableReason = useQuery(sandboxUnavailableReasonQueryOptions())
 
@@ -61,24 +62,18 @@ function applyPatch(patch: Partial<SandboxSettings>) {
 
 <template>
 	<div class="flex flex-col gap-6">
-		<DefaultSettingsIntro
+		<SettingsSourceHeader
+			v-model="source"
 			tab="sandbox"
-			:description="formatMessage(messages.defaultSettingsDescription)"
+			:title="formatMessage(messages.settingsSource)"
 		/>
 		<SandboxSettingsForm
 			v-if="effective"
 			:settings="effective"
 			instance-settings
+			:disabled="source === 'app'"
 			:unavailable-reason="unavailableReason.data.value"
 			@update="applyPatch"
-		>
-			<template #reset="{ field, label }">
-				<ResetToDefaultButton
-					:disabled="draft[field] === null"
-					:setting="label"
-					@reset="draft = { ...draft, [field]: null }"
-				/>
-			</template>
-		</SandboxSettingsForm>
+		/>
 	</div>
 </template>

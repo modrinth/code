@@ -505,8 +505,8 @@ pub struct Hooks {
 )]
 #[serde(rename_all = "snake_case")]
 pub enum SandboxMode {
-    Never,
     #[default]
+    Never,
     Unrecognized,
     Always,
 }

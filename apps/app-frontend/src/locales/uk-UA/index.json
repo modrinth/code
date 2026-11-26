@@ -3911,9 +3911,6 @@
   "instance.server-modal.resource-pack": {
     "message": "Пакет ресурсів"
   },
-  "instance.settings.defaults.open-app-settings": {
-    "message": "Керувати усталеними налаштуваннями"
-  },
   "instance.settings.sidebar.label.game": {
     "message": "Гра"
   },
@@ -4040,9 +4037,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Оберіть випуск оновлення"
   },
-  "instance.settings.tabs.hooks.default-settings-description": {
-    "message": "Ваш екземпляр використовує стандартні хуки запуску, якщо ви не перевизначите їх тут."
-  },
   "instance.settings.tabs.hooks.label": {
     "message": "Параметри запуску"
   },
@@ -4102,9 +4096,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Налаштування інсталяції недоступні, поки цей примірник заблокований."
-  },
-  "instance.settings.tabs.java.default-settings-description": {
-    "message": "Ваш примірник використовуватиме усталені налаштування Java й памʼяті, якщо ви їх не перезапишете тут."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Уведіть змінні середовища..."
@@ -4195,9 +4186,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Синхронізація"
-  },
-  "instance.settings.tabs.window.default-settings-description": {
-    "message": "Ваш примірник використовуватиме усталені налаштування вікна, якщо ви їх не перезапишете тут."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Повний екран"

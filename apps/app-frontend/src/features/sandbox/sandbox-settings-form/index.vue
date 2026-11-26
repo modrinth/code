@@ -23,10 +23,10 @@ import { SANDBOX_HELP_URL } from './links'
 const props = defineProps<{
 	settings: SandboxSettings
 	instanceSettings?: boolean
+	disabled?: boolean
 	unavailableReason?: string | null
 }>()
 const emit = defineEmits<{ update: [patch: Partial<SandboxSettings>] }>()
-defineSlots<{ reset?: (props: { field: keyof SandboxSettings; label: string }) => unknown }>()
 const { formatMessage } = useVIntl()
 const { openExternalUrl } = injectPageContext()
 const id = useId()
@@ -83,19 +83,19 @@ const messages = defineMessages({
 	},
 	downloads: {
 		id: 'app.settings.sandbox.downloads',
-		defaultMessage: 'Access downloads folder',
+		defaultMessage: 'Read-only access to downloads folder',
 	},
 	downloadsDescription: {
 		id: 'app.settings.sandbox.downloads.description',
-		defaultMessage: 'Allows access to files in your Downloads folder.',
+		defaultMessage: 'Allows mods to read files in your Downloads folder.',
 	},
 	documents: {
 		id: 'app.settings.sandbox.documents',
-		defaultMessage: 'Access documents folder',
+		defaultMessage: 'Read-only access to documents folder',
 	},
 	documentsDescription: {
 		id: 'app.settings.sandbox.documents.description',
-		defaultMessage: 'Allows access to files in your Documents folder.',
+		defaultMessage: 'Allows mods to read files in your Documents folder.',
 	},
 	folders: {
 		id: 'app.settings.sandbox.folders',
@@ -182,7 +182,11 @@ async function browseForFolder() {
 				type="critical"
 				:body="formatMessage(messages.unavailable, { reason: unavailableReason })"
 			/>
-			<div class="flex items-center justify-between gap-4">
+			<div
+				class="flex items-center justify-between gap-4 transition-opacity"
+				:class="{ 'opacity-60': disabled }"
+				:inert="disabled"
+			>
 				<div class="flex min-w-0 flex-col gap-1">
 					<label :for="`${id}-mode`" class="text-lg font-semibold text-contrast">
 						{{ formatMessage(instanceSettings ? messages.instanceTitle : messages.title) }}
@@ -193,23 +197,21 @@ async function browseForFolder() {
 						}}
 					</p>
 				</div>
-				<div class="flex shrink-0 items-center gap-2">
-					<Toggle
-						:id="`${id}-mode`"
-						:model-value="sandboxed"
-						:aria-describedby="`${id}-mode-description`"
-						@update:model-value="setSandboxed"
-					/>
-					<slot
-						name="reset"
-						field="mode"
-						:label="formatMessage(instanceSettings ? messages.instanceTitle : messages.title)"
-					/>
-				</div>
+				<Toggle
+					:id="`${id}-mode`"
+					class="shrink-0"
+					:model-value="sandboxed"
+					:aria-describedby="`${id}-mode-description`"
+					@update:model-value="setSandboxed"
+				/>
 			</div>
 		</div>
 		<div class="border-0 border-t border-solid border-surface-5 pt-6">
-			<div :class="{ 'opacity-60': !sandboxed }" :inert="!sandboxed">
+			<div
+				class="transition-opacity"
+				:class="{ 'opacity-60': disabled || !sandboxed }"
+				:inert="disabled || !sandboxed"
+			>
 				<h2 class="m-0 text-xl font-semibold text-contrast">
 					{{ formatMessage(messages.settingsTitle) }}
 				</h2>
@@ -227,25 +229,20 @@ async function browseForFolder() {
 								{{ formatMessage(option.description) }}
 							</p>
 						</div>
-						<div class="flex shrink-0 items-center gap-2">
-							<Toggle
-								:id="`${id}-${option.key}`"
-								:model-value="settings[option.key]"
-								:aria-describedby="`${id}-${option.key}-description`"
-								@update:model-value="(value) => update(option.key, value)"
-							/>
-							<slot name="reset" :field="option.key" :label="formatMessage(option.label)" />
-						</div>
+						<Toggle
+							:id="`${id}-${option.key}`"
+							class="shrink-0"
+							:model-value="settings[option.key]"
+							:aria-describedby="`${id}-${option.key}-description`"
+							@update:model-value="(value) => update(option.key, value)"
+						/>
 					</div>
 					<div class="flex flex-col gap-2.5">
-						<div class="flex items-center justify-between gap-4">
-							<div class="flex min-w-0 flex-col gap-1">
-								<h3 class="m-0 text-lg font-semibold text-contrast">
-									{{ formatMessage(messages.folders) }}
-								</h3>
-								<p class="m-0">{{ formatMessage(messages.foldersDescription) }}</p>
-							</div>
-							<slot name="reset" field="extra_paths" :label="formatMessage(messages.folders)" />
+						<div class="flex min-w-0 flex-col gap-1">
+							<h3 class="m-0 text-lg font-semibold text-contrast">
+								{{ formatMessage(messages.folders) }}
+							</h3>
+							<p class="m-0">{{ formatMessage(messages.foldersDescription) }}</p>
 						</div>
 						<form class="flex gap-2" @submit.prevent="addFolder">
 							<Input

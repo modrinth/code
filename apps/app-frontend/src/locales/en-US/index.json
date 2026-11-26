@@ -3168,16 +3168,16 @@
     "message": "A malicious mod could:"
   },
   "app.settings.sandbox.documents": {
-    "message": "Access documents folder"
+    "message": "Read-only access to documents folder"
   },
   "app.settings.sandbox.documents.description": {
-    "message": "Allows access to files in your Documents folder."
+    "message": "Allows mods to read files in your Documents folder."
   },
   "app.settings.sandbox.downloads": {
-    "message": "Access downloads folder"
+    "message": "Read-only access to downloads folder"
   },
   "app.settings.sandbox.downloads.description": {
-    "message": "Allows access to files in your Downloads folder."
+    "message": "Allows mods to read files in your Downloads folder."
   },
   "app.settings.sandbox.folders": {
     "message": "Access other folders"
@@ -4178,20 +4178,23 @@
   "instance.server-modal.resource-pack": {
     "message": "Resource pack"
   },
-  "instance.settings.defaults.open-app-settings": {
-    "message": "Manage default settings"
-  },
-  "instance.settings.reset-setting-to-default": {
-    "message": "Reset {setting} to default"
-  },
-  "instance.settings.reset-to-default": {
-    "message": "Reset to default"
-  },
   "instance.settings.sidebar.label.game": {
     "message": "Game"
   },
   "instance.settings.sidebar.label.instance": {
     "message": "Instance"
+  },
+  "instance.settings.source.app-settings": {
+    "message": "App settings"
+  },
+  "instance.settings.source.custom": {
+    "message": "Custom"
+  },
+  "instance.settings.source.using-custom": {
+    "message": "Using custom settings for this instance"
+  },
+  "instance.settings.source.using-defaults": {
+    "message": "Using defaults from <link>app settings</link>"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Turn off this override to edit synced data."
@@ -4313,9 +4316,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Select update channel"
   },
-  "instance.settings.tabs.hooks.default-settings-description": {
-    "message": "Your instance uses the default launch hooks unless you override them here."
-  },
   "instance.settings.tabs.hooks.label": {
     "message": "Launch hooks"
   },
@@ -4336,6 +4336,9 @@
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Enter pre-launch command..."
+  },
+  "instance.settings.tabs.hooks.settings-source": {
+    "message": "Launch hooks settings source"
   },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Hooks run in the working directory of the instance, with the following variables:"
@@ -4376,9 +4379,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Installation settings are unavailable while this instance is locked."
   },
-  "instance.settings.tabs.java.default-settings-description": {
-    "message": "Your instance uses the default Java and memory settings unless you override them here."
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Enter environmental variables..."
   },
@@ -4409,11 +4409,14 @@
   "instance.settings.tabs.java.recommended-java-version": {
     "message": "Java {version} is recommended for the Minecraft version of this instance."
   },
+  "instance.settings.tabs.java.settings-source": {
+    "message": "Java and memory settings source"
+  },
   "instance.settings.tabs.sandbox": {
     "message": "Sandboxing"
   },
-  "instance.settings.tabs.sandbox.default-settings-description": {
-    "message": "Your instance uses the default sandbox settings unless you override them here."
+  "instance.settings.tabs.sandbox.settings-source": {
+    "message": "Sandboxing settings source"
   },
   "instance.settings.tabs.sharing": {
     "message": "Sharing"
@@ -4478,9 +4481,6 @@
   "instance.settings.tabs.syncing": {
     "message": "Syncing"
   },
-  "instance.settings.tabs.window.default-settings-description": {
-    "message": "Your instance uses the default window settings unless you override them here."
-  },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Fullscreen"
   },
@@ -4499,6 +4499,9 @@
   "instance.settings.tabs.window.label": {
     "message": "Window"
   },
+  "instance.settings.tabs.window.settings-source": {
+    "message": "Window settings source"
+  },
   "instance.settings.tabs.window.width": {
     "message": "Width"
   },
@@ -4507,9 +4510,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Enter width..."
-  },
-  "instance.settings.using-defaults": {
-    "message": "Using defaults"
   },
   "instance.shared-instance.error.title": {
     "message": "Something has gone wrong"

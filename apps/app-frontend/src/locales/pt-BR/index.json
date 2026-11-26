@@ -3911,9 +3911,6 @@
   "instance.server-modal.resource-pack": {
     "message": "Pacote de recursos"
   },
-  "instance.settings.defaults.open-app-settings": {
-    "message": "Gerenciar configurações padrão"
-  },
   "instance.settings.sidebar.label.game": {
     "message": "Jogo"
   },
@@ -4037,9 +4034,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecionar canal de atualização"
   },
-  "instance.settings.tabs.hooks.default-settings-description": {
-    "message": "Sua instância usa os ganchos de inicialização padrão, a menos que você os substitua aqui."
-  },
   "instance.settings.tabs.hooks.label": {
     "message": "Ganchos de inicialização"
   },
@@ -4099,9 +4093,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "As opções de instalação estarão indisponíveis enquanto esta instância estiver privada."
-  },
-  "instance.settings.tabs.java.default-settings-description": {
-    "message": "Sua instância usa as configurações padrão do Java e memória, a menos que você as altere aqui."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Insira as variáveis ​​de ambiente..."
@@ -4192,9 +4183,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Sincronização"
-  },
-  "instance.settings.tabs.window.default-settings-description": {
-    "message": "Sua instância usa as configurações de janela padrão, a menos que você as altere aqui."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Tela cheia"

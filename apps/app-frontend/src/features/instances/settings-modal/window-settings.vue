@@ -6,10 +6,10 @@ import { computed } from 'vue'
 import { edit } from '@/helpers/instance'
 import { appSettingsQueryOptions } from '@/helpers/settings.ts'
 
-import DefaultSettingsIntro from './default-settings-intro.vue'
 import { injectInstanceSettings } from './instance-settings-context'
-import ResetToDefaultButton from './reset-to-default-button.vue'
+import SettingsSourceHeader from './settings-source-header.vue'
 import { useInstanceSettingsDraft } from './use-instance-settings-draft'
+import { useSettingsSource } from './use-settings-source'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -39,6 +39,11 @@ const defaultResolution = computed(
 	() => (settingsQuery.data.value?.game_resolution.slice() ?? [0, 0]) as [number, number],
 )
 
+const source = useSettingsSource(draft, () => ({
+	fullscreen: defaultFullscreen.value,
+	resolution: defaultResolution.value,
+}))
+
 const fullscreen = computed(() => draft.value.fullscreen ?? defaultFullscreen.value)
 const resolution = computed(() => draft.value.resolution ?? defaultResolution.value)
 
@@ -48,17 +53,10 @@ function setDimension(index: 0 | 1, value: number) {
 	draft.value.resolution = next
 }
 
-function resetDimension(index: 0 | 1) {
-	setDimension(index, defaultResolution.value[index])
-	if (resolution.value.every((dimension, i) => Number(dimension) === defaultResolution.value[i])) {
-		draft.value.resolution = null
-	}
-}
-
 const messages = defineMessages({
-	defaultSettingsDescription: {
-		id: 'instance.settings.tabs.window.default-settings-description',
-		defaultMessage: 'Your instance uses the default window settings unless you override them here.',
+	settingsSource: {
+		id: 'instance.settings.tabs.window.settings-source',
+		defaultMessage: 'Window settings source',
 	},
 	fullscreen: {
 		id: 'instance.settings.tabs.window.fullscreen',
@@ -97,43 +95,42 @@ const messages = defineMessages({
 
 <template>
 	<div class="flex flex-col gap-6">
-		<DefaultSettingsIntro
+		<SettingsSourceHeader
+			v-model="source"
 			tab="window"
-			:description="formatMessage(messages.defaultSettingsDescription)"
+			:title="formatMessage(messages.settingsSource)"
 		/>
-		<div class="flex items-center gap-4 justify-between">
-			<div class="flex flex-col gap-1">
-				<h2 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.fullscreen) }}
-				</h2>
-				<p class="m-0">
-					{{ formatMessage(messages.fullscreenDescription) }}
-				</p>
-			</div>
-			<div class="flex shrink-0 items-center gap-2">
+
+		<div
+			class="flex flex-col gap-6 transition-opacity"
+			:class="{ 'opacity-60': source === 'app' }"
+			:inert="source === 'app'"
+		>
+			<div class="flex items-center gap-4 justify-between">
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.fullscreen) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.fullscreenDescription) }}
+					</p>
+				</div>
 				<Toggle
 					id="fullscreen"
 					:model-value="fullscreen"
 					@update:model-value="(value) => (draft.fullscreen = value)"
 				/>
-				<ResetToDefaultButton
-					:disabled="draft.fullscreen === null"
-					:setting="formatMessage(messages.fullscreen)"
-					@reset="draft.fullscreen = null"
-				/>
 			</div>
-		</div>
 
-		<div class="flex items-center gap-4 justify-between">
-			<div class="flex flex-col gap-1">
-				<h2 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.width) }}
-				</h2>
-				<p class="m-0">
-					{{ formatMessage(messages.widthDescription) }}
-				</p>
-			</div>
-			<div class="flex shrink-0 items-center gap-2">
+			<div class="flex items-center gap-4 justify-between">
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.width) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.widthDescription) }}
+					</p>
+				</div>
 				<Input
 					id="width"
 					:model-value="resolution[0]"
@@ -143,24 +140,17 @@ const messages = defineMessages({
 					:placeholder="formatMessage(messages.enterWidth)"
 					@update:model-value="(value) => setDimension(0, Number(value))"
 				/>
-				<ResetToDefaultButton
-					:disabled="draft.resolution === null"
-					:setting="formatMessage(messages.width)"
-					@reset="resetDimension(0)"
-				/>
 			</div>
-		</div>
 
-		<div class="flex items-center gap-4 justify-between">
-			<div class="flex flex-col gap-1">
-				<h2 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.height) }}
-				</h2>
-				<p class="m-0">
-					{{ formatMessage(messages.heightDescription) }}
-				</p>
-			</div>
-			<div class="flex shrink-0 items-center gap-2">
+			<div class="flex items-center gap-4 justify-between">
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.height) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.heightDescription) }}
+					</p>
+				</div>
 				<Input
 					id="height"
 					:model-value="resolution[1]"
@@ -169,11 +159,6 @@ const messages = defineMessages({
 					type="number"
 					:placeholder="formatMessage(messages.enterHeight)"
 					@update:model-value="(value) => setDimension(1, Number(value))"
-				/>
-				<ResetToDefaultButton
-					:disabled="draft.resolution === null"
-					:setting="formatMessage(messages.height)"
-					@reset="resetDimension(1)"
 				/>
 			</div>
 		</div>
