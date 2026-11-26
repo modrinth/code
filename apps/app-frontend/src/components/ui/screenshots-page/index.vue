@@ -147,10 +147,28 @@ const props = withDefaults(
 const isGlobal = computed(() => !props.instanceId)
 const storageSuffix = props.instanceId ? 'instance' : 'global'
 const search = ref('')
-const sort = useStorage<SortMode<ScreenshotSortField>>(`screenshots-sort-v2-${storageSuffix}`, {
-	field: 'date',
-	direction: 'desc',
-})
+const legacySortModes: Record<string, SortMode<ScreenshotSortField>> = {
+	newest: { field: 'date', direction: 'desc' },
+	oldest: { field: 'date', direction: 'asc' },
+	name: { field: 'name', direction: 'asc' },
+}
+
+function readLegacySort(): SortMode<ScreenshotSortField> {
+	let legacy: string | null = null
+	try {
+		legacy = localStorage.getItem(`screenshots-sort-${storageSuffix}`)
+	} catch {
+		legacy = null
+	}
+	return legacy && Object.hasOwn(legacySortModes, legacy)
+		? legacySortModes[legacy]
+		: legacySortModes.newest
+}
+
+const sort = useStorage<SortMode<ScreenshotSortField>>(
+	`screenshots-sort-v2-${storageSuffix}`,
+	readLegacySort(),
+)
 const groupBy = useStorage<ScreenshotGroupBy>(`screenshots-group-v2-${storageSuffix}`, 'date')
 const collapsedGroups = useStorage<Record<string, boolean>>(
 	`screenshots-collapsed-groups-${storageSuffix}`,
