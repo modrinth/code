@@ -5,7 +5,7 @@ import type { ContentCardTableItem } from '../../types'
 
 type Point = { x: number; y: number }
 
-export const ROW_GATHER_DURATION = 500
+export const ROW_GATHER_DURATION = 350
 
 export interface RowDragGatherItem {
 	row: ContentCardTableItem
@@ -19,8 +19,8 @@ export function useRowDragGather(
 ) {
 	const items = ref<RowDragGatherItem[]>([])
 	const target = ref<Point>({ x: 0, y: 0 })
-	const targetOffset = ref<Point>({ x: 0, y: 0 })
 	const isGathering = ref(false)
+	let anchorOffset: Point = { x: 0, y: 0 }
 	let lastPointer: Point = { x: 0, y: 0 }
 	let cleanupTimer: number | undefined
 	let alignFrame: { id: number; window: Window } | undefined
@@ -41,15 +41,15 @@ export function useRowDragGather(
 		clearCleanupTimer()
 		cancelAlignFrame()
 		items.value = []
-		targetOffset.value = { x: 0, y: 0 }
+		anchorOffset = { x: 0, y: 0 }
 		isGathering.value = false
 	}
 
 	function updateTarget(pointer: Point) {
 		lastPointer = pointer
 		target.value = {
-			x: pointer.x + targetOffset.value.x,
-			y: pointer.y + targetOffset.value.y,
+			x: pointer.x + anchorOffset.x + (preview.value?.offsetWidth ?? 0) / 2,
+			y: pointer.y + anchorOffset.y + (preview.value?.offsetHeight ?? 0) / 2,
 		}
 	}
 
@@ -66,8 +66,13 @@ export function useRowDragGather(
 		const reduceMotion = ownerWindow.matchMedia('(prefers-reduced-motion: reduce)').matches
 		if (rowIds.length < 2 || reduceMotion) return
 
+		const source = rowElement(rowIds[0])?.getBoundingClientRect()
+		anchorOffset = source
+			? { x: source.left - pointer.x, y: source.top - pointer.y }
+			: { x: 0, y: 0 }
+
 		const rowsById = new Map(rows.value.map((row) => [row.id, row]))
-		items.value = rowIds.flatMap((rowId) => {
+		items.value = rowIds.slice(1).flatMap((rowId) => {
 			const row = rowsById.get(rowId)
 			const element = rowElement(rowId)
 			if (!row || !element || element.getClientRects().length === 0) return []
@@ -79,19 +84,14 @@ export function useRowDragGather(
 		updateTarget(pointer)
 		isGathering.value = items.value.length > 0
 		if (isGathering.value) {
-			alignFrame = { id: ownerWindow.requestAnimationFrame(alignToPreview), window: ownerWindow }
+			alignFrame = {
+				id: ownerWindow.requestAnimationFrame(() => {
+					alignFrame = undefined
+					updateTarget(lastPointer)
+				}),
+				window: ownerWindow,
+			}
 		}
-	}
-
-	function alignToPreview() {
-		alignFrame = undefined
-		const rect = preview.value?.getBoundingClientRect()
-		if (!rect) return
-		targetOffset.value = {
-			x: rect.left + rect.width / 2 - lastPointer.x,
-			y: rect.top + rect.height / 2 - lastPointer.y,
-		}
-		updateTarget(lastPointer)
 	}
 
 	function finish() {

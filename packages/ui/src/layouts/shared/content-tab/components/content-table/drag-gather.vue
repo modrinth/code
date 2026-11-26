@@ -28,17 +28,13 @@ const containerStyles = computed(() =>
 )
 
 const itemStyles = computed(() =>
-	props.items.map((item, index) => {
-		const originX = item.rect.left - props.target.x
-		const originY = item.rect.top - props.target.y
-		return {
-			transform: gathered.value
-				? 'translate3d(-50%, -50%, 0)'
-				: `translate3d(${originX}px, ${originY}px, 0)`,
-			transitionDuration: `${ROW_GATHER_DURATION}ms`,
-			transitionDelay: `${Math.min(index, 8) * 10}ms`,
-		}
-	}),
+	props.items.map((item, index) => ({
+		transform: gathered.value
+			? 'translate3d(0, 0, 0) translate(-50%, -50%)'
+			: `translate3d(${item.rect.left - props.target.x}px, ${item.rect.top - props.target.y}px, 0) translate(0, 0)`,
+		transitionDuration: gathered.value ? `${ROW_GATHER_DURATION}ms` : '0ms',
+		transitionDelay: gathered.value ? `${Math.min(index, 8) * 10}ms` : '0ms',
+	})),
 )
 
 onMounted(() => {
@@ -50,7 +46,7 @@ onMounted(() => {
 					finishing.value = true
 					emit('complete')
 				},
-				Math.max(ROW_GATHER_DURATION - 250, 0),
+				Math.max(ROW_GATHER_DURATION - 150, 0),
 			)
 		})
 	})
