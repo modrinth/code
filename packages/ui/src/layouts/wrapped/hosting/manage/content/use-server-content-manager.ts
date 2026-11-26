@@ -95,12 +95,8 @@ export function useServerContentManager() {
 
 	function browse(contentType: ContentType = primaryType.value) {
 		if (busy.actionDisabled.value) return
-		if (browseServerContent && ['mod', 'plugin', 'datapack'].includes(contentType)) {
-			browseServerContent({
-				serverId,
-				worldId: worldId.value,
-				type: contentType as 'mod' | 'plugin' | 'datapack',
-			})
+		if (browseServerContent) {
+			browseServerContent({ serverId, worldId: worldId.value, type: contentType })
 			return
 		}
 

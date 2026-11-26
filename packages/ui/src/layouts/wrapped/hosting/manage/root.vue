@@ -415,6 +415,7 @@ import { serverKeys } from '#ui/composables/server-queries'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
 import {
+	type BrowseServerContentArgs,
 	injectModrinthClient,
 	injectNotificationManager,
 	provideServerSettingsModal,
@@ -454,11 +455,7 @@ const props = withDefaults(
 			worldId: string | null
 			from: 'reset-server' | 'onboarding'
 		}) => void | Promise<void>
-		browseContent?: (args: {
-			serverId: string
-			worldId: string | null
-			type: 'mod' | 'plugin' | 'datapack'
-		}) => void | Promise<void>
+		browseContent?: (args: BrowseServerContentArgs) => void | Promise<void>
 		constrainWidth?: boolean
 		layoutMode?: 'page' | 'fill'
 	}>(),
@@ -1366,11 +1363,7 @@ function handleBrowseModpacks(args: {
 	props.browseModpacks?.(args)
 }
 
-function handleBrowseContent(args: {
-	serverId: string
-	worldId: string | null
-	type: 'mod' | 'plugin' | 'datapack'
-}) {
+function handleBrowseContent(args: BrowseServerContentArgs) {
 	props.browseContent?.(args)
 }
 

@@ -5,10 +5,12 @@ import {
 	type UnknownFileWarningModal,
 	useVIntl,
 } from '@modrinth/ui'
-import { nextTick, type Ref, ref } from 'vue'
+import type { UnlistenFn } from '@tauri-apps/api/event'
+import { type ComputedRef, nextTick, onMounted, onUnmounted, type Ref, ref } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { add_project_from_path, is_file_on_modrinth } from '@/helpers/instance'
+import { listenNativeDragDrop } from '@/helpers/native-drag-drop'
 import { get as getSettings, set as setSettings } from '@/helpers/settings'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { pickFiles } from '@/platform/dialogs'
@@ -31,12 +33,14 @@ const messages = defineMessages({
 export interface ContentUploadOptions {
 	instance: Ref<GameInstance>
 	items: Readonly<Ref<ContentItem[]>>
+	isInstanceBusy: ComputedRef<boolean>
 	refetchContent: (cacheBehaviour?: CacheBehaviour) => Promise<void>
 }
 
 export function useContentUpload({
 	instance,
 	items,
+	isInstanceBusy,
 	refetchContent,
 }: ContentUploadOptions) {
 	const { formatMessage } = useVIntl()
@@ -80,7 +84,12 @@ export function useContentUpload({
 
 	async function upload() {
 		if (!instance.value || instance.value.content_locked) return
-		const selectedFiles = (await pickFiles()).map((path) => ({
+		await installFiles(await pickFiles())
+	}
+
+	async function installFiles(paths: string[]) {
+		if (!instance.value || instance.value.content_locked) return
+		const selectedFiles = paths.map((path) => ({
 			path,
 			filename: path.split(/[\\/]/).pop() ?? path,
 		}))
@@ -131,6 +140,29 @@ export function useContentUpload({
 					: formatMessage(messages.projectsWereAdded, { count: names.length }),
 		})
 	}
+
+	let unmounted = false
+	let unlistenDragDrop: UnlistenFn | null = null
+
+	onMounted(() => {
+		void listenNativeDragDrop(async (event) => {
+			if (event.type !== 'drop' || isInstanceBusy.value) return
+			await installFiles(event.paths.filter((path) => !path.endsWith('.mrpack')))
+		})
+			.then((unlisten) => {
+				if (unmounted) {
+					unlisten()
+					return
+				}
+				unlistenDragDrop = unlisten
+			})
+			.catch((error) => handleError(error as Error))
+	})
+
+	onUnmounted(() => {
+		unmounted = true
+		unlistenDragDrop?.()
+	})
 
 	return {
 		unknownFileWarningModal,
