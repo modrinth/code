@@ -68,6 +68,7 @@ export function useContentUpdater({
 	}
 
 	const installVersionMutation = useMutation({
+		networkMode: 'always',
 		mutationFn: ({ filePath, versionId }: InstallVersionVariables) =>
 			switch_project_version_with_dependencies(instance.value.id, filePath, versionId),
 		onSuccess: (_result, { item }) => {
@@ -87,6 +88,7 @@ export function useContentUpdater({
 	})
 
 	const modpackVersionMutation = useMutation({
+		networkMode: 'always',
 		mutationFn: ({ instanceId, versionId }: { instanceId: string; versionId: string }) =>
 			update_managed_modrinth_version(instanceId, versionId),
 		onSuccess: () => refetchContent(),

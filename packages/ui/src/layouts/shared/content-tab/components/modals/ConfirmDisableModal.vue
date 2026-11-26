@@ -48,7 +48,7 @@ const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	header: {
-		id: 'content.confirm-disable.header',
+		id: 'content.confirm-disable.header-by-type',
 		defaultMessage:
 			'Disable {itemType, select, mod {{count, plural, one {mod} other {mods}}} plugin {{count, plural, one {plugin} other {plugins}}} resourcepack {{count, plural, one {resource pack} other {resource packs}}} datapack {{count, plural, one {data pack} other {data packs}}} shader {{count, plural, one {shader} other {shaders}}} other {{count, plural, one {project} other {projects}}}}',
 	},
