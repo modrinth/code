@@ -9,7 +9,7 @@ use std::{
 
 use async_trait::async_trait;
 use derive_more::Debug;
-use anyhow::{Context, Result, Context, bail, anyhow};
+use anyhow::{Context, Result, anyhow, bail};
 use libseccomp::{
     ScmpAction, ScmpArgCompare, ScmpCompareOp, ScmpFilterContext, ScmpSyscall,
 };

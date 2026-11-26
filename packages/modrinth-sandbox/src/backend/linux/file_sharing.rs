@@ -14,7 +14,7 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-use anyhow::{Context, bail, anyhow};
+use anyhow::{Context, anyhow, bail};
 use indexmap::IndexMap;
 use parking_lot::Mutex;
 use rand::RngExt;
