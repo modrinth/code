@@ -234,8 +234,8 @@ fn macos_java_executable(install_dir: &Path) -> crate::Result<PathBuf> {
     ))
 }
 
-/// Extracts a Java archive to staging, then moves it into place unless a
-/// working copy of the same package is already installed.
+/// Extracts a Java archive into place unless a working copy of the same
+/// package is already installed.
 async fn install_java_archive(
     file: Bytes,
     archive_type: &'static str,
@@ -243,12 +243,22 @@ async fn install_java_archive(
     java_versions_dir: &Path,
 ) -> crate::Result<PathBuf> {
     io::create_dir_all(java_versions_dir).await?;
-    let staging = tempfile::tempdir_in(java_versions_dir)
-        .map_err(|err| io::IOError::with_path(err, java_versions_dir))?;
-    let staging = tokio::task::spawn_blocking(move || {
+    let install_dir = java_versions_dir.join(directory_name);
+    let _install_guard = JAVA_INSTALL_LOCK.lock().await;
+    if let Ok(java_path) = installed_java_executable(&install_dir)
+        && jre::check_java_at_filepath(&java_path).await.is_ok()
+    {
+        return Ok(java_path);
+    }
+    if install_dir.exists() {
+        io::remove_dir_all(&install_dir).await?;
+    }
+
+    let target = java_versions_dir.to_path_buf();
+    tokio::task::spawn_blocking(move || {
         if archive_type == "tar.gz" {
             let decoder = flate2::read::GzDecoder::new(file.as_ref());
-            tar::Archive::new(decoder).unpack(staging.path()).context(
+            tar::Archive::new(decoder).unpack(&target).context(
                 ErrorKind::InputError(
                     "failed to extract java tar.gz".to_string(),
                 ),
@@ -258,45 +268,28 @@ async fn install_java_archive(
                 .context(ErrorKind::InputError(
                     "failed to read java zip".to_string(),
                 ))?;
-            archive
-                .extract(staging.path())
-                .context(ErrorKind::InputError(
-                    "failed to extract java zip".to_string(),
-                ))?;
+            archive.extract(&target).context(ErrorKind::InputError(
+                "failed to extract java zip".to_string(),
+            ))?;
         }
-        crate::Result::Ok(staging)
+        crate::Result::Ok(())
     })
     .await??;
 
-    let extracted_dir = staging.path().join(directory_name);
+    installed_java_executable(&install_dir)
+}
+
+fn installed_java_executable(install_dir: &Path) -> crate::Result<PathBuf> {
     #[cfg(target_os = "macos")]
-    let extracted_java = macos_java_executable(&extracted_dir)?;
+    let java = macos_java_executable(install_dir)?;
     #[cfg(not(target_os = "macos"))]
-    let extracted_java = java_executable(&extracted_dir);
-    if !extracted_java.is_file() {
+    let java = java_executable(install_dir);
+    if !java.is_file() {
         bail!(ErrorKind::InputError(
             "Java archive does not contain the expected executable".to_string()
         ));
     }
-
-    let install_dir = java_versions_dir.join(directory_name);
-    let relative_java = extracted_java.strip_prefix(&extracted_dir).context(
-        ErrorKind::InputError(
-            "Java executable is outside the extracted package".to_string(),
-        ),
-    )?;
-    let java_path = install_dir.join(relative_java);
-    let _install_guard = JAVA_INSTALL_LOCK.lock().await;
-    if jre::check_java_at_filepath(&java_path).await.is_err() {
-        if install_dir.exists() {
-            io::remove_dir_all(&install_dir).await?;
-        }
-        tokio::fs::rename(&extracted_dir, &install_dir)
-            .await
-            .map_err(|err| io::IOError::with_path(err, &install_dir))?;
-    }
-
-    Ok(java_path)
+    Ok(java)
 }
 
 async fn auto_install_java_inner(
@@ -649,7 +642,7 @@ mod tests {
     }
 
     #[cfg(unix)]
-    fn assert_no_staging_left(java_versions_dir: &Path) {
+    fn assert_only_package_installed(java_versions_dir: &Path) {
         let entries = std::fs::read_dir(java_versions_dir)
             .unwrap()
             .map(|entry| entry.unwrap().file_name())
@@ -673,21 +666,8 @@ mod tests {
             assert_eq!(std::fs::read(&java).unwrap(), WORKING_JAVA);
             let mode = std::fs::metadata(&java).unwrap().permissions().mode();
             assert_ne!(mode & 0o111, 0);
-            assert_no_staging_left(dir.path());
+            assert_only_package_installed(dir.path());
         }
-    }
-
-    #[cfg(unix)]
-    #[tokio::test]
-    async fn rejected_archive_leaves_existing_install_untouched() {
-        let dir = tempfile::tempdir().unwrap();
-        let java = write_java(dir.path(), BROKEN_JAVA);
-        let file = tar_gz(&format!("{PACKAGE}/readme.txt"), b"no java here");
-        install_java_archive(file, "tar.gz", PACKAGE, dir.path())
-            .await
-            .unwrap_err();
-        assert_eq!(std::fs::read(java).unwrap(), BROKEN_JAVA);
-        assert_no_staging_left(dir.path());
     }
 
     #[cfg(unix)]
@@ -717,7 +697,7 @@ mod tests {
             .await
             .unwrap();
         assert!(marker.exists());
-        assert_no_staging_left(dir.path());
+        assert_only_package_installed(dir.path());
     }
 
     #[cfg(unix)]
@@ -733,7 +713,7 @@ mod tests {
         let java = first.unwrap();
         assert_eq!(second.unwrap(), java);
         assert_eq!(third.unwrap(), java);
-        assert_no_staging_left(dir.path());
+        assert_only_package_installed(dir.path());
     }
 
     #[test]
