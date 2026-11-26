@@ -13,7 +13,7 @@ use dashmap::DashMap;
 use reqwest::Method;
 use serde::Deserialize;
 use std::future::Future;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::pin::Pin;
 use sysinfo::{MemoryRefreshKind, RefreshKind};
 
@@ -266,6 +266,7 @@ async fn install_java_archive(
     let result = extract_java_archive(
         file,
         archive_type,
+        directory_name,
         java_versions_dir,
         &install_dir,
     )
@@ -287,15 +288,38 @@ async fn install_java_archive(
     }
 }
 
+/// Extracts a Java archive into `java_versions_dir`, after checking that every
+/// entry lies inside `directory_name` so no other installed package is touched.
 async fn extract_java_archive(
     file: Bytes,
     archive_type: &'static str,
+    directory_name: &str,
     java_versions_dir: &Path,
     install_dir: &Path,
 ) -> crate::Result<PathBuf> {
     let target = java_versions_dir.to_path_buf();
+    let directory_name = directory_name.to_string();
     tokio::task::spawn_blocking(move || {
         if archive_type == "tar.gz" {
+            let read_error = || {
+                ErrorKind::InputError("failed to read java tar.gz".to_string())
+            };
+            let mut archive =
+                tar::Archive::new(flate2::read::GzDecoder::new(file.as_ref()));
+            for entry in archive.entries().with_context(read_error)? {
+                let entry = entry.with_context(read_error)?;
+                let kind = entry.header().entry_type();
+                if kind.is_pax_global_extensions()
+                    || kind.is_pax_local_extensions()
+                {
+                    continue;
+                }
+                ensure_entry_in_package(
+                    &entry.path().with_context(read_error)?,
+                    &directory_name,
+                )?;
+            }
+
             let decoder = flate2::read::GzDecoder::new(file.as_ref());
             tar::Archive::new(decoder).unpack(&target).context(
                 ErrorKind::InputError(
@@ -307,6 +331,19 @@ async fn extract_java_archive(
                 .context(ErrorKind::InputError(
                     "failed to read java zip".to_string(),
                 ))?;
+            for index in 0..archive.len() {
+                let entry = archive.by_index_raw(index).context(
+                    ErrorKind::InputError(
+                        "failed to read java zip".to_string(),
+                    ),
+                )?;
+                let path =
+                    entry.enclosed_name().context(ErrorKind::InputError(
+                        "Java archive contains an entry with an unsafe path"
+                            .to_string(),
+                    ))?;
+                ensure_entry_in_package(&path, &directory_name)?;
+            }
             archive.extract(&target).context(ErrorKind::InputError(
                 "failed to extract java zip".to_string(),
             ))?;
@@ -316,6 +353,23 @@ async fn extract_java_archive(
     .await??;
 
     installed_java_executable(install_dir)
+}
+
+fn ensure_entry_in_package(
+    path: &Path,
+    directory_name: &str,
+) -> crate::Result<()> {
+    let mut components = path
+        .components()
+        .filter(|component| !matches!(component, Component::CurDir));
+    match components.next() {
+        None => Ok(()),
+        Some(Component::Normal(first)) if first == directory_name => Ok(()),
+        _ => bail!(ErrorKind::InputError(format!(
+            "Java archive entry {} is outside the {directory_name} package",
+            path.display()
+        ))),
+    }
 }
 
 fn installed_java_executable(install_dir: &Path) -> crate::Result<PathBuf> {
@@ -645,27 +699,41 @@ mod tests {
 
     #[cfg(unix)]
     fn tar_gz(path: &str, contents: &[u8]) -> Bytes {
+        tar_gz_entries(&[(path, contents)])
+    }
+
+    #[cfg(unix)]
+    fn tar_gz_entries(entries: &[(&str, &[u8])]) -> Bytes {
         let encoder = flate2::write::GzEncoder::new(
             Vec::new(),
             flate2::Compression::fast(),
         );
         let mut builder = tar::Builder::new(encoder);
-        let mut header = tar::Header::new_gnu();
-        header.set_size(contents.len() as u64);
-        header.set_mode(0o755);
-        header.set_cksum();
-        builder.append_data(&mut header, path, contents).unwrap();
+        for (path, contents) in entries {
+            let mut header = tar::Header::new_gnu();
+            header.set_size(contents.len() as u64);
+            header.set_mode(0o755);
+            header.set_cksum();
+            builder.append_data(&mut header, path, *contents).unwrap();
+        }
         builder.into_inner().unwrap().finish().unwrap().into()
     }
 
     #[cfg(unix)]
     fn zip_archive(path: &str, contents: &[u8]) -> Bytes {
+        zip_entries(&[(path, contents)])
+    }
+
+    #[cfg(unix)]
+    fn zip_entries(entries: &[(&str, &[u8])]) -> Bytes {
         let mut writer = zip::ZipWriter::new(std::io::Cursor::new(Vec::new()));
         let options = zip::write::SimpleFileOptions::default()
             .compression_method(zip::CompressionMethod::Stored)
             .unix_permissions(0o755);
-        writer.start_file(path, options).unwrap();
-        writer.write_all(contents).unwrap();
+        for (path, contents) in entries {
+            writer.start_file(*path, options).unwrap();
+            writer.write_all(contents).unwrap();
+        }
         writer.finish().unwrap().into_inner().into()
     }
 
@@ -767,6 +835,33 @@ mod tests {
             .await
             .unwrap_err();
         assert!(!dir.path().join(PACKAGE).exists());
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn entries_outside_package_are_rejected_before_writing() {
+        let java = java_entry();
+        let outside = "other-package/bin/java";
+        for (archive_type, file) in [
+            (
+                "tar.gz",
+                tar_gz_entries(&[
+                    (&java, WORKING_JAVA),
+                    (outside, BROKEN_JAVA),
+                ]),
+            ),
+            (
+                "zip",
+                zip_entries(&[(&java, WORKING_JAVA), (outside, BROKEN_JAVA)]),
+            ),
+        ] {
+            let dir = tempfile::tempdir().unwrap();
+            install_java_archive(file, archive_type, PACKAGE, dir.path())
+                .await
+                .unwrap_err();
+            assert!(!dir.path().join("other-package").exists());
+            assert!(!dir.path().join(PACKAGE).exists());
+        }
     }
 
     #[cfg(unix)]
