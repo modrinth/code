@@ -73,7 +73,7 @@ mod ruleset_tests {
                 updated_by: None,
                 updated_at: chrono::Utc::now(),
                 params: serde_json::from_value(serde_json::json!({
-                    "expression": "[]", "decision_questions": {"q": "Question"},
+                    "expression": "[]", "decision_questions": {"q": {"question": "Question", "include_context": ["title"]}},
                 }))
                 .unwrap(),
             }],
@@ -116,7 +116,9 @@ mod ruleset_tests {
         changed.rules[0]
             .params
             .decision_questions
-            .insert("q".into(), "Different".into());
+            .get_mut("q")
+            .unwrap()
+            .question = "Different".into();
         assert_ne!(hash, changed.content_hash().unwrap());
         let mut changed = original;
         changed

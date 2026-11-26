@@ -50,7 +50,15 @@
 			</div>
 			<p :id="contextHelpId" class="m-0 text-sm text-secondary">
 				Enter a base62 project ID, not a slug. This loads the project's current context without
-				running rules or inference. No files are scanned, so scanned_files is empty.
+				running rules or inference. No files are scanned, so scanned_files is empty. Project
+				link_urls maps platform keys to objects containing platform, donation, and url. Decision
+				questions independently select title, summary, description, links, slug, license (ID, name,
+				URL), categories, additional categories, gallery titles, gallery descriptions, version
+				names, version numbers, version changelogs, version filenames, and typed Java/Bedrock server
+				listing addresses. Version text includes all available project versions. Only selected
+				fields are sent; account/private data, moderation data, server ping responses, and arbitrary
+				raw components are excluded. Named answers are available in ai.decisions when evaluating a
+				rule.
 			</p>
 			<div
 				v-if="submittedProjectId"

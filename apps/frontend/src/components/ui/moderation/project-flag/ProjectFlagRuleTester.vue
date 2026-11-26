@@ -106,7 +106,12 @@ const decisionQuestions = defineModel<DecisionQuestionEntry[]>('decisionQuestion
 	required: true,
 })
 const decisionQuestionsMap = computed(() =>
-	Object.fromEntries(decisionQuestions.value.map((entry) => [entry.key.trim(), entry.question])),
+	Object.fromEntries(
+		decisionQuestions.value.map((entry) => [
+			entry.key.trim(),
+			{ question: entry.question, include_context: [...entry.include_context] },
+		]),
+	),
 )
 const scanFilesFor = computed(() =>
 	Object.fromEntries(patterns.value.map((entry) => [entry.name.trim(), entry.pattern])),

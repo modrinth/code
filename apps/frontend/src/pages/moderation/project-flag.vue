@@ -376,6 +376,7 @@ const decisionQuestionsErrors = computed(() => {
 			return 'Each decision question key must be unique.'
 		}
 		if (!entry.question.trim()) return 'Enter a question.'
+		if (entry.include_context.length === 0) return 'Select at least one context field.'
 		return ''
 	})
 })
@@ -465,10 +466,11 @@ function openEdit(rule: Rule) {
 		name,
 		pattern,
 	}))
-	decisionQuestions.value = Object.entries(rule.params.decision_questions ?? {}).map(
-		([key, question]) => ({
+	decisionQuestions.value = Object.entries(rule.params.decision_questions).map(
+		([key, { question, include_context }]) => ({
 			key,
 			question,
+			include_context: [...include_context],
 		}),
 	)
 	isEditing.value = true
@@ -492,7 +494,10 @@ function saveRule() {
 		params: {
 			expression: form.expression,
 			decision_questions: Object.fromEntries(
-				decisionQuestions.value.map((entry) => [entry.key.trim(), entry.question]),
+				decisionQuestions.value.map((entry) => [
+					entry.key.trim(),
+					{ question: entry.question, include_context: [...entry.include_context] },
+				]),
 			),
 			scan_files_for: Object.fromEntries(
 				patterns.value.map((entry) => [entry.name.trim(), entry.pattern]),

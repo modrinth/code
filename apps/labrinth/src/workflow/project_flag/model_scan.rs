@@ -252,31 +252,23 @@ impl ModelScanner {
         .map(Some)
     }
 
-    /// Returns probabilities in question order for the supplied text,
-    /// or `None` if the scanner is disabled.
+    /// Sends exactly one question with only its explicitly selected context.
     pub async fn scan_text_content(
         &self,
         project_id: ProjectId,
-        text: &str,
-        questions: &[String],
-    ) -> Result<Option<Vec<f64>>> {
+        state: Value,
+        question: &str,
+    ) -> Result<Option<f64>> {
         let Some(config) = &self.config.infer_decisions else {
             return Ok(None);
         };
-        ensure!(
-            !text.trim().is_empty(),
-            InvalidScanInput("text must not be empty")
-        );
-
-        self.decide(
-            project_id,
-            config,
-            Value::String(text.to_owned()),
-            questions,
-        )
-        .await
-        .context("scanning text content")
-        .map(Some)
+        self.decide(project_id, config, state, &[question.to_owned()])
+            .await
+            .context("scanning text content")?
+            .into_iter()
+            .next()
+            .context("missing text decision answer")
+            .map(Some)
     }
 
     async fn decide(
@@ -460,6 +452,22 @@ mod tests {
         assert_eq!(questions["q1"]["instructions"], prompts[1]);
         assert!(decision_questions(&["  ".into()]).is_err());
         assert!(decision_questions(&[]).unwrap().is_empty());
+    }
+
+    #[test]
+    fn individual_text_requests_each_use_q0_and_decode_independently() {
+        for (prompt, probability) in [("First?", 0.25), ("Second?", 0.75)] {
+            let questions = decision_questions(&[prompt.to_owned()]).unwrap();
+            assert_eq!(questions.len(), 1);
+            assert_eq!(
+                questions["q0"],
+                json!({"type": "noul", "instructions": prompt})
+            );
+            assert_eq!(
+                parse(json!({"answers": {"q0": {"type": "noul", "noul": probability}}}), 1).unwrap(),
+                vec![probability],
+            );
+        }
     }
 
     #[test]

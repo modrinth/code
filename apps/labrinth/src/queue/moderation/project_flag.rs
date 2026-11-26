@@ -25,8 +25,8 @@ use crate::{
             DBOrganization, DBProject, DBProjectDisclosure, DBProjectId,
             DBTeamMember, DBThread, DBUser, DBVersion, DBVersionId,
             project_flag_item::{
-                DBProjectFlagModule, DBProjectFlagRule, PatternName,
-                ProjectFlag, ProjectRuleParams,
+                DBProjectFlagModule, DBProjectFlagRule, DecisionQuestion,
+                PatternName, ProjectFlag, ProjectRuleParams,
             },
         },
     },
@@ -299,7 +299,7 @@ pub struct ScannedFile {
 pub struct ProjectRuleCall {
     pub ast: rhai::AST,
     pub scan_files_for: BTreeMap<PatternName, Regex>,
-    pub decision_questions: HashMap<String, String>,
+    pub decision_questions: HashMap<String, DecisionQuestion>,
 }
 
 thread_local! {
@@ -436,6 +436,7 @@ impl ProjectFlagEngine {
         &self,
         params: &ProjectRuleParams,
     ) -> Result<ProjectRuleCall> {
+        params.validate_decision_questions()?;
         let ast = self
             .rhai
             .compile(&params.expression)
@@ -768,17 +769,14 @@ impl ProjectFlagEngine {
     pub(crate) async fn load_decisions(
         &self,
         context: &FlagContext,
-        questions: &HashMap<String, String>,
+        questions: &HashMap<String, DecisionQuestion>,
     ) -> Result<BTreeMap<String, Option<f64>>> {
         use crate::workflow::project_flag::{
             scan_cache::load_scan,
             text_scan::{ProjectText, decode_result, text_input_hash},
         };
-        let content = ProjectText {
-            title: context.project.name.clone(),
-            summary: context.project.summary.clone(),
-            description: context.project.description.clone(),
-        };
+        let content =
+            ProjectText::from_project(&context.project, &context.versions)?;
         let version = self
             .scanner_config
             .infer_decisions

@@ -185,6 +185,9 @@ pub async fn create_rule(
     body.validate().map_err(|error| {
         ApiError::Request(anyhow!(validation_errors_to_string(error, None)))
     })?;
+    body.params
+        .validate_decision_questions()
+        .map_err(ApiError::Request)?;
 
     let rule = DBProjectFlagRule::create(
         &body.name,
@@ -226,6 +229,9 @@ pub async fn update_rule(
     body.validate().map_err(|error| {
         ApiError::Request(anyhow!(validation_errors_to_string(error, None)))
     })?;
+    body.params
+        .validate_decision_questions()
+        .map_err(ApiError::Request)?;
 
     let rule = DBProjectFlagRule::update(
         path.into_inner().into(),
@@ -740,6 +746,9 @@ pub async fn eval_rule(
     body.validate().map_err(|error| {
         ApiError::Request(anyhow!(validation_errors_to_string(error, None)))
     })?;
+    body.params
+        .validate_decision_questions()
+        .map_err(ApiError::Request)?;
     let body = body.into_inner();
     let engine = engine
         .with_module_snapshot()

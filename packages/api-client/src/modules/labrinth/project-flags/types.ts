@@ -12,10 +12,32 @@ export type ListProjectFlagModulesParams = {
 
 export type SaveProjectFlagModuleRequest = ProjectFlagModule
 
+export type ProjectFlagContextField =
+	| 'title'
+	| 'summary'
+	| 'description'
+	| 'links'
+	| 'slug'
+	| 'license'
+	| 'categories'
+	| 'additional_categories'
+	| 'gallery_titles'
+	| 'gallery_descriptions'
+	| 'version_names'
+	| 'version_numbers'
+	| 'version_changelogs'
+	| 'filenames'
+	| 'server_addresses'
+
+export interface ProjectFlagDecisionQuestion {
+	question: string
+	include_context: ProjectFlagContextField[]
+}
+
 export interface ProjectFlagRuleParams {
 	expression: string
 	scan_files_for: Record<string, string>
-	decision_questions: Record<string, string>
+	decision_questions: Record<string, ProjectFlagDecisionQuestion>
 }
 
 export interface ProjectFlagRule {
@@ -38,7 +60,7 @@ export interface CreateProjectFlagRuleRequest {
 	name: string
 	params: Omit<ProjectFlagRuleParams, 'scan_files_for' | 'decision_questions'> & {
 		scan_files_for?: Record<string, string>
-		decision_questions?: Record<string, string>
+		decision_questions?: Record<string, ProjectFlagDecisionQuestion>
 	}
 }
 

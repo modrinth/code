@@ -380,7 +380,7 @@ impl ProjectFlagActivities {
         {
             return Ok(None);
         }
-        Ok(text_scan::project_text(&self.pool, input).await?)
+        Ok(text_scan::project_text(&self.pool, &self.redis, input).await?)
     }
 
     #[activity]
@@ -388,12 +388,14 @@ impl ProjectFlagActivities {
         self: Arc<Self>,
         _ctx: ActivityContext,
         input: TextScanInput,
-    ) -> Result<
-        Option<std::collections::BTreeMap<String, TextScanResult>>,
-        ActivityError,
-    > {
+    ) -> Result<Option<Vec<TextScanResult>>, ActivityError> {
         if !project_in_review(&self.pool, input.project_id).await?
-            || !text_scan::text_input_is_current(&self.pool, &input).await?
+            || !text_scan::text_input_is_current(
+                &self.pool,
+                &self.redis,
+                &input,
+            )
+            .await?
         {
             return Ok(None);
         }

@@ -2,14 +2,14 @@
 	<section class="flex flex-col gap-3" aria-label="Decision questions">
 		<div class="flex flex-wrap items-center justify-between gap-2">
 			<h3 class="m-0 text-base font-semibold text-contrast">Decision questions</h3>
-			<Button :disabled="disabled" @click="entries.push({ key: '', question: '' })">
+			<Button :disabled="disabled" @click="addQuestion">
 				<PlusIcon />
 				Add question
 			</Button>
 		</div>
 		<p class="m-0 text-sm text-secondary">
-			Key/question pairs are stored with the rule and passed to the test API. The tester does not
-			evaluate the decision model.
+			Each question uses only its selected project context. Each uncached question makes an
+			independent AI call, including in the tester. Answers remain available by key in ai.decisions.
 		</p>
 		<Table :columns="columns" :data="rows" row-key="index" :row-below-visible="hasError">
 			<template #cell-key="{ row }">
@@ -34,6 +34,17 @@
 					autocomplete="off"
 					@keydown.enter.prevent
 				/>
+				<fieldset class="m-0 mt-2 flex flex-col gap-2 border-0 p-0" :disabled="disabled">
+					<legend class="mb-2 text-sm font-semibold">Include context</legend>
+					<Checkbox
+						v-for="field in contextFields"
+						:key="field.value"
+						:label="field.label"
+						:disabled="disabled"
+						:model-value="row.entry.include_context.includes(field.value)"
+						@update:model-value="setContext(row.entry, field.value, $event)"
+					/>
+				</fieldset>
 			</template>
 			<template #header-actions>
 				<span class="sr-only">Remove</span>
@@ -57,13 +68,49 @@
 </template>
 
 <script setup lang="ts">
+import type { ProjectFlagContextField, ProjectFlagDecisionQuestion } from '@modrinth/api-client'
 import { PlusIcon, TrashIcon } from '@modrinth/assets'
-import { Button, IconButton, Input, Table, type TableColumn } from '@modrinth/ui'
+import { Button, Checkbox, IconButton, Input, Table, type TableColumn } from '@modrinth/ui'
 import { computed } from 'vue'
 
-export interface DecisionQuestionEntry {
+export interface DecisionQuestionEntry extends ProjectFlagDecisionQuestion {
 	key: string
-	question: string
+}
+
+const contextFields: { value: ProjectFlagContextField; label: string }[] = [
+	{ value: 'title', label: 'Title' },
+	{ value: 'summary', label: 'Summary' },
+	{ value: 'description', label: 'Description' },
+	{ value: 'links', label: 'Links' },
+	{ value: 'slug', label: 'Slug' },
+	{ value: 'license', label: 'License (ID, name, URL)' },
+	{ value: 'categories', label: 'Categories' },
+	{ value: 'additional_categories', label: 'Additional categories' },
+	{ value: 'gallery_titles', label: 'Gallery titles' },
+	{ value: 'gallery_descriptions', label: 'Gallery descriptions' },
+	{ value: 'version_names', label: 'Version names' },
+	{ value: 'version_numbers', label: 'Version numbers' },
+	{ value: 'version_changelogs', label: 'Version changelogs' },
+	{ value: 'filenames', label: 'Version filenames' },
+	{ value: 'server_addresses', label: 'Server listing addresses (Java/Bedrock)' },
+]
+
+function addQuestion() {
+	entries.value.push({
+		key: '',
+		question: '',
+		include_context: ['title', 'summary', 'description'],
+	})
+}
+
+function setContext(
+	entry: DecisionQuestionEntry,
+	field: ProjectFlagContextField,
+	selected: boolean,
+) {
+	entry.include_context = selected
+		? [...entry.include_context, field]
+		: entry.include_context.filter((value) => value !== field)
 }
 
 const entries = defineModel<DecisionQuestionEntry[]>({ required: true })

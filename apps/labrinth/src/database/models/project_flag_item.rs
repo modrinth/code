@@ -32,6 +32,64 @@ use super::{
 #[schema(value_type = String, example = "suspicious_url")]
 pub struct PatternName(pub String);
 
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Serialize,
+    Deserialize,
+    ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ContextField {
+    Title,
+    Summary,
+    Description,
+    Links,
+    Slug,
+    License,
+    Categories,
+    AdditionalCategories,
+    GalleryTitles,
+    GalleryDescriptions,
+    VersionNames,
+    VersionNumbers,
+    VersionChangelogs,
+    Filenames,
+    ServerAddresses,
+}
+
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Serialize,
+    Deserialize,
+    ToSchema,
+)]
+pub struct DecisionQuestion {
+    pub question: String,
+    pub include_context: Vec<ContextField>,
+}
+
+impl DecisionQuestion {
+    pub fn canonicalized(&self) -> Self {
+        let mut question = self.clone();
+        question.include_context.sort();
+        question.include_context.dedup();
+        question
+    }
+}
+
 #[serde_as]
 #[derive(Clone, Debug, Serialize, Deserialize, Validate, ToSchema)]
 pub struct ProjectRuleParams {
@@ -42,7 +100,23 @@ pub struct ProjectRuleParams {
     #[schema(value_type = BTreeMap<PatternName, String>)]
     pub scan_files_for: BTreeMap<PatternName, Regex>,
     #[serde(default)]
-    pub decision_questions: HashMap<String, String>,
+    pub decision_questions: HashMap<String, DecisionQuestion>,
+}
+
+impl ProjectRuleParams {
+    pub fn validate_decision_questions(&self) -> Result<()> {
+        for (name, question) in &self.decision_questions {
+            anyhow::ensure!(
+                !question.question.trim().is_empty(),
+                "decision question `{name}` must not be blank"
+            );
+            anyhow::ensure!(
+                !question.include_context.is_empty(),
+                "decision question `{name}` must include at least one context field"
+            );
+        }
+        Ok(())
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
@@ -978,4 +1052,41 @@ pub(crate) async fn freeze_project_flag_ruleset(
     .fetch_one(&mut *transaction)
     .await
     .context("loading existing immutable project flag ruleset")
+}
+
+#[cfg(test)]
+mod decision_question_tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn validates_named_questions_and_requires_explicit_safe_context() {
+        for (question, fields, valid) in [
+            (
+                "Question?",
+                json!(["title", "summary", "description", "links"]),
+                true,
+            ),
+            ("  ", json!(["title"]), false),
+            ("Question?", json!([]), false),
+        ] {
+            let params: ProjectRuleParams = serde_json::from_value(json!({
+                "expression": "[]",
+                "decision_questions": {"named_answer": {"question": question, "include_context": fields}},
+            })).unwrap();
+            let result = params.validate_decision_questions();
+            assert_eq!(result.is_ok(), valid);
+            if let Err(error) = result {
+                assert!(error.to_string().contains("named_answer"));
+            }
+        }
+        for value in [
+            json!({"question": "Q", "include_context": ["users"]}),
+            json!({"question": "Q", "include_context": ["Title"]}),
+            json!({"question": "Q"}),
+            json!("legacy prompt"),
+        ] {
+            assert!(serde_json::from_value::<DecisionQuestion>(value).is_err());
+        }
+    }
 }
