@@ -7,6 +7,7 @@ import { ROW_GATHER_DURATION, type RowDragGatherItem } from './use-row-drag-gath
 const props = defineProps<{
 	items: RowDragGatherItem[]
 	target: { x: number; y: number }
+	teleportTo: HTMLElement | string
 }>()
 
 const emit = defineEmits<{
@@ -62,7 +63,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-	<Teleport to="body">
+	<Teleport :to="teleportTo">
 		<div
 			class="pointer-events-none fixed inset-0 z-[9998] overflow-hidden transition-opacity duration-150 ease-out"
 			:class="finishing ? 'opacity-0' : 'opacity-100'"

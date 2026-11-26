@@ -12,7 +12,7 @@ export interface RowDragGatherItem {
 	rect: { left: number; top: number; width: number; height: number }
 }
 
-export function useRowDragGather(rows: Ref<ContentCardTableItem[]>) {
+export function useRowDragGather(rows: Ref<ContentCardTableItem[]>, root: Ref<HTMLElement | null>) {
 	const items = ref<RowDragGatherItem[]>([])
 	const target = ref<Point>({ x: 0, y: 0 })
 	const targetOffset = ref<Point>({ x: 0, y: 0 })
@@ -40,14 +40,16 @@ export function useRowDragGather(rows: Ref<ContentCardTableItem[]>) {
 	}
 
 	function rowElement(rowId: string) {
-		return Array.from(document.querySelectorAll<HTMLElement>('[data-content-card-item]')).find(
+		const ownerDocument = root.value?.ownerDocument ?? document
+		return Array.from(ownerDocument.querySelectorAll<HTMLElement>('[data-content-card-item]')).find(
 			(element) => element.dataset.contentCardItem === rowId,
 		)
 	}
 
 	function start(rowIds: string[], pointer: Point) {
 		clear()
-		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+		const ownerWindow = root.value?.ownerDocument.defaultView ?? window
+		const reduceMotion = ownerWindow.matchMedia('(prefers-reduced-motion: reduce)').matches
 		if (rowIds.length < 2 || reduceMotion) return
 
 		const source = rowElement(rowIds[0])

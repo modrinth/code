@@ -1,6 +1,6 @@
 import { useLocalStorage } from '@vueuse/core'
 import type { Ref } from 'vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -66,14 +66,15 @@ export function useContentGrouping(options: ContentGroupingOptions) {
 	const supported = computed(() => !!manager?.supportsType(options.activeType.value))
 
 	const groupByByType = persistedRecord<ContentGroupBy>(options.persistKey, 'content-group-by')
+	function setGroupBy(type: ContentType, value: ContentGroupBy) {
+		groupByByType.value = { ...groupByByType.value, [type]: value }
+	}
 	const groupBy = computed<ContentGroupBy>({
 		get: () => {
 			const value = groupByByType.value[options.activeType.value]
 			return value && contentGroupByOptions.includes(value) ? value : 'none'
 		},
-		set: (value) => {
-			groupByByType.value = { ...groupByByType.value, [options.activeType.value]: value }
-		},
+		set: (value) => setGroupBy(options.activeType.value, value),
 	})
 	const grouped = computed(() => supported.value && groupBy.value !== 'none')
 	const customGrouped = computed(() => supported.value && groupBy.value === 'custom')
@@ -95,6 +96,11 @@ export function useContentGrouping(options: ContentGroupingOptions) {
 	}
 
 	const pendingRenameGroupId = ref<string | null>(null)
+	const createdWhileFilteringIds = ref(new Set<string>())
+
+	watch(options.filtering, (filtering) => {
+		if (!filtering) createdWhileFilteringIds.value = new Set()
+	})
 
 	const sections = computed<ContentGroupSection[]>(() => {
 		if (!grouped.value) return []
@@ -128,7 +134,7 @@ export function useContentGrouping(options: ContentGroupingOptions) {
 			(section) =>
 				section.items.length > 0 ||
 				(section.groupId !== null &&
-					(section.groupId === pendingRenameGroupId.value || !options.filtering.value)),
+					(!options.filtering.value || createdWhileFilteringIds.value.has(section.groupId))),
 		)
 	})
 
@@ -140,14 +146,14 @@ export function useContentGrouping(options: ContentGroupingOptions) {
 	}
 
 	const collapsedSections = persistedRecord<boolean>(options.persistKey, 'content-collapsed-groups')
-	const sectionKey = (sectionId: string) => `${options.activeType.value}:${sectionId}`
+	const sectionKey = (sectionId: string, type = options.activeType.value) => `${type}:${sectionId}`
 
 	function isCollapsed(sectionId: string) {
 		return !options.filtering.value && !!collapsedSections.value[sectionKey(sectionId)]
 	}
 
-	function setCollapsed(sectionId: string, collapsed: boolean) {
-		const key = sectionKey(sectionId)
+	function setCollapsed(sectionId: string, collapsed: boolean, type = options.activeType.value) {
+		const key = sectionKey(sectionId, type)
 		const { [key]: _, ...rest } = collapsedSections.value
 		collapsedSections.value = collapsed ? { ...rest, [key]: true } : rest
 	}
@@ -164,16 +170,20 @@ export function useContentGrouping(options: ContentGroupingOptions) {
 	async function createGroup(items: ContentItem[] = []) {
 		if (!manager || creating.value) return null
 		creating.value = true
+		const type = options.activeType.value
 		try {
 			const group = await manager.create(
-				options.activeType.value,
+				type,
 				defaultGroupName(),
 				items.map(getContentGroupItemKey),
 			)
 			if (!group) return null
-			groupBy.value = 'custom'
-			setCollapsed(group.id, false)
-			pendingRenameGroupId.value = group.id
+			setGroupBy(type, 'custom')
+			setCollapsed(group.id, false, type)
+			if (options.filtering.value) {
+				createdWhileFilteringIds.value = new Set([...createdWhileFilteringIds.value, group.id])
+			}
+			if (options.activeType.value === type) pendingRenameGroupId.value = group.id
 			return group
 		} finally {
 			creating.value = false

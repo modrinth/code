@@ -274,13 +274,23 @@ const searchPlaceholder = computed(() =>
 	}),
 )
 
+const highlightedItem = computed(() => {
+	const id = props.highlightedItemId
+	return id ? ctx.items.value.find((candidate) => candidate.id === id) : undefined
+})
+
 watch(
 	() => props.highlightedItemId,
-	(id) => {
-		const item = id ? ctx.items.value.find((candidate) => candidate.id === id) : undefined
-		if (!item) return
-		reveal(item)
-		grouping.setCollapsed(grouping.sectionIdOf(item), false)
+	() => {
+		if (highlightedItem.value) reveal(highlightedItem.value)
+	},
+	{ immediate: true },
+)
+
+watch(
+	() => (highlightedItem.value ? grouping.sectionIdOf(highlightedItem.value) : null),
+	(sectionId) => {
+		if (sectionId) grouping.setCollapsed(sectionId, false)
 	},
 	{ immediate: true },
 )
@@ -417,7 +427,7 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 						:filter-categories="metadataFilterCategories"
 						:sort-fields="sortFields"
 						:show-grouping="grouping.supported.value"
-						:new-group-disabled="grouping.creating.value"
+						:new-group-disabled="grouping.creating.value || typeItems.length === 0"
 						@add="ctx.browse(activeType)"
 						@upload="ctx.upload()"
 						@update-all="updateAllFlow?.promptUpdate(typeItems)"

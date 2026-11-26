@@ -214,7 +214,8 @@ const activeDropSectionId = ref<string | null>(null)
 const activeDragRow = computed(() =>
 	activeDragIds.value.length > 0 ? rowsById.value.get(activeDragIds.value[0]) : undefined,
 )
-const gather = useRowDragGather(rows)
+const gather = useRowDragGather(rows, tableRef)
+const overlayTarget = computed(() => tableRef.value?.ownerDocument.body ?? 'body')
 
 function canDropOnSection(sectionId: string | null) {
 	if (!sectionId || activeDragIds.value.length === 0) return false
@@ -445,7 +446,7 @@ function rowClass(row: ContentCardTableItem, index: number, isLast: boolean, sec
 					</template>
 				</div>
 			</div>
-			<Teleport to="body">
+			<Teleport :to="overlayTarget">
 				<div class="pointer-events-none fixed inset-0 z-[9999]">
 					<DragOverlay :drop-animation="null">
 						<div
@@ -462,6 +463,7 @@ function rowClass(row: ContentCardTableItem, index: number, isLast: boolean, sec
 				v-if="gather.items.value.length > 0"
 				:items="gather.items.value"
 				:target="gather.target.value"
+				:teleport-to="overlayTarget"
 				@complete="gather.finish()"
 			/>
 		</DragDropProvider>

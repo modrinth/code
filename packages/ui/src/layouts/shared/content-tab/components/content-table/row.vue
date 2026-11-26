@@ -71,7 +71,7 @@ function handleRowMousedown(event: MouseEvent) {
 function handleRowClick(event: MouseEvent) {
 	if (!isShiftRowClick(event)) return
 	event.preventDefault()
-	emit('select', !props.selected)
+	emit('select', !props.selected, event)
 }
 
 function linkTarget(link: unknown) {
