@@ -15,7 +15,9 @@ export class LabrinthModerationInternalModule extends AbstractModule {
 		)
 	}
 
-	public async getAutoApproveQueue(): Promise<Labrinth.Moderation.Internal.AutoApprovalQueueEntry[]> {
+	public async getAutoApproveQueue(): Promise<
+		Labrinth.Moderation.Internal.AutoApprovalQueueEntry[]
+	> {
 		return this.client.request<Labrinth.Moderation.Internal.AutoApprovalQueueEntry[]>(
 			'/moderation/project-auto-approve',
 			{ api: 'labrinth', version: 'internal', method: 'GET' },

@@ -135,7 +135,6 @@ import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
 import { nagDestinations, normalizeProjectNagKind, toProjectNag } from '@modrinth/moderation'
 import { Accordion, Button, IconButton } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
-
 import type { Component } from 'vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 

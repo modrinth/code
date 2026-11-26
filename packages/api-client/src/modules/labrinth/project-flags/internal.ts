@@ -1,21 +1,21 @@
 import { AbstractModule } from '../../../core/abstract-module'
 import type {
 	CreateProjectFlagRuleRequest,
-	ListProjectFlagModulesParams,
-	ProjectFlagModule,
-	PersistedProjectFlag,
-	SaveProjectFlagModuleRequest,
 	EvalProjectFlagRuleRequest,
+	ListProjectFlagModulesParams,
 	ListProjectFlagRulesParams,
 	ListProjectFlagRunResultsParams,
 	ListProjectFlagRunsParams,
+	PersistedProjectFlag,
 	ProjectFlagDeployment,
 	ProjectFlagEvaluationResult,
+	ProjectFlagModule,
 	ProjectFlagRule,
 	ProjectFlagRuleSchemaResponse,
 	ProjectFlagRun,
 	ProjectFlagRunActivity,
 	ProjectFlagRunResults,
+	SaveProjectFlagModuleRequest,
 } from './types'
 
 export class LabrinthProjectFlagsInternalModule extends AbstractModule {
