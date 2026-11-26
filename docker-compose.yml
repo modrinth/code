@@ -403,6 +403,7 @@ services:
   temporal:
     image: temporalio/temporal:1.10.0
     container_name: labrinth-temporal
+    user: '0:0'
     command:
       - server
       - start-dev
