@@ -55,9 +55,9 @@ const dimmed = computed(() => props.row.enabled === false && !isDisabled.value)
 
 const INTERACTIVE_SELECTOR = 'a, button, input, label, select, textarea, [role="switch"]'
 
-function isShiftRowClick(event: MouseEvent) {
+function isSelectionRowClick(event: MouseEvent) {
 	return (
-		event.shiftKey &&
+		(event.shiftKey || event.metaKey || event.ctrlKey) &&
 		props.selection &&
 		!isDisabled.value &&
 		!(event.target instanceof Element && event.target.closest(INTERACTIVE_SELECTOR))
@@ -65,11 +65,11 @@ function isShiftRowClick(event: MouseEvent) {
 }
 
 function handleRowMousedown(event: MouseEvent) {
-	if (isShiftRowClick(event)) event.preventDefault()
+	if (isSelectionRowClick(event)) event.preventDefault()
 }
 
 function handleRowClick(event: MouseEvent) {
-	if (!isShiftRowClick(event)) return
+	if (!isSelectionRowClick(event)) return
 	event.preventDefault()
 	emit('select', !props.selected, event)
 }
