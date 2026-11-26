@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::{BufReader, BufWriter, IsTerminal};
 use std::path::Path;
 
-use eyre::{Result, WrapErr, eyre};
+use anyhow::{Context, Result, anyhow};
 use labrinth::models::projects::Project;
 use rustrict::{Censor, Type};
 use serde::de::{DeserializeSeed, IgnoredAny, MapAccess, SeqAccess, Visitor};
@@ -178,9 +178,9 @@ pub(super) fn write_report(
 ) -> Result<()> {
     let report = scan_dataset(dataset_path)?;
     let output = File::create(report_path)
-        .wrap_err_with(|| format!("creating `{}`", report_path.display()))?;
+        .with_context(|| format!("creating `{}`", report_path.display()))?;
     serde_json::to_writer_pretty(BufWriter::new(output), &report)
-        .wrap_err_with(|| format!("writing `{}`", report_path.display()))?;
+        .with_context(|| format!("writing `{}`", report_path.display()))?;
 
     eprintln!(
         "wrote {} projects with profanity across {} fields to `{}`",
@@ -197,12 +197,12 @@ pub(super) fn render_report(
     force_brackets: bool,
 ) -> Result<()> {
     let input = File::open(report_path)
-        .wrap_err_with(|| format!("opening `{}`", report_path.display()))?;
+        .with_context(|| format!("opening `{}`", report_path.display()))?;
     let report: ProfanityReport =
         serde_json::from_reader(BufReader::new(input))
-            .wrap_err_with(|| format!("reading `{}`", report_path.display()))?;
+            .with_context(|| format!("reading `{}`", report_path.display()))?;
     if report.format_version != REPORT_FORMAT_VERSION {
-        return Err(eyre!(
+        return Err(anyhow!(
             "unsupported profanity report format version `{}`",
             report.format_version
         ));
@@ -268,15 +268,15 @@ pub(super) fn highlight_text(text: &str, use_color: bool) -> String {
 
 fn scan_dataset(path: &Path) -> Result<ProfanityReport> {
     let input = File::open(path)
-        .wrap_err_with(|| format!("opening `{}`", path.display()))?;
+        .with_context(|| format!("opening `{}`", path.display()))?;
     let mut deserializer =
         serde_json::Deserializer::from_reader(BufReader::new(input));
     let report = ProfanityDatasetSeed
         .deserialize(&mut deserializer)
-        .wrap_err_with(|| format!("reading `{}`", path.display()))?;
+        .with_context(|| format!("reading `{}`", path.display()))?;
     deserializer
         .end()
-        .wrap_err_with(|| format!("reading `{}`", path.display()))?;
+        .with_context(|| format!("reading `{}`", path.display()))?;
     Ok(report)
 }
 

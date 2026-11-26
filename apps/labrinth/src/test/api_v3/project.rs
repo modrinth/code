@@ -54,7 +54,8 @@ impl ApiProject for ApiV3 {
             .append_pat(ADMIN_USER_PAT)
             .set_json(json!(
                 {
-                    "status": "approved"
+                    "review_outcome": "approved",
+                    "in_review": false
                 }
             ))
             .to_request();

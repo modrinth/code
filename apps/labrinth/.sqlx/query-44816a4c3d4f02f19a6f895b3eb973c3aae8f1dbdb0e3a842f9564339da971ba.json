@@ -1,0 +1,32 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO project_flag_rulesets (id, content_hash, rules, modules, created_by)\n        VALUES ($1, $2, $3, $4, $5)\n        ON CONFLICT (content_hash) DO NOTHING\n        RETURNING id\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "project_flag_rulesets",
+            "name": "id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Jsonb",
+        "Jsonb",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "44816a4c3d4f02f19a6f895b3eb973c3aae8f1dbdb0e3a842f9564339da971ba"
+}

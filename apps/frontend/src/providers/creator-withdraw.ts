@@ -11,6 +11,7 @@ import type { MessageDescriptor } from '@modrinth/ui'
 import { createContext, getCurrencyIcon, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
 import { type Component, computed, type ComputedRef, type Ref, ref } from 'vue'
 
+import { runPrivileged } from '@/composables/reauth.ts'
 import { type FieldConfig, getRailConfig, isMuralpayBlockedRegion } from '@/utils/muralpay-rails'
 
 export function getTaxThreshold(thresholds: Record<string, number> | undefined): number {
@@ -896,11 +897,13 @@ export function createWithdrawContext(
 
 		debug('Withdrawal payload:', payload)
 
-		await useBaseFetch('payout', {
-			apiVersion: 3,
-			method: 'POST',
-			body: payload,
-		})
+		await runPrivileged(() =>
+			useBaseFetch('payout', {
+				apiVersion: 3,
+				method: 'POST',
+				body: payload,
+			}),
+		)
 
 		withdrawData.value.result = {
 			created: new Date(),

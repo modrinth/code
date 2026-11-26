@@ -5,8 +5,8 @@ use crate::util::minecraft_meta::MinecraftVersionEntry;
 use std::collections::HashMap;
 use std::sync::LazyLock;
 
+use anyhow::{Result, anyhow};
 use chrono::{DateTime, Utc};
-use eyre::{Result, eyre};
 use minecraft_meta_model::{
     model::MinecraftVersionName, upstream::mojang::VersionType,
 };
@@ -58,7 +58,7 @@ pub fn parse_minecraft_fields(
                         value
                             .as_str()
                             .ok_or_else(|| {
-                                eyre!("`environment` must be a string")
+                                anyhow!("`environment` must be a string")
                             })?
                             .parse::<Environment>()?,
                     )
@@ -72,7 +72,7 @@ pub fn parse_minecraft_fields(
                         .collect::<Result<Vec<_>>>()?,
                 );
             }
-            _ => return Err(eyre!("unknown Minecraft field `{name}`")),
+            _ => return Err(anyhow!("unknown Minecraft field `{name}`")),
         }
     }
     Ok(edit)
@@ -81,12 +81,12 @@ pub fn parse_minecraft_fields(
 fn string_array<'a>(value: &'a Value, field: &str) -> Result<Vec<&'a str>> {
     value
         .as_array()
-        .ok_or_else(|| eyre!("`{field}` must be an array"))?
+        .ok_or_else(|| anyhow!("`{field}` must be an array"))?
         .iter()
         .map(|value| {
             value
                 .as_str()
-                .ok_or_else(|| eyre!("`{field}` must contain only strings"))
+                .ok_or_else(|| anyhow!("`{field}` must contain only strings"))
         })
         .collect()
 }

@@ -6,8 +6,8 @@ use crate::{
     auth::AuthProvider,
     models::{
         projects::{
-            Dependency, GalleryItem, License, ModeratorMessage,
-            MonetizationStatus, ProjectStatus, VersionFile, VersionStatus,
+            Dependency, GalleryItem, LegacyProjectStatus, License,
+            ModeratorMessage, MonetizationStatus, VersionFile, VersionStatus,
             VersionType,
         },
         teams::ProjectPermissions,
@@ -44,8 +44,8 @@ pub struct CommonProject {
     pub updated: DateTime<Utc>,
     pub approved: Option<DateTime<Utc>>,
     pub queued: Option<DateTime<Utc>>,
-    pub status: ProjectStatus,
-    pub requested_status: Option<ProjectStatus>,
+    pub status: LegacyProjectStatus,
+    pub requested_status: Option<LegacyProjectStatus>,
     pub moderator_message: Option<ModeratorMessage>,
     pub license: License,
     pub downloads: u32,
@@ -61,6 +61,7 @@ pub struct CommonProject {
     pub thread_id: ThreadId,
     pub monetization_status: MonetizationStatus,
 }
+
 #[derive(Deserialize, Clone)]
 pub struct CommonVersion {
     pub id: VersionId,
@@ -197,8 +198,8 @@ pub enum CommonMessageBody {
         associated_images: Vec<ImageId>,
     },
     StatusChange {
-        new_status: ProjectStatus,
-        old_status: ProjectStatus,
+        new_status: LegacyProjectStatus,
+        old_status: LegacyProjectStatus,
     },
     ThreadClosure,
     ThreadReopen,

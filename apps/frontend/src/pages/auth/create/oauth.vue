@@ -36,7 +36,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 
 import CreateAccountView from '@/components/ui/auth/CreateAccount.vue'
 import LauncherOpening from '@/components/ui/auth/LauncherOpening.vue'
-import { rememberStoredAccount } from '@/composables/accounts.ts'
+import { rememberSessionCreated, rememberStoredAccount } from '@/composables/accounts.ts'
 import { promotePendingSignInOAuthProvider } from '@/composables/auth.ts'
 import {
 	createLauncherHandoff,
@@ -46,7 +46,6 @@ import {
 	launcherAuthMessages,
 	type LauncherHandoff,
 } from '@/composables/launcher-auth.ts'
-
 interface ApiErrorShape {
 	data?: {
 		description?: string
@@ -139,6 +138,7 @@ async function completeOAuthSignUp(accountConsent: boolean) {
 			app_session: isProtocolV2,
 		})
 
+		rememberSessionCreated(res.session, res.created)
 		await finishSignIn(res.session, res.app_session)
 	} catch (err) {
 		addNotification({

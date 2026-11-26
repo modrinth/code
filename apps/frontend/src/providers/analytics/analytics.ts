@@ -1184,6 +1184,7 @@ export function createAnalyticsDashboardContext(
 			return buildAnalyticsFacetsRequest(
 				sortedAvailableProjectIds.value,
 				nextFetchRequest.time_range,
+				['project_id'],
 			)
 		},
 	)
@@ -1275,35 +1276,48 @@ export function createAnalyticsDashboardContext(
 		refetchOnWindowFocus: false,
 	})
 
-	const { data: analyticsDownloadCountTimeSlices } = useQuery({
-		queryKey: computed(() => [
-			'analytics',
-			'dashboard',
-			analyticsQueryUserId.value,
-			'filter-options',
-			'download-counts-fallback',
-			analyticsFacetsRequest.value,
-			queryRefreshTimestamp.value,
-		]),
-		queryFn: () => {
-			const nextRequest = analyticsFacetsRequest.value
-			if (!isAnalyticsFetchRequestReady(nextRequest)) {
-				return []
-			}
+	// One query per breakdown: a combined bucket_by multiplies the group count and pushes
+	// most country buckets under the privacy floor. Separate queries also keep one failed
+	// breakdown from hiding the others.
+	function useDownloadCountTimeSlices(bucketBy: Labrinth.Analytics.v3.ProjectDownloadsField[]) {
+		return useQuery({
+			queryKey: computed(() => [
+				'analytics',
+				'dashboard',
+				analyticsQueryUserId.value,
+				'filter-options',
+				'download-counts-fallback',
+				bucketBy,
+				analyticsFacetsRequest.value,
+				queryRefreshTimestamp.value,
+			]),
+			queryFn: () => {
+				const nextRequest = analyticsFacetsRequest.value
+				if (!isAnalyticsFetchRequestReady(nextRequest)) {
+					return []
+				}
 
-			return fetchAnalyticsTimeSlices(nextRequest, (request) =>
-				client.labrinth.analytics_v3.fetch(request),
-			)
-		},
-		enabled: computed(
-			() =>
-				hasFetchedAnalyticsFilterOptions.value &&
-				isAnalyticsFetchRequestReady(analyticsFacetsRequest.value),
-		),
-		placeholderData: [],
-		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
-		refetchOnWindowFocus: false,
-	})
+				return fetchAnalyticsTimeSlices(
+					{ ...nextRequest, return_metrics: { project_downloads: { bucket_by: bucketBy } } },
+					(request) => client.labrinth.analytics_v3.fetch(request),
+				)
+			},
+			enabled: computed(
+				() =>
+					hasFetchedAnalyticsFilterOptions.value &&
+					isAnalyticsFetchRequestReady(analyticsFacetsRequest.value),
+			),
+			placeholderData: [],
+			gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
+			refetchOnWindowFocus: false,
+		}).data
+	}
+	const projectVersionDownloadCountTimeSlices = useDownloadCountTimeSlices([
+		'project_id',
+		'version_id',
+	])
+	const countryDownloadCountTimeSlices = useDownloadCountTimeSlices(['country'])
+	const gameVersionDownloadCountTimeSlices = useDownloadCountTimeSlices(['game_version'])
 
 	const analyticsFacetsFilterOptionSummary = computed(() =>
 		getAnalyticsFacetsFilterOptionSummary(analyticsFacetsData.value?.facets),
@@ -1749,24 +1763,33 @@ export function createAnalyticsDashboardContext(
 		}
 		return versionProjectOrganizationNames
 	})
-	const downloadCountTimeSlices = computed(() => {
-		const countTimeSlices = analyticsDownloadCountTimeSlices.value ?? []
-		return countTimeSlices.length > 0 ? countTimeSlices : timeSlices.value
-	})
+	function downloadCountsOrCurrentTimeSlices(
+		countTimeSlices: Labrinth.Analytics.v3.TimeSlice[] | undefined,
+	): Labrinth.Analytics.v3.TimeSlice[] {
+		return countTimeSlices && countTimeSlices.length > 0 ? countTimeSlices : timeSlices.value
+	}
 	const availableProjectDownloadsById = computed(() =>
 		getProjectDownloadsByIdFromTimeSlices(availableProjectDownloadCountTimeSlices.value ?? []),
 	)
 	const projectDownloadsById = computed(() =>
-		getProjectDownloadsByIdFromTimeSlices(downloadCountTimeSlices.value),
+		getProjectDownloadsByIdFromTimeSlices(
+			downloadCountsOrCurrentTimeSlices(projectVersionDownloadCountTimeSlices.value),
+		),
 	)
 	const projectVersionDownloadsById = computed(() =>
-		getProjectVersionDownloadsByIdFromTimeSlices(downloadCountTimeSlices.value),
+		getProjectVersionDownloadsByIdFromTimeSlices(
+			downloadCountsOrCurrentTimeSlices(projectVersionDownloadCountTimeSlices.value),
+		),
 	)
 	const countryDownloadsByCode = computed(() =>
-		getCountryDownloadsByCodeFromTimeSlices(downloadCountTimeSlices.value),
+		getCountryDownloadsByCodeFromTimeSlices(
+			downloadCountsOrCurrentTimeSlices(countryDownloadCountTimeSlices.value),
+		),
 	)
 	const gameVersionDownloadsByVersion = computed(() =>
-		getGameVersionDownloadsByVersionFromTimeSlices(downloadCountTimeSlices.value),
+		getGameVersionDownloadsByVersionFromTimeSlices(
+			downloadCountsOrCurrentTimeSlices(gameVersionDownloadCountTimeSlices.value),
+		),
 	)
 
 	const selectedProjectIdSet = computed(() => new Set(selectedProjectIds.value))

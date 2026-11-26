@@ -1,5 +1,5 @@
 use actix_web::web;
-use eyre::WrapErr;
+use anyhow::Context;
 use rdkafka::{
     Message,
     consumer::{CommitMode, Consumer, StreamConsumer},
@@ -39,11 +39,11 @@ pub async fn run(
     redis_pool: RedisPool,
     search_backend: web::Data<dyn SearchBackend>,
     kafka_client: web::Data<KafkaClientState>,
-) -> eyre::Result<()> {
+) -> anyhow::Result<()> {
     let consumer = &kafka_client.incremental_index_search_consumer;
     consumer
         .subscribe(&[SEARCH_PROJECT_INDEX_QUEUE_TOPIC])
-        .wrap_err("failed to subscribe to Kafka topic")?;
+        .context("failed to subscribe to Kafka topic")?;
 
     tracing::info!(
         kafka.topic = SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
@@ -69,7 +69,7 @@ async fn consume(
     redis_pool: &RedisPool,
     search_backend: &dyn SearchBackend,
     consumer: &StreamConsumer,
-) -> eyre::Result<()> {
+) -> anyhow::Result<()> {
     // keep buffer capacity (pre-)allocated
     let mut messages = Vec::with_capacity(1024);
     loop {
@@ -79,7 +79,7 @@ async fn consume(
         let first_message = consumer
             .recv()
             .await
-            .wrap_err("failed to receive Kafka message")?;
+            .context("failed to receive Kafka message")?;
         messages.push(first_message);
 
         let delay = Duration::from_secs(
@@ -96,21 +96,21 @@ async fn consume(
         //
         // do a little trick with an `AsyncFnMut` closure
         // so that we can explicitly specify the return type
-        let mut collect_more_messages = async || -> eyre::Result<()> {
+        let mut collect_more_messages = async || -> anyhow::Result<()> {
             while messages.len() < ENV.SEARCH_INCREMENTAL_INDEX_BATCH_MAX_SIZE {
                 let message = consumer
                     .recv()
                     .await
-                    .wrap_err("failed to receive Kafka message")?;
+                    .context("failed to receive Kafka message")?;
                 messages.push(message);
             }
-            eyre::Ok(())
+            anyhow::Ok(())
         };
         match tokio::time::timeout(delay, collect_more_messages()).await {
             Ok(Ok(())) | Err(_) => {}
             Ok(Err(err)) => {
                 return Err(
-                    err.wrap_err("failed to receive more Kafka messages")
+                    err.context("failed to receive more Kafka messages")
                 );
             }
         }
@@ -172,7 +172,7 @@ async fn consume_batch(
     search_backend: &dyn SearchBackend,
     consumer: &StreamConsumer,
     messages: impl IntoIterator<Item = BorrowedMessage<'_>>,
-) -> eyre::Result<()> {
+) -> anyhow::Result<()> {
     let start = Instant::now();
 
     let mut project_ids_to_change = HashSet::new();
@@ -192,7 +192,7 @@ async fn consume_batch(
             );
             consumer
                 .commit_message(&message, CommitMode::Async)
-                .wrap_err("failed to commit empty Kafka message")?;
+                .context("failed to commit empty Kafka message")?;
             continue;
         };
 
@@ -209,7 +209,7 @@ async fn consume_batch(
                 );
                 consumer
                     .commit_message(&message, CommitMode::Async)
-                    .wrap_err("failed to commit malformed Kafka message")?;
+                    .context("failed to commit malformed Kafka message")?;
                 continue;
             }
         };
@@ -298,7 +298,7 @@ async fn consume_batch(
             batch_size = project_ids_with_all_versions_to_change.len()
         ))
         .await
-        .wrap_err_with(|| {
+        .with_context(|| {
             format!(
                 "failed to build search documents for {} projects and all their versions",
                 project_ids_with_all_versions_to_change.len()
@@ -329,7 +329,7 @@ async fn consume_batch(
             version_count = version_ids_to_change.len()
         ))
         .await
-        .wrap_err_with(|| {
+        .with_context(|| {
             format!(
                 "failed to build search documents for {} projects and {} versions",
                 project_ids_with_version_changes.len(),
@@ -366,7 +366,7 @@ async fn consume_batch(
             batch_size = project_ids_to_change.len()
         ))
         .await
-        .wrap_err_with(|| {
+        .with_context(|| {
             format!(
                 "failed to build search documents for {} projects",
                 project_ids_to_change.len()
@@ -393,7 +393,7 @@ async fn consume_batch(
             removed_versions: &version_ids_to_change,
         })
         .await
-        .wrap_err("failed to apply search index update")?;
+        .context("failed to apply search index update")?;
     info!(
         project_count = documents.projects.len(),
         version_count = documents.versions.len(),
@@ -406,7 +406,7 @@ async fn consume_batch(
     for message in messages_to_commit {
         consumer
             .commit_message(&message, CommitMode::Async)
-            .wrap_err("failed to commit Kafka message")?;
+            .context("failed to commit Kafka message")?;
     }
 
     info!(
@@ -424,7 +424,7 @@ pub async fn reindex_project_document(
     redis_pool: &RedisPool,
     search_backend: &dyn SearchBackend,
     project_id: ProjectId,
-) -> eyre::Result<()> {
+) -> anyhow::Result<()> {
     reindex_project_documents(
         ro_pool,
         redis_pool,
@@ -439,12 +439,12 @@ pub async fn reindex_project_documents(
     redis_pool: &RedisPool,
     search_backend: &dyn SearchBackend,
     project_ids: &[ProjectId],
-) -> eyre::Result<()> {
+) -> anyhow::Result<()> {
     info!("Creating project documents");
     let projects = build_project_documents(ro_pool, redis_pool, project_ids)
         .instrument(info_span!("index", batch_size = project_ids.len()))
         .await
-        .wrap_err_with(|| {
+        .with_context(|| {
             format!(
                 "failed to build search documents for {} projects",
                 project_ids.len()

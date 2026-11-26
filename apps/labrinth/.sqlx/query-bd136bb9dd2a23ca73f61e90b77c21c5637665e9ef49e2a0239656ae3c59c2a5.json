@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, project_id, done_by, occurred_at,\n                delta AS \"delta: sqlx::types::Json<ProjectDelta>\"\n            FROM project_history\n            WHERE project_id = $1\n            ORDER BY occurred_at, id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_history",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "project_id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_history",
+            "name": "project_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "done_by",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_history",
+            "name": "done_by"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "occurred_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "project_history",
+            "name": "occurred_at"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "delta: sqlx::types::Json<ProjectDelta>",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_history",
+            "name": "delta"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "bd136bb9dd2a23ca73f61e90b77c21c5637665e9ef49e2a0239656ae3c59c2a5"
+}

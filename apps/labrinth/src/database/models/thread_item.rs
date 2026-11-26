@@ -1,8 +1,8 @@
 use super::ids::*;
 use crate::database::PgTransaction;
 use crate::models::threads::{MessageBody, ThreadType};
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 
 pub struct ThreadBuilder {
@@ -49,9 +49,9 @@ impl ThreadMessageBuilder {
     ) -> Result<DBThreadMessageId> {
         let thread_message_id = generate_thread_message_id(transaction)
             .await
-            .wrap_err("generating thread message id")?;
+            .context("generating thread message id")?;
         let body = serde_json::value::to_value(self.body.clone())
-            .wrap_err("serializing thread message body")?;
+            .context("serializing thread message body")?;
 
         sqlx::query!(
             "
@@ -70,7 +70,7 @@ impl ThreadMessageBuilder {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting thread message")?;
+        .context("inserting thread message")?;
 
         Ok(thread_message_id)
     }
@@ -83,7 +83,7 @@ impl ThreadBuilder {
     ) -> Result<DBThreadId> {
         let thread_id = generate_thread_id(&mut *transaction)
             .await
-            .wrap_err("generating thread id")?;
+            .context("generating thread id")?;
         sqlx::query!(
             "
             INSERT INTO threads (
@@ -100,7 +100,7 @@ impl ThreadBuilder {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting thread")?;
+        .context("inserting thread")?;
 
         let (thread_ids, members): (Vec<_>, Vec<_>) =
             self.members.iter().map(|m| (thread_id.0, m.0)).unzip();
@@ -116,7 +116,7 @@ impl ThreadBuilder {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting thread members")?;
+        .context("inserting thread members")?;
 
         Ok(thread_id)
     }
@@ -159,7 +159,7 @@ impl DBThread {
         )
         .fetch_one(&mut *transaction)
         .await
-        .wrap_err("checking whether a project team member has replied")
+        .context("checking whether a project team member has replied")
     }
 
     pub async fn get<'a, E>(id: DBThreadId, exec: E) -> Result<Option<DBThread>>
@@ -168,7 +168,7 @@ impl DBThread {
     {
         Ok(Self::get_many(&[id], exec)
             .await
-            .wrap_err("fetching thread")?
+            .context("fetching thread")?
             .into_iter()
             .next())
     }
@@ -217,12 +217,12 @@ impl DBThread {
             })
         .try_collect::<Vec<DBThread>>()
         .await
-        .wrap_err("fetching threads")?;
+        .context("fetching threads")?;
 
         let mut issues =
             super::DBThreadIssue::get_many_for_threads(thread_ids, exec)
                 .await
-                .wrap_err("fetching thread issues")?
+                .context("fetching thread issues")?
                 .into_iter()
                 .fold(
                     std::collections::HashMap::<DBThreadId, Vec<_>>::new(),
@@ -251,7 +251,7 @@ impl DBThread {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("removing thread messages")?;
+        .context("removing thread messages")?;
         sqlx::query!(
             "
             DELETE FROM threads_members
@@ -261,7 +261,7 @@ impl DBThread {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("removing thread members")?;
+        .context("removing thread members")?;
         sqlx::query!(
             "
             DELETE FROM threads
@@ -271,7 +271,7 @@ impl DBThread {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("removing thread")?;
+        .context("removing thread")?;
 
         Ok(Some(()))
     }
@@ -287,7 +287,7 @@ impl DBThreadMessage {
     {
         Ok(Self::get_many(&[id], exec)
             .await
-            .wrap_err("fetching thread message")?
+            .context("fetching thread message")?
             .into_iter()
             .next())
     }
@@ -322,7 +322,7 @@ impl DBThreadMessage {
         })
         .try_collect::<Vec<DBThreadMessage>>()
         .await
-        .wrap_err("fetching thread messages")?;
+        .context("fetching thread messages")?;
 
         Ok(messages)
     }
@@ -333,7 +333,7 @@ impl DBThreadMessage {
         transaction: &mut PgTransaction<'_>,
     ) -> Result<Option<()>> {
         let body = serde_json::to_value(MessageBody::Deleted { private })
-            .wrap_err("serializing deleted thread message body")?;
+            .context("serializing deleted thread message body")?;
 
         sqlx::query!(
             "
@@ -346,7 +346,7 @@ impl DBThreadMessage {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("removing thread message")?;
+        .context("removing thread message")?;
 
         Ok(Some(()))
     }

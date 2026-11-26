@@ -1,6 +1,6 @@
 // eslint-disable-next-line simple-import-sort/imports -- The Rust mode reads the global initialized by Ace.
 import type { Ace } from 'ace-builds'
-import ace from 'ace-builds'
+import ace from '@modrinth/ui/src/utils/ace-core.ts'
 import 'ace-builds/src-noconflict/mode-rust'
 
 const RHAI_KEYWORDS =

@@ -11,6 +11,97 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-11-24T20:34:37+00:00`,
+		product: 'app',
+		version: '0.23.5',
+		body: `## Security
+- Modrinth App will now swap out Minecraft libraries on instance launch that don't match what is recorded by the metadata service.
+
+## Added
+- Added a section on the sidebar of Create Aeronautic's page for the Game Awards nomination.
+
+## Changed
+- When searching for filter options, a "No results" message will now show when there are no filters available for the query.`,
+	},
+	{
+		date: `2026-11-24T20:34:37+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Added feature to automatically restart servers when crashing after starting.
+
+## Changed
+- The "Memory" card now uses the more accurate Java heap memory number instead of container memory.`,
+	},
+	{
+		date: `2026-11-24T20:34:37+00:00`,
+		product: 'web',
+		body: `## Changed
+- Fixed loading spinner when re-focusing an org or collection page.`,
+	},
+	{
+		date: `2026-11-19T01:42:50+00:00`,
+		product: 'web',
+		body: `## Changed
+- Moved re-authentication prompt to before you perform actions so your state is not lost when you go to save.`,
+	},
+	{
+		date: `2026-11-18T20:04:02+00:00`,
+		product: 'web',
+		body: `## Added
+- Added a section on the sidebar of Create Aeronautic's page for the Game Awards nomination.
+
+## Changed
+- When searching for filter options, a "No results" message will now show when there are no filters available for the query.`,
+	},
+	{
+		date: `2026-11-18T19:26:47+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated c2pa restrictions to include Anthropic's declaration.
+- Improved the load time of playtime and download count charts on the Analytics page.
+
+## Security
+- Fixed payments accepting a charge that belongs to another account.`,
+	},
+	{
+		date: `2026-11-18T19:26:47+00:00`,
+		product: 'app',
+		version: '0.23.4',
+		body: `## Changed
+- Skin previews on the Skins page now load faster, at about 20-30 ms per skin.
+- Replaced the username field in Profile settings with a Change username button that opens the website, and added a Refresh profile button.
+- Raised the shared instance limits to 16,384 files and 2 GB per version.
+- Use paste.modrinth.com for app logs and errors to make support easier.
+
+## Fixed
+- Fixed modpacks failing to install when an override file has a name that Windows does not allow, such as \`CON.txt\`.
+- Fixed shared instances failing to install a file after you chose to continue past the external files warning.
+- Fixed instance icons larger than 8192 pixels failing to load.
+- Fixed instance creation failing when the instance icon can't be downloaded.
+- Fixed Java 16 and 18 failing to install on macOS and Linux.
+- Fixed local NeoForge mods showing their banner instead of their icon in the instance content list.
+- Fixed game settings changed while Modrinth App was closed being overwritten on the next launch when Sync game settings is on.
+- Fixes some issues with importing instances from CurseForge, Prism and MultiMC.
+
+## Security
+- Disabled base64 intrinsics to prevent java4shell.
+- Fixed "Export debug info" in Troubleshooting settings including sensitive information.
+- IP addresses, computer usernames in file paths, and other sensitive information is now censored in instance logs and debug info exports.`,
+	},
+	{
+		date: `2026-11-18T19:26:47+00:00`,
+		product: 'hosting',
+		body: `## Security
+- Fixed payments accepting a charge that belongs to another account.`,
+	},
+	{
+		date: `2026-11-13T17:27:08+00:00`,
+		product: 'web',
+		body: `## Security
+- Re-authentication is now required for sensitive privileged actions.
+- Changed how session authentication works to use one-time codes to prevent accidentally sharing your session token.`,
+	},
+	{
 		date: `2026-11-11T20:21:02+00:00`,
 		product: 'app',
 		version: '0.23.2',

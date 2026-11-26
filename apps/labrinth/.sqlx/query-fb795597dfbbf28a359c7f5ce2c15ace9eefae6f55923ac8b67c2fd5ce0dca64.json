@@ -1,0 +1,21 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT COUNT(DISTINCT u.id)\n        FROM users u\n        INNER JOIN team_members tm on u.id = tm.user_id AND tm.accepted = TRUE\n        INNER JOIN mods m on tm.team_id = m.team_id AND m.visibility = 'public' AND m.review_outcome = 'approved'\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "fb795597dfbbf28a359c7f5ce2c15ace9eefae6f55923ac8b67c2fd5ce0dca64"
+}

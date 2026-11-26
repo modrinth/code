@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "Kopioitu"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "Kopioi tiedot"
-  },
   "app.action-bar.install.dismiss": {
     "message": "Hylkää"
   },

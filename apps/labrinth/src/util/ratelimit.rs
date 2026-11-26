@@ -13,6 +13,7 @@ use actix_web::{
     middleware::Next,
     web,
 };
+use anyhow::anyhow;
 use chrono::Utc;
 use redis::Script;
 use std::str::FromStr;
@@ -180,7 +181,7 @@ impl AsyncRateLimiter {
 /// valid tokens. OAuth tokens are skipped because their lookup is not cached.
 async fn get_user_rate_limit(
     req: &ServiceRequest,
-) -> eyre::Result<Option<(DBUserId, u32)>> {
+) -> anyhow::Result<Option<(DBUserId, u32)>> {
     let Ok(token) = extract_authorization_header(req.request()) else {
         return Ok(None);
     };
@@ -222,6 +223,14 @@ pub async fn rate_limit_middleware(
         .clone();
 
     if req.path() == "/healthz" {
+        return Ok(next.call(req).await?.map_into_left_body());
+    }
+
+    let is_cors_preflight = req.method() == actix_web::http::Method::OPTIONS
+        && req.headers().contains_key(
+            actix_web::http::header::ACCESS_CONTROL_REQUEST_METHOD,
+        );
+    if is_cors_preflight {
         return Ok(next.call(req).await?.map_into_left_body());
     }
 
@@ -300,7 +309,7 @@ pub async fn rate_limit_middleware(
             Ok(service_response.map_into_left_body())
         } else {
             let retry_after_ms = decision.retry_after_ms.unwrap_or(0);
-            let mut response = ApiError::RateLimit(eyre::eyre!(
+            let mut response = ApiError::RateLimit(anyhow!(
                 "rate limit exceeded; retry after {retry_after_ms} milliseconds"
             ))
             .error_response();
@@ -342,7 +351,7 @@ pub async fn rate_limit_middleware(
         }
     } else {
         let response =
-            ApiError::Auth(eyre::eyre!("Unable to obtain user IP address!",))
+            ApiError::Auth(anyhow!("Unable to obtain user IP address!",))
                 .error_response();
 
         Ok(req.into_response(response.map_into_right_body()))

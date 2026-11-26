@@ -1,10 +1,10 @@
 use super::ids::*;
 use crate::database::PgTransaction;
 use crate::env::ENV;
+use anyhow::{Context, Result};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
-use eyre::{Result, WrapErr};
 use futures_util::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
@@ -28,6 +28,8 @@ pub struct SessionBuilder {
     pub ip: String,
     pub user_agent: String,
 
+    pub created: Option<DateTime<Utc>>,
+
     // When None, database default of 14 days will be used
     pub expires: Option<DateTime<Utc>>,
     // When None, database default of 60 days will be used
@@ -41,19 +43,19 @@ impl SessionBuilder {
     ) -> Result<DBSessionId> {
         let id = generate_session_id(transaction)
             .await
-            .wrap_err("generating session id")?;
+            .context("generating session id")?;
 
         sqlx::query!(
             "
             INSERT INTO sessions (
                 id, session, user_id, os, platform,
                 city, country, ip, user_agent,
-                expires, refresh_expires
+                expires, refresh_expires, created
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7, $8, $9,
-                $10, $11
+                $10, $11, COALESCE($12, NOW())
             )
             ",
             id as DBSessionId,
@@ -69,10 +71,11 @@ impl SessionBuilder {
                 .unwrap_or_else(|| Utc::now() + chrono::Duration::days(14)),
             self.session_expires
                 .unwrap_or_else(|| Utc::now() + chrono::Duration::days(60)),
+            self.created,
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting session")?;
+        .context("inserting session")?;
 
         Ok(id)
     }
@@ -114,7 +117,7 @@ impl DBSession {
         Self::get_many(&[id], exec, redis)
             .await
             .map(|x| x.into_iter().next())
-            .wrap_err("getting session")
+            .context("getting session")
     }
 
     pub async fn get_id<'a, 'b, E>(
@@ -132,7 +135,7 @@ impl DBSession {
         )
         .await
         .map(|x| x.into_iter().next())
-        .wrap_err("getting session by id")
+        .context("getting session by id")
     }
 
     pub async fn get_many_ids<'a, E>(
@@ -149,7 +152,7 @@ impl DBSession {
             .collect::<Vec<_>>();
         DBSession::get_many(&ids, exec, redis)
             .await
-            .wrap_err("getting sessions by id")
+            .context("getting sessions by id")
     }
 
     pub async fn get_many<
@@ -217,7 +220,7 @@ impl DBSession {
                     })
                     .await
             }).await
-            .wrap_err("getting sessions from cache or database")?;
+            .context("getting sessions from cache or database")?;
 
         Ok(val)
     }
@@ -234,12 +237,14 @@ impl DBSession {
                 true,
                 &[session],
                 |_| async {
-                    eyre::Ok(DashMap::<i64, (Option<String>, DBSession)>::new())
+                    anyhow::Ok(
+                        DashMap::<i64, (Option<String>, DBSession)>::new(),
+                    )
                 },
             )
             .await
             .map(|x| x.into_iter().next())
-            .wrap_err("getting cached session")
+            .context("getting cached session")
     }
 
     pub async fn get_user_sessions<'a, E>(
@@ -254,13 +259,13 @@ impl DBSession {
             let mut redis = redis
                 .connect()
                 .await
-                .wrap_err("connecting to redis for user sessions")?;
+                .context("connecting to redis for user sessions")?;
             let key = redis.key().entity(SESSIONS_USERS_NAMESPACE, user_id.0);
 
             let res = redis
                 .get_deserialized::<Vec<i64>>(&key)
                 .await
-                .wrap_err("getting cached user sessions")?;
+                .context("getting cached user sessions")?;
 
             if let Some(res) = res {
                 return Ok(res.into_iter().map(DBSessionId).collect());
@@ -281,12 +286,12 @@ impl DBSession {
         .map_ok(|x| DBSessionId(x.id))
         .try_collect::<Vec<DBSessionId>>()
         .await
-        .wrap_err("fetching user sessions from database")?;
+        .context("fetching user sessions from database")?;
 
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to cache user sessions")?;
+            .context("connecting to redis to cache user sessions")?;
         let key = redis.key().entity(SESSIONS_USERS_NAMESPACE, user_id.0);
 
         redis
@@ -296,7 +301,7 @@ impl DBSession {
                 Some(ENV.REDIS_SESSION_DEFAULT_EXPIRY),
             )
             .await
-            .wrap_err("caching user sessions")?;
+            .context("caching user sessions")?;
 
         Ok(db_sessions)
     }
@@ -312,7 +317,7 @@ impl DBSession {
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to clear session caches")?;
+            .context("connecting to redis to clear session caches")?;
 
         if clear_sessions.is_empty() {
             return Ok(());
@@ -337,7 +342,7 @@ impl DBSession {
         redis
             .delete_many(&keys)
             .await
-            .wrap_err("clearing session caches")?;
+            .context("clearing session caches")?;
         Ok(())
     }
 

@@ -1,7 +1,7 @@
 <template>
 	<div class="flex min-w-0 flex-col gap-2">
-		<p v-if="flag.name" class="m-0 break-words text-sm font-medium text-contrast">
-			{{ flag.name }}
+		<p class="m-0 break-words text-sm font-medium text-contrast">
+			{{ flag.name || flag.key }}
 		</p>
 		<p v-if="flag.reason" class="m-0 whitespace-pre-wrap break-words">{{ flag.reason }}</p>
 		<span

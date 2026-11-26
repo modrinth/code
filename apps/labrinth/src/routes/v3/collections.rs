@@ -23,9 +23,9 @@ use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
+use anyhow::anyhow;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
-use eyre::eyre;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -110,7 +110,7 @@ pub async fn collection_create(
         &redis,
     )
     .await
-    .wrap_internal_err("failed to fetch created projects")?
+    .internal_context("failed to fetch created projects")?
     .into_iter()
     .map(|x| x.inner.id.into())
     .collect::<Vec<ProjectId>>();
@@ -168,19 +168,19 @@ pub async fn collections_get(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)
-        .wrap_request_err("deserializing JSON data")?;
+        .request_context("deserializing JSON data")?;
     let ids = ids
         .into_iter()
         .map(|x| {
             parse_base62(x).map(|x| database::models::DBCollectionId(x as i64))
         })
         .collect::<Result<Vec<_>, _>>()
-        .wrap_request_err("parsing collection IDs")?;
+        .request_context("parsing collection IDs")?;
 
     let collections_data =
         database::models::DBCollection::get_many(&ids, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching collections from database")?;
+            .internal_context("fetching collections from database")?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -195,7 +195,7 @@ pub async fn collections_get(
     let collections =
         filter_visible_collections(collections_data, &user_option, false)
             .await
-            .wrap_api_err("filtering visible collections")?;
+            .api_context("filtering visible collections")?;
 
     Ok(HttpResponse::Ok().json(collections))
 }
@@ -212,12 +212,12 @@ pub async fn collection_get(
     let string = info.into_inner().0;
 
     let id = database::models::DBCollectionId(
-        parse_base62(&string).wrap_request_err("parsing collection ID")? as i64,
+        parse_base62(&string).request_context("parsing collection ID")? as i64,
     );
     let collection_data =
         database::models::DBCollection::get(id, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching collection from database")?;
+            .internal_context("fetching collection from database")?;
     let user_option = get_user_from_headers(
         &req,
         &**pool,
@@ -231,11 +231,11 @@ pub async fn collection_get(
     if let Some(data) = collection_data
         && is_visible_collection(&data, &user_option, false)
             .await
-            .wrap_api_err("checking collection visibility")?
+            .api_context("checking collection visibility")?
     {
         return Ok(HttpResponse::Ok().json(Collection::from(data)));
     }
-    Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+    Err(ApiError::NotFound(anyhow!("resource not found")))
 }
 
 #[derive(Deserialize, Validate, utoipa::ToSchema)]
@@ -277,12 +277,12 @@ pub async fn collection_edit(
         Scopes::COLLECTION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     new_collection
         .validate()
-        .map_err(|err| eyre::eyre!(err))
-        .wrap_request_err("validating request")?;
+        .map_err(|err| anyhow!(err))
+        .request_context("validating request")?;
 
     if let Some(projects) = &mut new_collection.new_projects {
         crate::routes::resolve_body_refs(
@@ -296,11 +296,11 @@ pub async fn collection_edit(
 
     let string = info.into_inner().0;
     let id = database::models::DBCollectionId(
-        parse_base62(&string).wrap_request_err("parsing collection ID")? as i64,
+        parse_base62(&string).request_context("parsing collection ID")? as i64,
     );
     let result = database::models::DBCollection::get(id, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching collection from database")?;
+        .internal_context("fetching collection from database")?;
 
     if let Some(collection_item) = result {
         if !can_modify_collection(&collection_item, &user) {
@@ -312,7 +312,7 @@ pub async fn collection_edit(
         let mut transaction = pool
             .begin()
             .await
-            .wrap_internal_err("starting database transaction")?;
+            .internal_context("starting database transaction")?;
 
         if let Some(name) = &new_collection.name {
             sqlx::query!(
@@ -326,7 +326,7 @@ pub async fn collection_edit(
             )
             .execute(&mut transaction)
             .await
-            .wrap_internal_err("querying database for `collection_edit`")?;
+            .internal_context("querying database for `collection_edit`")?;
         }
 
         if let Some(description) = &new_collection.description {
@@ -341,7 +341,7 @@ pub async fn collection_edit(
             )
             .execute(&mut transaction)
             .await
-            .wrap_internal_err("querying database for `collection_edit`")?;
+            .internal_context("querying database for `collection_edit`")?;
         }
 
         if let Some(status) = &new_collection.status {
@@ -349,7 +349,7 @@ pub async fn collection_edit(
                 || collection_item.status.is_approved()
                     && status.can_be_requested())
             {
-                return Err(ApiError::Auth(eyre::eyre!(
+                return Err(ApiError::Auth(anyhow!(
                     "You don't have permission to set this status!",
                 )));
             }
@@ -365,7 +365,7 @@ pub async fn collection_edit(
             )
             .execute(&mut transaction)
             .await
-            .wrap_internal_err("querying database for `collection_edit`")?;
+            .internal_context("querying database for `collection_edit`")?;
         }
 
         if let Some(new_project_ids) = &new_collection.new_projects {
@@ -379,7 +379,7 @@ pub async fn collection_edit(
             )
             .execute(&mut transaction)
             .await
-            .wrap_internal_err("fetching new project IDs from database")?;
+            .internal_context("fetching new project IDs from database")?;
 
             let collection_item_ids = new_project_ids
                 .iter()
@@ -391,9 +391,11 @@ pub async fn collection_edit(
                     project_id, &**pool, &redis,
                 )
                 .await
-                .wrap_internal_err("fetching project from database")?
-                .wrap_request_err_with(|| {
-                    eyre!("the specified project `{project_id}` does not exist")
+                .internal_context("fetching project from database")?
+                .request_context_with(|| {
+                    anyhow!(
+                        "the specified project `{project_id}` does not exist"
+                    )
                 })?;
                 validated_project_ids.push(project.inner.id.0);
             }
@@ -409,7 +411,7 @@ pub async fn collection_edit(
             )
             .execute(&mut transaction)
             .await
-            .wrap_internal_err("querying database for `collection_edit`")?;
+            .internal_context("querying database for `collection_edit`")?;
 
             sqlx::query!(
                 "
@@ -421,20 +423,20 @@ pub async fn collection_edit(
             )
             .execute(&mut transaction)
             .await
-            .wrap_internal_err("querying database for `collection_edit`")?;
+            .internal_context("querying database for `collection_edit`")?;
         }
 
         transaction
             .commit()
             .await
-            .wrap_internal_err("committing database transaction")?;
+            .internal_context("committing database transaction")?;
         database::models::DBCollection::clear_cache(collection_item.id, &redis)
             .await
-            .wrap_internal_err("clearing cached data from Redis")?;
+            .internal_context("clearing cached data from Redis")?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -469,17 +471,17 @@ pub async fn collection_icon_edit(
         Scopes::COLLECTION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let string = info.into_inner().0;
     let id = database::models::DBCollectionId(
-        parse_base62(&string).wrap_request_err("parsing collection ID")? as i64,
+        parse_base62(&string).request_context("parsing collection ID")? as i64,
     );
     let collection_item =
         database::models::DBCollection::get(id, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching collection from database")?
-            .wrap_request_err_with(|| {
+            .internal_context("fetching collection from database")?
+            .request_context_with(|| {
                 "the specified collection does not exist!".to_string()
             })?;
 
@@ -494,7 +496,7 @@ pub async fn collection_icon_edit(
         &**file_host,
     )
     .await
-    .wrap_api_err("deleting old images")?;
+    .api_context("deleting old images")?;
 
     let bytes = read_limited_from_payload(
         &mut payload,
@@ -520,12 +522,12 @@ pub async fn collection_icon_edit(
         &**file_host,
     )
     .await
-    .wrap_api_err("uploading image")?;
+    .api_context("uploading image")?;
 
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     sqlx::query!(
         "
@@ -540,15 +542,15 @@ pub async fn collection_icon_edit(
     )
     .execute(&mut transaction)
     .await
-    .wrap_internal_err("querying database for `collection_icon_edit`")?;
+    .internal_context("querying database for `collection_icon_edit`")?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
     database::models::DBCollection::clear_cache(collection_item.id, &redis)
         .await
-        .wrap_internal_err("clearing cached data from Redis")?;
+        .internal_context("clearing cached data from Redis")?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -571,17 +573,17 @@ pub async fn delete_collection_icon(
         Scopes::COLLECTION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let string = info.into_inner().0;
     let id = database::models::DBCollectionId(
-        parse_base62(&string).wrap_request_err("parsing collection ID")? as i64,
+        parse_base62(&string).request_context("parsing collection ID")? as i64,
     );
     let collection_item =
         database::models::DBCollection::get(id, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching collection from database")?
-            .wrap_request_err_with(|| {
+            .internal_context("fetching collection from database")?
+            .request_context_with(|| {
                 "the specified collection does not exist!".to_string()
             })?;
     if !can_modify_collection(&collection_item, &user) {
@@ -595,11 +597,11 @@ pub async fn delete_collection_icon(
         &**file_host,
     )
     .await
-    .wrap_api_err("deleting old images")?;
+    .api_context("deleting old images")?;
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     sqlx::query!(
         "
@@ -611,15 +613,15 @@ pub async fn delete_collection_icon(
     )
     .execute(&mut transaction)
     .await
-    .wrap_internal_err("querying database for `delete_collection_icon`")?;
+    .internal_context("querying database for `delete_collection_icon`")?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
     database::models::DBCollection::clear_cache(collection_item.id, &redis)
         .await
-        .wrap_internal_err("clearing cached data from Redis")?;
+        .internal_context("clearing cached data from Redis")?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -641,16 +643,16 @@ pub async fn collection_delete(
         Scopes::COLLECTION_DELETE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let string = info.into_inner().0;
     let id = database::models::DBCollectionId(
-        parse_base62(&string).wrap_request_err("parsing collection ID")? as i64,
+        parse_base62(&string).request_context("parsing collection ID")? as i64,
     );
     let collection = database::models::DBCollection::get(id, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching collection from database")?
-        .wrap_request_err_with(|| {
+        .internal_context("fetching collection from database")?
+        .request_context_with(|| {
             "the specified collection does not exist!".to_string()
         })?;
     if !can_modify_collection(&collection, &user) {
@@ -659,7 +661,7 @@ pub async fn collection_delete(
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     let result = database::models::DBCollection::remove(
         collection.id,
@@ -667,20 +669,20 @@ pub async fn collection_delete(
         &redis,
     )
     .await
-    .wrap_internal_err("deleting collection from database")?;
+    .internal_context("deleting collection from database")?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
     database::models::DBCollection::clear_cache(collection.id, &redis)
         .await
-        .wrap_internal_err("clearing cached data from Redis")?;
+        .internal_context("clearing cached data from Redis")?;
 
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 

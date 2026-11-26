@@ -1,7 +1,8 @@
+use anyhow::anyhow;
 use std::time::Duration;
 
+use anyhow::Result;
 use chrono::{DateTime, Utc};
-use eyre::Result;
 use minecraft_meta_model::model::MinecraftVersionName;
 use serde::{Deserialize, Serialize};
 use serde_binhum::serde_binhum;
@@ -129,7 +130,7 @@ pub enum Language {
 #[serde(rename_all = "snake_case")]
 #[strum(
     serialize_all = "snake_case",
-    parse_err_ty = eyre::Report,
+    parse_err_ty = anyhow::Error,
     parse_err_fn = invalid_minecraft_metadata_value
 )]
 pub enum Environment {
@@ -164,7 +165,7 @@ pub enum Environment {
 #[serde(rename_all = "lowercase")]
 #[strum(
     serialize_all = "lowercase",
-    parse_err_ty = eyre::Report,
+    parse_err_ty = anyhow::Error,
     parse_err_fn = invalid_minecraft_metadata_value
 )]
 pub enum MrpackLoader {
@@ -216,8 +217,8 @@ impl MrpackLoader {
     }
 }
 
-fn invalid_minecraft_metadata_value(value: &str) -> eyre::Report {
-    eyre::eyre!("invalid Minecraft metadata value `{value}`")
+fn invalid_minecraft_metadata_value(value: &str) -> anyhow::Error {
+    anyhow!("invalid Minecraft metadata value `{value}`")
 }
 
 component::define! {
@@ -455,7 +456,7 @@ impl ComponentEdit for JavaServerProjectEdit {
 
     fn create(self) -> Result<Self::Component> {
         Ok(JavaServerProject {
-            address: self.address.wrap_err("missing `address`")?,
+            address: self.address.context("missing `address`")?,
             content: self.content.unwrap_or_default(),
         })
     }

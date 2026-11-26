@@ -1,7 +1,8 @@
 use crate::install::diagnostics::{
-    censor_support_text, write_environment_details, write_latest_log,
+    write_environment_details, write_latest_log,
 };
 use crate::util::io::format_bytes;
+use crate::util::redactions::censor_support_text;
 use chrono::{DateTime, Utc};
 use std::collections::{HashMap, HashSet};
 use std::fmt::Write as _;

@@ -1,6 +1,6 @@
 // eslint-disable-next-line simple-import-sort/imports -- The resolver reads the global that Ace initializes.
 import cssText from '@modrinth/assets/styles/ace.css?raw'
-import ace from 'ace-builds'
+import ace from './ace-core'
 import 'ace-builds/esm-resolver'
 
 ace['define'](

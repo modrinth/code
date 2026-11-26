@@ -548,14 +548,23 @@
   "app-marketing.download.download-appimage": {
     "message": "Scarica il file AppImage"
   },
+  "app-marketing.download.download-appimage-arm64": {
+    "message": "Scarica il file AppImage (ARM64)"
+  },
   "app-marketing.download.download-beta": {
     "message": "Scarica la beta"
   },
   "app-marketing.download.download-deb": {
     "message": "Scarica il file DEB"
   },
+  "app-marketing.download.download-deb-arm64": {
+    "message": "Scarica il file DEB (ARM64)"
+  },
   "app-marketing.download.download-rpm": {
     "message": "Scarica il file RPM"
+  },
+  "app-marketing.download.download-rpm-arm64": {
+    "message": "Scarica il file RPM (ARM64)"
   },
   "app-marketing.download.flathub": {
     "message": "Installala da Flathub"
@@ -812,6 +821,12 @@
   "auth.create-account.username.placeholder": {
     "message": "Inserisci il nome utente"
   },
+  "auth.oauth.opening.description": {
+    "message": "Completa l'accesso su {provider}"
+  },
+  "auth.oauth.opening.title": {
+    "message": "Aprendo {provider}..."
+  },
   "auth.reauthenticate.2fa.description": {
     "message": "Inserisci il codice a 6 cifre dall'app di autenticazione oppure uno dei tuoi codici di backup."
   },
@@ -883,6 +898,9 @@
   },
   "auth.sign-in.choose-existing-account": {
     "message": "Usa un account esistente"
+  },
+  "auth.sign-in.code-failed": {
+    "message": "Il link di accesso non è valido o è scaduto. Riprova."
   },
   "auth.sign-in.continue-with-email": {
     "message": "Continua con l'email"
@@ -2406,7 +2424,7 @@
     "message": "La maggior parte dei problemi di prestazioni che si verificano sono causati da mod, pacchetti di mod o di dati, o plugin mal ottimizzati che causano lag nel server. Poiché i nostri server sono di alta gamma, non dovresti riscontrare molti problemi a condizione che tu abbia scelto il piano adeguato al contenuto che andrai a installare."
   },
   "hosting-marketing.faq.increase-storage": {
-    "message": "Posso aumentare lo spazio d'archiviazione del mio server?"
+    "message": "Posso aumentare lo spazio di archiviazione del mio server?"
   },
   "hosting-marketing.faq.increase-storage.answer": {
     "message": "Sì, puoi aumentare lo spazio di archiviazione del tuo server senza costi aggiunti. Se ne avessi bisogno, contatta l'assistenza di Modrinth."
@@ -2998,6 +3016,9 @@
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Abbonati a Modrinth+"
+  },
+  "layout.nav.use-signed-out": {
+    "message": "Uso disconnesso"
   },
   "layout.publish.email-verification-required.description": {
     "message": "Devi verificare l'indirizzo email prima di pubblicare su Modrinth."
@@ -3813,7 +3834,7 @@
     "message": "Modifica progetto"
   },
   "project.actions.open-in-modview": {
-    "message": "Apri in moderazione"
+    "message": "Moderazione"
   },
   "project.actions.project-page": {
     "message": "Pagina del progetto"
@@ -6241,6 +6262,12 @@
   },
   "thread.message.tech-review-exited": {
     "message": "Il progetto è uscito dalla coda di revisione tecnica in quanto tutte le tracce in attesa sono state risolte."
+  },
+  "thread.message.tech-review-failed": {
+    "message": "ha completato la revisione tecnica e segnato il progetto come bocciato con {safe} e {unsafe} problemi sicuri e non sicuri revisionati."
+  },
+  "thread.message.tech-review-passed": {
+    "message": "ha completato la revisione tecnica e segnato il progetto come promosso con {safe, plural, one {# problema sicuro revisionato} other {# problemi sicuri revisionati}}."
   },
   "thread.message.thread-closed": {
     "message": "ha chiuso il thread."

@@ -229,6 +229,8 @@ pub const JAVA_BIN: &str = if cfg!(target_os = "windows") {
     "java"
 };
 
+const MAX_JAVA_CHECK_STDERR_CHARS: usize = 500;
+
 // For each example filepath in 'paths', perform check_java_at_filepath, checking each one concurrently
 // and returning a JavaVersion for every valid path that points to a java bin
 #[tracing::instrument]
@@ -313,7 +315,20 @@ pub async fn check_java_at_filepath(path: &Path) -> crate::Result<JavaVersion> {
         return Err(JREError::InvalidJREVersion(version.to_owned()).into());
     }
 
-    Err(JREError::FailedJavaCheck(java).into())
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    let stderr = stderr.trim();
+    let stderr = match stderr.char_indices().nth(MAX_JAVA_CHECK_STDERR_CHARS) {
+        Some((end, _)) => format!("{}…", &stderr[..end]),
+        None if stderr.is_empty() => "<no stderr output>".to_string(),
+        None => stderr.to_string(),
+    };
+
+    Err(JREError::FailedJavaCheck {
+        path: java,
+        status: output.status,
+        stderr,
+    }
+    .into())
 }
 
 pub fn extract_java_version(version: &str) -> Result<u32, JREError> {
@@ -340,8 +355,12 @@ pub enum JREError {
     #[error("No executable found at {0}")]
     NoExecutable(PathBuf),
 
-    #[error("Could not check Java version at path {0}")]
-    FailedJavaCheck(PathBuf),
+    #[error("Could not check Java version at path {path} ({status}): {stderr}")]
+    FailedJavaCheck {
+        path: PathBuf,
+        status: std::process::ExitStatus,
+        stderr: String,
+    },
 
     #[error("Invalid JRE version string: {0}")]
     InvalidJREVersion(String),

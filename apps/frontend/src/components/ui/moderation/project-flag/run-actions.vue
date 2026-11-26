@@ -1,14 +1,36 @@
 <template>
-	<slot :run-options="runOptions" :busy="isDeleting" />
+	<slot :run-options="runOptions" :busy="isDeleting || isDeploying" />
 
-	<NewModal ref="applyModal" header="Apply run">
-		<div class="flex w-[32rem] max-w-full flex-col gap-4">
-			<p class="m-0 text-secondary">Applying flags from a run is not available yet.</p>
+	<NewModal
+		ref="deployModal"
+		header="Deploy tested rules"
+		:disable-close="isDeploying"
+		:on-hide="closeDeploy"
+	>
+		<div v-if="runToDeploy" class="flex w-[32rem] max-w-full flex-col gap-4">
+			<p class="m-0 break-words">
+				Deploy revision <code>{{ runToDeploy.ruleset_id }}</code> for live project reconciliation?
+				This revision contains the rules and modules tested by this run. Deployment does not apply
+				the run results to projects.
+			</p>
+			<p v-if="deploymentPending" class="m-0 text-secondary">Loading deployment status…</p>
+			<p v-else-if="deploymentError" role="alert" class="m-0 text-red">
+				Could not load deployment status.
+			</p>
+			<p v-else-if="deployRunPending" class="m-0 text-secondary">Checking run history…</p>
+			<p v-else-if="deployRunError || !deployableRun" role="alert" class="m-0 text-red">
+				The tested revision could not be verified against Temporal history.
+			</p>
 			<div class="flex justify-end gap-2">
-				<Button @click="applyModal?.hide()">Close</Button>
-				<Button type="colored" color="brand" disabled>
-					<CheckIcon />
-					Apply run
+				<Button :disabled="isDeploying" @click="deployModal?.hide()">Cancel</Button>
+				<Button
+					type="colored"
+					color="brand"
+					:loading="isDeploying"
+					:disabled="!canDeploy"
+					@click="deployRules(runToDeploy.id)"
+				>
+					Deploy rules
 				</Button>
 			</div>
 		</div>
@@ -26,8 +48,8 @@
 				>?
 			</p>
 			<p class="m-0 text-secondary">
-				This permanently deletes the run, its results, and its inactive project flags. Active flags
-				are preserved and detached from the run. This cannot be undone.
+				This terminates any running execution and permanently deletes its Temporal history, results,
+				and unretained inactive flags. Active and retained flags are detached and preserved.
 			</p>
 			<div class="flex justify-end gap-2">
 				<Button :disabled="isDeleting" @click="deleteModal?.hide()">Cancel</Button>
@@ -58,10 +80,12 @@ import {
 	injectNotificationManager,
 	NewModal,
 } from '@modrinth/ui'
-import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
+import { projectFlagDeploymentQueryOptions } from '~/composables/queries/project-flag'
 import {
 	projectFlagRunActivityKey,
+	projectFlagRunDetailOptions,
 	projectFlagRunHistoryKey,
 	projectFlagRunResultsOptions,
 } from '~/composables/queries/project-flag-run'
@@ -79,7 +103,65 @@ const api = client.labrinth.project_flags_internal
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 
-const applyModal = useTemplateRef<InstanceType<typeof NewModal>>('applyModal')
+const deployModal = useTemplateRef<InstanceType<typeof NewModal>>('deployModal')
+const runToDeploy = ref<ProjectFlagRun | null>(null)
+const deploymentOptions = projectFlagDeploymentQueryOptions(client)
+const {
+	data: deployment,
+	isPending: deploymentPending,
+	error: deploymentError,
+} = useQuery(deploymentOptions)
+const {
+	data: deployRun,
+	isPending: deployRunPending,
+	error: deployRunError,
+} = useQuery(
+	computed(() => ({
+		...projectFlagRunDetailOptions(client, runToDeploy.value?.id ?? ''),
+		enabled: runToDeploy.value !== null,
+	})),
+)
+const deployableRun = computed(
+	() =>
+		deployRun.value?.status === 'completed' &&
+		deployRun.value.ruleset_id === runToDeploy.value?.ruleset_id,
+)
+const {
+	mutate: deployRules,
+	isPending: isDeploying,
+	isSuccess: deploySuccess,
+	error: deployError,
+	reset: resetDeploy,
+} = useMutation({
+	mutationFn: (id: string) => api.deployRun(id),
+	retry: false,
+	onSuccess: async (live) => {
+		queryClient.setQueryData(deploymentOptions.queryKey, live)
+		addNotification({ type: 'success', title: 'Tested rules deployed' })
+		await queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag'] })
+	},
+})
+const canDeploy = computed(
+	() =>
+		deployableRun.value &&
+		!deployRunError.value &&
+		!deploymentPending.value &&
+		!deploymentError.value &&
+		!isDeploying.value &&
+		deployment.value?.ruleset_id !== runToDeploy.value?.ruleset_id,
+)
+watch(
+	deploySuccess,
+	(success) => {
+		if (success) deployModal.value?.hide()
+	},
+	{ flush: 'post' },
+)
+
+function closeDeploy() {
+	runToDeploy.value = null
+	resetDeploy()
+}
 const deleteModal = useTemplateRef<InstanceType<typeof NewModal>>('deleteModal')
 const runToDelete = ref<ProjectFlagRun | null>(null)
 const {
@@ -109,6 +191,7 @@ const {
 
 // TODO: Use the dedicated export endpoint when available.
 function runOptions(run: ProjectFlagRun): ButtonMenuOption[] {
+	const alreadyDeployed = !!run.ruleset_id && deployment.value?.ruleset_id === run.ruleset_id
 	const runJson = async () => {
 		const results = await queryClient.fetchQuery(projectFlagRunResultsOptions(client, run))
 		return JSON.stringify({ ...run, results }, null, 2)
@@ -170,11 +253,14 @@ function runOptions(run: ProjectFlagRun): ButtonMenuOption[] {
 			},
 		},
 		{
-			id: 'apply-run',
-			label: run.applied_at ? 'Run applied' : 'Apply run',
+			id: 'deploy-run',
+			label: alreadyDeployed ? 'Rules already deployed' : 'Deploy tested rules',
 			icon: CheckIcon,
-			disabled: run.status !== 'done' || run.error !== null || run.applied_at !== null,
-			action: () => applyModal.value?.show(),
+			disabled: run.status !== 'completed' || !run.ruleset_id || alreadyDeployed,
+			action: () => {
+				runToDeploy.value = run
+				deployModal.value?.show()
+			},
 		},
 		{
 			id: 'delete-run',
@@ -197,5 +283,6 @@ function closeDelete() {
 	resetDelete()
 }
 
+useFlagErrorNotification(deployError, 'Could not deploy tested rules')
 useFlagErrorNotification(deleteError, 'Could not delete the run')
 </script>

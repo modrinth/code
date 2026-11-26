@@ -9,7 +9,8 @@ export function createReviewFlags(projectId: Ref<string | undefined>) {
 	const { labrinth } = injectModrinthClient()
 	const { data, isPending, isError } = useQuery({
 		queryKey: computed(() => ['project', 'flags', projectId.value]),
-		queryFn: () => labrinth.project_flags_internal.getProjectFlags(projectId.value!),
+		queryFn: ({ queryKey: [, , id] }) => labrinth.project_flags_internal.getProjectFlags(id!),
+		refetchInterval: 10_000,
 		enabled: computed(() => !!projectId.value),
 	})
 	const flags = computed(() =>

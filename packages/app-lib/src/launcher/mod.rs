@@ -832,6 +832,68 @@ pub async fn install_minecraft_for_instance_id_with_reporter(
     install_minecraft_with_reporter(&context, repairing, reporter, state).await
 }
 
+pub(crate) async fn refresh_installed_version_info(
+    state: &State,
+) -> crate::Result<()> {
+    let catalog = crate::state::CachedEntry::get_minecraft_manifest(
+        Some(crate::state::CacheBehaviour::MustRevalidate),
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+    .ok_or_else(|| ErrorKind::NoValueFor("minecraft versions".to_string()))?;
+
+    let mut refreshed = std::collections::HashSet::new();
+    for metadata in
+        crate::state::instances::commands::list_instances(&state.pool).await?
+    {
+        if metadata.instance.install_stage != InstanceInstallStage::Installed {
+            continue;
+        }
+        let content_set = metadata.applied_content_set;
+        let Some(version) = catalog
+            .versions
+            .iter()
+            .find(|it| it.id == content_set.game_version.as_str())
+        else {
+            continue;
+        };
+        let Ok(loader) = get_loader_version_from_profile(
+            &content_set.game_version,
+            content_set.loader,
+            content_set.loader_version.as_deref(),
+            &state.directories,
+        )
+        .await
+        else {
+            continue;
+        };
+        let version_id = loader.as_ref().map_or(version.id.to_string(), |it| {
+            format!("{}-{}", version.id, it.id)
+        });
+        if !refreshed.insert(version_id) {
+            continue;
+        }
+        if let Err(error) = download::download_version_info(
+            state,
+            version,
+            loader.as_ref(),
+            Some(true),
+            None,
+            None,
+        )
+        .await
+        {
+            tracing::warn!(
+                "Failed to refresh version info for {}: {error}",
+                version.id
+            );
+        }
+    }
+
+    Ok(())
+}
+
 pub async fn read_protocol_version_from_jar(
     path: PathBuf,
 ) -> crate::Result<Option<u32>> {
@@ -1150,6 +1212,7 @@ pub async fn launch_minecraft(
             *memory,
             Vec::from(java_args),
             &java_version.architecture,
+            java_version.parsed_version,
             &quick_play_type,
             quick_play_version,
             version_info

@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use futures::future::try_join_all;
 use prometheus::Registry;
 use redis::aio::ConnectionLike;
@@ -80,7 +80,7 @@ impl RedisBackend {
             config.seed_urls()[0].clone(),
             connection_config,
         )
-        .wrap_err("configuring standalone Redis client")?;
+        .context("configuring standalone Redis client")?;
         let pool = deadpool_redis::Pool::builder(manager)
             .max_size(pool_size.max())
             .wait_timeout(Some(Duration::from_millis(config.wait_timeout_ms())))
@@ -88,11 +88,11 @@ impl RedisBackend {
             .recycle_timeout(Some(CONNECT_TIMEOUT))
             .runtime(deadpool_redis::Runtime::Tokio1)
             .build()
-            .wrap_err("building standalone Redis pool")?;
+            .context("building standalone Redis pool")?;
 
         warm_standalone_pool(&pool, pool_size.min())
             .await
-            .wrap_err("warming standalone Redis pool")?;
+            .context("warming standalone Redis pool")?;
         retain_standalone_pool(pool.clone());
 
         Ok(Self::StandalonePooled(pool))
@@ -106,7 +106,7 @@ impl RedisBackend {
             config.seed_urls().to_vec(),
             false,
         )
-        .wrap_err("configuring clustered Redis client")?;
+        .context("configuring clustered Redis client")?;
         let pool = deadpool_redis::cluster::Pool::builder(manager)
             .max_size(pool_size.max())
             .wait_timeout(Some(Duration::from_millis(config.wait_timeout_ms())))
@@ -114,7 +114,7 @@ impl RedisBackend {
             .recycle_timeout(Some(CONNECT_TIMEOUT))
             .runtime(deadpool_redis::Runtime::Tokio1)
             .build()
-            .wrap_err("building clustered Redis pool")?;
+            .context("building clustered Redis pool")?;
 
         if config.read_replica_strategy() != ReadReplicaStrategy::Primary {
             warn!(
@@ -124,7 +124,7 @@ impl RedisBackend {
 
         warm_cluster_pool(&pool, pool_size.min())
             .await
-            .wrap_err("warming clustered Redis pool")?;
+            .context("warming clustered Redis pool")?;
         retain_cluster_pool(pool.clone());
 
         Ok(Self::ClusterPooled(pool))
@@ -157,11 +157,11 @@ impl RedisBackend {
 
         let client = builder
             .build()
-            .wrap_err("building multiplexed Redis client")?;
+            .context("building multiplexed Redis client")?;
         let connection = client
             .get_async_connection()
             .await
-            .wrap_err("connecting multiplexed Redis client")?;
+            .context("connecting multiplexed Redis client")?;
 
         Ok(Self::ClusterMultiplexed(connection))
     }
@@ -171,7 +171,7 @@ impl RedisBackend {
     pub(crate) async fn connect(&self) -> Result<RedisConnection> {
         tokio::time::timeout(CONNECT_TIMEOUT, self.checkout())
             .await
-            .wrap_err("timed out fetching Redis connection")?
+            .context("timed out fetching Redis connection")?
     }
 
     async fn checkout(&self) -> Result<RedisConnection> {
@@ -180,13 +180,13 @@ impl RedisBackend {
                 RedisConnectionInner::StandalonePooled(
                     pool.get()
                         .await
-                        .wrap_err("fetching standalone Redis connection")?,
+                        .context("fetching standalone Redis connection")?,
                 )
             }
             Self::ClusterPooled(pool) => RedisConnectionInner::ClusterPooled(
                 pool.get()
                     .await
-                    .wrap_err("fetching clustered Redis connection")?,
+                    .context("fetching clustered Redis connection")?,
             ),
             Self::ClusterMultiplexed(connection) => {
                 RedisConnectionInner::ClusterMultiplexed(connection.clone())
@@ -327,7 +327,7 @@ async fn warm_standalone_pool(
 ) -> Result<()> {
     let connections = try_join_all((0..min).map(|_| pool.get()))
         .await
-        .wrap_err("fetching initial standalone Redis connections")?;
+        .context("fetching initial standalone Redis connections")?;
     drop(connections);
     Ok(())
 }
@@ -338,7 +338,7 @@ async fn warm_cluster_pool(
 ) -> Result<()> {
     let connections = try_join_all((0..min).map(|_| pool.get()))
         .await
-        .wrap_err("fetching initial clustered Redis connections")?;
+        .context("fetching initial clustered Redis connections")?;
     drop(connections);
     Ok(())
 }

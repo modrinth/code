@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "คัดลอก"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "คัดลอก รายระเอียด"
-  },
   "app.action-bar.install.dismiss": {
     "message": "ปิด"
   },
@@ -476,6 +473,9 @@
   "app.file-download.waiting": {
     "message": "กำลังรอเซิร์ฟเวอร์…"
   },
+  "app.instance.action.add-content": {
+    "message": "เพิ่มทรัพยากร"
+  },
   "app.instance.action.copy-path": {
     "message": "คัดลอกเส้นทาง"
   },
@@ -688,9 +688,6 @@
   },
   "app.settings.privacy.discord-rich-presence.description": {
     "message": "แสดงแอป Modrinth เป็นกิจกรรมปัจจุบันของคุณบน Discord การดำเนินการนี้จะไม่ส่งผลต่อสถานะ Rich Presence ที่เพิ่มโดยม็อดในชุดเซิร์ฟเวอร์ จำเป็นต้องรีสตาร์ทแอปพลิเคชัน"
-  },
-  "app.settings.resource-management.app-directory.description": {
-    "message": "ที่เก็บข้อมูลของ Modrinth App สำหรับชุดเซิร์ฟเวอร์และไฟล์อื่น ๆ การเปลี่ยนแปลงจะมีผลหลังจากรีสตาร์ทแอปพลิเคชัน"
   },
   "app.settings.resource-management.store.description": {
     "message": "ประหยัดพื้นที่ด้วยการนำชุดติดตั้งเกม ม็อด และแพ็กที่เคยใช้แล้วมาใช้ซ้ำกับหลายๆ โลกม็อดแพ็คของคุณ"

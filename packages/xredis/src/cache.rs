@@ -5,10 +5,10 @@ use std::future::Future;
 use std::hash::Hash;
 use std::str::FromStr;
 
+use anyhow::{Context, Result, anyhow};
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{TimeZone, Utc};
 use dashmap::DashMap;
-use eyre::{Result, WrapErr, eyre};
 use futures::stream::{FuturesUnordered, StreamExt};
 use redis::aio::ConnectionLike;
 use serde::de::DeserializeOwned;
@@ -114,7 +114,7 @@ impl CacheSettings {
     pub fn encode_value<T: Serialize>(&self, value: &T) -> Result<Vec<u8>> {
         let mut value = match self.encoding_format {
             EncodingFormat::Postcard => postcard::to_allocvec(value)
-                .wrap_err("serializing Redis cache value with postcard")?,
+                .context("serializing Redis cache value with postcard")?,
         };
 
         if self.compression_level > 0
@@ -215,7 +215,7 @@ impl CacheManager {
         P: ConnectionProvider,
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, E>>,
-        E: Into<eyre::Report>,
+        E: Into<anyhow::Error>,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -229,7 +229,7 @@ impl CacheManager {
         Ok(self
             .get_cached_keys_raw(provider, namespace, keys, closure)
             .await
-            .wrap_err("fetching Redis cache values")?
+            .context("fetching Redis cache values")?
             .into_values()
             .collect())
     }
@@ -246,7 +246,7 @@ impl CacheManager {
         P: ConnectionProvider,
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, E>>,
-        E: Into<eyre::Report>,
+        E: Into<anyhow::Error>,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -293,7 +293,7 @@ impl CacheManager {
         P: ConnectionProvider,
         F: FnOnce(Vec<I>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
-        E: Into<eyre::Report>,
+        E: Into<anyhow::Error>,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
@@ -315,7 +315,7 @@ impl CacheManager {
                 closure,
             )
             .await
-            .wrap_err("fetching Redis cache values by slug")?
+            .context("fetching Redis cache values by slug")?
             .into_values()
             .collect())
     }
@@ -334,7 +334,7 @@ impl CacheManager {
         P: ConnectionProvider,
         F: FnOnce(Vec<I>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
-        E: Into<eyre::Report>,
+        E: Into<anyhow::Error>,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
@@ -375,7 +375,7 @@ impl CacheManager {
                                 })
                                 .collect::<Vec<_>>();
                             let mut connection =
-                                provider.connect().await.wrap_err(
+                                provider.connect().await.context(
                                     "connecting to Redis for slug lookup",
                                 )?;
                             let values = match routing {
@@ -394,8 +394,8 @@ impl CacheManager {
                                     .await
                                 }
                             }
-                            .wrap_err("fetching Redis cache slug values")?;
-                            eyre::Ok(
+                            .context("fetching Redis cache slug values")?;
+                            anyhow::Ok(
                                 values
                                     .into_iter()
                                     .flatten()
@@ -404,7 +404,7 @@ impl CacheManager {
                         }
                         .instrument(info_span!("get slug ids"))
                         .await
-                        .wrap_err("resolving Redis cache slugs")?
+                        .context("resolving Redis cache slugs")?
                     } else {
                         Vec::new()
                     };
@@ -424,7 +424,7 @@ impl CacheManager {
                     let mut connection = provider
                         .connect()
                         .await
-                        .wrap_err("connecting to Redis for cache lookup")?;
+                        .context("connecting to Redis for cache lookup")?;
                     let mut cached_values = HashMap::new();
                     let values = match routing {
                         CacheReadRouting::ReplicaOptional => {
@@ -435,7 +435,7 @@ impl CacheManager {
                                 .await
                         }
                     }
-                    .wrap_err("fetching Redis cache values")?;
+                    .context("fetching Redis cache values")?;
                     for value in values {
                         if let Some(value) = value.and_then(|value| {
                             self.settings
@@ -445,7 +445,7 @@ impl CacheManager {
                         }
                     }
 
-                    eyre::Ok((cached_values, ids))
+                    anyhow::Ok((cached_values, ids))
                 }
                 .instrument(info_span!("get_cached_values_closure"))
             };
@@ -459,7 +459,7 @@ impl CacheManager {
         let (cached_values_raw, ids) =
             get_cached_values(ids, CacheReadRouting::ReplicaOptional)
                 .await
-                .wrap_err("reading Redis cache")?;
+                .context("reading Redis cache")?;
         let mut cached_values = cached_values_raw
             .into_iter()
             .filter_map(|(key, value)| {
@@ -531,10 +531,10 @@ impl CacheManager {
                 let values = timeout_at(fill_deadline, closure(fetch_ids))
                     .await
                     .map_err(|_| lock_timeout_error(0, waiters.len()))
-                    .wrap_err("waiting to fill Redis cache")?;
+                    .context("waiting to fill Redis cache")?;
                 let values = values
-                    .map_err(Into::<eyre::Report>::into)
-                    .wrap_err("fetching values to fill Redis cache")?;
+                    .map_err(Into::<anyhow::Error>::into)
+                    .context("fetching values to fill Redis cache")?;
 
                 let mut return_values = HashMap::new();
                 let mut encoded_values = Vec::with_capacity(values.len());
@@ -549,14 +549,14 @@ impl CacheManager {
                     let encoded = self
                         .settings
                         .encode_value(&value)
-                        .wrap_err("encoding Redis cache value")?;
+                        .context("encoding Redis cache value")?;
                     encoded_values.push((key, slug, value, encoded));
                 }
 
                 let mut connection = provider
                     .connect()
                     .await
-                    .wrap_err("connecting to Redis to fill cache")?;
+                    .context("connecting to Redis to fill cache")?;
                 for (key, slug, _, encoded) in &encoded_values {
                     let redis_key =
                         self.key_builder.entity(namespace, key.to_string());
@@ -567,7 +567,7 @@ impl CacheManager {
                         default_expiry,
                     )
                     .await
-                    .wrap_err("writing Redis cache value")?;
+                    .context("writing Redis cache value")?;
                     if let Some(slug) = slug
                         && let Some(slug_namespace) = slug_namespace
                     {
@@ -584,7 +584,7 @@ impl CacheManager {
                             default_expiry,
                         )
                         .await
-                        .wrap_err("writing Redis cache slug")?;
+                        .context("writing Redis cache slug")?;
                     }
                 }
 
@@ -641,7 +641,7 @@ impl CacheManager {
             Err(error) => Err(error),
         };
         cached_values
-            .extend(operation_result.wrap_err("populating Redis cache")?);
+            .extend(operation_result.context("populating Redis cache")?);
 
         Ok(cached_values
             .into_iter()
@@ -730,7 +730,7 @@ async fn wait_for_locks<I>(
                 return Err(lock_timeout_error(released.len(), total));
             }
             Err(error) => {
-                return Err(error).wrap_err("waiting for Redis cache lock");
+                return Err(error).context("waiting for Redis cache lock");
             }
         }
     }
@@ -740,8 +740,8 @@ async fn wait_for_locks<I>(
 fn lock_timeout_error(
     locks_released: usize,
     locks_waiting: usize,
-) -> eyre::Report {
-    eyre!(
+) -> anyhow::Error {
+    anyhow!(
         "timeout waiting on local Redis cache lock ({locks_released}/{locks_waiting} released)"
     )
 }

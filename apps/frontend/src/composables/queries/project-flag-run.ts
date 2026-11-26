@@ -36,14 +36,22 @@ export function projectFlagRunHistoryOptions(client: AbstractModrinthClient) {
 			}
 		},
 		refetchInterval: (query) =>
-			query.state.data?.some((run) => run.status !== 'done') ? REFRESH_INTERVAL : false,
+			query.state.data?.some((run) => typeof run.status === 'object') ? REFRESH_INTERVAL : false,
+	})
+}
+
+export function projectFlagRunDetailOptions(client: AbstractModrinthClient, id: string) {
+	return queryOptions({
+		queryKey: ['moderation', 'project-flag', 'runs', id, 'detail'] as const,
+		queryFn: () => client.labrinth.project_flags_internal.getRun(id),
+		refetchInterval: REFRESH_INTERVAL,
 	})
 }
 
 export function projectFlagResultCategory(result: ProjectFlagRunResult) {
 	const rules = Object.values(result.rules)
 	if (result.error !== null || rules.some((rule) => rule.error !== null)) return 'errors'
-	return rules.some((rule) => rule.flags.length > 0) ? 'flagged' : 'approvable'
+	return result.num_flags > 0 ? 'flagged' : 'approvable'
 }
 
 export function projectFlagRunResultsPageOptions(
@@ -52,7 +60,7 @@ export function projectFlagRunResultsPageOptions(
 	limit: number,
 	offset: number,
 ) {
-	const done = run.status === 'done'
+	const done = typeof run.status === 'string'
 	return queryOptions({
 		queryKey: [
 			'moderation',
@@ -75,7 +83,7 @@ export function projectFlagRunResultsOptions(
 	client: AbstractModrinthClient,
 	run: Pick<ProjectFlagRun, 'id' | 'status'>,
 ) {
-	const done = run.status === 'done'
+	const done = typeof run.status === 'string'
 	return queryOptions({
 		queryKey: ['moderation', 'project-flag', 'runs', run.id, 'results', done] as const,
 		queryFn: async ({ signal }) => {

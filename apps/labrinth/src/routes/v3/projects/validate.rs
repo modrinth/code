@@ -1,5 +1,5 @@
 use actix_web::{HttpRequest, HttpResponse, get, web};
-use eyre::eyre;
+use anyhow::anyhow;
 use serde::Serialize;
 use xredis::RedisPool;
 
@@ -33,7 +33,7 @@ pub(crate) fn require_valid_project(
         .iter()
         .any(|nag| nag.severity == ProjectNagSeverity::Required)
     {
-        return Err(ApiError::Request(eyre!(ProjectValidationError(nags))));
+        return Err(ApiError::Request(anyhow!(ProjectValidationError(nags))));
     }
     Ok(())
 }
@@ -77,30 +77,30 @@ pub(crate) async fn ensure_project_is_valid_for_review(
         redis,
     )
     .await
-    .wrap_internal_err("reloading project for review validation")?;
+    .internal_context("reloading project for review validation")?;
     let reloaded_project =
-        projects.pop().wrap_not_found_err("resource not found")?;
+        projects.pop().not_found_context("resource not found")?;
     let versions = db_models::DBVersion::get_many_uncached(
         &reloaded_project.versions,
         &mut *transaction,
         redis,
     )
     .await
-    .wrap_internal_err("reloading project versions for review validation")?
+    .internal_context("reloading project versions for review validation")?
     .into_iter()
     .map(Version::from)
     .collect::<Vec<_>>();
     let available_categories =
         db_models::categories::Category::list(&**pool, redis)
             .await
-            .wrap_internal_err("fetching project categories")?;
+            .internal_context("fetching project categories")?;
     let disclosures = db_models::DBProjectDisclosure::get_many_for_project(
         reloaded_project.inner.id,
         false,
         &mut *transaction,
     )
     .await
-    .wrap_internal_err("fetching project disclosures")?
+    .internal_context("fetching project disclosures")?
     .into_iter()
     .map(|disclosure| disclosure.disclosure)
     .collect::<Vec<_>>();
@@ -155,13 +155,13 @@ pub async fn validate(
         Scopes::PROJECT_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let project =
         db_models::DBProject::get(&info.into_inner().0, &***ro_pool, &redis)
             .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_not_found_err("resource not found")?;
+            .internal_context("fetching project from database")?
+            .not_found_context("resource not found")?;
 
     let (team_member, organization_team_member) =
         db_models::DBTeamMember::get_for_project_permissions(
@@ -170,7 +170,7 @@ pub async fn validate(
             &***ro_pool,
         )
         .await
-        .wrap_internal_err("fetching project permissions")?;
+        .internal_context("fetching project permissions")?;
 
     if !scopes.contains(Scopes::MODERATION_READ)
         && ProjectPermissions::get_permissions_by_scopes(
@@ -180,7 +180,7 @@ pub async fn validate(
         )
         .is_none()
     {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "you do not have permission to validate this project"
         )));
     }
@@ -188,21 +188,21 @@ pub async fn validate(
     let versions =
         db_models::DBVersion::get_many(&project.versions, &***ro_pool, &redis)
             .await
-            .wrap_internal_err("fetching project versions from database")?
+            .internal_context("fetching project versions from database")?
             .into_iter()
             .map(Version::from)
             .collect::<Vec<_>>();
     let available_categories =
         db_models::categories::Category::list(&**pool, &redis)
             .await
-            .wrap_internal_err("fetching project categories")?;
+            .internal_context("fetching project categories")?;
     let disclosures = db_models::DBProjectDisclosure::get_many_for_project(
         project.inner.id,
         false,
         &***ro_pool,
     )
     .await
-    .wrap_internal_err("fetching project disclosures")?
+    .internal_context("fetching project disclosures")?
     .into_iter()
     .map(|disclosure| disclosure.disclosure)
     .collect::<Vec<_>>();

@@ -32,7 +32,7 @@ export function useRules(active: () => boolean, onDeleted: () => void) {
 		error: deleteError,
 		reset: resetDelete,
 	} = useMutation({
-		mutationFn: (id: number) => api.delete(id),
+		mutationFn: (id: string) => api.delete(id),
 		onSuccess: async () => {
 			onDeleted()
 			await queryClient.invalidateQueries({ queryKey })
@@ -55,7 +55,7 @@ export function useRules(active: () => boolean, onDeleted: () => void) {
 }
 
 export function useSaveRule(
-	ruleId: () => number | undefined,
+	ruleId: () => string | undefined,
 	onSaved: (rule: ProjectFlagRule) => void,
 ) {
 	const { labrinth } = injectModrinthClient()
@@ -66,16 +66,17 @@ export function useSaveRule(
 			id,
 			body,
 		}: {
-			id: number | undefined
+			id: string | undefined
 			body: { name: string; params: ProjectFlagRuleParams }
 		}) => (id === undefined ? api.create(body) : api.update(id, body)),
 		onSuccess: async (rule, { id }) => {
 			const created = id === undefined
 			await queryClient.cancelQueries({ queryKey })
 			if (created) {
-				queryClient.setQueryData<ProjectFlagRule[]>(queryKey, (previous = []) =>
-					[rule, ...previous.filter((entry) => entry.id !== rule.id)],
-				)
+				queryClient.setQueryData<ProjectFlagRule[]>(queryKey, (previous = []) => [
+					rule,
+					...previous.filter((entry) => entry.id !== rule.id),
+				])
 			} else {
 				queryClient.setQueriesData<ProjectFlagRule[]>({ queryKey }, (previous) =>
 					previous?.map((entry) => (entry.id === rule.id ? rule : entry)),

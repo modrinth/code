@@ -545,14 +545,23 @@
   "app-marketing.download.download-appimage": {
     "message": "Pobierz AppImage"
   },
+  "app-marketing.download.download-appimage-arm64": {
+    "message": "Pobierz AppImage (ARM64)"
+  },
   "app-marketing.download.download-beta": {
     "message": "Pobierz wersję beta"
   },
   "app-marketing.download.download-deb": {
     "message": "Pobierz DEB"
   },
+  "app-marketing.download.download-deb-arm64": {
+    "message": "Pobierz DEB (ARM64)"
+  },
   "app-marketing.download.download-rpm": {
     "message": "Pobierz RPM"
+  },
+  "app-marketing.download.download-rpm-arm64": {
+    "message": "Pobierz RPM (ARM64)"
   },
   "app-marketing.download.flathub": {
     "message": "Pobierz z Flathub"
@@ -808,6 +817,12 @@
   },
   "auth.create-account.username.placeholder": {
     "message": "Wprowadź nazwę użytkownika"
+  },
+  "auth.oauth.opening.description": {
+    "message": "Dokończ logowanie na {provider}"
+  },
+  "auth.oauth.opening.title": {
+    "message": "Otwieranie {provider} ..."
   },
   "auth.reauthenticate.2fa.description": {
     "message": "Wpisz 6-cyfrowy kod z aplikacji uwierzytelniającej lub jeden z kodów zapasowych."
@@ -1133,6 +1148,9 @@
   "conversation-thread.error.sending-message": {
     "message": "Błąd podczas wysyłania wiadomości"
   },
+  "conversation-thread.image.open-externally": {
+    "message": "Otwórz zewnętrznie"
+  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Odpowiedz na wątek..."
   },
@@ -1154,11 +1172,17 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Jeżeli musisz skontaktować się z zespołem moderatorów, odwiedź <help-center-link>centrum pomocy Modrinth</help-center-link> i kliknij w niebieskie kółko, by skontaktować się z obsługą."
   },
+  "conversation-thread.reply.addresses": {
+    "message": "Ta odpowiedź odnosi się do następujących wyjaśnień:"
+  },
   "conversation-thread.reply.changed-thread": {
     "message": "Wybrany wątek uległ zmianie. Otwórz go ponownie, zanim na niego odpowiesz."
   },
   "conversation-thread.reply.facet": {
     "message": "Wyjaśnienie {issue}"
+  },
+  "conversation-thread.reply.unknown-issue": {
+    "message": "Problem z moderacją"
   },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Potwierdzenie, że komentarze od zespołu moderacji zostały zaadresowane"
@@ -1468,6 +1492,21 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Niewymieniony"
+  },
+  "create.restricted-alert.description": {
+    "message": "Moderator usunął to uprawnienie z Twojego konta."
+  },
+  "create.restricted-alert.header": {
+    "message": "Akcja ograniczona"
+  },
+  "create.restricted-alert.view-standing": {
+    "message": "Sprawdź status konta"
+  },
+  "create.version.restricted-text": {
+    "message": "Moderator usunął to uprawnienie z Twojego konta. Sprawdź status konta w ustawieniach, aby uzyskać szczegółowe informacje."
+  },
+  "create.version.restricted-title": {
+    "message": "Akcja ograniczona"
   },
   "dashboard.analytics.from-projects": {
     "message": "z {count} {count, plural, one {projektu} other {projektów}}"
@@ -2200,6 +2239,9 @@
   },
   "discover.install.error.unsupported-content-type": {
     "message": "Ten rodzaj zawartości nie może być zainstalowany na serwerze z widoku odkrywania."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Wybieranie paczki modów do zainstalowania po zresetowaniu"
   },
   "discover.seo.description": {
     "message": "Przeglądaj {projectType} Minecraft na Modrinth z natychmiastowymi, trafnymi wynikami wyszukiwania. Nasze filtry pomogą Ci znaleźć najlepsze {projectType} Minecraft."
@@ -2966,6 +3008,9 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Ulepsz do Modrinth+"
   },
+  "layout.nav.use-signed-out": {
+    "message": "Korzystaj bez logowania"
+  },
   "layout.publish.email-verification-required.description": {
     "message": "Musisz zweryfikować adres e-mail, żeby móc publikować zawartość na Modrinth."
   },
@@ -3059,6 +3104,12 @@
   "moderation.keybinds.conflicts": {
     "message": "Konfliktuje z: {actions}"
   },
+  "moderation.keybinds.decisions": {
+    "message": "Przejrzyj wyniki weryfikacji i kolejkę"
+  },
+  "moderation.keybinds.global": {
+    "message": "Przełącz hosty i skopiuj adresy URL"
+  },
   "moderation.keybinds.listen": {
     "message": "Wciśnij klawisz..."
   },
@@ -3094,9 +3145,6 @@
   },
   "moderation.keybinds.self-conflict": {
     "message": "inne skróty klawiszowe dla tej akcji"
-  },
-  "moderation.keybinds.technical": {
-    "message": "Strony przeglądu technicznego"
   },
   "moderation.keybinds.title": {
     "message": "Skróty klawiszowe"
@@ -3161,6 +3209,18 @@
   "moderation.settings.highlight-preview.incorrect-formatting": {
     "message": "Niepoprawne formatowanie"
   },
+  "moderation.settings.highlight-preview.missing-information": {
+    "message": "Brakujące informacje"
+  },
+  "moderation.settings.highlight-preview.non-english": {
+    "message": "Nieangielski"
+  },
+  "moderation.settings.highlights-section": {
+    "message": "Wyróżnienia"
+  },
+  "moderation.settings.no-results": {
+    "message": "Żadne ustawienia nie pasują do twojego wyszukiwania."
+  },
   "moderation.settings.off": {
     "message": "Wył."
   },
@@ -3175,6 +3235,9 @@
   },
   "moderation.settings.search": {
     "message": "Szukaj ustawień..."
+  },
+  "moderation.settings.theme-default": {
+    "message": "Kolor pomarańczowy motywu"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} na stronę"
@@ -3690,7 +3753,7 @@
     "message": "Edytuj projekt"
   },
   "project.actions.open-in-modview": {
-    "message": "Otwórz w widoku moderatora"
+    "message": "Widok moda"
   },
   "project.actions.project-page": {
     "message": "Strona projektu"
@@ -3739,6 +3802,18 @@
   },
   "project.disclosures.loading": {
     "message": "Ładowanie ujawnień…"
+  },
+  "project.disclosures.lock-status.cannot-disable": {
+    "message": "Nie można wyłączyć"
+  },
+  "project.disclosures.lock-status.fully-locked": {
+    "message": "W pełni zablokowany"
+  },
+  "project.disclosures.lock-status.label": {
+    "message": "Status blokady"
+  },
+  "project.disclosures.lock-status.unlocked": {
+    "message": "Odblokowany"
   },
   "project.disclosures.retry": {
     "message": "Spróbuj ponownie"
@@ -4138,6 +4213,9 @@
   },
   "project.settings.disclosures.derivative.note-placeholder": {
     "message": "To jest fork, który dodaje kilka nowych biomów i przenosi je do nowszych wersji Minecraft."
+  },
+  "project.settings.disclosures.derivative.open-link": {
+    "message": "Odwiedź link"
   },
   "project.settings.disclosures.derivative.title": {
     "message": "Zawiera zawartość pochodną"
@@ -5132,6 +5210,9 @@
   "servers.sharing-update.notification.title": {
     "message": "Udostępniaj serwery znajomym"
   },
+  "servers.sharing-update.notification.view-update": {
+    "message": "Pokaż aktualizację"
+  },
   "settings.account.button.complete-setup": {
     "message": "Zakończ ustawianie"
   },
@@ -5840,6 +5921,9 @@
   "thread-issues.addressed": {
     "message": "Oznaczone jako adresowane"
   },
+  "thread-issues.change-facet-first": {
+    "message": "Proszę wprowadzić żądane zmiany przed oznaczeniem ich jako adresowane."
+  },
   "thread-issues.facet.acknowledge-reply": {
     "message": "Wyjaśnij swoje zmiany w odpowiedzi"
   },
@@ -5891,6 +5975,12 @@
   "thread-issues.options": {
     "message": "Opcje problemu"
   },
+  "thread-issues.reply-to-address": {
+    "message": "Odpowiedz na adres"
+  },
+  "thread-issues.resolve-failed": {
+    "message": "Nie udało się oznaczyć problemu jako rozwiązany"
+  },
   "thread-issues.resolved": {
     "message": "Rozwiązane"
   },
@@ -5915,6 +6005,9 @@
   "thread-issues.unresolve-failed": {
     "message": "Nie udało się oznaczyć problemu jako nierozwiązany"
   },
+  "thread.issue-history.private-note": {
+    "message": "Widoczne tylko dla moderatorów"
+  },
   "thread.message.delete": {
     "message": "Usuń"
   },
@@ -5926,6 +6019,9 @@
   },
   "thread.message.more-options": {
     "message": "Więcej opcji"
+  },
+  "thread.message.open-image": {
+    "message": "Otwórz obraz"
   },
   "thread.message.preview": {
     "message": "Podgląd"
@@ -5939,8 +6035,20 @@
   "thread.message.reporter": {
     "message": "Zgłaszający"
   },
+  "thread.message.sent-image": {
+    "message": "wyślij obraz."
+  },
+  "thread.message.sent-message": {
+    "message": "wyślij wiadomość."
+  },
   "thread.message.system": {
     "message": "Modrinth"
+  },
+  "thread.message.thread-closed": {
+    "message": "zamknięto wątek."
+  },
+  "thread.message.thread-reopened": {
+    "message": "ponownie otwarto wątek."
   },
   "ui.latest-news-row.latest-news": {
     "message": "Najnowsze aktualności z Modrinth"
@@ -5992,6 +6100,9 @@
   },
   "version.download.download-dependency": {
     "message": "Wybierz wersję do pobrania"
+  },
+  "version.download.more-options": {
+    "message": "Więcej opcji pobierania"
   },
   "version.download.no-primary-file": {
     "message": "Błąd: Nie znaleziono pliku głównego"

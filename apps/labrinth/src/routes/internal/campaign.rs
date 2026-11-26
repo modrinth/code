@@ -1,8 +1,8 @@
 use crate::util::error::ApiContext as _;
 use actix_web::{HttpRequest, get, post, web};
+use anyhow::anyhow;
 use base64::Engine;
 use chrono::{DateTime, Duration, Utc};
-use eyre::eyre;
 use hmac::{Hmac, KeyInit, Mac};
 use reqwest::Method;
 use rust_decimal::Decimal;
@@ -138,7 +138,7 @@ impl CampaignDonation {
         )
         .fetch_optional(transaction)
         .await
-        .wrap_internal_err("inserting campaign donation")?;
+        .internal_context("inserting campaign donation")?;
 
         Ok(inserted.is_some())
     }
@@ -160,17 +160,17 @@ pub async fn tiltify_webhook(
     body: String,
 ) -> Result<(), ApiError> {
     verify_tiltify_webhook_signature(&req, &body)
-        .wrap_api_err("executing `verify_tiltify_webhook_signature`")?;
+        .api_context("executing `verify_tiltify_webhook_signature`")?;
 
     let raw_payload = serde_json::from_str::<serde_json::Value>(&body)
-        .wrap_internal_err_with(|| eyre!("invalid Tiltify webhook JSON"))?;
+        .internal_context_with(|| anyhow!("invalid Tiltify webhook JSON"))?;
 
     // deserialize the JSON in the request handler, not in the params,
     // since if the JSON fails to deserialize then it's *our* fault,
     // not the caller's.
     let payload = TiltifyWebhook::deserialize(&raw_payload)
-        .wrap_internal_err_with(|| {
-            eyre!(
+        .internal_context_with(|| {
+            anyhow!(
                 "invalid Tiltify webhook payload schema\n{}",
                 serde_json::to_string_pretty(&raw_payload)
                     .expect("serializing should not fail")
@@ -182,10 +182,10 @@ pub async fn tiltify_webhook(
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("beginning transaction")?;
+        .internal_context("beginning transaction")?;
     let id = generate_campaign_donation_id(&mut transaction)
         .await
-        .wrap_internal_err("generating campaign donation ID")?;
+        .internal_context("generating campaign donation ID")?;
 
     let mut donation = CampaignDonation {
         id,
@@ -201,13 +201,15 @@ pub async fn tiltify_webhook(
         let username = payload.data.donor_name.clone();
         let user = DBUser::get(&username, &**pool, &redis)
             .await
-            .wrap_err("fetching user from database")?
-            .wrap_err_with(|| {
-                eyre!("got donation for user '{username}' which does not exist")
+            .context("fetching user from database")?
+            .with_context(|| {
+                anyhow!(
+                    "got donation for user '{username}' which does not exist"
+                )
             })?;
 
         donation.user_id = Some(user.id);
-        eyre::Ok(username)
+        anyhow::Ok(username)
     }
     .await
     .inspect_err(|err| {
@@ -220,10 +222,10 @@ pub async fn tiltify_webhook(
         let amount_usd =
             amount_raised_usd(&payload.data.amount, &payouts_queue)
                 .await
-                .wrap_err("failed to get donation amount")?;
+                .context("failed to get donation amount")?;
 
         donation.amount_usd = Some(amount_usd);
-        eyre::Ok(amount_usd)
+        anyhow::Ok(amount_usd)
     }
     .await
     .inspect_err(|err| warn!("Failed to resolve donation amount: {err:?}"))
@@ -240,13 +242,13 @@ pub async fn tiltify_webhook(
     let inserted = donation
         .insert(&mut transaction)
         .await
-        .wrap_internal_err("inserting donation")?;
+        .internal_context("inserting donation")?;
 
     if !inserted {
         transaction
             .commit()
             .await
-            .wrap_internal_err("committing duplicate donation transaction")?;
+            .internal_context("committing duplicate donation transaction")?;
         info!("Ignoring duplicate Tiltify webhook {}", payload.meta.id);
         return Ok(());
     }
@@ -254,12 +256,12 @@ pub async fn tiltify_webhook(
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing transaction")?;
+        .internal_context("committing transaction")?;
 
     if let Some(user_id) = donation.user_id {
         DBUser::clear_caches(&[(user_id, username)], &redis)
             .await
-            .wrap_internal_err("clearing user caches")?;
+            .internal_context("clearing user caches")?;
     }
 
     Ok(())
@@ -273,40 +275,40 @@ fn verify_tiltify_webhook_signature(
         .headers()
         .get("X-Tiltify-Signature")
         .and_then(|x| x.to_str().ok())
-        .wrap_request_err("missing Tiltify webhook signature")?;
+        .request_context("missing Tiltify webhook signature")?;
     let signature = base64::engine::general_purpose::STANDARD
         .decode(signature)
-        .wrap_request_err("invalid Tiltify webhook signature")?;
+        .request_context("invalid Tiltify webhook signature")?;
 
     let timestamp = req
         .headers()
         .get("X-Tiltify-Timestamp")
         .and_then(|x| x.to_str().ok())
-        .wrap_request_err("missing Tiltify webhook timestamp")?;
+        .request_context("missing Tiltify webhook timestamp")?;
     let parsed_timestamp = DateTime::parse_from_rfc3339(timestamp)
-        .wrap_request_err("invalid Tiltify webhook timestamp")?;
+        .request_context("invalid Tiltify webhook timestamp")?;
     let parsed_timestamp = parsed_timestamp.with_timezone(&Utc);
     let age = Utc::now().signed_duration_since(parsed_timestamp);
     if age < -Duration::minutes(1) || age > Duration::minutes(1) {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "expired Tiltify webhook timestamp",
         )));
     }
 
     if ENV.TILTIFY_WEBHOOK_SIGNING_KEY.is_empty() {
-        return Err(ApiError::Internal(eyre!(
+        return Err(ApiError::Internal(anyhow!(
             "TILTIFY_WEBHOOK_SIGNING_KEY must be set"
         )));
     }
 
     let mut mac: Hmac<Sha256> =
         Hmac::new_from_slice(ENV.TILTIFY_WEBHOOK_SIGNING_KEY.as_bytes())
-            .wrap_internal_err("initializing Tiltify webhook HMAC")?;
+            .internal_context("initializing Tiltify webhook HMAC")?;
     mac.update(timestamp.as_bytes());
     mac.update(b".");
     mac.update(body.as_bytes());
     mac.verify_slice(&signature)
-        .wrap_request_err("invalid Tiltify webhook signature")?;
+        .request_context("invalid Tiltify webhook signature")?;
 
     Ok(())
 }
@@ -327,7 +329,7 @@ pub async fn pride_26(
     let mut redis_connection = redis
         .connect()
         .await
-        .wrap_internal_err("connecting to redis")?;
+        .internal_context("connecting to redis")?;
     let cache_key = redis
         .key()
         .entity(CAMPAIGN_INFO_CACHE_NAMESPACE, campaign_id);
@@ -335,7 +337,7 @@ pub async fn pride_26(
     let cached = redis_connection
         .get_deserialized::<CampaignInfo>(&cache_key)
         .await
-        .wrap_internal_err("getting cached campaign info")?;
+        .internal_context("getting cached campaign info")?;
 
     if let Some(cached) = &cached
         && !cached.is_stale()
@@ -347,7 +349,7 @@ pub async fn pride_26(
         let access_token = tiltify
             .access_token()
             .await
-            .wrap_internal_err("fetching Tiltify access token")?;
+            .internal_context("fetching Tiltify access token")?;
         let url = format!(
             "https://v5api.tiltify.com/api/public/team_campaigns/{campaign_id}",
         );
@@ -356,23 +358,23 @@ pub async fn pride_26(
             .bearer_auth(&access_token)
             .send()
             .await
-            .wrap_internal_err("fetching campaign from Tiltify")?
+            .internal_context("fetching campaign from Tiltify")?
             .error_for_status()
-            .wrap_internal_err("fetching campaign from Tiltify")?
+            .internal_context("fetching campaign from Tiltify")?
             .json::<TiltifyCampaignResponse>()
             .await
-            .wrap_internal_err("parsing Tiltify response")?;
+            .internal_context("parsing Tiltify response")?;
 
         let raised_currency = &response.data.total_amount_raised.currency;
         if raised_currency != "USD" {
-            return Err(ApiError::Internal(eyre!(
+            return Err(ApiError::Internal(anyhow!(
                 "total amount raised is in {raised_currency}, must be USD"
             )));
         }
 
         let goal_currency = &response.data.goal.currency;
         if goal_currency != "USD" {
-            return Err(ApiError::Internal(eyre!(
+            return Err(ApiError::Internal(anyhow!(
                 "goal amount is in {goal_currency}, must be USD"
             )));
         }
@@ -382,7 +384,7 @@ pub async fn pride_26(
             target_usd: response.data.goal.value,
             num_donators: num_donators(&http, &access_token, campaign_id)
                 .await
-                .wrap_api_err("executing `num_donators`")?,
+                .api_context("executing `num_donators`")?,
             cached_at: Utc::now(),
         };
 
@@ -393,7 +395,7 @@ pub async fn pride_26(
                 Some(CAMPAIGN_INFO_CACHE_TTL_SECONDS),
             )
             .await
-            .wrap_internal_err("caching campaign info")?;
+            .internal_context("caching campaign info")?;
 
         Ok(campaign_info)
     }
@@ -438,12 +440,12 @@ async fn num_donators(
         let response = request
             .send()
             .await
-            .wrap_internal_err("fetching donations from Tiltify")?
+            .internal_context("fetching donations from Tiltify")?
             .error_for_status()
-            .wrap_internal_err("fetching donations from Tiltify")?
+            .internal_context("fetching donations from Tiltify")?
             .json::<TiltifyDonationResponse>()
             .await
-            .wrap_internal_err("parsing Tiltify donations response")?;
+            .internal_context("parsing Tiltify donations response")?;
 
         donors.extend(
             response
@@ -475,14 +477,14 @@ async fn amount_raised_usd(
     let forex: TremendousForexResponse = payouts_queue
         .make_tremendous_request(Method::GET, "forex", None::<()>)
         .await
-        .wrap_internal_err("failed to fetch Tremendous forex data")?;
+        .internal_context("failed to fetch Tremendous forex data")?;
 
     let usd_to_currency = forex
         .forex
         .get(&currency)
         .copied()
-        .wrap_internal_err_with(|| {
-            eyre!("no Tremendous forex rate for '{currency}'")
+        .internal_context_with(|| {
+            anyhow!("no Tremendous forex rate for '{currency}'")
         })?;
 
     Ok(amount.value / usd_to_currency)

@@ -6,6 +6,7 @@ const AI_DIGITAL_SOURCE_TYPES = [
 	'http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia',
 	'http://cv.iptc.org/newscodes/digitalsourcetype/compositeWithTrainedAlgorithmicMedia',
 	'http://cv.iptc.org/newscodes/digitalsourcetype/compositeSynthetic',
+	'com.anthropic.claude.provided', // claude doesnt include the normal source types
 ]
 
 let c2paInstance: Promise<C2paSdk> | null = null

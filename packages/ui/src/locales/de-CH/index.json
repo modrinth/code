@@ -738,7 +738,7 @@
     "defaultMessage": "Geteilte Inhalte"
   },
   "content.managed-card.summary.installing": {
-    "defaultMessage": "Inhalt wird installiert..."
+    "defaultMessage": "Inhalte werden installiert..."
   },
   "content.managed-card.summary.loading": {
     "defaultMessage": "Zusammenfassung der verwalteten Inhalte wird geladen"
@@ -3998,6 +3998,9 @@
   "profile.restrict-user.admonition-title": {
     "defaultMessage": "Ausgewählte Berechtigungen werden entzogen"
   },
+  "profile.restrict-user.deselect-all-button": {
+    "defaultMessage": "Alle abwählen"
+  },
   "profile.restrict-user.error-description": {
     "defaultMessage": "Bei der Aktualisierung dieses Benutzers ist ein Fehler aufgetreten. Bitte versuche es erneut."
   },
@@ -4028,6 +4031,12 @@
   "profile.restrict-user.remove-success-title": {
     "defaultMessage": "Einschränkungen aufgehoben"
   },
+  "profile.restrict-user.reset-button": {
+    "defaultMessage": "Zurücksetzen"
+  },
+  "profile.restrict-user.restrictions-label": {
+    "defaultMessage": "Einschränkungen"
+  },
   "profile.restrict-user.save-button": {
     "defaultMessage": "Einschränkungen speichern"
   },
@@ -4039,6 +4048,9 @@
   },
   "profile.restrict-user.save-success-title": {
     "defaultMessage": "Einschränkungen gespeichert"
+  },
+  "profile.restrict-user.select-all-button": {
+    "defaultMessage": "Alle auswählen"
   },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "{username} wird auf allen Geräten abgemeldet und muss sich erneut anmelden. Persönliche Zugriffstoken sind davon nicht betroffen."
@@ -7323,7 +7335,7 @@
     "defaultMessage": "{name} wird gestoppt und die Subdomain wird freigegeben. Die Sicherungen werden nach 60 Tagen gelöscht, solange der Server nicht reaktiviert wird."
   },
   "servers.suspend.modal.warning-header": {
-    "defaultMessage": "Der Server wird offline geschaltet"
+    "defaultMessage": "Dieser Server wird gestoppt"
   },
   "settings.account.title": {
     "defaultMessage": "Konto und Sicherheit"
@@ -7505,6 +7517,9 @@
   "settings.profile.public-information.description": {
     "defaultMessage": "Deine Profilinformationen sind öffentlich <profile-link>auf Modrinth</profile-link> und über die <docs-link>Modrinth-API</docs-link> sichtbar."
   },
+  "settings.profile.refresh": {
+    "defaultMessage": "Profil aktualisieren"
+  },
   "settings.profile.save-error": {
     "defaultMessage": "Profil konnte nicht aktualisiert werden"
   },
@@ -7516,6 +7531,9 @@
   },
   "settings.profile.sign-in-required.title": {
     "defaultMessage": "Modrinth-Konto benötigt"
+  },
+  "settings.profile.username.change": {
+    "defaultMessage": "Benutzername ändern"
   },
   "settings.profile.username.description": {
     "defaultMessage": "Ein eindeutiger Name für dein Profil, bei dem Groß- und Kleinschreibung nicht unterschieden wird."
@@ -7545,7 +7563,7 @@
     "defaultMessage": "Dir Freundschaftsanfragen senden"
   },
   "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Dich zu einem Modrinth-Hosting Server einladen."
+    "defaultMessage": "Dich zu einem Server von Modrinth Hosting einladen"
   },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "Dich zu geteilten Instanzen einladen"
@@ -8373,7 +8391,7 @@
     "defaultMessage": "Aktuelle Version / Neue Version"
   },
   "update-all-modal.view": {
-    "defaultMessage": "Ansicht"
+    "defaultMessage": "Anzeigen"
   },
   "update-all-modal.view-changelog": {
     "defaultMessage": "Änderungen für {project} anzeigen"

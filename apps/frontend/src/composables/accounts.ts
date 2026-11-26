@@ -5,6 +5,10 @@ import { nextTick } from 'vue'
 import { useAuthState } from '@/composables/auth.ts'
 import { useAuthCookie } from '@/composables/auth-cookie.ts'
 import { promptAuth } from '@/composables/auth-modal.ts'
+import {
+	isIssuedWithinPrivilegedWindow,
+	sessionCreatedAt,
+} from '@/composables/privileged-session.ts'
 import type { CookieOptions } from '#app'
 import { useTheme } from '~/composables/nuxt-accessors.ts'
 import { getThemeType } from '~/plugins/theme/themes.ts'
@@ -35,9 +39,10 @@ export type StoredAccount = {
 	email?: string | null
 	authMethod?: StoredAccountAuthMethod
 	appearance?: Labrinth.Users.v3.AppearancePreferences
+	sessionCreated?: number
 }
 
-type AccountPreview = Omit<StoredAccount, 'token' | 'appearance'>
+type AccountPreview = Omit<StoredAccount, 'token' | 'appearance' | 'sessionCreated'>
 
 const STORAGE_KEY = 'auth-stored-accounts-v2'
 const LEGACY_STORAGE_KEY = 'auth-stored-accounts'
@@ -90,6 +95,10 @@ const parseAccount = (value: unknown): StoredAccount | null => {
 		...preview,
 		token: candidate.token ?? '',
 		appearance: isAppearance(candidate.appearance) ? candidate.appearance : undefined,
+		sessionCreated:
+			typeof candidate.sessionCreated === 'number' && Number.isFinite(candidate.sessionCreated)
+				? candidate.sessionCreated
+				: undefined,
 	}
 }
 
@@ -268,10 +277,62 @@ const forgetLegacyAccounts = () => {
 	if (legacyCookie.value) legacyCookie.value = null
 }
 
+const pendingSessionCreated = new Map<string, number>()
+
+export function rememberSessionCreated(token: string, created: string | number) {
+	const at = sessionCreatedAt(created)
+	if (!token || at == null) {
+		return
+	}
+
+	if (!import.meta.client) {
+		useCookie<{ token: string; created: number } | null>('auth-session-created', {
+			path: '/',
+			secure: useRuntimeConfig().public.cookieSecure,
+		}).value = { token, created: at }
+		return
+	}
+
+	pendingSessionCreated.set(token, at)
+	const accounts = readLocal()
+	const index = accounts.findIndex((account) => account.token === token)
+	const current = accounts[index]
+	if (!current || current.sessionCreated === at) {
+		return
+	}
+
+	const next = [...accounts]
+	next[index] = { ...current, sessionCreated: at }
+	setAccounts(next)
+}
+
+export function isSessionYoung(token: string): boolean | null {
+	const created =
+		readLocal().find((account) => account.token === token)?.sessionCreated ??
+		pendingSessionCreated.get(token)
+	if (created == null) {
+		return null
+	}
+	return isIssuedWithinPrivilegedWindow(created)
+}
+
 export const hydrateStoredAccounts = () => {
 	if (!import.meta.client) return
 
 	forgetLegacyAccounts()
+	const legacyStamp = useCookie<{ token?: string; created?: number } | null>(
+		'auth-session-created',
+		{
+			path: '/',
+			secure: useRuntimeConfig().public.cookieSecure,
+		},
+	)
+	if (legacyStamp.value?.token && typeof legacyStamp.value.created === 'number') {
+		rememberSessionCreated(legacyStamp.value.token, legacyStamp.value.created)
+	}
+	if (legacyStamp.value) {
+		legacyStamp.value = null
+	}
 
 	const local = readLocal()
 	if (local.length > 0) {
@@ -285,7 +346,7 @@ export const hydrateStoredAccounts = () => {
 export const rememberStoredAccount = (
 	user: Pick<Labrinth.Users.v2.User, 'id' | 'username' | 'avatar_url' | 'role' | 'email'>,
 	token: string,
-	options?: { authMethod?: StoredAccountAuthMethod },
+	options?: { authMethod?: StoredAccountAuthMethod; sessionCreated?: number },
 ) => {
 	if (!import.meta.client) return
 
@@ -302,7 +363,12 @@ export const rememberStoredAccount = (
 		email: user.email ?? existing?.email ?? null,
 		authMethod: options?.authMethod ?? existing?.authMethod ?? readPendingAuthMethod(),
 		appearance: existing?.appearance,
+		sessionCreated:
+			options?.sessionCreated ??
+			pendingSessionCreated.get(token) ??
+			(existing?.token === token ? existing.sessionCreated : undefined),
 	}
+	pendingSessionCreated.delete(token)
 
 	if (existingIndex === -1) {
 		setAccounts([...accounts, account])
@@ -401,9 +467,12 @@ async function refreshStoredToken(token: string): Promise<string | 'invalid' | '
 				},
 			},
 			true,
-		)) as { session?: unknown }
+		)) as { session?: unknown; created?: string }
 
 		const nextToken = typeof session.session === 'string' ? session.session : ''
+		if (nextToken && session.created) {
+			rememberSessionCreated(nextToken, session.created)
+		}
 		return nextToken || 'invalid'
 	} catch (error) {
 		return isAuthFailure(error) ? 'invalid' : 'error'

@@ -528,7 +528,7 @@ function updateThread(newThread: Labrinth.Threads.v3.Thread | null | undefined) 
 	)
 }
 
-async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
+async function setStatus(status: Labrinth.Projects.v2.ProjectStatus, reviewReason?: string) {
 	if (status === 'processing') {
 		return await setProcessing()
 	}
@@ -541,7 +541,11 @@ async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
 			await verifyThreadIssuesForApproval(threadId, client, () => {
 				if (project.value.id !== projectId) throw new Error(formatMessage(messages.projectChanged))
 			})
-		await client.labrinth.projects_v3.edit(projectId, { status })
+
+		await client.labrinth.projects_v3.edit(projectId, {
+			status,
+			review_reason: reviewReason,
+		})
 		await invalidate()
 		await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
 		return true

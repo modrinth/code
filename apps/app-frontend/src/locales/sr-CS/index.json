@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "Kopirano"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "Kopiraj detalje"
-  },
   "app.action-bar.install.dismiss": {
     "message": "Otpusti"
   },

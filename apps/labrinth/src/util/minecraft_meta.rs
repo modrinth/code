@@ -1,8 +1,8 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use anyhow::{Context, Result, anyhow};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use minecraft_meta_model::model::{MinecraftVersion, MinecraftVersionName};
 use minecraft_meta_model::upstream::mojang::VersionType;
 
@@ -66,7 +66,7 @@ impl MinecraftMeta {
             })
             .map(|name| format!("`{}`", name.0))
             .collect::<Vec<_>>();
-        eyre::ensure!(
+        anyhow::ensure!(
             invalid_versions.is_empty(),
             "invalid game versions: {}",
             invalid_versions.join(", ")
@@ -80,11 +80,11 @@ impl MinecraftMeta {
         let mut connection = db
             .connection()
             .await
-            .wrap_err("acquiring minecraft-meta connection")?;
+            .context("acquiring minecraft-meta connection")?;
         let versions = MinecraftVersion::all()
             .exec(&mut connection)
             .await
-            .wrap_err("loading Minecraft game versions")?;
+            .context("loading Minecraft game versions")?;
 
         let mut versions = versions
             .into_iter()
@@ -95,9 +95,7 @@ impl MinecraftMeta {
                     entry.release_time.subsec_nanosecond() as u32,
                 )
                 .ok_or_else(|| {
-                    eyre::eyre!(
-                        "minecraft-meta release timestamp is out of range"
-                    )
+                    anyhow!("minecraft-meta release timestamp is out of range")
                 })?;
                 Ok(MinecraftVersionEntry {
                     name: MinecraftVersionName(

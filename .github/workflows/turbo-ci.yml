@@ -17,11 +17,15 @@ env:
   pnpm_config_color: always
   INTERNAL: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
 
+permissions: {}
+
 jobs:
   build:
     name: Lint and Test
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'namespace-profile-modrinth-turbo' || 'namespace-profile-untrusted-large-amd64' }}
+    permissions:
+      contents: read
 
     env:
       # Color the output of Node tools run by Turborepo tasks in GitHub Actions logs
@@ -49,6 +53,7 @@ jobs:
         with:
           fetch-depth: 0
           filter: blob:none
+          persist-credentials: false
 
       - name: Check out code (Namespace)
         if: env.INTERNAL == 'true'
@@ -71,6 +76,7 @@ jobs:
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
+          package-manager-cache: false
 
       - name: Enable Corepack
         run: corepack enable
@@ -91,7 +97,7 @@ jobs:
       - name: Install apt dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake libcurl4-openssl-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+          sudo apt-get install -y cmake protobuf-compiler libprotobuf-dev libcurl4-openssl-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
 
       - name: Setup Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@a188e68d0fd2bd36ad51dccb2b07ba6e75105f30 # v2.0.1

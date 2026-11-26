@@ -115,7 +115,13 @@
 			:skipped-ids="moderationQueue.currentQueue.skipped"
 			@review-skipped="reviewSkippedQueue"
 		/>
-		<ModerateByIdsModal ref="moderateByIdsModal" @apply="startModeratingByIds" />
+		<ModerateByIdsModal
+			ref="moderateByIdsModal"
+			:skip-processed-ids="
+				!modSettings.get(moderationSettings.General.IncludeNonProcessingProjects)
+			"
+			@apply="startModeratingByIds"
+		/>
 
 		<ModerationQueueSkeleton v-if="pending" />
 		<EmptyState
@@ -148,6 +154,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ListFilterIcon, ScaleIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
 import { Button } from '@modrinth/ui'
 import {
 	Combobox,
@@ -184,6 +191,7 @@ const notificationManager = injectNotificationManager()
 const { addNotification } = notificationManager
 const formatNumber = useFormatNumber()
 const moderationQueue = useModerationQueue()
+const modSettings = useModerationSettings()
 const route = useRoute()
 const router = useRouter()
 const client = injectModrinthClient()
@@ -550,10 +558,10 @@ async function navigateToModerationProject(projectId: string) {
 	})
 }
 
-async function startModeratingByIds(projectIds: string[]) {
+async function startModeratingByIds(projectIds: string[], skipProcessedIds: boolean) {
 	const token = loadingState.begin()
 	try {
-		await moderationQueue.setQueue(projectIds)
+		await moderationQueue.setQueue(projectIds, skipProcessedIds)
 
 		const targetProjectId = await findFirstEligibleProject()
 

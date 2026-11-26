@@ -176,17 +176,27 @@ async fn load_instance_cfg(file_path: &Path) -> crate::Result<MMCInstance> {
     }
 }
 
+async fn find_icon(icons_dir: &Path, icon_key: &str) -> Option<PathBuf> {
+    let mut dir = io::read_dir(icons_dir).await.ok()?;
+    while let Ok(Some(entry)) = dir.next_entry().await {
+        let path = entry.path();
+        if path.is_file()
+            && path.file_stem().is_some_and(|stem| stem == icon_key)
+        {
+            return Some(path);
+        }
+    }
+    None
+}
+
 // #[tracing::instrument]
 pub async fn import_mmc(
-    mmc_base_path: PathBuf,  // path to base mmc folder
-    instance_folder: String, // instance folder in mmc_base_path
+    mmc_base_path: PathBuf,     // path to base mmc folder
+    mmc_instance_path: PathBuf, // path to the instance's folder
     instance_id: &str,
     reporter: InstallProgressReporter,
     details: InstallPhaseDetails,
 ) -> crate::Result<()> {
-    let mmc_instance_path =
-        mmc_base_path.join("instances").join(instance_folder);
-
     let mmc_pack = serde_json::from_str::<MMCPack>(
         &io::read_any_encoding_to_string(
             &mmc_instance_path.join("mmc-pack.json"),
@@ -199,11 +209,20 @@ pub async fn import_mmc(
         load_instance_cfg(&mmc_instance_path.join("instance.cfg")).await?;
 
     // Re-cache icon
-    let icon = if let Some(icon_key) = instance_cfg.icon_key {
-        let icon_path = mmc_base_path.join("icons").join(icon_key);
-        import::recache_icon(icon_path).await?
-    } else {
-        None
+    let icon = match &instance_cfg.icon_key {
+        Some(icon_key) => {
+            match find_icon(&mmc_base_path.join("icons"), icon_key).await {
+                Some(icon_path) => import::recache_icon(icon_path)
+                    .await
+                    .inspect_err(|e| {
+                        tracing::warn!("Could not import instance icon: {e}");
+                    })
+                    .ok()
+                    .flatten(),
+                None => None,
+            }
+        }
+        None => None,
     };
 
     // Create description from instance.cfg

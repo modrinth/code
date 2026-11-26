@@ -1,5 +1,5 @@
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use futures::{StreamExt, TryStreamExt};
 use sqlx::types::Json;
 use xredis::RedisPool;
@@ -38,7 +38,7 @@ impl DBAnalyticsEvent {
         )
         .execute(exec)
         .await
-        .wrap_err("inserting analytics event")?;
+        .context("inserting analytics event")?;
 
         Ok(())
     }
@@ -60,7 +60,7 @@ impl DBAnalyticsEvent {
         )
         .execute(exec)
         .await
-        .wrap_err("updating analytics event")?;
+        .context("updating analytics event")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -78,7 +78,7 @@ impl DBAnalyticsEvent {
         )
         .execute(exec)
         .await
-        .wrap_err("removing analytics event")?;
+        .context("removing analytics event")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -90,7 +90,7 @@ impl DBAnalyticsEvent {
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis for analytics events")?;
+            .context("connecting to redis for analytics events")?;
         let key = redis
             .key()
             .metadata(ANALYTICS_EVENTS_NAMESPACE, ANALYTICS_EVENTS_ALL_KEY);
@@ -98,7 +98,7 @@ impl DBAnalyticsEvent {
         if let Some(events) = redis
             .get_deserialized(&key)
             .await
-            .wrap_err("getting cached analytics events")?
+            .context("getting cached analytics events")?
         {
             return Ok(events);
         }
@@ -112,9 +112,9 @@ impl DBAnalyticsEvent {
         )
         .fetch(exec)
         .map(|record| {
-            let record = record.wrap_err("reading analytics event record")?;
+            let record = record.context("reading analytics event record")?;
 
-            eyre::Ok(DBAnalyticsEvent {
+            anyhow::Ok(DBAnalyticsEvent {
                 id: DBAnalyticsEventId(record.id),
                 meta: record.meta.0,
                 starts: record.starts,
@@ -123,12 +123,12 @@ impl DBAnalyticsEvent {
         })
         .try_collect::<Vec<_>>()
         .await
-        .wrap_err("fetching analytics events from database")?;
+        .context("fetching analytics events from database")?;
 
         redis
             .set_serialized(&key, &events, None)
             .await
-            .wrap_err("caching analytics events")?;
+            .context("caching analytics events")?;
 
         Ok(events)
     }
@@ -137,14 +137,14 @@ impl DBAnalyticsEvent {
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to clear analytics event cache")?;
+            .context("connecting to redis to clear analytics event cache")?;
         let key = redis
             .key()
             .metadata(ANALYTICS_EVENTS_NAMESPACE, ANALYTICS_EVENTS_ALL_KEY);
         redis
             .delete(&key)
             .await
-            .wrap_err("clearing analytics event cache")?;
+            .context("clearing analytics event cache")?;
         Ok(())
     }
 }

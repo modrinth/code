@@ -2,8 +2,8 @@ use crate::{
     database::PgTransaction,
     models::payouts::{PayoutMethodType, PayoutStatus},
 };
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
@@ -53,7 +53,7 @@ impl DBPayout {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting payout")?;
+        .context("inserting payout")?;
 
         Ok(())
     }
@@ -67,7 +67,7 @@ impl DBPayout {
     {
         DBPayout::get_many(&[id], executor)
             .await
-            .wrap_err("fetching payout")
+            .context("fetching payout")
             .map(|x| x.into_iter().next())
     }
 
@@ -103,7 +103,7 @@ impl DBPayout {
         })
         .try_collect::<Vec<DBPayout>>()
         .await
-        .wrap_err("fetching payouts")?;
+        .context("fetching payouts")?;
 
         Ok(results)
     }
@@ -122,7 +122,7 @@ impl DBPayout {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching payouts for user")?;
+        .context("fetching payouts for user")?;
 
         Ok(results
             .into_iter()

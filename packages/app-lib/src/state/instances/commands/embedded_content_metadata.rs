@@ -284,10 +284,13 @@ fn parse_toml_metadata<R: Read + Seek>(
         .and_then(toml_scalar_string)
         .and_then(|value| resolve_toml_value(&value, &root, manifest))
         .and_then(|value| clean_string(&value, MAX_VERSION_CHARS));
-    let icon = mod_table
-        .get("logoFile")
-        .and_then(TomlValue::as_str)
-        .and_then(safe_archive_path);
+    // NeoForge's iconFile is the square mod icon, logoFile is a wide banner
+    let icon = ["iconFile", "logoFile"].into_iter().find_map(|key| {
+        mod_table
+            .get(key)
+            .and_then(TomlValue::as_str)
+            .and_then(safe_archive_path)
+    });
 
     Some((
         EmbeddedContentMetadata {

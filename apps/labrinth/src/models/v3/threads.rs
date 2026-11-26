@@ -4,7 +4,7 @@ use crate::models::ids::{
     ImageId, ProjectId, ReportId, ThreadId, ThreadMessageId,
 };
 use crate::models::pats::Scopes;
-use crate::models::projects::ProjectStatus;
+use crate::models::projects::{ApprovalProvenance, LegacyProjectStatus};
 use crate::models::thread_issues::ThreadIssue;
 use crate::models::users::User;
 use ariadne::ids::UserId;
@@ -47,12 +47,14 @@ pub enum MessageBody {
         associated_images: Vec<ImageId>,
     },
     StatusChange {
-        new_status: ProjectStatus,
-        old_status: ProjectStatus,
+        new_status: LegacyProjectStatus,
+        old_status: LegacyProjectStatus,
     },
     AutoApproval {
-        new_status: ProjectStatus,
-        old_status: ProjectStatus,
+        new_status: LegacyProjectStatus,
+        old_status: LegacyProjectStatus,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        provenance: Option<ApprovalProvenance>,
     },
     TechReview {
         verdict: DelphiVerdict,

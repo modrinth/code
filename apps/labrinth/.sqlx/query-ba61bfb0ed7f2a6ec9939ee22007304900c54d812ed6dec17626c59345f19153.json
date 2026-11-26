@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "WITH random_id_point AS (\n                SELECT POINT(RANDOM() * ((SELECT MAX(id) FROM mods) - (SELECT MIN(id) FROM mods) + 1) + (SELECT MIN(id) FROM mods), 0) AS point\n            )\n            SELECT id FROM mods\n            WHERE visibility = 'public' AND review_outcome = 'approved'\n            ORDER BY POINT(id, 0) <-> (SELECT point FROM random_id_point)\n            LIMIT $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "ba61bfb0ed7f2a6ec9939ee22007304900c54d812ed6dec17626c59345f19153"
+}

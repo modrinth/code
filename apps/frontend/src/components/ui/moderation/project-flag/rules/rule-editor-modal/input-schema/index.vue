@@ -48,13 +48,26 @@
 				<code>{{ '}' }}</code>
 			</div>
 		</div>
+		<p v-if="projectId" class="m-0 text-sm text-secondary">
+			Shows the current rule inputs. Loading context does not run file scans or inference.
+		</p>
+		<details class="text-sm">
+			<summary class="cursor-pointer font-semibold text-contrast">Imported Rhai packages</summary>
+			<ul class="mb-0">
+				<li v-for="pkg in packages" :key="pkg.name">
+					<a :href="pkg.docs" target="_blank" rel="noopener noreferrer" class="text-link">{{
+						pkg.name
+					}}</a>
+					<span class="text-secondary"> · {{ pkg.description }}</span>
+				</li>
+			</ul>
+		</details>
 	</section>
 </template>
 
 <script setup lang="ts">
 import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
 
-import type { ProjectFlagValue } from '@modrinth/api-client'
 import { LoaderCircleIcon } from '@modrinth/assets'
 import { Button, injectModrinthClient, ProjectCombobox, TagItem } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
@@ -68,19 +81,29 @@ const { data, isPending, isError, error, isFetching, refetch } = useQuery({
 	queryKey: computed(
 		() => ['moderation', 'project-flag', 'input-schema', projectId.value ?? ''] as const,
 	),
-	queryFn: async ({ queryKey: [, , , projectId] }) => {
-		const example = client.labrinth.project_flags_internal.getRuleSchema()
-		if (!projectId) return example
-
-		// TODO: Use a dedicated backend route to preview the full flag rule input for a project.
-		const [schema, project] = await Promise.all([
-			example,
-			client.labrinth.projects_v3.get(projectId),
-		])
-		return { ...schema, project: project as Record<string, ProjectFlagValue> }
-	},
+	queryFn: ({ queryKey: [, , , projectId] }) =>
+		projectId
+			? client.labrinth.project_flags_internal.getProjectContext(projectId)
+			: client.labrinth.project_flags_internal.getRuleSchema(),
 	staleTime: 60_000,
 })
+const packages = [
+	{
+		name: 'StandardPackage',
+		description: 'Built-in functions for strings, arrays, maps, and math.',
+		docs: 'https://rhai.rs/book/language/builtin.html',
+	},
+	{
+		name: 'rhai-chrono',
+		description: 'Datetime parsing, formatting, timezones, and durations.',
+		docs: 'https://docs.rs/crate/rhai-chrono/0.1.1',
+	},
+	{
+		name: 'rhai-url',
+		description: 'URL parsing, properties, and query parameters.',
+		docs: 'https://docs.rs/rhai-url/0.0.6/rhai_url/',
+	},
+]
 const fields = computed(() => Object.entries(data.value ?? {}))
 useFlagErrorNotification(error, 'Could not load the input schema')
 </script>

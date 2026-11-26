@@ -22,12 +22,12 @@ pub async fn get_bank_details(
     let mural = payouts_queue.muralpay.load();
     let mural = mural
         .as_ref()
-        .wrap_internal_err("required Mural API is not available")?;
+        .internal_context("required Mural API is not available")?;
     let fiat_and_rail_codes = FiatAndRailCode::iter().collect::<Vec<_>>();
     let details = mural
         .client
         .get_bank_details(&fiat_and_rail_codes)
         .await
-        .wrap_internal_err("failed to fetch bank details")?;
+        .internal_context("failed to fetch bank details")?;
     Ok(web::Json(details))
 }

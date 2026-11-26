@@ -2228,6 +2228,12 @@
   "hosting.save-banner.saved": {
     "defaultMessage": "Saved"
   },
+  "hosting.settings.auto-restart-on-crash.description": {
+    "defaultMessage": "Automatically restart your server when it crashes after starting."
+  },
+  "hosting.settings.auto-restart-on-crash.title": {
+    "defaultMessage": "Restart on crash"
+  },
   "hosting.settings.properties.motd-profanity": {
     "defaultMessage": "Due to Minecraft Usage Guidelines, your server's MOTD cannot contain profanity. Detected: “{value}”."
   },
@@ -4442,6 +4448,33 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {follower} other {followers}}"
   },
+  "project.game-awards.body": {
+    "defaultMessage": "{projectName} is one of five nominees. Now it needs your vote!"
+  },
+  "project.game-awards.category.best-user-creation": {
+    "defaultMessage": "Best User Creation"
+  },
+  "project.game-awards.days-left": {
+    "defaultMessage": "{days, plural, one {# day left} other {# days left}}"
+  },
+  "project.game-awards.event-name": {
+    "defaultMessage": "The Game Awards {year}"
+  },
+  "project.game-awards.hide-voting-details": {
+    "defaultMessage": "Hide voting details"
+  },
+  "project.game-awards.nominee-for": {
+    "defaultMessage": "Nominee for {category}"
+  },
+  "project.game-awards.official-nominee": {
+    "defaultMessage": "Official nominee"
+  },
+  "project.game-awards.vote": {
+    "defaultMessage": "Vote at The Game Awards"
+  },
+  "project.game-awards.vote-now": {
+    "defaultMessage": "Vote now"
+  },
   "project.license.error": {
     "defaultMessage": "License text could not be retrieved."
   },
@@ -5072,6 +5105,9 @@
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Clear search"
   },
+  "search.filter.option.search.no_results": {
+    "defaultMessage": "No results found"
+  },
   "search.filter.option.search.placeholder": {
     "defaultMessage": "Search..."
   },
@@ -5335,6 +5371,9 @@
   },
   "servers.access-page.activity-log-filter.action.port-allocation-removed": {
     "defaultMessage": "Removed port allocation"
+  },
+  "servers.access-page.activity-log-filter.action.server-crash-restarted": {
+    "defaultMessage": "Server automatically restarted after a crash"
   },
   "servers.access-page.activity-log-filter.action.server-created": {
     "defaultMessage": "Created server"
@@ -5731,6 +5770,9 @@
   },
   "servers.audit-log.event.port-allocation-removed": {
     "defaultMessage": "Removed port allocation <port></port>"
+  },
+  "servers.audit-log.event.server-crash-restarted": {
+    "defaultMessage": "Server automatically restarted after a crash"
   },
   "servers.audit-log.event.server-created": {
     "defaultMessage": "Created server"
@@ -7517,6 +7559,9 @@
   "settings.profile.public-information.description": {
     "defaultMessage": "Your profile information is publicly <profile-link>viewable on Modrinth</profile-link> and through the <docs-link>Modrinth API</docs-link>."
   },
+  "settings.profile.refresh": {
+    "defaultMessage": "Refresh profile"
+  },
   "settings.profile.save-error": {
     "defaultMessage": "Failed to update profile"
   },
@@ -7528,6 +7573,9 @@
   },
   "settings.profile.sign-in-required.title": {
     "defaultMessage": "Modrinth account required"
+  },
+  "settings.profile.username.change": {
+    "defaultMessage": "Change username"
   },
   "settings.profile.username.description": {
     "defaultMessage": "A unique case-insensitive name to identify your profile."

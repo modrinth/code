@@ -30,19 +30,6 @@ pub(super) fn validate(
         ));
     }
 
-    if !is_minecraft_server && tag_count > MAX_TAG_COUNT {
-        nags.push(
-            ProjectNag::new(
-                ProjectNagKind::TooManyTags,
-                ProjectNagSeverity::Warning,
-            )
-            .with_details(serde_json::json!({
-                "tag_count": tag_count,
-                "max_tag_count": MAX_TAG_COUNT,
-            })),
-        );
-    }
-
     if is_minecraft_server && tag_count > MAX_TAG_COUNT_SERVER {
         nags.push(
             ProjectNag::new(
@@ -102,6 +89,17 @@ pub(super) fn validate(
             )
             .with_details(serde_json::json!({
                 "total_available_tags": total_available_tags,
+            })),
+        );
+    } else if !is_minecraft_server && tag_count > MAX_TAG_COUNT {
+        nags.push(
+            ProjectNag::new(
+                ProjectNagKind::TooManyTags,
+                ProjectNagSeverity::Warning,
+            )
+            .with_details(serde_json::json!({
+                "tag_count": tag_count,
+                "max_tag_count": MAX_TAG_COUNT,
             })),
         );
     }

@@ -16,6 +16,8 @@ use crate::{
     util::io::{self, IOError},
 };
 
+pub use crate::util::redactions::CensoredString;
+
 #[derive(Serialize, Debug)]
 pub struct Logs {
     pub log_type: LogType,
@@ -37,49 +39,6 @@ pub struct LatestLogCursor {
     pub cursor: u64,
     pub output: CensoredString,
     pub new_file: bool,
-}
-
-#[derive(Serialize, Debug)] // Not deserialize
-#[serde(transparent)]
-pub struct CensoredString(String);
-impl CensoredString {
-    pub fn censor(mut s: String, credentials_list: &[Credentials]) -> Self {
-        let Ok(username) = whoami::username_os() else {
-            return Self(
-                "[Log withheld: unable to determine computer username]".into(),
-            );
-        };
-        let username = username.to_string_lossy();
-        if username.is_empty() {
-            return Self(
-                "[Log withheld: unable to determine computer username]".into(),
-            );
-        }
-        s = s
-            .replace(&format!("/{username}/"), "/{COMPUTER_USERNAME}/")
-            .replace(&format!("\\{username}\\"), "\\{COMPUTER_USERNAME}\\");
-        for credentials in credentials_list {
-            // Use the offline profile to guarantee that this function does not cause
-            // Mojang API request, and is never delayed by a network request. The offline
-            // profile is optimistically updated on upsert from time to time anyway
-            s = s
-                .replace(&credentials.access_token, "{MINECRAFT_ACCESS_TOKEN}")
-                .replace(
-                    &credentials.offline_profile.name,
-                    "{MINECRAFT_USERNAME}",
-                )
-                .replace(
-                    &credentials.offline_profile.id.as_simple().to_string(),
-                    "{MINECRAFT_UUID}",
-                )
-                .replace(
-                    &credentials.offline_profile.id.as_hyphenated().to_string(),
-                    "{MINECRAFT_UUID}",
-                );
-        }
-
-        Self(s)
-    }
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -521,7 +480,7 @@ pub async fn get_generic_live_log_cursor(
         return Ok(LatestLogCursor {
             cursor: 0,
             new_file: false,
-            output: CensoredString("".to_string()),
+            output: CensoredString::default(),
         });
     }
 

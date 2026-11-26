@@ -1,8 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
+use anyhow::{Context, Result};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use serde::Serialize;
 use utoipa::ToSchema;
 
@@ -93,7 +93,7 @@ pub(super) async fn load_attributions(
     )
     .fetch_all(&**pool)
     .await
-    .wrap_err("fetching attribution groups for flag evaluation")?;
+    .context("fetching attribution groups for flag evaluation")?;
     if groups.is_empty() {
         return Ok(result);
     }
@@ -118,7 +118,7 @@ pub(super) async fn load_attributions(
     )
     .fetch_all(&**pool)
     .await
-    .wrap_err("fetching attribution files for flag evaluation")?;
+    .context("fetching attribution files for flag evaluation")?;
 
     let mut license_ids: Vec<_> = files
         .iter()
@@ -139,7 +139,7 @@ pub(super) async fn load_attributions(
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err(
+        .context(
             "fetching attribution external licenses for flag evaluation",
         )?;
         for row in rows {
@@ -182,7 +182,7 @@ pub(super) async fn load_attributions(
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err("fetching attribution versions for flag evaluation")?;
+        .context("fetching attribution versions for flag evaluation")?;
         versions.extend(rows.into_iter().map(|row| FlagAttributionVersion {
             id: VersionId(row.id as u64),
             name: row.name,
@@ -239,7 +239,7 @@ pub(super) async fn load_attributions(
     )
     .fetch_all(&**pool)
     .await
-    .wrap_err("fetching attribution override files on platform for flag evaluation")?;
+    .context("fetching attribution override files on platform for flag evaluation")?;
     let mut platform_files_by_project: HashMap<_, Vec<_>> = HashMap::new();
     for row in platform_files {
         platform_files_by_project
@@ -273,14 +273,14 @@ pub(super) async fn load_attributions(
             .attribution
             .map(serde_json::from_value::<AttributionResolution>)
             .transpose()
-            .wrap_err(
+            .context(
                 "deserializing attribution resolution for flag evaluation",
             )?;
         let flame_project = group
             .flame_project
             .map(serde_json::from_value::<FlameProject>)
             .transpose()
-            .wrap_err("deserializing attribution source for flag evaluation")?;
+            .context("deserializing attribution source for flag evaluation")?;
         result
             .entry(DBProjectId(group.project_id))
             .or_default()

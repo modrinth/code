@@ -13,6 +13,7 @@ use crate::models::projects::{DependencyType, Version, VersionType};
 use crate::queue::session::AuthQueue;
 use crate::util::error::ApiContext as _;
 use actix_web::{HttpRequest, post, web};
+use anyhow::anyhow;
 use ariadne::ids::base62_impl::parse_base62;
 use async_trait::async_trait;
 use modrinth_content_management::{
@@ -80,7 +81,7 @@ pub async fn resolve_content(
             .await
     }
     .map_err(resolve_error_to_api)
-    .wrap_api_err("executing `modrinth_content_management::resolve_content`")?;
+    .api_context("executing `modrinth_content_management::resolve_content`")?;
 
     Ok(web::Json(plan))
 }
@@ -651,33 +652,31 @@ fn resolve_provider_error(error: impl std::fmt::Display) -> ResolveError {
 
 fn resolve_error_to_api(error: ResolveError) -> ApiError {
     match error {
-        ResolveError::UnknownContentType(content_type) => ApiError::Request(
-            eyre::eyre!("unknown content type `{content_type}`"),
-        ),
+        ResolveError::UnknownContentType(content_type) => {
+            ApiError::Request(anyhow!("unknown content type `{content_type}`"))
+        }
         ResolveError::ConflictingProjectVersions {
             project_id,
             before,
             after,
-        } => ApiError::Request(eyre::eyre!(
+        } => ApiError::Request(anyhow!(
             "project `{project_id}` has conflicting versions `{before}` and `{after}`"
         )),
-        ResolveError::Provider(message) => {
-            ApiError::Internal(eyre::eyre!(message))
+        ResolveError::Provider(message) => ApiError::Internal(anyhow!(message)),
+        ResolveError::ProjectNotFound(project_id) => {
+            ApiError::Request(anyhow!("project `{project_id}` was not found"))
         }
-        ResolveError::ProjectNotFound(project_id) => ApiError::Request(
-            eyre::eyre!("project `{project_id}` was not found"),
-        ),
-        ResolveError::VersionNotFound(version_id) => ApiError::Request(
-            eyre::eyre!("version `{version_id}` was not found"),
-        ),
+        ResolveError::VersionNotFound(version_id) => {
+            ApiError::Request(anyhow!("version `{version_id}` was not found"))
+        }
         ResolveError::VersionProjectMismatch {
             version_id,
             project_id,
-        } => ApiError::Request(eyre::eyre!(
+        } => ApiError::Request(anyhow!(
             "version `{version_id}` does not belong to project `{project_id}`"
         )),
         ResolveError::NoCompatibleVersion(project_id) => {
-            ApiError::Request(eyre::eyre!(
+            ApiError::Request(anyhow!(
                 "no compatible version was found for project `{project_id}`"
             ))
         }

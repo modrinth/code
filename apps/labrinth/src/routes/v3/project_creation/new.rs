@@ -1,7 +1,8 @@
+use crate::util::temporal::TemporalClient;
 use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, put, web};
+use anyhow::anyhow;
 use chrono::Utc;
-use eyre::eyre;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -12,7 +13,7 @@ use crate::{
     database::{
         PgPool,
         models::{
-            self, DBOrganization, DBTeamMember, DBUser,
+            self, DBOrganization, DBProject, DBTeamMember, DBUser,
             project_item::ProjectBuilder, thread_item::ThreadBuilder,
             version_item::VersionBuilder,
         },
@@ -23,7 +24,8 @@ use crate::{
         ids::ProjectId,
         pats::Scopes,
         projects::{
-            MonetizationStatus, ProjectStatus, VersionStatus, VersionType,
+            MonetizationStatus, ProjectDelta, ProjectReviewOutcome,
+            VersionStatus, VersionType,
         },
         teams::{OrganizationPermissions, ProjectPermissions},
         threads::ThreadType,
@@ -140,6 +142,7 @@ pub async fn create(
     kafka_client: web::Data<KafkaClientState>,
     search_state: web::Data<SearchState>,
     web::Json(create): web::Json<ProjectCreate>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<web::Json<ProjectId>, CreateError> {
     // check that the user can make a project
     let user = get_user_from_headers(
@@ -150,13 +153,13 @@ pub async fn create(
         Scopes::PROJECT_CREATE,
     )
     .await
-    .wrap_auth_err("authenticating project creator")?;
+    .auth_context("authenticating project creator")?;
 
     require_verified_email(&user.user)?;
 
     let limits = UserLimits::get_for_projects(&user, &db)
         .await
-        .wrap_internal_err("fetching project limits")?;
+        .internal_context("fetching project limits")?;
     if limits.current >= limits.max {
         return Err(CreateError::LimitReached);
     }
@@ -164,7 +167,7 @@ pub async fn create(
     let daily_limits =
         UserLimits::get_for_projects_per_day(&user, Utc::now(), &db)
             .await
-            .wrap_internal_err("fetching daily project limits")?;
+            .internal_context("fetching daily project limits")?;
     if daily_limits.current >= daily_limits.max {
         return Err(CreateError::DailyProjectLimitReached);
     }
@@ -191,16 +194,25 @@ pub async fn create(
         slug,
         summary,
         description,
+        visibility,
         requested_status,
         organization_id,
     } = base;
+    let visibility = requested_status
+        .map(|status| {
+            status
+                .visibility()
+                .request_context("invalid requested project status")
+        })
+        .transpose()?
+        .unwrap_or(visibility);
 
     // check if this won't conflict with an existing project
 
     let mut txn = db
         .begin()
         .await
-        .wrap_internal_err("failed to begin transaction")?;
+        .internal_context("failed to begin transaction")?;
 
     let same_slug_record = sqlx::query!(
         "SELECT EXISTS(
@@ -210,7 +222,7 @@ pub async fn create(
     )
     .fetch_one(&mut txn)
     .await
-    .wrap_internal_err("failed to query if slug already exists")?;
+    .internal_context("failed to query if slug already exists")?;
 
     if same_slug_record.exists.unwrap_or(false) {
         return Err(CreateError::SlugCollision);
@@ -221,8 +233,8 @@ pub async fn create(
     let team = if let Some(organization_id) = organization_id {
         let org = DBOrganization::get_id(organization_id.into(), &**db, &redis)
             .await
-            .wrap_internal_err("failed to get organization")?
-            .wrap_request_err("invalid organization ID")?;
+            .internal_context("failed to get organization")?
+            .request_context("invalid organization ID")?;
 
         let team_member = DBTeamMember::get_from_user_id(
             org.team_id,
@@ -230,7 +242,7 @@ pub async fn create(
             &**db,
         )
         .await
-        .wrap_internal_err(
+        .internal_context(
             "failed to get team member of user for organization",
         )?;
 
@@ -242,7 +254,7 @@ pub async fn create(
         if !perms
             .is_some_and(|p| p.contains(OrganizationPermissions::ADD_PROJECT))
         {
-            return Err(ApiError::Auth(eyre!(
+            return Err(ApiError::Auth(anyhow!(
                 "no permission to create projects in this organization"
             ))
             .into());
@@ -268,11 +280,11 @@ pub async fn create(
     let team_id = team
         .insert(&mut txn)
         .await
-        .wrap_internal_err("failed to insert team")?;
+        .internal_context("failed to insert team")?;
 
     let project_id: ProjectId = models::generate_project_id(&mut txn)
         .await
-        .wrap_internal_err("failed to generate project ID")?
+        .internal_context("failed to generate project ID")?
         .into();
 
     // TODO: special casing certain components
@@ -286,7 +298,7 @@ pub async fn create(
             &db,
         )
         .await
-        .wrap_internal_err("fetching project version limits")?;
+        .internal_context("fetching project version limits")?;
         if version_limits.current >= version_limits.max {
             return Err(CreateError::ProjectVersionLimitReached);
         }
@@ -301,7 +313,7 @@ pub async fn create(
         // so we generate a synthetic initial version.
         let version_id = models::generate_version_id(&mut txn)
             .await
-            .wrap_internal_err("failed to generate project ID")?;
+            .internal_context("failed to generate project ID")?;
         version_builder = Some(VersionBuilder {
             version_id,
             project_id: project_id.into(),
@@ -334,8 +346,9 @@ pub async fn create(
         categories: vec![],
         additional_categories: vec![],
         initial_versions: vec![],
-        status: ProjectStatus::Draft,
-        requested_status: Some(requested_status),
+        visibility,
+        in_review: false,
+        review_outcome: ProjectReviewOutcome::NeverReviewed,
         license: "LicenseRef-Unknown".into(),
         slug: Some(slug.clone()),
         link_urls: vec![],
@@ -344,25 +357,33 @@ pub async fn create(
         monetization_status,
         components: components
             .create()
-            .wrap_request_err("failed to create components")?,
+            .request_context("failed to create components")?,
     };
 
     let mut delphi_scan_files = Vec::new();
     project_builder
         .insert(&mut txn, &redis, &**file_host, &mut delphi_scan_files)
         .await
-        .wrap_internal_err("failed to insert project")?;
+        .internal_context("failed to insert project")?;
+    DBProject::record_history(
+        project_id.into(),
+        Some(user.user.id.into()),
+        ProjectDelta::Created,
+        &mut txn,
+    )
+    .await
+    .internal_context("failed to record project creation history")?;
 
     if let Some(version_builder) = version_builder {
         version_builder
             .insert(&mut txn, &redis, &**file_host, &mut delphi_scan_files)
             .await
-            .wrap_internal_err("failed to insert initial version")?;
+            .internal_context("failed to insert initial version")?;
     }
 
     DBUser::clear_project_cache(&[user.user.id.into()], &redis)
         .await
-        .wrap_internal_err("failed to clear user project cache")?;
+        .internal_context("failed to clear user project cache")?;
 
     ThreadBuilder {
         type_: ThreadType::Project,
@@ -372,22 +393,26 @@ pub async fn create(
     }
     .insert(&mut txn)
     .await
-    .wrap_internal_err("failed to insert thread")?;
+    .internal_context("failed to insert thread")?;
 
-    super::super::projects::mutation::finalize_mutation(
-        project_id.into(),
-        txn,
+    let prepared = super::super::projects::mutation::prepare_mutations(
+        &[project_id.into()],
+        &mut txn,
         &db,
         &redis,
         Some(&user),
     )
     .await?;
-    crate::queue::delphi_scan::publish_new_files(
-        &kafka_client,
-        &delphi_scan_files,
-    )
-    .await;
-    search_state.queue.push_project_change(project_id).await;
+    prepared
+        .commit_with_post_commit(txn, &redis, &temporal, async {
+            crate::queue::delphi_scan::publish_new_files(
+                &kafka_client,
+                &delphi_scan_files,
+            )
+            .await;
+            search_state.queue.push_project_change(project_id).await;
+        })
+        .await?;
 
     Ok(web::Json(project_id))
 }
@@ -395,7 +420,7 @@ pub async fn create(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::projects::ProjectStatus;
+    use crate::models::projects::ProjectVisibility;
 
     fn project_create_with_slug(slug: &str) -> ProjectCreate {
         ProjectCreate {
@@ -404,7 +429,8 @@ mod tests {
                 slug: slug.into(),
                 summary: "test summary".into(),
                 description: String::new(),
-                requested_status: ProjectStatus::Approved,
+                visibility: ProjectVisibility::Public,
+                requested_status: None,
                 organization_id: None,
             },
             components: exp::ProjectEdit {
@@ -424,6 +450,26 @@ mod tests {
             expected_valid,
             "unexpected validation result for slug `{slug}`"
         );
+    }
+
+    #[test]
+    fn project_create_accepts_legacy_server_visibility() {
+        for (status, expected) in [
+            ("approved", ProjectVisibility::Public),
+            ("unlisted", ProjectVisibility::Unlisted),
+            ("private", ProjectVisibility::Private),
+        ] {
+            let request: ProjectCreate = serde_json::from_value(serde_json::json!({
+                "base": { "name": "test server", "slug": "test-server", "summary": "test summary", "description": "", "requested_status": status },
+                "minecraft_server": {},
+                "minecraft_java_server": { "address": "" },
+                "minecraft_bedrock_server": { "address": "" }
+            })).unwrap();
+            assert_eq!(
+                request.base.requested_status.unwrap().visibility(),
+                Some(expected)
+            );
+        }
     }
 
     #[test]

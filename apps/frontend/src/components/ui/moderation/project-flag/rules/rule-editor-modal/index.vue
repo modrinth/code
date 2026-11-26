@@ -39,6 +39,12 @@
 					:errors="patternErrors"
 					:disabled="isSaving"
 				/>
+				<DecisionQuestionsEditor
+					v-model="decisionQuestions"
+					class="shrink-0"
+					:errors="decisionQuestionErrors"
+					:disabled="isSaving"
+				/>
 				<ProjectFlagInputSchema
 					v-model:project-id="schemaProjectId"
 					class="min-h-40 flex-1 max-lg:max-h-96"
@@ -80,12 +86,18 @@
 							:disabled="isSaving"
 							:error-id="expressionError ? expressionErrorId : undefined"
 							:word-wrap="wordWrap"
+							frameless
 						/>
 						<ProjectFlagRuleTester
 							:key="editorSession"
 							ref="tester"
 							:params="params"
-							:can-test="!isSaving && !expressionError && invalidPatternIndex === -1"
+							:can-test="
+								!isSaving &&
+								!expressionError &&
+								invalidPatternIndex === -1 &&
+								invalidQuestionIndex === -1
+							"
 						/>
 					</div>
 					<p v-if="expressionError" :id="expressionErrorId" class="m-0 text-sm text-red">
@@ -128,6 +140,9 @@ import { Button, Input, NewModal, TeleportPopoutMenu, Toggle } from '@modrinth/u
 import { useLocalStorage } from '@vueuse/core'
 import { computed, nextTick, ref, shallowRef, useId, useTemplateRef } from 'vue'
 
+import DecisionQuestionsEditor, {
+	type DecisionQuestionEntry,
+} from '../../DecisionQuestionsEditor.vue'
 import RuleMetadata from '../rule-metadata.vue'
 import FileScanPatternsEditor, { type FileScanPattern } from './file-scan-patterns-editor.vue'
 import ProjectFlagInputSchema from './input-schema/index.vue'
@@ -160,6 +175,7 @@ const name = ref('')
 const schemaProjectId = ref<string>()
 const expression = ref('')
 const patterns = ref<FileScanPattern[]>([])
+const decisionQuestions = ref<DecisionQuestionEntry[]>([])
 const saveComplete = ref(false)
 
 const nameError = computed(() => {
@@ -191,6 +207,19 @@ const patternErrors = computed(() => {
 const invalidPatternIndex = computed(() =>
 	patternErrors.value.findIndex((error) => error.name || error.pattern),
 )
+const decisionQuestionErrors = computed(() => {
+	const keys = decisionQuestions.value.map(({ key }) => key.trim())
+	return decisionQuestions.value.map((entry, index) => {
+		const key = keys[index]
+		if (!key) return 'Enter a decision question key.'
+		if (keys.indexOf(key) !== keys.lastIndexOf(key))
+			return 'Each decision question key must be unique.'
+		if (!entry.question.trim()) return 'Enter a question.'
+		if (entry.include_context.length === 0) return 'Select at least one context field.'
+		return ''
+	})
+})
+const invalidQuestionIndex = computed(() => decisionQuestionErrors.value.findIndex(Boolean))
 const saveDisabledReason = computed(() => {
 	if (nameError.value) return nameError.value
 	if (expressionError.value) return expressionError.value
@@ -199,10 +228,19 @@ const saveDisabledReason = computed(() => {
 		const error = patternErrors.value[index]
 		return `Pattern ${index + 1}: ${error.name || error.pattern}`
 	}
+	if (invalidQuestionIndex.value !== -1) {
+		return `Question ${invalidQuestionIndex.value + 1}: ${decisionQuestionErrors.value[invalidQuestionIndex.value]}`
+	}
 	return hasChanges.value ? undefined : 'Make a change to save this rule.'
 })
 const params = computed<ProjectFlagRuleParams>(() => ({
 	expression: expression.value,
+	decision_questions: Object.fromEntries(
+		decisionQuestions.value.map(({ key, question, include_context }) => [
+			key.trim(),
+			{ question, include_context: [...include_context] },
+		]),
+	),
 	scan_files_for: Object.fromEntries(
 		patterns.value.map((entry) => [entry.name.trim(), entry.pattern]),
 	),
@@ -211,8 +249,19 @@ const hasChanges = computed(() => {
 	const original = rule.value
 	if (!original) return true
 	const savedPatterns = original.params.scan_files_for
+	const savedQuestions = original.params.decision_questions ?? {}
 	return (
 		name.value !== original.name ||
+		decisionQuestions.value.length !== Object.keys(savedQuestions).length ||
+		decisionQuestions.value.some(({ key, question, include_context }) => {
+			const saved = Object.hasOwn(savedQuestions, key) ? savedQuestions[key] : undefined
+			return (
+				!saved ||
+				question !== saved.question ||
+				include_context.length !== saved.include_context.length ||
+				include_context.some((field) => !saved.include_context.includes(field))
+			)
+		}) ||
 		expression.value !== original.params.expression ||
 		patterns.value.length !== Object.keys(savedPatterns).length ||
 		new Set(patterns.value.map((entry) => entry.name)).size !== patterns.value.length ||
@@ -251,6 +300,13 @@ function show(original: ProjectFlagRule | undefined, event?: MouseEvent) {
 		name,
 		pattern,
 	}))
+	decisionQuestions.value = Object.entries(original?.params.decision_questions ?? {}).map(
+		([key, { question, include_context }]) => ({
+			key,
+			question,
+			include_context: [...include_context],
+		}),
+	)
 	modal.value?.show(event)
 }
 

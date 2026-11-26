@@ -140,6 +140,9 @@
   "button.close": {
     "defaultMessage": "Zavřít"
   },
+  "button.confirm": {
+    "defaultMessage": "Potvrdit"
+  },
   "button.continue": {
     "defaultMessage": "Pokračovat"
   },

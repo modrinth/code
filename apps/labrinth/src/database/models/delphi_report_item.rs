@@ -3,8 +3,8 @@ use std::{
     fmt::{self, Display, Formatter},
 };
 
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
 
@@ -53,7 +53,7 @@ impl DBDelphiReport {
         )
         .fetch_one(&mut *transaction)
         .await
-        .wrap_err("upserting delphi report")?))
+        .context("upserting delphi report")?))
     }
 }
 
@@ -206,7 +206,7 @@ impl DBDelphiReportIssue {
             )
             .fetch_one(&mut *transaction)
             .await
-            .wrap_err("upserting delphi report issue")?,
+            .context("upserting delphi report issue")?,
         ))
     }
 
@@ -226,7 +226,7 @@ impl DBDelphiReportIssue {
             )
             .fetch_one(&mut *transaction)
             .await
-            .wrap_err("inserting delphi report issue")?,
+            .context("inserting delphi report issue")?,
         ))
     }
 }
@@ -291,7 +291,7 @@ impl ReportIssueDetail {
         )
         .fetch_one(&mut *transaction)
         .await
-        .wrap_err("inserting delphi report issue detail")?))
+        .context("inserting delphi report issue detail")?))
     }
 
     pub async fn remove_all_by_issue_id(
@@ -304,7 +304,7 @@ impl ReportIssueDetail {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("removing delphi report issue details")?
+        .context("removing delphi report issue details")?
         .rows_affected())
     }
 }

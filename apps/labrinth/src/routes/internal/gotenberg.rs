@@ -59,7 +59,7 @@ pub async fn success_callback(
     );
 
     let payout_id = maybe_payment_id
-        .wrap_request_err("no payout ID for document")?
+        .request_context("no payout ID for document")?
         .0
         .0;
 
@@ -67,7 +67,7 @@ pub async fn success_callback(
     let mut redis = redis
         .connect()
         .await
-        .wrap_internal_err("failed to get Redis connection")?;
+        .internal_context("failed to get Redis connection")?;
 
     let body = base64::engine::general_purpose::STANDARD.encode(&body);
 
@@ -75,12 +75,12 @@ pub async fn success_callback(
         GotenbergDocument,
         GotenbergError,
     >(GotenbergDocument { body }))
-    .wrap_internal_err("failed to serialize Redis document response")?;
+    .internal_context("failed to serialize Redis document response")?;
 
     redis
         .lpush(&response_key, &redis_msg)
         .await
-        .wrap_internal_err("failed to send document over Redis")?;
+        .internal_context("failed to send document over Redis")?;
 
     Ok(())
 }
@@ -128,25 +128,25 @@ pub async fn error_callback(
     );
 
     let payout_id = maybe_payment_id
-        .wrap_request_err("no payout ID for document")?
+        .request_context("no payout ID for document")?
         .0
         .0;
     let response_key = payment_statement_key(redis.get_ref(), &payout_id);
     let mut redis = redis
         .connect()
         .await
-        .wrap_internal_err("failed to get Redis connection")?;
+        .internal_context("failed to get Redis connection")?;
 
     let redis_msg = postcard::to_allocvec(&Err::<
         GotenbergDocument,
         GotenbergError,
     >(error_body))
-    .wrap_internal_err("failed to serialize Redis error response")?;
+    .internal_context("failed to serialize Redis error response")?;
 
     redis
         .lpush(&response_key, &redis_msg)
         .await
-        .wrap_internal_err("failed to send error over Redis")?;
+        .internal_context("failed to send error over Redis")?;
 
     Ok(())
 }

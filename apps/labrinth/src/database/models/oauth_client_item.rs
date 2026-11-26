@@ -1,5 +1,5 @@
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
@@ -85,7 +85,7 @@ impl DBOAuthClient {
     ) -> Result<Option<DBOAuthClient>> {
         Ok(Self::get_many(&[id], exec)
             .await
-            .wrap_err("fetching oauth client")?
+            .context("fetching oauth client")?
             .into_iter()
             .next())
     }
@@ -102,7 +102,7 @@ impl DBOAuthClient {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching oauth clients")?;
+        .context("fetching oauth clients")?;
 
         Ok(results.into_iter().map(|r| r.into()).collect_vec())
     }
@@ -118,7 +118,7 @@ impl DBOAuthClient {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching oauth clients for user")?;
+        .context("fetching oauth clients for user")?;
 
         Ok(clients.into_iter().map(|r| r.into()).collect())
     }
@@ -137,7 +137,7 @@ impl DBOAuthClient {
         )
         .execute(exec)
         .await
-        .wrap_err("removing oauth client")?;
+        .context("removing oauth client")?;
 
         Ok(())
     }
@@ -165,11 +165,11 @@ impl DBOAuthClient {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting oauth client")?;
+        .context("inserting oauth client")?;
 
         Self::insert_redirect_uris(&self.redirect_uris, &mut *transaction)
             .await
-            .wrap_err("inserting oauth client redirect uris")?;
+            .context("inserting oauth client redirect uris")?;
 
         Ok(())
     }
@@ -194,7 +194,7 @@ impl DBOAuthClient {
         )
         .execute(exec)
         .await
-        .wrap_err("updating oauth client")?;
+        .context("updating oauth client")?;
 
         Ok(())
     }
@@ -214,7 +214,7 @@ impl DBOAuthClient {
         )
         .execute(exec)
         .await
-        .wrap_err("removing oauth client redirect uris")?;
+        .context("removing oauth client redirect uris")?;
 
         Ok(())
     }
@@ -238,7 +238,7 @@ impl DBOAuthClient {
         )
         .execute(exec)
         .await
-        .wrap_err("inserting oauth client redirect uris")?;
+        .context("inserting oauth client redirect uris")?;
 
         Ok(())
     }

@@ -38,6 +38,10 @@
 					{{ isStarting ? 'Starting run…' : 'Start run' }}
 				</Button>
 			</div>
+			<p class="m-0 text-sm text-secondary">
+				Runs are listed while Temporal history is available. Stored results and deployed rulesets
+				can outlive it.
+			</p>
 			<div v-if="isPending" role="status" class="universal-card flex items-center gap-2">
 				<LoaderCircleIcon class="animate-spin" /> Loading project flag runs…
 			</div>
@@ -66,7 +70,7 @@
 								{{ formatDate(run.started_at) }}
 							</time>
 						</NuxtLink>
-						<ProjectFlagScanBadge :run="run" :num-consumers="activity?.num_consumers" />
+						<ProjectFlagScanBadge :run="run" :num-workers="activity?.num_workers" />
 					</div>
 
 					<div class="flex flex-wrap items-center gap-2 sm:ml-auto">
@@ -165,7 +169,7 @@ import {
 } from '~/composables/queries/project-flag-run'
 
 import ProjectFlagRunActions from './run-actions.vue'
-import { formatDate } from './run-format'
+import { formatDate, formatRunStatus } from './run-format'
 import ProjectFlagScanBadge from './scan-badge.vue'
 
 const client = injectModrinthClient()
@@ -223,10 +227,10 @@ const runSearch = computed(
 		new Fuse(
 			timeFilteredRuns.value.map((run) => ({
 				run,
-				status: run.status === 'done' ? 'Done' : 'Running',
+				status: formatRunStatus(run.status),
 			})),
 			{
-				keys: ['run.id', 'run.started_by.username', 'run.applied_by.username', 'status'],
+				keys: ['run.id', 'run.started_by.username', 'status'],
 				threshold: 0.3,
 				ignoreLocation: true,
 			},

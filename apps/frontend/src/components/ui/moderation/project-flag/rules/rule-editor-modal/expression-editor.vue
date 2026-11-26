@@ -1,5 +1,9 @@
 <template>
-	<div class="overflow-hidden">
+	<div
+		class="overflow-hidden"
+		:class="{ 'rounded-[20px] border border-solid border-surface-4': !frameless }"
+		:style="{ height }"
+	>
 		<component
 			:is="editorComponent"
 			v-if="editorComponent"
@@ -44,9 +48,12 @@ const props = withDefaults(
 		id: string
 		disabled?: boolean
 		errorId?: string
+		frameless?: boolean
+		height?: string
+		label?: string
 		wordWrap?: boolean
 	}>(),
-	{ wordWrap: true },
+	{ wordWrap: true, label: 'Rhai expression' },
 )
 const editorComponent = shallowRef<Component | null>(null)
 const languageOptions = shallowRef<Partial<Ace.EditorOptions>>({})
@@ -78,7 +85,7 @@ async function loadEditor() {
 function onEditorInit(editor: Ace.Editor) {
 	const input = editor.textInput.getElement()
 	input.id = props.id
-	input.setAttribute('aria-label', 'Rhai expression')
+	input.setAttribute('aria-label', props.label)
 	editorInput.value = input
 }
 

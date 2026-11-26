@@ -5,10 +5,32 @@
 			aria-label="Project scan results"
 		>
 			<template v-if="result">
+				<p class="m-0 text-sm text-secondary">
+					Preview:
+					{{
+						result.proposed_review_outcome
+							? outcomeLabels[result.proposed_review_outcome]
+							: 'No proposed review outcome'
+					}}
+				</p>
+				<section v-if="retainedFlags.length" class="flex flex-col gap-2">
+					<h3 class="m-0 text-base font-medium text-primary">
+						Resolved · Retained ({{ retainedFlags.length }})
+					</h3>
+					<p class="m-0 text-sm text-secondary">
+						These violations preserve their original evidence and still affect the review outcome.
+					</p>
+					<FlagCard
+						v-for="flag in retainedFlags"
+						:key="flag.key"
+						:flag="flag"
+						class="rounded-xl bg-surface-3 p-3"
+					/>
+				</section>
 				<section v-if="result.error !== null" class="flex min-w-0 flex-col gap-3">
 					<h3 class="m-0 text-base font-medium text-primary">Scan error</h3>
 					<p class="m-0 whitespace-pre-wrap break-words text-sm text-red">
-						{{ result.error }}
+						{{ scanError }}
 					</p>
 				</section>
 				<section
@@ -42,6 +64,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import ProjectFlagRuleEditorModal from '../rules/rule-editor-modal/index.vue'
+import FlagCard from './flag-card.vue'
 import RuleCard from './rule-card.vue'
 
 const props = defineProps<{ result?: ProjectFlagRunResult }>()
@@ -53,7 +76,7 @@ const { addNotification } = injectNotificationManager()
 async function openRuleEditor(ruleId: string, event: MouseEvent) {
 	try {
 		const rule = await queryClient.fetchQuery({
-			queryKey: ['moderation', 'project-flag', 'rule', Number(ruleId)] as const,
+			queryKey: ['moderation', 'project-flag', 'rule', ruleId] as const,
 			queryFn: ({ queryKey: [, , , id] }) => client.labrinth.project_flags_internal.get(id),
 			staleTime: 0,
 		})
@@ -67,6 +90,21 @@ async function openRuleEditor(ruleId: string, event: MouseEvent) {
 	}
 }
 
+const outcomeLabels = {
+	approved: 'Would approve',
+	withheld: 'Would withhold',
+	rejected: 'Would reject',
+	never_reviewed: 'Would mark as never reviewed',
+}
+const retainedFlags = computed(
+	() => props.result?.effective_flags.filter((flag) => !flag.active) ?? [],
+)
+const scanError = computed(() =>
+	props.result?.error?.replace(/^([A-Za-z0-9]+): /gm, (prefix, ruleId: string) => {
+		const rule = props.result?.rules[ruleId]
+		return rule ? `${rule.name ?? 'Deleted rule'} (${ruleId}): ` : prefix
+	}),
+)
 const ruleEntries = computed(() => Object.entries(props.result?.rules ?? {}))
 const ruleSections = computed(() =>
 	[

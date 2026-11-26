@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE mods SET review_outcome = $1, in_review = TRUE WHERE id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a1e5361a0abf7eb79c8a24891176e85f2af74d239eb5d2dac11883d4f9f504ff"
+}

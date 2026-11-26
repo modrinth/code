@@ -1,9 +1,7 @@
 <template>
 	<slot
-		:scanned-count="data?.length ?? resultPage?.total"
 		:scan-error-count="scanErrorCount"
-		:flagged-count="data ? groupedRows.flagged.length : undefined"
-		:approvable-count="data ? groupedRows.approvable.length : undefined"
+		:approvable-count="run.num_no_flags ?? groupedRows.approvable.length"
 		:unique-flag-key-count="uniqueFlagKeyCount"
 	/>
 	<section class="flex min-w-0 flex-col gap-3" aria-label="Project results">
@@ -124,7 +122,11 @@ const filters = [
 ] as const
 type Category = (typeof filters)[number]['category']
 
-const props = defineProps<{ run: ProjectFlagRun; category: Category; projectId?: string }>()
+const props = defineProps<{
+	run: Pick<ProjectFlagRun, 'id' | 'status'> & Partial<ProjectFlagRun>
+	category: Category
+	projectId?: string
+}>()
 const emit = defineEmits<{ changeCategory: [category: Category]; selectProject: [id: string] }>()
 const client = injectModrinthClient()
 
@@ -187,7 +189,7 @@ const uniqueFlagKeyCount = computed(() => data.value && countUniqueFlagKeys(data
 function resultRow(result: ProjectFlagRunResult) {
 	return {
 		...result,
-		flagCount: Object.values(result.rules).reduce((count, rule) => count + rule.flags.length, 0),
+		flagCount: result.num_flags,
 		category: projectFlagResultCategory(result),
 	}
 }
@@ -405,7 +407,7 @@ const emptyMessage = computed(() => {
 		return
 	if (search.value.trim() || hasFilters.value) return 'No projects match your search or filters.'
 	if (props.category === 'all') return 'No project results yet.'
-	return props.run.status === 'done'
+	return typeof props.run.status === 'string'
 		? 'No projects in this group.'
 		: 'No projects in this group yet. Results refresh automatically.'
 })

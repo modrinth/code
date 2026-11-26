@@ -1,8 +1,8 @@
 use std::time::Duration;
 
 use actix_web::web;
-use eyre::Context;
-use eyre::eyre;
+use anyhow::Context;
+use anyhow::anyhow;
 use prometheus::IntGauge;
 
 #[cfg(target_os = "linux")]
@@ -45,16 +45,16 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 pub fn register_and_set_metrics(
     registry: &prometheus::Registry,
-) -> eyre::Result<()> {
+) -> anyhow::Result<()> {
     #[cfg(target_os = "linux")]
     {
         pprof::register_and_set_metrics(registry)
-            .wrap_err("failed to register jemalloc metrics")?;
+            .context("failed to register jemalloc metrics")?;
     }
 
     let make_gauge = |key: &str, name: &str| {
         IntGauge::new(key, name)
-            .wrap_err_with(|| eyre!("failed to create gauge for '{key}'"))
+            .with_context(|| anyhow!("failed to create gauge for '{key}'"))
     };
 
     let num_workers = make_gauge(
@@ -73,7 +73,7 @@ pub fn register_and_set_metrics(
     for gauge in [&num_workers, &num_alive_tasks, &global_queue_depth] {
         registry
             .register(Box::new(gauge.clone()))
-            .wrap_err("failed to register gauge")?;
+            .context("failed to register gauge")?;
     }
 
     tokio::spawn(async move {

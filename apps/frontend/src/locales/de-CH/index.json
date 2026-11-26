@@ -548,14 +548,23 @@
   "app-marketing.download.download-appimage": {
     "message": "Lade das AppImage herunter"
   },
+  "app-marketing.download.download-appimage-arm64": {
+    "message": "AppImage (ARM64) herunterladen"
+  },
   "app-marketing.download.download-beta": {
     "message": "Lade die beta herunter"
   },
   "app-marketing.download.download-deb": {
     "message": "Lade das DEB herunter"
   },
+  "app-marketing.download.download-deb-arm64": {
+    "message": "DEB (ARM64) herunterladen"
+  },
   "app-marketing.download.download-rpm": {
     "message": "Lade das RPM herunter"
+  },
+  "app-marketing.download.download-rpm-arm64": {
+    "message": "RPM (ARM64) herunterladen"
   },
   "app-marketing.download.flathub": {
     "message": "Auf Flathub herunterladen"
@@ -812,6 +821,12 @@
   "auth.create-account.username.placeholder": {
     "message": "Benutzername eingeben"
   },
+  "auth.oauth.opening.description": {
+    "message": "Schließe deine Anmeldung auf {provider} ab"
+  },
+  "auth.oauth.opening.title": {
+    "message": "{provider} wird geöffnet..."
+  },
   "auth.reauthenticate.2fa.description": {
     "message": "Gib den 6-stelligen Code aus deiner Authentifikator-App oder einen deiner Wiederherstellungscodes ein."
   },
@@ -883,6 +898,9 @@
   },
   "auth.sign-in.choose-existing-account": {
     "message": "Ein bestehendes Konto verwenden"
+  },
+  "auth.sign-in.code-failed": {
+    "message": "Dieser Anmeldelink ist ungültig oder abgelaufen. Versuche es erneut."
   },
   "auth.sign-in.continue-with-email": {
     "message": "Weiter mit E-Mail"
@@ -2999,6 +3017,9 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Auf Modrinth+ upgraden"
   },
+  "layout.nav.use-signed-out": {
+    "message": "Abgemeldet verwenden"
+  },
   "layout.publish.email-verification-required.description": {
     "message": "Du musst deine E-Mail-Adresse bestätigen, bevor du auf Modrinth veröffentlichen kannst."
   },
@@ -3813,7 +3834,7 @@
     "message": "Projekt bearbeiten"
   },
   "project.actions.open-in-modview": {
-    "message": "In Modview öffnen"
+    "message": "Modview"
   },
   "project.actions.project-page": {
     "message": "Projektseite"
@@ -6244,6 +6265,12 @@
   },
   "thread.message.tech-review-exited": {
     "message": "Das Projekt hat die Warteschlange der technischen Überprüfung verlassen, da alle ausstehenden Traces gelöst wurden."
+  },
+  "thread.message.tech-review-failed": {
+    "message": "hat die technische Überprüfung abgeschlossen und das Projekt mit {safe} sicheren und {unsafe, plural, one {# unsicheren Befund} other {# unsicheren Befunden}} als nicht bestanden markiert."
+  },
+  "thread.message.tech-review-passed": {
+    "message": "hat die technische Überprüfung abgeschlossen und das Projekt mit {safe, plural, one {# sicheren Befund} other {# sicheren Befunden}} als bestanden markiert."
   },
   "thread.message.thread-closed": {
     "message": "hat den Thread geschlossen."

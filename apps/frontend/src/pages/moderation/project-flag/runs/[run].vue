@@ -8,39 +8,26 @@
 			All runs
 		</NuxtLink>
 
-		<p
-			v-if="!run && (historyPending || historyFetching)"
-			role="status"
-			class="universal-card flex items-center gap-2"
-		>
+		<p v-if="runPending" role="status" class="universal-card flex items-center gap-2">
 			<LoaderCircleIcon class="size-4 animate-spin" /> Loading project flag run…
 		</p>
 		<div
-			v-else-if="!run && historyError"
+			v-else-if="run === undefined && runError"
 			role="alert"
 			class="universal-card flex flex-col items-start gap-3"
 		>
-			<Button @click="refetchHistory()">Try again</Button>
+			<Button @click="refetchRun()">Try again</Button>
 		</div>
-		<p v-else-if="!run" class="universal-card m-0 text-secondary">Project flag run not found.</p>
 		<ProjectFlagRunActions v-else v-slot="{ runOptions, busy }" @deleted="returnToRuns">
 			<ProjectFlagRunResults
-				:run="run"
+				:run="resultRun"
 				:category="category"
 				:project-id="selectedProjectId"
 				@change-category="showCategory"
 				@select-project="selectProject"
 			>
-				<template
-					#default="{
-						scannedCount,
-						scanErrorCount,
-						flaggedCount,
-						approvableCount,
-						uniqueFlagKeyCount,
-					}"
-				>
-					<header class="universal-card !mb-4 flex min-w-0 flex-col gap-3">
+				<template #default="{ scanErrorCount, approvableCount, uniqueFlagKeyCount }">
+					<header v-if="run" class="universal-card !mb-4 flex min-w-0 flex-col gap-3">
 						<div class="flex flex-wrap items-center justify-between gap-3">
 							<div class="flex flex-wrap items-center gap-2">
 								<h2 ref="heading" tabindex="-1" class="m-0 text-xl font-semibold text-contrast">
@@ -48,11 +35,7 @@
 										{{ formatDate(run.started_at) }}
 									</time>
 								</h2>
-								<ProjectFlagScanBadge
-									:run="run"
-									:scanned="scannedCount"
-									:num-consumers="activity?.num_consumers"
-								/>
+								<ProjectFlagScanBadge :run="run" :num-workers="activity?.num_workers" />
 							</div>
 							<div class="flex flex-wrap items-center gap-2">
 								<TagItem
@@ -65,25 +48,25 @@
 								</TagItem>
 								<TagItem
 									v-tooltip="
-										flaggedCount === undefined || uniqueFlagKeyCount === undefined
-											? 'Flagged count unavailable'
-											: flagCountTooltip(flaggedCount, uniqueFlagKeyCount)
+										uniqueFlagKeyCount === undefined
+											? 'Flagged projects'
+											: flagCountTooltip(run.num_flagged, uniqueFlagKeyCount)
 									"
 									style="--_color: var(--color-purple)"
 								>
 									<TagCategoryFlagIcon aria-hidden="true" /><span class="sr-only">Flagged: </span>
-									{{ flaggedCount?.toLocaleString('en-US') ?? '—' }}
+									{{ run.num_flagged.toLocaleString('en-US') }}
 								</TagItem>
 								<TagItem v-tooltip="'Approvable'" style="--_color: var(--color-green)">
 									<BadgeCheckIcon aria-hidden="true" /><span class="sr-only">Approvable: </span>
 									{{ approvableCount?.toLocaleString('en-US') ?? '—' }}
 								</TagItem>
 								<TagItem
-									v-if="run.applied_at"
-									v-tooltip="formatDate(run.applied_at, true)"
+									v-if="run.ruleset_id && deployment?.ruleset_id === run.ruleset_id"
+									v-tooltip="formatDate(deployment.deployed_at, true)"
 									style="--_bg-color: var(--color-green-bg); --_color: var(--color-green)"
 								>
-									Applied
+									Rules deployed
 								</TagItem>
 								<TeleportOverflowMenu
 									type="quiet"
@@ -107,7 +90,23 @@
 								{{ run.started_by.username }}
 							</NuxtLink>
 							<span v-else>unknown user</span>
+							<span v-if="run.ruleset_id"
+								>· Tested revision <code>{{ run.ruleset_id }}</code></span
+							>
+							<span v-if="run.num_skipped">· {{ run.num_skipped }} skipped</span>
 						</div>
+					</header>
+					<header v-else class="universal-card !mb-4 flex flex-col gap-2">
+						<h2
+							ref="heading"
+							tabindex="-1"
+							class="m-0 break-all text-xl font-semibold text-contrast"
+						>
+							Run {{ runId }}
+						</h2>
+						<p class="m-0 text-sm text-secondary">
+							Temporal history is unavailable. Any stored results are shown below.
+						</p>
 					</header>
 				</template>
 			</ProjectFlagRunResults>
@@ -133,9 +132,10 @@ import ProjectFlagRunActions from '~/components/ui/moderation/project-flag/run-a
 import { flagCountTooltip, formatDate } from '~/components/ui/moderation/project-flag/run-format'
 import ProjectFlagRunResults from '~/components/ui/moderation/project-flag/run-results/index.vue'
 import ProjectFlagScanBadge from '~/components/ui/moderation/project-flag/scan-badge.vue'
+import { projectFlagDeploymentQueryOptions } from '~/composables/queries/project-flag'
 import {
 	projectFlagRunActivityOptions,
-	projectFlagRunHistoryOptions,
+	projectFlagRunDetailOptions,
 } from '~/composables/queries/project-flag-run'
 
 useHead({ title: 'Project flag run - Modrinth' })
@@ -146,16 +146,16 @@ const runId = computed(() => String(route.params.run))
 const runsList = { path: '/moderation/project-flag', query: { tab: 'runs' } }
 const client = injectModrinthClient()
 const {
-	data: history,
-	isPending: historyPending,
-	error: historyError,
-	isFetching: historyFetching,
-	refetch: refetchHistory,
-} = useQuery(projectFlagRunHistoryOptions(client))
-const run = computed(() => history.value?.find(({ id }) => id === runId.value))
+	data: run,
+	isPending: runPending,
+	error: runError,
+	refetch: refetchRun,
+} = useQuery(computed(() => projectFlagRunDetailOptions(client, runId.value)))
+const { data: deployment } = useQuery(projectFlagDeploymentQueryOptions(client))
+const resultRun = computed(() => run.value ?? { id: runId.value, status: 'unknown' as const })
 const { data: activity, error: activityError } = useQuery({
 	...projectFlagRunActivityOptions(client),
-	enabled: computed(() => !!run.value && run.value.status !== 'done'),
+	enabled: computed(() => typeof run.value?.status === 'object'),
 })
 const starterId = computed(() => run.value?.started_by?.id ?? '')
 const { data: starter, error: starterError } = useQuery({
@@ -191,7 +191,7 @@ function showCategory(category: 'all' | 'flagged' | 'approvable' | 'errors') {
 function selectProject(projectId: string) {
 	return router.replace({ query: { ...route.query, project: projectId }, hash: route.hash })
 }
-useFlagErrorNotification(historyError, 'Could not load the run')
+useFlagErrorNotification(runError, 'Could not load the run')
 useFlagErrorNotification(activityError, 'Could not load scan activity')
 useFlagErrorNotification(starterError, 'Could not load run starter')
 useFlagErrorNotification(() => run.value?.error, 'Flag rule run failed')

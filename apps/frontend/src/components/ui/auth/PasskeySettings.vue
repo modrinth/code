@@ -70,12 +70,7 @@
 							<IconButton
 								v-tooltip="formatMessage(messages.deletePasskeyButton)"
 								:label="formatMessage(messages.deletePasskeyButton)"
-								@click="
-									() => {
-										passkeyToRemove = passkey
-										removePasskeyModal?.show()
-									}
-								"
+								@click="confirmRemovePasskey(passkey)"
 							>
 								<TrashIcon />
 							</IconButton>
@@ -218,6 +213,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref, useTemplateRef } from 'vue'
 
+import { ensurePrivileged, isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
 import { createPasskeyCredential } from '~/helpers/passkey.ts'
 
 const { labrinth } = injectModrinthClient()
@@ -230,6 +226,9 @@ const formatDateTime = useFormatDateTime({
 })
 
 function notifyError(err: unknown) {
+	if (isReauthCancelled(err)) {
+		return
+	}
 	addNotification({
 		title: formatMessage(commonMessages.errorNotificationTitle),
 		text: err instanceof Error ? err.message : String(err),
@@ -356,16 +355,19 @@ async function showPasskeyModal() {
 async function registerPasskey() {
 	startLoading()
 	try {
-		const res = await labrinth.auth_v2.registerPasskeyStart()
+		await runPrivileged(async () => {
+			const res = await labrinth.auth_v2.registerPasskeyStart()
 
-		const credential = await createPasskeyCredential(res.options.publicKey)
-		pendingPasskey.value = {
-			flow: res.flow,
-			credential: credential,
-			name: '',
+			const credential = await createPasskeyCredential(res.options.publicKey)
+			pendingPasskey.value = {
+				flow: res.flow,
+				credential: credential,
+				name: '',
+			}
+		})
+		if (pendingPasskey.value) {
+			addPasskeyModal.value?.show()
 		}
-
-		addPasskeyModal.value?.show()
 	} catch (err) {
 		notifyError(err)
 	}
@@ -377,10 +379,15 @@ async function finishRegisterPasskey() {
 
 	startLoading()
 	try {
-		const passkey = await labrinth.auth_v2.registerPasskeyFinish(pendingPasskey.value)
-		passkeys.value.unshift(passkey)
-		pendingPasskey.value = null
-		addPasskeyModal.value?.hide()
+		await runPrivileged(async () => {
+			if (!pendingPasskey.value) {
+				return
+			}
+			const passkey = await labrinth.auth_v2.registerPasskeyFinish(pendingPasskey.value)
+			passkeys.value.unshift(passkey)
+			pendingPasskey.value = null
+			addPasskeyModal.value?.hide()
+		})
 	} catch (err) {
 		notifyError(err)
 	}
@@ -406,13 +413,19 @@ async function renamePasskey() {
 	stopLoading()
 }
 
+async function confirmRemovePasskey(passkey: Labrinth.Auth.v2.Passkey) {
+	if (!(await ensurePrivileged())) return
+	passkeyToRemove.value = passkey
+	removePasskeyModal.value?.show()
+}
+
 async function removePasskey() {
 	if (!passkeyToRemove.value) return
 	const { id } = passkeyToRemove.value
 
 	startLoading()
 	try {
-		await labrinth.auth_v2.deletePasskey(id)
+		await runPrivileged(() => labrinth.auth_v2.deletePasskey(id))
 		passkeys.value = passkeys.value.filter((passkey) => passkey.id !== id)
 		passkeyToRemove.value = null
 	} catch (err) {

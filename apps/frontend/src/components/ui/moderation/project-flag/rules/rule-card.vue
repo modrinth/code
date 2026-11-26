@@ -50,6 +50,9 @@
 			</section>
 		</div>
 
+		<p class="m-0 text-sm text-secondary">
+			{{ deploymentStatus[rule.deployment_status] }}
+		</p>
 		<RuleMetadata :rule="rule" class="mt-2" />
 		<slot name="delete-confirmation" />
 	</article>
@@ -71,6 +74,11 @@ const card = useTemplateRef<HTMLElement>('card')
 const ruleOptions: ButtonMenuOption[] = [
 	{ label: 'Delete rule', icon: TrashIcon, tone: 'red', action: () => emit('requestDelete') },
 ]
+const deploymentStatus = {
+	current: 'Deployed · current definition',
+	outdated: 'Outdated · definition differs from live',
+	not_deployed: 'Not deployed',
+}
 const patterns = computed(() => Object.entries(props.rule.params.scan_files_for))
 const tokenize = shallowRef<typeof tokenizeRhai>()
 const preview = computed(() => tokenize.value?.(props.rule.params.expression))

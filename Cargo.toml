@@ -12,7 +12,7 @@ members = [
   "packages/minecraft-meta-model",
   "packages/modrinth-content-management",
   "packages/modrinth-log",
-  "packages/modrinth-maxmind",
+  "packages/modrinth-skin-rendering",
   "packages/modrinth-util",
   "packages/neverbounce",
   "packages/path-util",
@@ -32,7 +32,7 @@ actix-files = "0.7.2"
 actix-http = "3.19.0"
 actix-multipart = "0.8.5"
 actix-rt = "2.15.0"
-actix-web = "4.17.0"
+actix-web = "4.20.0"
 actix-web-prom = "0.10.0"
 actix-ws = "0.4.0"
 aes-gcm = "0.11.1"
@@ -62,6 +62,7 @@ aws-sdk-s3 = { version = "=1.122.0", default-features = false, features = [
 ] }
 base64 = "0.23.1"
 bitflags = "2.13.2"
+blake3 = "1.8.7"
 blocklist = { version = "1.0.0" }
 bon = "3.10.2"
 bytemuck = "1.25.2"
@@ -74,7 +75,6 @@ chumsky = "0.13.0"
 cidre = { version = "0.29.0", default-features = false, features = ["macos_15_0"] }
 clap = "4.6.7"
 clickhouse = "0.15.3"
-color-eyre = "0.6.5"
 color-thief = "0.2.2"
 component-derive = { path = "packages/component-derive" }
 const_format = "0.2.36"
@@ -95,12 +95,13 @@ dunce = "1.0.5"
 either = "1.19.0"
 encoding_rs = "0.8.42"
 enumset = "1.1.14"
-eyre = "0.6.14"
 figment = { version = "0.10.19" }
 flate2 = "1.1.10"
 fs4 = { version = "1.1.0", default-features = false }
 futures = "0.3.34"
 futures-util = "0.3.34"
+glam = "0.34.3"
+gltf = "1.4.1"
 governor = "0.10.4"
 heck = "0.5.0"
 hex = "0.4.3"
@@ -147,11 +148,11 @@ lz4_flex = { version = "0.14.0", default-features = false, features = [
   "safe-encode",
   "std",
 ] }
-maxminddb = "0.32.0"
 minecraft-meta-manifest = { path = "packages/minecraft-meta-manifest" }
 minecraft-meta-model = { path = "packages/minecraft-meta-model" }
 modrinth-content-management = { path = "packages/modrinth-content-management" }
 modrinth-log = { path = "packages/modrinth-log" }
+modrinth-skin-rendering = { path = "packages/modrinth-skin-rendering" }
 modrinth-util = { path = "packages/modrinth-util" }
 muralpay = { path = "packages/muralpay" }
 murmur2 = "0.1.0"
@@ -184,6 +185,8 @@ regex = "1.13.1"
 reqwest = { version = "0.13.5", default-features = false, features = ["form", "query"] }
 rgb = "0.8.53"
 rhai = "1.27.0"
+rhai-chrono = "0.1.1"
+rhai-url = "0.0.6"
 rust_decimal = { version = "1.43.0", features = ["serde-with-float", "serde-with-str"] }
 rust_iso3166 = "0.2.0"
 rust-s3 = { version = "0.38.0", default-features = false, features = [
@@ -241,6 +244,11 @@ tauri-plugin-updater = { git = "https://github.com/modrinth/plugins-workspace", 
 ] }
 tauri-plugin-window-state = "=2.4.0"
 tempfile = "3.27.0"
+temporalio-client = "1.2.0"
+temporalio-common = "1.2.0"
+temporalio-macros = "1.2.0"
+temporalio-sdk = "1.2.0"
+temporalio-workflow = "1.2.0"
 theseus = { path = "packages/app-lib" }
 thiserror = "2.0.21"
 tikv-jemalloc-ctl = "0.7.0"
@@ -341,6 +349,22 @@ tauri-runtime-wry = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e
 tauri-utils = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
 # Toasty's unused SQLite driver conflicts with SQLx's native SQLite bindings.
 toasty = { path = "packages/toasty" }
+
+[profile.dev.package.fdeflate]
+opt-level = 3
+
+[profile.dev.package.flate2]
+opt-level = 3
+
+[profile.dev.package.miniz_oxide]
+opt-level = 3
+
+# Unoptimized, rendering one skin preview takes over a second
+[profile.dev.package.modrinth-skin-rendering]
+opt-level = 3
+
+[profile.dev.package.png]
+opt-level = 3
 
 [profile.dev.package.sqlx-macros]
 opt-level = 3

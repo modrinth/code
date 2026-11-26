@@ -47,7 +47,7 @@ pub async fn setup_search_projects(
                     .edit_project(
                         &project.id.to_string(),
                         json!({
-                            "status": "approved"
+                            "review_outcome": "approved", "in_review": false
                         }),
                         MOD_USER_PAT,
                     )

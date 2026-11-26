@@ -1,5 +1,5 @@
 use crate::models::v3::notifications::NotificationType;
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
@@ -43,13 +43,13 @@ impl NotificationTypeItem {
             let mut redis = redis
                 .connect()
                 .await
-                .wrap_err("connecting to Redis for notification types")?;
+                .context("connecting to Redis for notification types")?;
             let key = redis.key().metadata(NOTIFICATION_TYPES_NAMESPACE, "all");
 
             let cached_types = redis
                 .get_deserialized(&key)
                 .await
-                .wrap_err("fetching notification types from cache")?;
+                .context("fetching notification types from cache")?;
 
             if let Some(types) = cached_types {
                 return Ok(types);
@@ -62,20 +62,20 @@ impl NotificationTypeItem {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching notification types")?;
+        .context("fetching notification types")?;
 
         let types = results.into_iter().map(Into::into).collect();
 
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to Redis to cache notification types")?;
+            .context("connecting to Redis to cache notification types")?;
         let key = redis.key().metadata(NOTIFICATION_TYPES_NAMESPACE, "all");
 
         redis
             .set_serialized(&key, &types, None)
             .await
-            .wrap_err("caching notification types")?;
+            .context("caching notification types")?;
 
         Ok(types)
     }

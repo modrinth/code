@@ -966,7 +966,7 @@
     "defaultMessage": "Modパックをインポート"
   },
   "creation-flow.modal.modpack.known-modpack.prompt": {
-    "defaultMessage": "インストールしたいMODパックは既に決まっていますか？"
+    "defaultMessage": "インストールしたいModパックは既に決まっていますか？"
   },
   "creation-flow.modal.modpack.search.no-results": {
     "defaultMessage": "見つかりません"
@@ -975,7 +975,7 @@
     "defaultMessage": "Modパックを検索"
   },
   "creation-flow.modal.project.known-project.prompt": {
-    "defaultMessage": "すでにあなたがプレイしたいものを知っていますか？"
+    "defaultMessage": "すでにプレイしたいものがありますか？"
   },
   "creation-flow.modal.project.search.create-instance": {
     "defaultMessage": "インスタンスを作成する"
@@ -987,10 +987,10 @@
     "defaultMessage": "一致する結果が見つかりませんでした"
   },
   "creation-flow.modal.project.search.placeholder": {
-    "defaultMessage": "Mod、Modpackなどを検索"
+    "defaultMessage": "Mod、Modパックなどを検索"
   },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
-    "defaultMessage": "ローダーとゲームのバージョンを選択して、最初から始めましょう"
+    "defaultMessage": "ローダーとゲームのバージョンを選択して、最初から始める。"
   },
   "creation-flow.modal.setup-type.option.custom-setup.title": {
     "defaultMessage": "カスタム設定"
@@ -1002,19 +1002,19 @@
     "defaultMessage": "インスタンスをインポート"
   },
   "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "プロジェクトを選択してください。最新バージョンを使用します。"
+    "defaultMessage": "プロジェクトを選択して最新バージョンを使用します。"
   },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "ModまたはModpackから開始"
+    "defaultMessage": "ModまたはModパックから開始"
   },
   "creation-flow.modal.setup-type.option.upload-modpack.description": {
-    "defaultMessage": ".mrpackファイルからmodpackをインストールします"
+    "defaultMessage": "端末の.mrpackファイルからModパックをインストールします。"
   },
   "creation-flow.modal.setup-type.option.upload-modpack.title": {
-    "defaultMessage": "Modpackをアップロード"
+    "defaultMessage": "Modパックをアップロード"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
-    "defaultMessage": "MODやプラグインを一切使用していない、クラシックなMinecraft。"
+    "defaultMessage": "Modやプラグインを一切使用していない、クラシックなMinecraft。"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
     "defaultMessage": "マインクラフト"
@@ -3492,7 +3492,7 @@
     "defaultMessage": "サーバー"
   },
   "project-card.environment.singleplayer": {
-    "defaultMessage": "シングルプレイヤー"
+    "defaultMessage": "シングルプレイ"
   },
   "project-type.all": {
     "defaultMessage": "すべて"
@@ -3525,7 +3525,7 @@
     "defaultMessage": "Modパック"
   },
   "project-type.modpack.lowercase": {
-    "defaultMessage": "{count, plural, other {modパック}}"
+    "defaultMessage": "{count, plural, other {Modパック}}"
   },
   "project-type.plugin.capital": {
     "defaultMessage": "プラグイン"
@@ -3555,13 +3555,13 @@
     "defaultMessage": "リソースパック"
   },
   "project-type.server.capital": {
-    "defaultMessage": "{count, plural,one {台のサーバー}other {台のサーバー}}"
+    "defaultMessage": "{count, plural, other {サーバー}}"
   },
   "project-type.server.category": {
     "defaultMessage": "サーバー"
   },
   "project-type.server.lowercase": {
-    "defaultMessage": "{count, plural,one {台のサーバー}other {台のサーバー}}"
+    "defaultMessage": "{count, plural, other {サーバー}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "シェーダー"
@@ -3588,10 +3588,10 @@
     "defaultMessage": "サーバー側"
   },
   "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "シングルプレイヤー"
+    "defaultMessage": "シングルプレイ"
   },
   "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "シングルプレイヤー専用"
+    "defaultMessage": "シングルプレイ専用"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
@@ -3762,10 +3762,10 @@
     "defaultMessage": "全ての機能はサーバー側で実行され、バニラクライアントと互換性があります。シングルプレイの内部サーバーでも動作します。"
   },
   "project.environment.server-only.title": {
-    "defaultMessage": "サーバー側のみ、シングルプレイヤーでも動作します"
+    "defaultMessage": "サーバー側のみ、シングルプレイでも動作します"
   },
   "project.environment.singleplayer-only.description": {
-    "defaultMessage": "シングルプレイヤーまたはマルチプレイヤーサーバーに接続されていないときに機能します。"
+    "defaultMessage": "シングルプレイまたはマルチプレイサーバーに接続されていないときに機能します。"
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "シングルプレイのみ"
@@ -4086,7 +4086,7 @@
     "defaultMessage": "常にアクティブ"
   },
   "project.settings.disclosures.title": {
-    "defaultMessage": "開示"
+    "defaultMessage": "開示事項"
   },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "部分的ではありますが、クライアント側とサーバー側の両方にいくつかの機能があります。"
@@ -4146,13 +4146,13 @@
     "defaultMessage": "全ての機能はサーバー側で実行され、バニラクライアントと互換性があります。"
   },
   "project.settings.environment.server_only.supports_singleplayer.title": {
-    "defaultMessage": "シングルプレイヤーでも動作"
+    "defaultMessage": "シングルプレイでも動作"
   },
   "project.settings.environment.server_only.title": {
     "defaultMessage": "サーバー側のみ"
   },
   "project.settings.environment.singleplayer.description": {
-    "defaultMessage": "シングルプレイヤーまたはマルチプレイヤーサーバーに接続されていないときに機能します。"
+    "defaultMessage": "シングルプレイまたはマルチプレイサーバーに接続されていないときに機能します。"
   },
   "project.settings.environment.singleplayer.title": {
     "defaultMessage": "シングルプレイのみ"
@@ -5145,19 +5145,19 @@
     "defaultMessage": "新しいサーバー"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Modrinth Appを使えば、MODのインストール、友達の招待、そして一緒にプレイすることなど、すべてが可能です。"
+    "defaultMessage": "Modrinth Appを使えば、Modのインストール、友達の招待、そして一緒にプレイすることなど、すべてが可能です。"
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "お好みのModを選んだら、あとはすべて対応いたします。"
   },
   "servers.list-empty.one-click-mod-installs-title": {
-    "defaultMessage": "ワンクリックでMODをインストール"
+    "defaultMessage": "ワンクリックでModをインストール"
   },
   "servers.list-empty.play-with-friends-title": {
-    "defaultMessage": "友達と遊ぶ"
+    "defaultMessage": "フレンドと遊ぶ"
   },
   "servers.list-empty.simple-setup-description": {
-    "defaultMessage": "サーバーは、シングルプレイヤーワールドと同じように設定してください。"
+    "defaultMessage": "サーバーは、シングルプレイワールドと同じように設定できます。"
   },
   "servers.list-empty.simple-setup-title": {
     "defaultMessage": "簡単なセットアップ"
@@ -5937,7 +5937,7 @@
     "defaultMessage": "モデル"
   },
   "tag.category.multiplayer": {
-    "defaultMessage": "マルチプレイヤー"
+    "defaultMessage": "マルチプレイ"
   },
   "tag.category.network": {
     "defaultMessage": "ネットワーク"

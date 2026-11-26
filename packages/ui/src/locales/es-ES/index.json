@@ -8,6 +8,9 @@
   "app.appearance-settings.native-decorations.title": {
     "defaultMessage": "Marco de ventana del sistema"
   },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "defaultMessage": "Lanzar actualización"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "No se han podido cargar las versiones del servidor"
   },
@@ -508,6 +511,21 @@
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} actualizado/s"
+  },
+  "content.enabled-for.description": {
+    "defaultMessage": "Elige dónde se muestra este contenido. Usa el botón de alternancia de Acciones para activarlo o desactivarlo por completo."
+  },
+  "content.enabled-for.label": {
+    "defaultMessage": "Habilitado para"
+  },
+  "content.enabled-for.not-supported-here": {
+    "defaultMessage": "Este contenido no está diseñado para activarse aquí."
+  },
+  "content.enabled-for.player": {
+    "defaultMessage": "Jugador"
+  },
+  "content.enabled-for.player-only-filter": {
+    "defaultMessage": "Solo para jugadores"
   },
   "content.filter.disabled": {
     "defaultMessage": "Deshabilitados"
@@ -5776,9 +5794,6 @@
   },
   "settings.social.blocked-users.restriction.friend-requests": {
     "defaultMessage": "Enviar solicitudes de amistad"
-  },
-  "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Invitarte a administrar un Servidor en Modrinth."
   },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "Invitarte a instancias compartidas"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CalendarIcon, UsersIcon, XIcon } from '@modrinth/assets'
-import { injectModrinthClient, ProgressBar } from '@modrinth/ui'
+import { daysLeft, injectModrinthClient, ProgressBar } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, ref } from 'vue'
@@ -47,9 +47,7 @@ function formatUsd(amount: string | number) {
 	})
 }
 
-function daysLeft() {
-	return Math.max(0, Math.ceil((PRIDE_FUNDRAISER_END_DATE - Date.now()) / (24 * 60 * 60 * 1000)))
-}
+const remainingDays = computed(() => daysLeft(PRIDE_FUNDRAISER_END_DATE))
 </script>
 
 <template>
@@ -106,7 +104,7 @@ function daysLeft() {
 					</span>
 					<span class="flex items-center gap-1">
 						<CalendarIcon aria-hidden="true" class="size-4 shrink-0" />
-						{{ daysLeft() }} {{ daysLeft() === 1 ? 'day left' : 'days left' }}
+						{{ remainingDays }} {{ remainingDays === 1 ? 'day left' : 'days left' }}
 					</span>
 				</div>
 			</div>

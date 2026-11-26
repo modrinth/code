@@ -1,13 +1,25 @@
-import type { ProjectFlagRunResult } from '@modrinth/api-client'
+import type { ProjectFlagRun, ProjectFlagRunResult } from '@modrinth/api-client'
 
 export function countUniqueFlagKeys(results: ProjectFlagRunResult[]) {
 	const keys = new Set<string>()
 	for (const result of results) {
-		for (const rule of Object.values(result.rules)) {
-			for (const flag of rule.flags) keys.add(flag.key)
-		}
+		for (const flag of result.effective_flags) keys.add(flag.key)
 	}
 	return keys.size
+}
+
+export function formatRunStatus(status: ProjectFlagRun['status']) {
+	if (typeof status === 'object') return `Running (${status.running.num_queued} queued)`
+	const labels = {
+		completed: 'Completed',
+		failed: 'Failed',
+		canceled: 'Canceled',
+		terminated: 'Terminated',
+		timed_out: 'Timed out',
+		continued_as_new: 'Continued as new',
+		unknown: 'Unknown',
+	}
+	return labels[status]
 }
 
 export function flagCountTooltip(count: number, uniqueCount: number, label = 'flagged') {

@@ -1,9 +1,9 @@
-use eyre::{Context, Result};
+use anyhow::{Context, Result};
 use serde_json::{Map, Value, json};
 
 pub(super) fn generate<T: utoipa::ToSchema>() -> Result<Value> {
     let schema = serde_json::to_value(T::schema())
-        .wrap_err("serializing input schema")?;
+        .context("serializing input schema")?;
     let mut schemas = Vec::new();
     T::schemas(&mut schemas);
     let components = schemas
@@ -11,7 +11,7 @@ pub(super) fn generate<T: utoipa::ToSchema>() -> Result<Value> {
         .map(|(name, schema)| {
             serde_json::to_value(schema)
                 .map(|schema| (name, schema))
-                .wrap_err("serializing component schema")
+                .context("serializing component schema")
         })
         .collect::<Result<Map<String, Value>>>()?;
     Ok(example(&schema, &components, &mut Vec::new(), 0))

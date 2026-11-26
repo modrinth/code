@@ -90,7 +90,7 @@ const editor = useTemplateRef<InstanceType<typeof ProjectFlagRuleEditorModal>>('
 const route = useRoute()
 const linkedRuleId = computed(() => {
 	const id = typeof route.query.rule === 'string' ? route.query.rule : ''
-	return /^\d+$/.test(id) && Number.isSafeInteger(Number(id)) ? Number(id) : undefined
+	return /^[A-Za-z0-9]+$/.test(id) ? id : undefined
 })
 const ruleList = useTemplateRef<HTMLElement>('ruleList')
 const ruleToDelete = ref<ProjectFlagRule | null>(null)
@@ -124,7 +124,7 @@ function confirmDelete(rule: ProjectFlagRule) {
 }
 
 const linkedRule = computed(() => rules.value.find((rule) => rule.id === linkedRuleId.value))
-const openedRuleId = ref<number>()
+const openedRuleId = ref<string>()
 watch(
 	[linkedRule, editor, ruleList, () => props.active],
 	([rule, modal, list, active]) => {

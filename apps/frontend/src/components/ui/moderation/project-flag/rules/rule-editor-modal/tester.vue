@@ -38,6 +38,7 @@
 				<ChevronUpIcon v-else class="size-4" aria-hidden="true" />
 			</button>
 			<ProjectCombobox
+				v-if="!batchMode"
 				v-model="projectId"
 				trigger-size="sm"
 				class="relative z-10 min-w-0 max-w-80 flex-1"
@@ -52,6 +53,24 @@
 					<TagItem class="shrink-0 font-mono">{{ item.value }}</TagItem>
 				</template>
 			</ProjectCombobox>
+			<Input
+				v-else
+				v-model="batchInput"
+				class="relative z-10 min-w-0 flex-1"
+				placeholder="Project IDs separated by commas or spaces"
+				aria-label="Up to 100 unique project IDs"
+				autocomplete="off"
+				:spellcheck="false"
+				@keydown.enter.prevent="evaluate"
+			/>
+			<Button
+				class="relative z-10"
+				size="xs"
+				:aria-pressed="batchMode"
+				@click="batchMode = !batchMode"
+			>
+				Batch IDs
+			</Button>
 			<Button
 				class="relative z-10"
 				size="xs"
@@ -76,6 +95,14 @@
 			:aria-busy="isPending"
 		>
 			<div class="flex flex-wrap items-center gap-3 px-3 pb-3">
+				<label v-if="results.length > 1" class="flex items-center gap-2 text-sm">
+					Project result
+					<select v-model="resultIndex" class="rounded-md bg-surface-3 px-2 py-1">
+						<option v-for="(entry, index) in results" :key="entry.project_id" :value="index">
+							{{ entry.project_id }}
+						</option>
+					</select>
+				</label>
 				<Tabs
 					v-model:value="activeView"
 					:tabs="outputTabs"
@@ -86,6 +113,9 @@
 			</div>
 			<div class="min-h-0 flex-1 overflow-auto px-3 pb-3">
 				<template v-if="result">
+					<p v-if="result.error" role="alert" class="m-0 mb-3 whitespace-pre-wrap text-sm text-red">
+						{{ result.error }}
+					</p>
 					<section
 						v-if="activeView === 'flags'"
 						class="flex flex-col gap-3"
@@ -138,6 +168,7 @@ import type { EvalProjectFlagRuleRequest, ProjectFlagRuleParams } from '@modrint
 import { ChevronDownIcon, ChevronUpIcon, LoaderCircleIcon, PlayIcon } from '@modrinth/assets'
 import {
 	Button,
+	Input,
 	injectModrinthClient,
 	ProjectCombobox,
 	Tabs,
@@ -154,6 +185,22 @@ const props = defineProps<{
 const client = injectModrinthClient()
 const outputId = useId()
 const projectId = ref<string>()
+const batchMode = ref(false)
+const batchInput = ref('')
+const projectIds = computed(() =>
+	batchMode.value
+		? [
+				...new Set(
+					String(batchInput.value ?? '')
+						.split(/[,\s]+/)
+						.filter(Boolean),
+				),
+			]
+		: projectId.value
+			? [projectId.value]
+			: [],
+)
+const resultIndex = ref(0)
 const expanded = ref(false)
 const activeView = ref<TabsValue>('flags')
 const output = useTemplateRef<HTMLElement>('output')
@@ -162,20 +209,26 @@ const MAX_HEIGHT = 480
 const outputHeight = ref(240)
 const drag = shallowRef<{ pointerId: number; startY: number; startHeight: number }>()
 
-async function runTest(request: EvalProjectFlagRuleRequest) {
-	const evaluation = await client.labrinth.project_flags_internal.evalRule(request)
-	return { ...evaluation, request }
+function runTest(request: EvalProjectFlagRuleRequest) {
+	return client.labrinth.project_flags_internal.evalRule(request)
 }
 
 const previousResult = shallowRef<Awaited<ReturnType<typeof runTest>>>()
 const { mutate, data, isPending, error } = useMutation({
 	mutationFn: runTest,
 	retry: false,
+	onSuccess: () => {
+		resultIndex.value = 0
+	},
 })
-const result = computed(() => data.value ?? previousResult.value)
+const results = computed(() => data.value ?? previousResult.value ?? [])
+const result = computed(() => results.value[resultIndex.value])
 const runDisabledReason = computed(() => {
 	if (isPending.value) return 'A test is running.'
-	if (!projectId.value) return 'Choose a project to test.'
+	if (!projectIds.value.length)
+		return batchMode.value ? 'Enter at least one project ID.' : 'Choose a project to test.'
+	if (projectIds.value.length > 100) return 'Enter up to 100 unique project IDs.'
+	if (projectIds.value.some((id) => !/^[A-Za-z0-9]+$/.test(id))) return 'Enter base62 project IDs.'
 	if (!props.canTest) return 'Finish editing the rule before testing.'
 	return undefined
 })
@@ -186,15 +239,12 @@ const outputTabs = computed(() => [
 ])
 
 function evaluate() {
-	if (!canEvaluate.value || !projectId.value) return
+	if (!canEvaluate.value) return
 	expanded.value = true
-	previousResult.value = result.value
+	previousResult.value = data.value ?? previousResult.value
 	mutate({
-		project_id: projectId.value,
-		params: {
-			expression: props.params.expression,
-			scan_files_for: { ...props.params.scan_files_for },
-		},
+		project_ids: projectIds.value,
+		params: props.params,
 	})
 }
 

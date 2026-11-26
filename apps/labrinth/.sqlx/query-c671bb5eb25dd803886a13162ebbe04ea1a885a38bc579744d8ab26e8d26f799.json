@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO project_flags_deployed (singleton, ruleset_id) VALUES (TRUE, $1)\n                ON CONFLICT (singleton) DO UPDATE SET ruleset_id = EXCLUDED.ruleset_id",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c671bb5eb25dd803886a13162ebbe04ea1a885a38bc579744d8ab26e8d26f799"
+}

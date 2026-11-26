@@ -6536,9 +6536,6 @@
   "settings.social.blocked-users.restriction.friend-requests": {
     "defaultMessage": "Barátkérelmeket küldeni neked"
   },
-  "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Meghívni téged, hogy kezelj egy Modrinth Hosting szervert."
-  },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "Meghívni téged megosztott példányokba"
   },

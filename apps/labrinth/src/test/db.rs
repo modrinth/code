@@ -1,5 +1,5 @@
 use crate::database::Executor;
-use eyre::{Context, Result};
+use anyhow::{Context, Result};
 use sqlx::AssertSqlSafe;
 
 use crate::database::{PgPool, models::DBUserId};
@@ -46,9 +46,9 @@ pub async fn mark_email_verified(db: &PgPool, user_id: DBUserId) -> Result<()> {
     )
     .execute(db)
     .await
-    .wrap_err("failed to mark user email as verified")?;
+    .context("failed to mark user email as verified")?;
 
-    eyre::ensure!(result.rows_affected() == 1, "user does not exist");
+    anyhow::ensure!(result.rows_affected() == 1, "user does not exist");
 
     Ok(())
 }
@@ -74,7 +74,7 @@ pub mod user_id {
 pub async fn add_minecraft_meta_dummy_data(db: &PgPool) -> Result<()> {
     db.execute(include_str!("../../fixtures/minecraft-meta-dummy-data.sql"))
         .await
-        .wrap_err("failed to add Minecraft metadata dummy data")?;
+        .context("failed to add Minecraft metadata dummy data")?;
 
     Ok(())
 }
@@ -110,7 +110,7 @@ pub async fn add_dummy_data(db: &PgPool) -> Result<()> {
             ),
     ))
     .await
-    .wrap_err("failed to add dummy data")?;
+    .context("failed to add dummy data")?;
 
     for user_id in [
         user_id::ADMIN,

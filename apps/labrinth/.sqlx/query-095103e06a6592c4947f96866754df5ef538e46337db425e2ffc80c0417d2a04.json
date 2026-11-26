@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT ruleset_id FROM project_flags_deployed WHERE singleton FOR SHARE",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "ruleset_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "project_flags_deployed",
+            "name": "ruleset_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "095103e06a6592c4947f96866754df5ef538e46337db425e2ffc80c0417d2a04"
+}

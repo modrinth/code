@@ -17,6 +17,7 @@ export interface ModerationQueue {
 	history: string[]
 	activeProjectId: string | null
 	lastUpdated: Date
+	skipProcessedIds?: boolean
 }
 
 export type LockStatusResponse = Labrinth.Moderation.Internal.LockStatusResponse
@@ -33,7 +34,7 @@ export interface ModerationQueueService {
 	hasSkipped: boolean
 	progress: number
 
-	setQueue(projectIds: string[]): Promise<void>
+	setQueue(projectIds: string[], skipProcessedIds?: boolean): Promise<void>
 	completeProject(projectId: string): Promise<boolean>
 	deferProject(projectId: string): Promise<boolean>
 	excludeProject(projectId: string): Promise<boolean>
@@ -55,6 +56,7 @@ const EMPTY_QUEUE: ModerationQueue = {
 	history: [],
 	activeProjectId: null,
 	lastUpdated: new Date(),
+	skipProcessedIds: false,
 }
 
 function createEmptyQueue(): ModerationQueue {
@@ -96,6 +98,7 @@ function sanitizeQueue(raw: PersistedModerationQueueState['currentQueue']): Mode
 		history: (raw.history ?? []).filter((id): id is string => typeof id === 'string'),
 		activeProjectId: typeof raw.activeProjectId === 'string' ? raw.activeProjectId : null,
 		lastUpdated: Number.isNaN(lastUpdated.getTime()) ? new Date() : lastUpdated,
+		skipProcessedIds: raw.skipProcessedIds,
 	}
 }
 
@@ -115,6 +118,7 @@ function persistedPayload(
 			history: [...queue.history],
 			activeProjectId: queue.activeProjectId,
 			lastUpdated: queue.lastUpdated.toISOString(),
+			skipProcessedIds: queue.skipProcessedIds,
 		},
 		isQueueMode,
 	}
@@ -175,7 +179,7 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 		return result
 	}
 
-	function setQueueState(items: string[]) {
+	function setQueueState(items: string[], skipProcessedIds?: boolean = null) {
 		isQueueMode.value = true
 		currentQueue.value = {
 			projectOrder: [...items],
@@ -186,12 +190,13 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 			history: [],
 			activeProjectId: null,
 			lastUpdated: new Date(),
+			skipProcessedIds: skipProcessedIds,
 		}
 	}
 
-	async function setQueue(projectIds: string[]): Promise<void> {
+	async function setQueue(projectIds: string[], skipProcessedIds?: boolean = null): Promise<void> {
 		await withMutation(() => {
-			setQueueState(projectIds)
+			setQueueState(projectIds, skipProcessedIds)
 		})
 	}
 
@@ -259,7 +264,10 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 	async function startSkippedReview(): Promise<void> {
 		await withMutation(() => {
 			const skipped = new Set(currentQueue.value.skipped)
-			setQueueState(currentQueue.value.projectOrder.filter((id) => skipped.has(id)))
+			setQueueState(
+				currentQueue.value.projectOrder.filter((id) => skipped.has(id)),
+				currentQueue.value.skipProcessedIds,
+			)
 		})
 	}
 
