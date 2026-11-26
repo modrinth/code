@@ -37,6 +37,7 @@ export const projectNagFields = {
 		'minecraft-title-clause',
 	],
 	summary: [
+		'add-summary',
 		'project-summary-slur',
 		'project-summary-profanity',
 		'project-summary-non-standard-text',

@@ -18,7 +18,7 @@ pub struct Project {
     )]
     pub slug: String,
     /// Short description of the project.
-    #[validate(length(min = 3, max = 255))]
+    #[validate(length(max = 255))]
     pub summary: String,
     /// A long description of the project, in markdown.
     #[validate(length(max = 65536))]

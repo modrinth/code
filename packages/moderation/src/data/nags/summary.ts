@@ -3,6 +3,11 @@ import { defineMessages } from '@modrinth/ui'
 import type { NagDefinitions } from './types.ts'
 
 const messages = defineMessages({
+	addTitle: { id: 'nags.add-summary.title', defaultMessage: 'Add a summary' },
+	add: {
+		id: 'nags.add-summary.description',
+		defaultMessage: 'Add a short summary that provides an appealing introduction to your project.',
+	},
 	linksTitle: {
 		id: 'nags.project-summary-links.title',
 		defaultMessage: 'Remove summary links',
@@ -67,6 +72,12 @@ const messages = defineMessages({
 })
 
 export const summaryNags = {
+	'add-summary': {
+		title: messages.addTitle,
+		description: messages.add,
+		destination: 'general',
+		linkTitle: messages.editSummary,
+	},
 	'project-summary-links': {
 		title: messages.linksTitle,
 		description: messages.links,

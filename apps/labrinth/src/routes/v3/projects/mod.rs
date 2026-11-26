@@ -424,7 +424,7 @@ pub struct EditProject {
         custom(function = "crate::util::validate::validate_name")
     )]
     pub name: Option<String>,
-    #[validate(length(min = 3, max = 256))]
+    #[validate(length(max = 256))]
     pub summary: Option<String>,
     #[validate(length(max = 65536))]
     pub description: Option<String>,
