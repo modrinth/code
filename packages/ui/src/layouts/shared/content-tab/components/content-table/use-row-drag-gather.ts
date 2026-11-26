@@ -12,12 +12,18 @@ export interface RowDragGatherItem {
 	rect: { left: number; top: number; width: number; height: number }
 }
 
-export function useRowDragGather(rows: Ref<ContentCardTableItem[]>, root: Ref<HTMLElement | null>) {
+export function useRowDragGather(
+	rows: Ref<ContentCardTableItem[]>,
+	root: Ref<HTMLElement | null>,
+	preview: Ref<HTMLElement | null>,
+) {
 	const items = ref<RowDragGatherItem[]>([])
 	const target = ref<Point>({ x: 0, y: 0 })
 	const targetOffset = ref<Point>({ x: 0, y: 0 })
 	const isGathering = ref(false)
+	let lastPointer: Point = { x: 0, y: 0 }
 	let cleanupTimer: number | undefined
+	let alignFrame: { id: number; window: Window } | undefined
 
 	function clearCleanupTimer() {
 		if (cleanupTimer === undefined) return
@@ -25,14 +31,22 @@ export function useRowDragGather(rows: Ref<ContentCardTableItem[]>, root: Ref<HT
 		cleanupTimer = undefined
 	}
 
+	function cancelAlignFrame() {
+		if (alignFrame === undefined) return
+		alignFrame.window.cancelAnimationFrame(alignFrame.id)
+		alignFrame = undefined
+	}
+
 	function clear() {
 		clearCleanupTimer()
+		cancelAlignFrame()
 		items.value = []
 		targetOffset.value = { x: 0, y: 0 }
 		isGathering.value = false
 	}
 
 	function updateTarget(pointer: Point) {
+		lastPointer = pointer
 		target.value = {
 			x: pointer.x + targetOffset.value.x,
 			y: pointer.y + targetOffset.value.y,
@@ -52,15 +66,6 @@ export function useRowDragGather(rows: Ref<ContentCardTableItem[]>, root: Ref<HT
 		const reduceMotion = ownerWindow.matchMedia('(prefers-reduced-motion: reduce)').matches
 		if (rowIds.length < 2 || reduceMotion) return
 
-		const source = rowElement(rowIds[0])
-		if (source) {
-			const rect = source.getBoundingClientRect()
-			targetOffset.value = {
-				x: rect.left + rect.width / 2 - pointer.x,
-				y: rect.top + rect.height / 2 - pointer.y,
-			}
-		}
-
 		const rowsById = new Map(rows.value.map((row) => [row.id, row]))
 		items.value = rowIds.flatMap((rowId) => {
 			const row = rowsById.get(rowId)
@@ -73,6 +78,20 @@ export function useRowDragGather(rows: Ref<ContentCardTableItem[]>, root: Ref<HT
 		})
 		updateTarget(pointer)
 		isGathering.value = items.value.length > 0
+		if (isGathering.value) {
+			alignFrame = { id: ownerWindow.requestAnimationFrame(alignToPreview), window: ownerWindow }
+		}
+	}
+
+	function alignToPreview() {
+		alignFrame = undefined
+		const rect = preview.value?.getBoundingClientRect()
+		if (!rect) return
+		targetOffset.value = {
+			x: rect.left + rect.width / 2 - lastPointer.x,
+			y: rect.top + rect.height / 2 - lastPointer.y,
+		}
+		updateTarget(lastPointer)
 	}
 
 	function finish() {
@@ -84,7 +103,10 @@ export function useRowDragGather(rows: Ref<ContentCardTableItem[]>, root: Ref<HT
 		}, 400)
 	}
 
-	onBeforeUnmount(clearCleanupTimer)
+	onBeforeUnmount(() => {
+		clearCleanupTimer()
+		cancelAlignFrame()
+	})
 
 	return { items, target, isGathering, start, updateTarget, clear, finish }
 }

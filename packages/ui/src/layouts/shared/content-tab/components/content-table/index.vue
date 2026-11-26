@@ -22,6 +22,7 @@ import DragPreview from './drag-preview.vue'
 import DragRow from './drag-row.vue'
 import TableHeader from './header.vue'
 import TableRow from './row.vue'
+import SectionEmpty from './section-empty.vue'
 import SectionHeader from './section-header.vue'
 import type { ContentTableColumns, ContentTableSection } from './types'
 import {
@@ -214,7 +215,8 @@ const activeDropSectionId = ref<string | null>(null)
 const activeDragRow = computed(() =>
 	activeDragIds.value.length > 0 ? rowsById.value.get(activeDragIds.value[0]) : undefined,
 )
-const gather = useRowDragGather(rows, tableRef)
+const dragPreviewRef = ref<HTMLElement | null>(null)
+const gather = useRowDragGather(rows, tableRef, dragPreviewRef)
 const overlayTarget = computed(() => tableRef.value?.ownerDocument.body ?? 'body')
 
 function canDropOnSection(sectionId: string | null) {
@@ -385,18 +387,14 @@ function rowClass(row: ContentCardTableItem, index: number, isLast: boolean, sec
 								/>
 							</template>
 						</SectionHeader>
-						<div
+						<SectionEmpty
 							v-else-if="entry.kind === 'empty'"
-							role="row"
-							class="flex items-center border-0 border-t border-solid border-surface-4 px-4 text-secondary transition-colors duration-150"
-							:class="[
-								dropSectionId === entry.section.id ? 'bg-surface-3' : 'bg-surface-2',
-								lastGroupedEntryKey === entry.key && !flat ? 'rounded-b-[20px]' : '',
-							]"
+							:section="entry.section"
+							:droppable="canDrag && entry.section.droppable !== false"
+							:drop-active="dropSectionId === entry.section.id"
+							:class="lastGroupedEntryKey === entry.key && !flat ? 'rounded-b-[20px]' : ''"
 							:style="{ height: `${SECTION_EMPTY_HEIGHT}px` }"
-						>
-							{{ entry.section.emptyLabel }}
-						</div>
+						/>
 						<DragRow
 							v-else
 							:row-id="entry.row.id"
@@ -451,6 +449,7 @@ function rowClass(row: ContentCardTableItem, index: number, isLast: boolean, sec
 					<DragOverlay :drop-animation="null">
 						<div
 							v-if="activeDragRow"
+							ref="dragPreviewRef"
 							class="w-fit transition-transform duration-150 ease-out"
 							:class="gather.isGathering.value ? 'scale-[0.975]' : 'scale-100'"
 						>
