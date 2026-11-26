@@ -2180,7 +2180,7 @@ impl CachedEntry {
 
         sqlx::query!(
             "
-            INSERT INTO cache (id, data_type, alias, data, expires)
+            INSERT OR REPLACE INTO cache (id, data_type, alias, data, expires)
                 SELECT
                     json_extract(value, '$.id') AS id,
                     json_extract(value, '$.data_type') AS data_type,
@@ -2189,11 +2189,6 @@ impl CachedEntry {
                     json_extract(value, '$.expires') AS expires
                 FROM
                     json_each($1)
-                WHERE TRUE
-            ON CONFLICT (id, data_type) DO UPDATE SET
-                alias = excluded.alias,
-                data = excluded.data,
-                expires = excluded.expires
             ",
             items,
         )
