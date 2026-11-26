@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO project_flag_rulesets (id, content_hash, rules, modules) VALUES ($1, $2, '[]'::jsonb, '[]'::jsonb)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "24473c44a56370108561bc2118153e38c5117a99920ec483e8f309a912e58a98"
+}

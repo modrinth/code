@@ -1813,6 +1813,7 @@ const linkValidation = useProjectLinkValidation(
 )
 const projectLinksNetworkValidationLoading = linkValidation.isChecking
 const reviewSubmissionPending = ref(false)
+const canBypassValidation = computed(() => isStaff(auth.value.user))
 const projectValidation = computed(() => {
 	const validation = projectValidationResponse.value
 	if (!validation || backendValidationError.value || linkValidation.isError.value) return null
@@ -1824,6 +1825,7 @@ const { canSubmit: canSubmitForReview } = provideProjectPublishing({
 	projectValidationLoading,
 	projectLinksNetworkValidationLoading,
 	thread,
+	canBypassValidation,
 	submitting: reviewSubmissionPending,
 })
 
@@ -2240,9 +2242,9 @@ async function setProcessing() {
 	reviewSubmissionPending.value = true
 	startLoading()
 	try {
-		const validation = await refreshProjectValidation()
+		const validation = canBypassValidation.value ? null : await refreshProjectValidation()
 		if (
-			!canSubmitProjectForReview(validation, false) ||
+			(!canBypassValidation.value && !canSubmitProjectForReview(validation, false)) ||
 			(isRejected(project.value) && !canResubmitProjectForReview(thread.value))
 		) {
 			return false

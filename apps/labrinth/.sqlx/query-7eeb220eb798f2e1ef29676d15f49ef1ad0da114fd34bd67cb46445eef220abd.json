@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO project_flag_run_results\n                (id, run_id, project_id, rule_results, num_flags, error, proposed_review_outcome, effective_flags, skipped)\n            SELECT results.id, results.run_id, results.project_id, results.rule_results,\n                jsonb_array_length(results.effective_flags)::BIGINT,\n                results.error, results.proposed_review_outcome, results.effective_flags, results.skipped\n            FROM jsonb_to_recordset($1) AS results(\n                id UUID, run_id UUID, project_id BIGINT, rule_results JSONB, error TEXT,\n                proposed_review_outcome TEXT, effective_flags JSONB, skipped BOOLEAN\n            )\n            ORDER BY results.run_id, results.project_id\n            ON CONFLICT (run_id, project_id) DO NOTHING\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7eeb220eb798f2e1ef29676d15f49ef1ad0da114fd34bd67cb46445eef220abd"
+}

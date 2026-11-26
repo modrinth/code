@@ -623,7 +623,7 @@ pub async fn download_version_info(
 
         info.id.0.clone_from(&version_id);
 
-        write(&path, &serde_json::to_vec(&info)?, &st.io_semaphore)
+        write_atomic(&path, &serde_json::to_vec(&info)?, &st.io_semaphore)
             .await
             .context(format!("writing version info to {}", path.display()))?;
         Ok(info)

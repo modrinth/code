@@ -53,6 +53,69 @@ fn legacy_project_status(
 }
 
 #[actix_rt::test]
+async fn retained_project_flags_block_snapshot_approval_without_double_counting()
+ {
+    use labrinth::database::models::project_flag_item::{
+        DBProjectFlagRunResult, ProjectFlag, ProjectFlagRuleResult,
+    };
+    use labrinth::models::projects::ProjectReviewOutcome;
+    use std::collections::BTreeMap;
+
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+        let project_id = DBProjectId::from(env.dummy.project_alpha.project_id_parsed);
+        let what = json!({
+            "key": "retained-lifecycle", "reason": "original evidence",
+            "retain_when_resolved": true, "flag_outcome": "manual_review",
+            "evidence": {"file": "original.jar"},
+        });
+        let mut transaction = env.db.pool.begin().await.unwrap();
+        let id = labrinth::database::models::ids::generate_project_flag_id(&mut transaction).await.unwrap();
+        sqlx::query!(
+            "INSERT INTO project_flags (id, project_id, what, active) VALUES ($1, $2, $3, TRUE)",
+            id.0, project_id.0, what,
+        ).execute(&mut transaction).await.unwrap();
+        transaction.commit().await.unwrap();
+        for (active, emitted, expected_outcome) in [
+            (true, false, None),
+            (false, false, None),
+            (false, true, None),
+            (true, true, None),
+        ] {
+            sqlx::query!("UPDATE project_flags SET active = $1 WHERE id = $2", active, id.0)
+                .execute(&*env.db.pool).await.unwrap();
+            let mut rules = BTreeMap::new();
+            if emitted {
+                rules.insert("1".into(), ProjectFlagRuleResult {
+                    flags: vec![serde_json::from_value::<ProjectFlag>(what.clone()).unwrap()],
+                    log: Vec::new(), error: None,
+                });
+            }
+            DBProjectFlagRunResult::upsert_many(vec![DBProjectFlagRunResult {
+                run_id: None, project_id, rules, error: None,
+                proposed_review_outcome: if emitted { None } else { Some(ProjectReviewOutcome::Approved) },
+            }], &env.db.pool).await.unwrap();
+            let stored = sqlx::query!(
+                "SELECT num_flags, proposed_review_outcome FROM project_flag_run_results WHERE project_id = $1 ORDER BY evaluated_at DESC, id DESC LIMIT 1",
+                project_id.0,
+            ).fetch_one(&*env.db.pool).await.unwrap();
+            assert_eq!(stored.num_flags, 1);
+            assert_eq!(stored.proposed_review_outcome, expected_outcome);
+            let stored = sqlx::query!("SELECT what, active FROM project_flags WHERE id = $1", id.0)
+                .fetch_one(&*env.db.pool).await.unwrap();
+            assert_eq!(stored.what, what);
+            assert_eq!(stored.active, active);
+            let visible = labrinth::database::models::project_flag_item::DBProjectFlag::get_project_flags(
+                project_id, &env.db.ro_pool,
+            ).await.unwrap().unwrap();
+            let visible = visible.iter().find(|flag| flag.flag.key == "retained-lifecycle").unwrap();
+            assert_eq!(visible.active, active);
+            assert_eq!(visible.flag.reason.as_deref(), Some("original evidence"));
+            assert!(visible.flag.retain_when_resolved);
+        }
+    }).await;
+}
+
+#[actix_rt::test]
 async fn project_history_requires_moderation_read() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let project_id = &env.dummy.project_alpha.project_id;
@@ -1083,7 +1146,7 @@ pub async fn test_patch_project() {
                 .edit_project(
                     alpha_project_slug,
                     json!({
-                        "summary": "",
+                        "summary": "a".repeat(257),
                     }),
                     USER_USER_PAT,
                 )
@@ -1543,7 +1606,7 @@ async fn test_plugin_and_datapack_validation_use_mod_tags() {
                 .filter(|category| category.project_type == "mod")
                 .map(|category| category.name)
                 .collect::<Vec<_>>();
-            assert!(mod_categories.len() > 3);
+            assert!(mod_categories.len() > 8);
 
             for (project_type, loader, file) in [
                 ("plugin", "bukkit", TestFile::build_random_plugin()),
@@ -1578,9 +1641,8 @@ async fn test_plugin_and_datapack_validation_use_mod_tags() {
                 assert_status!(&response, StatusCode::OK);
                 let validation: serde_json::Value =
                     test::read_body_json(response).await;
-                let all_tags_selected = validation["nags"]
-                    .as_array()
-                    .unwrap()
+                let nags = validation["nags"].as_array().unwrap();
+                let all_tags_selected = nags
                     .iter()
                     .find(|nag| nag["kind"] == "all_tags_selected")
                     .expect("all shared mod tags should be detected as selected");
@@ -1589,6 +1651,7 @@ async fn test_plugin_and_datapack_validation_use_mod_tags() {
                     all_tags_selected["details"]["total_available_tags"],
                     mod_categories.len()
                 );
+                assert!(nags.iter().all(|nag| nag["kind"] != "too_many_tags"));
             }
         },
     )
@@ -2907,7 +2970,7 @@ async fn assert_no_technical_review_auto_approval(
 }
 
 #[actix_rt::test]
-async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
+async fn test_safe_technical_review_exit_defers_automatic_approval() {
     use labrinth::database::models::DBUserId;
     use labrinth::database::models::notification_item::DBNotification;
     use labrinth::routes::internal::delphi::tech_review_queue;
@@ -3033,13 +3096,13 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                         USER_USER_PAT,
                     )
                     .await;
-                assert_eq!(legacy_project_status(&after), requested_status);
+                assert_eq!(legacy_project_status(&after), LegacyProjectStatus::Processing);
                 assert_eq!(
                     serde_json::to_value(labrinth::models::v2::projects::ProjectStatus::from_visibility(after.visibility)).unwrap(),
                     requested_status.as_str(),
                 );
-                assert_eq!(after.review_outcome, labrinth::models::projects::ProjectReviewOutcome::Approved);
-                assert!(!after.in_review);
+                assert_eq!(after.review_outcome, before.review_outcome);
+                assert!(after.in_review);
                 let queued = sqlx::query_scalar!(
                     r#"
 		SELECT EXISTS (
@@ -3058,24 +3121,9 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                 assert_status!(&response, StatusCode::OK);
                 let thread: serde_json::Value =
                     test::read_body_json(response).await;
-                let auto_approvals = thread["messages"]
-                    .as_array()
-                    .unwrap()
-                    .iter()
-                    .filter(|message| {
-                        message["body"]["type"] == "auto_approval"
-                    })
-                    .collect::<Vec<_>>();
-                assert_eq!(auto_approvals.len(), 1);
-                assert_eq!(
-                    auto_approvals[0]["body"]["old_status"],
-                    json!(old_status)
-                );
-                assert_eq!(
-                    auto_approvals[0]["body"]["new_status"],
-                    json!(requested_status)
-                );
-                assert!(auto_approvals[0]["author_id"].is_null());
+                assert!(!thread["messages"]
+                    .as_array().unwrap().iter()
+                    .any(|message| message["body"]["type"] == "auto_approval"));
                 let facets = thread["issues"]
                     .as_array()
                     .unwrap()
@@ -3085,8 +3133,8 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                 assert_eq!(facets.len(), 3);
                 for facet in facets {
                     assert_eq!(facet["verdict"], "resolved");
-                    assert_eq!(facet["user_addressed"], true);
-                    assert_eq!(facet["moderator_verified"], true);
+                    assert_eq!(facet["user_addressed"], false);
+                    assert_eq!(facet["moderator_verified"], false);
                 }
 
                 let response = api
@@ -3103,14 +3151,7 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                             .any(|before| before["id"] == notification["id"])
                     })
                     .collect::<Vec<_>>();
-                assert_eq!(new_notifications.len(), 1);
-                assert!(new_notifications.iter().any(
-					|notification| notification["body"]
-						== json!({
-							"type": "status_change", "project_id": project.project_id,
-							"old_status": old_status, "new_status": requested_status,
-						})
-				));
+                assert!(new_notifications.iter().all(|notification| notification["body"]["type"] != "project_status_approved"));
                 let stored_notifications_after = DBNotification::get_all_user(
                     DBUserId(USER_USER_ID_PARSED),
                     &**test_env.db.ro_pool,
@@ -3125,13 +3166,8 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                             .any(|before| before.id == notification.id)
                     })
                     .collect::<Vec<_>>();
-                assert_eq!(new_stored_notifications.len(), 2);
-                assert!(new_stored_notifications.iter().any(|notification| {
-                    serde_json::to_value(&notification.body).unwrap()
-                        == json!({
-                            "type": "project_status_approved",
-                            "project_id": project.project_id,
-                        })
+                assert!(new_stored_notifications.iter().all(|notification| {
+                    serde_json::to_value(&notification.body).unwrap()["type"] != "project_status_approved"
                 }));
 
                 if old_status != LegacyProjectStatus::Processing {
@@ -3163,7 +3199,7 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                         .filter(|message| message["body"]["type"]
                             == "auto_approval")
                         .count(),
-                    1
+                    0
                 );
                 let response = api
                     .get_user_notifications(USER_USER_ID, USER_USER_PAT)

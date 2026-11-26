@@ -21,14 +21,18 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
 use std::sync::{Arc, LazyLock};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use tempfile::TempDir;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{Child, Command};
+use tokio::task::JoinHandle;
 use uuid::Uuid;
 
 const LAUNCHER_LOG_PATH: &str = "launcher_log.txt";
 const LOG_BUFFER_CAPACITY: usize = 50_000;
+const LAUNCH_HANDSHAKE_TIMEOUT: Duration = Duration::from_secs(120);
+const OUTPUT_DRAIN_TIMEOUT: Duration = Duration::from_secs(5);
+const LAUNCH_FAILURE_OUTPUT_LINES: usize = 10;
 
 struct LogRingBuffer {
     lines: VecDeque<String>,
@@ -309,54 +313,84 @@ impl ProcessManager {
             }
         }
 
-        if let Err(e) =
-            post_process_init(&process.metadata, &process.rpc_server).await
-        {
-            tracing::error!("Failed to run post-process init: {e}");
+        let output_readers = [
+            stdout.map(|stdout| {
+                Process::spawn_output_reader(
+                    stdout,
+                    &process.metadata,
+                    &log_path,
+                    xml_logging,
+                    &state.pool,
+                )
+            }),
+            stderr.map(|stderr| {
+                Process::spawn_output_reader(
+                    stderr,
+                    &process.metadata,
+                    &log_path,
+                    xml_logging,
+                    &state.pool,
+                )
+            }),
+        ];
+
+        let launch_failure = tokio::select! {
+            result = post_process_init(&process.metadata, &process.rpc_server) => result.err(),
+            status = process.child.wait() => Some(match status {
+                Ok(status) => anyhow::anyhow!("Minecraft exited with {status}"),
+                Err(error) => anyhow::Error::from(error),
+            }),
+            () = tokio::time::sleep(LAUNCH_HANDSHAKE_TIMEOUT) => Some(anyhow::anyhow!(
+                "Minecraft did not start within {} seconds",
+                LAUNCH_HANDSHAKE_TIMEOUT.as_secs()
+            )),
+        };
+
+        if let Some(error) = launch_failure {
+            tracing::error!("Failed to launch Minecraft: {error:#}");
             clear_persisted_process(&state.pool, persisted_process).await;
-            let _ = process.child.kill().await;
-            return Err(e);
+            let exit_status = match process.child.try_wait() {
+                Ok(Some(status)) => Some(status),
+                _ => {
+                    let _ = process.child.kill().await;
+                    process.child.wait().await.ok()
+                }
+            };
+            let mut readers =
+                output_readers.into_iter().flatten().collect::<Vec<_>>();
+            let _ = tokio::time::timeout(
+                OUTPUT_DRAIN_TIMEOUT,
+                futures::future::join_all(readers.iter_mut()),
+            )
+            .await;
+            for reader in &readers {
+                reader.abort();
+            }
+            if let Some(status) = exit_status
+                && let Err(e) = Process::append_to_log_file(
+                    &log_path,
+                    &format!("\n# Process exited with status: {status}\n"),
+                )
+            {
+                tracing::warn!("Failed to write exit status to log file: {e}");
+            }
+
+            let output = get_log_buffer(instance_id);
+            let output_tail = output
+                .iter()
+                .skip(output.len().saturating_sub(LAUNCH_FAILURE_OUTPUT_LINES))
+                .map(String::as_str)
+                .collect::<Vec<_>>()
+                .join("\n");
+            let message = if output_tail.is_empty() {
+                format!("{error}")
+            } else {
+                format!("{error}. Last output:\n{output_tail}")
+            };
+            return Err(ErrorKind::LauncherError(message).into());
         }
 
         let metadata = process.metadata.clone();
-
-        if let Some(stdout) = stdout {
-            let log_path_clone = log_path.clone();
-
-            let instance_id = metadata.instance_id.clone();
-            let instance_path = metadata.instance_path.clone();
-            let pool = state.pool.clone();
-            tokio::spawn(async move {
-                Process::process_output(
-                    &instance_id,
-                    &instance_path,
-                    stdout,
-                    log_path_clone,
-                    xml_logging,
-                    &pool,
-                )
-                .await;
-            });
-        }
-
-        if let Some(stderr) = stderr {
-            let log_path_clone = log_path.clone();
-
-            let instance_id = metadata.instance_id.clone();
-            let instance_path = metadata.instance_path.clone();
-            let pool = state.pool.clone();
-            tokio::spawn(async move {
-                Process::process_output(
-                    &instance_id,
-                    &instance_path,
-                    stderr,
-                    log_path_clone,
-                    xml_logging,
-                    &pool,
-                )
-                .await;
-            });
-        }
 
         self.processes.insert(process.metadata.uuid, process);
 
@@ -459,6 +493,33 @@ pub struct Log4jEvent {
 }
 
 impl Process {
+    fn spawn_output_reader<R>(
+        reader: R,
+        metadata: &ProcessMetadata,
+        log_path: &Path,
+        xml_logging: bool,
+        pool: &SqlitePool,
+    ) -> JoinHandle<()>
+    where
+        R: tokio::io::AsyncRead + Unpin + Send + 'static,
+    {
+        let instance_id = metadata.instance_id.clone();
+        let instance_path = metadata.instance_path.clone();
+        let log_path = log_path.to_path_buf();
+        let pool = pool.clone();
+        tokio::spawn(async move {
+            Process::process_output(
+                &instance_id,
+                &instance_path,
+                reader,
+                log_path,
+                xml_logging,
+                &pool,
+            )
+            .await;
+        })
+    }
+
     async fn process_output<R>(
         instance_id: &str,
         _instance_path: &str,

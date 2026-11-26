@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO project_flags (id, project_id, what, active) VALUES ($1, $2, $3, TRUE)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3bc937804be7fb4b9a7b8f2dee60e38123aca20efb981201f54d4b13cdf66046"
+}

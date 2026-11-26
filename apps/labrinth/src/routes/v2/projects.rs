@@ -15,6 +15,7 @@ use crate::search::{SearchBackend, SearchRequest, SearchState};
 use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
+use crate::util::temporal::TemporalClient;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -487,7 +488,7 @@ pub struct EditProject {
         custom(function = "crate::util::validate::validate_name")
     )]
     pub title: Option<String>,
-    #[validate(length(min = 3, max = 256))]
+    #[validate(length(max = 256))]
     pub description: Option<String>,
     #[validate(length(max = 65536))]
     pub body: Option<String>,
@@ -613,6 +614,7 @@ pub async fn project_edit(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
@@ -750,6 +752,7 @@ pub async fn project_edit(
         session_queue.clone(),
         search_state.clone(),
         true,
+        &temporal,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;
@@ -807,6 +810,7 @@ pub async fn project_edit(
                 },
                 session_queue.clone(),
                 search_state.clone(),
+                &temporal,
             )
             .await
             .api_context("editing project")?;
@@ -906,6 +910,7 @@ pub async fn projects_edit(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     let project_refs = serde_json::from_str::<Vec<String>>(&ids.ids)
         .request_context("deserializing project references")?;
@@ -1015,6 +1020,7 @@ pub async fn projects_edit(
         redis,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -1063,6 +1069,7 @@ pub async fn project_icon_edit(
     payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
@@ -1088,6 +1095,7 @@ pub async fn project_icon_edit(
         payload,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -1121,6 +1129,7 @@ pub async fn delete_project_icon(
     file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
@@ -1144,6 +1153,7 @@ pub async fn delete_project_icon(
         file_host,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -1210,6 +1220,7 @@ pub async fn add_gallery_item(
     payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
@@ -1241,6 +1252,7 @@ pub async fn add_gallery_item(
         payload,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -1303,6 +1315,7 @@ pub async fn edit_gallery_item(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
@@ -1331,6 +1344,7 @@ pub async fn edit_gallery_item(
         redis,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -1370,6 +1384,7 @@ pub async fn delete_gallery_item(
     file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
@@ -1393,6 +1408,7 @@ pub async fn delete_gallery_item(
         file_host,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -1425,6 +1441,7 @@ pub async fn project_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
@@ -1447,6 +1464,7 @@ pub async fn project_delete(
         redis,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
     .map(|()| HttpResponse::NoContent().body(""))

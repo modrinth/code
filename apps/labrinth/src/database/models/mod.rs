@@ -69,7 +69,4 @@ pub use version_item::DBVersion;
 
 pub use moderation_lock_item::{DBModerationLock, ModerationLockWithUser};
 pub use moderation_note_item::DBModerationNote;
-pub use project_flag_item::{
-    DBProjectFlag, DBProjectFlagRule, DBProjectFlagRun, ProjectFlagRunOutput,
-    ProjectFlagRunStatus,
-};
+pub use project_flag_item::{DBProjectFlag, DBProjectFlagRule};

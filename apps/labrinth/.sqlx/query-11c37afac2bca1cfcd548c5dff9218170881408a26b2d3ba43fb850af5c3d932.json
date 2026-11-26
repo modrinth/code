@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO project_flag_scans\n            (scan_kind, input_hash, model_version, result)\n        VALUES ($1, $2, $3, $4)\n        ON CONFLICT (scan_kind, input_hash, model_version) DO NOTHING\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Bytea",
+        "Int8",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "11c37afac2bca1cfcd548c5dff9218170881408a26b2d3ba43fb850af5c3d932"
+}

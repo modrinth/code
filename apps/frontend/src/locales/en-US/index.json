@@ -4311,7 +4311,7 @@
     "message": "Submit for review"
   },
   "project.publishing.ready.body": {
-    "message": "Your required checks are complete. Submit your project and the moderation team will review it."
+    "message": "Submit your project and the moderation team will review it."
   },
   "project.publishing.ready.title": {
     "message": "Ready for review"

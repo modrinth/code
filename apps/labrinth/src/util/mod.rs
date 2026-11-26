@@ -11,7 +11,6 @@ pub mod error;
 pub mod ext;
 pub mod gotenberg;
 pub mod guards;
-
 pub mod http;
 pub mod img;
 pub mod ip;
@@ -25,6 +24,7 @@ pub mod routes;
 pub mod sentry;
 pub mod stripe;
 pub mod tags;
+pub mod temporal;
 pub mod tiltify;
 pub mod usercheck;
 pub mod validate;

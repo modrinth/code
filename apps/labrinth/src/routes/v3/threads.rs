@@ -22,6 +22,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
+use crate::util::temporal::TemporalClient;
 use actix_web::{
     HttpRequest, HttpResponse, delete, get, patch, post, put, web,
 };
@@ -587,6 +588,7 @@ pub async fn thread_issues_create(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     web::Json(new_issues): web::Json<NewThreadIssues>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<(), ApiError> {
     let moderator = get_user_from_headers(
         &req,
@@ -653,6 +655,7 @@ pub async fn thread_issues_create(
         &pool,
         &redis,
         None,
+        &temporal,
     )
     .await
 }
@@ -670,6 +673,7 @@ pub async fn thread_issue_facet_edit(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     web::Json(edit): web::Json<EditThreadIssueFacet>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<(), ApiError> {
     if edit.user_addressed.is_none() && edit.moderator_verified.is_none() {
         return Err(ApiError::Request(anyhow!(
@@ -784,6 +788,7 @@ pub async fn thread_issue_facet_edit(
             &pool,
             &redis,
             project_editor,
+            &temporal,
         )
         .await
     } else {
@@ -802,6 +807,7 @@ pub async fn thread_issue_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<(), ApiError> {
     get_user_from_headers(
         &req,
@@ -840,6 +846,7 @@ pub async fn thread_issue_delete(
             &pool,
             &redis,
             None,
+            &temporal,
         )
         .await
     } else {

@@ -32,6 +32,7 @@ pub mod copyright_archives;
 pub mod external_license;
 mod ownership;
 pub mod project_flag;
+mod queue;
 pub mod tech_review;
 pub mod user_restrictions;
 
@@ -39,6 +40,10 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.configure(user_restrictions::config)
         .configure(copyright_archives::config)
         .service(get_projects)
+        .configure(queue::config)
+        .service(get_project_auto_approve)
+        .service(cancel_project_auto_approve)
+        .service(get_auto_approve_queue)
         .service(get_project_ids)
         .service(get_project_meta)
         .service(set_project_meta)
@@ -61,6 +66,237 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(
             web::scope("/external-license").configure(external_license::config),
         );
+}
+
+/// Explain current automatic approval checks without scanning or changing project state.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    params(("id" = ProjectId, Path)),
+    responses((status = OK, body = crate::routes::v3::projects::mutation::AutoApprovalDiagnostics), (status = NOT_FOUND))
+)]
+#[get("/project-auto-approve/{id}")]
+pub async fn get_project_auto_approve(
+    req: HttpRequest,
+    path: web::Path<String>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<crate::util::temporal::TemporalClient>,
+) -> Result<
+    web::Json<crate::routes::v3::projects::mutation::AutoApprovalDiagnostics>,
+    ApiError,
+> {
+    get_user_from_headers(
+        &req,
+        &***ro_pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
+    )
+    .await
+    .auth_context("authenticating moderator")?;
+    let project_id = serde_json::from_value::<ProjectId>(
+        serde_json::Value::String(path.into_inner()),
+    )
+    .ok()
+    .not_found_context("project not found")?;
+    let mut diagnostics =
+        crate::routes::v3::projects::mutation::auto_approval_diagnostics(
+            project_id.into(),
+            &ro_pool,
+            &redis,
+        )
+        .await?;
+    diagnostics.workflow = crate::workflow::project_flag::approve::status(
+        &temporal.client,
+        project_id,
+    )
+    .await
+    .internal_context("reading approval workflow state")?;
+    diagnostics.can_auto_approve &= !diagnostics
+        .workflow
+        .as_ref()
+        .is_some_and(|state| state.auto_approve_blocked);
+    Ok(web::Json(diagnostics))
+}
+
+/// Cancel delayed automatic approval for the current review, waiting for workflow acknowledgement.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    params(("id" = ProjectId, Path)),
+    responses((status = OK, body = crate::workflow::project_flag::approve::ApprovalStatus), (status = CONFLICT), (status = NOT_FOUND))
+)]
+#[post("/project-auto-approve/{id}/cancel")]
+pub async fn cancel_project_auto_approve(
+    req: HttpRequest,
+    path: web::Path<ProjectId>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<crate::util::temporal::TemporalClient>,
+) -> Result<
+    web::Json<crate::workflow::project_flag::approve::ApprovalStatus>,
+    ApiError,
+> {
+    cancel_auto_approval(
+        req,
+        path.into_inner(),
+        &pool,
+        &redis,
+        &session_queue,
+        &temporal,
+    )
+    .await
+    .map(web::Json)
+}
+
+async fn cancel_auto_approval(
+    req: HttpRequest,
+    project_id: ProjectId,
+    pool: &PgPool,
+    redis: &RedisPool,
+    session_queue: &AuthQueue,
+    temporal: &crate::util::temporal::TemporalClient,
+) -> Result<crate::workflow::project_flag::approve::ApprovalStatus, ApiError> {
+    let actor = get_user_from_headers(
+        &req,
+        pool,
+        redis,
+        session_queue,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
+    )
+    .await
+    .auth_context("authenticating moderator")?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .internal_context("starting approval cancellation operation")?;
+    let id = DBProjectId::from(project_id);
+    let in_review = sqlx::query_scalar!(
+        r#"SELECT in_review FROM mods WHERE id = $1 FOR UPDATE"#,
+        id.0
+    )
+    .fetch_optional(&mut transaction)
+    .await
+    .internal_context("locking project approval")?
+    .not_found_context("project not found")?;
+    if !in_review {
+        return Err(ApiError::Conflict(anyhow!(
+            "project is no longer in review"
+        )));
+    }
+    use crate::workflow::project_flag::{
+        PROJECT_FLAG_TASK_QUEUE, approve::ApproveProjectWorkflow,
+    };
+    let handle = temporal
+        .client
+        .signal_with_start_workflow(
+            ApproveProjectWorkflow::run,
+            project_id,
+            ApproveProjectWorkflow::cancel,
+            (),
+            temporalio_client::WorkflowStartOptions::new(
+                PROJECT_FLAG_TASK_QUEUE,
+                format!("approve-project:{project_id}"),
+            )
+            .id_conflict_policy(
+                temporalio_client::WorkflowIdConflictPolicy::UseExisting,
+            )
+            .id_reuse_policy(
+                temporalio_client::WorkflowIdReusePolicy::AllowDuplicate,
+            )
+            .build(),
+        )
+        .await
+        .internal_context("updating approval cancellation")?;
+    let state =
+        tokio::time::timeout(std::time::Duration::from_secs(60), async {
+            loop {
+                let state = handle
+                    .query(
+                        ApproveProjectWorkflow::status,
+                        (),
+                        temporalio_client::WorkflowQueryOptions::default(),
+                    )
+                    .await?;
+                if state.auto_approve_blocked && !state.finished {
+                    return anyhow::Ok(state);
+                }
+                tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+            }
+        })
+        .await
+        .internal_context("waiting for approval cancellation acknowledgement")?
+        .internal_context("reading approval cancellation acknowledgement")?;
+    let latest = sqlx::query_scalar!(
+        r#"
+        SELECT delta->>'kind' AS kind
+        FROM project_history
+        WHERE project_id = $1
+            AND occurred_at >= (SELECT queued FROM mods WHERE id = $1)
+            AND delta->>'kind' IN ('auto_approval_scheduled', 'auto_approval_cancelled')
+        ORDER BY occurred_at DESC, id DESC
+        LIMIT 1
+        "#,
+        id.0
+    )
+    .fetch_optional(&mut transaction)
+    .await
+    .internal_context("reading approval cancellation history")?
+    .flatten();
+    if latest.as_deref() != Some("auto_approval_cancelled") {
+        DBProject::record_history(
+            id,
+            Some(actor.user.id.into()),
+            crate::models::v3::projects::ProjectDelta::AutoApprovalCancelled,
+            &mut transaction,
+        )
+        .await
+        .internal_context("recording approval cancellation")?;
+    }
+    transaction
+        .commit()
+        .await
+        .internal_context("committing approval cancellation history")?;
+    Ok(state)
+}
+
+/// List active approval executions using eventually consistent Temporal visibility metadata only.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = Vec<crate::workflow::project_flag::approve::ApprovalQueueEntry>))
+)]
+#[get("/project-auto-approve")]
+pub async fn get_auto_approve_queue(
+    req: HttpRequest,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<crate::util::temporal::TemporalClient>,
+) -> Result<
+    web::Json<Vec<crate::workflow::project_flag::approve::ApprovalQueueEntry>>,
+    ApiError,
+> {
+    get_user_from_headers(
+        &req,
+        &***ro_pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
+    )
+    .await
+    .auth_context("authenticating moderator")?;
+    Ok(web::Json(
+        crate::workflow::project_flag::approve::queue(&temporal.client)
+            .await
+            .internal_context("listing approval workflows")?,
+    ))
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]

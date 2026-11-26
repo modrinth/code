@@ -119,8 +119,7 @@ const copy = computed(() => {
 				}),
 				body: defineMessage({
 					id: 'project.publishing.ready.body',
-					defaultMessage:
-						'Your required checks are complete. Submit your project and the moderation team will review it.',
+					defaultMessage: 'Submit your project and the moderation team will review it.',
 				}),
 			}
 		case 'ready-to-resubmit':

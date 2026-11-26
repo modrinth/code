@@ -10,6 +10,7 @@ use crate::models::pats::Scopes;
 use crate::models::projects::{VersionStatus, VersionType};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
+use crate::util::temporal::TemporalClient;
 use anyhow::anyhow;
 
 use crate::routes::{FileHash, HashAlgorithm};
@@ -955,8 +956,10 @@ pub async fn delete_file_route(
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
-    delete_file(req, info, pool, redis, hash_query, session_queue).await
+    delete_file(req, info, pool, redis, hash_query, session_queue, &temporal)
+        .await
 }
 
 pub async fn delete_file(
@@ -966,6 +969,7 @@ pub async fn delete_file(
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -1091,6 +1095,7 @@ pub async fn delete_file(
             &pool,
             &redis,
             Some(&user),
+            temporal,
         )
         .await?;
 

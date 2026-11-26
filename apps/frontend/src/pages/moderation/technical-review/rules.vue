@@ -820,7 +820,7 @@ let scanAbortController: AbortController | null = null
 onMounted(async () => {
 	const [{ VAceEditor }] = await Promise.all([
 		import('vue3-ace-editor'),
-		import('@modrinth/ui/src/utils/ace-theme'),
+		import('@modrinth/ui/src/utils/ace-theme.ts'),
 	])
 	await import('ace-builds/src-noconflict/ext-language_tools')
 	editorComponent.value = VAceEditor

@@ -44,7 +44,10 @@ type PublishingSources = Pick<
 	| 'projectValidationLoading'
 	| 'projectLinksNetworkValidationLoading'
 	| 'thread'
-> & { submitting: Readonly<Ref<boolean>> }
+> & {
+	canBypassValidation: Readonly<Ref<boolean>>
+	submitting: Readonly<Ref<boolean>>
+}
 
 function createProjectPublishingContext({
 	projectV2: project,
@@ -52,6 +55,7 @@ function createProjectPublishingContext({
 	projectValidationLoading,
 	projectLinksNetworkValidationLoading,
 	thread,
+	canBypassValidation,
 	submitting,
 }: PublishingSources) {
 	const rejected = computed(() => !!project.value && isRejected(project.value))
@@ -77,14 +81,17 @@ function createProjectPublishingContext({
 	const canSubmit = computed(
 		() =>
 			!!project.value &&
-			canSubmitProjectForReview(projectValidation.value, checking.value || submitting.value) &&
+			!submitting.value &&
+			(canBypassValidation.value ||
+				canSubmitProjectForReview(projectValidation.value, checking.value)) &&
 			(!rejected.value || canResubmitProjectForReview(thread.value)),
 	)
 	const state = computed<ProjectPublishingState>(() => {
 		const status = project.value?.status
 		if (!status) return 'unavailable'
 		if (rejected.value && (canSubmit.value || submitting.value)) return 'ready-to-resubmit'
-		if (status === 'draft' && submitting.value) return 'ready'
+		if (status === 'draft' && (submitting.value || (canBypassValidation.value && canSubmit.value)))
+			return 'ready'
 		if (!projectValidation.value) return checking.value ? 'checking' : 'unavailable'
 		switch (status) {
 			case 'processing':

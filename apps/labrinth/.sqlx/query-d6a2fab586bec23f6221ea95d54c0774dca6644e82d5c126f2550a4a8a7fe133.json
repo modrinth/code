@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT CASE WHEN flags.id IS NOT NULL THEN flags.what || jsonb_build_object('active', flags.active) END AS \"what?: sqlx::types::Json<PersistedProjectFlag>\"\n            FROM mods AS projects\n            LEFT JOIN project_flags AS flags ON flags.project_id = projects.id\n                AND (flags.active OR (flags.what->>'retain_when_resolved')::bool = TRUE)\n            WHERE projects.id = $1\n            ORDER BY flags.what->>'key', flags.id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "what?: sqlx::types::Json<PersistedProjectFlag>",
+        "type_info": "Jsonb",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "d6a2fab586bec23f6221ea95d54c0774dca6644e82d5c126f2550a4a8a7fe133"
+}

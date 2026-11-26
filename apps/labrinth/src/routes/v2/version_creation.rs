@@ -15,6 +15,7 @@ use crate::routes::{v2_reroute, v3};
 use crate::search::SearchState;
 use crate::util::MinecraftMeta;
 use crate::util::kafka::KafkaClientState;
+use crate::util::temporal::TemporalClient;
 use actix_multipart::Multipart;
 use actix_web::http::header::ContentDisposition;
 use actix_web::web::Data;
@@ -129,6 +130,7 @@ pub async fn version_create(
     session_queue: Data<AuthQueue>,
     kafka_client: Data<KafkaClientState>,
     search_state: Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, CreateError> {
     let payload = v2_reroute::alter_actix_multipart(
         payload,
@@ -264,6 +266,7 @@ pub async fn version_create(
         session_queue,
         kafka_client,
         search_state,
+        &temporal,
     )
     .await?;
 
@@ -344,6 +347,7 @@ pub async fn upload_file_to_version(
     session_queue: web::Data<AuthQueue>,
     kafka_client: web::Data<KafkaClientState>,
     search_state: Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, CreateError> {
     // Returns NoContent, so no need to convert to V2
     let response = v3::version_creation::upload_file_to_version(
@@ -357,6 +361,7 @@ pub async fn upload_file_to_version(
         session_queue,
         kafka_client,
         search_state,
+        &temporal,
     )
     .await?;
     Ok(response)

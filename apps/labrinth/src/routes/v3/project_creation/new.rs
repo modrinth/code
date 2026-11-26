@@ -1,3 +1,4 @@
+use crate::util::temporal::TemporalClient;
 use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, put, web};
 use anyhow::anyhow;
@@ -141,6 +142,7 @@ pub async fn create(
     kafka_client: web::Data<KafkaClientState>,
     search_state: web::Data<SearchState>,
     web::Json(create): web::Json<ProjectCreate>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<web::Json<ProjectId>, CreateError> {
     // check that the user can make a project
     let user = get_user_from_headers(
@@ -393,20 +395,24 @@ pub async fn create(
     .await
     .internal_context("failed to insert thread")?;
 
-    super::super::projects::mutation::finalize_mutation(
-        project_id.into(),
-        txn,
+    let prepared = super::super::projects::mutation::prepare_mutations(
+        &[project_id.into()],
+        &mut txn,
         &db,
         &redis,
         Some(&user),
     )
     .await?;
-    crate::queue::delphi_scan::publish_new_files(
-        &kafka_client,
-        &delphi_scan_files,
-    )
-    .await;
-    search_state.queue.push_project_change(project_id).await;
+    prepared
+        .commit_with_post_commit(txn, &redis, &temporal, async {
+            crate::queue::delphi_scan::publish_new_files(
+                &kafka_client,
+                &delphi_scan_files,
+            )
+            .await;
+            search_state.queue.push_project_change(project_id).await;
+        })
+        .await?;
 
     Ok(web::Json(project_id))
 }

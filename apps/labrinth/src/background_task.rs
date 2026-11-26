@@ -24,8 +24,8 @@ pub enum BackgroundTask {
     IndexBilling,
     IndexSubscriptions,
     IncrementalIndexSearch,
-    /// Consumes project flag run jobs from Kafka.
-    ProjectFlagRuns,
+    /// Runs Temporal workflow and activity workers.
+    RunWorkflows,
     Migrations,
     Mail,
     /// Queries server project analytics (e.g. number of verified plays in last
@@ -57,6 +57,7 @@ impl BackgroundTask {
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
         email_queue: EmailQueue,
+        config: crate::env::Config,
     ) -> anyhow::Result<()> {
         use BackgroundTask::*;
         match self {
@@ -89,11 +90,15 @@ impl BackgroundTask {
                 )
                 .await
             }
-            ProjectFlagRuns => {
-                crate::queue::moderation::project_flag_run::consume_project_flag_runs(
-                                    pool, ro_pool.into(), redis_pool, file_host.into_inner(),
-                                ).await
-            }
+            RunWorkflows => crate::workflow::run(
+                pool,
+                redis_pool,
+                file_host.into_inner(),
+                config.project_flags,
+                kafka_client,
+            )
+            .await
+            .map_err(|error| anyhow::anyhow!(error)),
             Mail => run_email(email_queue).await,
             CacheAnalytics => {
                 cache_analytics(&pool, &redis_pool, &clickhouse).await

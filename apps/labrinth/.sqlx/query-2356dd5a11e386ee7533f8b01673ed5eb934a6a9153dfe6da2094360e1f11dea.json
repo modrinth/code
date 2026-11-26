@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE project_flags SET run_id = NULL WHERE run_id = $1 AND (active OR (what->>'retain_when_resolved')::bool = TRUE)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2356dd5a11e386ee7533f8b01673ed5eb934a6a9153dfe6da2094360e1f11dea"
+}
