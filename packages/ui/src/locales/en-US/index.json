@@ -3948,10 +3948,13 @@
     "defaultMessage": "You don't have any collections yet."
   },
   "profile.label.no-projects": {
-    "defaultMessage": "This user has no projects!"
+    "defaultMessage": "No projects yet"
   },
   "profile.label.no-projects-auth-description": {
-    "defaultMessage": "You don't have any projects yet."
+    "defaultMessage": "Create your first project."
+  },
+  "profile.label.no-public-projects-description": {
+    "defaultMessage": "This user doesn't have any public projects"
   },
   "profile.label.organizations": {
     "defaultMessage": "Organizations"
