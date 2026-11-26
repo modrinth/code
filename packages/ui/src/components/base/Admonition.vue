@@ -1,7 +1,7 @@
 <template>
 	<div
 		:class="[
-			'relative grid grid-cols-[1.5rem_minmax(0,1fr)_auto] gap-x-2 rounded-2xl border border-solid p-4 text-contrast',
+			'relative grid grid-cols-[1.5rem_minmax(0,1fr)_auto] gap-x-2.5 rounded-2xl border border-solid p-4 text-contrast',
 			centerContent ? 'items-center' : 'items-start',
 			progress != null ? 'overflow-hidden pb-5' : '',
 			typeClasses[type],

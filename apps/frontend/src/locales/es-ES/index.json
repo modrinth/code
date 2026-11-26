@@ -1061,23 +1061,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Añadir nota privada"
   },
-  "conversation-thread.action.approve": {
-    "message": "Aprobar"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Aprobar con respuesta"
-  },
   "conversation-thread.action.close-report": {
     "message": "Cerrar informe"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Cerrar con respuesta"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Rechazar"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rechazar con respuesta"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reabrir hilo"
@@ -1088,32 +1076,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Responder al hilo"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Resubir para revisión"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Resubir para revisión con respuesta"
-  },
   "conversation-thread.action.send": {
     "message": "Enviar"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Enviar para revisión"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Enviar para revisión con respuesta"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Cambiar a borrador"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Cambiar a borrador con respuesta"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Retener"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Retener con respuesta"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Este hilo está cerrado y los nuevos mensajes no podrán ser enviados."
@@ -1162,30 +1126,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Error de moderación"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Confirma que respondiste los mensajes de los moderadores"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Confirmo que he respondido debidamente los comentarios de los moderadores."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Resubiendo para revisión"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Subiendo para revisión"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Asegúrate de que has respondido todos los mensajes del equipo de moderación."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "Subidas repetidas sin responder a los moderadores puede resultar en una suspensión de cuenta."
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "Debes completar todas las acciones requeridas para volver a enviar"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "Estás subiendo <project-title>{projectTitle}</project-title> para que sea revisado nuevamente por los moderadores."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Los archivos complementarios son para recursos de soporte, como el código fuente, no para versiones alternativas o variantes."
@@ -1319,9 +1259,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Versiones"
   },
-  "create.collection.collection-info": {
-    "message": "Tu nueva colección se creará como colección pública {count, plural, =0 {sin ningún proyecto} one {# proyecto} other {# proyectos}}."
-  },
   "create.collection.create-collection": {
     "message": "Crear colección"
   },
@@ -1385,9 +1322,6 @@
   "create.organization.name-placeholder": {
     "message": "Introduzca el nombre de la organización..."
   },
-  "create.organization.ownership-info": {
-    "message": "Serás el propietario de esta organización, pero podrás invitar a otros miembros y transferir la propiedad en cualquier momento."
-  },
   "create.organization.summary-description": {
     "message": "Una o dos frases que describan su organización."
   },
@@ -1415,20 +1349,11 @@
   "create.project.name-placeholder": {
     "message": "Introduzca el nombre del proyecto..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} Icono"
-  },
-  "create.project.owner-description": {
-    "message": "Establezca el propietario del proyecto como usted mismo o una organización de la que sea miembro."
-  },
   "create.project.owner-label": {
     "message": "Dueño"
   },
   "create.project.server-project-title": {
     "message": "Creando un proyecto de servidor"
-  },
-  "create.project.summary-description": {
-    "message": "Una o dos frases que describan tu proyecto."
   },
   "create.project.summary-label": {
     "message": "Resumen"
@@ -1439,26 +1364,11 @@
   "create.project.title": {
     "message": "Creando un proyecto"
   },
-  "create.project.type-label": {
-    "message": "Tipo"
-  },
-  "create.project.type-project": {
-    "message": "Proyecto"
-  },
-  "create.project.type-server": {
-    "message": "Servidor"
-  },
   "create.project.unknown-user": {
     "message": "Usuario desconocido"
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Avatar del usuario"
-  },
-  "create.project.visibility-description": {
-    "message": "La visibilidad de tu proyecto después de que haya sido aprobado."
   },
   "create.project.visibility-private": {
     "message": "Privado"
@@ -1873,9 +1783,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Error al cargar las notificaciones:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Historial"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Historial de notificaciones"
@@ -3851,80 +3758,14 @@
   "project.install-context.back-to-discover": {
     "message": "Volver a descubrir"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "Tu proyecto es privado, lo que significa que solo tú, o las personas que invites, pueden acceder."
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "Tu proyecto está publicado y se puede encontrar en Descubrir en Modrinth."
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "Tu proyecto está en \"no listado\", lo que significa que solo las personas con un link directo pueden acceder y no se encuentra en Descubrir en Modrinth."
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "Puedes cambiar la visibilidad de tu proyecto en las <visibility-settings-link>configuraciones de visibilidad</visibility-settings-link> del mismo."
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "Proyecto aprobado"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "Esto es un proyecto borrador y no puede ser visto por otros hasta que lo subas a revisión y sea aprobado por el equipo de moderación de Modrinth."
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "Proyecto borrador"
-  },
-  "project.moderation.admonition.draft.submit-for-review": {
-    "message": "Una vez que hayas completado todos los pasos necesarios y te hayas asegurado de que tu proyecto cumple con las <rules-link>Reglas de contenido</rules-link> de Modrinth, puedes enviar tu proyecto para revisión."
-  },
-  "project.moderation.admonition.rejected.address-all-concerns": {
-    "message": "Por favor resuelve todas las observaciones de moderación, incluyendo cualquiera listada abajo, antes de enviar de nuevo el proyecto."
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Cambios solicitados"
-  },
-  "project.moderation.admonition.rejected.spam-notice": {
-    "message": "Enviar en repetidas ocasiones tu proyecto sin atender antes todas las observaciones de moderación puede resultar en la suspensión de la cuenta."
-  },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "Tu proyecto está en lista de espera para ser revisado por el equipo de moderación de Modrinth."
-  },
-  "project.moderation.admonition.under-review.body.2": {
-    "message": "Tu proyecto será escaneado y después revisado por moderadores humanos para asegurarnos de que esté de acuerdo con las <rules-link>Reglas de contenido</rules-link> y los <terms-link>Términos de uso</terms-link> de Modrinth."
-  },
-  "project.moderation.admonition.under-review.body.3": {
-    "message": "Aún puedes modificar tu proyecto, no afectará tu posición en la cola."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Nuestro objetivo es revisar envíos en un plazo de 24 a 48 horas, pero algunos proyectos pueden sufrir retrasos. Esto no indica que haya algún problema con tu envío."
-  },
-  "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "Nuestro objetivo es revisar envíos dentro del plazo de una semana, pero algunos proyectos pueden sufrir retrasos. Esto no indica que haya algún problema con tu envío."
-  },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>¡Apreciamos tu paciencia mientras nuestros moderadores trabajan duro para mantener Modrinth seguro, y estaremos encantados de poder ayudarte a compartir tu contenido! 💚</emphasis>"
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "Proyecto bajo revisión"
-  },
-  "project.moderation.admonition.withheld.body": {
-    "message": "Tu proyecto no aparecerá públicamente y solo se podrá acceder a él por un enlace directo.{requestedStatus, select,unlisted { Según tu <visibility-settings-link>configuración de visibilidad</visibility-settings-link>, es muy probable que no se necesite ninguna acción adicional.} other { Por favor resuelve todas las observaciones de moderación, incluyendo las listadas abajo, antes de enviar de nuevo el proyecto.}}"
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "No listado por el Staff"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Sin autorización"
   },
   "project.moderation.thread.approved-warning": {
     "message": "Este hilo no esta siendo monitorizado de manera activa, pero puede ser revisado para más información sobre tu proyecto de ser necesario."
   },
-  "project.moderation.thread.help-center-note.1": {
-    "message": "Los moderadores de contenido no pueden dar soporte a la mayoría de los problemas y los mensajes de este hilo no notifican al staff."
-  },
   "project.moderation.thread.help-center-note.2": {
     "message": "Si necesitas ayuda o tienes consultas adicionales, por favor visita el <help-center-link>Centro de ayuda de Modrinth</help-center-link> y haz click en la burbuja azul para contactar con soporte."
-  },
-  "project.moderation.thread.private-description": {
-    "message": "Este es un hilo de conversación privado con los moderadores de Modrinth. Es posible que te envíen mensajes sobre cuestiones relacionadas con este proyecto."
   },
   "project.moderation.thread.title": {
     "message": "Mensajes de moderación"
@@ -3989,17 +3830,8 @@
   "project.settings.delete-project.confirmation.title": {
     "message": "¿Confirmas que quieres eliminar este proyecto?"
   },
-  "project.settings.delete-project.description.1": {
-    "message": "Elimina permanentemente este proyecto de Modrinth. Los proyectos borrados <emphasis>no pueden ser recuperados</emphasis> por el staff o el soporte de Modrinth."
-  },
-  "project.settings.delete-project.description.2": {
-    "message": "Los archivos subidos a este proyecto que se utilizan activamente en Modpacks alojados en Modrinth pueden seguir existiendo."
-  },
   "project.settings.delete-project.title": {
     "message": "Eliminar proyecto"
-  },
-  "project.settings.description.intro": {
-    "message": "Puede escribir aquí una descripción extendida de tu proyecto. La descripción debe describir clara y honestamente el propósito y la función del proyecto. Consulte la sección 2.1 de la <rules>Reglas de Contenido</rules> para ver los requisitos completos."
   },
   "project.settings.description.title": {
     "message": "Descripción"
@@ -4190,59 +4022,8 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Contiene telemetría"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Sube versiones antes de añadir divulgaciones"
-  },
   "project.settings.editing-project": {
     "message": "Editando un proyecto de {projectType}"
-  },
-  "project.settings.general.name.description": {
-    "message": "Evite prefijos, sufijos, paréntesis o descripciones añadidas; utilice solo el nombre real del proyecto."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "p. ej. Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "p. ej. Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "p. ej. Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "p. ej. Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "p. ej. Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Nombre"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Resuma su proyecto en una sola frase."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "p. ej. Renueva la progresión del juego para que gire en torno al Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "p. ej. Añade equipo de construcción vestible."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "p. ej. Añade mecánicas realistas de construcción."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "p. ej. Mejora la forma en que los portales del Nether se vinculan entre sí."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "p. ej. Agrega versiones poderosas de jefes de los mobs normales para enfrentar en la noche."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Eslogan"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
-  "project.settings.license.all-rights": {
-    "message": "Todos los derechos reservados/Sin Licencia"
   },
   "project.settings.license.allow-later": {
     "message": "Permitir ediciones futuras"
@@ -4250,22 +4031,13 @@
   "project.settings.license.custom": {
     "message": "Personalizado"
   },
-  "project.settings.license.intro": {
-    "message": "Es importante elegir una licencia adecuada para tu {type}. Puedes elegir una de nuestra lista o proporcionar una licencia personalizada. También puede proporcionar una URL personalizada a su licencia elegida; de lo contrario, se mostrará el texto de la licencia. Consulte nuestra <guide>guía de licencias</guide> para obtener más información."
-  },
   "project.settings.license.later": {
     "message": "Ediciones posteriores"
   },
   "project.settings.license.later-description": {
     "message": "La licencia que seleccionó tiene una cláusula \"o posterior\". Si marca esta casilla, los usuarios pueden utilizar su proyecto bajo ediciones posteriores de la licencia."
   },
-  "project.settings.license.missing-url": {
-    "message": "Introduzca una URL al texto completo de su licencia personalizada."
-  },
   "project.settings.license.name": {
-    "message": "Nombre de licencia"
-  },
-  "project.settings.license.name-placeholder": {
     "message": "Nombre de licencia"
   },
   "project.settings.license.title": {
@@ -4279,9 +4051,6 @@
   },
   "project.settings.license.url": {
     "message": "URL de Licencia"
-  },
-  "project.settings.license.url-description": {
-    "message": "La ubicación web del texto completo de la licencia. Si no proporcionas un link, el texto de la licencia se mostrará en su lugar."
   },
   "project.settings.links.add-link": {
     "message": "Añadir enlace"
@@ -4372,15 +4141,6 @@
   },
   "project.settings.links.wiki-description": {
     "message": "Una página que contiene información, documentación, y ayuda sobre el proyecto."
-  },
-  "project.settings.monetization.description": {
-    "message": "Los proyectos en Modrinth están inscritos automáticamente en el <rewards-program-link>Rewards Program (Programa de Recompensas)</rewards-program-link>. Si usted no quiere (o no puede por razones legales) obtener ingresos de este proyecto, puede desactivarlo aquí."
-  },
-  "project.settings.monetization.disabled-description": {
-    "message": "Este proyecto no es elegible para monetizar. Si tu crees que esto es un error, por favor <contact-support-link>contacta al soporte</contact-support-link>."
-  },
-  "project.settings.monetization.title": {
-    "message": "Monetización"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Por favor, proporciona una prueba de que tienes permiso para redistribuir todos los siguientes archivos. Una vez completado, las versiones retenidas se publicarán automáticamente."
@@ -4493,9 +4253,6 @@
   "project.settings.server.latency-label": {
     "message": "Latencia: {latency}ms"
   },
-  "project.settings.server.optional-label": {
-    "message": "opcional"
-  },
   "project.settings.server.ping-failed-message": {
     "message": "No le pudimos hacer ping a este servidor. Puede estar bloqueado por tu host. Vuelve a reintentar unas cuantas veces, Si aún no responde, por favor <support-link>contacta al soporte</support-link>."
   },
@@ -4515,7 +4272,7 @@
     "message": "¡El server está online!"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "Si tienes un <srv-tooltip>[registro SRV]</srv-tooltip> no necesitas añadir un puerto. Si no, si tienes un puerto que no sea 25565, puedes incluirlo como :12345"
+    "message": "Si tienes un <srv-tooltip>registro SRV</srv-tooltip> no necesitas añadir un puerto. Si no, si tienes un puerto que no sea 25565, puedes incluirlo como :12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "La dirección que ingreses aquí puede tener registros DNS SRV _minecraft._tcp.(tu dominio) que apuntan a la dirección y el puerto de tu servidor de Minecraft."
@@ -4523,20 +4280,8 @@
   "project.settings.tags.all-tags-selected-warning": {
     "message": "Has seleccionado las {count} etiquetas disponibles. Por favor, selecciona solo las etiquetas que de verdad apliquen en tu proyecto."
   },
-  "project.settings.tags.categories-description": {
-    "message": "Selecciona todas las categorías que reflejen los temas o la función de tu {type}."
-  },
   "project.settings.tags.featured-tags": {
     "message": "Etiquetas experimentales"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "Debes seleccionar al menos una etiqueta destacada."
-  },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Selecciona las etiquetas más relevantes. Estas se mostrarán primero que las demás etiquetas."
-  },
-  "project.settings.tags.features-description": {
-    "message": "Selecciona todas las características que tu {type} usa."
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {Categorías {types}} other {Categorías}}"
@@ -4561,18 +4306,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Selecciona al menos una categoría para destacar una categoría."
-  },
-  "project.settings.tags.title": {
-    "message": "Etiquetas"
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "Has seleccionado {count} etiquetas. Considera reducirlas a 8 o menos para mantener tu proyecto enfocado y que sea más fácil de descubrir."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "Has seleccionado {count} etiquetas. Considera reducirlas a 18 o menos para mantener tu servidor enfocado y que sea más fácil de descubrir."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "Has seleccionado {count} etiquetas. Considera reducirlas a 12 o menos para mantener tu servidor enfocado y que sea más fácil de descubrir."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Sube versiones antes de añadir etiquetas"

@@ -5,7 +5,7 @@
 				<div
 					v-for="(validation, index) in validations"
 					:key="validation.code ?? validation.message?.id ?? index"
-					class="flex w-full items-start gap-1.5"
+					class="flex w-full items-start gap-1 leading-tight"
 					:class="{
 						'text-red': validation.severity === 'error',
 						'text-orange': validation.severity === 'warning',
@@ -20,7 +20,7 @@
 									? LightBulbIcon
 									: TriangleAlertIcon
 						"
-						class="mt-0.5 shrink-0"
+						class="relative top-0.5 shrink-0"
 					/>
 					{{
 						validation.message ? formatMessage(validation.message, validation.values) : undefined
@@ -112,11 +112,10 @@ onScopeDispose(() => clearTimeout(debounceTimer))
 const validations = computed(() => {
 	if (validationIsStale.value) return []
 
-	return Array.isArray(displayedCheck.value)
-		? displayedCheck.value
-		: displayedCheck.value
-			? [displayedCheck.value]
-			: []
+	const check = displayedCheck.value
+	if (!Array.isArray(check)) return check ? [check] : []
+
+	return check.toSorted((a, b) => Number(b.severity === 'error') - Number(a.severity === 'error'))
 })
 </script>
 

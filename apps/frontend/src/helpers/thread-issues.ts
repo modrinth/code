@@ -12,6 +12,17 @@ export function threadIssueVerdict(
 	return issue.facets.every((facet) => facet.verdict === 'resolved') ? 'resolved' : 'addressed'
 }
 
+export function isThreadIssueVisible(
+	issue: Labrinth.Threads.v3.ThreadIssue,
+	underReview: boolean,
+	threadHistory = false,
+): boolean {
+	return (
+		(threadHistory || !isThreadIssueVerified(issue)) &&
+		(!underReview || threadIssueVerdict(issue) !== 'addressed')
+	)
+}
+
 export function isThreadIssueStatusChange(
 	body: Labrinth.Threads.v3.MessageBody,
 ): body is Extract<Labrinth.Threads.v3.MessageBody, { type: 'status_change' | 'auto_approval' }> {

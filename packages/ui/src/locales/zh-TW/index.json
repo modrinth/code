@@ -3299,12 +3299,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "影片"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "未提供檔案"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "未提供圖片上傳處理常式"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "網址"
   },

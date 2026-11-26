@@ -1088,23 +1088,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "新增私人附註"
   },
-  "conversation-thread.action.approve": {
-    "message": "核准"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "回覆並核准"
-  },
   "conversation-thread.action.close-report": {
     "message": "關閉檢舉"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "回覆並關閉"
-  },
-  "conversation-thread.action.reject": {
-    "message": "拒絕"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "回覆並拒絕"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "重新開啟討論串"
@@ -1115,32 +1103,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "回覆討論串"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "重新提交審查"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "回覆並重新提交審查"
-  },
   "conversation-thread.action.send": {
     "message": "傳送"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "送交審查"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "回覆並送交審查"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "設為草稿"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "回覆並設為草稿"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "保留"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "回覆並保留"
   },
   "conversation-thread.closed-thread.description": {
     "message": "這個討論串已關閉，無法再傳送新訊息。"
@@ -1189,33 +1153,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "審查問題"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "確認我解決了管理員提到的問題"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "我確認管理員所提到的問題皆已解決。"
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "你即將重新提交 <project-title>{projectTitle}</project-title>。若所有審查問題均已解決，專案可能會自動獲得核准；否則，將送交管理員進行審查。"
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "重新提交審查"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "提交審查"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "請務必確認你解決了管理團隊提出的所有問題。"
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "在未解決管理員提出的問題的情況下反覆提交審查，可能會導致帳號被停權。"
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "你必須完成上述所有的必要動作才能重新提交"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "你即將提交 <project-title>{projectTitle}</project-title> 以供管理員審查。"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "補充檔案是用於提供原始碼等支援性資源，而非用於替代版本或變體。"
@@ -1349,9 +1286,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "版本"
   },
-  "create.collection.collection-info": {
-    "message": "你的新收藏將建立為公開收藏，{count, plural, =0 {不包含任何專案} other {包含 # 個專案}}。"
-  },
   "create.collection.create-collection": {
     "message": "建立收藏"
   },
@@ -1415,9 +1349,6 @@
   "create.organization.name-placeholder": {
     "message": "輸入組織名稱..."
   },
-  "create.organization.ownership-info": {
-    "message": "你將是這個組織的擁有者，但你可以隨時邀請其他成員並轉移擁有權。"
-  },
   "create.organization.summary-description": {
     "message": "用一兩句話描述你的組織。"
   },
@@ -1445,20 +1376,11 @@
   "create.project.name-placeholder": {
     "message": "輸入專案名稱..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} 圖示"
-  },
-  "create.project.owner-description": {
-    "message": "請將專案擁有者設為你自己，或是你所屬的組織。"
-  },
   "create.project.owner-label": {
     "message": "擁有者"
   },
   "create.project.server-project-title": {
     "message": "建立伺服器專案"
-  },
-  "create.project.summary-description": {
-    "message": "用一兩句話描述你的專案。"
   },
   "create.project.summary-label": {
     "message": "摘要"
@@ -1469,26 +1391,11 @@
   "create.project.title": {
     "message": "建立專案"
   },
-  "create.project.type-label": {
-    "message": "類型"
-  },
-  "create.project.type-project": {
-    "message": "專案"
-  },
-  "create.project.type-server": {
-    "message": "伺服器"
-  },
   "create.project.unknown-user": {
     "message": "未知使用者"
   },
   "create.project.url-label": {
     "message": "網址"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "使用者顯示圖片"
-  },
-  "create.project.visibility-description": {
-    "message": "你的專案核准後的瀏覽權限。"
   },
   "create.project.visibility-private": {
     "message": "私人"
@@ -1918,9 +1825,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "載入通知時發生錯誤："
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "紀錄"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "通知紀錄"
@@ -4031,66 +3935,6 @@
   "project.install-context.back-to-discover": {
     "message": "返回探索"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "你的專案目前設為私人，這代表只有你和你邀請的人才能存取。"
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "你的專案已在 Modrinth 上發布並可被搜尋到。"
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "你的專案目前設為不公開，這代表專案只能透過直接連結存取，無法在 Modrinth 上被搜尋到。"
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "你可以前往專案的<visibility-settings-link>瀏覽權限設定</visibility-settings-link>來變更瀏覽權限。"
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "專案已獲核准"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "這是一個草稿專案，在送交審查並獲得 Modrinth 管理團隊核准之前，其他人無法查看。"
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "草稿專案"
-  },
-  "project.moderation.admonition.draft.submit-for-review": {
-    "message": "完成所有必要步驟，並確保你的專案符合 Modrinth 的《<rules-link>內容規範</rules-link>》後，即可將專案送交審查。"
-  },
-  "project.moderation.admonition.rejected.address-all-concerns": {
-    "message": "在重新提交專案之前，請先處理管理團隊提出的所有疑慮，包括下方訊息中列出的任何問題。"
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "需要修改"
-  },
-  "project.moderation.admonition.rejected.spam-notice": {
-    "message": "在未解決管理員提出的所有問題的情況下反覆提交專案，可能會導致帳號被停權。"
-  },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "你的專案已在佇列中，等待 Modrinth 管理團隊審查。"
-  },
-  "project.moderation.admonition.under-review.body.2": {
-    "message": "你的專案會先被掃描，再由管理員人工審核，以確保其符合 Modrinth 的《<rules-link>內容規範</rules-link>》與《<terms-link>使用條款</terms-link>》。"
-  },
-  "project.moderation.admonition.under-review.body.3": {
-    "message": "你仍可修改專案，這不會影響你在佇列中的位置。"
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "我們的目標是在 24 至 48 小時內審查你提交的專案。部分專案可能需要較長時間，但這不代表你的專案有問題。"
-  },
-  "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "我們的目標是在一週內審查你提交的專案。部分專案可能需要較長時間，但這不代表你的專案有問題。"
-  },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>感謝你的耐心等候，我們的管理員正努力維護 Modrinth 的安全，我們期待能協助你分享你的內容！💚</emphasis>"
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "專案審查中"
-  },
-  "project.moderation.admonition.withheld.body": {
-    "message": "你的專案不會公開顯示，只能透過直接連結存取。{requestedStatus, select, unlisted {根據你所選的<visibility-settings-link>瀏覽權限設定</visibility-settings-link>，你很可能無需採取任何行動。} other {在重新提交專案之前，請先處理管理團隊提出的所有疑慮，包括下方訊息中列出的任何問題。}}"
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "由工作人員設為不公開"
-  },
   "project.moderation.error.unauthorized": {
     "message": "未經授權"
   },
@@ -4100,14 +3944,8 @@
   "project.moderation.thread.approved-warning": {
     "message": "管理團隊不會主動查看這個討論串，但如果有需要，他們可能會查看討論串以獲取專案相關資訊。"
   },
-  "project.moderation.thread.help-center-note.1": {
-    "message": "大多數的問題無法由內容管理員提供協助，且這個討論串的訊息不會通知工作人員。"
-  },
   "project.moderation.thread.help-center-note.2": {
     "message": "如果你需要協助或有其他疑問，請前往 <help-center-link>Modrinth 說明中心</help-center-link>，然後按一下藍色對話氣泡以聯絡客服團隊。"
-  },
-  "project.moderation.thread.private-description": {
-    "message": "這是你與 Modrinth 管理員之間的私人討論串。他們可能會就專案的相關問題向你傳送訊息。"
   },
   "project.moderation.thread.title": {
     "message": "審查訊息"
@@ -4175,17 +4013,8 @@
   "project.settings.delete-project.confirmation.title": {
     "message": "確定要刪除這個專案嗎？"
   },
-  "project.settings.delete-project.description.1": {
-    "message": "將這個專案從 Modrinth 中永久刪除。Modrinth 的工作人員和客服團隊<emphasis>無法還原</emphasis>已刪除的專案。"
-  },
-  "project.settings.delete-project.description.2": {
-    "message": "如果上傳到這個專案的檔案目前仍被 Modrinth 上的模組包使用，檔案可能會繼續存在。"
-  },
   "project.settings.delete-project.title": {
     "message": "刪除專案"
-  },
-  "project.settings.description.intro": {
-    "message": "你可以在這裡輸入專案的詳細描述。專案描述必須清楚、誠實地說明專案的目的與功能。完整規範請參閱《<rules>內容規範</rules>》第 2.1 節。"
   },
   "project.settings.description.title": {
     "message": "描述"
@@ -4379,59 +4208,8 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "包含遙測系統"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "請先上傳版本再新增揭露資訊"
-  },
   "project.settings.editing-project": {
     "message": "正在編輯{projectType}專案"
-  },
-  "project.settings.general.name.description": {
-    "message": "請避免使用前綴、後綴、括弧內容或額外描述，僅填寫專案的實際名稱。"
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "例如：Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "例如：Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "例如：Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "例如：Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "例如：Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "名稱"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "用一句話總結你的專案。"
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "例如：Overhauls game progression to revolve around the Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "例如：Adds wearable construction gear."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "例如：Adds realistic mineshaft-building mechanics."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "例如：Improves how Nether portals link to each other."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "例如：Adds powerful boss versions of the normal mobs to encounter in the night."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "標語"
-  },
-  "project.settings.general.url.title": {
-    "message": "網址"
-  },
-  "project.settings.license.all-rights": {
-    "message": "版權所有／無授權條款"
   },
   "project.settings.license.allow-later": {
     "message": "允許較新版本"
@@ -4442,38 +4220,14 @@
   "project.settings.license.custom-name-invalid": {
     "message": "自訂授權條款名稱只能包含字母、數字、句號及連字號。"
   },
-  "project.settings.license.custom-name-required": {
-    "message": "請輸入自訂授權條款的名稱。"
-  },
-  "project.settings.license.custom-url-description": {
-    "message": "授權條款全文的網址。你必須提供自訂授權條款的連結。"
-  },
-  "project.settings.license.intro": {
-    "message": "為你的{type}選擇適當的授權條款非常重要。你可以從我們的清單中選擇，或提供自訂授權條款。你也可以另外提供所選授權條款的自訂網址；若不提供，將直接顯示授權條款文字。如需更多資訊，請參閱我們的《<guide>授權指南</guide>》。"
-  },
   "project.settings.license.later": {
     "message": "較新版本"
   },
   "project.settings.license.later-description": {
     "message": "你選擇的授權條款包含「或較新版本」的條款。若勾選此方塊，使用者即可依據授權條款的較新版本使用你的專案。"
   },
-  "project.settings.license.missing-url": {
-    "message": "請輸入指向自訂授權條款全文的網址。"
-  },
   "project.settings.license.name": {
     "message": "授權條款名稱"
-  },
-  "project.settings.license.name-description": {
-    "message": "自訂授權條款的完整名稱。"
-  },
-  "project.settings.license.name-placeholder": {
-    "message": "授權條款名稱"
-  },
-  "project.settings.license.optional-label": {
-    "message": "可選"
-  },
-  "project.settings.license.optional-url": {
-    "message": "授權條款網址（可選）"
   },
   "project.settings.license.select": {
     "message": "授權條款"
@@ -4491,12 +4245,6 @@
     "message": "你的授權條款已更新。"
   },
   "project.settings.license.url": {
-    "message": "授權條款網址"
-  },
-  "project.settings.license.url-description": {
-    "message": "授權條款全文的網址。如果不提供連結，則會直接顯示授權條款文字。"
-  },
-  "project.settings.license.url-placeholder": {
     "message": "授權條款網址"
   },
   "project.settings.links.add-link": {
@@ -4588,15 +4336,6 @@
   },
   "project.settings.links.wiki-description": {
     "message": "包含專案資訊、文件及說明的頁面。"
-  },
-  "project.settings.monetization.description": {
-    "message": "Modrinth 上的專案會自動加入<rewards-program-link>獎勵計畫</rewards-program-link>。如果你不想（或因法律原因無法）從專案獲取收益，可在這裡關閉營利功能。"
-  },
-  "project.settings.monetization.disabled-description": {
-    "message": "這個專案不符合營利資格。如果你有疑問，請<contact-support-link>聯絡客服</contact-support-link>。"
-  },
-  "project.settings.monetization.title": {
-    "message": "營利"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "請提供證明，以確認你擁有重新發布下列所有檔案的權限。提供完成後，任何遭保留的版本都將自動發布。"
@@ -4721,9 +4460,6 @@
   "project.settings.server.latency-label": {
     "message": "延遲：{latency} 毫秒"
   },
-  "project.settings.server.optional-label": {
-    "message": "可選"
-  },
   "project.settings.server.ping-failed-message": {
     "message": "我們無法對伺服器進行 Ping 測試。該伺服器可能已被你的主機封鎖。請嘗試重新整理頁面幾次，如果還是沒有回應，請<support-link>聯絡客服</support-link>。"
   },
@@ -4743,7 +4479,7 @@
     "message": "伺服器已上線！"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "如果你有設定 <srv-tooltip>[SRV 紀錄]</srv-tooltip>，則不需要新增連接埠。否則，如果你的連接埠不是 25565，你可以附加上連接埠，例如 :12345"
+    "message": "如果你有設定 <srv-tooltip>SRV 紀錄</srv-tooltip>，則不需要新增連接埠。否則，如果你的連接埠不是 25565，你可以附加上連接埠，例如 :12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "你在這裡輸入的位址可能有 DNS SRV 紀錄 _minecraft._tcp.(你的網域)，指向你的 Minecraft 伺服器位址和連接埠。"
@@ -4751,20 +4487,8 @@
   "project.settings.tags.all-tags-selected-warning": {
     "message": "你選擇了所有 {count} 個可用標籤。請僅選擇真正適用於你的專案的標籤。"
   },
-  "project.settings.tags.categories-description": {
-    "message": "請選擇所有能反映你的{type}主題或功能的類別。"
-  },
   "project.settings.tags.featured-tags": {
     "message": "精選標籤"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "你必須選擇至少一個精選標籤。"
-  },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "請選擇最相關的標籤。這些標籤會顯示在其他標籤之前。"
-  },
-  "project.settings.tags.features-description": {
-    "message": "請選擇你的{type}包含的功能。"
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types}類別} other {類別}}"
@@ -4789,18 +4513,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "請選擇至少一個類別再選擇精選標籤。"
-  },
-  "project.settings.tags.title": {
-    "message": "標籤"
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "你選擇了 {count} 個標籤。請考慮減少到 8 個或更少，以確保你的專案主題更明確，並更容易被搜尋到。"
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "你選擇了 {count} 個標籤。請減少到 18 個或更少，以確保你的伺服器主題更明確，並更容易被搜尋到。"
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "你選擇了 {count} 個標籤。請考慮減少到 12 個或更少，以確保你的伺服器主題更明確，並更容易被搜尋到。"
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "請先上傳版本再新增標籤"

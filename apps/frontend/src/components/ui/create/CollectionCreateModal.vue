@@ -1,55 +1,53 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.title)">
-		<div class="min-w-md flex max-w-md flex-col gap-3">
+	<NewModal
+		ref="modal"
+		:header="formatMessage(messages.title)"
+		max-width="550px"
+		:initial-focus="getNameInput"
+	>
+		<div class="flex w-full flex-col gap-6">
 			<RestrictedActionAlert
 				v-model="isRestricted"
 				scope="COLLECTION_CREATE"
 				@navigate="modal.hide()"
 			/>
 			<CreateLimitAlert v-model="hasHitLimit" type="collection" />
-			<div class="flex flex-col gap-2">
-				<label for="name">
-					<span class="text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.nameLabel) }}
-						<span class="text-brand-red">*</span>
-					</span>
-				</label>
+			<Field :label="formatMessage(messages.nameLabel)" :input-id="nameId">
 				<Input
-					id="name"
+					:id="nameId"
+					ref="nameInput"
 					v-model="name"
 					:maxlength="64"
 					:placeholder="formatMessage(messages.namePlaceholder)"
 					autocomplete="off"
+					wrapper-class="w-full"
+					aria-required="true"
 					:disabled="hasHitLimit"
 				/>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label for="additional-information" class="flex flex-col gap-1">
-					<span class="text-lg font-semibold text-contrast">{{
-						formatMessage(messages.summaryLabel)
-					}}</span>
-					<span>{{ formatMessage(messages.summaryDescription) }}</span>
-				</label>
+			</Field>
+			<Field :label="formatMessage(messages.summaryLabel)" :input-id="summaryId" label-optional>
 				<Textarea
-					id="additional-information"
+					:id="summaryId"
 					v-model="description"
-					:maxlength="256"
+					:maxlength="255"
 					:placeholder="formatMessage(messages.summaryPlaceholder)"
 					:disabled="hasHitLimit"
+					:aria-describedby="summaryHelpId"
 				/>
-			</div>
-			<p class="m-0">
-				{{ formatMessage(messages.collectionInfo, { count: projectIds.length }) }}
-			</p>
-			<div class="flex justify-end gap-2">
+				<template #subtext>
+					<span :id="summaryHelpId">{{ formatMessage(messages.summaryDescription) }}</span>
+				</template>
+			</Field>
+			<div class="flex flex-wrap justify-end gap-2.5">
 				<Button type="outlined" @click="modal.hide()">
 					<XIcon aria-hidden="true" />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
 				<Button
+					v-tooltip="validationTooltip"
 					type="colored"
 					color="brand"
-					:disabled="hasHitLimit || isRestricted"
+					:disabled="disableCreate"
 					@click="create"
 				>
 					<PlusIcon aria-hidden="true" />
@@ -65,12 +63,14 @@ import {
 	Button,
 	commonMessages,
 	defineMessages,
+	Field,
 	injectNotificationManager,
 	Input,
 	NewModal,
 	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
+import { computed, ref, useId } from 'vue'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
 import RestrictedActionAlert from './RestrictedActionAlert.vue'
@@ -104,14 +104,17 @@ const messages = defineMessages({
 		id: 'create.collection.summary-placeholder',
 		defaultMessage: 'This is a collection of...',
 	},
-	collectionInfo: {
-		id: 'create.collection.collection-info',
-		defaultMessage:
-			'Your new collection will be created as a public collection with {count, plural, =0 {no projects} one {# project} other {# projects}}.',
-	},
 	createCollection: {
 		id: 'create.collection.create-collection',
 		defaultMessage: 'Create collection',
+	},
+	invalidName: {
+		id: 'create.collection.invalid-name',
+		defaultMessage: 'Enter a collection name of 3 to 64 characters.',
+	},
+	invalidSummary: {
+		id: 'create.collection.invalid-summary',
+		defaultMessage: 'Enter a summary of 3 to 255 characters or leave it blank.',
 	},
 })
 
@@ -119,8 +122,25 @@ const name = ref('')
 const description = ref('')
 const hasHitLimit = ref(false)
 const isRestricted = ref(false)
+const isCreating = ref(false)
 
 const modal = ref()
+const nameInput = ref()
+const nameId = useId()
+const summaryId = useId()
+const summaryHelpId = useId()
+
+const validationTooltip = computed(() => {
+	const nameLength = [...name.value.trim()].length
+	const summaryLength = [...description.value.trim()].length
+	if (nameLength < 3 || nameLength > 64) return formatMessage(messages.invalidName)
+	if (summaryLength > 0 && (summaryLength < 3 || summaryLength > 255))
+		return formatMessage(messages.invalidSummary)
+	return ''
+})
+const disableCreate = computed(
+	() => hasHitLimit.value || isRestricted.value || isCreating.value || !!validationTooltip.value,
+)
 
 const props = defineProps({
 	projectIds: {
@@ -132,6 +152,8 @@ const props = defineProps({
 })
 
 async function create() {
+	if (disableCreate.value) return
+	isCreating.value = true
 	startLoading()
 	try {
 		const result = await useBaseFetch('collection', {
@@ -154,8 +176,10 @@ async function create() {
 			text: err?.data?.description || err?.message || err,
 			type: 'error',
 		})
+	} finally {
+		isCreating.value = false
+		stopLoading()
 	}
-	stopLoading()
 }
 function show(event) {
 	name.value = ''
@@ -163,24 +187,11 @@ function show(event) {
 	modal.value.show(event)
 }
 
+function getNameInput() {
+	return nameInput.value?.$el.querySelector('input:enabled') ?? null
+}
+
 defineExpose({
 	show,
 })
 </script>
-
-<style scoped lang="scss">
-.modal-creation {
-	input {
-		width: 20rem;
-		max-width: 100%;
-	}
-
-	.text-input-wrapper {
-		width: 100%;
-	}
-
-	.input-group {
-		margin-top: var(--gap-md);
-	}
-}
-</style>

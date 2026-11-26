@@ -465,7 +465,7 @@ defineExpose({ markSaved })
 	</template>
 	<div
 		v-else
-		class="absolute bottom-6 left-1/2 z-10 flex max-w-[calc(100%_-_3rem)] -translate-x-1/2 items-center gap-2 rounded-[20px] border border-solid border-white/10 bg-surface-3 p-2 shadow-[0_1rem_3rem_rgb(0_0_0_/_32%)]"
+		class="absolute bottom-6 left-1/2 z-10 flex w-max max-w-[calc(100%_-_3rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-2 rounded-[20px] border border-solid border-white/10 bg-surface-3 p-2 shadow-[0_1rem_3rem_rgb(0_0_0_/_32%)]"
 		@click.stop
 	>
 		<div v-if="count > 1" class="flex items-center gap-2">
@@ -483,7 +483,7 @@ defineExpose({ markSaved })
 				<RightArrowIcon aria-hidden="true" />
 			</IconButton>
 		</div>
-		<div v-if="count > 1" class="h-6 w-px bg-white/10" />
+		<div v-if="count > 1" class="hidden h-6 w-px bg-white/10 sm:block" />
 		<div class="flex items-center gap-2">
 			<IconButton
 				v-tooltip="formatMessage(messages.zoomOut)"
@@ -512,7 +512,7 @@ defineExpose({ markSaved })
 				<ZoomInIcon aria-hidden="true" />
 			</IconButton>
 		</div>
-		<div class="h-6 w-px bg-white/10" />
+		<div v-if="canEdit || $slots.actions" class="hidden h-6 w-px bg-white/10 sm:block" />
 		<IconButton
 			v-if="canEdit"
 			v-tooltip="formatMessage(messages.edit)"
@@ -522,10 +522,10 @@ defineExpose({ markSaved })
 		>
 			<EditIcon aria-hidden="true" />
 		</IconButton>
-		<div class="flex items-center gap-2">
+		<div v-if="$slots.actions" class="flex items-center gap-2">
 			<slot name="actions" :metadata="imageMetadata" />
 		</div>
-		<div class="h-6 w-px bg-white/10" />
+		<div class="hidden h-6 w-px bg-white/10 sm:block" />
 		<IconButton :label="formatMessage(messages.close)" type="quiet" @click="emit('close')">
 			<XIcon aria-hidden="true" />
 		</IconButton>

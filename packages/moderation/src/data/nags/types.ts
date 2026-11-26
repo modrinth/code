@@ -3,7 +3,11 @@ import type { MessageDescriptor } from '@modrinth/ui'
 
 import type { NagDestinationId } from '../../types/nags.ts'
 
+export type ProjectNagCategory = 'setup-step' | 'validation'
+
 export interface NagDefinition {
+	/** Defaults to validation when omitted. */
+	category?: ProjectNagCategory
 	title:
 		| MessageDescriptor
 		| ((context: {
@@ -16,6 +20,8 @@ export interface NagDefinition {
 				nag: Labrinth.Projects.v3.ProjectNag
 				projectType?: string
 		  }) => MessageDescriptor)
+	/** Field identifier owned by the destination settings page; null for page-only actions. */
+	highlightField: string | null | ((nag: Labrinth.Projects.v3.ProjectNag) => string)
 	destination: NagDestinationId
 	linkTitle?: MessageDescriptor
 }

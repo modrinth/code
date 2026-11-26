@@ -207,6 +207,7 @@ const props = withDefaults(
 		fade?: 'standard' | 'warning' | 'danger'
 		closeOnEsc?: boolean
 		closeOnClickOutside?: boolean
+		closeLabel?: string
 		warnOnClose?: boolean
 		header?: string
 		hideHeader?: boolean
@@ -301,7 +302,7 @@ const computedFade = computed(() => {
 
 const modalId = `modal-${Math.random().toString(36).slice(2, 9)}`
 const headerId = `${modalId}-header`
-const closeLabel = computed(() => formatMessage(commonMessages.closeButton))
+const closeLabel = computed(() => props.closeLabel ?? formatMessage(commonMessages.closeButton))
 
 const modalAnchor = ref<HTMLElement | null>(null)
 const modalDocument = shallowRef<Document>()

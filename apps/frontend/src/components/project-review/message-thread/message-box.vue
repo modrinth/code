@@ -217,7 +217,7 @@ defineExpose({ openEditor })
 	transition: none;
 }
 
-.message-editor :deep(.block) {
+.message-editor > :deep(.block) {
 	display: flex;
 	height: 100%;
 	min-height: 0;
@@ -228,8 +228,15 @@ defineExpose({ openEditor })
 	flex-shrink: 0;
 }
 
-.message-editor :deep([class~='group/input']),
-.message-editor :deep(.block > div:not([class])) {
+.message-editor :deep(.editor-panes) {
+	display: flex;
+	flex: 1;
+	min-height: 0;
+	flex-direction: column;
+}
+
+.message-editor :deep(.editor-input),
+.message-editor :deep(.editor-preview) {
 	flex: 1;
 	min-height: 0;
 	overflow: hidden;

@@ -1070,23 +1070,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Privát megjegyzés"
   },
-  "conversation-thread.action.approve": {
-    "message": "Jóváhagyás"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Jóváhagyás és válasz"
-  },
   "conversation-thread.action.close-report": {
     "message": "Jelentés lezárása"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Bezárás és válasz"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Elutasítás"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Elutasítás és válasz"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Beszélgetés megnyitása újra"
@@ -1097,32 +1085,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Válasz a beszélgetésre"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Benyújtás újra felülvizsgálatra"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Újbóli beküldés ellenőrzésre, válasszal"
-  },
   "conversation-thread.action.send": {
     "message": "Küldés"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Küldés áttekintésre"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Küldés áttekintésre válasszal"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Beállítás vázlatként"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Piszkozatba állítás válasszal"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Visszatartás"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Visszatartás és válasz"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Ez a beszélgetés le van zárva, és nem lehet új üzeneteket küldeni benne."
@@ -1168,27 +1132,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Moderációs probléma"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Megerősítem, hogy foglalkoztam a moderátorok üzeneteivel"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Megerősítem, hogy a moderátorok észrevételeit megfelelően figyelembe vettem."
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "A <project-title>{projectTitle}</project-title> projektet újra benyújtod. Ha minden moderációs problémát megoldottál, a rendszer automatikusan jóváhagyhatja. Ellenkező esetben a moderátorokhoz kerül felülvizsgálatra."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Benyújtás újra felülvizsgálatra"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Benyújtás felülvizsgálatra"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Győződj meg róla, hogy a moderációs csapat minden megjegyzésével foglalkoztál."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "A moderátorok megjegyzéseinek figyelmen kívül hagyásával történő ismételt beküldések a fiókod felfüggesztését eredményezhetik."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "A kiegészítő fájlok olyan kiegészítő forrásokhoz tartoznak, mint például a forráskód, nem pedig alternatív verziókhoz vagy változatokhoz."
@@ -1322,9 +1265,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Verziók"
   },
-  "create.collection.collection-info": {
-    "message": "Az új gyűjteményed nyilvános gyűjteményként jön létre {count, plural, =0 {projektek nélkül} other {# projekttel}}."
-  },
   "create.collection.create-collection": {
     "message": "Gyűjtemény létrehozása"
   },
@@ -1388,9 +1328,6 @@
   "create.organization.name-placeholder": {
     "message": "Adj meg a szervezetednek egy nevet..."
   },
-  "create.organization.ownership-info": {
-    "message": "Át fogod ruházni a tulajdonjogod erre a szervezetre, de már meghívhatsz másokat és átruházhatod a tulajdonjogot bármikor."
-  },
   "create.organization.summary-description": {
     "message": "Egy vagy több mondat ami leírja a szervezetedet."
   },
@@ -1418,20 +1355,11 @@
   "create.project.name-placeholder": {
     "message": "Adj meg egy projekt nevet..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} ikon"
-  },
-  "create.project.owner-description": {
-    "message": "Állítsd be a projekt tulajdonosát saját magadra vagy egy olyan szervezetre, amelynek tagja vagy."
-  },
   "create.project.owner-label": {
     "message": "Tulajdonos"
   },
   "create.project.server-project-title": {
     "message": "Szerverprojekt létrehozása"
-  },
-  "create.project.summary-description": {
-    "message": "Egy vagy kettő mondat ami leírja a projektedet."
   },
   "create.project.summary-label": {
     "message": "Összegzés"
@@ -1442,26 +1370,11 @@
   "create.project.title": {
     "message": "Projekt létrehozása"
   },
-  "create.project.type-label": {
-    "message": "Típus"
-  },
-  "create.project.type-project": {
-    "message": "Projekt"
-  },
-  "create.project.type-server": {
-    "message": "Szerver"
-  },
   "create.project.unknown-user": {
     "message": "Ismeretlen felhasználó"
   },
   "create.project.url-label": {
     "message": "Link"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Felhasználói avatár"
-  },
-  "create.project.visibility-description": {
-    "message": "A projekt láthatósága jóváhagyása után."
   },
   "create.project.visibility-private": {
     "message": "Privát"
@@ -1870,9 +1783,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Hiba az értesítések betöltése során:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Előzmények"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Értesítési előzmények"
@@ -3752,80 +3662,14 @@
   "project.install-context.back-to-discover": {
     "message": "Vissza a felfedezéshez"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "A projekted privát, vagyis csak te és az általad meghívott személyek férhetnek hozzá."
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "A projekted közzétételre került, és megtalálható a Modrinthon."
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "A projekted nem listázott, ami azt jelenti, hogy csak a linkjével érhető el, és nem található meg a Modrinthon."
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "A projekt láthatóságát a projekt <visibility-settings-link>láthatósági beállításaiban</visibility-settings-link> módosíthatod."
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "Projekt jóváhagyva"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "Ez egy projektvázlat, amelyet mások nem láthatnak, amíg azt felülvizsgálatra nem nyújtják be, és a Modrinth moderátori csapata jóvá nem hagyja."
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "Projektvázlat"
-  },
-  "project.moderation.admonition.draft.submit-for-review": {
-    "message": "Miután elvégezted az összes szükséges lépést, és meggyőződtél arról, hogy a projekted megfelel a Modrinth <rules-link>Tartalmi szabályainak</rules-link>, benyújthatod a projektedet felülvizsgálatra."
-  },
-  "project.moderation.admonition.rejected.address-all-concerns": {
-    "message": "Az újbóli beküldés előtt kezeld az összes moderációs kifogást, beleértve az alábbi üzenetekben felsorolt problémákat is."
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Változtatások kérve lettek"
-  },
-  "project.moderation.admonition.rejected.spam-notice": {
-    "message": "Ha ismételten úgy küldöd be a projektedet, hogy előtte nem kezelted az összes moderációs kifogást, az a fiókod felfüggesztéséhez vezethet."
-  },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "A projekted a Modrinth moderációs csapatának ellenőrzési sorában van."
-  },
-  "project.moderation.admonition.under-review.body.2": {
-    "message": "A projektedet először beolvassuk, majd emberi moderátorok ellenőrzik, hogy megfelel-e a Modrinth <rules-link>Tartalmi szabályainak</rules-link> és <terms-link>Felhasználási feltételeinek</terms-link>."
-  },
-  "project.moderation.admonition.under-review.body.3": {
-    "message": "Továbbra is módosíthatod a projektedet, ez nem befolyásolja a sorban elfoglalt helyedet."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Igyekszünk 24–48 órán belül ellenőrizni a beküldéseket, de egyes projektek esetében előfordulhatnak késések. Ez nem jelenti azt, hogy probléma lenne a beküldéseddel."
-  },
-  "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "Igyekszünk egy héten belül ellenőrizni a beküldéseket, de egyes projektek esetében előfordulhatnak késések. Ez nem jelenti azt, hogy probléma lenne a beküldéseddel."
-  },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>Köszönjük türelmedet, amíg moderátoraink keményen dolgoznak a Modrinth biztonságának fenntartásán, és alig várjuk, hogy segíthessünk tartalmaid megosztásában! 💚</emphasis>"
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "Projekt áttekintés alatt"
-  },
-  "project.moderation.admonition.withheld.body": {
-    "message": "A projekted nem fog nyilvánosan megjelenni, és csak közvetlen hivatkozással lesz elérhető.{requestedStatus, select, unlisted { A kiválasztott <visibility-settings-link>láthatósági beállítások</visibility-settings-link> alapján valószínűleg nincs szükség további teendőre.} other { Kérjük, a projekt újbóli beküldése előtt oldj meg minden moderálási problémát, beleértve az alábbi üzenetekben felsoroltakat is.}}"
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "Moderátor által nem listázott"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Nem engedélyezett"
   },
   "project.moderation.thread.approved-warning": {
     "message": "Ezt a beszélgetést nem figyelik aktívan, de szükség esetén átnézhetik a projekteddel kapcsolatos információkért."
   },
-  "project.moderation.thread.help-center-note.1": {
-    "message": "A tartalommoderátorok a legtöbb problémával kapcsolatban nem tudnak segítséget nyújtani, és az ebbe a beszélgetésbe küldött üzenetek nem értesítik a munkatársakat."
-  },
   "project.moderation.thread.help-center-note.2": {
     "message": "Ha segítségre van szükséged, vagy további kérdésed van, látogass el a <help-center-link>Modrinth Súgóközpontjába</help-center-link>, majd kattints a kék buborékra az ügyfélszolgálattal való kapcsolatfelvételhez."
-  },
-  "project.moderation.thread.private-description": {
-    "message": "Ez egy privát beszélgetés a Modrinth moderátoraival. A projekttel kapcsolatos problémák miatt üzenetet küldhetnek neked."
   },
   "project.moderation.thread.title": {
     "message": "Moderációs üzenetek"
@@ -3890,17 +3734,8 @@
   "project.settings.delete-project.confirmation.title": {
     "message": "Tuti fix biztos vagy abban, hogy ki szeretnéd törölni ezt a projektet?"
   },
-  "project.settings.delete-project.description.1": {
-    "message": "Véglegesen törli ezt a projektet a Modrinthról. A törölt projekteket a Modrinth munkatársai vagy az ügyfélszolgálat <emphasis>sem tudja visszaállítani</emphasis>."
-  },
-  "project.settings.delete-project.description.2": {
-    "message": "A projekthez feltöltött, a Modrinthon tárolt modcsomagok által aktívan használt fájlok továbbra is elérhetők maradhatnak."
-  },
   "project.settings.delete-project.title": {
     "message": "Projekt végleges törlése"
-  },
-  "project.settings.description.intro": {
-    "message": "Itt részletesebb leírást adhatsz meg a projektedről. A leírásnak egyértelműen és őszintén ismertetnie kell a projekt célját és működését. A teljes követelményekért lásd a <rules>Content Rules</rules> 2.1. szakaszát."
   },
   "project.settings.description.title": {
     "message": "Leírás"
@@ -4091,59 +3926,8 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Telemetriát tartalmaz"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Tölts fel verziókat a tartalmi nyilatkozatok hozzáadása előtt"
-  },
   "project.settings.editing-project": {
     "message": "Projekt szerkesztése"
-  },
-  "project.settings.general.name.description": {
-    "message": "Kerüld az előtagokat, utótagokat, zárójeleket vagy hozzáadott leírásokat – csak a projekt tényleges nevét használd."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "pl. Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "pl. Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "pl. Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "pl. Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "pl. Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Név"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Összegezd projektedet legfeljebb egy mondatban."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "pl. Átalakítja a játék menetét, hogy az az Alvilág körül forogjon."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "pl. Hordható építőipari felszerelést ad hozzá."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "pl. Valósághű bányajárat-építő mehanikákat ad hozzá."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "pl. Javítja az alvilágportálok egymáshoz való kapcsolódását."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "pl. Hozzáadja a normál mobok erőteljes főellenségváltozatát, akikkel éjszaka találkozhatunk."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Címke sor"
-  },
-  "project.settings.general.url.title": {
-    "message": "Link"
-  },
-  "project.settings.license.all-rights": {
-    "message": "Minden jog fenntartva/Nincs licenc"
   },
   "project.settings.license.allow-later": {
     "message": "Későbbi kiadások engedélyezése"
@@ -4151,32 +3935,14 @@
   "project.settings.license.custom": {
     "message": "Egyéni"
   },
-  "project.settings.license.custom-name-required": {
-    "message": "Add meg az egyéni licenc nevét."
-  },
-  "project.settings.license.intro": {
-    "message": "Fontos, hogy a projektedhez megfelelő licencet válassz. Választhataz egyet a listánkból, vagy megadhatsz egy egyéni licencet. Megadhatsz egy egyéni URL-címet is a választott licenchez; ellenkező esetben a licenc szövege jelenik meg. További információkért lásd a <guide>licencelési útmutatónkat</guide>."
-  },
   "project.settings.license.later": {
     "message": "Későbbi kiadások"
   },
   "project.settings.license.later-description": {
     "message": "A kiválasztott licenc tartalmaz egy „vagy későbbi” záradékot. Ha bejelölöd ezt a jelölőnégyzetet, a felhasználók a projektedet a licenc későbbi kiadásai alapján is használhatják."
   },
-  "project.settings.license.missing-url": {
-    "message": "Adj meg egy URL címet az egyéni licenced teljes tartalmához."
-  },
   "project.settings.license.name": {
     "message": "A licenc neve"
-  },
-  "project.settings.license.name-description": {
-    "message": "Az egyéni licenced teljes neve."
-  },
-  "project.settings.license.name-placeholder": {
-    "message": "A licenc neve"
-  },
-  "project.settings.license.optional-label": {
-    "message": "opcionális"
   },
   "project.settings.license.title": {
     "message": "Licenc"
@@ -4189,12 +3955,6 @@
   },
   "project.settings.license.url": {
     "message": "A licenc linkje"
-  },
-  "project.settings.license.url-description": {
-    "message": "Az internetes elérhetősége a teljes licenc tartalomnak. Ha nem adod meg az elérési utat, a licenced szövege lesz megjelenítve."
-  },
-  "project.settings.license.url-placeholder": {
-    "message": "A licenc URL-címe"
   },
   "project.settings.links.add-link": {
     "message": "Hivatkozás megadása"
@@ -4285,15 +4045,6 @@
   },
   "project.settings.links.wiki-description": {
     "message": "Egy oldal ami információt, dokumentációt és egy segédletet tartalmaz a projektedhez."
-  },
-  "project.settings.monetization.description": {
-    "message": "A Modrinthon található projektek automatikusan részt vesznek a <rewards-program-link>Jutalmazási programban</rewards-program-link>. Ha nem szeretnél (vagy jogi okokból nem tudsz) bevételt szerezni ebből a projektből, itt kikapcsolhatod."
-  },
-  "project.settings.monetization.disabled-description": {
-    "message": "Ez a projekt nem jogosult bevételszerzésre. Ha úgy gondolod, hogy ez tévedés, kérjük, <contact-support-link>vedd fel a kapcsolatot az ügyfélszolgálattal</contact-support-link>."
-  },
-  "project.settings.monetization.title": {
-    "message": "Bevétel"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Igazold, hogy rendelkezel az alábbi fájlok mindegyikének továbbterjesztésére vonatkozó engedéllyel. A folyamat befejezése után a visszatartott verziók automatikusan közzétételre kerülnek."
@@ -4406,9 +4157,6 @@
   "project.settings.server.latency-label": {
     "message": "Késleltetés: {latency} ms"
   },
-  "project.settings.server.optional-label": {
-    "message": "opcionális"
-  },
   "project.settings.server.ping-failed-message": {
     "message": "Nem sikerült pingelnünk ezt a szervert. Lehet, hogy a szolgáltatód blokkolja, ezért próbáld meg néhányszor frissíteni az oldalt. Ha továbbra sem válaszol, kérjük, <support-link>fordulj az ügyfélszolgálathoz</support-link>."
   },
@@ -4428,7 +4176,7 @@
     "message": "A szerver elérhető!"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "Ha rendelkezel <srv-tooltip>[SRV-rekordokkal]</srv-tooltip>, akkor nem kell portot hozzáadnod. Ellenkező esetben, ha a port száma nem 25565, akkor azt a következő formában adhatod meg: :12345"
+    "message": "Ha rendelkezel <srv-tooltip>SRV-rekordokkal</srv-tooltip>, akkor nem kell portot hozzáadnod. Ellenkező esetben, ha a port száma nem 25565, akkor azt a következő formában adhatod meg: :12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "Az itt megadott címhez tartozhatnak olyan DNS SRV-bejegyzések, mint például _minecraft._tcp.(a domainod), amelyek a Minecraft-szerver címére és portjára mutatnak."
@@ -4436,20 +4184,8 @@
   "project.settings.tags.all-tags-selected-warning": {
     "message": "Mind a {count} elérhető címkét kiválasztottad. Kérjük, csak azokat a címkéket válaszd ki, amelyek valóban vonatkoznak a projektedre."
   },
-  "project.settings.tags.categories-description": {
-    "message": "Jelöld ki az összes olyan kategóriát, amely tükrözi a {type} témáit vagy funkcióját."
-  },
   "project.settings.tags.featured-tags": {
     "message": "Kiemelt címkék"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "Legalább egy címkét ki kell emlelned!"
-  },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Válaszd ki a legrelevánsabb címkéidet. Ezek a többi címke előtt jelennek meg."
-  },
-  "project.settings.tags.features-description": {
-    "message": "Jelöld ki az összes olyan funkciót, amelyet a {type} használ."
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} kategóriák} other {Kategóriák}}"
@@ -4474,18 +4210,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Válassz ki legalább egy kategóriát ahhoz, hogy kiemelj egy kategóriát."
-  },
-  "project.settings.tags.title": {
-    "message": "Címkék"
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "{count} címkét választottál ki. Fontold meg, hogy 8-ra vagy annál kevesebbre csökkentsd a számukat, hogy a projekted célzott maradjon és könnyebben megtalálható legyen."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "{count} címkét választottál ki. Kérjük, csökkentsd a számukat 18-ra vagy annál kevesebbre, hogy a szervered célzott maradjon és könnyebben megtalálható legyen."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "{count} címkét választottál ki. Fontold meg, hogy 12-re vagy annál kevesebbre csökkentsd a számukat, hogy a szervered célzott maradjon és könnyebben megtalálható legyen."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Tölts fel verziókat a címkék hozzáadása előtt"

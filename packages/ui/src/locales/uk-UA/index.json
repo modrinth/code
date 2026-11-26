@@ -3461,12 +3461,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Відео"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Файл не надано"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "Не передбачено обробника вивантаження зображення"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "Посилання"
   },

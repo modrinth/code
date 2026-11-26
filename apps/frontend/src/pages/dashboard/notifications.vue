@@ -1,72 +1,61 @@
 <template>
-	<div>
-		<section class="universal-card">
-			<Breadcrumbs
-				v-if="history"
-				:current-title="formatMessage(messages.historyLabel)"
-				:link-stack="[
-					{
-						href: `/dashboard/notifications`,
-						label: formatMessage(commonMessages.notificationsLabel),
-					},
-				]"
-			/>
-			<div class="header__row">
-				<div class="header__title">
-					<h2 v-if="history" class="text-2xl">
-						{{ formatMessage(messages.notificationHistoryTitle) }}
-					</h2>
-					<h2 v-else class="text-2xl">
-						{{ formatMessage(commonMessages.notificationsLabel) }}
-					</h2>
-				</div>
-				<template v-if="!history">
-					<Button v-if="data.hasRead" @click="updateRoute()">
-						<HistoryIcon />
-						{{ formatMessage(messages.viewHistory) }}
-					</Button>
-					<Button v-if="notifications.length > 0" type="colored" color="red" @click="readAll()">
-						<CheckCheckIcon />
-						{{ formatMessage(messages.markAllAsRead) }}
-					</Button>
-				</template>
+	<section class="flex flex-col gap-4 pb-20">
+		<BackToParentLink v-if="history" to="/dashboard/notifications" class="mt-2.5">
+			{{ formatMessage(commonMessages.notificationsLabel) }}
+		</BackToParentLink>
+		<div class="flex flex-wrap items-center justify-between gap-2">
+			<h2 class="m-0 text-xl font-semibold text-contrast md:text-2xl">
+				{{
+					formatMessage(
+						history ? messages.notificationHistoryTitle : commonMessages.notificationsLabel,
+					)
+				}}
+			</h2>
+			<div v-if="!history && (data.hasRead || notifications.length)" class="flex flex-wrap gap-2">
+				<Button v-if="data.hasRead" @click="updateRoute()">
+					<HistoryIcon />
+					{{ formatMessage(messages.viewHistory) }}
+				</Button>
+				<Button v-if="notifications.length > 0" type="colored" color="red" @click="readAll()">
+					<CheckCheckIcon />
+					{{ formatMessage(messages.markAllAsRead) }}
+				</Button>
 			</div>
-			<Chips
-				v-if="notifTypes.length > 1"
-				v-model="selectedType"
-				:items="notifTypes"
-				:format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x).replace('_', ' ') + 's')"
-				:capitalize="false"
+		</div>
+		<Chips
+			v-if="notifTypes.length > 1"
+			v-model="selectedType"
+			:items="notifTypes"
+			:format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x).replace('_', ' ') + 's')"
+			:capitalize="false"
+		/>
+		<p v-if="isPending" class="m-0">{{ formatMessage(messages.loadingNotifications) }}</p>
+		<template v-else-if="error">
+			<p class="m-0">{{ formatMessage(messages.errorLoadingNotifications) }}</p>
+			<pre class="m-0 overflow-x-auto">{{ error }}</pre>
+		</template>
+		<template v-else-if="notifications.length > 0">
+			<NotificationItem
+				v-for="notification in notifications"
+				:key="notification.id"
+				:notifications="notifications"
+				class="universal-card !mb-0"
+				:notification="notification"
+				:auth="auth"
+				raised
+				@update:notifications="() => refetch()"
 			/>
-			<p v-if="isPending">{{ formatMessage(messages.loadingNotifications) }}</p>
-			<template v-else-if="error">
-				<p>{{ formatMessage(messages.errorLoadingNotifications) }}</p>
-				<pre>
-          {{ error }}
-        </pre>
-			</template>
-			<template v-else-if="notifications && notifications.length > 0">
-				<NotificationItem
-					v-for="notification in notifications"
-					:key="notification.id"
-					:notifications="notifications"
-					class="universal-card recessed"
-					:notification="notification"
-					:auth="auth"
-					raised
-					@update:notifications="() => refetch()"
-				/>
-			</template>
-			<p v-else>{{ formatMessage(messages.noUnreadNotifications) }}</p>
-			<div class="flex justify-end">
-				<Pagination :page="page" :count="pages" @switch-page="changePage" />
-			</div>
-		</section>
-	</div>
+		</template>
+		<p v-else class="m-0">{{ formatMessage(messages.noUnreadNotifications) }}</p>
+		<div v-if="pages > 1" class="flex justify-end">
+			<Pagination :page="page" :count="pages" @switch-page="changePage" />
+		</div>
+	</section>
 </template>
 <script setup>
 import { CheckCheckIcon, HistoryIcon } from '@modrinth/assets'
 import {
+	BackToParentLink,
 	Button,
 	Chips,
 	commonMessages,
@@ -78,7 +67,6 @@ import {
 import { formatProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
-import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import NotificationItem from '~/components/ui/NotificationItem.vue'
 import {
 	fetchExtraNotificationData,
@@ -89,10 +77,6 @@ import {
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	historyLabel: {
-		id: 'dashboard.overview.notifications.history.label',
-		defaultMessage: 'History',
-	},
 	notificationHistoryTitle: {
 		id: 'dashboard.overview.notifications.history.title',
 		defaultMessage: 'Notification history',
@@ -207,20 +191,3 @@ function changePage(newPage) {
 	if (import.meta.client) window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 </script>
-<style lang="scss" scoped>
-.read-toggle-input {
-	display: flex;
-	align-items: center;
-	gap: var(--spacing-card-md);
-
-	.label__title {
-		margin: 0;
-	}
-}
-
-.header__title {
-	h2 {
-		margin: 0 auto 0 0;
-	}
-}
-</style>

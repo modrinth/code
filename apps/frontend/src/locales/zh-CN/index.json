@@ -1088,23 +1088,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "添加个人笔记"
   },
-  "conversation-thread.action.approve": {
-    "message": "批准"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "批准并回复"
-  },
   "conversation-thread.action.close-report": {
     "message": "关闭举报"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "关闭并回复"
-  },
-  "conversation-thread.action.reject": {
-    "message": "驳回"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "驳回并回复"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "重开对话消息"
@@ -1115,32 +1103,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "回复对话消息"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "重新提交审核"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "重新提交审核并回复"
-  },
   "conversation-thread.action.send": {
     "message": "发送"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "送审"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "送审并回复"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "设为草稿"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "设为草稿并回复"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "暂扣"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "暂扣并回复"
   },
   "conversation-thread.closed-thread.description": {
     "message": "此对话消息已关闭，无法发送新消息。"
@@ -1189,33 +1153,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "审核问题"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "我已确认处理来自管理员的消息"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "我确认我已妥善处理了管理员的评论。"
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "您正在重复提交 <project-title>{projectTitle}</project-title>. 如果所有的管理员问题都被解决，那么此提交可能自动通过审核。否则，此提交将会交由管理员审核。"
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "重新提交审核"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "提交审核"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "请确保你已处理来自管理团队的所有评论。"
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "如果反复提交而不处理管理员的评论，可能会导致账户被暂停。"
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "你必须完成上面所有必需的操作才能重新提交"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "你正在上传 <project-title>{projectTitle}</project-title>以交由管理员审核。"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "补充文件仅用来保存源代码等支持性资料，不能用来存放替代版本或者变体文件。"
@@ -1349,9 +1286,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "版本"
   },
-  "create.collection.collection-info": {
-    "message": "将创建一个公开收藏夹，包含{count, plural, =0 {0个项目}  other {#个项目}}。"
-  },
   "create.collection.create-collection": {
     "message": "新建收藏夹"
   },
@@ -1415,9 +1349,6 @@
   "create.organization.name-placeholder": {
     "message": "输入组织名称……"
   },
-  "create.organization.ownership-info": {
-    "message": "你将成为这个组织的所有者，但你可以随时邀请其他成员并转让所有权。"
-  },
   "create.organization.summary-description": {
     "message": "一两句话描述你的组织。"
   },
@@ -1445,20 +1376,11 @@
   "create.project.name-placeholder": {
     "message": "输入项目名称…"
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} 图标"
-  },
-  "create.project.owner-description": {
-    "message": "将项目所有者设置为你自己或你所属的组织。"
-  },
   "create.project.owner-label": {
     "message": "所有者"
   },
   "create.project.server-project-title": {
     "message": "创建服务器项目"
-  },
-  "create.project.summary-description": {
-    "message": "一两句话描述你的项目。"
   },
   "create.project.summary-label": {
     "message": "概述"
@@ -1469,26 +1391,11 @@
   "create.project.title": {
     "message": "创建项目"
   },
-  "create.project.type-label": {
-    "message": "类型"
-  },
-  "create.project.type-project": {
-    "message": "项目"
-  },
-  "create.project.type-server": {
-    "message": "服务器"
-  },
   "create.project.unknown-user": {
     "message": "未知用户"
   },
   "create.project.url-label": {
     "message": "URL链接"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "用户头像"
-  },
-  "create.project.visibility-description": {
-    "message": "你的项目在获得批准后的可见性。"
   },
   "create.project.visibility-private": {
     "message": "私有"
@@ -1918,9 +1825,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "加载通知出错："
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "历史"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "历史通知"
@@ -4061,66 +3965,6 @@
   "project.install-context.back-to-discover": {
     "message": "返回发现页"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "你的项目是私人的，这意味着它只能由你本人或受你邀请的人访问。"
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "您的项目已发布，并且可以在 Modrinth 上被发现。"
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "你的项目状态为“未列出”，即只能通过直链访问，无法在 Modrinth 被搜索到。"
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "您可以在项目的<visibility-settings-link>可见性设置</visibility-settings-link>中更改项目的可见性。"
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "项目已被批准"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "这是一个草稿项目，在提交审核并获得 Modrinth 管理团队批准之前，其他人无法查看。"
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "草稿项目"
-  },
-  "project.moderation.admonition.draft.submit-for-review": {
-    "message": "一旦你完成了所有必需步骤，并确保你的项目符合 Modrinth 的<rules-link>内容规则</rules-link>，你就可以提交你的项目以供审核。"
-  },
-  "project.moderation.admonition.rejected.address-all-concerns": {
-    "message": "在重新提交项目前，请解决所有审核关切和下方列出的问题。"
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "更改请求"
-  },
-  "project.moderation.admonition.rejected.spam-notice": {
-    "message": "如果反复提交你的项目而不预先处理管理问题，可能会导致账户被暂停。"
-  },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "您的项目正在等待 Modrinth 审核团队审核。"
-  },
-  "project.moderation.admonition.under-review.body.2": {
-    "message": "你的项目将先被扫描，然后由人工管理员来审核，以确保其符合 Modrinth 的<rules-link>内容规则</rules-link>和<terms-link>使用条款</terms-link>。"
-  },
-  "project.moderation.admonition.under-review.body.3": {
-    "message": "你仍然可以修改项目，这不会影响你在队列中的位置。"
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "我们计划在24-48小时内审查提交内容，但某些项目可能会有延迟。这并不意味着你的提交有问题。"
-  },
-  "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "我们计划在一周内审查提交内容，但某些项目可能会有延迟。这并不意味着你的提交有问题。"
-  },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>我们感谢您的耐心等待，同时我们的管理员正在努力保持 Modrinth 的安全，并期待帮助您分享内容！💚</emphasis>"
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "在审项目"
-  },
-  "project.moderation.admonition.withheld.body": {
-    "message": "你的项目不会公开显示，只能通过直链访问。{requestedStatus, select, unlisted { 根据你选择的 <visibility-settings-link>可见性设置</visibility-settings-link>，很可能无需操作。} other { 请在重新提交项目前，解决所有审核关切，包括下方消息中列出的任何问题。}}"
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "由管理员下架"
-  },
   "project.moderation.error.unauthorized": {
     "message": "未经许可"
   },
@@ -4130,14 +3974,8 @@
   "project.moderation.thread.approved-warning": {
     "message": "这则聊天消息审核并不活跃，但如有需要，可能会审查其中关于你项目的信息。"
   },
-  "project.moderation.thread.help-center-note.1": {
-    "message": "内容管理员无法为大多数问题提供支持，并且发送到此对话的消息不会通知工作人员。"
-  },
   "project.moderation.thread.help-center-note.2": {
     "message": "如果你需要帮助或有其他疑问，请访问 <help-center-link>Modrinth Help Center</help-center-link>，然后点击蓝色气泡以联系支持。"
-  },
-  "project.moderation.thread.private-description": {
-    "message": "这是与 Modrinth 管理员的私人对话消息。他们可能会就此项目的问题向你发送消息。"
   },
   "project.moderation.thread.title": {
     "message": "审核信息"
@@ -4205,17 +4043,8 @@
   "project.settings.delete-project.confirmation.title": {
     "message": "你真的确定要删除这个项目吗？"
   },
-  "project.settings.delete-project.description.1": {
-    "message": "从Modrinth中永久删除此项目，已删除的项目 <emphasis>无法由 Modrinth 员工或支持恢复</emphasis>。"
-  },
-  "project.settings.delete-project.description.2": {
-    "message": "上传到这个项目并且在Modrints托管的整合包中积极使用的文件可能仍然存在。"
-  },
   "project.settings.delete-project.title": {
     "message": "删除项目"
-  },
-  "project.settings.description.intro": {
-    "message": "你可以在这里输入项目的详细描述。该描述必须清晰、诚实地说明项目的用途和功能。完整要求请参见 <rules>内容规则</rules> 第2.1节。"
   },
   "project.settings.description.title": {
     "message": "描述"
@@ -4409,59 +4238,8 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "包含遥测功能"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "在添加披露前上传版本"
-  },
   "project.settings.editing-project": {
     "message": "编辑 {projectType} 项目"
-  },
-  "project.settings.general.name.description": {
-    "message": "请勿添加前缀、后缀、括号内容或附加说明——仅填写项目实际名称。"
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "例：Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "例：Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "例：Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "例：Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "例：Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "名称"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "一句话总结你的项目。"
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "例：Overhauls game progression to revolve around the Nether。"
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "例：Adds wearable construction gear。"
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "例：Adds realistic mineshaft-building mechanics。"
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "例：Improves how Nether portals link to each other。"
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "例：Adds powerful boss versions of the normal mobs to encounter in the night。"
-  },
-  "project.settings.general.tagline.title": {
-    "message": "概要"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
-  "project.settings.license.all-rights": {
-    "message": "保留所有权利/无许可证"
   },
   "project.settings.license.allow-later": {
     "message": "允许后续版本"
@@ -4472,38 +4250,14 @@
   "project.settings.license.custom-name-invalid": {
     "message": "自定义许可证名称只能包含字母、数字、句点和连字符。"
   },
-  "project.settings.license.custom-name-required": {
-    "message": "为你的自定义许可证输入名称。"
-  },
-  "project.settings.license.custom-url-description": {
-    "message": "完整许可证文本的网址。由于这是自定义许可证，你必须提供一个链接。"
-  },
-  "project.settings.license.intro": {
-    "message": "为你的 {type} 选择合适的许可证非常重要。你可以从我们的列表中选择一项，也可以提供自定义许可证。你还可以为你选择的许可证提供一个自定义 URL；否则，将显示许可证文本。更多信息请参阅我们的 <guide>许可指南</guide> 。"
-  },
   "project.settings.license.later": {
     "message": "后续版本"
   },
   "project.settings.license.later-description": {
     "message": "你选择的许可证包含“或更多”条款。如果你勾选此复选框，用户可以在该许可证的后续版本下使用你的项目。"
   },
-  "project.settings.license.missing-url": {
-    "message": "输入指向你的自定义许可证全文的 URL。"
-  },
   "project.settings.license.name": {
     "message": "许可证名称"
-  },
-  "project.settings.license.name-description": {
-    "message": "自定义许可证的全称。"
-  },
-  "project.settings.license.name-placeholder": {
-    "message": "许可证名称"
-  },
-  "project.settings.license.optional-label": {
-    "message": "可选"
-  },
-  "project.settings.license.optional-url": {
-    "message": "许可证URL(可选)"
   },
   "project.settings.license.select": {
     "message": "许可证"
@@ -4521,12 +4275,6 @@
     "message": "你的许可证已更新。"
   },
   "project.settings.license.url": {
-    "message": "许可证 URL"
-  },
-  "project.settings.license.url-description": {
-    "message": "完整许可证文本的网址。如果你不提供链接，将改为显示许可证文本。"
-  },
-  "project.settings.license.url-placeholder": {
     "message": "许可证 URL"
   },
   "project.settings.links.add-link": {
@@ -4618,15 +4366,6 @@
   },
   "project.settings.links.wiki-description": {
     "message": "一个包含项目信息、文档和帮助的页面。"
-  },
-  "project.settings.monetization.description": {
-    "message": "Modrinth上的项目会自动加入<rewards-program-link>激励计划</rewards-program-link>。如果你不想（或由于法律原因不能）从这个项目赚取收入，你可以在这里关闭它。"
-  },
-  "project.settings.monetization.disabled-description": {
-    "message": "本项目不适用于变现。如果您认为此为错误，请<contact-support-link>联系支持团队</contact-support-link>。"
-  },
-  "project.settings.monetization.title": {
-    "message": "收益"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "请提供证明，表明您有权利二次分发下列所有文件进行再次分发。完成后，被暂扣的版本将自动发布。"
@@ -4751,9 +4490,6 @@
   "project.settings.server.latency-label": {
     "message": "延迟：{latency}ms"
   },
-  "project.settings.server.optional-label": {
-    "message": "可选"
-  },
   "project.settings.server.ping-failed-message": {
     "message": "我们无法对该服务器进行 Ping 测试。该服务器可能正被你的主机阻止连接，因此可以尝试刷新几次，如果仍无回应，请<support-link>联系客服</support-link>。"
   },
@@ -4773,7 +4509,7 @@
     "message": "服务器在线！"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "如果有 <srv-tooltip>[SRV 记录]</srv-tooltip>，你就不必添加端口号。如果没有上述记录，且端口号不是 25565，你可以将端口号以形如 :12345 的格式包含进地址内"
+    "message": "如果有 <srv-tooltip>SRV 记录</srv-tooltip>，你就不必添加端口号。如果没有上述记录，且端口号不是 25565，你可以将端口号以形如 :12345 的格式包含进地址内"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "你在此处输入的地址可能拥有 DNS SRV 记录 _minecraft._tcp.(你的域名)，指向你的 Minecraft 服务器地址和端口。"
@@ -4781,20 +4517,8 @@
   "project.settings.tags.all-tags-selected-warning": {
     "message": "你选择了全部的 {count} 个可用标签。请仅选择真正适合你项目的标签。"
   },
-  "project.settings.tags.categories-description": {
-    "message": "选择所有能反映出你{type}的主题或功能的分类。"
-  },
   "project.settings.tags.featured-tags": {
     "message": "精选标签"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "您必须至少有一个精选标签。"
-  },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "选择您最相关的标签，这些标签将显示在您其余标签之前。"
-  },
-  "project.settings.tags.features-description": {
-    "message": "选择你的{type}作用于哪类特性。"
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types}类别} other {类别}}"
@@ -4819,18 +4543,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "请先至少选择一个分类，再设置精选分类。"
-  },
-  "project.settings.tags.title": {
-    "message": "标签"
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "你选择了 {count} 个标签。建议将数量减少到 8 个或更少，以确保你的项目主题更明确，且更容易发现。"
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "你选择了 {count} 个标签。请将数量减少到 18 个或更少，以确保你的服务器主题更明确，且更容易发现。"
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "你选择了 {count} 个标签。建议将数量减少到 12 个或更少，以确保你的服务器主题更明确，且更容易发现。"
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "添加标签前上传版本"

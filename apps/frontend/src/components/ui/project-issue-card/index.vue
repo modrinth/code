@@ -82,7 +82,7 @@
 					<div class="flex flex-col gap-3 pb-3">
 						<IssueMessage
 							v-if="issueMessage(issue)"
-							class="markdown-body min-w-0 text-sm text-inherit"
+							class="markdown-body min-w-0 text-sm text-inherit [&_p]:!mb-2 [&_ul]:!mb-2"
 							:message="issueMessage(issue)"
 						/>
 						<div
@@ -248,9 +248,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive, watch } from 'vue'
 
 import type { ProjectIssueFieldAction } from '~/composables/project-issue-field-action'
+import { isUnderReview } from '~/helpers/projects.js'
 import {
 	isThreadIssueFacetReadyToAddress,
 	isThreadIssueVerified,
+	isThreadIssueVisible,
 	threadIssueVerdict,
 } from '~/helpers/thread-issues'
 
@@ -628,7 +630,11 @@ const matchingIssues = computed(() =>
 	(props.issues ?? thread.value?.issues ?? [])
 		.filter(
 			(issue) =>
-				(props.threadHistory || !isThreadIssueVerified(issue)) &&
+				isThreadIssueVisible(
+					issue,
+					Boolean(isUnderReview(projectContext?.projectV3.value)),
+					props.threadHistory,
+				) &&
 				(props.issues !== undefined ||
 					matchesLocation(issue) ||
 					issue.facets.some(({ what }) => matchesTarget(what))),
@@ -919,8 +925,5 @@ function toggle(issue: ThreadIssue) {
 	.project-issue-content.open > div {
 		overflow: visible;
 	}
-}
-.markdown-body :deep(p) {
-	margin-bottom: 12px;
 }
 </style>

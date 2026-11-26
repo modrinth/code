@@ -12,12 +12,12 @@
 			<template v-if="canAccessSettings">
 				<div class="normal-page__sidebar">
 					<div
-						class="bg-surface mb-4 flex flex-col rounded-xl border border-solid border-surface-4 p-4"
+						class="mb-4 flex flex-col rounded-xl border border-solid border-surface-4 bg-surface-2 p-4"
 					>
 						<div class="flex items-center gap-4">
 							<Avatar size="sm" :src="organization.icon_url" :raw-src="organization.raw_icon_url" />
 							<div class="flex flex-col justify-center gap-1">
-								<h2 class="m-0 text-base">
+								<h2 class="m-0 text-base hover:underline">
 									<nuxt-link :to="`/organization/${organization.slug}`">
 										{{ organization.name }}
 									</nuxt-link>
@@ -150,7 +150,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import { type Labrinth, ModrinthApiError } from '@modrinth/api-client'
 import {
 	BoxIcon,
 	ChartIcon,
@@ -222,7 +222,10 @@ const tags = useGeneratedState()
 const config = useRuntimeConfig()
 const modal_creation = useTemplateRef('modal_creation')
 
-const orgId = useRouteId('organization')
+const orgId = computed(() => {
+	const id = route.params.organization
+	return typeof id === 'string' ? id : ''
+})
 
 if (route.path.includes('settings')) {
 	useSeoMeta({
@@ -243,23 +246,22 @@ const {
 	error: orgError,
 	isPending: organizationIsPending,
 } = useQuery({
-	queryKey: computed(() => ['organization', orgId]),
-	// @ts-expect-error
-	queryFn: () => client.labrinth.organizations_v3.get(orgId),
-	enabled: !!orgId,
+	queryKey: computed(() => ['organization', orgId.value] as const),
+	queryFn: ({ queryKey: [, id] }) => client.labrinth.organizations_v3.get(id),
+	enabled: computed(() => !!orgId.value),
 })
 
 watch(
 	orgError,
 	(error) => {
-		if (error) {
-			const status = (error as any).statusCode ?? (error as any).status ?? 404
-			showError({
-				fatal: true,
-				statusCode: status,
-				message: 'Organization not found',
-			})
-		}
+		if (!error) return
+		const statusCode = error instanceof ModrinthApiError ? (error.statusCode ?? 502) : 500
+		if (organization.value && statusCode !== 404) return
+		showError({
+			fatal: true,
+			statusCode,
+			cause: error,
+		})
 	},
 	{ immediate: true },
 )
@@ -269,8 +271,9 @@ const {
 	refetch: refreshProjects,
 	isLoading: projectsIsLoading,
 } = useQuery({
-	queryKey: computed(() => ['organization', orgId, 'projects']),
-	queryFn: () => client.labrinth.organizations_v3.getProjects(orgId),
+	queryKey: computed(() => ['organization', orgId.value, 'projects'] as const),
+	queryFn: ({ queryKey: [, id] }) => client.labrinth.organizations_v3.getProjects(id),
+	enabled: computed(() => !!orgId.value),
 })
 
 watch(

@@ -1070,23 +1070,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Özel not ekle"
   },
-  "conversation-thread.action.approve": {
-    "message": "Onaylandı"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Onaylandı, işlem tamamlandı"
-  },
   "conversation-thread.action.close-report": {
     "message": "Raporu kapat"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Cevapla ve kapat"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Reddet"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Cevap vererek reddet"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Konuyu yeniden aç"
@@ -1097,32 +1085,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Konuya yanıt ver"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "İnceleme için yeniden gönder"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Yanıtla birlikte yeniden incelemeye gönder"
-  },
   "conversation-thread.action.send": {
     "message": "Gönder"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "İncelemeye gönder"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Yanıtla birlikte incelemeye gönder"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Taslağa ayarla"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Yanıtla birlikte taslağa ayarla"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Yanıtla birlikte taslağa çevir"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Yanıtla birlikte beklet"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Bu konu kapatılmıştır ve yeni mesaj gönderilemez."
@@ -1168,30 +1132,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Moderasyon sorunu"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Moderatörlerin mesajlarını yanıtladığımı onaylıyorum"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Moderatörlerin yorumlarını uygun şekilde yanıtladığımı onaylıyorum."
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "<project-title>{projectTitle}</project-title> projesini yeniden gönderiyorsun. Bütün moderasyon sorunları çözüldüyse,  otomatilk olarak onaylanabilir. Yoksa moderatörlerin incelemesine gönderilecek."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "İnceleme için yeniden gönderiliyor"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "İncelemeye gönderiliyor"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Moderatör ekibinin tüm yorumlarını ele aldığınızdan emin olun."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "Moderatörlerin yorumlarını ele almadan tekrar tekrar gönderim yapmak, hesabınızın askıya alınmasına neden olabilir."
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "<project-title>{projectTitle}</project-title> projesini moderatörler tarafından incelenmek üzere gönderiyorsun."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ek dosyalar, alternatif sürümler veya varyantlar için değil, kaynak kodu gibi destekleyici kaynaklar içindir."
@@ -1325,9 +1265,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Sürümler"
   },
-  "create.collection.collection-info": {
-    "message": "Yeni koleksiyonunuz herkese açık olarak {count, plural, =0 {projesiz hâlde} other {# proje ile}} oluşturulacaktır."
-  },
   "create.collection.create-collection": {
     "message": "Koleksiyon oluştur"
   },
@@ -1391,9 +1328,6 @@
   "create.organization.name-placeholder": {
     "message": "Organizasyonun ismini girin..."
   },
-  "create.organization.ownership-info": {
-    "message": "Siz bu organizasyonun sahibi olacaksınız fakat dilediğiniz zaman diğer üyeleri davet edebilir ve sahibliğinizi devredebilirsiniz."
-  },
   "create.organization.summary-description": {
     "message": "Organizasyonunuzu anlatan bir iki cümle."
   },
@@ -1421,20 +1355,11 @@
   "create.project.name-placeholder": {
     "message": "Projenin ismini girin..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} İkon"
-  },
-  "create.project.owner-description": {
-    "message": "Proje sahibini kendin ya da üyesi olduğun bir organizasyon olarak ayarla."
-  },
   "create.project.owner-label": {
     "message": "Sahip"
   },
   "create.project.server-project-title": {
     "message": "Sunucu Projesi oluştur"
-  },
-  "create.project.summary-description": {
-    "message": "Projenizi anlatan bir iki cümle."
   },
   "create.project.summary-label": {
     "message": "Özet"
@@ -1445,26 +1370,11 @@
   "create.project.title": {
     "message": "Proje oluştur"
   },
-  "create.project.type-label": {
-    "message": "Tür"
-  },
-  "create.project.type-project": {
-    "message": "Proje"
-  },
-  "create.project.type-server": {
-    "message": "Sunucu"
-  },
   "create.project.unknown-user": {
     "message": "Bilinmeyen kullanıcı"
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Kullanıcı Avatarı"
-  },
-  "create.project.visibility-description": {
-    "message": "Projenizin onaylandıktan sonraki görünürlük ayarı."
   },
   "create.project.visibility-private": {
     "message": "Gizli"
@@ -1885,9 +1795,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Bildirimler yüklenirken hata oluştu:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Geçmiş"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Bildirim geçmişi"
@@ -3806,71 +3713,14 @@
   "project.install-context.back-to-discover": {
     "message": "Keşfete geri dön"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "Projeniz özeldir, yani yalnızca siz ve davet ettiğiniz kişiler tarafından erişilebilir."
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "Projeniz Modrinth'te yayınlandı ve keşfedilebilir."
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "Projeniz liste dışıdır, yani yalnızca doğrudan bir bağlantıyla erişilebilir ve Modrinth'te keşfedilemez."
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "Projenizin görünürlüğünü projenizin <visibility-settings-link>görünürlük ayarları</visibility-settings-link> bölümünden değiştirebilirsiniz."
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "Proje onaylandı"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "Bu, Modrinth'in moderasyon ekibi tarafından incelenmek ve onaylanmak üzere sunulana kadar başkaları tarafından görülemeyen bir taslak projedir."
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "Taslak proje"
-  },
-  "project.moderation.admonition.rejected.address-all-concerns": {
-    "message": "Lütfen bu projeyi yeniden göndermeden önce aşağıdaki mesajlarda listelenen sorunlar da dahil olmak üzere tüm moderasyon endişelerini giderin."
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Talep edilen değişiklikler"
-  },
-  "project.moderation.admonition.rejected.spam-notice": {
-    "message": "Projenizi düzenli olarak göndermeden önce tüm moderasyon sorunlarını çözmemeniz durumunda, hesabınızın askıya alınması söz konusu olabilir."
-  },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "Projeniz Modrinth'in moderasyon ekibi tarafından incelenmek üzere sıraya alındı."
-  },
-  "project.moderation.admonition.under-review.body.3": {
-    "message": "Projenizi değiştirmeye devam edebilirsiniz, bu kuyruktaki konumunuzu etkilemeyecektir."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Gönderileri 24–48 saat içinde incelemeyi amaçlıyoruz, ancak bazı projelerde gecikmeler yaşanabilir. Bu durum gönderinizle ilgili bir sorun olduğu anlamına gelmez."
-  },
-  "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "Gönderileri bir hafta içinde incelemeyi amaçlıyoruz, ancak bazı projelerde gecikmeler yaşanabilir. Bu durum, gönderinizle ilgili bir sorun olduğu anlamına gelmez."
-  },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>Moderatörlerimiz Modrinth'i güvende tutmak için çok çalışırken gösterdiğiniz sabır için teşekkür ediyor ve içeriğinizi paylaşmanıza yardımcı olmayı dört gözle bekliyoruz! 💚</emphasis>"
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "İncelenmekte olan proje"
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "Kadro tarafından liste dışı"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Yetkisiz"
   },
   "project.moderation.thread.approved-warning": {
     "message": "Bu konu aktif olarak izlenmemektedir, ancak gerektiğinde projeniz hakkında bilgi almak için incelenebilir."
   },
-  "project.moderation.thread.help-center-note.1": {
-    "message": "İçerik moderatörleri çoğu sorun için destek sağlayamaz ve bu konuya gönderilen mesajlar personele bildirilmez."
-  },
   "project.moderation.thread.help-center-note.2": {
     "message": "Yardıma ihtiyacınız varsa veya ek sorularınız varsa, lütfen <help-center-link>Modrinth Yardım Merkezi'ni</help-center-link> ziyaret edin ve destekle iletişime geçmek için mavi baloncuğa tıklayın."
-  },
-  "project.moderation.thread.private-description": {
-    "message": "Bu, Modrinth moderatörleri ile özel bir konuşma başlığıdır. Bu projeyle ilgili konularda size mesaj gönderebilirler."
   },
   "project.moderation.thread.title": {
     "message": "Moderasyon mesajları"
@@ -3934,12 +3784,6 @@
   },
   "project.settings.delete-project.confirmation.title": {
     "message": "Bu projeyi silmek istediğinizden emin misiniz?"
-  },
-  "project.settings.delete-project.description.1": {
-    "message": "Proje Modrinth'den kalıcı olarak kaldırıldı. Kaldırılan projeler Modrinth personeli veya destek ekibi tarafından <emphasis>kurtarılamaz</emphasis>."
-  },
-  "project.settings.delete-project.description.2": {
-    "message": "Bu projeye yüklenen ve Modrinth’te barındırılan Mod Paketlerinde aktif olarak kullanılan dosyalar varlığını sürdürebilir."
   },
   "project.settings.delete-project.title": {
     "message": "Projeyi kaldır"
@@ -4094,71 +3938,11 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Telemetri içerir"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Uyarı eklemeden önce sürümleri yükleyin"
-  },
   "project.settings.editing-project": {
     "message": "{projectType} projesi düzenleniyor"
   },
-  "project.settings.general.name.description": {
-    "message": "Önek, ek veya açıklayıcılardan kaçının—sadece projenin asıl adı."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "ör. Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "ör. Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "ör. Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "ör. Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "ör. Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Ad"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Bir cümlede projenizi özetleyin."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "ör. Overhauls game progression to revolve around the Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "ör. Adds wearable construction gear."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "ör. Adds realistic mineshaft-building mechanics."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "ör. Improves how Nether portals link to each other."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "ör. Adds powerful boss versions of the normal mobs to encounter in the night."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Kısa tanıtım cümlesi"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
   "project.settings.license.custom": {
     "message": "Özel"
-  },
-  "project.settings.license.optional-label": {
-    "message": "isteğe bağlı"
-  },
-  "project.settings.monetization.description": {
-    "message": "Modrinth’teki projeler otomatik olarak <rewards-program-link>Ödül Programı</rewards-program-link>’na kaydedilir. Bu projeden gelir elde etmek istemiyorsanız (veya yasal nedenlerle edemiyorsanız), buradan kapatabilirsiniz."
-  },
-  "project.settings.monetization.disabled-description": {
-    "message": "Bu proje para kazanmaya uygun değil. Bunun bir hata olduğunu düşünüyorsanız lütfen <contact-support-link>destek ile iletişime geçin</contact-support-link>."
-  },
-  "project.settings.monetization.title": {
-    "message": "Para Kazanma"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Aşağıdaki tüm dosyaları yeniden dağıtma izniniz olduğunu kanıtlayın. Tamamlandıktan sonra, bekletilen sürümler otomatik olarak yayınlanacaktır."
@@ -4271,9 +4055,6 @@
   "project.settings.server.latency-label": {
     "message": "Gecikme: {latency}ms"
   },
-  "project.settings.server.optional-label": {
-    "message": "isteğe bağlı"
-  },
   "project.settings.server.ping-failed-message": {
     "message": "Bu sunucuya ping atamadık. Barındırma sağlayıcınız tarafından engellenmiş olabilir, bu nedenle birkaç kez daha deneyin. Hala yanıt vermiyorsa lütfen <support-link>destek ile iletişime geçin</support-link>."
   },
@@ -4298,17 +4079,8 @@
   "project.settings.tags.all-tags-selected-warning": {
     "message": "Mevcut tüm {count} etiketi seçtiniz. Lütfen yalnızca projeniz için geçerli olan etiketleri seçin."
   },
-  "project.settings.tags.categories-description": {
-    "message": "{type} temanızı veya işlevini yansıtan tüm ayar etiketlerini seçin."
-  },
   "project.settings.tags.featured-tags": {
     "message": "Öne çıkan etiketler"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "En az bir biçim etiketiniz olmalıdır."
-  },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Görsel özellik etiketlerinizi seçin. Bunlar diğer etiketlerinizin önünde görüntülenir."
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select,yes {{types} kategorileri}other {Kategoriler}}"
@@ -4324,18 +4096,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Bir kategoriyi öne çıkarmak için en az bir kategori seçin."
-  },
-  "project.settings.tags.title": {
-    "message": "Etiketler"
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "{count} adet etiket seçtiniz. Sunucunuzun odağını korumak ve daha kolay bulunmasını sağlamak için lütfen bu sayıyı 8 veya daha azına indirmeyi düşünün."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "{count} adet etiket seçtiniz. Sunucunuzun odağını korumak ve daha kolay bulunmasını sağlamak için lütfen bu sayıyı 18 veya daha azına indirin."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "{count} adet etiket seçtiniz. Sunucunuzun odağını korumak ve daha kolay bulunmasını sağlamak için bu sayıyı 12 veya daha azına indirmeyi düşünün."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Etiket eklemeden önce sürümleri yükleyin"

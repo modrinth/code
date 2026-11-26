@@ -1,47 +1,51 @@
 <template>
-	<div class="normal-page !mt-8">
-		<div class="normal-page__sidebar">
-			<NavStack
-				:items="[
-					{ type: 'heading', label: formatMessage(messages.dashboard) },
-					{ link: '/dashboard', label: formatMessage(messages.overview), icon: DashboardIcon },
-					{
-						link: '/dashboard/notifications',
-						label: formatMessage(messages.notifications),
-						icon: NotificationsIcon,
-					},
-					{
-						link: '/dashboard/reports',
-						label: formatMessage(messages.activeReports),
-						icon: ReportIcon,
-					},
-					{
-						link: '/dashboard/collections',
-						label: formatMessage(commonMessages.collectionsLabel),
-						icon: LibraryIcon,
-					},
-					{ type: 'heading', label: formatMessage(messages.creators) },
-					{ link: '/dashboard/projects', label: formatMessage(messages.projects), icon: ListIcon },
-					{
-						link: '/dashboard/organizations',
-						label: formatMessage(messages.organizations),
-						icon: OrganizationIcon,
-					},
-					{
-						link: '/dashboard/analytics',
-						label: formatMessage(messages.analytics),
-						icon: ChartIcon,
-					},
-					{
-						link: '/dashboard/revenue',
-						label: formatMessage(messages.revenue),
-						icon: CurrencyIcon,
-						matchNested: true,
-					},
-				]"
-			/>
-		</div>
-		<div class="normal-page__content mt-4 lg:!mt-0">
+	<div class="normal-page no-sidebar !mt-8">
+		<SidebarPageLayout class="normal-page__content">
+			<template #sidebar>
+				<NavStack
+					:items="[
+						{ type: 'heading', label: formatMessage(messages.dashboard) },
+						{ link: '/dashboard', label: formatMessage(messages.overview), icon: DashboardIcon },
+						{
+							link: '/dashboard/notifications',
+							label: formatMessage(messages.notifications),
+							icon: NotificationsIcon,
+						},
+						{
+							link: '/dashboard/reports',
+							label: formatMessage(messages.activeReports),
+							icon: ReportIcon,
+						},
+						{
+							link: '/dashboard/collections',
+							label: formatMessage(commonMessages.collectionsLabel),
+							icon: LibraryIcon,
+						},
+						{ type: 'heading', label: formatMessage(messages.creators) },
+						{
+							link: '/dashboard/projects',
+							label: formatMessage(messages.projects),
+							icon: ListIcon,
+						},
+						{
+							link: '/dashboard/organizations',
+							label: formatMessage(messages.organizations),
+							icon: OrganizationIcon,
+						},
+						{
+							link: '/dashboard/analytics',
+							label: formatMessage(messages.analytics),
+							icon: ChartIcon,
+						},
+						{
+							link: '/dashboard/revenue',
+							label: formatMessage(messages.revenue),
+							icon: CurrencyIcon,
+							matchNested: true,
+						},
+					]"
+				/>
+			</template>
 			<Admonition
 				v-if="showDiscordRoleBanner"
 				class="mb-3"
@@ -66,7 +70,7 @@
 				</template>
 			</Admonition>
 			<NuxtPage :route="route" />
-		</div>
+		</SidebarPageLayout>
 	</div>
 </template>
 <script setup lang="ts">
@@ -94,6 +98,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 
 import NavStack from '~/components/ui/NavStack.vue'
+import SidebarPageLayout from '~/components/ui/SidebarPageLayout.vue'
 
 const auth = (await useAuth()) as Ref<{ user: Labrinth.Users.v3.User | null }>
 const client = injectModrinthClient()

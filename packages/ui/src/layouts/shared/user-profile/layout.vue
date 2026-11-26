@@ -194,7 +194,11 @@
 			</div>
 		</NewModal>
 
-		<NormalPage :sidebar="sidebarPosition" :full-width="variant === 'app'">
+		<NormalPage
+			:sidebar="sidebarPosition"
+			:sidebar-class="variant === 'web' ? 'flex flex-col gap-4' : undefined"
+			:full-width="variant === 'app'"
+		>
 			<template #header>
 				<UserPageHeader
 					:user="user"
@@ -278,7 +282,11 @@
 					type="empty"
 					:heading="formatMessage(messages.profileNoProjectsLabel)"
 					:description="
-						isSelf ? formatMessage(messages.profileNoProjectsAuthDescription) : undefined
+						formatMessage(
+							isSelf
+									? messages.profileNoProjectsAuthDescription
+								: messages.profileNoPublicProjectsDescription,
+						)
 					"
 				>
 					<template v-if="isSelf" #actions>
@@ -372,41 +380,39 @@
 			</div>
 
 			<template #sidebar>
-				<div class="flex flex-col" :class="{ 'gap-4': variant === 'web' }">
-					<div v-if="sortedOrganizations.length > 0" :class="sidebarSectionClass">
-						<h2 class="m-0 mb-2 text-lg font-semibold text-contrast">
-							{{ formatMessage(messages.profileOrganizations) }}
-						</h2>
-						<div class="flex flex-wrap gap-2">
-							<AutoLink
-								v-for="organization in sortedOrganizations"
-								:key="organization.id"
-								v-tooltip="organization.name"
-								:to="organizationLink(organization.slug)"
-								link-class="!inline-flex"
-							>
-								<Avatar
-									:src="organization.icon_url"
-									:alt="`Icon for ${organization.name}`"
-									size="3rem"
-								/>
-							</AutoLink>
-						</div>
+				<div v-if="sortedOrganizations.length > 0" :class="sidebarSectionClass">
+					<h2 class="m-0 mb-2 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.profileOrganizations) }}
+					</h2>
+					<div class="flex flex-wrap gap-2">
+						<AutoLink
+							v-for="organization in sortedOrganizations"
+							:key="organization.id"
+							v-tooltip="organization.name"
+							:to="organizationLink(organization.slug)"
+							link-class="!inline-flex"
+						>
+							<Avatar
+								:src="organization.icon_url"
+								:alt="`Icon for ${organization.name}`"
+								size="3rem"
+							/>
+						</AutoLink>
 					</div>
-
-					<UserBadges
-						:downloads="sumDownloads"
-						:join-date="new Date(user.created)"
-						:role="user.role"
-						:badges="user.badges"
-						:has-midas="hasMidas"
-						:has-pride="hasPride26Badge(user)"
-						:earliest-project-by-type="earliestProjectByType"
-						:class="sidebarSectionClass"
-					/>
-
-					<slot name="sidebar" />
 				</div>
+
+				<UserBadges
+					:downloads="sumDownloads"
+					:join-date="new Date(user.created)"
+					:role="user.role"
+					:badges="user.badges"
+					:has-midas="hasMidas"
+					:has-pride="hasPride26Badge(user)"
+					:earliest-project-by-type="earliestProjectByType"
+					:class="sidebarSectionClass"
+				/>
+
+				<slot name="sidebar" />
 			</template>
 		</NormalPage>
 	</template>
@@ -623,11 +629,15 @@ const messages = defineMessages({
 	},
 	profileNoProjectsLabel: {
 		id: 'profile.label.no-projects',
-		defaultMessage: 'This user has no projects!',
+		defaultMessage: 'No projects yet',
+	},
+	profileNoPublicProjectsDescription: {
+		id: 'profile.label.no-public-projects-description',
+		defaultMessage: "This user doesn't have any public projects",
 	},
 	profileNoProjectsAuthDescription: {
 		id: 'profile.label.no-projects-auth-description',
-		defaultMessage: "You don't have any projects yet.",
+		defaultMessage: 'Create your first project.',
 	},
 	createProjectButton: {
 		id: 'profile.button.create-project',

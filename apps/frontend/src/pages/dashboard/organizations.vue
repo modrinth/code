@@ -1,54 +1,52 @@
 <template>
-	<div>
+	<section class="flex flex-col gap-4 pb-20">
 		<OrganizationCreateModal ref="createOrgModal" />
-		<section class="universal-card">
-			<div class="header__row">
-				<h2 class="header__title text-2xl">{{ formatMessage(messages.organizationsTitle) }}</h2>
-				<div class="input-group">
-					<Button type="colored" color="brand" @click="openCreateOrgModal">
-						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.createOrganization) }}
-					</Button>
-				</div>
-			</div>
-			<template v-if="orgs?.length > 0">
-				<div class="orgs-grid">
-					<ButtonLink
-						v-for="org in sortedOrgs"
-						:key="org.id"
-						type="quiet"
-						interaction="none"
-						:to="`/organization/${org.slug}`"
-						class="universal-card recessed org !h-auto !w-full !shrink !items-stretch !justify-start !whitespace-normal !p-[var(--spacing-card-bg)]"
-						:class="{ 'is-disabled': onlyAcceptedMembers(org.members).length === 0 }"
-					>
-						<Avatar :src="org.icon_url" :alt="org.name" class="icon" />
-						<div class="details">
-							<div class="title">
-								{{ org.name }}
-							</div>
-							<div class="description">
-								{{ org.description }}
-							</div>
-							<span class="stat-bar">
-								<div class="stats">
-									<UsersIcon aria-hidden="true" />
-									<span>
-										{{
-											formatMessage(messages.memberCount, {
-												count: onlyAcceptedMembers(org.members).length,
-											})
-										}}
-									</span>
-								</div>
-							</span>
+		<div class="flex flex-wrap items-center justify-between gap-2">
+			<h2 class="m-0 text-xl font-semibold text-contrast md:text-2xl">
+				{{ formatMessage(messages.organizationsTitle) }}
+			</h2>
+			<Button type="colored" color="brand" @click="openCreateOrgModal">
+				<PlusIcon aria-hidden="true" />
+				{{ formatMessage(messages.createOrganization) }}
+			</Button>
+		</div>
+		<template v-if="orgs?.length > 0">
+			<div class="orgs-grid">
+				<ButtonLink
+					v-for="org in sortedOrgs"
+					:key="org.id"
+					type="quiet"
+					interaction="none"
+					:to="`/organization/${org.slug}`"
+					class="universal-card org !h-auto !w-full !shrink !items-stretch !justify-start !whitespace-normal !bg-surface-3 !p-[var(--spacing-card-bg)]"
+					:class="{ 'is-disabled': onlyAcceptedMembers(org.members).length === 0 }"
+				>
+					<Avatar :src="org.icon_url" :alt="org.name" class="icon" />
+					<div class="details">
+						<div class="title">
+							{{ org.name }}
 						</div>
-					</ButtonLink>
-				</div>
-			</template>
-			<template v-else> {{ formatMessage(messages.makeOrganization) }} </template>
-		</section>
-	</div>
+						<div class="description">
+							{{ org.description }}
+						</div>
+						<span class="stat-bar">
+							<div class="stats">
+								<UsersIcon aria-hidden="true" />
+								<span>
+									{{
+										formatMessage(messages.memberCount, {
+											count: onlyAcceptedMembers(org.members).length,
+										})
+									}}
+								</span>
+							</div>
+						</span>
+					</div>
+				</ButtonLink>
+			</div>
+		</template>
+		<p v-else class="m-0">{{ formatMessage(messages.makeOrganization) }}</p>
+	</section>
 </template>
 
 <script setup>

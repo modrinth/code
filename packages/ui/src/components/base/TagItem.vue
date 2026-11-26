@@ -6,12 +6,13 @@
 	>
 		<slot />
 	</button>
-	<div v-else :class="baseClass">
+	<component :is="as ?? 'div'" v-else :class="baseClass">
 		<slot />
-	</div>
+	</component>
 </template>
 <script setup lang="ts">
 defineProps<{
+	as?: 'div' | 'span' // span for usage of TagItem inside <button>s
 	action?: (event: MouseEvent) => void
 }>()
 

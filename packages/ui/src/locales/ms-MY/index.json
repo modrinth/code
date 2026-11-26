@@ -2042,9 +2042,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Video"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Tiada fail disediakan"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },
@@ -4106,6 +4103,9 @@
   "settings.feature-flags.title": {
     "defaultMessage": "Penetapan ciri"
   },
+  "settings.form.group.optional": {
+    "defaultMessage": "(pilihan)"
+  },
   "settings.language.categories.default": {
     "defaultMessage": "Bahasa standard"
   },
@@ -4749,4 +4749,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

@@ -4,7 +4,11 @@
 			<ProjectBackgroundGradient :project="project" />
 		</Teleport>
 		<template v-if="isSettings">
-			<div v-if="canAccessSettings" class="normal-page no-sidebar" :class="`align-${marginTarget}`">
+			<div
+				v-if="canAccessSettings"
+				class="normal-page no-sidebar project-settings-page"
+				:class="`align-${marginTarget}`"
+			>
 				<div class="normal-page__header mb-6">
 					<PageHeader :title="project.title" :row-class="'items-center'">
 						<template #leading>
@@ -28,9 +32,11 @@
 							<PageHeaderMetadata>
 								<PageHeaderMetadataItem>
 									{{
-										formatMessage(messages.editingProject, {
-											projectType: projectTypeDisplay.toLowerCase(),
-										})
+										project.project_type === 'project' && !isServerProject
+											? formatMessage(messages.editingGenericProject)
+											: formatMessage(messages.editingProject, {
+													projectType: projectTypeDisplay.toLowerCase(),
+												})
 									}}
 								</PageHeaderMetadataItem>
 								<PageHeaderMetadataItem>
@@ -122,30 +128,14 @@
 					class="normal-page__header relative mb-4"
 					:class="projectInstallContext && !isSettings ? 'mt-0' : 'mt-4'"
 				>
-					<div class="mb-6">
-						<ModerationProjectNags
-							v-if="
-								projectV3 &&
-								currentMember &&
-								(projectV3.status === 'draft' ||
-									projectV3.status === 'processing' ||
-									tags.rejectedStatuses.includes(projectV3.status))
-							"
-							:project="project"
-							:project-v3="projectV3"
-							:versions="versions ?? undefined"
-							:current-member="currentMember"
-							:can-bypass-validation="isStaff(auth.user)"
-							:collapsed="collapsedChecklist"
-							:route-name="route.name"
-							:tags="tags"
-							:validation-nags="projectValidation?.nags ?? []"
-							:validation-loading="reviewSubmissionLoading"
-							:validation-available="projectValidation !== null"
-							:submit-project="setProcessing"
-							@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
-						/>
-					</div>
+					<Admonition
+						v-if="project.status === 'draft'"
+						type="info"
+						:header="formatMessage(messages.draftProjectTitle)"
+						:body="formatMessage(messages.draftProjectDescription)"
+						class="mb-4"
+						center-content
+					/>
 					<ProjectPageHeader
 						v-if="projectV3Loaded"
 						:project="project"
@@ -289,10 +279,10 @@
 												<XIcon aria-hidden="true" />
 											</IconButton>
 										</div>
-										<p class="m-0 text-sm font-medium leading-tight text-secondary">
+										<p class="m-0 font-medium leading-tight text-secondary">
 											{{ formatMessage(messages.serversPromoDescription) }}
 										</p>
-										<p class="m-0 text-sm font-semibold text-contrast">
+										<p class="m-0 font-semibold text-contrast">
 											<IntlFormatted
 												:message-id="messages.serversPromoPricing"
 												:values="{ price: formatPrice(500, 'USD', true) }"
@@ -638,7 +628,6 @@ import { navigateTo } from '#app'
 import ProjectStatusStats from '~/components/ProjectStatusStats.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
-import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import ModpackScanModal from '~/components/ui/moderation/ModpackScanModal.vue'
 import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveButton.vue'
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
@@ -666,6 +655,7 @@ import { useServerInstallContent } from '~/composables/use-server-install-conten
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { isApproved, isRejected } from '~/helpers/projects.js'
 import { injectCurrentProjectId } from '~/providers/current-project.ts'
+import { provideProjectPublishing } from '~/providers/project-publishing'
 import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
@@ -827,6 +817,15 @@ const messages = defineMessages({
 		id: 'project.gallery.title',
 		defaultMessage: 'Gallery',
 	},
+	draftProjectTitle: {
+		id: 'project.draft.banner.title',
+		defaultMessage: 'Draft project',
+	},
+	draftProjectDescription: {
+		id: 'project.draft.banner.description',
+		defaultMessage:
+			'This project is only visible to project members and moderators. Complete the required items in project settings, then submit it for review to publish it.',
+	},
 	moderationTab: {
 		id: 'project.moderation.title',
 		defaultMessage: 'Moderation',
@@ -952,6 +951,10 @@ const messages = defineMessages({
 	editingProject: {
 		id: 'project.settings.editing-project',
 		defaultMessage: 'Editing {projectType} project',
+	},
+	editingGenericProject: {
+		id: 'project.settings.editing-generic-project',
+		defaultMessage: 'Editing project',
 	},
 })
 
@@ -1357,8 +1360,7 @@ function loadDependencies() {
 // This allows showing/hiding UI elements without loading full version data
 const hasVersions = computed(() => (project.value?.versions?.length ?? 0) > 0)
 
-async function invalidateProject() {
-	const id = projectId.value
+async function invalidateProject(id = projectId.value) {
 	if (!id) {
 		return
 	}
@@ -1366,24 +1368,40 @@ async function invalidateProject() {
 	await queryClient.invalidateQueries({ queryKey: ['project', 'v3', id] })
 	// Prefix match — invalidates members, versions, dependencies, organization
 	await queryClient.invalidateQueries({ queryKey: ['project', id] })
-	if (projectRaw.value?.thread_id) {
-		await queryClient.invalidateQueries({ queryKey: ['thread', projectRaw.value.thread_id] })
+	const threadId = queryClient.getQueryData(['project', 'v2', id])?.thread_id
+	if (threadId) {
+		await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
 	}
 }
 
 async function redirectIfNewSlug(newSlug, id) {
-	if (newSlug === undefined || newSlug === route.params.project) {
+	if (newSlug === undefined) {
 		return
 	}
 
-	warmProjectCheckCaches(queryClient, { id, slug: newSlug })
+	const slug = newSlug.toLowerCase()
+	const projectKeys = [
+		projectQueryOptions.v2(id, client).queryKey,
+		projectQueryOptions.v3(id, client).queryKey,
+	]
+	await Promise.all(projectKeys.map((queryKey) => queryClient.cancelQueries({ queryKey })))
+	for (const queryKey of projectKeys) {
+		queryClient.setQueryData(queryKey, (cachedProject) =>
+			cachedProject ? { ...cachedProject, slug } : cachedProject,
+		)
+	}
+	warmProjectCheckCaches(queryClient, { id, slug })
+
+	if (slug === route.params.project) {
+		return
+	}
 
 	await navigateTo(
 		{
 			name: route.name,
 			params: {
 				type: route.params.type,
-				project: newSlug,
+				project: slug,
 			},
 			query: route.query,
 			hash: route.hash,
@@ -1601,9 +1619,12 @@ const createGalleryItemMutation = useMutation({
 				created: new Date().toISOString(),
 				ordering: ordering ?? old.gallery.length,
 			}
+			const gallery = featured
+				? old.gallery.map((item) => (item.featured ? { ...item, featured: false } : item))
+				: old.gallery
 			return {
 				...old,
-				gallery: [...old.gallery, newItem],
+				gallery: [...gallery, newItem],
 			}
 		})
 
@@ -1617,8 +1638,8 @@ const createGalleryItemMutation = useMutation({
 		addProjectMutationErrorNotification(err)
 	},
 
-	onSettled: async () => {
-		await invalidateProject()
+	onSettled: async (_, __, { projectId }) => {
+		await invalidateProject(projectId)
 	},
 })
 
@@ -1651,7 +1672,7 @@ const editGalleryItemMutation = useMutation({
 							ordering: ordering ?? item.ordering,
 						}
 					}
-					return item
+					return featured && item.featured ? { ...item, featured: false } : item
 				}),
 			}
 		})
@@ -1792,16 +1813,20 @@ const linkValidation = useProjectLinkValidation(
 )
 const projectLinksNetworkValidationLoading = linkValidation.isChecking
 const reviewSubmissionPending = ref(false)
-const reviewSubmissionLoading = computed(
-	() =>
-		projectValidationLoading.value ||
-		projectLinksNetworkValidationLoading.value ||
-		reviewSubmissionPending.value,
-)
+const canBypassValidation = computed(() => isStaff(auth.value.user))
 const projectValidation = computed(() => {
 	const validation = projectValidationResponse.value
 	if (!validation || backendValidationError.value || linkValidation.isError.value) return null
 	return { ...validation, nags: [...validation.nags, ...linkValidation.nags.value] }
+})
+const { canSubmit: canSubmitForReview } = provideProjectPublishing({
+	projectV2: project,
+	projectValidation,
+	projectValidationLoading,
+	projectLinksNetworkValidationLoading,
+	thread,
+	canBypassValidation,
+	submitting: reviewSubmissionPending,
 })
 
 async function refreshProjectValidation() {
@@ -2211,20 +2236,15 @@ watch(
 )
 
 async function setProcessing() {
-	if (
-		patchStatusMutation.isPending.value ||
-		(!isStaff(auth.value.user) &&
-			!canSubmitProjectForReview(projectValidation.value, reviewSubmissionLoading.value)) ||
-		(isRejected(project.value) && !canResubmitProjectForReview(thread.value))
-	) {
+	if (patchStatusMutation.isPending.value || !canSubmitForReview.value) {
 		return false
 	}
 	reviewSubmissionPending.value = true
 	startLoading()
 	try {
-		const validation = isStaff(auth.value.user) ? null : await refreshProjectValidation()
+		const validation = canBypassValidation.value ? null : await refreshProjectValidation()
 		if (
-			(!isStaff(auth.value.user) && !canSubmitProjectForReview(validation, false)) ||
+			(!canBypassValidation.value && !canSubmitProjectForReview(validation, false)) ||
 			(isRejected(project.value) && !canResubmitProjectForReview(thread.value))
 		) {
 			return false
@@ -2316,6 +2336,8 @@ async function patchIcon(icon) {
 	})
 }
 
+let galleryUploadQueue = Promise.resolve()
+
 async function createGalleryItem(
 	file,
 	title,
@@ -2324,25 +2346,32 @@ async function createGalleryItem(
 	ordering,
 	throwOnError = false,
 ) {
-	startLoading()
-
-	return new Promise((resolve, reject) => {
-		createGalleryItemMutation.mutate(
-			{
-				projectId: project.value.id,
+	const projectId = project.value.id
+	const upload = galleryUploadQueue.then(async () => {
+		startLoading()
+		try {
+			const gallery = queryClient.getQueryData(['project', 'v2', projectId])?.gallery ?? []
+			await createGalleryItemMutation.mutateAsync({
+				projectId,
 				file,
 				title,
 				description,
 				featured,
-				ordering,
-			},
-			{
-				onSuccess: () => resolve(true),
-				onError: (error) => (throwOnError ? reject(error) : resolve(false)),
-				onSettled: () => stopLoading(),
-			},
-		)
+				ordering: ordering ?? Math.max(-1, ...gallery.map((image) => image.ordering)) + 1,
+			})
+			return true
+		} catch (error) {
+			if (throwOnError) throw error
+			return false
+		} finally {
+			stopLoading()
+		}
 	})
+	galleryUploadQueue = upload.then(
+		() => {},
+		() => {},
+	)
+	return upload
 }
 
 async function editGalleryItem(
@@ -2499,11 +2528,6 @@ const navLinks = computed(() => {
 			subpages: [`${projectUrl}/version/`],
 			onHover: loadVersions,
 		},
-		{
-			label: formatMessage(messages.moderationTab),
-			href: withInstallContextQuery(`${projectUrl}/moderation`),
-			shown: !!currentMember.value,
-		},
 	]
 })
 
@@ -2550,6 +2574,19 @@ provideProjectPageContext({
 </script>
 
 <style lang="scss" scoped>
+@media (min-width: 1280px) {
+	.project-settings-page {
+		margin-right: max(var(--project-settings-drawer-space, 0px), (100% - 80rem) / 2);
+		transition: margin-right 240ms cubic-bezier(0.16, 1, 0.3, 1);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.project-settings-page {
+		transition: none;
+	}
+}
+
 .settings-header {
 	display: flex;
 	flex-direction: row;

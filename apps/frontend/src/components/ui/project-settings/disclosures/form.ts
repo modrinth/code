@@ -307,12 +307,12 @@ export type DisclosureFormIssue =
 
 export function getDisclosureFormIssues(
 	form: DisclosureFormState,
-	projectTypes?: readonly string[],
+	projectTypes?: readonly string[] | null,
 ): DisclosureFormIssue[] {
 	const issues: DisclosureFormIssue[] = []
 	const missingNote = (model: NoteDisclosure) => model.enabled && !model.note.trim()
 	const compatible = (type: DisclosureType) =>
-		!projectTypes || isDisclosureCompatibleWithProjectTypes(type, projectTypes)
+		projectTypes === undefined || isDisclosureCompatibleWithProjectTypes(type, projectTypes)
 
 	if (compatible('advertisements') && missingNote(form.advertising)) {
 		issues.push('advertising-note')

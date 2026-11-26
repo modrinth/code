@@ -2855,12 +2855,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Video"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "No se ha proporcionado ningún archivo"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "No se especificó un método de subida de imagen"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },

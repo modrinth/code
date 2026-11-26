@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col">
-		<BackToParentLink :to="buildProjectHref(`/project/${route.params.id}/versions`)">
+		<BackToParentLink :to="buildProjectHref(`/project/${route.params.id}/versions`)" class="mb-4">
 			{{ formatMessage(messages.allVersions) }}
 		</BackToParentLink>
 		<VersionPage

@@ -15,7 +15,7 @@
 						:auth="auth"
 						raised
 						image-previews
-						message-class="shrink-0 !px-2 !py-2 !text-xs [&_.message\_\_date]:!text-xs"
+						compact
 						@update-thread="() => refetch()"
 						@open-image="openImage"
 					/>

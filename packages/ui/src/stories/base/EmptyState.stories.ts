@@ -1,3 +1,4 @@
+import { BoxIcon, FolderOpenIcon, PlusIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import { Button } from '../../components/base/buttons'
@@ -51,6 +52,25 @@ export const WithActions: StoryObj = {
 			>
 				<template #actions>
 					<Button type="colored" color="brand">Create backup</Button>
+				</template>
+			</EmptyState>
+		`,
+	}),
+}
+
+export const WithIcon: StoryObj = {
+	render: () => ({
+		components: { EmptyState, Button, FolderOpenIcon, PlusIcon },
+		setup: () => ({ BoxIcon }),
+		template: /*html*/ `
+			<EmptyState
+				:icon="BoxIcon"
+				heading="No content installed"
+				description="Browse or upload projects to get started."
+			>
+				<template #actions>
+					<Button type="outlined" size="lg"><FolderOpenIcon /> Upload files</Button>
+					<Button type="colored" color="brand" size="lg"><PlusIcon /> Add content</Button>
 				</template>
 			</EmptyState>
 		`,

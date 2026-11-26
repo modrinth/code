@@ -44,6 +44,17 @@
 						>
 							{{ String(item.badge) }}
 						</span>
+						<span
+							v-if="item.issueCount"
+							class="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-xs font-bold"
+							:class="
+								item.hasValidationErrors
+									? 'bg-highlight-red text-red'
+									: 'bg-highlight-orange text-orange'
+							"
+						>
+							{{ item.issueCount }}
+						</span>
 						<span v-if="item.chevron" class="ml-auto"><ChevronRightIcon /></span>
 					</ButtonLink>
 
@@ -92,6 +103,8 @@ type NavStackBaseItem = {
 	label: string
 	icon?: Component | string
 	badge?: string | number | null
+	issueCount?: number
+	hasValidationErrors?: boolean
 	chevron?: boolean
 	danger?: boolean
 }

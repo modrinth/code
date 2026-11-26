@@ -851,9 +851,6 @@
   "create.project.server-project-title": {
     "message": "Kreiranje projekat servera"
   },
-  "create.project.type-server": {
-    "message": "Server"
-  },
   "dashboard.analytics.total-downloads": {
     "message": "Ukupan broj preuzimanja"
   },

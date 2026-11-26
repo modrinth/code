@@ -1,9 +1,11 @@
 import { EditorView } from '@codemirror/view'
+import { ImageIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { expect, waitFor } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { ref } from 'vue'
 
-import MarkdownEditor from '../../components/base/MarkdownEditor.vue'
+import { Button, IconButton } from '../../components/base/buttons'
+import { MarkdownEditor } from '../../components/base/markdown-editor'
 import { codeClipboardHtml } from '../../utils/markdown-code'
 
 const meta = {
@@ -98,6 +100,94 @@ export const WithContent: StoryObj = {
 			</div>
 		`,
 	}),
+}
+
+export const ImageOnlyToolbar: StoryObj = {
+	render: () => ({
+		components: { IconButton, ImageIcon, MarkdownEditor },
+		setup() {
+			const content = ref('')
+			return { content }
+		},
+		template: /*html*/ `
+			<MarkdownEditor v-model="content" hide-markdown-hint :min-height="80">
+				<template #toolbar />
+				<template #footer="{ disabled, openImageModal }">
+					<IconButton class="mt-2" size="sm" label="Image" :disabled="disabled" @click="openImageModal">
+						<ImageIcon aria-hidden="true" />
+					</IconButton>
+				</template>
+			</MarkdownEditor>
+		`,
+	}),
+}
+
+export const ExternalImageAction: StoryObj = {
+	render: () => ({
+		components: { Button, MarkdownEditor },
+		setup() {
+			const content = ref('')
+			const editor = ref<InstanceType<typeof MarkdownEditor>>()
+			return { content, editor }
+		},
+		template: /*html*/ `
+			<MarkdownEditor ref="editor" v-model="content" hide-markdown-hint :min-height="80">
+				<template #toolbar />
+			</MarkdownEditor>
+			<Button class="mt-2" @click="editor?.openImageModal()">Attach image</Button>
+		`,
+	}),
+}
+
+export const InsertModals: StoryObj = {
+	render: () => ({
+		components: { MarkdownEditor },
+		setup() {
+			return { content: ref('') }
+		},
+		template: /*html*/ `<MarkdownEditor v-model="content" />`,
+	}),
+	play: async ({ canvasElement }) => {
+		const canvas = within(canvasElement)
+		const page = within(canvasElement.ownerDocument.body)
+
+		await userEvent.click(await canvas.findByRole('button', { name: 'Link' }))
+		const link = within(await page.findByRole('dialog', { name: 'Insert link' }))
+		await userEvent.type(link.getByPlaceholderText('Enter label...'), 'Example')
+		await userEvent.type(
+			link.getByPlaceholderText("Enter the link's URL..."),
+			'https://example.com',
+		)
+		await userEvent.click(link.getByRole('button', { name: 'Insert' }))
+		await waitFor(() => expect(page.queryByRole('dialog', { name: 'Insert link' })).toBeNull())
+
+		await userEvent.click(canvas.getByRole('button', { name: 'Image' }))
+		const image = within(await page.findByRole('dialog', { name: 'Insert image' }))
+		await userEvent.type(image.getByPlaceholderText('Describe the image...'), 'Example image')
+		await userEvent.type(
+			image.getByPlaceholderText('Enter the image URL...'),
+			'https://example.com/image.png',
+		)
+		await userEvent.click(image.getByRole('button', { name: 'Insert' }))
+		await waitFor(() => expect(page.queryByRole('dialog', { name: 'Insert image' })).toBeNull())
+
+		await userEvent.click(canvas.getByRole('button', { name: 'Video' }))
+		const video = within(await page.findByRole('dialog', { name: 'Insert YouTube video' }))
+		await userEvent.type(
+			video.getByPlaceholderText('Enter YouTube video URL'),
+			'https://youtu.be/abcdefghijk',
+		)
+		await userEvent.click(video.getByRole('button', { name: 'Insert' }))
+		await waitFor(() =>
+			expect(page.queryByRole('dialog', { name: 'Insert YouTube video' })).toBeNull(),
+		)
+
+		const editor = EditorView.findFromDOM(canvasElement.querySelector<HTMLElement>('.cm-editor')!)!
+		const source = editor.state.doc.toString()
+		expect(source).toContain('[Example](https://example.com/)')
+		expect(source).toContain('![Example image](https://example.com/image.png)')
+		expect(source).toContain('https://www.youtube-nocookie.com/embed/abcdefghijk')
+	},
 }
 
 export const MaxHeightWithScroll: StoryObj = {

@@ -23,6 +23,7 @@ import {
 	getDisclosureFormSnapshot,
 	toModifyRequests,
 } from './form'
+import { disclosureTitle } from './messages'
 import type {
 	DisclosureFormState,
 	DisclosureLockStatus,
@@ -32,8 +33,8 @@ import type {
 
 type DisclosureEditorOptions = {
 	projectId: Ref<string>
-	projectTypes: Ref<string[]>
-	canEditDisclosures: Ref<boolean>
+	projectTypes: Ref<string[] | null>
+	canEditDisclosures?: Ref<boolean>
 	hasPermission: Ref<boolean>
 	isActingAsModerator: Ref<boolean>
 	isAdminUser: Ref<boolean>
@@ -43,7 +44,7 @@ type DisclosureEditorOptions = {
 export function useDisclosureEditor({
 	projectId,
 	projectTypes,
-	canEditDisclosures,
+	canEditDisclosures = ref(true),
 	hasPermission,
 	isActingAsModerator,
 	isAdminUser,
@@ -58,10 +59,6 @@ export function useDisclosureEditor({
 		return isDisclosureCompatibleWithProjectTypes(type, projectTypes.value)
 	}
 	const messages = defineMessages({
-		title: {
-			id: 'project.settings.disclosures.content-disclosures',
-			defaultMessage: 'Content disclosures',
-		},
 		description: {
 			id: 'project.settings.disclosures.description',
 			defaultMessage: `You must add any applicable content disclosures to your project in compliance with <rules>Modrinth's Content Rules</rules>.`,
@@ -73,10 +70,6 @@ export function useDisclosureEditor({
 		noPermission: {
 			id: 'project.settings.disclosures.save-blocked.no-permission',
 			defaultMessage: `You don't have permission to edit this project's disclosures.`,
-		},
-		uploadVersionFirstHeading: {
-			id: 'project.settings.disclosures.upload-version-first.heading',
-			defaultMessage: 'Upload versions before adding disclosures',
 		},
 	})
 
@@ -355,7 +348,7 @@ export function useDisclosureEditor({
 	})
 
 	return {
-		messages,
+		messages: { title: disclosureTitle, ...messages },
 		current,
 		savedSnapshot,
 		currentSnapshot,

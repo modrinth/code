@@ -4,95 +4,38 @@
 		<Modal
 			v-if="currentMember"
 			ref="modal_edit_item"
+			:on-show="() => (isGalleryModalOpen = true)"
+			:on-hide="() => (isGalleryModalOpen = false)"
 			:header="editIndex === -1 ? 'Upload gallery image' : 'Edit gallery item'"
 		>
-			<div class="modal-gallery universal-labels">
-				<div class="gallery-file-input">
-					<div class="file-header">
-						<ImageIcon aria-hidden="true" />
-						<strong>{{ editFile ? editFile.name : 'Current image' }}</strong>
-						<FileButton
-							v-if="editIndex === -1"
-							:disabled="!globals?.max_gallery_image_size"
-							type="outlined"
-							class="button-like"
-							prompt="Replace"
-							:accept="acceptFileTypes"
-							:max-size="globals?.max_gallery_image_size"
-							aria-label="Replace image"
-							@change="replaceEditFile"
-						>
-							<TransferIcon aria-hidden="true" />
-						</FileButton>
-					</div>
-					<img
-						:src="
-							previewImage
-								? previewImage
-								: filteredGallery[editIndex]?.url
-									? filteredGallery[editIndex].url
-									: 'https://cdn.modrinth.com/placeholder-banner.svg'
-						"
-						alt="gallery-preview"
-					/>
-				</div>
-				<label for="gallery-image-title">
-					<span class="label__title">Title</span>
-				</label>
-				<Input
-					id="gallery-image-title"
-					v-model="editTitle"
-					:maxlength="64"
-					placeholder="Enter title..."
-				/>
-				<ValidationMessage
-					:check="galleryTitleValidation"
-					:project-field="filteredGallery[editIndex]?.title ?? ''"
-					:current-field="editTitle"
-				/>
-				<label for="gallery-image-desc">
-					<span class="label__title">Description</span>
-				</label>
-				<Textarea
-					id="gallery-image-desc"
-					v-model="editDescription"
-					:maxlength="255"
-					placeholder="Enter description..."
-				/>
-				<ValidationMessage
-					:check="galleryDescriptionValidation"
-					:project-field="filteredGallery[editIndex]?.description ?? ''"
-					:current-field="editDescription"
-				/>
-				<label for="gallery-image-ordering">
-					<span class="label__title">Order Index</span>
-				</label>
-				<Input
-					id="gallery-image-ordering"
-					v-model="editOrder"
-					type="number"
-					placeholder="Enter order index..."
-				/>
-				<label for="gallery-image-featured">
-					<span class="label__title">Banner image</span>
-					<span class="label__description">
-						You can feature one image on your project to be used as a banner image.
-					</span>
-				</label>
-				<Button
-					v-if="!editFeatured"
-					id="gallery-image-featured"
-					class="w-fit"
-					@click="editFeatured = true"
+			<div class="flex flex-col gap-4">
+				<GalleryImageFields
+					v-model:title="editTitle"
+					v-model:description="editDescription"
+					v-model:featured="editFeatured"
+					:preview-src="previewImage || filteredGallery[editIndex]?.url"
+					:filename="editFile?.name"
+					:accept="acceptFileTypes"
+					:max-size="globals?.max_gallery_image_size"
+					:replace-disabled="!canUploadGallery"
+					@replace="replaceEditFile"
 				>
-					<StarIcon aria-hidden="true" />
-					Set as banner
-				</Button>
-				<Button v-else id="gallery-image-featured" class="w-fit" @click="editFeatured = false">
-					<StarIcon fill="currentColor" aria-hidden="true" />
-					Unset as banner
-				</Button>
-				<div class="mt-3 flex flex-wrap justify-end gap-2">
+					<template #title-feedback>
+						<ValidationMessage
+							:check="galleryTitleValidation"
+							:project-field="filteredGallery[editIndex]?.title ?? ''"
+							:current-field="editTitle"
+						/>
+					</template>
+					<template #description-feedback>
+						<ValidationMessage
+							:check="galleryDescriptionValidation"
+							:project-field="filteredGallery[editIndex]?.description ?? ''"
+							:current-field="editDescription"
+						/>
+					</template>
+				</GalleryImageFields>
+				<div class="flex flex-wrap justify-end gap-2">
 					<Button type="outlined" @click="modalEditItem?.hide()">
 						<XIcon aria-hidden="true" />
 						Cancel
@@ -121,7 +64,7 @@
 			</div>
 		</Modal>
 		<ConfirmModal
-			v-if="currentMember"
+			v-if="canEditGallery"
 			ref="modal_confirm"
 			title="Are you sure you want to delete this gallery image?"
 			description="This will remove this gallery image forever (like really forever)."
@@ -151,9 +94,7 @@
 				prompt="Upload an image"
 				aria-label="Upload an image"
 				class="button-like"
-				:disabled="
-					!globals?.max_gallery_image_size || !isPermission(currentMember?.permissions, 1 << 2)
-				"
+				:disabled="!canUploadGallery || galleryEditingBusy || galleryReordering"
 				@change="handleFiles"
 			>
 				<UploadIcon aria-hidden="true" />
@@ -161,68 +102,21 @@
 			<span class="indicator">
 				<InfoIcon aria-hidden="true" /> Click to choose an image or drag one onto this page
 			</span>
-			<DropArea
-				:accept="acceptFileTypes"
-				:disabled="!isPermission(currentMember?.permissions, 1 << 2)"
-				@change="handleFiles"
-			/>
+			<DropArea v-if="canUploadGallery" :accept="acceptFileTypes" @change="handleFiles" />
 		</div>
-		<div v-if="filteredGallery.length" class="items">
-			<div v-for="(item, index) in filteredGallery" :key="index" class="card gallery-item">
-				<a class="gallery-thumbnail" @click="expandImage(index)">
-					<FullImage
-						:src="item.url ? item.url : 'https://cdn.modrinth.com/placeholder-banner.svg'"
-						:raw-src="item.raw_url"
-						:alt="item.title ? item.title : 'gallery-image'"
-					/>
-				</a>
-				<div class="gallery-body">
-					<div class="gallery-info">
-						<h2 v-if="item.title">
-							{{ item.title }}
-						</h2>
-						<p v-if="item.description">
-							{{ item.description }}
-						</p>
-					</div>
-				</div>
-				<div class="gallery-bottom">
-					<div class="gallery-created">
-						<CalendarIcon aria-hidden="true" aria-label="Date created" />
-						{{ formatDate(item.created) }}
-					</div>
-					<div v-if="currentMember" class="gallery-buttons input-group">
-						<Button
-							@click="
-								() => {
-									resetEdit()
-									editIndex = index
-									editTitle = item.title ?? ''
-									editDescription = item.description ?? ''
-									editFeatured = item.featured
-									editOrder = item.ordering
-									modalEditItem?.show()
-								}
-							"
-						>
-							<EditIcon aria-hidden="true" />
-							Edit
-						</Button>
-						<Button
-							@click="
-								() => {
-									deleteIndex = index
-									modalConfirm?.show()
-								}
-							"
-						>
-							<TrashIcon aria-hidden="true" />
-							Remove
-						</Button>
-					</div>
-				</div>
-			</div>
-		</div>
+		<SortableGalleryGrid
+			v-if="filteredGallery.length"
+			v-model:reordering="galleryReordering"
+			:project-id="project.id"
+			:images="filteredGallery"
+			:editable="canEditGallery"
+			:busy="galleryEditingBusy"
+			class="items"
+			heading="h2"
+			@preview="expandImage"
+			@edit="openGalleryEditor"
+			@remove="confirmGalleryRemoval"
+		/>
 		<template v-else>
 			<p class="ml-2">
 				No images in gallery. Visit
@@ -236,38 +130,23 @@
 </template>
 
 <script setup lang="ts">
-import {
-	CalendarIcon,
-	EditIcon,
-	ExternalIcon,
-	ImageIcon,
-	InfoIcon,
-	PlusIcon,
-	SaveIcon,
-	StarIcon,
-	TransferIcon,
-	TrashIcon,
-	UploadIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { ExternalIcon, InfoIcon, PlusIcon, SaveIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import {
 	Button,
 	ConfirmModal,
 	DropArea,
 	FileButton,
-	FullImage,
+	GalleryImageFields,
 	ImageViewerEditor,
 	injectProjectPageContext,
-	Input,
 	NewModal as Modal,
-	Textarea,
 	useFormatBytes,
-	useFormatDateTime,
 	useGlobals,
 } from '@modrinth/ui'
-import { fileIsValid } from '@modrinth/utils'
+import { fileIsValid, isAdmin, isStaff, TeamMemberPermission } from '@modrinth/utils'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import SortableGalleryGrid from '~/components/ui/project-gallery/sortable-gallery-grid.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
@@ -276,11 +155,6 @@ import { isPermission } from '~/utils/permissions.ts'
 const { data: globals } = useGlobals()
 const formatBytes = useFormatBytes()
 
-const formatDate = useFormatDateTime({
-	year: 'numeric',
-	month: 'long',
-	day: 'numeric',
-})
 // Single DI injection
 const {
 	projectV2: project,
@@ -310,19 +184,33 @@ useSeoMeta({
 })
 
 // Delete state
-const deleteIndex = ref(-1)
+const deleteImageUrl = ref<string>()
 
 // Edit state
 const editIndex = ref(-1)
 const editTitle = ref('')
 const editDescription = ref('')
 const editFeatured = ref(false)
-const editOrder = ref<number | null>(null)
 const editFile = ref<File | null>(null)
 const previewImage = ref<string | null>(null)
 
 // UI state
 const shouldPreventActions = ref(false)
+const isGalleryModalOpen = ref(false)
+const isPreparingUpload = ref(false)
+const galleryReordering = ref(false)
+const galleryEditingBusy = computed(
+	() => shouldPreventActions.value || isGalleryModalOpen.value || isPreparingUpload.value,
+)
+const hasEditDetails = computed(() =>
+	isPermission(currentMember.value?.permissions, TeamMemberPermission.EDIT_DETAILS),
+)
+const canEditGallery = computed(() => hasEditDetails.value || isStaff(currentMember.value?.user))
+const canUploadGallery = computed(
+	() =>
+		!!globals.value?.max_gallery_image_size &&
+		(hasEditDetails.value || isAdmin(currentMember.value?.user)),
+)
 // Constant for accepted file types
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
 const acceptFileTypes = 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp'
@@ -365,17 +253,34 @@ function openImageInNewTab(url: string) {
 }
 
 // Edit state management
+function openGalleryEditor(index: number) {
+	if (!canEditGallery.value || galleryEditingBusy.value || galleryReordering.value) return
+	const item = filteredGallery.value[index]
+	resetEdit()
+	editIndex.value = index
+	editTitle.value = item.title ?? ''
+	editDescription.value = item.description ?? ''
+	editFeatured.value = item.featured
+	modalEditItem.value?.show()
+}
+
+function confirmGalleryRemoval(url: string) {
+	if (!canEditGallery.value || galleryEditingBusy.value || galleryReordering.value) return
+	deleteImageUrl.value = url
+	modalConfirm.value?.show()
+}
+
 function resetEdit() {
 	editIndex.value = -1
 	editTitle.value = ''
 	editDescription.value = ''
 	editFeatured.value = false
-	editOrder.value = null
 	editFile.value = null
 	previewImage.value = null
 }
 
 async function handleFiles(files: File[]) {
+	if (!canUploadGallery.value || galleryEditingBusy.value || galleryReordering.value) return
 	const file = files[0]
 	if (!file) {
 		return
@@ -390,15 +295,20 @@ async function handleFiles(files: File[]) {
 	) {
 		return
 	}
-	if (await fileDeclaresAi(file)) {
-		aiImageWarningModal.value?.show()
-		return
+	isPreparingUpload.value = true
+	try {
+		if (await fileDeclaresAi(file)) {
+			aiImageWarningModal.value?.show()
+			return
+		}
+		if (!canUploadGallery.value) return
+		resetEdit()
+		editFile.value = file
+		showPreviewImage()
+		modalEditItem.value?.show()
+	} finally {
+		isPreparingUpload.value = false
 	}
-	resetEdit()
-	editFile.value = file
-
-	showPreviewImage()
-	modalEditItem.value?.show()
 }
 
 async function replaceEditFile(files: File[]) {
@@ -426,7 +336,13 @@ function showPreviewImage() {
 
 // CRUD operations
 async function createGalleryItem() {
-	if (!canSaveGalleryFields.value) return
+	if (
+		!canUploadGallery.value ||
+		galleryReordering.value ||
+		!canSaveGalleryFields.value ||
+		shouldPreventActions.value
+	)
+		return
 	shouldPreventActions.value = true
 	startLoading()
 
@@ -435,7 +351,7 @@ async function createGalleryItem() {
 		editTitle.value || undefined,
 		editDescription.value || undefined,
 		editFeatured.value,
-		editOrder.value ? Number(editOrder.value) : undefined,
+		Math.max(-1, ...filteredGallery.value.map((image) => image.ordering)) + 1,
 	)
 
 	if (success) {
@@ -447,7 +363,13 @@ async function createGalleryItem() {
 }
 
 async function editGalleryItem() {
-	if (!canSaveGalleryFields.value) return
+	if (
+		!canEditGallery.value ||
+		galleryReordering.value ||
+		!canSaveGalleryFields.value ||
+		shouldPreventActions.value
+	)
+		return
 	shouldPreventActions.value = true
 	startLoading()
 
@@ -457,7 +379,6 @@ async function editGalleryItem() {
 		editTitle.value,
 		editDescription.value,
 		editFeatured.value,
-		editOrder.value ? Number(editOrder.value) : undefined,
 	)
 
 	if (success) {
@@ -469,12 +390,15 @@ async function editGalleryItem() {
 }
 
 async function deleteGalleryImage() {
-	startLoading()
-
-	const imageUrl = filteredGallery.value[deleteIndex.value].url!
-	await contextDeleteGalleryItem(imageUrl)
-
-	stopLoading()
+	const url = deleteImageUrl.value
+	if (!canEditGallery.value || galleryReordering.value || !url) return
+	deleteImageUrl.value = undefined
+	shouldPreventActions.value = true
+	try {
+		await contextDeleteGalleryItem(url)
+	} finally {
+		shouldPreventActions.value = false
+	}
 }
 </script>
 
@@ -500,109 +424,6 @@ async function deleteGalleryImage() {
 
 	@media screen and (min-width: 1024px) {
 		grid-template-columns: 1fr 1fr 1fr;
-	}
-}
-
-.gallery-item {
-	display: flex;
-	flex-direction: column;
-	padding: 0;
-
-	img {
-		width: 100%;
-		margin-top: 0;
-		margin-bottom: 0;
-		border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
-
-		aspect-ratio: 16 / 9;
-		object-fit: cover;
-	}
-
-	.gallery-body {
-		width: calc(100% - 2 * var(--spacing-card-md));
-		padding: var(--spacing-card-sm) var(--spacing-card-md);
-		overflow-wrap: anywhere;
-
-		.gallery-info {
-			h2 {
-				margin-bottom: 0.5rem;
-			}
-
-			p {
-				margin: 0 0 0.5rem 0;
-			}
-		}
-	}
-
-	.gallery-thumbnail {
-		cursor: pointer;
-
-		img {
-			transition: filter 0.25s ease-in-out;
-
-			&:hover {
-				filter: brightness(0.7);
-			}
-		}
-	}
-
-	.gallery-bottom {
-		width: calc(100% - 2 * var(--spacing-card-md));
-		padding: 0 var(--spacing-card-md) var(--spacing-card-sm) var(--spacing-card-md);
-
-		.gallery-created {
-			display: flex;
-			align-items: center;
-			margin-bottom: 0.5rem;
-			color: var(--color-icon);
-
-			svg {
-				width: 1rem;
-				height: 1rem;
-				margin-right: 0.25rem;
-			}
-		}
-
-		.gallery-buttons {
-			display: flex;
-		}
-
-		.columns {
-			margin-bottom: 0.5rem;
-		}
-	}
-}
-
-.modal-gallery {
-	display: flex;
-	flex-direction: column;
-
-	.gallery-file-input {
-		.file-header {
-			border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
-
-			display: flex;
-			align-items: center;
-			gap: 0.5rem;
-			background-color: var(--color-button-bg);
-			padding: var(--spacing-card-md);
-
-			svg {
-				min-width: 1rem;
-			}
-			strong {
-				word-wrap: anywhere;
-			}
-		}
-
-		img {
-			border-radius: 0 0 var(--size-rounded-card) var(--size-rounded-card);
-			width: 100%;
-			height: auto;
-			max-height: 15rem;
-			object-fit: contain;
-			background-color: #000000;
-		}
 	}
 }
 </style>

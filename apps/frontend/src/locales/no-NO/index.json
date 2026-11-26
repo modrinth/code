@@ -758,20 +758,8 @@
   "collection.title": {
     "message": "{name} - Samling"
   },
-  "conversation-thread.action.approve": {
-    "message": "Godkjenn"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Godkjenn med svar"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Lukk med svar"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Avvis"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Avvis med svar"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Gjenåpne tråd"
@@ -796,9 +784,6 @@
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Tilleggsfiler er for støtteressurser som kildekode, ikke for alternative versjoner eller varianter."
-  },
-  "create.collection.collection-info": {
-    "message": "Den nye samlinga di kommer til å bli laga som ei offentlig samling med {count, plural, =0 {ingen prosjekt} one {# prosjekt} other {# prosjekt}}."
   },
   "create.collection.create-collection": {
     "message": "Opprett samling"
@@ -863,9 +848,6 @@
   "create.organization.name-placeholder": {
     "message": "Tast inn organiseringsnavn..."
   },
-  "create.organization.ownership-info": {
-    "message": "Du kommer til å bli eieren til denne organiseringa, men du kan invitere andre medlemmer og overføre eierskap når som helst."
-  },
   "create.organization.summary-description": {
     "message": "Ei eller to setninger som beskriver organiseringa di."
   },
@@ -893,17 +875,11 @@
   "create.project.name-placeholder": {
     "message": "Skriv inn prosjektnavn..."
   },
-  "create.project.owner-description": {
-    "message": "Sett prosjekteieren som deg sjøl eller ei organisering du er medlem av."
-  },
   "create.project.owner-label": {
     "message": "Eier"
   },
   "create.project.server-project-title": {
     "message": "Laging av et nytt serverprosjekt"
-  },
-  "create.project.summary-description": {
-    "message": "En eller to setninger som beskriver prosjektet ditt."
   },
   "create.project.summary-label": {
     "message": "Oppsummering"
@@ -914,20 +890,8 @@
   "create.project.title": {
     "message": "Lag et prosjekt"
   },
-  "create.project.type-label": {
-    "message": "Type"
-  },
-  "create.project.type-project": {
-    "message": "Prosjekt"
-  },
-  "create.project.type-server": {
-    "message": "Server"
-  },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.visibility-description": {
-    "message": "Synligheten til prosjektet ditt etter at det er godkjent."
   },
   "create.project.visibility-private": {
     "message": "Privat"
@@ -1282,9 +1246,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Feil ved lasting av varsler:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Historie"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Varslingshistorikk"
@@ -2714,12 +2675,6 @@
   "project.gallery.title": {
     "message": "Galleri"
   },
-  "project.moderation.admonition.approved.header": {
-    "message": "Prosjekt godkjent"
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Forespurte endringer"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Uautorisert"
   },
@@ -2740,51 +2695,6 @@
   },
   "project.notification.updated.title": {
     "message": "Prosjekt oppdatert"
-  },
-  "project.settings.general.name.description": {
-    "message": "Unngå forstavelser, avledningsendelser, parantesisering, eller lagt til beskrivelser—bare det aktuelle navnet til prosjeket."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "Til dømes Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "Til dømes Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "Til dømes Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "Til dømes Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "Til dømes dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Navn"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Oppsummer prosjektet ditt med maks ei setning."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "Til dømes overhaler spillprogresjonen sånn at det omgår the Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "Til dømes Legger til konstruksjonsutstyr du kan ta på deg."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "Til dømes Legger til en realistisk mineshaft-byggemekanikk."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "Til dømes forbedrer hvordan Nether-portaler linker mellom hverandre."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "Til dømes Legger til en kraftig bossversjon av de normale mobsa som kan bli møtt om natta."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Slagord"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
   },
   "project.settings.permissions.learn-more": {
     "message": "Lær mer"

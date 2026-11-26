@@ -1070,23 +1070,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "비공개 노트 추가"
   },
-  "conversation-thread.action.approve": {
-    "message": "승인"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "답글과 함께 승인"
-  },
   "conversation-thread.action.close-report": {
     "message": "티켓 닫기"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "답글과 함께 닫기"
-  },
-  "conversation-thread.action.reject": {
-    "message": "거부"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "답글과 함께 거부"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "스레드 다시 열기"
@@ -1097,32 +1085,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "스레드에 답글 게시"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "검토를 위해 다시 제출"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "검토를 위해 답글과 함께 다시 제출"
-  },
   "conversation-thread.action.send": {
     "message": "전송됨"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "검토 요청"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "답글과 함께 검토 요청"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "초안으로 설정"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "답글과 함께 초안으로 설정"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "보류"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "답글과 함께 보류"
   },
   "conversation-thread.closed-thread.description": {
     "message": "이 스레드는 닫혔으며, 더 이상 새로운 메시지를 작성할 수 없습니다."
@@ -1171,33 +1135,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "검토 관련 문제"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "운영진이 보낸 메시지에 답변했는지 확인"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "운영진의 지적 사항을 적절히 반영했음을 확인합니다."
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "<project-title>{projectTitle}</project-title> 프로젝트를 다시 제출하려고 합니다. 모든 검토 관련 문제가 해결되었다면 자동으로 승인될 수 있습니다. 그렇지 않으면 검토 담당자에게 전달되어 심사를 받게 됩니다."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "검토를 위해 다시 제출"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "검토를 위해 제출"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "운영진에서 제시한 모든 의견을 반영했는지 확인해 주세요."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "운영진의 지적 사항을 반영하지 않고 반복적으로 제출할 경우, 계정이 정지될 수 있습니다."
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "다시 제출하려면 위의 필수 조치를 모두 완료해야 합니다."
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "<project-title>{projectTitle}</project-title> 프로젝트를 검토 담당자의 심사를 받기 위해 제출합니다."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "보조 파일은 소스 코드와 같은 지원용 리소스를 위한 것이며, 대체 버전이나 변형을 위한 것이 아닙니다."
@@ -1331,9 +1268,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "버전"
   },
-  "create.collection.collection-info": {
-    "message": "새 모음집은 {count, plural, =0 {아무 프로젝트 없이} other {#개의 프로젝트를 포함하여}} 공개 모음집으로 생성됩니다."
-  },
   "create.collection.create-collection": {
     "message": "모음집 생성"
   },
@@ -1397,9 +1331,6 @@
   "create.organization.name-placeholder": {
     "message": "조직 이름 입력..."
   },
-  "create.organization.ownership-info": {
-    "message": "여러분은 이 조직의 소유자이며, 필요시 다른 멤버를 초대하거나 권한을 이전할 수 있습니다."
-  },
   "create.organization.summary-description": {
     "message": "여러분의 조직에 대해 짧게 설명해 보세요."
   },
@@ -1427,20 +1358,11 @@
   "create.project.name-placeholder": {
     "message": "프로젝트 이름 입력..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} 아이콘"
-  },
-  "create.project.owner-description": {
-    "message": "프로젝트 소유자를 자신 또는 소속된 조직으로 설정하세요."
-  },
   "create.project.owner-label": {
     "message": "소유자"
   },
   "create.project.server-project-title": {
     "message": "서버 프로젝트 생성"
-  },
-  "create.project.summary-description": {
-    "message": "프로젝트를 한두 문장으로 설명해 주세요."
   },
   "create.project.summary-label": {
     "message": "개요"
@@ -1451,26 +1373,11 @@
   "create.project.title": {
     "message": "프로젝트 생성"
   },
-  "create.project.type-label": {
-    "message": "유형"
-  },
-  "create.project.type-project": {
-    "message": "프로젝트"
-  },
-  "create.project.type-server": {
-    "message": "서버"
-  },
   "create.project.unknown-user": {
     "message": "알려지지 않은 사용자"
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "사용자 아바타"
-  },
-  "create.project.visibility-description": {
-    "message": "승인 후 프로젝트의 공개 범위."
   },
   "create.project.visibility-private": {
     "message": "비공개"
@@ -1900,9 +1807,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "알림 불러오기 오류:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "기록"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "알림 기록"
@@ -4031,66 +3935,6 @@
   "project.install-context.back-to-discover": {
     "message": "탐색으로 돌아가기"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "이 프로젝트는 비공개로 설정되어 있어, 본인과 본인이 초대한 사람만 접근할 수 있습니다."
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "프로젝트가 Modrinth에 게시되어 누구나 확인할 수 있습니다."
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "프로젝트는 일부 공개로 설정되어 있어, 직접 링크를 통해서만 접근할 수 있으며 Modrinth에서 검색할 수 없습니다."
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "프로젝트의 <visibility-settings-link>공개 범위 설정</visibility-settings-link>에서 프로젝트의 공개 범위를 변경할 수 있습니다."
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "프로젝트 승인됨"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "이 프로젝트는 검토를 위해 제출되고 Modrinth 운영진의 승인을 받기 전까지는 다른 사람이 볼 수 없는 초안입니다."
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "프로젝트 초안"
-  },
-  "project.moderation.admonition.draft.submit-for-review": {
-    "message": "필요한 모든 단계를 완료하고 프로젝트가 Modrinth의 <rules-link>콘텐츠 규정</rules-link>을 준수하는지 확인한 후, 프로젝트를 검토를 위해 제출할 수 있습니다."
-  },
-  "project.moderation.admonition.rejected.address-all-concerns": {
-    "message": "이 프로젝트를 다시 제출하기 전에, 아래 메시지에 언급된 문제를 포함하여 모든 검토 관련 사항을 해결해야 합니다."
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "수정 요청"
-  },
-  "project.moderation.admonition.rejected.spam-notice": {
-    "message": "검토 과정에서 제기된 모든 문제를 먼저 해결하지 않고 프로젝트를 반복적으로 제출할 경우, 계정이 정지될 수 있습니다."
-  },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "프로젝트가 Modrinth 운영진의 검토 대기열에 등록되었습니다."
-  },
-  "project.moderation.admonition.under-review.body.2": {
-    "message": "프로젝트가 스캔 과정을 거친 후, Modrinth의 <rules-link>콘텐츠 규정</rules-link> 및 <terms-link>이용 약관</terms-link>을 준수하는지 확인하기 위해 운영진이 검토하게 됩니다."
-  },
-  "project.moderation.admonition.under-review.body.3": {
-    "message": "프로젝트를 수정해도 대기열 우선 순위에는 영향을 미치지 않습니다."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "24~48시간 이내에 제출 항목을 검토하고자 하나, 일부 프로젝트 검토가 지연될 수 있습니다. 제출 항목의 문제를 의미하지는 않습니다."
-  },
-  "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "1주일 이내에 제출 항목을 검토하고자 하나, 일부 프로젝트 검토가 지연될 수 있습니다. 제출 항목의 문제를 의미하지는 않습니다."
-  },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>운영진들이 Modrinth의 안전한 환경을 유지하기 위해 최선을 다하고 있는 동안 기다려 주셔서 감사합니다. 여러분의 콘텐츠를 공유하실 수 있도록 도와드릴 수 있기를 기대합니다! 💚</emphasis>"
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "프로젝트 검토 중"
-  },
-  "project.moderation.admonition.withheld.body": {
-    "message": "이 프로젝트는 공개되지 않으며, 직접 링크를 통해서만 접근할 수 있습니다.{requestedStatus, select,unlisted { 선택한 <visibility-settings-link>공개 범위 설정</visibility-settings-link>에 따라, 별도의 조치가 필요하지 않을 가능성이 높습니다.} other { 이 프로젝트를 다시 제출하기 전에, 아래 메시지에 나열된 문제를 포함하여 모든 검토 관련 사항을 해결해야 합니다.}}"
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "운영진에 의해 일부 공개로 변경됨"
-  },
   "project.moderation.error.unauthorized": {
     "message": "권한 없음"
   },
@@ -4100,14 +3944,8 @@
   "project.moderation.thread.approved-warning": {
     "message": "이 스레드는 적극적으로 관리되지는 않지만, 필요한 경우 프로젝트에 관한 정보를 확인하기 위해 검토될 수 있습니다."
   },
-  "project.moderation.thread.help-center-note.1": {
-    "message": "콘텐츠 관리자는 대부분의 문제에 대해 지원을 제공할 수 없으며, 이 스레드에 남겨진 메시지는 운영진에 전달되지 않습니다."
-  },
   "project.moderation.thread.help-center-note.2": {
     "message": "도움이 필요하거나 추가 문의 사항이 있다면 <help-center-link>Modrinth 도움말 센터</help-center-link>를 방문하여 파란색 말풍선을 클릭해 지원 센터에 문의해 주세요."
-  },
-  "project.moderation.thread.private-description": {
-    "message": "이곳은 Modrinth 운영진과의 비공개 대화 스레드입니다. 운영진이 이 프로젝트와 관련된 사항에 대해 메시지를 보낼 수 있습니다."
   },
   "project.moderation.thread.title": {
     "message": "운영진 메시지"
@@ -4175,17 +4013,8 @@
   "project.settings.delete-project.confirmation.title": {
     "message": "이 프로젝트를 삭제하시겠습니까?"
   },
-  "project.settings.delete-project.description.1": {
-    "message": "Modrinth에서 이 프로젝트를 영구적으로 삭제합니다. 삭제된 프로젝트는 Modrinth에서 <emphasis>절대로 복구할 수 없습니다</emphasis>."
-  },
-  "project.settings.delete-project.description.2": {
-    "message": "Modrinth에 업로드된 모드팩에 이 프로젝트의 파일이 계속 남아있을 수 있습니다."
-  },
   "project.settings.delete-project.title": {
     "message": "프로젝트 삭제"
-  },
-  "project.settings.description.intro": {
-    "message": "여기에 프로젝트에 대한 상세 설명을 기재할 수 있습니다. 설명은 프로젝트의 목적과 기능에 대해 명확하고 진실되게 작성해야 합니다. 전체 요구 사항은 <rules>콘텐츠 규정</rules>의 2.1절을 확인하세요."
   },
   "project.settings.description.title": {
     "message": "설명"
@@ -4379,59 +4208,8 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "원격 측정 포함"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "고지 사항을 추가하기 전에 버전을 업로드하세요"
-  },
   "project.settings.editing-project": {
     "message": "{projectType} 프로젝트 수정 중"
-  },
-  "project.settings.general.name.description": {
-    "message": "접두사, 접미사, 괄호 속 설명 또는 추가 설명은 피하세요—프로젝트의 실제 이름만 기재하세요."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "예시: Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "예시: Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "예시: Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "예시: Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "예시: Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "이름"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "프로젝트를 한 문장으로 요약하세요."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "예시: 게임 진행을 네더를 중심으로 재구성합니다."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "예시: 착용 가능한 건설 장비 추가."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "예시: 현실적인 갱도 건설 메커니즘을 추가합니다."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "예시: 네더 포탈 간의 연결 방식을 개선합니다."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "예시: 밤에 마주칠 수 있는 일반 몬스터들의 강력한 보스 버전을 추가합니다."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "요약"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
-  "project.settings.license.all-rights": {
-    "message": "모든 권리 보유/라이선스 없음"
   },
   "project.settings.license.allow-later": {
     "message": "이후 에디션 허용"
@@ -4442,38 +4220,14 @@
   "project.settings.license.custom-name-invalid": {
     "message": "맞춤 라이선스 이름은 문자, 숫자, 마침표, 붙임표만 포함할 수 있습니다."
   },
-  "project.settings.license.custom-name-required": {
-    "message": "사용자 지정 라이선스 이름을 입력하세요."
-  },
-  "project.settings.license.custom-url-description": {
-    "message": "라이선스 전문의 웹 위치입니다. 사용자 지정 라이선스이므로 링크를 제공해야 합니다."
-  },
-  "project.settings.license.intro": {
-    "message": "{type}을(를) 위한 적절한 라이선스를 선택해야 합니다. 저희가 제공하는 목록에서 하나를 선택하거나 사용자 지정 라이선스를 제공할 수 있습니다. 또한 선택한 라이선스에 따라 자체적인 URL을 제공해야 할 수 있습니다. 그렇지 않으면 라이선스 텍스트가 표시됩니다. 자세한 정보는 <guide>라이선스 가이드</guide>를 확인하세요."
-  },
   "project.settings.license.later": {
     "message": "이후 에디션"
   },
   "project.settings.license.later-description": {
     "message": "선택한 라이선스에 \"또는 그 이후\" 조항이 있습니다. 이 상자를 체크하면 사용자는 해당 라이선스의 이후 버전 하에서 프로젝트를 이용할 수 있게 됩니다."
   },
-  "project.settings.license.missing-url": {
-    "message": "사용자 지정 라이선스 전문 URL을 입력하세요."
-  },
   "project.settings.license.name": {
     "message": "라이선스 이름"
-  },
-  "project.settings.license.name-description": {
-    "message": "사용자 지정 라이선스의 전체 이름입니다."
-  },
-  "project.settings.license.name-placeholder": {
-    "message": "라이선스 이름"
-  },
-  "project.settings.license.optional-label": {
-    "message": "선택"
-  },
-  "project.settings.license.optional-url": {
-    "message": "라이선스 URL(선택)"
   },
   "project.settings.license.select": {
     "message": "라이선스"
@@ -4491,12 +4245,6 @@
     "message": "라이선스가 업데이트되었습니다."
   },
   "project.settings.license.url": {
-    "message": "라이선스 URL"
-  },
-  "project.settings.license.url-description": {
-    "message": "라이선스 전문의 웹 위치입니다. 링크를 제공하지 않으면 라이선스 텍스트가 대신 표시됩니다."
-  },
-  "project.settings.license.url-placeholder": {
     "message": "라이선스 URL"
   },
   "project.settings.links.add-link": {
@@ -4588,15 +4336,6 @@
   },
   "project.settings.links.wiki-description": {
     "message": "프로젝트에 대한 정보, 문서 및 도움말을 제공하는 페이지입니다."
-  },
-  "project.settings.monetization.description": {
-    "message": "Modrinth 프로젝트들은 자동으로 <rewards-program-link>보상 프로그램</rewards-program-link>에 등록됩니다. 수익 창출을 원하지 않거나 법적인 이유로 수익을 창출할 수 없는 경우 여기에서 비활성화할 수 있습니다."
-  },
-  "project.settings.monetization.disabled-description": {
-    "message": "이 프로젝트는 수익 창출 대상이 아닙니다. 잘못된 판단이라고 생각되는 경우 <contact-support-link>지원팀에 문의하세요</contact-support-link>."
-  },
-  "project.settings.monetization.title": {
-    "message": "수익 창출"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "다음의 모든 파일을 재배포할 수 있는 권한이 있음을 증명해 주세요. 확인이 완료되면 보류된 버전이 자동으로 게시됩니다."
@@ -4721,9 +4460,6 @@
   "project.settings.server.latency-label": {
     "message": "응답 지연: {latency}ms"
   },
-  "project.settings.server.optional-label": {
-    "message": "옵션"
-  },
   "project.settings.server.ping-failed-message": {
     "message": "이 서버에 ping을 보낼 수 없습니다. 호스트에서 차단되었을 수 있으니 몇 번 새로고침해 보세요. 그래도 응답하지 않으면 <support-link>지원팀에 문의해 주세요.</support-link>."
   },
@@ -4743,7 +4479,7 @@
     "message": "서버 접속!"
   },
   "project.settings.server.srv-records-hint": {
-    "message": " <srv-tooltip>[SRV 레코드]</srv-tooltip>가 있는 경우 포트를 추가할 필요가 없습니다. 그렇지 않고 포트가 25565가 아니라면 :12345처럼 포함할 수 있습니다."
+    "message": " <srv-tooltip>SRV 레코드</srv-tooltip>가 있는 경우 포트를 추가할 필요가 없습니다. 그렇지 않고 포트가 25565가 아니라면 :12345처럼 포함할 수 있습니다."
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "여기 입력한 주소에는 DNS SRV 레코드 _minecraft._tcp.(도메인)이 있을 수 있으며, 이는 Minecraft 서버 주소와 포트를 가리킵니다."
@@ -4751,20 +4487,8 @@
   "project.settings.tags.all-tags-selected-warning": {
     "message": "사용 가능한 {count}개의 태그를 모두 선택하셨습니다. 프로젝트에 실제로 적용되는 태그만 선택해 주세요."
   },
-  "project.settings.tags.categories-description": {
-    "message": " {type}의 주제나 기능을 반영하는 모든 카테고리를 선택하세요."
-  },
   "project.settings.tags.featured-tags": {
     "message": "추천 태그"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "추천 태그가 한 개 이상 필요합니다."
-  },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "가장 관련성 높은 태그를 선택하세요. 선택한 태그는 다른 태그보다 먼저 표시됩니다."
-  },
-  "project.settings.tags.features-description": {
-    "message": " {type}에서 사용하는 모든 기능을 선택하세요."
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} 카테고리} other {카테고리}}"
@@ -4789,18 +4513,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "추천 카테고리를 지정하려면 적어도 하나의 카테고리를 선택해야 합니다."
-  },
-  "project.settings.tags.title": {
-    "message": "태그"
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "선택한 태그가 {count}개입니다. 프로젝트를 더 집중적이고 검색하기 쉽게 만들려면 태그를 8개 이하로 줄이는 것이 좋습니다."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "선택한 태그가 {count}개입니다. 서버를 더 집중적이고 검색하기 쉽게 만들려면 태그를 18개 이하로 줄여 주세요."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "선택한 태그가 {count}개입니다. 서버를 더 집중적이고 검색하기 쉽게 만들려면 태그를 12개 이하로 줄이는 것이 좋습니다."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "태그를 추가하기 전에 버전을 업로드하세요"

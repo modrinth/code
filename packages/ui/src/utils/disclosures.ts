@@ -55,10 +55,14 @@ function normalizeProjectType(type: string): string {
 
 export function isDisclosureCompatibleWithProjectTypes(
 	disclosureType: Labrinth.Projects.v3.ProjectDisclosureType,
-	projectTypes: readonly string[],
+	projectTypes: readonly string[] | null,
 ): boolean {
+	const supportedTypes = DISCLOSURE_SUPPORTED_PROJECT_TYPES[disclosureType]
+	if (projectTypes === null) {
+		return ALL_CONTENT_PROJECT_TYPES.every((type) => supportedTypes.includes(type))
+	}
 	const types = projectTypes.map(normalizeProjectType)
-	return DISCLOSURE_SUPPORTED_PROJECT_TYPES[disclosureType].some((type) => types.includes(type))
+	return supportedTypes.some((type) => types.includes(type))
 }
 
 export function isActiveDisclosure(

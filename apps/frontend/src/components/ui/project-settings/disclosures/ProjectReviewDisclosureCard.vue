@@ -104,6 +104,7 @@ const isToggleLocked = computed(() => !!props.disabled || (!!props.toggleDisable
 </template>
 
 <style scoped>
+.disclosure-details :deep(.field-label),
 .disclosure-details :deep(label.font-semibold.text-contrast),
 .disclosure-details :deep(p.font-semibold.text-contrast) {
 	@apply text-sm font-medium text-secondary;

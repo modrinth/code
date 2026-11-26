@@ -56,11 +56,29 @@ export class OrganizationContext {
 		return null
 	})
 
-	public hasPermission = computed(() => {
-		const EDIT_DETAILS = 1 << 2
+	public canEditDetails = computed(() => {
+		const editDetails = 1 << 0
+		const member = this.currentMember.value
+		const role = this.auth.value.user?.role
+		const isStaffWithoutMembership =
+			role === 'moderator' &&
+			!this.organization.value?.members.some(
+				({ user, accepted }) => accepted && user.id === this.auth.value.user?.id,
+			)
 		return (
-			this.currentMember.value &&
-			(this.currentMember.value.permissions! & EDIT_DETAILS) === EDIT_DETAILS
+			role === 'admin' ||
+			isStaffWithoutMembership ||
+			(!!member?.accepted && ((member.organization_permissions ?? 0) & editDetails) === editDetails)
+		)
+	})
+
+	public canDelete = computed(() => {
+		const deleteOrganization = 1 << 6
+		const member = this.currentMember.value
+		return (
+			this.auth.value.user?.role === 'admin' ||
+			(!!member?.accepted &&
+				((member.organization_permissions ?? 0) & deleteOrganization) === deleteOrganization)
 		)
 	})
 
@@ -101,8 +119,6 @@ export class OrganizationContext {
 			body: newData,
 			apiVersion: 3,
 		})
-
-		await this.refreshFunction()
 	}
 }
 

@@ -1,4 +1,4 @@
-import { defineMessages } from '@modrinth/ui'
+import { defineMessage, defineMessages } from '@modrinth/ui'
 
 export const disclosureStatusMessages = defineMessages({
 	loading: { id: 'project.disclosures.loading', defaultMessage: 'Loading disclosures…' },
@@ -12,4 +12,9 @@ export const disclosureStatusMessages = defineMessages({
 		defaultMessage:
 			'Could not save all disclosure changes. Your edits have been kept. Try saving again.',
 	},
+})
+
+export const disclosureTitle = defineMessage({
+	id: 'project.settings.disclosures.content-disclosures',
+	defaultMessage: 'Content disclosures',
 })

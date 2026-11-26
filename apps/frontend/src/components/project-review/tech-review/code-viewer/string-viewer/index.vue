@@ -193,7 +193,8 @@ defineExpose({ onContextMenu })
 				<Combobox
 					v-model="language"
 					:options="languageOptions"
-					:search-input-attrs="{ id: languageId, 'aria-label': 'Language' }"
+					:search-input-id="languageId"
+					:search-input-attrs="{ 'aria-label': 'Language' }"
 					searchable
 					select-search-text-on-focus
 					search-placeholder="Search languages..."

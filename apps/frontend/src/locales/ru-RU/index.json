@@ -1082,23 +1082,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Добавить приватную заметку"
   },
-  "conversation-thread.action.approve": {
-    "message": "Одобрить"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Одобрить с ответом"
-  },
   "conversation-thread.action.close-report": {
     "message": "Закрыть жалобу"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Закрыть с ответом"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Отклонить"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Отклонить с ответом"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Возобновить ветку"
@@ -1109,32 +1097,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Ответить в ветке"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Отправить на перепроверку"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Отправить на перепроверку с ответом"
-  },
   "conversation-thread.action.send": {
     "message": "Отправить"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Отправить на проверку"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Отправить на проверку с ответом"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Установить в черновик"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Установить в черновик с ответом"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Удержать"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Удержать с ответом"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Ветка закрыта. Отправка сообщений недоступна."
@@ -1183,33 +1147,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Замечание модерации"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Подтвердить, что все замечания модераторов исправлены"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Я подтверждаю, что все замечания модераторов исправлены."
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "Вы повторно отправляете <project-title>{projectTitle}</project-title>. Если все замечания модерации устранены, проект может быть одобрен автоматически. В противном случае он будет отправлен модераторам на проверку."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Отправка на перепроверку"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Отправка на проверку"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Убедитесь, что все замечания модераторов исправлены."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "Регулярная отправка без исправления замечаний модераторов грозит блокировкой аккаунта."
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "Чтобы отправить повторно, нужно выполнить все обязательные действия выше"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "Вы отправляете <project-title>{projectTitle}</project-title> на проверку модераторам."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Дополнительные файлы нужны для ресурсов вроде исходного кода, а не других версий или вариантов."
@@ -1343,9 +1280,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Версии"
   },
-  "create.collection.collection-info": {
-    "message": "Будет создана публичная коллекция {count, plural, =0 {без проектов} one {с # проектом} other {с # проектами}}."
-  },
   "create.collection.create-collection": {
     "message": "Создать коллекцию"
   },
@@ -1409,9 +1343,6 @@
   "create.organization.name-placeholder": {
     "message": "Введите название организации..."
   },
-  "create.organization.ownership-info": {
-    "message": "Вы станете владельцем организации и в любой момент сможете пригласить участников и передать владение."
-  },
   "create.organization.summary-description": {
     "message": "Пара предложений про организацию."
   },
@@ -1439,20 +1370,11 @@
   "create.project.name-placeholder": {
     "message": "Введите название проекта..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "Иконка {name}"
-  },
-  "create.project.owner-description": {
-    "message": "Укажите себя или организацию, в которой состоите."
-  },
   "create.project.owner-label": {
     "message": "Владелец"
   },
   "create.project.server-project-title": {
     "message": "Создание серверного проекта"
-  },
-  "create.project.summary-description": {
-    "message": "Пара предложений про проект."
   },
   "create.project.summary-label": {
     "message": "Сводка"
@@ -1463,26 +1385,11 @@
   "create.project.title": {
     "message": "Создание проекта"
   },
-  "create.project.type-label": {
-    "message": "Тип"
-  },
-  "create.project.type-project": {
-    "message": "Проект"
-  },
-  "create.project.type-server": {
-    "message": "Сервер"
-  },
   "create.project.unknown-user": {
     "message": "Неизвестный пользователь"
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Аватар"
-  },
-  "create.project.visibility-description": {
-    "message": "Видимость проекта после прохождения модерации."
   },
   "create.project.visibility-private": {
     "message": "Приватный"
@@ -1912,9 +1819,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Ошибка загрузки уведомлений:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "История"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "История уведомлений"
@@ -4046,66 +3950,6 @@
   "project.install-context.back-to-discover": {
     "message": "Вернуться к поиску"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "Проект приватный и доступен только участникам."
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "Проект опубликован и доступен в поиске на Modrinth."
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "Проект скрыт из поиска и доступен только по прямой ссылке."
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "Изменить доступность проекта можно в <visibility-settings-link>настройках видимости</visibility-settings-link>."
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "Проект одобрен"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "Это черновик проекта. Он доступен только вам до прохождения модерации."
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "Черновик"
-  },
-  "project.moderation.admonition.draft.submit-for-review": {
-    "message": "Для прохождения модерации убедитесь, что проект соответствует <rules-link>правилам контента Modrinth</rules-link>, и выполните обязательные действия в контрольном списке."
-  },
-  "project.moderation.admonition.rejected.address-all-concerns": {
-    "message": "Перед повторной отправкой проекта исправьте все замечания модераторов из переписки ниже."
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Требуются изменения"
-  },
-  "project.moderation.admonition.rejected.spam-notice": {
-    "message": "Регулярная отправка проекта без исправления замечаний модераторов грозит блокировкой аккаунта."
-  },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "Проект ожидает рассмотрения командой модераторов Modrinth."
-  },
-  "project.moderation.admonition.under-review.body.2": {
-    "message": "Система и команда проверят проект на соответствие <rules-link>правилам контента</rules-link> и <terms-link>условиям использования</terms-link>."
-  },
-  "project.moderation.admonition.under-review.body.3": {
-    "message": "Изменения в проекте не влияют на место в очереди."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Рассмотрение занимает около 24–48 часов. Задержка не указывает на проблемы с проектом."
-  },
-  "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "Рассмотрение занимает около недели. Задержка не указывает на проблемы с проектом."
-  },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>Спасибо за терпение, пока мы следим за безопасностью. Надеемся, ваш проект скоро увидит свет! 💚</emphasis>"
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "Проект на рассмотрении"
-  },
-  "project.moderation.admonition.withheld.body": {
-    "message": "Проект скрыт из поиска и доступен только по прямой ссылке. {requestedStatus, select, unlisted {Судя по текущим <visibility-settings-link>настройкам видимости</visibility-settings-link>, никаких действий не требуется.} other {Перед повторной отправкой проекта исправьте все замечания модераторов из переписки ниже.}}"
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "Проект скрыт модератором"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Нет доступа"
   },
@@ -4115,14 +3959,8 @@
   "project.moderation.thread.approved-warning": {
     "message": "За этой веткой почти не следят. Её могут изучить для уточнения сведений о проекте."
   },
-  "project.moderation.thread.help-center-note.1": {
-    "message": "Модераторы не решают общие вопросы и не получают уведомления о сообщениях в ветке."
-  },
   "project.moderation.thread.help-center-note.2": {
     "message": "Для связи с поддержкой посетите <help-center-link>справочный центр</help-center-link> и используйте синий виджет чата."
-  },
-  "project.moderation.thread.private-description": {
-    "message": "Это приватная ветка общения с модераторами Modrinth. Сюда поступают замечания касательно проекта."
   },
   "project.moderation.thread.title": {
     "message": "Сообщения модерации"
@@ -4190,17 +4028,8 @@
   "project.settings.delete-project.confirmation.title": {
     "message": "Вы точно хотите удалить этот проект?"
   },
-  "project.settings.delete-project.description.1": {
-    "message": "Проект будет удалён с Modrinth навсегда. Удалённые проекты <emphasis>невозможно восстановить</emphasis> через поддержку Modrinth."
-  },
-  "project.settings.delete-project.description.2": {
-    "message": "Файлы, загруженные в этот проект, которые активно используются в сборках, размещенных на Modrinth, могут продолжать существовать."
-  },
   "project.settings.delete-project.title": {
     "message": "Удаление проекта"
-  },
-  "project.settings.description.intro": {
-    "message": "Здесь можно ввести подробное описание вашего проекта. Описание должно четко и честно раскрывать цель и назначение проекта. Полный перечень требований см. в разделе 2.1 <rules>Правил размещения контента</rules>."
   },
   "project.settings.description.title": {
     "message": "Описание"
@@ -4394,59 +4223,8 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Есть телеметрия"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Загрузите версии перед настройкой маркировки"
-  },
   "project.settings.editing-project": {
     "message": "Редактирование проекта {projectType}"
-  },
-  "project.settings.general.name.description": {
-    "message": "Не используйте лишние приписки, скобки и описания — введите только название проекта."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "Например: Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "Например: Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "Например: Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "Например: Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "Например: Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Название"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Опишите проект одним предложением."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "Например: Overhauls game progression to revolve around the Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "Например: Adds wearable construction gear."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "Например: Adds realistic mineshaft-building mechanics."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "Например: Improves how Nether portals link to each other."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "Например: Adds powerful boss versions of the normal mobs to encounter in the night."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Слоган"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
-  "project.settings.license.all-rights": {
-    "message": "Все права защищены/Без лицензии"
   },
   "project.settings.license.allow-later": {
     "message": "Допускать более поздние версии"
@@ -4457,38 +4235,14 @@
   "project.settings.license.custom-name-invalid": {
     "message": "В названиях лицензий могут быть лишь буквы, цифры, точки и дефисы."
   },
-  "project.settings.license.custom-name-required": {
-    "message": "Укажите название своей лицензии."
-  },
-  "project.settings.license.custom-url-description": {
-    "message": "Ссылка на полный текст лицензии. Для своей лицензии ссылка обязательна."
-  },
-  "project.settings.license.intro": {
-    "message": "Важно выбрать подходящую лицензию для вашего {type}. Вы можете выбрать ее из нашего списка или предоставить свою лицензию. Вы также можете предоставить URL выбранной лицензии в противном случае будет лицензия будет показана в виде текста. Смотрите руководство <guide>по лицензированию</guide> для получения дополнительной информации."
-  },
   "project.settings.license.later": {
     "message": "Более поздние версии"
   },
   "project.settings.license.later-description": {
     "message": "Выбранная лицензия поддерживается в варианте «или более поздняя». Установите флажок, если разрешаете использовать проект на условиях более поздних версий лицензии."
   },
-  "project.settings.license.missing-url": {
-    "message": "Укажите URL полного текста своей лицензии."
-  },
   "project.settings.license.name": {
     "message": "Название лицензии"
-  },
-  "project.settings.license.name-description": {
-    "message": "Полное название своей лицензии."
-  },
-  "project.settings.license.name-placeholder": {
-    "message": "Название лицензии"
-  },
-  "project.settings.license.optional-label": {
-    "message": "необязательно"
-  },
-  "project.settings.license.optional-url": {
-    "message": "Ссылка на лицензию (необязательно)"
   },
   "project.settings.license.select": {
     "message": "Лицензия"
@@ -4507,12 +4261,6 @@
   },
   "project.settings.license.url": {
     "message": "Ссылка на лицензию"
-  },
-  "project.settings.license.url-description": {
-    "message": "Расположение полного текста лицензии. Если ссылка не указана, будет отображаться текст лицензии."
-  },
-  "project.settings.license.url-placeholder": {
-    "message": "Адрес лицензии"
   },
   "project.settings.links.add-link": {
     "message": "Добавить ссылку"
@@ -4603,15 +4351,6 @@
   },
   "project.settings.links.wiki-description": {
     "message": "Страница с информацией, документацией и справкой по проекту."
-  },
-  "project.settings.monetization.description": {
-    "message": "Проекты на Modrinth автоматически зачисляются в <rewards-program-link>программу наград</rewards-program-link>. Если вы не хотите (или не можете по юридическим причинам) получать доход от этого проекта, вы можете отключить его здесь."
-  },
-  "project.settings.monetization.disabled-description": {
-    "message": "Этот проект не имеет права на монетизацию. Если вы считаете, что это ошибка, пожалуйста <contact-support-link>обратитесь в поддержку</contact-support-link>."
-  },
-  "project.settings.monetization.title": {
-    "message": "Монетизация"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Предоставьте доказательства на использование указанных ниже файлов. По завершении затронутые версии опубликуются автоматически."
@@ -4736,9 +4475,6 @@
   "project.settings.server.latency-label": {
     "message": "Задержка: {latency} мс"
   },
-  "project.settings.server.optional-label": {
-    "message": "необязательно"
-  },
   "project.settings.server.ping-failed-message": {
     "message": "Мы не могли связаться с этим сервером. Он может быть заблокирован вашим хостом, так что попробуйте перезагрузить его несколько раз. Если он все еще не отвечает, пожалуйста <support-link>свяжитесь с поддержкой</support-link>."
   },
@@ -4758,25 +4494,13 @@
     "message": "Сервер запущен!"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "Если у вас есть <srv-tooltip>[записи SRV]</srv-tooltip>, вы не должны добавлять порт. В другом случае если у вас есть порт, который не 25565, вы можете его ввести как: 12345"
+    "message": "Если у вас есть <srv-tooltip>записи SRV</srv-tooltip>, вы не должны добавлять порт. В другом случае если у вас есть порт, который не 25565, вы можете его ввести как: 12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "Адрес который вы сюда вводите,может иметь DNS записей SRV _minecraft._tcp.(ваш домен), которые указывают на ваш адрес и порт сервера Майнкрафта."
   },
-  "project.settings.tags.categories-description": {
-    "message": "Выберите все категории, которые отражают темы или функции вашего {type}"
-  },
   "project.settings.tags.featured-tags": {
     "message": "Ключевые теги"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "Необходим хотя бы один ключевой тег."
-  },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Выберите наиболее подходящие теги. Они видны первыми."
-  },
-  "project.settings.tags.features-description": {
-    "message": "Выберите все особенности, которые использует ваш {type}"
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types}: категории} other {Категории}}"
@@ -4798,9 +4522,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Выберите хотя бы одну категорию, чтобы отобразить ее."
-  },
-  "project.settings.tags.title": {
-    "message": "Теги"
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Загрузите версии перед добавлением тегов"

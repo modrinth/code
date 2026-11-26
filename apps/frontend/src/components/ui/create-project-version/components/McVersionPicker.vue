@@ -29,47 +29,23 @@
 					<Button
 						v-for="version in group.versions"
 						:key="version"
+						:aria-pressed="modelValue.includes(version)"
 						:type="
-							modelValue.includes(version) || (holdingShift && version === anchorVersion)
-								? 'colored'
-								: 'base'
+							modelValue.includes(version)
+								? 'outlined'
+								: holdingShift && version === anchorVersion
+									? 'colored'
+									: 'base'
 						"
 						:color="
-							(holdingShift && version === anchorVersion
+							holdingShift && version === anchorVersion
 								? 'purple'
 								: modelValue.includes(version)
-									? 'green'
-									: 'standard') &&
-							(holdingShift && version === anchorVersion
-								? 'purple'
-								: modelValue.includes(version)
-									? 'green'
-									: 'standard') !== 'standard'
-								? (holdingShift && version === anchorVersion
-										? 'purple'
-										: modelValue.includes(version)
-											? 'green'
-											: 'standard') === 'medal-promo'
-									? 'medal_promotion'
-									: holdingShift && version === anchorVersion
-										? 'purple'
-										: modelValue.includes(version)
-											? 'green'
-											: 'standard'
-								: undefined
+									? 'brand'
+									: undefined
 						"
-						class="!py-1.5 focus:outline-none"
-						:class="[
-							[
-								versionType === 'all' && !group.isReleaseGroup ? 'w-max' : 'w-16',
-								modelValue.includes(version) ? '!text-contrast' : '',
-							],
-							modelValue.includes(version)
-								? true
-									? '!bg-[var(--color-button-bg-selected)] !text-[var(--color-button-text-selected)] [&>svg]:!text-[var(--color-button-text-selected)]'
-									: '!bg-[var(--color-button-bg)] !text-contrast'
-								: '',
-						]"
+						class="!py-1.5 focus:outline-none aria-pressed:!bg-brand-highlight aria-pressed:!text-contrast"
+						:class="versionType === 'all' && !group.isReleaseGroup ? 'w-max' : 'w-16'"
 						:disabled="disabled"
 						@click="() => handleToggleVersion(version)"
 						@blur="

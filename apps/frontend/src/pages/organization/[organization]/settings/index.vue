@@ -1,247 +1,350 @@
-<script setup>
+<script setup lang="ts">
 import { TrashIcon, UploadIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	Button,
+	commonMessages,
+	commonProjectSettingsMessages,
 	ConfirmModal,
+	defineMessages,
+	Field,
 	FileButton,
+	injectModrinthClient,
 	injectNotificationManager,
 	Input,
 	Textarea,
 	UnsavedChangesPopup,
 	useGlobals,
-	useSavable,
+	useVIntl,
 } from '@modrinth/ui'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { useObjectUrl } from '@vueuse/core'
+import { computed, ref, shallowRef, useId, useTemplateRef, watch } from 'vue'
 
-import { injectOrganizationContext } from '~/providers/organization-context.ts'
+import DangerZonePanel from '~/components/project-settings/general/danger-zone/panel.vue'
+import SettingsSection from '~/components/project-settings/settings-section.vue'
+import { injectOrganizationContext } from '~/providers/organization-context'
 
-const { data: globals } = useGlobals()
-
-const { addNotification } = injectNotificationManager()
-const {
-	organization,
-	refresh: refreshOrganization,
-	hasPermission,
-	deleteIcon,
-	patchIcon,
-	patchOrganization,
-} = injectOrganizationContext()
-
-// Icon state (separate from useSavable, like collection page)
-const icon = ref(null)
-const deletedIcon = ref(false)
-const previewImage = ref(null)
-
-const {
-	saved,
-	current,
-	saving,
-	hasChanges: hasFieldChanges,
-	reset: resetFields,
-} = useSavable(
-	() => ({
-		name: organization.value.name,
-		slug: organization.value.slug,
-		summary: organization.value.description,
-	}),
-	async ({ name, slug, summary }) => {
-		await patchOrganization({
-			...(name !== undefined && { name }),
-			...(slug !== undefined && { slug }),
-			...(summary !== undefined && { description: summary }),
-		})
+const messages = defineMessages({
+	about: { id: 'organization.settings.about.title', defaultMessage: 'About' },
+	name: { id: 'organization.settings.about.name', defaultMessage: 'Name' },
+	summary: { id: 'organization.settings.about.summary', defaultMessage: 'Summary' },
+	icon: { id: 'organization.settings.about.icon', defaultMessage: 'Icon' },
+	optional: { id: 'organization.settings.about.optional', defaultMessage: '(optional)' },
+	url: { id: 'organization.settings.about.url', defaultMessage: 'URL' },
+	characterCount: {
+		id: 'organization.settings.about.character-count',
+		defaultMessage: '{count, number} / {limit, number}',
 	},
-)
-
-// Combined state for UnsavedChangesPopup
-const originalState = computed(() => ({
-	...saved.value,
-	iconChanged: false,
-}))
-
-const modifiedState = computed(() => ({
-	...current.value,
-	iconChanged: !!(deletedIcon.value || icon.value),
-}))
-
-const reset = () => {
-	resetFields()
-	icon.value = null
-	deletedIcon.value = false
-	previewImage.value = null
-}
-
-const markIconForDeletion = () => {
-	deletedIcon.value = true
-	icon.value = null
-	previewImage.value = null
-}
-
-const showPreviewImage = (files) => {
-	const reader = new FileReader()
-
-	icon.value = files[0]
-	deletedIcon.value = false
-
-	reader.readAsDataURL(icon.value)
-	reader.onload = (event) => {
-		previewImage.value = event.target.result
-	}
-}
-
-const orgId = useRouteId('organization')
-
-const save = async () => {
-	// Save field changes via useSavable
-	if (hasFieldChanges.value) {
-		await patchOrganization({
-			...(current.value.name !== organization.value.name && { name: current.value.name }),
-			...(current.value.slug !== organization.value.slug && { slug: current.value.slug }),
-			...(current.value.summary !== organization.value.description && {
-				description: current.value.summary,
-			}),
-		})
-	}
-
-	// Handle icon deletion / upload separately
-	if (deletedIcon.value) {
-		await deleteIcon()
-		deletedIcon.value = false
-	} else if (icon.value) {
-		await patchIcon(icon.value)
-		icon.value = null
-	}
-
-	// Always refresh after any change
-	await refreshOrganization()
-
-	addNotification({
-		title: 'Organization updated',
-		text: 'Your organization has been updated.',
-		type: 'success',
-	})
-}
-
-const onDeleteOrganization = useClientTry(async () => {
-	await useBaseFetch(`organization/${orgId}`, {
-		method: 'DELETE',
-		apiVersion: 3,
-	})
-
-	addNotification({
-		title: 'Organization deleted',
-		text: 'Your organization has been deleted.',
-		type: 'success',
-	})
-
-	await navigateTo('/dashboard/organizations')
+	dangerZone: { id: 'organization.settings.danger-zone', defaultMessage: 'Danger zone' },
+	delete: { id: 'organization.settings.delete.title', defaultMessage: 'Delete organization' },
+	deleteDescription: {
+		id: 'organization.settings.delete.description',
+		defaultMessage:
+			'Deleting this organization is permanent. All of its projects will transfer to the organization owner.',
+	},
+	deleteConfirmationTitle: {
+		id: 'organization.settings.delete.confirmation.title',
+		defaultMessage: 'Are you sure you want to delete this organization?',
+	},
+	deleteConfirmationAction: {
+		id: 'organization.settings.delete.confirmation.action',
+		defaultMessage: 'Permanently delete organization',
+	},
+	updated: { id: 'organization.settings.updated', defaultMessage: 'Organization updated' },
+	deleted: { id: 'organization.settings.deleted', defaultMessage: 'Organization deleted' },
+	error: { id: 'organization.settings.error', defaultMessage: 'An error occurred' },
 })
+
+const nameLimit = 64
+const summaryLimit = 256
+const { formatMessage } = useVIntl()
+const { data: globals } = useGlobals()
+const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
+const { organization, canEditDetails, canDelete, deleteIcon, patchIcon, patchOrganization } =
+	injectOrganizationContext()
+const orgId = useRouteId('organization')
+const confirmModal = useTemplateRef('confirmModal')
+const aboutTitleId = useId()
+const nameId = useId()
+const summaryId = useId()
+const slugId = useId()
+const dangerZoneTitleId = useId()
+
+const saved = computed(() => ({
+	name: organization.value?.name ?? '',
+	slug: organization.value?.slug ?? '',
+	description: organization.value?.description ?? '',
+}))
+const current = ref({ ...saved.value })
+const icon = shallowRef<File>()
+const deletedIcon = ref(false)
+const previewImage = useObjectUrl(icon)
+const original = computed(() => ({ ...saved.value, iconChanged: false }))
+const modified = computed(() => ({
+	...current.value,
+	iconChanged: !!icon.value || deletedIcon.value,
+}))
+
+watch(saved, (next, previous) => {
+	if (
+		current.value.name === previous.name &&
+		current.value.slug === previous.slug &&
+		current.value.description === previous.description
+	) {
+		current.value = { ...next }
+	}
+})
+
+function reset() {
+	current.value = { ...saved.value }
+	icon.value = undefined
+	deletedIcon.value = false
+}
+
+function markIconForDeletion() {
+	icon.value = undefined
+	deletedIcon.value = !!organization.value?.icon_url
+}
+
+function showPreviewImage([file]: File[]) {
+	if (!file) return
+	icon.value = file
+	deletedIcon.value = false
+}
+
+function notifyError(error: unknown) {
+	const data = (error as { data?: { description?: string } } | null)?.data
+	addNotification({
+		title: formatMessage(messages.error),
+		text: data?.description || (error instanceof Error ? error.message : undefined),
+		type: 'error',
+	})
+}
+
+const { mutate: saveChanges, isPending: saving } = useMutation({
+	mutationFn: async (id: string) => {
+		const changes = {
+			...(current.value.name !== saved.value.name && { name: current.value.name }),
+			...(current.value.slug !== saved.value.slug && { slug: current.value.slug.toLowerCase() }),
+			...(current.value.description !== saved.value.description && {
+				description: current.value.description,
+			}),
+		}
+		const fieldsChanged = Object.keys(changes).length > 0
+		if (fieldsChanged) await patchOrganization(changes)
+
+		let iconSaved = false
+		try {
+			if (deletedIcon.value) {
+				await deleteIcon()
+				deletedIcon.value = false
+				iconSaved = true
+			} else if (icon.value) {
+				await patchIcon(icon.value)
+				icon.value = undefined
+				iconSaved = true
+			}
+		} finally {
+			try {
+				if (fieldsChanged || iconSaved) {
+					const latest = await client.labrinth.organizations_v3.get(id)
+					const { name, slug, description } = latest
+					queryClient.setQueryData(['organization', orgId], latest)
+					if (fieldsChanged) current.value = { name, slug, description }
+					if (changes.slug) queryClient.setQueryData(['organization', slug], latest)
+				}
+			} finally {
+				if (changes.slug && orgId !== id) {
+					await navigateTo(`/organization/${changes.slug}/settings`, { replace: true })
+				}
+			}
+		}
+	},
+	onSuccess: () => addNotification({ title: formatMessage(messages.updated), type: 'success' }),
+	onError: notifyError,
+})
+
+const { mutate: deleteOrganization, isPending: deleting } = useMutation({
+	mutationFn: (id: string) =>
+		client.request<void>(`/organization/${id}`, { api: 'labrinth', version: 3, method: 'DELETE' }),
+	onSuccess: async () => {
+		await navigateTo('/dashboard/organizations')
+		addNotification({ title: formatMessage(messages.deleted), type: 'success' })
+	},
+	onError: notifyError,
+})
+
+const busy = computed(() => saving.value || deleting.value)
+
+function save() {
+	if (organization.value && canEditDetails.value && !busy.value) saveChanges(organization.value.id)
+}
+
+function confirmDelete() {
+	if (organization.value && canDelete.value && !busy.value)
+		deleteOrganization(organization.value.id)
+}
 </script>
 
 <template>
-	<div class="normal-page__content">
-		<ConfirmModal
-			ref="modal_deletion"
-			:title="`Are you sure you want to delete ${organization.name}?`"
-			description="This will delete this organization forever (like *forever* ever)."
-			:has-to-type="true"
-			proceed-label="Delete"
-			:confirmation-text="organization.name"
-			@proceed="onDeleteOrganization"
-		/>
-		<div class="universal-card">
-			<div class="label">
-				<h3>
-					<span class="label__title size-card-header">Organization information</span>
-				</h3>
+	<div v-if="organization" class="flex flex-col gap-8">
+		<SettingsSection :title="formatMessage(messages.about)" :title-id="aboutTitleId">
+			<div
+				class="flex flex-col gap-6 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4 sm:p-6"
+			>
+				<Field
+					:label="formatMessage(messages.name)"
+					:input-id="nameId"
+					class="max-w-[600px]"
+				>
+					<template #right>
+						<span class="text-xs text-secondary">
+							{{
+								formatMessage(messages.characterCount, {
+									count: current.name.length,
+									limit: nameLimit,
+								})
+							}}
+						</span>
+					</template>
+					<Input
+						:id="nameId"
+						v-model="current.name"
+						:maxlength="nameLimit"
+						wrapper-class="w-full"
+						:disabled="!canEditDetails || busy"
+					/>
+				</Field>
+
+				<Field
+					:label="formatMessage(messages.summary)"
+					:input-id="summaryId"
+					class="max-w-[600px]"
+				>
+					<template #right>
+						<span class="text-xs text-secondary">
+							{{
+								formatMessage(messages.characterCount, {
+									count: current.description.length,
+									limit: summaryLimit,
+								})
+							}}
+						</span>
+					</template>
+					<Textarea
+						:id="summaryId"
+						v-model="current.description"
+						:maxlength="summaryLimit"
+						:disabled="!canEditDetails || busy"
+						resize="vertical"
+					/>
+				</Field>
+
+				<Field class="max-w-[600px]">
+					<template #label>
+						{{ formatMessage(messages.icon) }}
+						<span class="font-normal text-secondary">{{ formatMessage(messages.optional) }}</span>
+					</template>
+					<template #default="{ labelId }">
+						<div class="flex items-start gap-2" role="group" :aria-labelledby="labelId">
+							<Avatar
+								:src="deletedIcon ? null : (previewImage ?? organization.icon_url)"
+								:alt="organization.name"
+								size="md"
+							/>
+							<div class="flex flex-col items-start gap-2">
+								<FileButton
+									:max-size="globals?.max_organization_icon_size"
+									accept="image/png,image/jpeg,image/gif,image/webp"
+									class="button-like choose-image"
+									:prompt="formatMessage(commonProjectSettingsMessages.upload)"
+									:disabled="!globals?.max_organization_icon_size || !canEditDetails || busy"
+									@change="showPreviewImage"
+								>
+									<UploadIcon aria-hidden="true" />
+								</FileButton>
+								<Button
+									v-if="!deletedIcon && (previewImage || organization.icon_url)"
+									:disabled="!canEditDetails || busy"
+									@click="markIconForDeletion"
+								>
+									<TrashIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.removeButton) }}
+								</Button>
+							</div>
+						</div>
+					</template>
+				</Field>
+
+				<Field
+					:label="formatMessage(messages.url)"
+					:input-id="slugId"
+					class="max-w-[600px]"
+				>
+					<Input
+						:id="slugId"
+						v-model="current.slug"
+						:maxlength="64"
+						autocomplete="off"
+						wrapper-class="w-full"
+						:disabled="!canEditDetails || busy"
+					>
+						<template #prefix>
+							<span class="whitespace-nowrap">
+								<span class="hidden sm:inline">https://modrinth.com</span>/organization/
+							</span>
+						</template>
+					</Input>
+				</Field>
 			</div>
-			<label for="project-icon">
-				<span class="label__title">Icon</span>
-			</label>
-			<div class="input-group">
-				<Avatar
-					:src="deletedIcon ? null : previewImage ? previewImage : organization.icon_url"
-					:alt="organization.name"
-					size="md"
-					class="project__icon"
-				/>
-				<div class="flex flex-col gap-2">
-					<FileButton
-						id="project-icon"
-						:max-size="globals?.max_organization_icon_size"
-						accept="image/png,image/jpeg,image/gif,image/webp"
-						class="button-like"
-						prompt="Upload icon"
-						:disabled="!globals?.max_organization_icon_size || !hasPermission"
-						@change="showPreviewImage"
-					>
-						<UploadIcon />
-					</FileButton>
+		</SettingsSection>
+
+		<SettingsSection
+			:title="formatMessage(messages.dangerZone)"
+			:title-id="dangerZoneTitleId"
+			danger
+		>
+			<ConfirmModal
+				ref="confirmModal"
+				:title="formatMessage(messages.deleteConfirmationTitle)"
+				:description="formatMessage(messages.deleteDescription)"
+				:confirmation-text="organization.name"
+				:proceed-label="formatMessage(messages.deleteConfirmationAction)"
+				:markdown="false"
+				has-to-type
+				@proceed="confirmDelete"
+			/>
+			<DangerZonePanel>
+				<div class="danger-zone-row">
+					<div>
+						<h3 class="mb-1 mt-0 text-base font-semibold text-contrast">
+							{{ formatMessage(messages.delete) }}
+						</h3>
+						<p class="m-0 leading-normal text-secondary">
+							{{ formatMessage(messages.deleteDescription) }}
+						</p>
+					</div>
 					<Button
-						v-if="!deletedIcon && (previewImage || organization.icon_url)"
-						:disabled="!hasPermission"
-						@click="markIconForDeletion"
+						size="sm"
+						type="colored"
+						color="red"
+						:disabled="!canDelete || busy"
+						@click="confirmModal?.show()"
 					>
-						<TrashIcon />
-						Remove icon
+						{{ formatMessage(messages.delete) }}
 					</Button>
 				</div>
-			</div>
+			</DangerZonePanel>
+		</SettingsSection>
 
-			<label for="project-name">
-				<span class="label__title">Name</span>
-			</label>
-			<Input
-				id="project-name"
-				v-model="current.name"
-				:maxlength="2048"
-				:disabled="!hasPermission"
-			/>
-
-			<label for="project-slug">
-				<span class="label__title">URL</span>
-			</label>
-			<div class="text-input-wrapper">
-				<div class="text-input-wrapper__before">https://modrinth.com/organization/</div>
-				<Input
-					id="project-slug"
-					v-model="current.slug"
-					:maxlength="64"
-					autocomplete="off"
-					:disabled="!hasPermission"
-				/>
-			</div>
-
-			<label for="project-summary">
-				<span class="label__title">Summary</span>
-			</label>
-			<Textarea
-				id="project-summary"
-				v-model="current.summary"
-				:maxlength="256"
-				:disabled="!hasPermission"
-				resize="vertical"
-			/>
-		</div>
-		<div class="universal-card">
-			<div class="label">
-				<h3>
-					<span class="label__title size-card-header">Delete organization</span>
-				</h3>
-			</div>
-			<p>
-				Deleting your organization will transfer all of its projects to the organization owner. This
-				action cannot be undone.
-			</p>
-			<Button type="colored" color="red" @click="() => $refs.modal_deletion.show()">
-				<TrashIcon />
-				Delete organization
-			</Button>
-		</div>
 		<UnsavedChangesPopup
-			:original="originalState"
-			:modified="modifiedState"
+			:original="original"
+			:modified="modified"
 			:saving="saving"
+			:can-save="canEditDetails && !busy"
 			@reset="reset"
 			@save="save"
 		/>

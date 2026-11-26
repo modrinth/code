@@ -68,13 +68,13 @@ export const nagDestinations = {
 	general: {
 		path: 'settings',
 		title: messages.general,
-		shouldShow: (context) =>
-			!['type-project-settings', 'type-project-settings-general'].includes(context.currentRoute),
+		shouldShow: (context) => context.currentRoute !== 'type-project-settings',
 	},
 	license: {
-		path: 'settings/license',
+		path: 'settings',
 		title: messages.license,
-		shouldShow: (context) => context.currentRoute !== 'type-project-settings-license',
+		shouldShow: (context) =>
+			!['type-project-settings', 'type-project-settings-license'].includes(context.currentRoute),
 	},
 	links: {
 		path: 'settings/links',

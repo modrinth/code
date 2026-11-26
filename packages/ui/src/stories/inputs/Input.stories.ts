@@ -113,6 +113,14 @@ export const Search: Story = {
 		placeholder: 'Search...',
 		clearable: true,
 	},
+	render: (args) => ({
+		components: { Input },
+		setup: () => ({ args }),
+		template: `
+			<label for="input-story-search">Search projects</label>
+			<Input v-bind="args" id="input-story-search" />
+		`,
+	}),
 }
 
 export const Small: Story = {

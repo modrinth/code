@@ -539,12 +539,6 @@
   "collection.title": {
     "message": "{name} - Colecție"
   },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Retrimite pentru revizuire"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Retrimite pentru revizuire"
-  },
   "create-project-version.create-modal.stage.add-files.details-tab": {
     "message": "Detalii"
   },
@@ -614,9 +608,6 @@
   "create-project-version.create-modal.stage.metadata.details-tab": {
     "message": "Detalii"
   },
-  "create.collection.collection-info": {
-    "message": "Noua ta colecție va fi creată ca o colecție publică cu {count, plural, =0 {niciun proiect} one {# proiect} other {# proiecte}}."
-  },
   "create.collection.create-collection": {
     "message": "Creează o colecție"
   },
@@ -680,9 +671,6 @@
   "create.organization.name-placeholder": {
     "message": "Introduceți numele organizației..."
   },
-  "create.organization.ownership-info": {
-    "message": "Vei fi proprietarul acestei organizații, dar poți invita alți membri și poți transfera proprietatea oricând."
-  },
   "create.organization.summary-description": {
     "message": "O propoziție sau două care îți descriu organizația."
   },
@@ -707,9 +695,6 @@
   "create.project.name-placeholder": {
     "message": "Introduceți numele proiectului..."
   },
-  "create.project.summary-description": {
-    "message": "O propoziție sau două care îți descriu proiectul."
-  },
   "create.project.summary-label": {
     "message": "Rezumat"
   },
@@ -721,9 +706,6 @@
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.visibility-description": {
-    "message": "Vizibilitatea proiectului tău după ce a fost aprobat."
   },
   "create.project.visibility-private": {
     "message": "Privat"
@@ -1642,51 +1624,6 @@
   },
   "project.notification.updated.title": {
     "message": "Proiect actualizat"
-  },
-  "project.settings.general.name.description": {
-    "message": "Nu folosi prefixe, sufixe, paranteze sau descrieri adăugate—doar numele real al proiectului."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "ex. Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "ex. Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "ex. Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "ex. Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "ex. Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Nume"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Oferă un rezumat al proiectului tău, care să nu depășească o singură propoziție."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "ex. Remodelează progresia jocului pentru a se concentra pe Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "ex. Adaugă echipament de construcții care poate fi purtat."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "ex. Adaugă mecanici realiste de construire a minelor."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "ex. Îmbunătățește modul în care portalurile Nether se conectează între ele."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "ex. Adaugă versiuni puternice de tip boss ale mobilor normali pe care îi poți întâlni noaptea."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Slogan"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
   },
   "project.versions.title": {
     "message": "Versiuni"

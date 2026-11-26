@@ -3515,12 +3515,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Video"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "No file provided"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "No image upload handler provided"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },
@@ -3954,10 +3948,13 @@
     "defaultMessage": "You don't have any collections yet."
   },
   "profile.label.no-projects": {
-    "defaultMessage": "This user has no projects!"
+    "defaultMessage": "No projects yet"
   },
   "profile.label.no-projects-auth-description": {
-    "defaultMessage": "You don't have any projects yet."
+    "defaultMessage": "Create your first project."
+  },
+  "profile.label.no-public-projects-description": {
+    "defaultMessage": "This user doesn't have any public projects"
   },
   "profile.label.organizations": {
     "defaultMessage": "Organizations"
@@ -4883,8 +4880,47 @@
   "project.settings.environment.verification.verify-text": {
     "defaultMessage": "Verify that this project's environment is set correctly."
   },
+  "project.settings.gallery.banner": {
+    "defaultMessage": "Banner image"
+  },
+  "project.settings.gallery.banner-description": {
+    "defaultMessage": "You can feature one image on your project to be used as a banner image."
+  },
+  "project.settings.gallery.date-created": {
+    "defaultMessage": "Date created"
+  },
+  "project.settings.gallery.description": {
+    "defaultMessage": "Description"
+  },
+  "project.settings.gallery.description-placeholder": {
+    "defaultMessage": "Enter description..."
+  },
+  "project.settings.gallery.image-alt": {
+    "defaultMessage": "gallery-image"
+  },
+  "project.settings.gallery.image-title": {
+    "defaultMessage": "Title"
+  },
+  "project.settings.gallery.preview-alt": {
+    "defaultMessage": "gallery-preview"
+  },
+  "project.settings.gallery.replace": {
+    "defaultMessage": "Replace"
+  },
+  "project.settings.gallery.replace-image": {
+    "defaultMessage": "Replace image"
+  },
+  "project.settings.gallery.set-banner": {
+    "defaultMessage": "Set as banner"
+  },
   "project.settings.gallery.title": {
     "defaultMessage": "Gallery"
+  },
+  "project.settings.gallery.title-placeholder": {
+    "defaultMessage": "Enter title..."
+  },
+  "project.settings.gallery.unset-banner": {
+    "defaultMessage": "Unset as banner"
   },
   "project.settings.general.title": {
     "defaultMessage": "General"

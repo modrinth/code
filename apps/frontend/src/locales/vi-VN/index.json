@@ -1061,23 +1061,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Thêm ghi chú bí mật"
   },
-  "conversation-thread.action.approve": {
-    "message": "Chấp thuận"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Chấp thuận với phản hồi"
-  },
   "conversation-thread.action.close-report": {
     "message": "Đóng báo cáo"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Đóng với phản hồi"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Từ chối"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Từ chối với phản hồi"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Mở lại luồng"
@@ -1088,32 +1076,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Phản hồi đến luồng"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Gửi lại để xét duyệt"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Gửi lại để xét duyệt kèm phản hồi"
-  },
   "conversation-thread.action.send": {
     "message": "Gửi"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Gửi để xem xét"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Gửi để xem xét với phản hồi"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Chuyển sang bản nháp"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Chuyển sang bản nháp kèm phản hồi"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Thu hồi"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Thu hồi với phản hồi"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Luồng này đã bị đóng và tin nhắn mới không thể gửi được vào."
@@ -1156,33 +1120,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Vấn đề liên quan đến kiểm duyệt"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Chắc chắn rằng tôi đã trả lời tin nhắn từ bên kiểm duyệt"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Tôi đã chắc chắn rằng tôi đã trả lời đúng cách các bình luận từ bên kiểm duyệt."
-  },
-  "conversation-thread.resubmit-modal.description.auto-approval": {
-    "message": "Bạn đang nộp lại <project-title>{projectTitle}</project-title>. Nếu tất cả các vấn đề liên quan đến kiểm duyệt đã được giải quyết, dự án của bạn sẽ tự động được phê duyệt. Nếu không thì nó sẽ được chuyển đến đội ngũ kiểm duyệt để được xem xét."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Gửi lại để kiểm duyệt"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Gửi để kiểm duyệt"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Hãy chắc chắn rằng bạn đã trả lời tất cả các bình luận từ bên kiểm duyệt."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "Gửi lại nhiều lần mà không trả lời các bình luận từ bên kiểm duyệt có thể đình chỉ tài khoản của bạn."
-  },
-  "conversation-thread.resubmit-required-actions-tooltip": {
-    "message": "Bạn cần phải hoàn thành tất cả yêu cầu bắt buộc để nộp lại"
-  },
-  "conversation-thread.submit-modal.description": {
-    "message": "Bạn đang nộp <project-title>{projectTitle}</project-title> để được xem xét bởi đội ngũ kiểm duyệt."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Các tệp bổ trợ dùng cho các tài nguyên hỗ trợ như mã nguồn, không dùng cho các phiên bản hoặc biến thể thay thế."
@@ -1316,9 +1253,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Phiên bản"
   },
-  "create.collection.collection-info": {
-    "message": "Bộ sưu tập mới của bạn sẽ được tạo dưới dạng bộ sưu tập công khai với {count, plural, =0 {không có dự án} other {# dự án}}."
-  },
   "create.collection.create-collection": {
     "message": "Tạo bộ sưu tập"
   },
@@ -1382,9 +1316,6 @@
   "create.organization.name-placeholder": {
     "message": "Nhập tên tổ chức..."
   },
-  "create.organization.ownership-info": {
-    "message": "Bạn sẽ là chủ của tổ chức này, nhưng bạn có thể mời các thành viên khác và chuyển quyền sở hữu bất cứ lúc nào."
-  },
   "create.organization.summary-description": {
     "message": "Một hoặc hai câu mô tả tổ chức của bạn."
   },
@@ -1412,20 +1343,11 @@
   "create.project.name-placeholder": {
     "message": "Nhập tên dự án..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "Biểu tượng của {name}"
-  },
-  "create.project.owner-description": {
-    "message": "Chọn chính bạn hoặc tổ chức của bạn làm chủ sở hữu dự án."
-  },
   "create.project.owner-label": {
     "message": "Chủ sở hữu"
   },
   "create.project.server-project-title": {
     "message": "Tạo dự án máy chủ"
-  },
-  "create.project.summary-description": {
-    "message": "Một hoặc hai câu mô tả dự án của bạn."
   },
   "create.project.summary-label": {
     "message": "Tóm tắt"
@@ -1436,26 +1358,11 @@
   "create.project.title": {
     "message": "Đang tạo dự án"
   },
-  "create.project.type-label": {
-    "message": "Loại"
-  },
-  "create.project.type-project": {
-    "message": "Dự án"
-  },
-  "create.project.type-server": {
-    "message": "Máy chủ"
-  },
   "create.project.unknown-user": {
     "message": "Người dùng không xác định"
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Ảnh đại diện người dùng"
-  },
-  "create.project.visibility-description": {
-    "message": "Khả năng hiển thị của dự án sau khi được phê duyệt."
   },
   "create.project.visibility-private": {
     "message": "Riêng tư"
@@ -1870,9 +1777,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Không thể tải thông báo:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Lịch sử"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Lịch sử thông báo"
@@ -3746,80 +3650,14 @@
   "project.install-context.back-to-discover": {
     "message": "Quay lại Khám phá"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "Dự án của bạn đang để chế độ riêng tư, nghĩa là chỉ có bạn và những người khác được mời có thể truy cập nó."
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "Dự án của bạn đã được phát hành và công khai trên Modrinth."
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "Dự án của bạn đang để chế độ không công khai, nghĩa là nó chỉ có thể được truy cập qua đường liên kết và không được công khai tại Modrinth."
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "Bạn có thể tùy chỉnh chế độ hiển thị qua <visibility-settings-link>cài đặt hiển thị</visibility-settings-link> của dự án."
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "Dự án được chấp nhận"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "Đây là dự án nháp và không thể xem bởi người khác đến khi được xem và chấp nhận bởi bên kiểm duyệt của Modrinth."
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "Dự án nháp"
-  },
-  "project.moderation.admonition.draft.submit-for-review": {
-    "message": "Khi bạn đã hoàn thành tất cả các bước và đã chắc chắn nó tuân thủ <rules-link>Quy Tắc Nội Dung</rules-link> của modrinth, bạn có thể đăng tải để bên kiểm duyệt xem xét."
-  },
-  "project.moderation.admonition.rejected.address-all-concerns": {
-    "message": "Vui lòng trả lời mối lo ngại từ bên kiểm duyệt, bao gồm mọi vấn đề ở tin dưới, trước khi đăng lại dự án."
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Yêu cầu thay đổi"
-  },
-  "project.moderation.admonition.rejected.spam-notice": {
-    "message": "Gửi đi gửi lại dự án của bạn mà không trả lời các câu hỏi của bên kiểm duyệt có thể gây đình chỉ tài khoản."
-  },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "Dự án của bạn đang trong hàng để được xem xét bởi bên kiểm duyệt của modrinth."
-  },
-  "project.moderation.admonition.under-review.body.2": {
-    "message": "Dự án của bạn sẽ được quét và xem xét bởi người trong bên kiểm duyệt để chắc chắn nó tuân thủ <rules-link>Quy Tắc Nội Dung</rules-link> và <terms-link>Điều khoản Sử dụng</terms-link>."
-  },
-  "project.moderation.admonition.under-review.body.3": {
-    "message": "Bạn có thể thay đổi dự án mà không làm ảnh hưởng đến thứ tự trong hàng của bạn."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Chúng tôi cố gắng xét duyệt trong vòng 24–48 giờ, nhưng một số dự án có thể bị chậm hơn. Điều này không có nghĩa là bài gửi của bạn có vấn đề."
-  },
-  "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "Chúng tôi cố gắng xét duyệt trong vòng một tuần, nhưng một số dự án có thể bị chậm hơn. Điều này không có nghĩa là bài gửi của bạn có vấn đề."
-  },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>Chúng tôi rất cảm ơn sự kiên nhẫn của bạn trong khi đội ngũ kiểm duyệt chúng tôi đang nỗ lực giữ cho Modrinth an toàn, và mong được hỗ trợ bạn để chia sẻ nội dung của mình!💚</emphasis>"
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "Dự án đang xem xét"
-  },
-  "project.moderation.admonition.withheld.body": {
-    "message": "Dự án của bạn sẽ chỉ được truy cập trực tiếp qua đường liên kết mà không được công khai hoàn toàn.{requestedStatus, select, unlisted { Dựa trên <visibility-settings-link>cài đặt hiển thị</visibility-settings-link> của bạn, không cần hành động nào thêm.} other { Vui lòng trả lời tin từ bên kiểm duyệt, bao gồm các tin nhắn ở dưới trước khi đăng lại dự án này.}}"
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "Không công khai bởi đội ngũ"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Vô quyền"
   },
   "project.moderation.thread.approved-warning": {
     "message": "Nơi này không được theo dõi thường xuyên, nhưng có thể được xem lại cho các thông tin về dự án của bạn nếu cần."
   },
-  "project.moderation.thread.help-center-note.1": {
-    "message": "Bên kiểm duyệt không thể hỗ trợ cho hầu hết các vấn đề và các tin nhắn ở đây không thông báo cho bên đội ngũ."
-  },
   "project.moderation.thread.help-center-note.2": {
     "message": "Nếu bạn cần trợ giúp hoặc có thắc mắc, vui lòng vào <help-center-link>trung tâm trợ giúp</help-center-link> và bấm vào nút tin nhắn màu xanh để liên hệ hỗ trợ."
-  },
-  "project.moderation.thread.private-description": {
-    "message": "Đây là nơi hội thoại riêng tư với bên kiểm duyệt của Modrinth. Họ có thể nhắn cho bạn về những vấn đề trong dự án này."
   },
   "project.moderation.thread.title": {
     "message": "Tin từ bên kiểm duyệt"
@@ -3884,17 +3722,8 @@
   "project.settings.delete-project.confirmation.title": {
     "message": "Bạn có chắc muốn xóa dự án này không?"
   },
-  "project.settings.delete-project.description.1": {
-    "message": "Xóa vĩnh viễn dự án này khỏi Modrinth. Các dự án đã xóa <emphasis>không thể được khôi phục</emphasis> bởi nhân viên hoặc đội ngũ hỗ trợ Modrinth."
-  },
-  "project.settings.delete-project.description.2": {
-    "message": "Các tệp đã tải lên dự án này nhưng vẫn đang được dùng trong những modpack lưu trữ trên Modrinth có thể tiếp tục tồn tại."
-  },
   "project.settings.delete-project.title": {
     "message": "Xóa dự án"
-  },
-  "project.settings.description.intro": {
-    "message": "Bạn có thể viết mô tả chi tiết cho dự án tại đây. Phần mô tả phải nêu rõ và trung thực mục đích cũng như chức năng của dự án. Xem mục 2.1 trong <rules>Quy tắc nội dung</rules> để biết đầy đủ yêu cầu."
   },
   "project.settings.description.title": {
     "message": "Mô tả"
@@ -4085,59 +3914,8 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Có thu thập dữ liệu đo từ xa"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Tải phiên bản lên trước khi thêm mục công bố"
-  },
   "project.settings.editing-project": {
     "message": "Đang chỉnh sửa dự án {projectType}"
-  },
-  "project.settings.general.name.description": {
-    "message": "Tránh dùng tiền tố, hậu tố, nội dung trong ngoặc hoặc mô tả bổ sung — chỉ sử dụng đúng tên thực của dự án."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "vd: Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "vd: Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "vd: Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "vd: Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "vd: Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Tên"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Tóm tắt dự án của bạn trong không quá một câu."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "vd: Overhauls game progression to revolve around the Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "vd: Adds wearable construction gear."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "vd: Adds realistic mineshaft-building mechanics."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "vd: Improves how Nether portals link to each other."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "vd: Adds powerful boss versions of the normal mobs to encounter in the night."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Khẩu hiệu"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
-  "project.settings.license.all-rights": {
-    "message": "Bảo lưu mọi quyền/Không có giấy phép"
   },
   "project.settings.license.allow-later": {
     "message": "Cho phép các phiên bản giấy phép mới hơn"
@@ -4145,32 +3923,14 @@
   "project.settings.license.custom": {
     "message": "Tùy chỉnh"
   },
-  "project.settings.license.custom-name-required": {
-    "message": "Nhập tên cho giấy phép tùy chỉnh của bạn."
-  },
-  "project.settings.license.intro": {
-    "message": "Việc chọn giấy phép phù hợp cho {type} rất quan trọng. Bạn có thể chọn một giấy phép trong danh sách hoặc cung cấp giấy phép tùy chỉnh. Bạn cũng có thể cung cấp URL tùy chỉnh cho giấy phép đã chọn; nếu không, nội dung giấy phép sẽ được hiển thị. Xem <guide>hướng dẫn về giấy phép</guide> để biết thêm thông tin."
-  },
   "project.settings.license.later": {
     "message": "Phiên bản giấy phép mới hơn"
   },
   "project.settings.license.later-description": {
     "message": "Giấy phép bạn chọn có điều khoản “hoặc phiên bản mới hơn”. Nếu chọn ô này, người dùng có thể sử dụng dự án của bạn theo các phiên bản giấy phép mới hơn."
   },
-  "project.settings.license.missing-url": {
-    "message": "Nhập URL dẫn đến toàn bộ nội dung giấy phép tùy chỉnh."
-  },
   "project.settings.license.name": {
     "message": "Tên giấy phép"
-  },
-  "project.settings.license.name-description": {
-    "message": "Tên đầy đủ của giấy phép tùy chỉnh."
-  },
-  "project.settings.license.name-placeholder": {
-    "message": "Tên giấy phép"
-  },
-  "project.settings.license.optional-label": {
-    "message": "tùy chọn"
   },
   "project.settings.license.title": {
     "message": "Giấy phép"
@@ -4182,12 +3942,6 @@
     "message": "Giấy phép của bạn đã được cập nhật."
   },
   "project.settings.license.url": {
-    "message": "URL giấy phép"
-  },
-  "project.settings.license.url-description": {
-    "message": "Địa chỉ web chứa toàn bộ nội dung giấy phép. Nếu bạn không cung cấp liên kết, nội dung giấy phép sẽ được hiển thị thay thế."
-  },
-  "project.settings.license.url-placeholder": {
     "message": "URL giấy phép"
   },
   "project.settings.links.add-link": {
@@ -4279,15 +4033,6 @@
   },
   "project.settings.links.wiki-description": {
     "message": "Trang chứa thông tin, tài liệu và trợ giúp cho dự án."
-  },
-  "project.settings.monetization.description": {
-    "message": "Các dự án trên Modrinth được tự động tham gia <rewards-program-link>Chương trình phần thưởng</rewards-program-link>. Nếu bạn không muốn (hoặc không thể vì lý do pháp lý) kiếm doanh thu từ dự án này, bạn có thể tắt tại đây."
-  },
-  "project.settings.monetization.disabled-description": {
-    "message": "Dự án này không đủ điều kiện kiếm tiền. Nếu bạn cho rằng đây là nhầm lẫn, vui lòng <contact-support-link>liên hệ hỗ trợ</contact-support-link>."
-  },
-  "project.settings.monetization.title": {
-    "message": "Kiếm tiền"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Vui lòng cung cấp bằng chứng cho thấy bạn có quyền phân phối lại tất cả các tệp dưới đây. Sau khi hoàn tất, các phiên bản đang bị giữ lại sẽ tự động được xuất bản."
@@ -4400,9 +4145,6 @@
   "project.settings.server.latency-label": {
     "message": "Độ trễ: {latency}ms"
   },
-  "project.settings.server.optional-label": {
-    "message": "tùy chọn"
-  },
   "project.settings.server.ping-failed-message": {
     "message": "Chúng tôi không thể ping máy chủ này. Có thể nhà cung cấp dịch vụ của bạn đang chặn ping, vì vậy hãy thử làm mới vài lần. Nếu máy chủ vẫn không phản hồi, vui lòng <support-link>liên hệ hỗ trợ</support-link>."
   },
@@ -4422,7 +4164,7 @@
     "message": "Máy chủ đang trực tuyến!"
   },
   "project.settings.server.srv-records-hint": {
-    "message": "Nếu bạn có <srv-tooltip>[bản ghi SRV]</srv-tooltip>, bạn không cần thêm cổng. Nếu không và bạn dùng cổng khác 25565, có thể thêm theo dạng :12345"
+    "message": "Nếu bạn có <srv-tooltip>bản ghi SRV</srv-tooltip>, bạn không cần thêm cổng. Nếu không và bạn dùng cổng khác 25565, có thể thêm theo dạng :12345"
   },
   "project.settings.server.srv-records-tooltip": {
     "message": "Địa chỉ bạn nhập tại đây có thể có bản ghi DNS SRV _minecraft._tcp.(tên miền của bạn) trỏ tới địa chỉ và cổng máy chủ Minecraft."
@@ -4430,20 +4172,8 @@
   "project.settings.tags.all-tags-selected-warning": {
     "message": "Bạn đã chọn tất cả {count} thẻ hiện có. Vui lòng chỉ chọn những thẻ thực sự áp dụng cho dự án."
   },
-  "project.settings.tags.categories-description": {
-    "message": "Chọn tất cả danh mục phản ánh chủ đề hoặc chức năng của {type}."
-  },
   "project.settings.tags.featured-tags": {
     "message": "Thẻ nổi bật"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "Bạn phải có ít nhất một thẻ nổi bật."
-  },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Chọn các thẻ phù hợp nhất. Những thẻ này sẽ được hiển thị trước các thẻ còn lại."
-  },
-  "project.settings.tags.features-description": {
-    "message": "Chọn tất cả tính năng mà {type} của bạn sử dụng."
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} danh mục} other {Danh mục}}"
@@ -4468,18 +4198,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Chọn ít nhất một danh mục để có thể đặt danh mục nổi bật."
-  },
-  "project.settings.tags.title": {
-    "message": "Thẻ"
-  },
-  "project.settings.tags.too-many-tags-project-warning": {
-    "message": "Bạn đã chọn {count} thẻ. Hãy cân nhắc giảm xuống còn 8 thẻ trở xuống để dự án tập trung hơn và dễ được tìm thấy."
-  },
-  "project.settings.tags.too-many-tags-server-hard-warning": {
-    "message": "Bạn đã chọn {count} thẻ. Vui lòng giảm xuống còn 18 thẻ trở xuống để máy chủ tập trung hơn và dễ được tìm thấy."
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "Bạn đã chọn {count} thẻ. Hãy cân nhắc giảm xuống còn 12 thẻ trở xuống để máy chủ tập trung hơn và dễ được tìm thấy."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Tải phiên bản lên trước khi thêm thẻ"

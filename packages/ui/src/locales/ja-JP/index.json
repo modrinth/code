@@ -3068,12 +3068,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "動画"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "ファイルが指定されていません"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "画像アップロードハンドラーが指定されていません"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
   },
@@ -5582,6 +5576,9 @@
   "settings.feature-flags.title": {
     "defaultMessage": "機能フラグ"
   },
+  "settings.form.group.optional": {
+    "defaultMessage": "(任意)"
+  },
   "settings.language.categories.default": {
     "defaultMessage": "一般的な言語"
   },
@@ -6276,4 +6273,3 @@
     "defaultMessage": "タイプ"
   }
 }
-

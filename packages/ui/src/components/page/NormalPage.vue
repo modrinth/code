@@ -3,6 +3,7 @@ import { injectPageContext } from '@modrinth/ui'
 
 defineProps<{
 	sidebar?: 'right' | 'left'
+	sidebarClass?: string
 	fullWidth?: boolean
 }>()
 const { hierarchicalSidebarAvailable } = injectPageContext()
@@ -29,7 +30,7 @@ const { hierarchicalSidebarAvailable } = injectPageContext()
 				</Teleport>
 			</template>
 			<template v-else>
-				<div class="ui-normal-page__sidebar">
+				<div class="ui-normal-page__sidebar" :class="sidebarClass">
 					<slot name="sidebar" />
 				</div>
 			</template>
@@ -53,7 +54,7 @@ const { hierarchicalSidebarAvailable } = injectPageContext()
 }
 
 @media (width >= 64rem) {
-	.ui-normal-page--sidebar-left {
+	.ui-normal-page--sidebar-left:has(> .ui-normal-page__sidebar:not(:empty)) {
 		grid-template:
 			'header header'
 			'sidebar content'
@@ -61,7 +62,7 @@ const { hierarchicalSidebarAvailable } = injectPageContext()
 			/ 300px 1fr;
 	}
 
-	.ui-normal-page--sidebar-right {
+	.ui-normal-page--sidebar-right:has(> .ui-normal-page__sidebar:not(:empty)) {
 		grid-template:
 			'header header'
 			'content sidebar'
@@ -80,5 +81,9 @@ const { hierarchicalSidebarAvailable } = injectPageContext()
 
 .ui-normal-page__sidebar {
 	grid-area: sidebar;
+}
+
+.ui-normal-page__sidebar:empty {
+	display: none;
 }
 </style>

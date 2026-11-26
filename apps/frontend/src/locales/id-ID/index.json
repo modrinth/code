@@ -605,9 +605,6 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Berkas tambahan hanya untuk sumber pendukung seperti kode sumber, bukan untuk versi atau varian lain."
   },
-  "create.collection.collection-info": {
-    "message": "Koleksi baru Anda akan dibuat sebagai koleksi publik dengan {count, plural, =0 {0 proyek} other {# proyek}}."
-  },
   "create.collection.create-collection": {
     "message": "Buat koleksi"
   },
@@ -671,9 +668,6 @@
   "create.organization.name-placeholder": {
     "message": "Masukkan nama organisasi..."
   },
-  "create.organization.ownership-info": {
-    "message": "Anda akan menjadi pemilik organisasi ini, tetapi Anda dapat mengundang anggota lain dan memindahkan kepemilikan kapan saja."
-  },
   "create.organization.summary-description": {
     "message": "Satu atau dua kalimat yang menjelaskan organisasi Anda."
   },
@@ -701,17 +695,11 @@
   "create.project.name-placeholder": {
     "message": "Masukkan nama proyek..."
   },
-  "create.project.owner-description": {
-    "message": "Buat diri Anda atau organisasi yang Anda sertai sebagai pemilik proyek."
-  },
   "create.project.owner-label": {
     "message": "Pemilik"
   },
   "create.project.server-project-title": {
     "message": "Membuat proyek server"
-  },
-  "create.project.summary-description": {
-    "message": "Satu atau dua kalimat yang menjelaskan proyek Anda."
   },
   "create.project.summary-label": {
     "message": "Ringkasan"
@@ -722,20 +710,8 @@
   "create.project.title": {
     "message": "Membuat proyek"
   },
-  "create.project.type-label": {
-    "message": "Jenis"
-  },
-  "create.project.type-project": {
-    "message": "Proyek"
-  },
-  "create.project.type-server": {
-    "message": "Server"
-  },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.visibility-description": {
-    "message": "Visibilitas proyek Anda setelah ia disetujui."
   },
   "create.project.visibility-private": {
     "message": "Pribadi"
@@ -2347,51 +2323,6 @@
   },
   "project.notification.updated.title": {
     "message": "Proyek diperbarui"
-  },
-  "project.settings.general.name.description": {
-    "message": "Hindari awalan, akhiran, tanda kurung, atau keterangan tambahan. Gunakan nama asli proyek."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "cth. Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "cth. Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "cth. Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "cth. Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "cth. Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Nama"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Buat ringkasan dari proyek Anda dalam satu kalimat."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "cth. Overhauls game progression to revolve around the Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "cth. Adds wearable construction gear."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "cth. Adds realistic mineshaft-building mechanics."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "cth. Improves how Nether portals link to each other."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "cth. Adds powerful boss versions of the normal mobs to encounter in the night."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Slogan"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
   },
   "project.versions.title": {
     "message": "Versi"

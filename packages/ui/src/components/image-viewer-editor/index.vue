@@ -286,7 +286,7 @@ defineExpose({ show, edit, hide, next, previous, markSavedAndView })
 				@cancel="finishEditing"
 				@save="emit('save', $event)"
 			>
-				<template #actions="{ metadata }">
+				<template v-if="$slots.actions" #actions="{ metadata }">
 					<slot
 						name="actions"
 						:item="activeItem"

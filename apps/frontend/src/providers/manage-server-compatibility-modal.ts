@@ -1,17 +1,20 @@
 import type { Labrinth, UploadProgress } from '@modrinth/api-client'
 import { ArrowLeftRightIcon, LeftArrowIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
+	commonMessages,
 	createContext,
 	injectModrinthClient,
 	injectNotificationManager,
 	type MultiStageModal,
 	type StageConfigInput,
+	useVIntl,
 } from '@modrinth/ui'
 import JSZip from 'jszip'
 import type { MaybeRefOrGetter, Ref, ShallowRef } from 'vue'
 import { computed, markRaw, onBeforeUnmount, ref, toRaw, toValue, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
+import { compatibilityMessages as messages } from '~/components/ui/project-settings/ServerCompatibilityModal/messages'
 import SelectCompatibilityType from '~/components/ui/project-settings/ServerCompatibilityModal/stages/SelectCompatibilityType.vue'
 import SelectPublishedModpack from '~/components/ui/project-settings/ServerCompatibilityModal/stages/SelectPublishedModpack.vue'
 import SelectVanillaVersions from '~/components/ui/project-settings/ServerCompatibilityModal/stages/SelectVanillaVersions.vue'
@@ -89,6 +92,7 @@ export type CompatibilityType = 'vanilla' | 'published-modpack' | 'custom-modpac
 export interface ServerCompatibilityContextValue {
 	project: Ref<Labrinth.Projects.v3.Project | undefined>
 	// Stage management
+	formatMessage: ReturnType<typeof useVIntl>['formatMessage']
 	stageConfigs: StageConfigInput<ServerCompatibilityContextValue>[]
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>
 	isSubmitting: Ref<boolean>
@@ -121,6 +125,7 @@ export function createServerCompatibilityContext(
 ): ServerCompatibilityContextValue {
 	const { labrinth } = injectModrinthClient()
 	const { addNotification } = injectNotificationManager()
+	const { formatMessage } = useVIntl()
 
 	const isSubmitting = ref(false)
 	const isUploading = ref(false)
@@ -136,7 +141,7 @@ export function createServerCompatibilityContext(
 	const isSwitchingCompatibilityType = ref(false)
 
 	async function uploadCustomModpackFile(file: File): Promise<Labrinth.Versions.v3.Version> {
-		if (!projectV3.value) throw new Error('No server project selected')
+		if (!projectV3.value) throw new Error(formatMessage(messages.noProject))
 		const rawFile = toRaw(file)
 
 		// Default to filename if we can't parse the mrpack
@@ -274,7 +279,7 @@ export function createServerCompatibilityContext(
 
 			const error = err as { data?: { description?: string } }
 			addNotification({
-				title: 'Failed to save server compatibility',
+				title: formatMessage(messages.saveFailed),
 				text: error.data?.description || String(err),
 				type: 'error',
 			})
@@ -295,6 +300,7 @@ export function createServerCompatibilityContext(
 
 	return {
 		project: projectV3,
+		formatMessage,
 		stageConfigs,
 		modal,
 		isSubmitting,
@@ -317,7 +323,7 @@ export function createServerCompatibilityContext(
 const selectCompatibilityTypeStage: StageConfigInput<ServerCompatibilityContextValue> = {
 	id: 'select-compatibility-type',
 	stageContent: markRaw(SelectCompatibilityType),
-	title: 'Compatibility type',
+	title: (ctx) => ctx.formatMessage(messages.compatibilityType),
 	cannotNavigateForward: (ctx) => !ctx.compatibilityType.value,
 	leftButtonConfig: null,
 	rightButtonConfig: null,
@@ -326,24 +332,24 @@ const selectCompatibilityTypeStage: StageConfigInput<ServerCompatibilityContextV
 const selectVanillaVersionsStage: StageConfigInput<ServerCompatibilityContextValue> = {
 	id: 'select-vanilla-versions',
 	stageContent: markRaw(SelectVanillaVersions),
-	title: 'Vanilla versions',
+	title: (ctx) => ctx.formatMessage(messages.vanillaVersions),
 	skip: (ctx) => ctx.compatibilityType.value !== 'vanilla' && !!ctx.compatibilityType.value,
 	leftButtonConfig: (ctx) =>
 		ctx.isEditingExistingCompatibility.value
 			? {
-					label: 'Cancel',
+					label: ctx.formatMessage(commonMessages.cancelButton),
 					icon: XIcon,
 					onClick: () => ctx.modal.value?.hide(),
 				}
 			: {
-					label: 'Back',
+					label: ctx.formatMessage(commonMessages.backButton),
 					icon: LeftArrowIcon,
 					onClick: () => ctx.modal.value?.prevStage(),
 				},
 	rightButtonConfig: (ctx) =>
 		ctx.isSwitchingCompatibilityType.value
 			? {
-					label: 'Change type',
+					label: ctx.formatMessage(messages.changeType),
 					icon: ArrowLeftRightIcon,
 					iconPosition: 'before' as const,
 					color: 'red' as const,
@@ -356,11 +362,11 @@ const selectVanillaVersionsStage: StageConfigInput<ServerCompatibilityContextVal
 			: {
 					label: ctx.isSubmitting.value
 						? ctx.isEditingExistingCompatibility.value
-							? 'Updating…'
-							: 'Saving…'
+							? ctx.formatMessage(messages.updating)
+							: ctx.formatMessage(messages.saving)
 						: ctx.isEditingExistingCompatibility.value
-							? 'Save changes'
-							: 'Save',
+							? ctx.formatMessage(commonMessages.saveChangesButton)
+							: ctx.formatMessage(commonMessages.saveButton),
 					icon: ctx.isSubmitting.value ? SpinnerIcon : SaveIcon,
 					iconPosition: 'before' as const,
 					iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
@@ -377,25 +383,25 @@ const selectVanillaVersionsStage: StageConfigInput<ServerCompatibilityContextVal
 const selectPublishedModpackStage: StageConfigInput<ServerCompatibilityContextValue> = {
 	id: 'select-published-modpack',
 	stageContent: markRaw(SelectPublishedModpack),
-	title: 'Select modpack',
+	title: (ctx) => ctx.formatMessage(messages.selectModpack),
 	skip: (ctx) => ctx.compatibilityType.value !== 'published-modpack',
 	cannotNavigateForward: (ctx) => !ctx.selectedProjectId.value || !ctx.selectedVersionId.value,
 	leftButtonConfig: (ctx) =>
 		ctx.isEditingExistingCompatibility.value
 			? {
-					label: 'Cancel',
+					label: ctx.formatMessage(commonMessages.cancelButton),
 					icon: XIcon,
 					onClick: () => ctx.modal.value?.hide(),
 				}
 			: {
-					label: 'Back',
+					label: ctx.formatMessage(commonMessages.backButton),
 					icon: LeftArrowIcon,
 					onClick: () => ctx.modal.value?.prevStage(),
 				},
 	rightButtonConfig: (ctx) =>
 		ctx.isSwitchingCompatibilityType.value
 			? {
-					label: 'Change type',
+					label: ctx.formatMessage(messages.changeType),
 					icon: ArrowLeftRightIcon,
 					iconPosition: 'before' as const,
 					color: 'red' as const,
@@ -406,11 +412,11 @@ const selectPublishedModpackStage: StageConfigInput<ServerCompatibilityContextVa
 			: {
 					label: ctx.isSubmitting.value
 						? ctx.isEditingExistingCompatibility.value
-							? 'Updating…'
-							: 'Saving…'
+							? ctx.formatMessage(messages.updating)
+							: ctx.formatMessage(messages.saving)
 						: ctx.isEditingExistingCompatibility.value
-							? 'Save changes'
-							: 'Save',
+							? ctx.formatMessage(commonMessages.saveChangesButton)
+							: ctx.formatMessage(commonMessages.saveButton),
 					icon: ctx.isSubmitting.value ? SpinnerIcon : SaveIcon,
 					iconPosition: 'before' as const,
 					iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
@@ -425,32 +431,36 @@ const selectPublishedModpackStage: StageConfigInput<ServerCompatibilityContextVa
 function getUploadLabel(ctx: ServerCompatibilityContextValue): string {
 	if (ctx.isUploading.value) {
 		if (ctx.uploadProgress.value.progress >= 1) {
-			return 'Saving…'
+			return ctx.formatMessage(messages.saving)
 		}
-		return `Uploading ${Math.round(ctx.uploadProgress.value.progress * 100)}%`
+		return ctx.formatMessage(messages.uploading, { progress: ctx.uploadProgress.value.progress })
 	}
 	if (ctx.isSubmitting.value) {
-		return ctx.isEditingExistingCompatibility.value ? 'Updating…' : 'Saving…'
+		return ctx.isEditingExistingCompatibility.value
+			? ctx.formatMessage(messages.updating)
+			: ctx.formatMessage(messages.saving)
 	}
-	return ctx.isEditingExistingCompatibility.value ? 'Save changes' : 'Save'
+	return ctx.isEditingExistingCompatibility.value
+		? ctx.formatMessage(commonMessages.saveChangesButton)
+		: ctx.formatMessage(commonMessages.saveButton)
 }
 
 const uploadCustomModpackStage: StageConfigInput<ServerCompatibilityContextValue> = {
 	id: 'upload-custom-modpack',
 	stageContent: markRaw(UploadCustomModpack),
-	title: 'Custom modpack',
+	title: (ctx) => ctx.formatMessage(messages.customModpack),
 	skip: (ctx) => ctx.compatibilityType.value !== 'custom-modpack',
 	disableClose: (ctx) => ctx.isUploading.value,
 	leftButtonConfig: (ctx) =>
 		ctx.isEditingExistingCompatibility.value
 			? {
-					label: 'Cancel',
+					label: ctx.formatMessage(commonMessages.cancelButton),
 					icon: XIcon,
 					disabled: ctx.isUploading.value,
 					onClick: () => ctx.modal.value?.hide(),
 				}
 			: {
-					label: 'Back',
+					label: ctx.formatMessage(commonMessages.backButton),
 					icon: LeftArrowIcon,
 					disabled: ctx.isUploading.value,
 					onClick: () => ctx.modal.value?.prevStage(),
@@ -459,8 +469,8 @@ const uploadCustomModpackStage: StageConfigInput<ServerCompatibilityContextValue
 		ctx.isSwitchingCompatibilityType.value
 			? {
 					label: ctx.isUploading.value
-						? `Uploading ${Math.round(ctx.uploadProgress.value.progress * 100)}%`
-						: 'Change type',
+						? ctx.formatMessage(messages.uploading, { progress: ctx.uploadProgress.value.progress })
+						: ctx.formatMessage(messages.changeType),
 					icon: ctx.isSubmitting.value ? SpinnerIcon : ArrowLeftRightIcon,
 					iconPosition: 'before' as const,
 					iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,

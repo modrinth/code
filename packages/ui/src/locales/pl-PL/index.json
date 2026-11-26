@@ -3497,12 +3497,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "Film"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "Nie wybrano pliku"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "Nie dołączono usługi przesyłania zdjęć"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "Adres URL"
   },

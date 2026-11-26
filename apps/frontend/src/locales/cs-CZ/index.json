@@ -980,23 +980,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Přidat soukromou poznámku"
   },
-  "conversation-thread.action.approve": {
-    "message": "Schválit"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Schválit s odpovědí"
-  },
   "conversation-thread.action.close-report": {
     "message": "Uzavřít hlášení"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Uzavřít s odpovědí"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Zamítnout"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Zamítnout s odpovědí"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Znovuotevřít vlákno"
@@ -1007,32 +995,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Odpovědět vláknu"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Znovu odeslat ke kontrole"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Znovu odeslat ke kontrole s odpovědí"
-  },
   "conversation-thread.action.send": {
     "message": "Odeslat"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Odeslat ke kontrole"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Odeslat ke kontrole s odpovědí"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Nastaven jako návrh"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Nastaven jako návrh s odpovědí"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Pozastavit"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Pozastavit s odpovědí"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Toto vlákno je uzavřené a nelze do něj posílat nové zprávy."
@@ -1063,12 +1027,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Moderační problém"
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Opětovné odesílání ke kontrole"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Odesílání ke kontrole"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Doplňkové soubory slouží jako podpůrné materiály (např. zdrojový kód), ne jako alternativní verze či varianty."
@@ -1142,9 +1100,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Verze"
   },
-  "create.collection.collection-info": {
-    "message": "Tvá nová kolekce bude vytvořena jako veřejná a bude obsahovat {count, plural, =0 {žádné projekty} one {# projekt} few {# projekty} other {# projektů}}."
-  },
   "create.collection.create-collection": {
     "message": "Vytvořit kolekci"
   },
@@ -1208,9 +1163,6 @@
   "create.organization.name-placeholder": {
     "message": "Zadej název organizace..."
   },
-  "create.organization.ownership-info": {
-    "message": "Budete vlastníkem této organizace, ale kdykoli můžete pozvat další členy a převést vlastnictví."
-  },
   "create.organization.summary-description": {
     "message": "Popiště vaši organizace dvěma nebo jednou větou."
   },
@@ -1238,17 +1190,11 @@
   "create.project.name-placeholder": {
     "message": "Zadejte název projektu..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} Ikona"
-  },
   "create.project.owner-label": {
     "message": "Vlastník"
   },
   "create.project.server-project-title": {
     "message": "Vytváření serverového projektu"
-  },
-  "create.project.summary-description": {
-    "message": "Popiště vaši organizace dvěma nebo jednou větou."
   },
   "create.project.summary-label": {
     "message": "Shrnutí"
@@ -1259,26 +1205,11 @@
   "create.project.title": {
     "message": "Vytvořit projekt"
   },
-  "create.project.type-label": {
-    "message": "Typ"
-  },
-  "create.project.type-project": {
-    "message": "Projekt"
-  },
-  "create.project.type-server": {
-    "message": "Server"
-  },
   "create.project.unknown-user": {
     "message": "Neznámý uživatel"
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Avatar uživatele"
-  },
-  "create.project.visibility-description": {
-    "message": "Viditelnost vašeho projektu poté co bude schválena."
   },
   "create.project.visibility-private": {
     "message": "Soukromé"
@@ -1525,9 +1456,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Chyba při načítání oznámení:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Historie"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Historie oznámení"
@@ -2486,33 +2414,6 @@
   "project.gallery.title": {
     "message": "Galerie"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "Váš projekt je soukromý, což znamená, že k němu máte přístup pouze vy a lidé, které pozvete."
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "Váš projekt je zveřejněný a dostupný na Modrinthu."
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "Váš projekt je neveřejný, což znamená, že je přístupný pouze přes přímý odkaz a na Modrinthu ho nelze najít."
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "Viditelnost svého projektu můžete změnit v <visibility-settings-link>nastavení viditelnosti</visibility-settings-link> projektu."
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "Projekt schválen"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "Toto je návrh projektu, který ostatní neuvidí, dokud nebude odeslán ke kontrole a schválen moderátorským týmem Modrinthu."
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "Návrh projektu"
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Vyžádány změny"
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "Zneveřejněno moderátory"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Nemáte oprávnění"
   },
@@ -2533,12 +2434,6 @@
   },
   "project.notification.updated.title": {
     "message": "Projekt aktualizován"
-  },
-  "project.settings.general.name.title": {
-    "message": "Název"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Doložte prosím, že máte oprávnění k redistribuci všech následujících souborů. Po dokončení budou zadržené verze automaticky publikovány."

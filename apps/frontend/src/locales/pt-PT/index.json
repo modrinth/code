@@ -971,20 +971,8 @@
   "conversation-thread.action.add-private-note": {
     "message": "Adicionar nota privada"
   },
-  "conversation-thread.action.approve": {
-    "message": "Aprovar"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Aprovar com comentário"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Fechar com comentário"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Rejeitar"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rejeitar com comentário"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reabrir tópico"
@@ -995,32 +983,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Responder ao tópico"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Reenviar para revisão"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Reenviar para revisão com comentário"
-  },
   "conversation-thread.action.send": {
     "message": "Enviar"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Enviar para revisão"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Enviar para revisão com comentário"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Definir como rascunho"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Definir como rascunho com comentário"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Reter"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Reter com comentário"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Este tópico está fechado e não aceita novas mensagens."
@@ -1082,9 +1046,6 @@
   "create-project-version.create-modal.stage.metadata.uploaded-files": {
     "message": "Ficheiros carregados"
   },
-  "create.collection.collection-info": {
-    "message": "A tua nova coleção vai ser criada como uma coleção pública {count, plural,=0 {sem projetos}one {com # projeto}other {com # projetos}}."
-  },
   "create.collection.create-collection": {
     "message": "Criar coleção"
   },
@@ -1139,9 +1100,6 @@
   "create.organization.name-placeholder": {
     "message": "Inserir nome da organização..."
   },
-  "create.organization.ownership-info": {
-    "message": "Serás o dono desta organização, mas podes convidar outros membros e transferir o cargo de dono a qualquer momento."
-  },
   "create.organization.summary-description": {
     "message": "Uma ou duas frases que descrevem a tua organização."
   },
@@ -1169,17 +1127,11 @@
   "create.project.name-placeholder": {
     "message": "Insere o nome do projeto..."
   },
-  "create.project.owner-description": {
-    "message": "Define-te como dono do projeto ou uma organização da qual faças parte."
-  },
   "create.project.owner-label": {
     "message": "Dono"
   },
   "create.project.server-project-title": {
     "message": "Criar um projeto de servidor"
-  },
-  "create.project.summary-description": {
-    "message": "Uma ou duas frases que descrevem o teu projeto."
   },
   "create.project.summary-label": {
     "message": "Resumo"
@@ -1190,20 +1142,8 @@
   "create.project.title": {
     "message": "Criar um projeto"
   },
-  "create.project.type-label": {
-    "message": "Tipo"
-  },
-  "create.project.type-project": {
-    "message": "Projeto"
-  },
-  "create.project.type-server": {
-    "message": "Servidor"
-  },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.visibility-description": {
-    "message": "A visibilidade do teu projeto após ser aprovado."
   },
   "create.project.visibility-private": {
     "message": "Privado"
@@ -1564,9 +1504,6 @@
   },
   "dashboard.overview.notifications.empty.no-unread": {
     "message": "Não tens notificações por ler."
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Histórico"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Histórico de notificações"
@@ -2945,9 +2882,6 @@
   "project.gallery.title": {
     "message": "Galeria"
   },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>Agradecemos a sua paciência enquanto os nossos moderadores trabalham duro para manter o Modrinth seguro, e esperamos ajudá-lo a compartilhar o seu conteúdo! 💚</emphasis>"
-  },
   "project.moderation.title": {
     "message": "Moderação"
   },
@@ -2965,60 +2899,6 @@
   },
   "project.notification.updated.title": {
     "message": "Projeto atualizado"
-  },
-  "project.settings.delete-project.description.2": {
-    "message": "Ficheiros carregados para este projeto que são usados ativamente em Modpacks hospedados no Modrinth podem continuar a existir."
-  },
-  "project.settings.general.name.description": {
-    "message": "Evita prefixos, sufixos, parênteses ou descrições adicionais—usa apenas o nome real do projeto."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "ex. Reformulação do Nether 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "ex. Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "ex. Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "ex. Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "ex. Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Nome"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Resuma o teu projeto em, no máximo, uma frase."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "ex. Overhauls game progression to revolve around the Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "ex. Adds wearable construction gear."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "ex. Adds realistic mineshaft-building mechanics."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "ex. Improves how Nether portals link to each other."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "ex. Adds powerful boss versions of the normal mobs to encounter in the night."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Slogan"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
-  "project.settings.tags.title": {
-    "message": "Marcadores"
-  },
-  "project.settings.tags.too-many-tags-server-soft-warning": {
-    "message": "Selecionaste {count} marcadores. Considera reduzir para 12 ou menos para manter o foco do servidor e torná-lo mais fácil de descobrir."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Carrega versões antes de adicionar marcadores"

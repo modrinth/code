@@ -770,20 +770,8 @@
   "conversation-thread.action.add-private-note": {
     "message": "Tambah nota peribadi"
   },
-  "conversation-thread.action.approve": {
-    "message": "Luluskan"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Luluskan dengan balasan"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Tutup dengan balasan"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Tolak"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Tolak dengan balasan"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Buka semula bebenang"
@@ -794,32 +782,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Balas bebenang"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Serah semula untuk semakan"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Serah semula untuk semakan dengan balasan"
-  },
   "conversation-thread.action.send": {
     "message": "Hantar"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Hantar untuk semakan"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Hantar untuk semakan dengan balasan"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Tetapkan kepada draf"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Tetapkan kepada draf dengan balasan"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Tahan"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Tahan dengan balasan"
   },
   "conversation-thread.error.closing-report": {
     "message": "Ralat semasa menutup laporan"
@@ -850,18 +814,6 @@
   },
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Jika anda perlu menghubungi pasukan penyederhana, sila gunakan <help-center-link>Pusat Bantuan Modrinth</help-center-link> dan klik gelembung biru di penjuru kanan bawah untuk menghubungi sokongan."
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Saya mengesahkan bahawa saya telah menjawab ulasan-ulasan penyederhana dengan betul."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Sedang menyerahkan semula untuk semakan"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Sedang menyerahkan untuk semakan"
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "Penyerahan berulang tanpa menangani ulasan penyederhana boleh mengakibatkan penggantungan akaun."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Fail tambahan adalah untuk sumber sokongan seperti kod sumber, bukan untuk versi atau varian alternatif."
@@ -910,9 +862,6 @@
   },
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Versi"
-  },
-  "create.collection.collection-info": {
-    "message": "Koleksi baharu anda akan dibuat sebagai koleksi awam dengan {count, plural, =0 {0 projek} other {# projek}}."
   },
   "create.collection.create-collection": {
     "message": "Cipta koleksi"
@@ -977,9 +926,6 @@
   "create.organization.name-placeholder": {
     "message": "Masukkan nama organisasi..."
   },
-  "create.organization.ownership-info": {
-    "message": "Anda akan menjadi pemilik organisasi ini, tetapi anda boleh menjemput ahli lain dan memindahkan pemilikan pada bila-bila masa."
-  },
   "create.organization.summary-description": {
     "message": "Satu atau dua ayat yang menerangkan organisasi anda."
   },
@@ -1007,20 +953,11 @@
   "create.project.name-placeholder": {
     "message": "Masukkan nama projek..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "Ikon {name}"
-  },
-  "create.project.owner-description": {
-    "message": "Tetapkan pemilik projek sebagai diri anda atau organisasi yang anda sertai."
-  },
   "create.project.owner-label": {
     "message": "Pemilik"
   },
   "create.project.server-project-title": {
     "message": "Mencipta sebuah projek pelayan"
-  },
-  "create.project.summary-description": {
-    "message": "Satu atau dua ayat yang menerangkan projek anda."
   },
   "create.project.summary-label": {
     "message": "Ringkasan"
@@ -1031,23 +968,8 @@
   "create.project.title": {
     "message": "Mencipta sebuah projek"
   },
-  "create.project.type-label": {
-    "message": "Jenis"
-  },
-  "create.project.type-project": {
-    "message": "Projek"
-  },
-  "create.project.type-server": {
-    "message": "Pelayan"
-  },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Avatar Pengguna"
-  },
-  "create.project.visibility-description": {
-    "message": "Keterlihatan projek anda selepas ia diluluskan."
   },
   "create.project.visibility-private": {
     "message": "Peribadi"
@@ -1396,9 +1318,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Ralat semasa memuat pemberitahuan:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Sejarah"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Sejarah pemberitahuan"
@@ -2912,74 +2831,14 @@
   "project.gallery.title": {
     "message": "Galeri"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "Projek anda adalah peribadi, yang bermakna ia hanya boleh diakses oleh anda dan orang yang anda jemput."
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "Projek anda adalah diterbitkan dan boleh ditemui di Modrinth."
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "Projek anda adalah tidak tersenarai, yang bermakna ia hanya boleh diakses dengan pautan langsung dan tidak boleh ditemui di Modrinth."
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "Anda boleh menukar keterlihatan projek anda dalam <visibility-settings-link>tetapan keterlihatan</visibility-settings-link> projek anda."
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "Projek diluluskan"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "Ini merupakan draf projek yang tidak boleh dilihat oleh orang lain sehingga dihantar untuk semakan dan diluluskan oleh pasukan penyederhanaan Modrinth."
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "Draf projek"
-  },
-  "project.moderation.admonition.draft.submit-for-review": {
-    "message": "Sebaik sahaja anda telah menyelesaikan semua langkah yang diperlukan dan memastikan projek anda mematuhi <rules-link>Peraturan Kandungan</rules-link> Modrinth, anda boleh menghantar projek anda untuk semakan."
-  },
-  "project.moderation.admonition.rejected.address-all-concerns": {
-    "message": "Mohon tangani semua kebimbangan tentang penyederhanaan, termasuk sebarang isu yang disenaraikan dalam mesej di bawah, sebelum menghantar semula projek ini."
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Perubahan diminta"
-  },
-  "project.moderation.admonition.rejected.spam-notice": {
-    "message": "Menyerahkan projek anda berulang kali tanpa menangani semua kebimbangan penyederhanaan terlebih dahulu boleh mengakibatkan penggantungan akaun."
-  },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "Projek anda sedang dalam barisan untuk disemak oleh pasukan penyederhanaan Modrinth."
-  },
-  "project.moderation.admonition.under-review.body.2": {
-    "message": "Projek anda akan diimbas dan kemudian disemak oleh penyederhana manusia untuk memastikan ia mematuhi <rules-link>Peraturan Kandungan</rules-link> dan <terms-link>Terma Penggunaan</terms-link> Modrinth."
-  },
-  "project.moderation.admonition.under-review.body.3": {
-    "message": "Anda masih boleh mengubah suai projek anda, ia tidak akan menjejaskan kedudukan anda dalam barisan."
-  },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>Kami menghargai kesabaran anda sementara penyederhana kami berusaha keras untuk memastikan Modrinth kekal selamat, dan berharap dapat membantu anda berkongsi kandungan anda!💚</emphasis>"
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "Projek dalam semakan"
-  },
-  "project.moderation.admonition.withheld.body": {
-    "message": "Projek anda tidak akan dipaparkan secara terbuka dan hanya boleh diakses dengan pautan langsung.{requestedStatus, select, unlisted { Berdasarkan <visibility-settings-link>tetapan keterlihatan</visibility-settings-link> yang anda pilih, kemungkinan besar tiada tindakan diperlukan.} other { Mohon tangani semua kebimbangan tentang penyederhanaan, termasuk sebarang isu yang disenaraikan dalam mesej di bawah, sebelum menghantar semula projek ini.}}"
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "Tidak disenaraikan oleh kakitangan"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Tidak dibenarkan"
   },
   "project.moderation.thread.approved-warning": {
     "message": "Bebenang ini tidak dipantau secara aktif, tetapi mungkin disemak untuk mendapatkan maklumat tentang projek anda jika perlu."
   },
-  "project.moderation.thread.help-center-note.1": {
-    "message": "Penyederhana kandungan tidak dapat memberikan sokongan untuk kebanyakan isu dan mesej ke dalam bebenang ini tidak memaklumkan kakitangan."
-  },
   "project.moderation.thread.help-center-note.2": {
     "message": "Jika anda memerlukan bantuan atau mempunyai pertanyaan tambahan, sila lawati <help-center-link>Pusat Bantuan Modrinth</help-center-link> dan klik gelembung biru untuk menghubungi sokongan."
-  },
-  "project.moderation.thread.private-description": {
-    "message": "Ini adalah bebenang perbualan peribadi dengan penyederhana Modrinth. Mereka mungkin akan menghantar mesej kepada anda tentang isu-isu berkaitan projek ini."
   },
   "project.moderation.thread.title": {
     "message": "Mesej penyederhana"
@@ -3007,54 +2866,6 @@
   },
   "project.settings.disclosures.last-updated.moderator": {
     "message": "Penyederhana"
-  },
-  "project.settings.general.name.description": {
-    "message": "Elakkan awalan, akhiran, kurungan atau perihalan tambahan—hanya nama sebenar projek."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "cth. Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "cth. Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "cth. Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "cth. Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "cth. Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Nama"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Ringkaskan projek anda dalam tidak lebih daripada satu ayat."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "cth. Membaik pulih perkembangan permainan untuk sentiasa berkait rapat dengan Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "cth. Menambah peralatan pembinaan yang boleh dipakai."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "cth. Menambahkan mekanik binaan gua perlombongan yang realistik."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "cth. Memperbaik cara gerbang Nether memaut antara satu sama lain."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "cth. Menambahkan versi bos yang berkuasa bagi makhluk biasa untuk dijumpai pada waktu malam."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Slogan"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
-  "project.settings.license.intro": {
-    "message": "Adalah penting untuk memilih lesen yang sesuai bagi {type} anda. Anda boleh memilih satu lesen daripada senarai kami atau menyediakan lesen tersuai. Anda juga boleh menyediakan URL tersuai untuk lesen pilihan anda; jika tidak, teks lesen tersebut akan dipaparkan. Sila rujuk <guide>panduan pelesenan</guide> kami untuk maklumat lanjut."
   },
   "project.settings.links.donation-link": {
     "message": "Pautan"
@@ -3098,14 +2909,8 @@
   "project.settings.server.languages-label": {
     "message": "Bahasa"
   },
-  "project.settings.server.optional-label": {
-    "message": "pilihan"
-  },
   "project.settings.server.region-label": {
     "message": "Rantau"
-  },
-  "project.settings.tags.title": {
-    "message": "Tag"
   },
   "project.versions.copy-id-option": {
     "message": "Salin ID"

@@ -758,20 +758,8 @@
   "conversation-thread.action.add-private-note": {
     "message": "Tilføj privat note"
   },
-  "conversation-thread.action.approve": {
-    "message": "Godkend"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Godkend med svar"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Luk med svar"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Afvis"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Afvis med svar"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Genåbn tråd"
@@ -781,12 +769,6 @@
   },
   "conversation-thread.action.send": {
     "message": "Send"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Send til gennemgang"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Send til gennemgang med svar"
   },
   "conversation-thread.reply-editor.placeholder.send": {
     "message": "Send en besked..."
@@ -848,9 +830,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Versioner"
   },
-  "create.collection.collection-info": {
-    "message": "Din nye samling vil blive skabt som en offentlig samling med {count, plural, =0 {ingen projekter} one {# projekt} other {# projekter}}."
-  },
   "create.collection.create-collection": {
     "message": "Opret samling"
   },
@@ -902,9 +881,6 @@
   "create.organization.name-placeholder": {
     "message": "Indtast organisation navn..."
   },
-  "create.organization.ownership-info": {
-    "message": "Du vil blive ejeren af denne organisation, men du kan invitere andre medlemmer og overføre ejerskabet på et hvert tidspunkt."
-  },
   "create.organization.summary-description": {
     "message": "En sætning eller to som beskriver din organisation."
   },
@@ -932,20 +908,11 @@
   "create.project.name-placeholder": {
     "message": "Indtast projekt navn..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} Ikon"
-  },
-  "create.project.owner-description": {
-    "message": "Det projekt ejeren som dig selv eller en organisation du medlem af."
-  },
   "create.project.owner-label": {
     "message": "Ejer"
   },
   "create.project.server-project-title": {
     "message": "Opretter et server projekt"
-  },
-  "create.project.summary-description": {
-    "message": "En sætning eller to som beskriver dit projekt."
   },
   "create.project.summary-label": {
     "message": "Resumé"
@@ -956,26 +923,11 @@
   "create.project.title": {
     "message": "Opretter et projekt"
   },
-  "create.project.type-label": {
-    "message": "Type"
-  },
-  "create.project.type-project": {
-    "message": "Projekt"
-  },
-  "create.project.type-server": {
-    "message": "Server"
-  },
   "create.project.unknown-user": {
     "message": "Ukendt bruger"
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Bruger Avatar"
-  },
-  "create.project.visibility-description": {
-    "message": "Dit projekts synlighed efter det er blevet godkendt."
   },
   "create.project.visibility-private": {
     "message": "Privat"
@@ -1237,9 +1189,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Fejl ved indlæsning af notifikationer:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Historik"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Notifkations historik"
@@ -2429,15 +2378,6 @@
   "project.install-context.back-to-discover": {
     "message": "Tilbage til udforsk"
   },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "Dit projekt er i kø til at blive gennemgået af Modrinth's moderatorteam."
-  },
-  "project.moderation.admonition.under-review.body.2": {
-    "message": "Dit projekt vil blive skannet og efterfølgende gennemgået af menneskelige moderators, for at sikre sig at det opretholder Modrinth's <rules-link>Indholsregler</rules-link> og <terms-link>Vilkår for brug</terms-link>."
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "Projekt under gennemgang"
-  },
   "project.moderation.title": {
     "message": "Moderation"
   },
@@ -2455,27 +2395,6 @@
   },
   "project.notification.updated.title": {
     "message": "Projekt opdateret"
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "f.eks Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "f.eks Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "f.eks Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "f.eks Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "f.eks Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Navn"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
   },
   "project.settings.permissions.delete-all-groups": {
     "message": "Slet alle grupper"
@@ -2533,9 +2452,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Fremhævet tags"
-  },
-  "project.settings.tags.title": {
-    "message": "Tags"
   },
   "project.versions.copy-id-option": {
     "message": "Kopier ID"

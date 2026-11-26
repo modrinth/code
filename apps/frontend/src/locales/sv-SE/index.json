@@ -1040,23 +1040,11 @@
   "conversation-thread.action.add-private-note": {
     "message": "Lägg till privat anteckning"
   },
-  "conversation-thread.action.approve": {
-    "message": "Godkänn"
-  },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Godkänn med svar"
-  },
   "conversation-thread.action.close-report": {
     "message": "Stäng rapport"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Stäng med svar"
-  },
-  "conversation-thread.action.reject": {
-    "message": "Avslå"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Avslå med svar"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Återuppta tråd"
@@ -1067,32 +1055,8 @@
   "conversation-thread.action.reply-to-thread": {
     "message": "Svara tråd"
   },
-  "conversation-thread.action.resubmit-for-review": {
-    "message": "Skicka in igen för granskning"
-  },
-  "conversation-thread.action.resubmit-for-review-with-reply": {
-    "message": "Skicka in igen för granskning med svar"
-  },
   "conversation-thread.action.send": {
     "message": "Skicka"
-  },
-  "conversation-thread.action.send-to-review": {
-    "message": "Skicka in för granskning"
-  },
-  "conversation-thread.action.send-to-review-with-reply": {
-    "message": "Skicka in för granskning med svar"
-  },
-  "conversation-thread.action.set-to-draft": {
-    "message": "Sätt till utkast"
-  },
-  "conversation-thread.action.set-to-draft-with-reply": {
-    "message": "Sätt till utkast med svar"
-  },
-  "conversation-thread.action.withhold": {
-    "message": "Tillhandahåll"
-  },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Tillbakahåll med svar"
   },
   "conversation-thread.closed-thread.description": {
     "message": "Den här tråden är stängd och nya meddelanden kan inte skickas."
@@ -1135,24 +1099,6 @@
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Modereringsfel"
-  },
-  "conversation-thread.resubmit-modal.confirmation.description": {
-    "message": "Bekräfta att jag tagit itu med meddelandena från moderatorerna"
-  },
-  "conversation-thread.resubmit-modal.confirmation.label": {
-    "message": "Jag bekräftar att jag ordentligt tagit itu med moderatorernas kommentarer."
-  },
-  "conversation-thread.resubmit-modal.header.resubmitting": {
-    "message": "Skickar in igen för granskning"
-  },
-  "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Skickar in för granskning"
-  },
-  "conversation-thread.resubmit-modal.reminder": {
-    "message": "Se till att du tagit itu med alla kommentarer från moderationsteamet."
-  },
-  "conversation-thread.resubmit-modal.warning": {
-    "message": "Upprepade inlämningar utan att ta itu med moderationsteamets kommentarer kan leda till tillfällig avstängning."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Kompletterande filer är avsedda för stödjande resurser som källkod, inte för alternativa versioner eller varianter."
@@ -1262,9 +1208,6 @@
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Versioner"
   },
-  "create.collection.collection-info": {
-    "message": "Din nya samling kommer skapas som en offentlig samling {count, plural, =0 {utan några projekt} one {med # projekt} other {med # projekt}}."
-  },
   "create.collection.create-collection": {
     "message": "Skapa samling"
   },
@@ -1328,9 +1271,6 @@
   "create.organization.name-placeholder": {
     "message": "Ange organisationsnamn..."
   },
-  "create.organization.ownership-info": {
-    "message": "Du kommer vara ägaren av organisationen, men du kan bjuda in andra medlemmar och överföra ägarskap när som helst."
-  },
   "create.organization.summary-description": {
     "message": "En mening eller två som beskriver din organisation."
   },
@@ -1358,20 +1298,11 @@
   "create.project.name-placeholder": {
     "message": "Ange projektnamn..."
   },
-  "create.project.organization-icon-alt": {
-    "message": "{name} ikon"
-  },
-  "create.project.owner-description": {
-    "message": "Sätt projektägaren som dig själv eller en organisation du är medlem i."
-  },
   "create.project.owner-label": {
     "message": "Ägare"
   },
   "create.project.server-project-title": {
     "message": "Skapar ett serverprojekt"
-  },
-  "create.project.summary-description": {
-    "message": "En mening eller två som beskriver ditt projekt."
   },
   "create.project.summary-label": {
     "message": "Sammanfattning"
@@ -1382,26 +1313,11 @@
   "create.project.title": {
     "message": "Skapar ett projekt"
   },
-  "create.project.type-label": {
-    "message": "Typ"
-  },
-  "create.project.type-project": {
-    "message": "Projekt"
-  },
-  "create.project.type-server": {
-    "message": "Server"
-  },
   "create.project.unknown-user": {
     "message": "Okänd användare"
   },
   "create.project.url-label": {
     "message": "URL"
-  },
-  "create.project.user-avatar-alt": {
-    "message": "Användaravatar"
-  },
-  "create.project.visibility-description": {
-    "message": "Synligheten av ditt projekt efter att det har godkänts."
   },
   "create.project.visibility-private": {
     "message": "Privat"
@@ -1789,9 +1705,6 @@
   },
   "dashboard.overview.notifications.error.loading": {
     "message": "Misslyckades att läsa in notifikationer:"
-  },
-  "dashboard.overview.notifications.history.label": {
-    "message": "Historik"
   },
   "dashboard.overview.notifications.history.title": {
     "message": "Notifikationshistorik"
@@ -3515,48 +3428,6 @@
   "project.install-context.back-to-discover": {
     "message": "Tillbaka till upptäck"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "Ditt projekt är privat, vilket betyder att endast du och personer du bjuder in kan komma åt det."
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "Ditt projekt är publicerat och upptäckbart på Modrinth."
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "Du kan ändra synligheten av ditt projekt i projektets <visibility-settings-link>synlighetsinställningar</visibility-settings-link>."
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "Projekt godkänt"
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "Projektutkast"
-  },
-  "project.moderation.admonition.draft.submit-for-review": {
-    "message": "När du har slutfört alla nödvändiga steg och säkerställt att ditt projekt följer Modrinths <rules-link>innehållsregler</rules-link> så kan du skicka in ditt projekt för granskning."
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Ändringar begärda"
-  },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "Ditt projekt står i kö för att granskas av Modrinths modereringsteam."
-  },
-  "project.moderation.admonition.under-review.body.2": {
-    "message": "Ditt projekt kommer skannas och sedan granskas av mänskliga moderatorer för att säkerställa att det uppfyller Modrinths <rules-link>innehållsregler</rules-link> och <terms-link>användarvillkor</terms-link>."
-  },
-  "project.moderation.admonition.under-review.body.3": {
-    "message": "Du kan fortfarande ändra ditt projekt utan att påverka din plats i kön."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Vi försöker granska inlämningar inom 24–48 timmar, men vissa projekt kanske får förseningar. Det här speglar inte något problem med din inlämning."
-  },
-  "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "Vi försöker granska inlämningar inom en vecka, men vissa projekt kanske får förseningar. Det här speglar inte något problem med din inlämning."
-  },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>Vi uppskattar ditt tålamod medan våra moderatorer jobbar hård för att hålla Modrinth säkert och vi ser fram emot att hjälpa dig dela ditt innehåll! 💚</emphasis>"
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "Projekt under granskning"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Obehörig"
   },
@@ -3565,9 +3436,6 @@
   },
   "project.moderation.thread.help-center-note.2": {
     "message": "Om du behöver hjälp eller har fler frågor, vänligen besök <help-center-link>Modrinth hjälpcentret</help-center-link> och klicka den blåa bubblan för att kontakta support."
-  },
-  "project.moderation.thread.private-description": {
-    "message": "Det här är en privat konversationstråd med Modrinth-moderatorerna. De kan meddela dig om problem angående detta projekt."
   },
   "project.moderation.thread.title": {
     "message": "Moderationsmeddelanden"
@@ -3613,9 +3481,6 @@
   },
   "project.settings.delete-project.confirmation.title": {
     "message": "Är du säker på att du vill radera det här projektet?"
-  },
-  "project.settings.delete-project.description.1": {
-    "message": "Permanent raderar projektet från Modrinth. Raderade projekt <emphasis>kan inte återställas</emphasis> av Modrinth-personal eller -support."
   },
   "project.settings.delete-project.title": {
     "message": "Radera projekt"
@@ -3752,59 +3617,8 @@
   "project.settings.disclosures.telemetry.title": {
     "message": "Innehåller telemetri"
   },
-  "project.settings.disclosures.upload-version-first.heading": {
-    "message": "Ladda upp versioner innan du lägger till upplysningar"
-  },
   "project.settings.editing-project": {
     "message": "Ändrar {projectType}projekt"
-  },
-  "project.settings.general.name.description": {
-    "message": "Undvik prefix, suffix, parenteser och beskrivningar — endast projektets riktiga namn."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "t.ex. Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "ex. Bygg föremål"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "ex. Bättre än att gräva"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "ex. Förbättrade portaler"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "ex. Farliga varelser"
-  },
-  "project.settings.general.name.title": {
-    "message": "Namn"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Sammanfatta ditt projekt i bara en mening."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "t.ex. Gör helt om spelframsteg till att handla om nethern."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "t.ex. Lägger till användbar byggarbetsutrustning."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "t.ex. Lägger till realistiska byggtekniker för gruvschakt."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "t.ex. Förbättrar hur netherportaler länkar till varandra."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "t.ex. Lägger till kraftfulla bossvarianter av normala varelser att stöta på under natten."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Tagline"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
-  "project.settings.license.all-rights": {
-    "message": "Alla rättigheter förbehållna/Ingen licens"
   },
   "project.settings.license.allow-later": {
     "message": "Tillåt senare versioner"
@@ -3812,23 +3626,8 @@
   "project.settings.license.custom": {
     "message": "Anpassad"
   },
-  "project.settings.license.custom-name-required": {
-    "message": "Ange namnet för din anpassade licens."
-  },
   "project.settings.license.name": {
     "message": "Licensnamn"
-  },
-  "project.settings.license.name-description": {
-    "message": "Det fullständiga namnet på den anpassade licensen."
-  },
-  "project.settings.license.name-placeholder": {
-    "message": "Licensnamn"
-  },
-  "project.settings.license.optional-label": {
-    "message": "valfritt"
-  },
-  "project.settings.license.optional-url": {
-    "message": "Licens-URL (valfritt)"
   },
   "project.settings.license.select": {
     "message": "Licens"
@@ -3846,9 +3645,6 @@
     "message": "Din licens har uppdaterats."
   },
   "project.settings.license.url": {
-    "message": "LicensURL"
-  },
-  "project.settings.license.url-placeholder": {
     "message": "LicensURL"
   },
   "project.settings.links.add-link": {
@@ -3913,9 +3709,6 @@
   },
   "project.settings.links.wiki": {
     "message": "Wikisida"
-  },
-  "project.settings.monetization.title": {
-    "message": "Intäkter"
   },
   "project.settings.permissions.attention-needed.title": {
     "message": "Okänt externt innehåll"
@@ -3989,9 +3782,6 @@
   "project.settings.server.latency-label": {
     "message": "Fördröjning: {latency} ms"
   },
-  "project.settings.server.optional-label": {
-    "message": "valfri"
-  },
   "project.settings.server.refresh-ping-tooltip": {
     "message": "Uppdatera ping"
   },
@@ -4007,20 +3797,8 @@
   "project.settings.server.server-online": {
     "message": "Servern är online!"
   },
-  "project.settings.tags.categories-description": {
-    "message": "Markera alla kategorier som speglar de teman eller funktionen i ditt {type}."
-  },
   "project.settings.tags.featured-tags": {
     "message": "Nyckeltaggar"
-  },
-  "project.settings.tags.featured-tags-required": {
-    "message": "Du måste ha minst en nyckeltagg."
-  },
-  "project.settings.tags.featured-tags-select-description": {
-    "message": "Markera dina mest relevanta taggar. De syns före resten av dina taggar."
-  },
-  "project.settings.tags.features-description": {
-    "message": "Markera alla funktioner som ditt {type} använder."
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} kategorier} other {Kategorier}}"
@@ -4030,9 +3808,6 @@
   },
   "project.settings.tags.resolutions-description": {
     "message": "Välj upplösning(en/arna) på dina texturer i ditt {type}."
-  },
-  "project.settings.tags.title": {
-    "message": "Taggar"
   },
   "project.slug-suggestions.label": {
     "message": "Förslag:"

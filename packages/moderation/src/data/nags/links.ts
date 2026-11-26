@@ -174,17 +174,32 @@ export const linkNags = {
 				? linkReasons[reason as keyof typeof linkReasons]
 				: messages.unverifiable
 		},
+		highlightField: (nag) =>
+			nag.details.field === 'description'
+				? 'description'
+				: nag.details.field === 'license'
+					? 'license-url'
+					: nag.details.field
+						? `link-${String(nag.details.field)}`
+						: 'links',
 		destination: 'links',
 	},
-	'add-links': { title: messages.addTitle, description: messages.add, destination: 'links' },
+	'add-links': {
+		title: messages.addTitle,
+		description: messages.add,
+		highlightField: 'links',
+		destination: 'links',
+	},
 	'add-links-server': {
 		title: messages.addServerTitle,
 		description: messages.addServer,
+		highlightField: 'links',
 		destination: 'links',
 	},
 	'gpl-license-source-required': {
 		title: messages.gplTitle,
 		description: messages.gpl,
+		highlightField: 'link-source',
 		destination: 'links',
 		linkTitle: messages.visitLinks,
 	},

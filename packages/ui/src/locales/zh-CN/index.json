@@ -3404,12 +3404,6 @@
   "markdown-editor.toolbar.video": {
     "defaultMessage": "视频"
   },
-  "markdown-editor.upload-error.no-file": {
-    "defaultMessage": "没有提供文件"
-  },
-  "markdown-editor.upload-error.no-handler": {
-    "defaultMessage": "未提供图像上传处理程序"
-  },
   "markdown-editor.url-label": {
     "defaultMessage": "URL链接"
   },
@@ -7908,4 +7902,3 @@
     "defaultMessage": "类型"
   }
 }
-

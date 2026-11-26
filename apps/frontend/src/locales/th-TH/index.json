@@ -668,9 +668,6 @@
   "create.organization.name-label": {
     "message": ""
   },
-  "create.organization.ownership-info": {
-    "message": "คุณจะเป็นเจ้าของในการจัดการต่างๆ และคุณก็สามารถเพิ่มสมาชิกได้ และ ย้ายเจ้าของตอนไหนก็ได้"
-  },
   "create.organization.summary-label": {
     "message": "สรุป"
   },
@@ -697,15 +694,6 @@
   },
   "create.project.title": {
     "message": "สร้างโปรเจ็ก"
-  },
-  "create.project.type-label": {
-    "message": "ประเภท"
-  },
-  "create.project.type-project": {
-    "message": "โปรเจกต์"
-  },
-  "create.project.type-server": {
-    "message": "เซิร์ฟเวอร์"
   },
   "create.project.url-label": {
     "message": "URL"

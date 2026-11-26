@@ -2,6 +2,7 @@
 	<div>
 		<section class="card">
 			<Breadcrumbs
+				class="mb-4"
 				:current-title="formatMessage(messages.title)"
 				:link-stack="[
 					{ href: '/settings/billing', label: formatMessage(commonSettingsMessages.billing) },

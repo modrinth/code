@@ -6,53 +6,34 @@
 				? formatMessage(messages.serverProjectTitle)
 				: formatMessage(messages.title)
 		"
-		:max-width="'550px'"
+		max-width="550px"
+		:initial-focus="getNameInput"
 	>
 		<div class="flex w-full flex-col gap-6">
 			<RestrictedActionAlert v-model="isRestricted" scope="PROJECT_CREATE" @navigate="cancel" />
 			<CreateLimitAlert v-model="hasHitLimit" type="project" />
 
-			<div class="flex flex-col gap-2.5">
-				<label for="project-type">
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.typeLabel) }}
-					</span>
-				</label>
-				<Combobox
-					id="project-type"
-					v-model="projectType"
-					name="project-type"
-					:options="projectTypeOptions"
-					:disabled="hasHitLimit"
-				/>
-			</div>
-
-			<div class="flex flex-col gap-2.5">
-				<label for="name">
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.nameLabel) }}
-					</span>
-				</label>
+			<Field :label="formatMessage(messages.nameLabel)" :input-id="nameId">
 				<Input
-					id="name"
+					:id="nameId"
+					ref="nameInput"
 					v-model="name"
 					:maxlength="64"
 					:placeholder="formatMessage(messages.namePlaceholder)"
 					autocomplete="off"
+					wrapper-class="w-full"
 					:disabled="hasHitLimit"
 					@update:model-value="updatedName()"
 				/>
-			</div>
-			<div
-				class="flex flex-col gap-2.5"
+			</Field>
+			<Field
+				:label="formatMessage(messages.urlLabel)"
+				:input-id="slugId"
 				@focusin="onSlugSuggestionFocusIn"
 				@focusout="onSlugSuggestionFocusOut"
 			>
-				<label for="slug" class="text-md font-semibold text-contrast">
-					{{ formatMessage(messages.urlLabel) }}
-				</label>
 				<Input
-					id="slug"
+					:id="slugId"
 					v-model="slug"
 					:maxlength="64"
 					class="w-full"
@@ -63,62 +44,59 @@
 				>
 					<template #prefix>https://modrinth.com/project/</template>
 				</Input>
-				<SlugSuggestions
-					:selected="slug"
-					:suggestions="slugSuggestions"
-					:visible="showSlugSuggestions"
-					@select="selectSlugSuggestion"
-				/>
-			</div>
-			<div class="flex flex-col gap-2.5">
-				<label for="owner">
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.ownerLabel) }}
-					</span>
-				</label>
-				<Combobox
-					id="owner"
-					v-model="owner"
-					name="owner"
-					:options="[userOption, ...ownerOptions]"
-					searchable
-					:disabled="hasHitLimit"
-					select-search-text-on-focus
-					show-icon-in-selected
-				/>
-				<span>{{ formatMessage(messages.ownerDescription) }}</span>
-			</div>
-			<div class="flex flex-col gap-2.5">
-				<label for="visibility" class="flex flex-col gap-1">
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(commonMessages.visibilityLabel) }}
-					</span>
-				</label>
-				<Chips
-					id="visibility"
-					v-model="visibility"
-					:items="visibilities"
-					:format-label="(x) => x.display"
-					:capitalize="false"
-					:disabled="hasHitLimit"
-				/>
-				<span>{{ formatMessage(messages.visibilityDescription) }}</span>
-			</div>
-			<div class="flex flex-col gap-2.5">
-				<label for="additional-information" class="flex flex-col gap-1">
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.summaryLabel) }}
-					</span>
-				</label>
+				<template #bottom>
+					<SlugSuggestions
+						:selected="slug"
+						:suggestions="slugSuggestions"
+						:visible="showSlugSuggestions"
+						@select="selectSlugSuggestion"
+					/>
+				</template>
+			</Field>
+			<Field :label="formatMessage(messages.summaryLabel)" :input-id="summaryId">
 				<Textarea
-					id="additional-information"
+					:id="summaryId"
 					v-model="description"
 					:maxlength="256"
 					:placeholder="formatMessage(messages.summaryPlaceholder)"
 					:disabled="hasHitLimit"
 				/>
-				<span>{{ formatMessage(messages.summaryDescription) }}</span>
-			</div>
+				<template #subtext>
+					{{ formatMessage(projectSummaryHelp) }}
+				</template>
+			</Field>
+			<Field :label="formatMessage(messages.ownerLabel)" :input-id="ownerId">
+				<ProjectOwnerCombobox
+					v-model="owner"
+					:input-id="ownerId"
+					:options="ownerOptions"
+					:disabled="hasHitLimit"
+					hide-chevron
+				/>
+			</Field>
+			<Field :label="formatMessage(commonMessages.visibilityLabel)">
+				<template #default="{ labelId }">
+					<Chips
+						v-model="visibility"
+						:items="visibilityOptions"
+						:format-label="(option) => formatMessage(projectVisibilityOptions[option].label)"
+						:format-tooltip="
+							(option) => formatMessage(projectVisibilityOptions[option].description)
+						"
+						:aria-labelledby="labelId"
+						:aria-describedby="visibility !== 'private' ? visibilityId : undefined"
+						:capitalize="false"
+						:disabled-items="hasHitLimit ? visibilityOptions : undefined"
+					/>
+				</template>
+				<template v-if="visibility !== 'private'" #subtext>
+					<span :id="visibilityId">
+						{{
+							formatMessage(projectMessages.visibilityApprovalHelp, { contentType: projectType })
+						}}
+					</span>
+				</template>
+			</Field>
 			<div class="flex justify-end gap-2.5">
 				<Button type="outlined" @click="cancel">
 					<XIcon aria-hidden="true" />
@@ -141,14 +119,13 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { OrganizationIcon, PlusIcon, XIcon } from '@modrinth/assets'
-import { Button } from '@modrinth/ui'
+import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
+	Button,
 	Chips,
-	Combobox,
-	type ComboboxOption,
 	commonMessages,
 	defineMessages,
+	Field,
 	injectModrinthClient,
 	injectNotificationManager,
 	Input,
@@ -157,25 +134,28 @@ import {
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, defineAsyncComponent, h } from 'vue'
+import { computed, useId } from 'vue'
 
+import ProjectOwnerCombobox from '~/components/ui/ProjectOwnerCombobox.vue'
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import {
 	generateUrlSlug,
 	useProjectSlugSuggestions,
 	useSlugSuggestionVisibility,
 } from '~/composables/project-slug-suggestions'
+import {
+	projectMessages,
+	projectSummaryHelp,
+	projectVisibilityOptions,
+} from '~/utils/project-messages'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
 import RestrictedActionAlert from './RestrictedActionAlert.vue'
 
-type ProjectTypes = 'server' | 'project'
-interface VisibilityOption {
-	actual: Labrinth.Projects.v2.ProjectStatus
-	display: string
-}
+type ProjectType = 'server' | 'project'
+
 interface ShowOptions {
-	type?: 'server' | 'project'
+	type?: ProjectType
 }
 
 const { addNotification } = injectNotificationManager()
@@ -198,25 +178,9 @@ const messages = defineMessages({
 		id: 'create.project.server-project-title',
 		defaultMessage: 'Creating a server project',
 	},
-	typeLabel: {
-		id: 'create.project.type-label',
-		defaultMessage: 'Type',
-	},
-	typeProject: {
-		id: 'create.project.type-project',
-		defaultMessage: 'Project',
-	},
-	typeServer: {
-		id: 'create.project.type-server',
-		defaultMessage: 'Server',
-	},
 	ownerLabel: {
 		id: 'create.project.owner-label',
 		defaultMessage: 'Owner',
-	},
-	ownerDescription: {
-		id: 'create.project.owner-description',
-		defaultMessage: `Set the project owner as yourself or an organization you're a member of.`,
 	},
 	nameLabel: {
 		id: 'create.project.name-label',
@@ -230,17 +194,9 @@ const messages = defineMessages({
 		id: 'create.project.url-label',
 		defaultMessage: 'URL',
 	},
-	visibilityDescription: {
-		id: 'create.project.visibility-description',
-		defaultMessage: 'The visibility of your project after it has been approved.',
-	},
 	summaryLabel: {
 		id: 'create.project.summary-label',
 		defaultMessage: 'Summary',
-	},
-	summaryDescription: {
-		id: 'create.project.summary-description',
-		defaultMessage: 'A sentence or two that describes your project.',
 	},
 	summaryPlaceholder: {
 		id: 'create.project.summary-placeholder',
@@ -250,18 +206,6 @@ const messages = defineMessages({
 		id: 'create.project.create-project',
 		defaultMessage: 'Create project',
 	},
-	visibilityPublic: {
-		id: 'create.project.visibility-public',
-		defaultMessage: 'Public',
-	},
-	visibilityUnlisted: {
-		id: 'create.project.visibility-unlisted',
-		defaultMessage: 'Unlisted',
-	},
-	visibilityPrivate: {
-		id: 'create.project.visibility-private',
-		defaultMessage: 'Private',
-	},
 	missingFieldsTooltip: {
 		id: 'create.project.missing-fields-tooltip',
 		defaultMessage: 'Missing fields: {fields}',
@@ -270,14 +214,6 @@ const messages = defineMessages({
 		id: 'create.project.unknown-user',
 		defaultMessage: 'Unknown user',
 	},
-	userAvatarAlt: {
-		id: 'create.project.user-avatar-alt',
-		defaultMessage: 'User Avatar',
-	},
-	organizationIconAlt: {
-		id: 'create.project.organization-icon-alt',
-		defaultMessage: '{name} Icon',
-	},
 })
 
 const props = defineProps<{
@@ -285,6 +221,7 @@ const props = defineProps<{
 }>()
 
 const modal = ref<InstanceType<typeof NewModal>>()
+const nameInput = ref<InstanceType<typeof Input>>()
 const hasHitLimit = ref(false)
 const isRestricted = ref(false)
 
@@ -302,35 +239,17 @@ const { checking: checkingSlugSuggestions, suggestions: slugSuggestions } =
 		title: name,
 		username: () => auth.value.user?.username,
 	})
-const projectType = ref<ProjectTypes>('project')
-const projectTypeOptions = computed<ComboboxOption<ProjectTypes>[]>(() => [
-	{
-		value: 'project',
-		label: formatMessage(messages.typeProject),
-	},
-	{
-		value: 'server',
-		label: formatMessage(messages.typeServer),
-	},
-])
-const ownerOptions = ref<ComboboxOption<string>[]>([])
+const projectType = ref<ProjectType>('project')
 const owner = ref<string | undefined>('self')
 const organizations = ref<Labrinth.Projects.v3.Organization[]>([])
-const visibilities = ref<VisibilityOption[]>([
-	{
-		actual: 'approved',
-		display: formatMessage(messages.visibilityPublic),
-	},
-	{
-		actual: 'unlisted',
-		display: formatMessage(messages.visibilityUnlisted),
-	},
-	{
-		actual: 'private',
-		display: formatMessage(messages.visibilityPrivate),
-	},
-])
-const visibility = ref<VisibilityOption>(visibilities.value[0])
+const nameId = useId()
+const slugId = useId()
+const summaryId = useId()
+const ownerId = useId()
+const visibilityId = useId()
+type Visibility = keyof typeof projectVisibilityOptions
+const visibilityOptions = Object.keys(projectVisibilityOptions) as Visibility[]
+const visibility = ref<Visibility>('approved')
 
 const disableCreate = computed(() => {
 	if (hasHitLimit.value || isRestricted.value) return true
@@ -359,24 +278,19 @@ const cancel = () => {
 	modal.value?.hide()
 }
 
-const userOption = computed(() => ({
-	value: 'self',
-	label: auth.value.user?.username || formatMessage(messages.unknownUser),
-	icon: auth.value.user?.avatar_url
-		? markRaw(
-				defineAsyncComponent(() =>
-					Promise.resolve({
-						setup: () => () =>
-							h('img', {
-								src: auth.value.user?.avatar_url,
-								alt: formatMessage(messages.userAvatarAlt),
-								class: 'h-5 w-5 rounded-full',
-							}),
-					}),
-				),
-			)
-		: undefined,
-}))
+const ownerOptions = computed(() => [
+	{
+		value: 'self',
+		label: auth.value.user?.username || formatMessage(messages.unknownUser),
+		avatar_url: auth.value.user?.avatar_url,
+	},
+	...organizations.value.map((organization) => ({
+		value: organization.id,
+		label: organization.name,
+		avatar_url: organization.icon_url,
+		isOrganization: true,
+	})),
+])
 
 const { labrinth } = injectModrinthClient()
 
@@ -390,30 +304,6 @@ async function fetchOrganizations() {
 
 		organizations.value = orgs || []
 
-		ownerOptions.value = organizations.value.map((org) => ({
-			value: org.id,
-			label: org.name,
-			icon: org.icon_url
-				? markRaw(
-						defineAsyncComponent(() =>
-							Promise.resolve({
-								setup: () => () =>
-									h('img', {
-										src: org.icon_url,
-										alt: formatMessage(messages.organizationIconAlt, { name: org.name }),
-										class: 'h-5 w-5 rounded',
-									}),
-							}),
-						),
-					)
-				: markRaw(
-						defineAsyncComponent(() =>
-							Promise.resolve({
-								setup: () => () => h(OrganizationIcon, { class: 'size-5' }),
-							}),
-						),
-					),
-		}))
 		if (props.organizationId) owner.value = props.organizationId
 	} catch (err) {
 		console.error('Failed to fetch organizations:', err)
@@ -432,7 +322,7 @@ async function createProject() {
 		slug: slug.value,
 		description: description.value.trim(),
 		body: '',
-		requested_status: visibility.value.actual,
+		requested_status: visibility.value,
 		initial_versions: [],
 		team_members: [
 			{
@@ -510,6 +400,11 @@ async function show(event?: MouseEvent, options?: ShowOptions) {
 	projectType.value = options?.type ?? 'project'
 	await fetchOrganizations()
 	modal.value?.show(event)
+}
+
+function getNameInput() {
+	const root: HTMLElement | undefined = nameInput.value?.$el
+	return root?.querySelector<HTMLInputElement>('input:enabled') ?? null
 }
 
 function updatedName() {

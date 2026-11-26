@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-4 pb-20 lg:pl-4 lg:pt-1.5">
+	<div class="flex flex-col gap-4 pb-20">
 		<h2 class="m-0 text-xl font-semibold text-contrast md:text-2xl">
 			{{ formatMessage(messages.reportsTitle) }}
 		</h2>
