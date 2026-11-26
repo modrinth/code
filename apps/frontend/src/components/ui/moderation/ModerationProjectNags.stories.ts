@@ -250,6 +250,7 @@ const meta = {
 		versions: [],
 		collapsed: false,
 		disableHorizontalScroll: true,
+
 		routeName: 'type-project',
 		tags,
 	},

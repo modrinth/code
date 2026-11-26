@@ -15,6 +15,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
+use crate::util::temporal::TemporalClient;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use anyhow::anyhow;
 use ariadne::ids::UserId;
@@ -547,8 +548,18 @@ pub async fn add_team_member_route(
     new_member: web::Json<NewTeamMember>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
-    add_team_member(req, info, pool, new_member, redis, session_queue).await
+    add_team_member(
+        req,
+        info,
+        pool,
+        new_member,
+        redis,
+        session_queue,
+        &temporal,
+    )
+    .await
 }
 
 pub async fn add_team_member(
@@ -558,6 +569,7 @@ pub async fn add_team_member(
     new_member: web::Json<NewTeamMember>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     let team_id = info.into_inner().0.into();
 
@@ -806,6 +818,7 @@ pub async fn add_team_member(
         &pool,
         &redis,
         Some(&current_user),
+        temporal,
     )
     .await?;
     DBTeamMember::clear_cache(team_id, &redis)
@@ -836,8 +849,18 @@ pub async fn edit_team_member_route(
     edit_member: web::Json<EditTeamMember>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
-    edit_team_member(req, info, pool, edit_member, redis, session_queue).await
+    edit_team_member(
+        req,
+        info,
+        pool,
+        edit_member,
+        redis,
+        session_queue,
+        &temporal,
+    )
+    .await
 }
 
 pub async fn edit_team_member(
@@ -847,6 +870,7 @@ pub async fn edit_team_member(
     edit_member: web::Json<EditTeamMember>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     let ids = info.into_inner();
     let id = ids.0.into();
@@ -1041,6 +1065,7 @@ pub async fn edit_team_member(
         &pool,
         &redis,
         Some(&current_user),
+        temporal,
     )
     .await?;
     DBTeamMember::clear_cache(id, &redis)
@@ -1064,8 +1089,18 @@ pub async fn transfer_ownership_route(
     new_owner: web::Json<TransferOwnership>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
-    transfer_ownership(req, info, pool, new_owner, redis, session_queue).await
+    transfer_ownership(
+        req,
+        info,
+        pool,
+        new_owner,
+        redis,
+        session_queue,
+        &temporal,
+    )
+    .await
 }
 
 pub async fn transfer_ownership(
@@ -1075,6 +1110,7 @@ pub async fn transfer_ownership(
     new_owner: web::Json<TransferOwnership>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
 
@@ -1261,6 +1297,7 @@ pub async fn transfer_ownership(
             &pool,
             &redis,
             Some(&current_user),
+            temporal,
         )
         .await?;
     } else {
@@ -1290,8 +1327,9 @@ pub async fn remove_team_member_route(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
-    remove_team_member(req, info, pool, redis, session_queue).await
+    remove_team_member(req, info, pool, redis, session_queue, &temporal).await
 }
 
 pub async fn remove_team_member(
@@ -1300,6 +1338,7 @@ pub async fn remove_team_member(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     let ids = info.into_inner();
     let id = ids.0.into();
@@ -1465,6 +1504,7 @@ pub async fn remove_team_member(
             &pool,
             &redis,
             Some(&current_user),
+            temporal,
         )
         .await?;
 

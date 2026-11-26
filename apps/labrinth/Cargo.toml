@@ -45,6 +45,7 @@ async-trait = { workspace = true }
 aws-sdk-s3 = { workspace = true }
 base64 = { workspace = true }
 bitflags = { workspace = true }
+blake3 = { workspace = true }
 blocklist = { workspace = true }
 bytes = { workspace = true }
 cel = { workspace = true }
@@ -61,6 +62,7 @@ derive_more = { workspace = true, features = ["deref", "deref_mut"] }
 dioxus-devtools = { workspace = true }
 dotenvy = { workspace = true }
 either = { workspace = true }
+figment = { workspace = true, features = ["env"] }
 futures = { workspace = true }
 futures-util = { workspace = true }
 heck = { workspace = true }
@@ -111,6 +113,8 @@ redis = { workspace = true, features = ["ahash", "cluster", "cluster-async", "r2
 regex = { workspace = true }
 reqwest = { workspace = true, features = ["http2", "json", "multipart", "rustls"] }
 rhai = { workspace = true, features = ["serde", "sync"] }
+rhai-chrono = { workspace = true, features = ["sync"] }
+rhai-url = { workspace = true }
 rust_decimal = { workspace = true, features = ["serde-with-float", "serde-with-str"] }
 rust_iso3166 = { workspace = true }
 rustls = { workspace = true, features = [
@@ -123,6 +127,7 @@ rustls = { workspace = true, features = [
 rustrict = { workspace = true }
 rusty-money = { workspace = true }
 scalar_api_reference = { workspace = true, features = ["actix-web"] }
+secrecy = { workspace = true, features = ["serde"] }
 sentry = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde-binhum = { workspace = true }
@@ -146,6 +151,11 @@ sqlx = { workspace = true, features = [
 sqlx-tracing = { workspace = true, features = ["postgres"] }
 strum = { workspace = true, features = ["derive"] }
 subtle = { workspace = true }
+temporalio-client = { workspace = true }
+temporalio-common = { workspace = true }
+temporalio-macros = { workspace = true }
+temporalio-sdk = { workspace = true }
+temporalio-workflow = { workspace = true }
 thiserror = { workspace = true }
 toasty = { workspace = true, features = ["postgresql"] }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }

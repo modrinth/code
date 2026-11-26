@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT name, script FROM project_flag_modules WHERE name = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "name",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "project_flag_modules",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "script",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "project_flag_modules",
+            "name": "script"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "816b803b4baf4274098942d7f8f05a8b807aa4ae53df13587ba74945a0cb35b9"
+}

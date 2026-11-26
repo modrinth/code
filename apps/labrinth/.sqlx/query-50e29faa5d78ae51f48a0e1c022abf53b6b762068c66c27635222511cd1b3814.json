@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT raw_image_url\n        FROM mods_gallery\n        WHERE mod_id = $1\n        ORDER BY ordering, id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "raw_image_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "mods_gallery",
+            "name": "raw_image_url"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "50e29faa5d78ae51f48a0e1c022abf53b6b762068c66c27635222511cd1b3814"
+}

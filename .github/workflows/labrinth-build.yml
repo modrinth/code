@@ -84,7 +84,7 @@ jobs:
         run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
 
       - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake protobuf-compiler libprotobuf-dev
 
       - name: Build labrinth
         run: cargo build --profile release-labrinth --package labrinth

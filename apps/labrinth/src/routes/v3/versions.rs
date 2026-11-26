@@ -1,5 +1,6 @@
 use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
+use crate::util::temporal::TemporalClient;
 use anyhow::anyhow;
 use std::collections::HashMap;
 
@@ -439,6 +440,7 @@ pub async fn version_edit_route(
     new_version: web::Json<EditVersion>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     version_edit(
         minecraft_meta.clone(),
@@ -449,6 +451,7 @@ pub async fn version_edit_route(
         new_version,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
 }
@@ -462,6 +465,7 @@ pub async fn version_edit(
     new_version: web::Json<EditVersion>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     let new_version = new_version.into_inner();
     version_edit_helper(
@@ -473,6 +477,7 @@ pub async fn version_edit(
         new_version,
         session_queue,
         search_state,
+        temporal,
     )
     .await
 }
@@ -485,6 +490,7 @@ pub async fn version_edit_helper(
     new_version: EditVersion,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     let mut transaction = pool
         .begin()
@@ -508,6 +514,7 @@ pub async fn version_edit_helper(
         &pool,
         &redis,
         Some(&user),
+        temporal,
     )
     .await?;
     database::models::DBVersion::clear_cache(&version_item, &redis)
@@ -1342,8 +1349,18 @@ pub async fn version_delete_route(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
-    version_delete(req, info, pool, redis, session_queue, search_state).await
+    version_delete(
+        req,
+        info,
+        pool,
+        redis,
+        session_queue,
+        search_state,
+        &temporal,
+    )
+    .await
 }
 
 pub async fn version_delete(
@@ -1353,6 +1370,7 @@ pub async fn version_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -1451,6 +1469,7 @@ pub async fn version_delete(
         &pool,
         &redis,
         Some(&user),
+        temporal,
     )
     .await?;
     search_state

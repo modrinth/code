@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT raw_icon_url, icon_url\n        FROM mods\n        WHERE id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "raw_icon_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "raw_icon_url"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "icon_url",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "icon_url"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      true,
+      true
+    ]
+  },
+  "hash": "4da9953b0e80106928ad1d196e386d664b3f632460f283fc63b1afbcb20e3963"
+}

@@ -1,6 +1,7 @@
 use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
+use crate::util::temporal::TemporalClient;
 use anyhow::anyhow;
 use std::collections::HashMap;
 
@@ -643,6 +644,7 @@ pub async fn version_edit(
     new_version: web::Json<EditVersion>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     let mut new_version = new_version.into_inner();
     if let Some(dependencies) = &mut new_version.dependencies {
@@ -745,6 +747,7 @@ pub async fn version_edit(
         new_version,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -782,6 +785,7 @@ pub async fn version_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::versions::version_delete(
@@ -791,6 +795,7 @@ pub async fn version_delete(
         redis,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)

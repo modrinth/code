@@ -1,0 +1,269 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        WITH schedules AS (\n            SELECT id, scheduled_for\n            FROM UNNEST($9::bigint[], $10::timestamptz[]) AS s(id, scheduled_for)\n        ), candidates AS (\n            SELECT m.*, s.scheduled_for,\n                CASE WHEN jsonb_typeof(m.components -> 'minecraft_server') = 'object'\n                    THEN array_append(array_remove(COALESCE(t.types, ARRAY[]::text[]), 'modpack'), 'minecraft_java_server')\n                    ELSE COALESCE(t.types, ARRAY[]::text[]) END AS project_types\n            FROM mods m\n            LEFT JOIN schedules s ON s.id = m.id\n            LEFT JOIN LATERAL (\n                SELECT array_agg(DISTINCT pt.name::text) AS types\n                FROM versions v\n                JOIN loaders_versions lv ON lv.version_id = v.id\n                JOIN loaders_project_types lpt ON lpt.joining_loader_id = lv.loader_id\n                JOIN project_types pt ON pt.id = lpt.joining_project_type_id\n                WHERE v.mod_id = m.id AND v.status = ANY($2)\n            ) t ON true\n            WHERE m.in_review AND (NOT $1::boolean OR s.id IS NOT NULL)\n                AND ($3::text IS NULL\n                    OR ($3 = 'new' AND m.queued = m.initial_queued)\n                    OR ($3 = 'resubmission' AND m.queued > m.initial_queued))\n                AND (cardinality($4::text[]) = 0 OR EXISTS (\n                    SELECT 1 FROM project_flags f WHERE f.project_id = m.id\n                        AND (f.active OR (f.what->>'retain_when_resolved')::boolean = true)\n                        AND f.what->>'key' = ANY($4)\n                ))\n        ), filtered AS (\n            SELECT *, CASE WHEN $1 THEN scheduled_for ELSE queued END AS sort_time\n            FROM candidates\n            WHERE cardinality($5::text[]) = 0 OR project_types && $5\n        ), total AS (\n            SELECT count(*) AS total_count FROM filtered\n        ), page AS (\n            SELECT * FROM filtered\n            ORDER BY CASE WHEN $6 THEN sort_time END DESC NULLS LAST,\n                CASE WHEN NOT $6 THEN sort_time END ASC NULLS LAST, id ASC\n            LIMIT $7 OFFSET $8\n        ), cards AS (\n            SELECT p.*, o.name AS organization_name, o.icon_url AS organization_icon_url,\n                owner.user_id AS owner_id, owner.username AS owner_name, owner.avatar_url AS owner_icon_url,\n                (SELECT count(*) FROM versions v JOIN dependencies d ON d.dependent_id = v.id\n                    WHERE v.mod_id = p.id AND d.dependency_file_name IS NOT NULL) AS external_dependencies_count\n            FROM page p\n            LEFT JOIN organizations o ON o.id = p.organization_id\n            LEFT JOIN LATERAL (\n                SELECT tm.user_id, u.username, u.avatar_url\n                FROM team_members tm JOIN users u ON u.id = tm.user_id\n                WHERE tm.team_id = p.team_id AND tm.is_owner\n                ORDER BY tm.ordering ASC LIMIT 1\n            ) owner ON p.organization_id IS NULL\n        )\n        SELECT total.total_count AS \"total_count!\",\n                cards.id AS \"id?\",\n                cards.slug AS \"slug?\",\n                cards.name AS \"name?\",\n                cards.summary AS \"summary?\",\n                cards.icon_url AS \"icon_url?\",\n                cards.visibility AS \"visibility?\",\n                cards.in_review AS \"in_review?\",\n                cards.review_outcome AS \"review_outcome?\",\n                cards.queued AS \"queued?\",\n                cards.initial_queued AS \"initial_queued?\",\n                cards.published AS \"published?\",\n                cards.updated AS \"updated?\",\n                cards.organization_id AS \"organization_id?\",\n                cards.organization_name AS \"organization_name?\",\n                cards.organization_icon_url AS \"organization_icon_url?\",\n                cards.owner_id AS \"owner_id?\",\n                cards.owner_name AS \"owner_name?\",\n                cards.owner_icon_url AS \"owner_icon_url?\",\n                cards.project_types AS \"project_types?: Vec<String>\",\n                cards.external_dependencies_count AS \"external_dependencies_count?\",\n            cards.scheduled_for AS \"scheduled_for?\"\n        FROM total LEFT JOIN cards ON true\n        ORDER BY CASE WHEN $6 THEN cards.sort_time END DESC NULLS LAST,\n            CASE WHEN NOT $6 THEN cards.sort_time END ASC NULLS LAST, cards.id ASC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total_count!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "id?",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "slug?",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "slug"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "name?",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "summary?",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "summary"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "icon_url?",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "icon_url"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "visibility?",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "visibility"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "in_review?",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "in_review"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "review_outcome?",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "review_outcome"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "queued?",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "queued"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "initial_queued?",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "initial_queued"
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "published?",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "published"
+          }
+        }
+      },
+      {
+        "ordinal": 12,
+        "name": "updated?",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "updated"
+          }
+        }
+      },
+      {
+        "ordinal": 13,
+        "name": "organization_id?",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "organization_id"
+          }
+        }
+      },
+      {
+        "ordinal": 14,
+        "name": "organization_name?",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "organizations",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 15,
+        "name": "organization_icon_url?",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "organizations",
+            "name": "icon_url"
+          }
+        }
+      },
+      {
+        "ordinal": 16,
+        "name": "owner_id?",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "team_members",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "ordinal": 17,
+        "name": "owner_name?",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "username"
+          }
+        }
+      },
+      {
+        "ordinal": 18,
+        "name": "owner_icon_url?",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "avatar_url"
+          }
+        }
+      },
+      {
+        "ordinal": 19,
+        "name": "project_types?: Vec<String>",
+        "type_info": "TextArray",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 20,
+        "name": "external_dependencies_count?",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 21,
+        "name": "scheduled_for?",
+        "type_info": "Timestamptz",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bool",
+        "TextArray",
+        "Text",
+        "TextArray",
+        "TextArray",
+        "Bool",
+        "Int8",
+        "Int8",
+        "Int8Array",
+        "TimestamptzArray"
+      ]
+    },
+    "nullable": [
+      null,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      true,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "2948e3d68532079ccc75f856da3c233e90c19ebe69aa6288ddaebb08a3e21190"
+}

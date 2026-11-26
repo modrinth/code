@@ -4,8 +4,8 @@ use crate::models::ids::{
     CollectionId, CopyrightArchiveId, FileId, ImageId, NotificationId,
     OAuthAccessTokenId, OAuthClientAuthorizationId, OAuthClientId,
     OAuthRedirectUriId, OrganizationId, PasskeyId, PatId, PayoutId, ProductId,
-    ProductPriceId, ProjectId, ReportId, SessionId, TeamId, TeamMemberId,
-    ThreadId, ThreadIssueFacetId, ThreadIssueId, ThreadMessageId,
+    ProductPriceId, ProjectFlagRuleId, ProjectId, ReportId, SessionId, TeamId,
+    TeamMemberId, ThreadId, ThreadIssueFacetId, ThreadIssueId, ThreadMessageId,
     UserSubscriptionId, VersionId,
 };
 use anyhow::{Context, Result, anyhow};
@@ -306,6 +306,11 @@ id_type!(DelphiReportIssueId as i64);
 id_type!(DelphiReportIssueDetailsId as i64);
 id_type!(DelphiRuleId as i64);
 id_type!(SharedInstanceId as i64);
-id_type!(ProjectFlagRuleId as i64);
+db_id_interface!(ProjectFlagRuleId);
 id_type!(ProjectFlagId as i64);
+generate_ids!(
+    generate_project_flag_id,
+    ProjectFlagId,
+    "SELECT EXISTS(SELECT 1 FROM project_flags WHERE id=$1)"
+);
 id_type!(ProjectFlagRunId as uuid::Uuid);
