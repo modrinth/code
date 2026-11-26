@@ -5567,8 +5567,8 @@
   "project.settings.review.moderator-issue": {
     "message": "Moderator issue"
   },
-  "project.settings.review.open-drawer": {
-    "message": "Open moderation drawer{count, plural, =0 {} one { (# checklist item remaining)} other { (# checklist items remaining)}}"
+  "project.settings.review.open-checklist": {
+    "message": "Open review checklist ({count, plural, one {# item remaining} other {# items remaining}})"
   },
   "project.settings.review.open-thread": {
     "message": "Open moderation thread"

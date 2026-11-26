@@ -229,6 +229,7 @@ const open = ref(false)
 const pinned = ref(false)
 const selectedView = ref<DrawerView>('moderation')
 const view = computed(() => (showChecklist.value ? selectedView.value : 'thread'))
+let openedFrom: DrawerView = 'moderation'
 const { data: disclosures } = useQuery(
 	computed(() => ({
 		...projectQueryOptions.disclosures(projectV3.value.id, client),
@@ -237,17 +238,13 @@ const { data: disclosures } = useQuery(
 )
 const anchor = ref<HTMLElement>()
 const teleportTarget = ref<HTMLElement>()
-const ownerDocument = computed(() => teleportTarget.value?.ownerDocument)
 onMounted(() => {
 	teleportTarget.value = anchor.value?.ownerDocument.body
 })
-const drawerArea = ref<HTMLElement>()
 const panel = ref<HTMLElement>()
 const launcher = ref<InstanceType<typeof OpenDrawerButton>>()
 const launcherElement = computed(() => launcher.value?.element)
-let closeOnPageHover = false
 watch([open, pinned], ([isOpen, isPinned]) => {
-	if (!isOpen) closeOnPageHover = false
 	emit('pinned', isOpen && isPinned)
 })
 const issues = computed(() =>
@@ -378,8 +375,9 @@ function onItemClick(event: MouseEvent, path: string | undefined, field?: string
 	void settingsNavigation.reveal(path.replace(/#.*$/, ''), field)
 }
 
-function show(target?: DrawerView) {
-	if (target) selectedView.value = target
+function show(target: DrawerView) {
+	if (!open.value) openedFrom = target
+	selectedView.value = target
 	open.value = true
 	nextTick(() => panel.value?.focus())
 }
@@ -400,21 +398,17 @@ function openPublishingDetails() {
 	}
 }
 
-function showOnHover() {
-	closeOnPageHover = true
-	open.value = true
-}
-
 function close() {
 	const focused = panel.value?.contains(panel.value.ownerDocument.activeElement)
 	open.value = false
-	if (focused) nextTick(() => launcherElement.value?.focus())
+	if (focused) nextTick(() => launcher.value?.focusTrigger(openedFrom))
 }
 watch(
 	() => route.query.moderation,
 	(value) => {
 		if (value) {
 			selectedView.value = value === 'thread' ? 'thread' : 'moderation'
+			if (!open.value) openedFrom = selectedView.value
 			open.value = true
 		}
 	},
@@ -428,25 +422,6 @@ watch(
 )
 const modalSelector = '[data-modal-root], [aria-modal="true"]'
 const popoverSelector = '[role="menu"], [data-popper-placement], .v-popper__inner'
-
-useEventListener<PointerEvent>(
-	ownerDocument,
-	'pointermove',
-	(event) => {
-		if (event.pointerType !== 'mouse' || !open.value || !drawerArea.value) return
-		if (event.composedPath().includes(drawerArea.value)) {
-			closeOnPageHover = true
-			return
-		}
-		if (!closeOnPageHover || pinned.value || ownerDocument.value?.querySelector(modalSelector))
-			return
-		if (event.clientX >= drawerArea.value.getBoundingClientRect().left) return
-		if ((event.target as Element | null)?.closest?.(popoverSelector)) return
-
-		close()
-	},
-	{ capture: true },
-)
 
 onClickOutside(
 	panel,
@@ -491,11 +466,9 @@ useEventListener('keydown', (event) => {
 			:state="publishingState"
 			:remaining="remaining"
 			:controls="settingsNavigation.moderationDrawerId"
-			@open="show()"
-			@hover="showOnHover"
+			@open="show"
 		/>
 		<div
-			ref="drawerArea"
 			class="fixed bottom-0 right-0 top-0 z-40 w-full"
 			:class="open ? 'pointer-events-auto' : 'pointer-events-none'"
 			:style="{ maxWidth: `${moderationDrawerWidth}px` }"

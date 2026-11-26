@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ListTodoIcon, MessagesSquareIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
+import { defineMessages, IconButton, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import {
@@ -10,19 +10,21 @@ import {
 	projectPublishingTones,
 } from '~/providers/project-publishing'
 
+type DrawerView = 'moderation' | 'thread'
+
 const props = defineProps<{
 	state: ProjectPublishingState
 	remaining: number
 	controls?: string
 }>()
-const emit = defineEmits<{ open: []; hover: [] }>()
+const emit = defineEmits<{ open: [target: DrawerView] }>()
 
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
-	openDrawer: {
-		id: 'project.settings.review.open-drawer',
+	openChecklist: {
+		id: 'project.settings.review.open-checklist',
 		defaultMessage:
-			'Open moderation drawer{count, plural, =0 {} one { (# checklist item remaining)} other { (# checklist items remaining)}}',
+			'Open review checklist ({count, plural, one {# item remaining} other {# items remaining}})',
 	},
 	openThread: {
 		id: 'project.settings.review.open-thread',
@@ -32,36 +34,43 @@ const messages = defineMessages({
 const launcherColor = computed(() => projectPublishingColors[projectPublishingTones[props.state]])
 const showChecklist = computed(() => isProjectChecklistVisible(props.state, props.remaining))
 
-const trigger = ref<HTMLButtonElement>()
+const element = ref<HTMLDivElement>()
+const checklistTrigger = ref<InstanceType<typeof IconButton>>()
+const threadTrigger = ref<InstanceType<typeof IconButton>>()
 
-function onPointerMove(event: PointerEvent) {
-	if (event.pointerType === 'mouse' && event.buttons === 0) emit('hover')
+function focusTrigger(target: DrawerView) {
+	const trigger = target === 'thread' || !showChecklist.value ? threadTrigger : checklistTrigger
+	trigger.value?.element?.focus()
 }
 
-defineExpose({ element: trigger })
+defineExpose({ element, focusTrigger })
 </script>
 
 <template>
-	<button
-		ref="trigger"
-		type="button"
-		class="drawer-launcher flex cursor-pointer flex-col rounded-l-2xl border border-r-0 border-solid p-1 shadow-lg transition-[filter] hover:brightness-110 focus-visible:outline focus-visible:outline-brand motion-reduce:transition-none"
+	<div
+		ref="element"
+		class="drawer-launcher flex flex-col rounded-l-2xl border border-r-0 border-solid p-1 shadow-lg"
 		:style="{ '--launcher-color': launcherColor ? `var(--color-${launcherColor})` : undefined }"
-		:aria-label="
-			showChecklist
-				? formatMessage(messages.openDrawer, { count: remaining })
-				: formatMessage(messages.openThread)
-		"
-		:aria-controls="controls"
-		:aria-expanded="controls ? false : undefined"
-		@pointermove="onPointerMove"
-		@click="emit('open')"
 	>
-		<span v-if="showChecklist" class="relative grid size-12 place-items-center" aria-hidden="true">
-			<ListTodoIcon class="size-6" />
+		<IconButton
+			v-if="showChecklist"
+			ref="checklistTrigger"
+			class="group/checklist-trigger"
+			type="quiet"
+			:color="launcherColor"
+			:interaction="launcherColor ? 'filled' : 'surface'"
+			size="xl"
+			:circular="false"
+			:label="formatMessage(messages.openChecklist, { count: remaining })"
+			:aria-controls="controls"
+			:aria-expanded="controls ? false : undefined"
+			@click="emit('open', 'moderation')"
+		>
+			<ListTodoIcon aria-hidden="true" />
 			<span
 				v-if="remaining > 0"
-				class="absolute right-0 top-0 flex aspect-square h-4 min-w-4 items-center justify-center rounded-full text-[10px] leading-none"
+				aria-hidden="true"
+				class="pointer-events-none absolute -right-0 -top-0 flex aspect-square h-4 min-w-4 items-center justify-center rounded-full text-[10px] leading-none group-hover/checklist-trigger:brightness-[115%]"
 				:class="
 					launcherColor
 						? 'bg-[--launcher-color] text-[var(--color-accent-contrast)]'
@@ -70,16 +79,27 @@ defineExpose({ element: trigger })
 			>
 				{{ remaining }}
 			</span>
-		</span>
-		<span class="grid size-12 place-items-center" aria-hidden="true">
-			<MessagesSquareIcon class="size-6" />
-		</span>
-	</button>
+		</IconButton>
+		<IconButton
+			ref="threadTrigger"
+			type="quiet"
+			:color="launcherColor"
+			:interaction="launcherColor ? 'filled' : 'surface'"
+			size="xl"
+			:circular="false"
+			:label="formatMessage(messages.openThread)"
+			:aria-controls="controls"
+			:aria-expanded="controls ? false : undefined"
+			@click="emit('open', 'thread')"
+		>
+			<MessagesSquareIcon aria-hidden="true" />
+		</IconButton>
+	</div>
 </template>
 
 <style scoped>
 .drawer-launcher {
-	color: var(--launcher-color, var(--color-contrast));
+	--hover-brightness: 1;
 	background-color: color-mix(
 		in srgb,
 		var(--launcher-color, var(--surface-2)) 14%,
