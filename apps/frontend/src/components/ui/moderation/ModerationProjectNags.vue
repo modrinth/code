@@ -135,7 +135,6 @@ import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
 import { nagDestinations, normalizeProjectNagKind, toProjectNag } from '@modrinth/moderation'
 import { Accordion, Button, IconButton } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
-import { isStaff } from '@modrinth/utils'
 import type { Component } from 'vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
@@ -154,6 +153,7 @@ interface Props {
 	validationNags?: Labrinth.Projects.v3.ProjectNag[]
 	validationLoading?: boolean
 	validationAvailable?: boolean
+	canBypassValidation?: boolean
 	submitProject: () => Promise<boolean>
 	currentMember?: Labrinth.Projects.v3.TeamMember | null
 	collapsed?: boolean
@@ -223,6 +223,7 @@ const props = withDefaults(defineProps<Props>(), {
 	validationNags: () => [],
 	validationLoading: false,
 	validationAvailable: true,
+	canBypassValidation: false,
 })
 
 const emit = defineEmits<{
@@ -364,9 +365,10 @@ const nagContext = computed<NagContext>(() => ({
 
 const canSubmitForReview = computed(() => {
 	return (
-		!props.validationLoading &&
-		props.validationAvailable &&
-		!props.validationNags.some((nag) => nag.severity === 'required')
+		props.canBypassValidation ||
+		(!props.validationLoading &&
+			props.validationAvailable &&
+			!props.validationNags.some((nag) => nag.severity === 'required'))
 	)
 })
 

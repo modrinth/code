@@ -14,6 +14,7 @@ use crate::routes::{v2_reroute, v3};
 use crate::search::SearchState;
 use crate::util::MinecraftMeta;
 use crate::util::kafka::KafkaClientState;
+use crate::util::temporal::TemporalClient;
 use actix_multipart::Multipart;
 use actix_web::web;
 use actix_web::web::Data;
@@ -165,6 +166,7 @@ pub async fn project_create(
     session_queue: Data<AuthQueue>,
     kafka_client: Data<KafkaClientState>,
     search_state: Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, CreateError> {
     // Convert V2 multipart payload to V3 multipart payload
     let redirect_client = client.clone();
@@ -317,6 +319,7 @@ pub async fn project_create(
         session_queue,
         kafka_client,
         search_state,
+        &temporal,
     )
     .await?;
 

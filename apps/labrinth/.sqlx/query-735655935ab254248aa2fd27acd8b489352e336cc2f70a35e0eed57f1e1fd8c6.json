@@ -1,0 +1,70 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT run_id AS \"run_id!\", COUNT(*) AS \"num_scanned!\",\n                COALESCE(SUM(num_flags), 0)::bigint AS \"num_flags!\",\n                COUNT(*) FILTER (WHERE NOT skipped AND error IS NULL AND num_flags > 0) AS \"num_flagged!\",\n                COUNT(*) FILTER (WHERE NOT skipped AND error IS NULL AND num_flags = 0) AS \"num_no_flags!\",\n                COUNT(*) FILTER (WHERE NOT skipped AND error IS NOT NULL) AS \"num_errors!\",\n                COUNT(*) FILTER (WHERE skipped) AS \"num_skipped!\"\n            FROM project_flag_run_results\n            WHERE run_id = ANY($1)\n            GROUP BY run_id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "run_id!",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "project_flag_run_results",
+            "name": "run_id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "num_scanned!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "num_flags!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 3,
+        "name": "num_flagged!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 4,
+        "name": "num_no_flags!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 5,
+        "name": "num_errors!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 6,
+        "name": "num_skipped!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "UuidArray"
+      ]
+    },
+    "nullable": [
+      true,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "735655935ab254248aa2fd27acd8b489352e336cc2f70a35e0eed57f1e1fd8c6"
+}

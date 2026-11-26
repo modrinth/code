@@ -400,6 +400,29 @@ services:
       # Gotenberg must send a message on a webhook to our backend,
       # so it must have access to our local network
       - 'host.docker.internal:host-gateway'
+  temporal:
+    image: temporalio/temporal:1.10.0
+    container_name: labrinth-temporal
+    user: '0:0'
+    command:
+      - server
+      - start-dev
+      - --ip
+      - 0.0.0.0
+      - --ui-port
+      - '8233'
+      - --db-filename
+      - /data/temporal.db
+    ports:
+      - '127.0.0.1:7233:7233'
+      - '127.0.0.1:8233:8233'
+    volumes:
+      - temporal-data:/data
+    healthcheck:
+      test: ['CMD', 'temporal', 'operator', 'cluster', 'health', '--address', '127.0.0.1:7233']
+      interval: 3s
+      timeout: 5s
+      retries: 10
   redpanda:
     image: redpandadata/redpanda:v26.1.10
     container_name: labrinth-redpanda
@@ -464,3 +487,4 @@ volumes:
   redis-data:
   redis-insight-data:
   redpanda-data:
+  temporal-data:

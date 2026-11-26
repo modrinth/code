@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) AS \"count!\" FROM project_flags WHERE project_id = $1 AND (active OR (what->>'retain_when_resolved')::bool = TRUE)",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "d57d6bd7e11c430fa267bcad9a4523f59cdfa2540d30604c3f958bafdc8896c1"
+}

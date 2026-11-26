@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT rules, modules FROM project_flag_rulesets WHERE id = $1\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "rules",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_flag_rulesets",
+            "name": "rules"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "modules",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_flag_rulesets",
+            "name": "modules"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "14221c0e5fe0bb220aa05e86546b4c6d87595735f3e56a1389188de3c1868f58"
+}

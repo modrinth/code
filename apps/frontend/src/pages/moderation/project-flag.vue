@@ -1,9 +1,44 @@
 <template>
 	<div class="flex flex-col gap-6">
+		<div class="universal-card flex flex-col gap-2 text-sm">
+			<p class="m-0 font-semibold text-contrast">
+				Staged changes do not affect live rules until deployed.
+			</p>
+			<p v-if="deploymentPending" role="status" class="m-0 text-secondary">
+				Loading live deployment…
+			</p>
+			<div v-else-if="deploymentError" role="alert" class="flex flex-wrap items-center gap-2">
+				<span class="text-red"
+					>Could not load live deployment: {{ errorMessage(deploymentError) }}</span
+				>
+				<Button :disabled="deploymentFetching" @click="refetchDeployment()">Try again</Button>
+			</div>
+			<p v-else-if="deployment" class="m-0 break-words text-secondary">
+				Live revision <code>{{ deployment.ruleset_id }}</code> · Deployed
+				{{ formatDate(deployment.deployed_at) }}
+				<template v-if="deployment.deployed_by">
+					by
+					<NuxtLink :to="`/user/${deployment.deployed_by}`" class="text-link">{{
+						deployment.deployed_by
+					}}</NuxtLink></template
+				>
+			</p>
+			<p v-else class="m-0 text-secondary">No rules deployed.</p>
+			<Button :disabled="isDeploying || isBusy || isEditing" @click="confirmStagingDeploy">
+				<LoaderCircleIcon v-if="isDeploying" class="animate-spin" />
+				{{ isDeploying ? 'Deploying…' : 'Deploy current staging' }}
+			</Button>
+			<p v-if="deployError" role="alert" class="m-0 text-red">
+				Could not deploy staging: {{ errorMessage(deployError) }}
+			</p>
+			<p v-if="deploySuccess" role="status" class="m-0 text-green">
+				Current staging deployed successfully.
+			</p>
+		</div>
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<NavTabs :links="tabs" query="tab" />
 			<Button
-				v-if="!showRuns"
+				v-if="showRules"
 				type="colored"
 				color="brand"
 				:disabled="isBusy || isEditing"
@@ -12,7 +47,7 @@
 				<PlusIcon />
 				Create rule
 			</Button>
-			<div v-else class="flex flex-wrap items-center gap-3">
+			<div v-else-if="showRuns" class="flex flex-wrap items-center gap-3">
 				<span
 					v-if="runsView && runsView.numScanning > 0"
 					role="status"
@@ -23,10 +58,10 @@
 					{{ runsView.numScanning === 1 ? 'project' : 'projects' }} scanning…
 					<span aria-hidden="true">·</span>
 					<span
-						title="Consumers assigned partitions of the project scan topic"
-						:class="{ 'text-red': runsView.numConsumers === 0 }"
+						title="Temporal activity workers that have polled recently; recently stopped workers may still appear"
+						:class="{ 'text-red': runsView.numWorkers === 0 }"
 					>
-						{{ runsView.numConsumers }} {{ runsView.numConsumers === 1 ? 'consumer' : 'consumers' }}
+						{{ runsView.numWorkers }} {{ runsView.numWorkers === 1 ? 'worker' : 'workers' }}
 					</span>
 				</span>
 				<Button
@@ -43,6 +78,7 @@
 		</div>
 
 		<ProjectFlagRuns v-if="showRuns" ref="runsView" />
+		<ProjectFlagModules v-if="showModules" />
 
 		<NewModal
 			ref="ruleModal"
@@ -85,7 +121,9 @@
 				</ProjectFlagInputSchema>
 				<ProjectFlagRuleTester
 					v-model:patterns="patterns"
+					v-model:decision-questions="decisionQuestions"
 					:pattern-errors="patternErrors"
+					:decision-questions-errors="decisionQuestionsErrors"
 					:expression="form.expression"
 					:disabled="isSaving"
 				/>
@@ -115,7 +153,7 @@
 		</NewModal>
 
 		<div
-			v-if="!showRuns && isPending"
+			v-if="showRules && isPending"
 			role="status"
 			class="universal-card flex items-center justify-center gap-2 py-8"
 		>
@@ -123,14 +161,14 @@
 			Loading project flag rules…
 		</div>
 		<div
-			v-else-if="!showRuns && isError"
+			v-else-if="showRules && isError"
 			role="alert"
 			class="universal-card flex flex-col items-start gap-3"
 		>
 			<p class="m-0 text-red">Could not load project flag rules: {{ errorMessage(error) }}</p>
 			<Button :disabled="isFetching" @click="refetch()">Try again</Button>
 		</div>
-		<template v-else-if="!showRuns">
+		<template v-else-if="showRules">
 			<div v-if="rules.length === 0" class="universal-card flex flex-col gap-2 py-8 text-center">
 				<h2 class="m-0 text-lg font-bold text-contrast">
 					{{ offset === 0 ? 'No project flag rules' : 'No rules on this page' }}
@@ -151,6 +189,18 @@
 				<div class="flex flex-wrap items-start justify-between gap-3">
 					<div class="min-w-0">
 						<h2 class="m-0 break-words text-lg font-bold text-contrast">{{ rule.name }}</h2>
+						<p
+							class="m-0 text-sm text-secondary"
+							title="Compares rule ID, name, and parameters, excluding audit metadata. Shared modules are excluded."
+						>
+							{{
+								rule.deployment_status === 'current'
+									? 'Deployed · current definition'
+									: rule.deployment_status === 'outdated'
+										? 'Outdated · definition differs from live'
+										: 'Not deployed'
+							}}
+						</p>
 						<p class="m-0 mt-1 text-sm text-secondary">
 							Created {{ formatDate(rule.created_at) }} · Updated {{ formatDate(rule.updated_at) }}
 						</p>
@@ -228,6 +278,7 @@
 
 <script setup lang="ts">
 import {
+	BoxIcon,
 	EditIcon,
 	HistoryIcon,
 	LoaderCircleIcon,
@@ -238,25 +289,58 @@ import {
 import { Button, injectModrinthClient, Input, NavTabs, NewModal } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
+import type { DecisionQuestionEntry } from '~/components/ui/moderation/project-flag/DecisionQuestionsEditor.vue'
 import type { FileScanPattern } from '~/components/ui/moderation/project-flag/FileScanPatternsEditor.vue'
 import ProjectFlagInputSchema from '~/components/ui/moderation/project-flag/ProjectFlagInputSchema.vue'
+import ProjectFlagModules from '~/components/ui/moderation/project-flag/ProjectFlagModules.vue'
 import ProjectFlagRuleTester from '~/components/ui/moderation/project-flag/ProjectFlagRuleTester.vue'
 import ProjectFlagRuns from '~/components/ui/moderation/project-flag/ProjectFlagRuns.vue'
 import RhaiExpressionEditor from '~/components/ui/moderation/project-flag/RhaiExpressionEditor.vue'
+import { projectFlagDeploymentQueryOptions } from '~/composables/queries/project-flag'
 
 useHead({ title: 'Project flag rules - Modrinth' })
 
 const route = useRoute()
 const showRuns = computed(() => route.query.tab === 'runs')
+const showModules = computed(() => route.query.tab === 'modules')
+const showRules = computed(() => !showRuns.value && !showModules.value)
 const runsView = useTemplateRef<InstanceType<typeof ProjectFlagRuns>>('runsView')
 const tabs = [
 	{ label: 'Rules', href: '', icon: TagCategoryFlagIcon },
 	{ label: 'Runs', href: 'runs', icon: HistoryIcon },
+	{ label: 'Modules', href: 'modules', icon: BoxIcon },
 ]
 
 const client = injectModrinthClient()
 const api = client.labrinth.project_flags_internal
 const queryClient = useQueryClient()
+const {
+	data: deployment,
+	isPending: deploymentPending,
+	error: deploymentError,
+	isFetching: deploymentFetching,
+	refetch: refetchDeployment,
+} = useQuery(projectFlagDeploymentQueryOptions(client))
+const {
+	mutate: deployStaging,
+	isPending: isDeploying,
+	error: deployError,
+	isSuccess: deploySuccess,
+} = useMutation({
+	mutationFn: () => api.deployStaging(),
+	retry: false,
+	onSuccess: async () => {
+		await queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag'] })
+	},
+})
+function confirmStagingDeploy() {
+	if (
+		window.confirm(
+			'Deploy all currently saved staging rules and shared modules to live? This includes additions, edits, and deletions, without running a test scan. Unsaved edits are not included.',
+		)
+	)
+		deployStaging()
+}
 type Rule = Awaited<ReturnType<typeof api.get>>
 
 const PAGE_SIZE = 25
@@ -265,7 +349,7 @@ const offset = ref(0)
 const { data, isPending, isError, error, isFetching, refetch } = useQuery({
 	queryKey: computed(() => [...queryKey, { limit: PAGE_SIZE + 1, offset: offset.value }]),
 	queryFn: () => api.list({ limit: PAGE_SIZE + 1, offset: offset.value }),
-	enabled: computed(() => !showRuns.value),
+	enabled: showRules,
 })
 const rules = computed(() => data.value?.slice(0, PAGE_SIZE) ?? [])
 const hasNextPage = computed(() => (data.value?.length ?? 0) > PAGE_SIZE)
@@ -279,9 +363,23 @@ if project.slug == "foo" {
 
 const ruleModal = useTemplateRef<InstanceType<typeof NewModal>>('ruleModal')
 const isEditing = ref(false)
-const editingId = ref<number | null>(null)
+const editingId = ref<string | null>(null)
 const form = reactive({ name: '', expression: '' })
 const patterns = ref<FileScanPattern[]>([])
+const decisionQuestions = ref<DecisionQuestionEntry[]>([])
+const decisionQuestionsErrors = computed(() => {
+	const keys = decisionQuestions.value.map((entry) => entry.key.trim())
+	return decisionQuestions.value.map((entry) => {
+		const key = entry.key.trim()
+		if (!key) return 'Enter a decision question key.'
+		if (keys.indexOf(key) !== keys.lastIndexOf(key)) {
+			return 'Each decision question key must be unique.'
+		}
+		if (!entry.question.trim()) return 'Enter a question.'
+		if (entry.include_context.length === 0) return 'Select at least one context field.'
+		return ''
+	})
+})
 const patternErrors = computed(() => {
 	const names = patterns.value.map((entry) => entry.name.trim())
 	return patterns.value.map((entry) => {
@@ -301,7 +399,8 @@ const isValid = computed(
 		Array.from(form.name).length <= 1023 &&
 		form.expression.length > 0 &&
 		Array.from(form.expression).length <= 65535 &&
-		patternErrors.value.every((error) => !error),
+		patternErrors.value.every((error) => !error) &&
+		decisionQuestionsErrors.value.every((error) => !error),
 )
 
 const {
@@ -315,7 +414,7 @@ const {
 		name,
 		params,
 	}: {
-		id: number | null
+		id: string | null
 		name: string
 		params: Rule['params']
 	}) => (id === null ? api.create({ name, params }) : api.update(id, { name, params })),
@@ -324,7 +423,7 @@ const {
 		await nextTick()
 		closeEditor()
 		if (id === null) offset.value = 0
-		await queryClient.invalidateQueries({ queryKey })
+		await queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag'] })
 	},
 })
 
@@ -334,13 +433,13 @@ const {
 	error: deleteError,
 	reset: resetDelete,
 } = useMutation({
-	mutationFn: (id: number) => api.delete(id),
+	mutationFn: (id: string) => api.delete(id),
 	onSuccess: async () => {
 		ruleToDelete.value = null
 		if (rules.value.length === 1 && offset.value > 0) {
 			offset.value = Math.max(0, offset.value - PAGE_SIZE)
 		}
-		await queryClient.invalidateQueries({ queryKey })
+		await queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag'] })
 	},
 })
 const isBusy = computed(() => isSaving.value || isDeleting.value)
@@ -352,6 +451,7 @@ function openCreate() {
 	form.name = ''
 	form.expression = DEFAULT_RULE
 	patterns.value = []
+	decisionQuestions.value = []
 	isEditing.value = true
 	ruleModal.value?.show()
 }
@@ -366,6 +466,13 @@ function openEdit(rule: Rule) {
 		name,
 		pattern,
 	}))
+	decisionQuestions.value = Object.entries(rule.params.decision_questions).map(
+		([key, { question, include_context }]) => ({
+			key,
+			question,
+			include_context: [...include_context],
+		}),
+	)
 	isEditing.value = true
 	ruleModal.value?.show()
 }
@@ -386,6 +493,12 @@ function saveRule() {
 		name: form.name,
 		params: {
 			expression: form.expression,
+			decision_questions: Object.fromEntries(
+				decisionQuestions.value.map((entry) => [
+					entry.key.trim(),
+					{ question: entry.question, include_context: [...entry.include_context] },
+				]),
+			),
 			scan_files_for: Object.fromEntries(
 				patterns.value.map((entry) => [entry.name.trim(), entry.pattern]),
 			),

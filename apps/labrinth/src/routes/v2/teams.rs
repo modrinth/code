@@ -8,6 +8,7 @@ use crate::models::v2::teams::LegacyTeamMember;
 use crate::queue::session::AuthQueue;
 use crate::routes::{ApiError, v2_reroute, v3};
 use crate::util::error::ApiContext as _;
+use crate::util::temporal::TemporalClient;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::UserId;
 use rust_decimal::Decimal;
@@ -277,6 +278,7 @@ pub async fn add_team_member(
     new_member: web::Json<NewTeamMember>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::teams::add_team_member(
@@ -293,6 +295,7 @@ pub async fn add_team_member(
         }),
         redis,
         session_queue,
+        &temporal,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -339,6 +342,7 @@ pub async fn edit_team_member(
     edit_member: web::Json<EditTeamMember>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::teams::edit_team_member(
@@ -354,6 +358,7 @@ pub async fn edit_team_member(
         }),
         redis,
         session_queue,
+        &temporal,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -395,6 +400,7 @@ pub async fn transfer_ownership(
     new_owner: web::Json<TransferOwnership>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::teams::transfer_ownership(
@@ -406,6 +412,7 @@ pub async fn transfer_ownership(
         }),
         redis,
         session_queue,
+        &temporal,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -441,9 +448,17 @@ pub async fn remove_team_member(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
-    v3::teams::remove_team_member(req, info, pool, redis, session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)
+    v3::teams::remove_team_member(
+        req,
+        info,
+        pool,
+        redis,
+        session_queue,
+        &temporal,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)
 }

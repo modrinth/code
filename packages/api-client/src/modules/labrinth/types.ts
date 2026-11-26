@@ -1048,6 +1048,10 @@ export namespace Labrinth {
 		}
 
 		export namespace v3 {
+			export type ProjectVisibility = 'public' | 'unlisted' | 'private'
+
+			export type ProjectReviewOutcome = 'never_reviewed' | 'approved' | 'rejected' | 'withheld'
+
 			export type ProjectType =
 				| 'mod'
 				| 'modpack'
@@ -1071,11 +1075,42 @@ export namespace Labrinth {
 			export type AutoApprovalCause =
 				| { kind: 'resubmission'; user_id: string }
 				| { kind: 'technical_review_no_details' }
+				| { kind: 'project_flags'; ruleset_id: string }
 				| { kind: 'scan_completed'; report_id: number; scan_id: string }
 				| { kind: 'rules_changed'; revision: number; user_id: string }
 				| { kind: 'moderator_technical_review_pass'; user_id: string }
 				| { kind: 'local_verdicts_updated'; user_id: string }
 				| { kind: 'global_verdicts_updated'; user_id: string }
+
+			export type ProjectDelta =
+				| { kind: 'created' }
+				| { kind: 'deleted' }
+				| { kind: 'auto_approval_cancelled' }
+				| { kind: 'change_visibility'; from: ProjectVisibility; to: ProjectVisibility }
+				| { kind: 'change_in_review'; from: boolean; to: boolean }
+				| {
+						kind: 'change_review_outcome'
+						from: ProjectReviewOutcome
+						to: ProjectReviewOutcome
+						reason: ReviewOutcomeReason | null
+				  }
+				| {
+						kind: 'auto_approval_scheduled'
+						provenance: ApprovalProvenance
+						scheduled_for: string
+				  }
+
+			export type ReviewOutcomeReason =
+				| { type: 'by_user'; reason: string | null }
+				| { type: 'auto'; provenance: ApprovalProvenance }
+
+			export type ProjectHistoryEntry = {
+				id: number
+				project_id: string
+				done_by: string | null
+				occurred_at: string
+				delta: ProjectDelta
+			}
 
 			export type ApprovalProvenance = {
 				trigger: AutoApprovalCause
@@ -2454,6 +2489,36 @@ export namespace Labrinth {
 
 	export namespace Moderation {
 		export namespace Internal {
+			export type AutoApprovalStatus = {
+				project_id: string | null
+				auto_approve_blocked: boolean
+				eligible: boolean
+				finished: boolean
+				deadline: string | null
+				phase: string
+			}
+			export type AutoApprovalQueueEntry = {
+				workflow_id: string
+				state: AutoApprovalStatus | null
+			}
+			export type AutoApprovalDiagnostics = {
+				workflow: AutoApprovalStatus | null
+				/** Current checks only, not evidence of a successful scan or inference run. */
+				can_auto_approve: boolean
+				eligible_by_checks: boolean
+				in_review: boolean
+				outstanding_technical_review: boolean
+				blockers: (
+					| 'not_in_review'
+					| 'required_nags'
+					| 'project_flags'
+					| 'outstanding_technical_review'
+					| 'unresolved_thread_issues'
+				)[]
+				required_nags: Projects.v3.ProjectNag[]
+				project_flags: { key: string; active: boolean; retain_when_resolved: boolean }[]
+				unresolved_thread_issues: { id: string; status: Threads.v3.ThreadIssueVerdict }[]
+			}
 			export type Ownership =
 				| {
 						kind: 'user'

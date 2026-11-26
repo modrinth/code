@@ -3,6 +3,10 @@
 		<p v-if="activityError" role="alert" class="m-0 text-red">
 			Could not load scan activity: {{ errorMessage(activityError) }}
 		</p>
+		<p class="m-0 text-sm text-secondary">
+			Runs are listed from Temporal and remain available for its configured history retention
+			period. Stored evaluation results and deployed rulesets outlive that history.
+		</p>
 		<p v-if="startError" role="alert" class="m-0 text-red">
 			Could not start the run: {{ errorMessage(startError) }}
 		</p>
@@ -40,22 +44,10 @@
 			</template>
 			<template #cell-status="{ row }">
 				<span class="inline-flex items-center gap-2"
-					><LoaderCircleIcon v-if="row.status !== 'done'" class="size-4 animate-spin" />{{
+					><LoaderCircleIcon v-if="isRunning(row.status)" class="size-4 animate-spin" />{{
 						formatStatus(row.status)
 					}}</span
 				>
-			</template>
-			<template #cell-applied_at="{ row }">
-				<div class="flex flex-col gap-1">
-					<span>{{ formatDate(row.applied_at) }}</span>
-					<NuxtLink
-						v-if="row.applied_by"
-						data-no-row-click
-						:to="`/user/${row.applied_by.id}`"
-						class="text-sm text-link"
-						>{{ row.applied_by.username }}</NuxtLink
-					>
-				</div>
 			</template>
 			<template #cell-view="{ row }">
 				<div class="flex items-center gap-2" data-no-row-click>
@@ -103,8 +95,9 @@
 					>?
 				</p>
 				<p class="m-0 text-secondary">
-					This permanently deletes the run, its results, and its inactive project flags. Active
-					flags are preserved and detached from the run. This cannot be undone.
+					This terminates any running execution and permanently deletes its Temporal history,
+					results, and unretained inactive project flags. Active and retained flags are preserved
+					and detached from the run. This cannot be undone.
 				</p>
 				<p v-if="deleteError" role="alert" class="m-0 text-red">
 					Could not delete the run: {{ errorMessage(deleteError) }}
@@ -125,13 +118,34 @@
 			</div>
 		</NewModal>
 
-		<NewModal ref="runModal" header="Project flag run" :on-hide="closeRun">
+		<NewModal
+			ref="runModal"
+			header="Project flag run"
+			:disable-close="isDeploying"
+			:on-hide="closeRun"
+		>
 			<div v-if="selectedRun" class="flex w-[64rem] max-w-full flex-col gap-4">
+				<p v-if="runDetailError" role="alert" class="m-0 text-red">
+					Could not refresh Temporal execution: {{ errorMessage(runDetailError) }}
+				</p>
+				<p v-if="historyUnavailable" role="status" class="m-0 text-secondary">
+					Temporal history is unavailable. Metadata below is from the last loaded snapshot, not a
+					current execution status. Stored results remain accessible, but this run cannot be
+					deployed.
+				</p>
 				<dl class="m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
 					<dt class="font-semibold text-contrast">Run ID</dt>
 					<dd class="m-0 break-all font-mono">{{ selectedRun.id }}</dd>
+					<dt class="font-semibold text-contrast">Tested revision</dt>
+					<dd class="m-0 break-all font-mono">{{ selectedRun.ruleset_id ?? 'Unavailable' }}</dd>
 					<dt class="font-semibold text-contrast">Status</dt>
-					<dd class="m-0">{{ formatStatus(selectedRun.status) }}</dd>
+					<dd class="m-0">
+						{{
+							historyUnavailable
+								? 'Unavailable (deleted or expired)'
+								: formatStatus(selectedRun.status)
+						}}
+					</dd>
 					<dt class="font-semibold text-contrast">Started by</dt>
 					<dd class="m-0">
 						<NuxtLink
@@ -146,22 +160,20 @@
 					<dd class="m-0">{{ formatDate(selectedRun.started_at) }}</dd>
 					<dt class="font-semibold text-contrast">Completed</dt>
 					<dd class="m-0">{{ formatDate(selectedRun.completed_at) }}</dd>
-					<dt class="font-semibold text-contrast">Applied</dt>
-					<dd class="m-0">{{ formatDate(selectedRun.applied_at) }}</dd>
-					<dt class="font-semibold text-contrast">Applied by</dt>
-					<dd class="m-0">
-						<NuxtLink
-							v-if="selectedRun.applied_by"
-							:to="`/user/${selectedRun.applied_by.id}`"
-							class="text-link"
-							>{{ selectedRun.applied_by.username }}</NuxtLink
-						>
-						<span v-else>—</span>
-					</dd>
-					<dt class="font-semibold text-contrast">Projects</dt>
+					<dt class="font-semibold text-contrast">Originally queued</dt>
 					<dd class="m-0">{{ selectedRun.total_projects }}</dd>
+					<dt class="font-semibold text-contrast">Completed (including skipped)</dt>
+					<dd class="m-0">{{ selectedRun.num_scanned }}</dd>
+					<dt class="font-semibold text-contrast">Flagged</dt>
+					<dd class="m-0">{{ selectedRun.num_flagged }}</dd>
+					<dt class="font-semibold text-contrast">Total flag violations</dt>
+					<dd class="m-0">{{ selectedRun.num_flags }}</dd>
+					<dt class="font-semibold text-contrast">Would be approved (no flags)</dt>
+					<dd class="m-0">{{ selectedRun.num_no_flags }}</dd>
 					<dt class="font-semibold text-contrast">Errors</dt>
 					<dd class="m-0">{{ selectedRun.num_errors }}</dd>
+					<dt class="font-semibold text-contrast">Skipped (deleted)</dt>
+					<dd class="m-0">{{ selectedRun.num_skipped }}</dd>
 				</dl>
 				<p
 					v-if="selectedRun.error !== null"
@@ -170,12 +182,55 @@
 				>
 					Run error: {{ selectedRun.error }}
 				</p>
-				<details v-if="selectedRun.output !== null">
-					<summary class="cursor-pointer font-semibold text-contrast">Run output</summary>
-					<pre class="max-h-64 overflow-auto whitespace-pre-wrap break-words text-sm">{{
-						json(selectedRun.output)
-					}}</pre>
-				</details>
+				<div
+					v-if="!historyUnavailable && selectedRun.status === 'completed'"
+					class="flex flex-col items-start gap-3"
+				>
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="!canDeploy || confirmingDeploy"
+						@click="confirmingDeploy = true"
+					>
+						{{ alreadyDeployed ? 'Rules already deployed' : 'Deploy rules' }}
+					</Button>
+					<p v-if="!selectedRun.ruleset_id" class="m-0 text-sm text-secondary">
+						This run has no tested revision to deploy.
+					</p>
+					<p v-if="deploymentError" role="alert" class="m-0 text-red">
+						Could not load deployment status: {{ errorMessage(deploymentError) }}
+					</p>
+					<div
+						v-if="confirmingDeploy"
+						role="group"
+						aria-label="Confirm rules deployment"
+						class="flex flex-col gap-3 rounded-lg border border-divider p-3"
+					>
+						<p class="m-0 break-words">
+							Deploy the exact rules and modules revision
+							<code>{{ selectedRun.ruleset_id }}</code> tested by this run? It becomes live for
+							project reconciliation, not the current staged edits.
+						</p>
+						<p class="m-0 text-secondary">
+							This does not apply this run’s results or change project statuses.
+						</p>
+						<p v-if="deployError" role="alert" class="m-0 text-red">
+							Could not deploy rules: {{ errorMessage(deployError) }}
+						</p>
+						<div class="flex justify-end gap-2">
+							<Button :disabled="isDeploying" @click="cancelDeploy">Cancel</Button>
+							<Button
+								type="colored"
+								color="brand"
+								:disabled="!canDeploy"
+								@click="deployRules(selectedRun.id)"
+							>
+								<LoaderCircleIcon v-if="isDeploying" class="animate-spin" />
+								{{ isDeploying ? 'Deploying…' : 'Deploy rules' }}
+							</Button>
+						</div>
+					</div>
+				</div>
 				<h2 class="m-0 text-lg font-semibold text-contrast">Project results</h2>
 				<p v-if="resultsPending" role="status" class="m-0 flex items-center gap-2">
 					<LoaderCircleIcon class="animate-spin" /> Loading project results…
@@ -211,8 +266,11 @@
 									<p class="m-0 break-all font-mono text-xs">{{ row.project.id }}</p>
 								</div>
 							</div>
-							<span class="ml-auto text-sm text-secondary"
-								>{{ row.flags.length }} {{ row.flags.length === 1 ? 'flag' : 'flags' }}</span
+							<span class="ml-auto text-sm font-semibold text-contrast">{{
+								formatProposedReviewOutcome(row.proposed_review_outcome)
+							}}</span>
+							<span class="text-sm text-secondary"
+								>{{ row.num_flags }} {{ row.num_flags === 1 ? 'violation' : 'violations' }}</span
 							>
 							<span v-if="row.error !== null" class="text-sm text-red">Error</span>
 						</summary>
@@ -227,16 +285,26 @@
 								>
 								<span class="text-secondary">Evaluated {{ formatDate(row.evaluated_at) }}</span>
 							</div>
-							<p v-if="row.flags.length === 0" class="m-0 text-secondary">No flags found.</p>
+							<p class="m-0 font-semibold text-contrast">
+								Preview: {{ formatProposedReviewOutcome(row.proposed_review_outcome) }}
+							</p>
+							<p v-if="row.num_flags === 0" class="m-0 text-secondary">No flags found.</p>
+							<p v-if="row.flags.some((entry) => !entry.flag.active)" class="m-0 text-secondary">
+								Resolved retained violations preserve their original evidence and still affect the
+								outcome.
+							</p>
 							<article
 								v-for="entry in row.flags"
-								:key="`${entry.ruleId}:${entry.index}`"
+								:key="entry.flag.key"
 								class="flex min-w-0 flex-col gap-2 rounded-lg bg-surface-3 p-3"
 							>
 								<div class="flex flex-wrap items-center justify-between gap-2">
 									<h3 class="m-0 break-all text-base font-semibold text-contrast">
 										{{ entry.flag.key }}
 									</h3>
+									<span class="text-sm font-semibold text-contrast">
+										{{ entry.flag.active ? 'Current' : 'Resolved · Retained' }}
+									</span>
 									<span class="break-all text-sm text-secondary">{{ entry.ruleName }}</span>
 								</div>
 								<div
@@ -286,7 +354,7 @@
 					</details>
 					<p v-if="resultRows.length === 0" class="p-6 text-center text-secondary">
 						{{
-							selectedRun.status !== 'done'
+							isRunning(selectedRun.status)
 								? 'No project results on this page yet. Results refresh automatically.'
 								: 'No project results on this page.'
 						}}
@@ -324,8 +392,18 @@ import { ChevronRightIcon, LoaderCircleIcon, TrashIcon } from '@modrinth/assets'
 import { Button, IconButton, injectModrinthClient, NewModal, Table } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
-const api = injectModrinthClient().labrinth.project_flags_internal
+import { projectFlagDeploymentQueryOptions } from '~/composables/queries/project-flag'
+
+const client = injectModrinthClient()
+const api = client.labrinth.project_flags_internal
+const deploymentOptions = projectFlagDeploymentQueryOptions(client)
+const {
+	data: deployment,
+	isPending: deploymentPending,
+	error: deploymentError,
+} = useQuery(deploymentOptions)
 type Run = Awaited<ReturnType<typeof api.listRuns>>[number]
+type RunResult = Awaited<ReturnType<typeof api.getRunResults>>['results'][number]
 const PAGE_SIZE = 25
 const REFRESH_INTERVAL = 10_000
 const offset = ref(0)
@@ -335,7 +413,7 @@ const { data: activity, error: activityError } = useQuery({
 	refetchInterval: REFRESH_INTERVAL,
 })
 const numScanning = computed(() => activity.value?.num_scanning ?? 0)
-const numConsumers = computed(() => activity.value?.num_consumers ?? 0)
+const numWorkers = computed(() => activity.value?.num_workers ?? 0)
 const queryClient = useQueryClient()
 const {
 	mutate: startRun,
@@ -347,6 +425,25 @@ const {
 	onSuccess: async () => {
 		offset.value = 0
 		await queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag', 'runs'] })
+	},
+})
+const confirmingDeploy = ref(false)
+const {
+	mutate: deployRules,
+	isPending: isDeploying,
+	error: deployError,
+	reset: resetDeploy,
+} = useMutation({
+	mutationFn: (id: string) => api.deployRun(id),
+	retry: false,
+	onSuccess: async (deployed) => {
+		queryClient.setQueryData(deploymentOptions.queryKey, deployed)
+		confirmingDeploy.value = false
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag', 'rules'] }),
+			queryClient.invalidateQueries({ queryKey: deploymentOptions.queryKey }),
+			queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag', 'runs'] }),
+		])
 	},
 })
 const selectedSnapshot = ref<Run | null>(null)
@@ -383,14 +480,50 @@ const { data, isPending, isError, error, isFetching, refetch } = useQuery({
 		{ limit: PAGE_SIZE + 1, offset: offset.value },
 	]),
 	queryFn: () => api.listRuns({ limit: PAGE_SIZE + 1, offset: offset.value }),
-	refetchInterval: (query) =>
-		query.state.data?.some((run) => run.status !== 'done') ? REFRESH_INTERVAL : false,
+	refetchInterval: REFRESH_INTERVAL,
 })
 const runs = computed(() => data.value?.slice(0, PAGE_SIZE) ?? [])
 const hasNextPage = computed(() => (data.value?.length ?? 0) > PAGE_SIZE)
+const { data: runDetail, error: runDetailError } = useQuery({
+	queryKey: computed(() => [
+		'moderation',
+		'project-flag',
+		'runs',
+		selectedSnapshot.value?.id,
+		'detail',
+	]),
+	queryFn: () => {
+		if (!selectedSnapshot.value) throw new Error('No run selected.')
+		return api.getRun(selectedSnapshot.value.id)
+	},
+	enabled: computed(() => selectedSnapshot.value !== null),
+	refetchInterval: REFRESH_INTERVAL,
+})
+const historyUnavailable = computed(() => runDetail.value === null)
 const selectedRun = computed(
-	() => data.value?.find((run) => run.id === selectedSnapshot.value?.id) ?? selectedSnapshot.value,
+	() =>
+		runDetail.value ??
+		data.value?.find((run) => run.id === selectedSnapshot.value?.id) ??
+		selectedSnapshot.value,
 )
+const alreadyDeployed = computed(
+	() =>
+		!!selectedRun.value?.ruleset_id &&
+		deployment.value?.ruleset_id === selectedRun.value.ruleset_id,
+)
+const canDeploy = computed(
+	() =>
+		!!runDetail.value &&
+		!historyUnavailable.value &&
+		!runDetailError.value &&
+		selectedRun.value?.status === 'completed' &&
+		!!selectedRun.value.ruleset_id &&
+		!alreadyDeployed.value &&
+		!deploymentPending.value &&
+		!deploymentError.value &&
+		!isDeploying.value,
+)
+
 const {
 	data: resultsData,
 	isPending: resultsPending,
@@ -416,21 +549,43 @@ const {
 	},
 	enabled: computed(() => selectedRun.value !== null),
 	refetchInterval: () =>
-		selectedRun.value && selectedRun.value.status !== 'done' ? REFRESH_INTERVAL : false,
+		selectedRun.value && !historyUnavailable.value && isRunning(selectedRun.value.status)
+			? REFRESH_INTERVAL
+			: false,
 })
+function formatProposedReviewOutcome(outcome: RunResult['proposed_review_outcome']): string {
+	switch (outcome) {
+		case 'approved':
+			return 'Would approve'
+		case 'withheld':
+			return 'Would withhold'
+		case 'rejected':
+			return 'Would reject'
+		case 'never_reviewed':
+			return 'Would mark as never reviewed'
+		case null:
+			return 'No proposed review outcome (may require manual review)'
+	}
+}
+
 const resultRows = computed(
 	() =>
 		resultsData.value?.results.map((result) => ({
 			...result,
+			error:
+				result.error?.replace(/^([A-Za-z0-9]+): /gm, (prefix, ruleId: string) => {
+					const rule = result.rules[ruleId]
+					return rule ? `${rule.name ?? 'Deleted rule'} (${ruleId}): ` : prefix
+				}) ?? null,
 			projectId: result.project.id,
-			flags: Object.entries(result.rules).flatMap(([ruleId, rule]) =>
-				rule.flags.map((flag, index) => ({
-					ruleId,
-					ruleName: rule.name ?? 'Deleted rule',
-					flag,
-					index,
-				})),
-			),
+			flags: result.effective_flags.map((flag) => ({
+				flag,
+				ruleName: flag.active
+					? (Object.values(result.rules).find((rule) =>
+							rule.flags.some((current) => current.key === flag.key),
+						)?.name ?? 'Deleted rule')
+					: 'Retained evidence',
+			})),
 			diagnostics: Object.entries(result.rules)
 				.filter(([, rule]) => rule.error !== null || rule.log.length > 0)
 				.map(([ruleId, rule]) => ({ ruleId, rule })),
@@ -444,20 +599,24 @@ const columns = [
 	{ key: 'started_at', label: 'Started' },
 	{ key: 'started_by', label: 'Started by' },
 	{ key: 'status', label: 'Status' },
-	{ key: 'total_projects', label: 'Projects' },
+	{ key: 'total_projects', label: 'Originally queued' },
+	{ key: 'num_scanned', label: 'Completed' },
+	{ key: 'num_flagged', label: 'Flagged' },
+	{ key: 'num_no_flags', label: 'No flags' },
 	{ key: 'num_errors', label: 'Errors' },
-	{ key: 'applied_at', label: 'Applied' },
+	{ key: 'num_skipped', label: 'Skipped' },
 	{ key: 'view', label: 'Actions', cellClass: 'whitespace-nowrap' },
 ]
 
 watch(
 	() => selectedRun.value?.status,
 	(status, previousStatus) => {
-		if (status === 'done' && previousStatus && previousStatus !== 'done') refetchResults()
+		if (status && !isRunning(status) && previousStatus && isRunning(previousStatus))
+			refetchResults()
 	},
 )
 
-defineExpose({ startRun, isStarting, numScanning, numConsumers })
+defineExpose({ startRun, isStarting, numScanning, numWorkers })
 
 function confirmDelete(run: Run) {
 	resetDelete()
@@ -470,19 +629,40 @@ function closeDelete() {
 	resetDelete()
 }
 
+function cancelDeploy() {
+	confirmingDeploy.value = false
+	resetDeploy()
+}
+
 function openRun(run: Run) {
+	cancelDeploy()
 	selectedSnapshot.value = run
 	resultsOffset.value = 0
 	runModal.value?.show()
 }
 
 function closeRun() {
+	cancelDeploy()
 	selectedSnapshot.value = null
 	resultsOffset.value = 0
 }
 
+function isRunning(status: Run['status']) {
+	return typeof status === 'object' && 'running' in status
+}
+
 function formatStatus(status: Run['status']) {
-	return status === 'done' ? 'Done' : 'Running'
+	if (typeof status === 'object') return `Running (${status.running.num_queued} queued)`
+	const labels = {
+		completed: 'Completed',
+		failed: 'Failed',
+		canceled: 'Canceled',
+		terminated: 'Terminated',
+		timed_out: 'Timed out',
+		continued_as_new: 'Continued as new',
+		unknown: 'Unknown',
+	}
+	return labels[status]
 }
 
 function formatDate(value: string | null) {
