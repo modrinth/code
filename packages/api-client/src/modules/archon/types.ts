@@ -419,6 +419,39 @@ export namespace Archon {
 				version: AddonVersion | null
 				owner: ContentOwner | null
 				icon_url: string | null
+				/** The content group the addon is in. */
+				group_id?: string | null
+			}
+
+			/** A named group of a world's addons of one kind. Addons reference their group with their `group_id`. */
+			export type WorldContentGroup = {
+				id: string
+				content_type: AddonKind
+				name: string
+			}
+
+			export type CreateWorldContentGroupRequest = {
+				content_type: AddonKind
+				name: string
+				/** The filenames of the addons to move into the group. */
+				filenames?: string[]
+			}
+
+			export type RenameWorldContentGroupRequest = {
+				name: string
+			}
+
+			export type SetWorldContentGroupOrderRequest = {
+				content_type: AddonKind
+				group_ids: string[]
+			}
+
+			export type SetWorldContentGroupMembershipsRequest = {
+				content_type: AddonKind
+				/** The filenames of the addons to move. */
+				filenames: string[]
+				/** The group to move the addons into, or `null` to take them out of their groups. */
+				group_id?: string | null
 			}
 
 			export type Addons = {
@@ -1508,6 +1541,8 @@ export namespace Archon {
 				owner: Archon.Content.v1.ContentOwner | null
 				has_update: string | null
 				icon_url: string | null
+				/** The content group the item is in. */
+				group_id?: string | null
 			}
 			export type WorldContentUpdateEvent = {
 				type: 'world.content.update'
@@ -1533,6 +1568,12 @@ export namespace Archon {
 				parent_directory: 'mods' | 'plugins' | 'datapacks' | 'resourcepacks' | 'shaderpacks'
 				filename: string
 				locked: boolean
+			}
+
+			export type WorldContentGroupsUpdateEvent = {
+				type: 'world.content.groups.update'
+				world_id: string
+				groups: Archon.Content.v1.WorldContentGroup[]
 			}
 
 			export type WorldSharedInstanceUpdateEvent = {
@@ -1571,6 +1612,7 @@ export namespace Archon {
 				| WorldContentUpdateEvent
 				| WorldContentFileSideEvent
 				| WorldContentFileSideLockEvent
+				| WorldContentGroupsUpdateEvent
 				| WorldSharedInstanceUpdateEvent
 				| WorldSharedInstanceDeleteEvent
 		}

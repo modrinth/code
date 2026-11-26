@@ -66,6 +66,114 @@ export class ArchonContentV1Module extends AbstractModule {
 		)
 	}
 
+	/** GET /v1/:server_id/worlds/:world_id/content/groups */
+	public async getContentGroups(
+		serverId: string,
+		worldId: string,
+	): Promise<Archon.Content.v1.WorldContentGroup[]> {
+		return this.client.request<Archon.Content.v1.WorldContentGroup[]>(
+			`/servers/${serverId}/worlds/${worldId}/content/groups`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
+	 * POST /v1/:server_id/worlds/:world_id/content/groups
+	 *
+	 * Creates the group at the top of its content type and moves the named addons into it.
+	 */
+	public async createContentGroup(
+		serverId: string,
+		worldId: string,
+		request: Archon.Content.v1.CreateWorldContentGroupRequest,
+	): Promise<Archon.Content.v1.WorldContentGroup> {
+		return this.client.request<Archon.Content.v1.WorldContentGroup>(
+			`/servers/${serverId}/worlds/${worldId}/content/groups`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+				body: request,
+			},
+		)
+	}
+
+	/** PATCH /v1/:server_id/worlds/:world_id/content/groups/:group_id */
+	public async renameContentGroup(
+		serverId: string,
+		worldId: string,
+		groupId: string,
+		request: Archon.Content.v1.RenameWorldContentGroupRequest,
+	): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/content/groups/${encodeURIComponent(groupId)}`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'PATCH',
+				body: request,
+			},
+		)
+	}
+
+	/**
+	 * DELETE /v1/:server_id/worlds/:world_id/content/groups/:group_id
+	 *
+	 * The addons in the group are taken out of it.
+	 */
+	public async deleteContentGroup(serverId: string, worldId: string, groupId: string): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/content/groups/${encodeURIComponent(groupId)}`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'DELETE',
+			},
+		)
+	}
+
+	/** PUT /v1/:server_id/worlds/:world_id/content/groups/order */
+	public async setContentGroupOrder(
+		serverId: string,
+		worldId: string,
+		request: Archon.Content.v1.SetWorldContentGroupOrderRequest,
+	): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/content/groups/order`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'PUT',
+				body: request,
+			},
+		)
+	}
+
+	/**
+	 * PUT /v1/:server_id/worlds/:world_id/content/groups/memberships
+	 *
+	 * Moves addons into a group, or out of their groups when `group_id` is absent.
+	 */
+	public async setContentGroupMemberships(
+		serverId: string,
+		worldId: string,
+		request: Archon.Content.v1.SetWorldContentGroupMembershipsRequest,
+	): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/content/groups/memberships`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'PUT',
+				body: request,
+			},
+		)
+	}
+
 	/** GET /v1/:server_id/worlds/:world_id/addons */
 	public async getAddons(
 		serverId: string,
