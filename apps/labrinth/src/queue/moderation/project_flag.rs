@@ -835,7 +835,9 @@ impl ProjectFlagEngine {
         approval_workflow: Option<&temporalio_client::Client>,
     ) -> Result<()> {
         crate::routes::v3::projects::mutation::apply_project_flag_reconciliation_after_delay(
-            context, result, ruleset_id, file_manifest_hash, pool, &self.redis, approval_due, approval_workflow,
+            context, result, ruleset_id, file_manifest_hash, pool, &self.redis,
+                        approval_due && self.scanner_config.auto_approve_enabled,
+                        approval_workflow, self.scanner_config.auto_withhold_enabled,
         ).await.map_err(|error| match error {
             crate::routes::ApiError::Internal(report) => report.context("applying project flag reconciliation"),
             error => anyhow!("applying project flag reconciliation: {error}"),

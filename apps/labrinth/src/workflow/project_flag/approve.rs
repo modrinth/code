@@ -468,6 +468,9 @@ impl ApprovalActivities {
         _ctx: ActivityContext,
         input: ApprovalSchedule,
     ) -> Result<bool, ActivityError> {
+        if !self.config.auto_approve_enabled {
+            return Ok(false);
+        }
         crate::routes::v3::projects::mutation::delayed_auto_approval_eligible(
             input.project_id.into(),
             &self.pool,
@@ -515,6 +518,9 @@ impl ApprovalActivities {
         &self,
         input: &ReconcileRulesInput,
     ) -> Result<bool, ActivityError> {
+        if !self.config.auto_approve_enabled {
+            return Ok(false);
+        }
         let eligible = crate::routes::v3::projects::mutation::delayed_auto_approval_eligible(
             input.project_id.into(),
             &self.pool,

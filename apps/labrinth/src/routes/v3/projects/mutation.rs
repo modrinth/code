@@ -971,6 +971,7 @@ async fn apply_project_flag_reconciliation(
         redis,
         false,
         None,
+        true,
     )
     .await
 }
@@ -984,6 +985,7 @@ pub(crate) async fn apply_project_flag_reconciliation_after_delay(
     redis: &RedisPool,
     approval_due: bool,
     approval_workflow: Option<&temporalio_client::Client>,
+    auto_withhold_enabled: bool,
 ) -> Result<(), ApiError> {
     use db_models::project_flag_item::ProjectFlag;
     use std::collections::BTreeMap;
@@ -1140,8 +1142,11 @@ pub(crate) async fn apply_project_flag_reconciliation_after_delay(
         &effective,
         false,
     );
-    let outcome =
-        desired.filter(|outcome| *outcome != ProjectReviewOutcome::Approved);
+    let outcome = desired.filter(|outcome| {
+        *outcome != ProjectReviewOutcome::Approved
+            && (*outcome != ProjectReviewOutcome::Withheld
+                || auto_withhold_enabled)
+    });
     if approval_due
         && desired == Some(ProjectReviewOutcome::Approved)
         && match approval_workflow {
@@ -1687,6 +1692,13 @@ mod tests {
                     rules.insert("test".into(), ProjectFlagRuleResult { flags: vec![flag], log: vec![], error: None });
                 }
                 let result = DBProjectFlagRunResult { run_id: None, project_id, rules, error: None, proposed_review_outcome: None };
+                if flag == Some("withheld") {
+                    apply_project_flag_reconciliation_after_delay(&context, &result, ruleset_id, manifest_hash, &env.db.pool, &env.db.redis_pool, false, None, false).await.unwrap();
+                    let retained = db_models::DBProject::get_id(project_id, &*env.db.ro_pool, &env.db.redis_pool).await.unwrap().unwrap();
+                    assert!(retained.inner.in_review);
+                    assert_eq!(retained.inner.review_outcome, initial);
+                    assert_eq!(db_models::DBProject::get_history(project_id, &env.db.ro_pool).await.unwrap().len(), history_before);
+                }
                 apply_project_flag_reconciliation(&context, &result, ruleset_id, manifest_hash, &env.db.pool, &env.db.redis_pool).await.unwrap();
                 let updated = db_models::DBProject::get_id(project_id, &*env.db.ro_pool, &env.db.redis_pool).await.unwrap().unwrap();
                 assert_eq!(updated.inner.review_outcome, expected);
@@ -1708,7 +1720,7 @@ mod tests {
                     assert!(pending.inner.in_review);
                     assert_eq!(pending.inner.review_outcome, initial);
                     assert_eq!(db_models::DBProject::get_history(project_id, &env.db.ro_pool).await.unwrap().len(), history_before);
-                    apply_project_flag_reconciliation_after_delay(&context, &result, ruleset_id, manifest_hash, &env.db.pool, &env.db.redis_pool, true, None).await.unwrap();
+                    apply_project_flag_reconciliation_after_delay(&context, &result, ruleset_id, manifest_hash, &env.db.pool, &env.db.redis_pool, true, None, true).await.unwrap();
                     let retained = db_models::DBProject::get_id(project_id, &*env.db.ro_pool, &env.db.redis_pool).await.unwrap().unwrap();
                     assert!(retained.inner.in_review);
                     assert_eq!(retained.inner.review_outcome, initial);
@@ -1725,7 +1737,7 @@ mod tests {
                     let mut context = context.clone();
                     context.project = project;
                     let result = DBProjectFlagRunResult { rules: BTreeMap::new(), ..result };
-                    apply_project_flag_reconciliation_after_delay(&context, &result, ruleset_id, manifest_hash, &env.db.pool, &env.db.redis_pool, true, None).await.unwrap();
+                    apply_project_flag_reconciliation_after_delay(&context, &result, ruleset_id, manifest_hash, &env.db.pool, &env.db.redis_pool, true, None, true).await.unwrap();
                     let retained = db_models::DBProject::get_id(project_id, &*env.db.ro_pool, &env.db.redis_pool).await.unwrap().unwrap();
                     assert!(retained.inner.in_review);
                     assert_eq!(retained.inner.review_outcome, initial);

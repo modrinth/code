@@ -26,6 +26,10 @@ impl Config {
 #[derive(Debug, Clone, Deserialize)]
 #[serde(default)]
 pub struct ProjectFlags {
+    /// Allow automatic approval after the configured delay and final checks.
+    pub auto_approve_enabled: bool,
+    /// Allow project flag rules to automatically withhold projects.
+    pub auto_withhold_enabled: bool,
     #[serde_as(as = "DurationSeconds<u64>")]
     pub auto_approve_min_delay: Duration,
     #[serde_as(as = "DurationSeconds<u64>")]
@@ -43,6 +47,8 @@ pub struct ProjectFlags {
 impl Default for ProjectFlags {
     fn default() -> Self {
         Self {
+            auto_approve_enabled: false,
+            auto_withhold_enabled: false,
             auto_approve_min_delay: Duration::ZERO,
             auto_approve_max_delay: Duration::ZERO,
             infer_decisions: None,
