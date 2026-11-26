@@ -78,20 +78,20 @@ function createProjectPublishingContext({
 			nags.value.filter((nag) => nag.severity === 'required').length +
 			issues.value.filter((issue) => issue.verdict === 'open').length,
 	)
+	const validationReady = computed(() =>
+		canSubmitProjectForReview(projectValidation.value, checking.value),
+	)
 	const canSubmit = computed(
 		() =>
 			!!project.value &&
 			!submitting.value &&
-			(canBypassValidation.value ||
-				canSubmitProjectForReview(projectValidation.value, checking.value)) &&
+			(canBypassValidation.value || validationReady.value) &&
 			(!rejected.value || canResubmitProjectForReview(thread.value)),
 	)
 	const state = computed<ProjectPublishingState>(() => {
 		const status = project.value?.status
 		if (!status) return 'unavailable'
 		if (rejected.value && (canSubmit.value || submitting.value)) return 'ready-to-resubmit'
-		if (status === 'draft' && (submitting.value || (canBypassValidation.value && canSubmit.value)))
-			return 'ready'
 		if (!projectValidation.value) return checking.value ? 'checking' : 'unavailable'
 		switch (status) {
 			case 'processing':
@@ -107,7 +107,7 @@ function createProjectPublishingContext({
 				return 'changes'
 		}
 		if (remaining.value) return 'todo'
-		if (status === 'draft') return canSubmit.value ? 'ready' : 'checking'
+		if (status === 'draft') return validationReady.value || submitting.value ? 'ready' : 'checking'
 		return 'unavailable'
 	})
 
