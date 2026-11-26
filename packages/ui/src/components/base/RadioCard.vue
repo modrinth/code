@@ -41,15 +41,14 @@ const checked = computed(() => props.modelValue === props.value)
 			@change="emit('update:modelValue', value)"
 		/>
 		<span
-			class="radio-card border-surface-4 bg-surface-2 peer-checked:border-brand peer-focus-visible:outline-brand box-border flex h-full flex-col gap-2 rounded-xl border border-solid p-3.5 transition-[border-color,background-color,filter] group-hover:peer-[:enabled:not(:checked)]:border-surface-4 group-hover:peer-[:enabled:not(:checked)]:brightness-125 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 motion-reduce:transition-none"
+			class="border-surface-5 bg-surface-4 peer-checked:border-brand peer-focus-visible:outline-brand box-border flex h-full flex-col gap-2 rounded-xl border border-solid p-3.5 transition-[border-color,filter] duration-150 ease-out group-hover:peer-[:enabled:not(:checked)]:brightness-125 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 motion-reduce:transition-none"
 		>
 			<span class="flex items-center gap-2">
 				<component
 					:is="icon"
 					v-if="icon"
 					aria-hidden="true"
-					class="size-4 shrink-0"
-					:class="checked ? 'text-brand' : 'text-secondary'"
+					class="text-secondary size-4 shrink-0"
 				/>
 				<span :id="`${id}-label`" class="text-contrast min-w-0 flex-1 text-sm font-semibold">{{
 					label
@@ -57,7 +56,7 @@ const checked = computed(() => props.modelValue === props.value)
 				<component
 					:is="checked ? RadioButtonCheckedIcon : RadioButtonIcon"
 					aria-hidden="true"
-					class="size-4 shrink-0"
+					class="size-5 shrink-0"
 					:class="checked ? 'text-brand' : 'text-secondary'"
 				/>
 			</span>
@@ -67,10 +66,3 @@ const checked = computed(() => props.modelValue === props.value)
 		</span>
 	</label>
 </template>
-
-<style scoped>
-.peer:checked + .radio-card {
-	border-color: var(--color-brand);
-	background-color: color-mix(in srgb, var(--color-brand) 8%, var(--surface-2));
-}
-</style>
