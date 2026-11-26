@@ -4,8 +4,8 @@ use std::{
     process::Stdio,
 };
 
-use async_trait::async_trait;
 use anyhow::{Context, Result, anyhow};
+use async_trait::async_trait;
 
 use crate::{
     SandboxCommand, SandboxExitStatus, SandboxStdio,
@@ -137,10 +137,7 @@ impl SandboxChildOp for StdChild {
         if self.child.try_wait()?.is_some() {
             return Ok(());
         }
-        self.child
-            .kill()
-            .await
-            .context("killing unsandboxed child")
+        self.child.kill().await.context("killing unsandboxed child")
     }
 }
 

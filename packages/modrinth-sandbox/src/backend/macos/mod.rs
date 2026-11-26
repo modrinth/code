@@ -5,9 +5,9 @@ use std::{
     sync::Arc,
 };
 
+use anyhow::{Context, Result};
 use async_trait::async_trait;
 use derive_more::Debug;
-use anyhow::{Context, Result};
 
 use crate::{
     ExposedPath, SandboxCommand, SandboxExitStatus,

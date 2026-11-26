@@ -4,13 +4,13 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:8.3.0")
+        classpath("com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.2.2")
     }
 }
 
 plugins {
     id "java"
-    id "com.gradleup.shadow" version "8.3.0"
+    id "com.gradleup.shadow" version "9.2.2"
 }
 
 group = "com.modrinth"

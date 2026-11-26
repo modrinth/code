@@ -5,7 +5,7 @@ use std::{
     path::{Component, Path, PathBuf},
 };
 
-use anyhow::{Result, Context, ensure};
+use anyhow::{Context, Result, ensure};
 use uuid::Uuid;
 use windows::Win32::{
     Foundation::{GENERIC_WRITE, HANDLE},
@@ -63,8 +63,7 @@ pub fn link_into_sandbox_home(
         if let Err(err) = fs::create_dir(&directory)
             && err.kind() != ErrorKind::AlreadyExists
         {
-            return Err(err)
-                .with_context(|| format!("creating {directory:?}"));
+            return Err(err).with_context(|| format!("creating {directory:?}"));
         }
     }
 

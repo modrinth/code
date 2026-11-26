@@ -4,7 +4,7 @@ use std::{
     path::PathBuf,
 };
 
-use anyhow::{Result, Context, ensure};
+use anyhow::{Context, Result, ensure};
 use modrinth_sandbox::{SandboxArg, SandboxCommand, SandboxEnv, SandboxStdio};
 use tracing::info;
 

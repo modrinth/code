@@ -17,7 +17,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use anyhow::{Result, Context, ensure, anyhow};
+use anyhow::{Context, Result, anyhow, ensure};
 use tracing::{debug, error, warn};
 use windows::{
     Win32::{

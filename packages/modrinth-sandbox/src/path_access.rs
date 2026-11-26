@@ -1,6 +1,6 @@
 use std::path::{Component, Path, PathBuf};
 
-use anyhow::{Result, bail, anyhow};
+use anyhow::{Result, anyhow, bail};
 
 /// Types which Windows or a common runtime executes, installs or imports when
 /// they are opened.

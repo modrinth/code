@@ -119,9 +119,8 @@ impl FileSharing {
             Err(errno) => {
                 let io_error =
                     std::io::Error::from_raw_os_error(errno.raw_os_error());
-                return Err(
-                    anyhow!("unable to open parent directory").context(io_error)
-                );
+                return Err(anyhow!("unable to open parent directory")
+                    .context(io_error));
             }
         };
 
@@ -130,9 +129,8 @@ impl FileSharing {
             Err(errno) => {
                 let io_error =
                     std::io::Error::from_raw_os_error(errno.raw_os_error());
-                return Err(
-                    anyhow!("unable to stat parent directory").context(io_error)
-                );
+                return Err(anyhow!("unable to stat parent directory")
+                    .context(io_error));
             }
         };
         let child_stat = match rustix::fs::statat(
@@ -147,7 +145,9 @@ impl FileSharing {
                 } else {
                     let io_error =
                         std::io::Error::from_raw_os_error(errno.raw_os_error());
-                    return Err(anyhow!("unable to stat file").context(io_error));
+                    return Err(
+                        anyhow!("unable to stat file").context(io_error)
+                    );
                 }
             }
         };

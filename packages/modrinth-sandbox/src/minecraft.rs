@@ -288,7 +288,9 @@ pub async fn setup_minecraft_command(
     minecraft: MinecraftCommand,
 ) -> Result<SandboxCommand> {
     let Ok(instance_path) = minecraft.instance_path.canonicalize() else {
-        return Err(anyhow::anyhow!("Instance path could not be canonicalized"));
+        return Err(anyhow::anyhow!(
+            "Instance path could not be canonicalized"
+        ));
     };
 
     let java_path = {
@@ -391,10 +393,10 @@ pub async fn setup_minecraft_command(
         const BYTES: &[u8] =
             include_bytes!(concat!(env!("OUT_DIR"), "/SandboxAgent.jar"));
 
-        let launcher_files_dir =
-            minecraft.launcher_files_dir.clone().context(
-                "launcher_files_dir must be set to use the sandbox API",
-            )?;
+        let launcher_files_dir = minecraft
+            .launcher_files_dir
+            .clone()
+            .context("launcher_files_dir must be set to use the sandbox API")?;
         let sandbox_agent_path = tokio::task::spawn_blocking(move || {
             create_launcher_jar(
                 &launcher_files_dir,

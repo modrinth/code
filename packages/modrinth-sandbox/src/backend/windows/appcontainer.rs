@@ -73,9 +73,9 @@ use windows::{
     core::{HRESULT, PCWSTR, PWSTR},
 };
 
+use anyhow::{Context, Result, anyhow, bail, ensure};
 use async_trait::async_trait;
 use derive_more::Debug;
-use anyhow::{Context, Result, bail, ensure, anyhow};
 use parking_lot::Mutex;
 use uuid::Uuid;
 
@@ -339,8 +339,9 @@ fn spawn(
     }
     for path in path_set.iter_read_write() {
         instance_grants.extend(
-            Grant::from_path(path, PermissionType::Write)
-                .with_context(|| anyhow!("creating write grant for {path:?}"))?,
+            Grant::from_path(path, PermissionType::Write).with_context(
+                || anyhow!("creating write grant for {path:?}"),
+            )?,
         );
     }
     for path in parents {

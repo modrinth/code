@@ -7,9 +7,9 @@ use std::{
     sync::Arc,
 };
 
+use anyhow::{Context, Result, anyhow, bail};
 use async_trait::async_trait;
 use derive_more::Debug;
-use anyhow::{Context, Result, anyhow, bail};
 use libseccomp::{
     ScmpAction, ScmpArgCompare, ScmpCompareOp, ScmpFilterContext, ScmpSyscall,
 };

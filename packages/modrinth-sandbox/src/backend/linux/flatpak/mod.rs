@@ -8,9 +8,9 @@ use std::{
     sync::Arc,
 };
 
+use anyhow::{Context, Result, anyhow, bail, ensure};
 use async_trait::async_trait;
 use derive_more::Debug;
-use anyhow::{Context, Result, bail, ensure, anyhow};
 use futures::{StreamExt, TryStreamExt, stream::FuturesUnordered};
 use libc::SIGKILL;
 use tokio::{fs, sync::oneshot};
@@ -217,8 +217,9 @@ async fn spawn(
             {
                 return anyhow::Ok(None);
             }
-            let file = file_result
-                .with_context(|| anyhow!("opening file {path:?} for writing"))?;
+            let file = file_result.with_context(|| {
+                anyhow!("opening file {path:?} for writing")
+            })?;
             let file = file.into_std().await;
             let fd = OwnedFd::from(file);
             let fd = zbus::OwnedFd::from(fd);
@@ -242,8 +243,9 @@ async fn spawn(
             {
                 return anyhow::Ok(None);
             }
-            let file = file_result
-                .with_context(|| anyhow!("opening file {path:?} for reading"))?;
+            let file = file_result.with_context(|| {
+                anyhow!("opening file {path:?} for reading")
+            })?;
             let file = file.into_std().await;
             let fd = OwnedFd::from(file);
             let fd = zbus::OwnedFd::from(fd);

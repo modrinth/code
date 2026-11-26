@@ -4,7 +4,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use anyhow::{Result, Context, anyhow};
+use anyhow::{Context, Result, anyhow};
 
 use crate::{SandboxStdio, backend::unix, util::SandboxArg};
 

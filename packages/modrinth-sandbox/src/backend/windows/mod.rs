@@ -8,8 +8,8 @@ use std::{
     path::PathBuf,
 };
 
+use anyhow::{Context, Result, anyhow};
 use async_trait::async_trait;
-use anyhow::{Result, Context, anyhow};
 use windows::{
     Win32::{
         Foundation::{
