@@ -356,11 +356,16 @@ impl ProcessManager {
                     process.child.wait().await.ok()
                 }
             };
+            let mut readers =
+                output_readers.into_iter().flatten().collect::<Vec<_>>();
             let _ = tokio::time::timeout(
                 OUTPUT_DRAIN_TIMEOUT,
-                futures::future::join_all(output_readers.into_iter().flatten()),
+                futures::future::join_all(readers.iter_mut()),
             )
             .await;
+            for reader in &readers {
+                reader.abort();
+            }
             if let Some(status) = exit_status
                 && let Err(e) = Process::append_to_log_file(
                     &log_path,
