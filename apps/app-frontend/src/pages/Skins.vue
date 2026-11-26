@@ -33,7 +33,6 @@ import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
 import { injectMinecraftAccounts } from '@/features/minecraft-accounts/context'
 import { deleteLegacySkinPreviewStorage } from '@/features/skins/legacy-preview-storage'
-import { trackEvent } from '@/helpers/analytics'
 import { check_reachable, get_default_user, login as login_flow, users } from '@/helpers/auth'
 import { listenNativeDragDrop, type NativeDragDropEvent } from '@/helpers/native-drag-drop'
 import type { Cape, Skin, SkinTextureUrl } from '@/helpers/skins.ts'
@@ -826,7 +825,6 @@ async function login() {
 		await minecraftAccounts.value.refreshValues()
 	}
 
-	trackEvent('AccountLogIn')
 	minecraftAccounts.value?.setLoginDisabled(false)
 }
 

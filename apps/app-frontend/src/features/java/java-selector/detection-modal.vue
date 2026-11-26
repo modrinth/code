@@ -12,7 +12,6 @@ import {
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
-import { trackEvent } from '@/helpers/analytics'
 import type { JavaVersion } from '@/platform/app-lib/jre/types'
 
 import { detectedJresQueryOptions } from '../queries'
@@ -54,7 +53,6 @@ function show(javaVersion: number | null, current?: Partial<JavaVersion> | null)
 function select(jre: JavaVersion) {
 	emit('submit', jre)
 	modal.value?.hide()
-	trackEvent('JavaAutoDetect', { path: jre.path, version: jre.version })
 }
 
 defineExpose({ show })

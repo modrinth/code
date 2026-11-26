@@ -2,7 +2,6 @@ use std::fmt;
 use std::sync::Arc;
 use std::time::Duration;
 
-use arc_swap::ArcSwap;
 use chrono::Utc;
 use parking_lot::Mutex;
 use reqwest::Url;
@@ -33,30 +32,27 @@ impl AppAnalytics {
     pub async fn new(
         AppAnalyticsParameters {
             push_url,
-            opted_out,
-            user_agent,
             installation_id,
+            user_agent,
             os,
             arch,
             app_version,
         }: AppAnalyticsParameters,
     ) -> AppAnalytics {
-        assert_installation_id(installation_id);
+        let backend = match installation_id {
+            Some(installation_id) => {
+                enabled_backend(&user_agent, installation_id)
+            }
+            None => AnalyticsBackend::OptedOut,
+        };
 
         let (drain_tx, drain_rx) = mpsc::unbounded_channel();
 
         let this = AppAnalytics {
             inner: Arc::new(AnalyticsInner {
-                backend: Mutex::new(if opted_out {
-                    AnalyticsBackend::OptedOut
-                } else {
-                    AnalyticsBackend::Enabled {
-                        http_pool: init_pool(&user_agent),
-                    }
-                }),
+                backend: Mutex::new(backend),
                 user_agent,
                 push_url,
-                installation_id: ArcSwap::from_pointee(installation_id),
                 queue: EventQueue::new(),
                 os,
                 arch,
@@ -105,30 +101,53 @@ impl AppAnalytics {
         matches!(tokio::time::timeout(timeout, rx).await, Ok(Ok(true)))
     }
 
-    pub fn set_telemetry_opt_out(&self, opted_out: bool) {
-        if opted_out {
-            // drops the http_pool and closes connections to the analytics server
-            *self.inner.backend.lock() = AnalyticsBackend::OptedOut;
-            self.inner.queue.clear();
-        } else {
-            *self.inner.backend.lock() = AnalyticsBackend::Enabled {
-                http_pool: init_pool(&self.inner.user_agent),
-            };
-        }
-    }
-
-    /// Replaces the installation ID sent with every future batch.
+    /// Starts recording and sending events under `installation_id`, or
+    /// switches to it if already opted in.
     ///
-    /// Events still queued are dropped, so none recorded under the old ID
+    /// Events still queued are dropped, so none recorded under a previous ID
     /// are sent under the new one.
     ///
     /// # Panics
     ///
     /// Panics if `installation_id` is not a UUIDv4.
-    pub fn set_installation_id(&self, installation_id: Uuid) {
-        assert_installation_id(installation_id);
-        self.inner.installation_id.store(Arc::new(installation_id));
+    pub fn opt_in(&self, installation_id: Uuid) {
+        let mut backend = self.inner.backend.lock();
+        match &mut *backend {
+            AnalyticsBackend::Enabled {
+                installation_id: current,
+                ..
+            } => {
+                assert_installation_id(installation_id);
+                *current = installation_id;
+            }
+            AnalyticsBackend::OptedOut => {
+                *backend =
+                    enabled_backend(&self.inner.user_agent, installation_id);
+            }
+        }
         self.inner.queue.clear();
+    }
+
+    /// Stops recording events, drops the queued ones and forgets the
+    /// installation ID.
+    pub fn opt_out(&self) {
+        // drops the http_pool and closes connections to the analytics server
+        *self.inner.backend.lock() = AnalyticsBackend::OptedOut;
+        self.inner.queue.clear();
+    }
+}
+
+/// # Panics
+///
+/// Panics if `installation_id` is not a UUIDv4.
+fn enabled_backend(
+    user_agent: &str,
+    installation_id: Uuid,
+) -> AnalyticsBackend {
+    assert_installation_id(installation_id);
+    AnalyticsBackend::Enabled {
+        http_pool: init_pool(user_agent),
+        installation_id,
     }
 }
 
@@ -145,16 +164,15 @@ impl fmt::Debug for AppAnalytics {
         f.debug_struct("AppAnalytics")
             .field("push_url", &self.inner.push_url)
             .field("backend", &self.inner.backend)
-            .field("installation_id", &**self.inner.installation_id.load())
             .finish()
     }
 }
 
 pub struct AppAnalyticsParameters {
     pub push_url: Url,
-    pub opted_out: bool,
+    /// UUIDv4 identifying this installation, or `None` to start opted out.
+    pub installation_id: Option<Uuid>,
     pub user_agent: String,
-    pub installation_id: Uuid,
     pub os: AppOs,
     pub arch: AppArch,
     pub app_version: SmolStr,
@@ -166,7 +184,6 @@ pub(crate) struct AnalyticsInner {
     backend: Mutex<AnalyticsBackend>,
     pub(crate) queue: EventQueue,
     user_agent: String,
-    installation_id: ArcSwap<Uuid>,
     os: AppOs,
     arch: AppArch,
     app_version: SmolStr,
@@ -185,13 +202,13 @@ impl AnalyticsInner {
             "events len must be at most {MAX_EVENTS_PER_BATCH}"
         );
 
-        let Some(pool) = self.backend.lock().clone_pool() else {
+        let Some((pool, installation_id)) = self.backend.lock().sender() else {
             return Ok(());
         };
 
         let batch = AppEventBatch {
             sent_at: Utc::now(),
-            installation_id: **self.installation_id.load(),
+            installation_id,
             os: self.os,
             arch: self.arch,
             app_version: self.app_version.clone(), // should be cheap

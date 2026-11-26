@@ -8445,7 +8445,6 @@ dependencies = [
 name = "modrinth-app-analytics-sdk"
 version = "0.0.0"
 dependencies = [
- "arc-swap",
  "chrono",
  "modrinth-app-analytics-types",
  "parking_lot",

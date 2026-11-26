@@ -5,10 +5,13 @@ use url::Url;
 use uuid::Uuid;
 
 /// Endpoint the app sends batches of analytics events to.
-const PUSH_URL: &str =
-    concat!(env!("MODRINTH_API_BASE_URL"), "analytics/app-events");
+//const PUSH_URL: &str = concat!(env!("MODRINTH_API_BASE_URL"), "analytics/app-events");
+const PUSH_URL: &str = "http://localhost:8003/app-events";
 
 /// Starts the analytics client, opted out when `telemetry` is disabled.
+///
+/// The stored installation ID is created when `telemetry` is enabled and
+/// deleted when it is disabled, on every platform.
 ///
 /// Returns `None` when the app runs on an OS or CPU architecture analytics
 /// events can't describe, or when the client can't be set up. Analytics never
@@ -17,6 +20,14 @@ pub(crate) async fn init(
     pool: &SqlitePool,
     telemetry: bool,
 ) -> Option<AppAnalytics> {
+    let installation_id = match sync_installation_id(pool, telemetry).await {
+        Ok(installation_id) => installation_id,
+        Err(error) => {
+            tracing::warn!("Failed to set up analytics: {error}");
+            return None;
+        }
+    };
+
     let (Some(os), Some(arch)) = (AppOs::current(), AppArch::current()) else {
         tracing::info!(
             os = std::env::consts::OS,
@@ -29,9 +40,8 @@ pub(crate) async fn init(
     let params = async {
         crate::Result::Ok(AppAnalyticsParameters {
             push_url: Url::parse(PUSH_URL)?,
-            opted_out: !telemetry,
+            installation_id,
             user_agent: crate::launcher_user_agent(),
-            installation_id: installation_id(pool).await?,
             os,
             arch,
             app_version: env!("CARGO_PKG_VERSION").into(),
@@ -70,10 +80,39 @@ pub(crate) async fn reset_installation_id(
     Ok(new_id)
 }
 
-/// Returns this installation's analytics ID, creating it on first use.
+/// Creates the installation ID if `telemetry` is enabled, or deletes it if
+/// not, and returns the ID that now exists.
+pub(crate) async fn sync_installation_id(
+    pool: &SqlitePool,
+    telemetry: bool,
+) -> crate::Result<Option<Uuid>> {
+    if telemetry {
+        get_or_create_installation_id(pool).await.map(Some)
+    } else {
+        delete_installation_id(pool).await?;
+        Ok(None)
+    }
+}
+
+async fn delete_installation_id(pool: &SqlitePool) -> crate::Result<()> {
+    sqlx::query!(
+        "
+        DELETE FROM app_analytics
+        WHERE id = 0
+        ",
+    )
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+
+/// Returns this installation's analytics ID, creating it if there is none.
 ///
 /// The ID is a UUIDv4. A stored ID that isn't one is replaced.
-async fn installation_id(pool: &SqlitePool) -> crate::Result<Uuid> {
+async fn get_or_create_installation_id(
+    pool: &SqlitePool,
+) -> crate::Result<Uuid> {
     let new_id = Uuid::new_v4();
     let new_id_str = new_id.to_string();
 

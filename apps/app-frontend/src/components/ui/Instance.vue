@@ -21,7 +21,6 @@ import { useRouter } from 'vue-router'
 
 import { useAppEvent } from '@/composables/use-app-event'
 import { handleSevereError } from '@/composables/use-error.js'
-import { trackEvent } from '@/helpers/analytics'
 import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
 import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
@@ -81,33 +80,21 @@ const checkProcess = async () => {
 	playing.value = runningProcesses.length > 0
 }
 
-const play = async (e, context) => {
+const play = async (e) => {
 	e?.stopPropagation()
 	if (props.instance.launch_blocked || installing.value || modLoading.value) return
 	loading.value = true
-	await run(props.instance.id)
-		.catch((err) => handleSevereError(err, { instanceId: props.instance.id }))
-		.finally(() => {
-			trackEvent('InstanceStart', {
-				loader: props.instance.loader,
-				game_version: props.instance.game_version,
-				source: context,
-			})
-		})
+	await run(props.instance.id).catch((err) =>
+		handleSevereError(err, { instanceId: props.instance.id }),
+	)
 	loading.value = false
 }
 
-const stop = async (e, context) => {
+const stop = async (e) => {
 	e?.stopPropagation()
 	playing.value = false
 
 	await kill(props.instance.id).catch(handleError)
-
-	trackEvent('InstanceStop', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
-		source: context,
-	})
 }
 
 const repair = async (e) => {
@@ -192,7 +179,7 @@ onMounted(() => {
 					color="red"
 					:label="formatMessage(messages.stop)"
 					@mouseenter="checkProcess"
-					@click="(e) => stop(e, 'InstanceCard')"
+					@click="(e) => stop(e)"
 				>
 					<StopCircleIcon />
 				</IconButton>
@@ -210,7 +197,7 @@ onMounted(() => {
 					:type="first ? 'colored' : 'base'"
 					:color="first ? 'brand' : undefined"
 					:label="formatMessage(messages.play)"
-					@click="(e) => play(e, 'InstanceCard')"
+					@click="(e) => play(e)"
 					@mouseenter="checkProcess"
 				>
 					<!-- Translate for optical centering -->
@@ -257,7 +244,7 @@ onMounted(() => {
 						:label="formatMessage(messages.stop)"
 						:class="{ 'scale-100 opacity-100': playing }"
 						class="transition-all scale-75 origin-bottom opacity-0 card-shadow"
-						@click="(e) => stop(e, 'InstanceCard')"
+						@click="(e) => stop(e)"
 						@mouseenter="checkProcess"
 					>
 						<StopCircleIcon />
@@ -288,7 +275,7 @@ onMounted(() => {
 						size="xl"
 						:label="formatMessage(messages.play)"
 						class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
-						@click="(e) => play(e, 'InstanceCard')"
+						@click="(e) => play(e)"
 						@mouseenter="checkProcess"
 					>
 						<PlayIcon class="translate-x-[2px]" />

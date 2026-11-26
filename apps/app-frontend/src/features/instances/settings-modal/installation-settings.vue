@@ -17,7 +17,6 @@ import { computed, ref } from 'vue'
 
 import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache'
 import {
 	install_existing_instance,
@@ -198,16 +197,15 @@ function getManifest(loader: string) {
 
 async function installLocalModpackFromPicker() {
 	const picked = await filePicker.pickModpackFile({ readFile: false })
-	if (!picked?.path) return false
+	if (!picked?.path) return
 
 	const job = await install_pack_to_existing_instance(instance.value.id, {
 		type: 'fromFile',
 		path: picked.path,
 	}).catch(handleError)
-	if (!job) return false
+	if (!job) return
 
-	const completed = await wait_for_install_job(appEvents, job.job_id).catch(handleError)
-	return !!completed
+	await wait_for_install_job(appEvents, job.job_id).catch(handleError)
 }
 
 provideInstanceBackup(instance)
@@ -369,10 +367,6 @@ provideInstallationSettings({
 	afterSave: async () => {
 		debug('afterSave: installing', { instanceId: instance.value.id })
 		await install_existing_instance(instance.value.id, false).catch(handleError)
-		trackEvent('InstanceRepair', {
-			loader: instance.value.loader,
-			game_version: instance.value.game_version,
-		})
 		debug('afterSave: done')
 	},
 
@@ -381,32 +375,20 @@ provideInstallationSettings({
 		repairing.value = true
 		await install_existing_instance(instance.value.id, true).catch(handleError)
 		repairing.value = false
-		trackEvent('InstanceRepair', {
-			loader: instance.value.loader,
-			game_version: instance.value.game_version,
-		})
 		debug('repair: done')
 	},
 
 	async reinstallModpack() {
 		debug('reinstallModpack: called', { instanceId: instance.value.id })
 		reinstalling.value = true
-		let shouldTrack = false
 		try {
 			if (isImportedModpack.value) {
-				shouldTrack = await installLocalModpackFromPicker()
+				await installLocalModpackFromPicker()
 			} else {
 				await update_repair_modrinth(instance.value.id).catch(handleError)
-				shouldTrack = true
 			}
 		} finally {
 			reinstalling.value = false
-		}
-		if (shouldTrack) {
-			trackEvent('InstanceRepair', {
-				loader: instance.value.loader,
-				game_version: instance.value.game_version,
-			})
 		}
 		debug('reinstallModpack: done')
 	},
@@ -415,13 +397,7 @@ provideInstallationSettings({
 		debug('swapModpack: called', { instanceId: instance.value.id })
 		reinstalling.value = true
 		try {
-			const installed = await installLocalModpackFromPicker()
-			if (installed) {
-				trackEvent('InstanceRepair', {
-					loader: instance.value.loader,
-					game_version: instance.value.game_version,
-				})
-			}
+			await installLocalModpackFromPicker()
 		} finally {
 			reinstalling.value = false
 		}

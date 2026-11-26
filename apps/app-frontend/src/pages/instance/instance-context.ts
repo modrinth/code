@@ -21,8 +21,8 @@ export interface InstancePageContext {
 	refreshInstance: () => Promise<void>
 	refreshPlayState: () => Promise<void>
 	refreshServerStatus: () => Promise<void>
-	play: (source: string) => Promise<void>
-	stop: (source: string) => Promise<void>
+	play: () => Promise<void>
+	stop: () => Promise<void>
 	playServer: () => Promise<void>
 	openSettings: (tab?: number) => void
 	browseContent: (projectType?: string) => Promise<void>

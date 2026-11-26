@@ -137,8 +137,8 @@ export async function set(settings: AppSettings) {
 	return await invoke('plugin:settings|settings_set', { settings })
 }
 
-/** Replaces the analytics installation ID with a new random one. */
-export async function reset_analytics_installation_id(): Promise<void> {
+/** Replaces the analytics installation ID with a new random one and returns it. */
+export async function reset_analytics_installation_id(): Promise<string> {
 	return await invoke('plugin:settings|reset_analytics_installation_id')
 }
 

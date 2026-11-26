@@ -88,7 +88,7 @@
 					:game-mode="world.type === 'singleplayer' ? GAME_MODES[world.game_mode] : undefined"
 					:shortcut-instance-id="instance.id"
 					@play="() => joinWorld(world)"
-					@stop="() => instancePage.stop('InstanceWorlds')"
+					@stop="() => instancePage.stop()"
 					@refresh="() => refreshServer((world as ServerWorld).address)"
 					@edit="
 						() =>
@@ -153,7 +153,6 @@ import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldMod
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import { handleSevereError } from '@/composables/use-error.js'
-import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3 } from '@/helpers/cache.js'
 import { set_synced_option } from '@/helpers/instance'
 import { get_game_versions } from '@/helpers/tags'
@@ -578,20 +577,10 @@ async function joinWorld(world: World) {
 		const managedProjectId = instance.value.link?.project_id
 		if (managedProjectId && isManagedServerWorld(world)) {
 			await playServerProject(managedProjectId).catch(handleJoinError)
-			trackEvent('InstanceStart', {
-				loader: instance.value.loader,
-				game_version: instance.value.game_version,
-				source: 'WorldsPage',
-			})
 			startingInstance.value = false
 			return
 		}
 		await start_join_server(instance.value.id, world.address).catch(handleJoinError)
-		trackEvent('InstanceStart', {
-			loader: instance.value.loader,
-			game_version: instance.value.game_version,
-			source: 'WorldsPage',
-		})
 	} else if (world.type === 'singleplayer') {
 		await start_join_singleplayer_world(instance.value.id, world.path).catch(handleJoinError)
 	}

@@ -53,11 +53,12 @@ pub async fn settings_set(settings: Settings) -> Result<()> {
     Ok(())
 }
 
-/// Replaces the analytics installation ID with a new random one.
+/// Replaces the analytics installation ID with a new random one and returns
+/// it.
 ///
 /// invoke('plugin:settings|reset_analytics_installation_id')
 #[tauri::command]
-pub async fn reset_analytics_installation_id() -> Result<()> {
+pub async fn reset_analytics_installation_id() -> Result<uuid::Uuid> {
     Ok(theseus::analytics::reset_installation_id().await?)
 }
 

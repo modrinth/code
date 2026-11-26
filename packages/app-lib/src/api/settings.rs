@@ -73,10 +73,20 @@ pub async fn set(settings: Settings) -> crate::Result<()> {
         };
     settings.update(&state.pool).await?;
 
-    if current_settings.telemetry != settings.telemetry
-        && let Some(analytics) = &state.analytics
-    {
-        analytics.set_telemetry_opt_out(!settings.telemetry);
+    if current_settings.telemetry != settings.telemetry {
+        let installation_id =
+            crate::state::app_analytics::sync_installation_id(
+                &state.pool,
+                settings.telemetry,
+            )
+            .await?;
+
+        if let Some(analytics) = &state.analytics {
+            match installation_id {
+                Some(installation_id) => analytics.opt_in(installation_id),
+                None => analytics.opt_out(),
+            }
+        }
     }
 
     if shared_fullscreen_changed {
