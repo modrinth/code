@@ -1140,6 +1140,7 @@ export namespace Labrinth {
 				| 'project-name-profanity'
 				| 'project-name-slur'
 				| 'project-name-version'
+				| 'add-summary'
 				| 'project-summary-links'
 				| 'project-summary-matches-title'
 				| 'project-summary-non-english'

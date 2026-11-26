@@ -213,6 +213,7 @@ const everyNag: Nag[] = Object.keys(nagDefinitions).flatMap((kind) => {
 
 const draftNags = [
 	'add-icon',
+	'add-summary',
 	'add-description',
 	'upload-version',
 	'select-environment',
