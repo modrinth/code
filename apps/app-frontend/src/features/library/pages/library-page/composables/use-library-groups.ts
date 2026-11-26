@@ -38,24 +38,15 @@ export function useLibraryGroups(view: ReturnType<typeof useLibraryView>) {
 	}
 
 	const createGroup = (name: string, instanceIds: Iterable<string> = []) =>
-		mutations.create.mutateAsync({ name, instanceIds }).then(
-			() => true,
-			() => false,
-		)
+		mutations.create.mutateAsync({ name, instanceIds }).catch(() => null)
 
 	const createDefaultGroup = async (instanceIds: Iterable<string> = []) => {
-		if (creatingGroup.value) return false
-		try {
-			const group = await mutations.create.mutateAsync({
-				name: getDefaultGroupName(),
-				instanceIds,
-			})
-			view.displayState.value.group = 'Group'
-			groupIdPendingNameEdit.value = group.id
-			return true
-		} catch {
-			return false
-		}
+		if (creatingGroup.value) return null
+		const result = await createGroup(getDefaultGroupName(), instanceIds)
+		if (!result) return null
+		view.displayState.value.group = 'Group'
+		groupIdPendingNameEdit.value = result.group.id
+		return result
 	}
 
 	const completePendingGroupNameEdit = (groupId: string) => {

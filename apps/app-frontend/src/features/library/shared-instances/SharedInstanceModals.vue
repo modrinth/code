@@ -106,9 +106,12 @@ const removeMutation = useMutation({
 					: leaveRemoteSharedInstance(instance.shared_instance_id),
 			),
 		)
-		for (const result of results) {
+		const removedIds = new Set<string>()
+		for (const [index, result] of results.entries()) {
 			if (result.status === 'rejected') notifySharedInstanceError(result.reason)
+			else removedIds.add(sharedInstances[index].shared_instance_id)
 		}
+		return removedIds
 	},
 	onMutate: async (sharedInstances) => {
 		await queryClient.cancelQueries({ queryKey: sharedInstanceIdsKey })
@@ -118,6 +121,14 @@ const removeMutation = useMutation({
 			ids?.filter((sharedInstanceId) => !removedIds.has(sharedInstanceId)),
 		)
 		return { previous }
+	},
+	onSuccess: (removedIds, _, context) => {
+		for (const [queryKey, data] of context?.previous ?? []) {
+			queryClient.setQueryData(
+				queryKey,
+				data?.filter((sharedInstanceId) => !removedIds.has(sharedInstanceId)),
+			)
+		}
 	},
 	onError: (error, _, context) => {
 		for (const [queryKey, data] of context?.previous ?? []) {

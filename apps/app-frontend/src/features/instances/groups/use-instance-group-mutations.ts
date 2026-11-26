@@ -89,8 +89,13 @@ export function useInstanceGroupMutations() {
 					group_ids: [...instance.group_ids, group.id],
 				}))
 			updateGroups((groups) => [group, ...groups.filter((existing) => existing.id !== group.id)])
-			if (updates.length > 0) await setMemberships.mutateAsync(updates).catch(() => undefined)
-			return group
+			const membershipsAdded =
+				updates.length === 0 ||
+				(await setMemberships.mutateAsync(updates).then(
+					() => true,
+					() => false,
+				))
+			return { group, membershipsAdded }
 		},
 		onError: (error) => handleError(toError(error)),
 		onSettled: settle,

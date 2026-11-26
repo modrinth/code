@@ -178,10 +178,10 @@ function show(instanceIds: Iterable<string> = [], event?: MouseEvent) {
 
 async function handleCreateGroup() {
 	if (normalizedName.value.length === 0 || creatingGroup.value) return
-	if (await createGroup(normalizedName.value, selectedIds.value)) {
-		clearLibraryInstanceSelection()
-		modal.value?.hide()
-	}
+	const result = await createGroup(normalizedName.value, selectedIds.value)
+	if (!result) return
+	if (result.membershipsAdded) clearLibraryInstanceSelection()
+	modal.value?.hide()
 }
 
 defineExpose({ show })

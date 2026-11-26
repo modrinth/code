@@ -200,9 +200,8 @@ const messages = defineMessages({
 async function createGroupFromSelection() {
 	if (busy.value) return
 
-	const instanceIds = selectedInstanceIds.value
-	clearLibraryInstanceSelection()
-	await createDefaultGroup(instanceIds)
+	const result = await createDefaultGroup(new Set(selectedInstanceIds.value))
+	if (result?.membershipsAdded) clearLibraryInstanceSelection()
 }
 
 async function removeSelectedInstancesFromGroups() {
