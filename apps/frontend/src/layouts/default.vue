@@ -8,7 +8,7 @@
 			'expanded-mobile-nav': isBrowseMenuOpen,
 			'modrinth-parent__no-modal-blurs': !cosmetics.advancedRendering,
 		}"
-		:style="{ '--moderation-drawer-reserved-width': `${moderationDrawerReservedWidth}px` }"
+		:style="{ '--moderation-drawer-width': `${moderationDrawerWidth}px` }"
 	>
 		<div class="pointer-events-none fixed inset-0 z-[-1]">
 			<div id="fixed-background-teleport" class="relative"></div>
@@ -896,10 +896,7 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
-import {
-	moderationDrawerGap,
-	moderationDrawerWidth,
-} from '~/components/ui/project-settings/project-moderation-drawer/layout'
+import { moderationDrawerWidth } from '~/components/ui/project-settings/project-moderation-drawer/layout'
 import {
 	browseSignedOut,
 	forgetStoredAccount,
@@ -920,9 +917,8 @@ import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 import { hasActiveMidas } from '~/utils/user-membership.ts'
 
 const country = useUserCountry()
-const moderationDrawerReservedWidth = moderationDrawerWidth + moderationDrawerGap
 const shouldStackPinnedNavigation = useMediaQuery(
-	`(max-width: ${1280 + moderationDrawerReservedWidth - 1}px)`,
+	`(max-width: ${1280 + moderationDrawerWidth - 1}px)`,
 )
 
 const { formatMessage } = useVIntl()
@@ -1602,7 +1598,7 @@ function changeTheme() {
 <style>
 @media (min-width: 1280px) {
 	.layout:has(.settings-with-review) {
-		--project-settings-drawer-space: var(--moderation-drawer-reserved-width);
+		--project-settings-drawer-space: var(--moderation-drawer-width);
 	}
 
 	.layout > .desktop-navigation {
