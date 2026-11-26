@@ -214,6 +214,7 @@ import {
 } from '@modrinth/assets'
 import type { Component } from 'vue'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { onBeforeRouteUpdate } from 'vue-router'
 
 import { Button, ContextMenu } from '#ui/components/base/buttons'
 import EmptyState from '#ui/components/base/EmptyState.vue'
@@ -390,16 +391,31 @@ const unsavedChangesModal = ref<InstanceType<typeof FileUnsavedChangesModal>>()
 
 const hasUnsavedChanges = computed(() => fileEditorRef.value?.hasUnsavedChanges ?? false)
 
+let discardConfirmed = false
+
 async function confirmDiscardChanges(): Promise<boolean> {
-	if (!hasUnsavedChanges.value) return true
+	if (discardConfirmed || !hasUnsavedChanges.value) return true
 	const result = await unsavedChangesModal.value?.prompt()
 	if (result === 'save') {
 		if (isBusy.value) return false
 		await fileEditorRef.value?.saveFileContent(false)
 		return true
 	}
-	return result === 'discard'
+	discardConfirmed = result === 'discard'
+	return discardConfirmed
 }
+
+watch(
+	() => ctx.editingFile.value?.path,
+	() => {
+		discardConfirmed = false
+	},
+)
+
+onBeforeRouteUpdate(async (to, from) => {
+	if (!from.query.editing || to.query.editing === from.query.editing) return
+	if (!(await confirmDiscardChanges())) return false
+})
 
 // Navigation
 async function navigateToSegment(index: number) {

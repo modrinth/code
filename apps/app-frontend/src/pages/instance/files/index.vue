@@ -11,7 +11,7 @@ import {
 	useFileRouteState,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
 import { computed, ref, watch } from 'vue'
 
@@ -84,6 +84,8 @@ async function writeBytes(path: string, bytes: Uint8Array, createOnly = false) {
 	})
 }
 
+const queryClient = useQueryClient()
+
 const directoryQuery = useQuery(
 	computed(() => ({
 		queryKey: instanceKeys.files(instancePage.instanceId.value, currentPath.value),
@@ -117,7 +119,7 @@ firstPaintPending.value = false
 
 async function refresh() {
 	debug('refresh: called, currentPath =', currentPath.value, 'instanceRoot =', instanceRoot.value)
-	await directoryQuery.refetch()
+	await queryClient.invalidateQueries({ queryKey: instanceKeys.allFiles(instanceId.value) })
 }
 
 async function handleCreateItem(name: string, type: 'file' | 'directory') {
