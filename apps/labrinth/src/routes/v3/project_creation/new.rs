@@ -395,21 +395,24 @@ pub async fn create(
     .await
     .internal_context("failed to insert thread")?;
 
-    super::super::projects::mutation::finalize_mutation(
-        project_id.into(),
-        txn,
+    let prepared = super::super::projects::mutation::prepare_mutations(
+        &[project_id.into()],
+        &mut txn,
         &db,
         &redis,
         Some(&user),
-        &temporal,
     )
     .await?;
-    crate::queue::delphi_scan::publish_new_files(
-        &kafka_client,
-        &delphi_scan_files,
-    )
-    .await;
-    search_state.queue.push_project_change(project_id).await;
+    prepared
+        .commit_with_post_commit(txn, &redis, &temporal, async {
+            crate::queue::delphi_scan::publish_new_files(
+                &kafka_client,
+                &delphi_scan_files,
+            )
+            .await;
+            search_state.queue.push_project_change(project_id).await;
+        })
+        .await?;
 
     Ok(web::Json(project_id))
 }

@@ -223,16 +223,22 @@ pub async fn version_create(
         }
     };
 
-    prepared.commit(transaction, &redis, temporal).await?;
-    crate::queue::delphi_scan::publish_new_files(
-        &kafka_client,
-        &delphi_scan_files,
-    )
-    .await;
-    search_state
-        .queue
-        .push_version_changes(project_id.into(), [VersionId::from(version_id)])
-        .await;
+    prepared
+        .commit_with_post_commit(transaction, &redis, temporal, async {
+            crate::queue::delphi_scan::publish_new_files(
+                &kafka_client,
+                &delphi_scan_files,
+            )
+            .await;
+            search_state
+                .queue
+                .push_version_changes(
+                    project_id.into(),
+                    [VersionId::from(version_id)],
+                )
+                .await;
+        })
+        .await?;
     Ok(response)
 }
 
@@ -756,16 +762,19 @@ pub async fn upload_file_to_version(
         }
     };
 
-    prepared.commit(transaction, &redis, temporal).await?;
-    crate::queue::delphi_scan::publish_new_files(
-        &kafka_client,
-        &delphi_scan_files,
-    )
-    .await;
-    search_state
-        .queue
-        .push_version_changes(project_id.into(), [version_id])
-        .await;
+    prepared
+        .commit_with_post_commit(transaction, &redis, temporal, async {
+            crate::queue::delphi_scan::publish_new_files(
+                &kafka_client,
+                &delphi_scan_files,
+            )
+            .await;
+            search_state
+                .queue
+                .push_version_changes(project_id.into(), [version_id])
+                .await;
+        })
+        .await?;
     Ok(response)
 }
 

@@ -43,8 +43,8 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 		})
 	}
 
-	public async createModule(body: SaveProjectFlagModuleRequest): Promise<void> {
-		return this.client.request<void>('/moderation/project-flag/modules', {
+	public async createModule(body: SaveProjectFlagModuleRequest): Promise<ProjectFlagModule> {
+		return this.client.request<ProjectFlagModule>('/moderation/project-flag/modules', {
 			api: 'labrinth',
 			version: 'internal',
 			method: 'POST',
@@ -53,8 +53,11 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 		})
 	}
 
-	public async updateModule(name: string, body: SaveProjectFlagModuleRequest): Promise<void> {
-		return this.client.request<void>('/moderation/project-flag/module', {
+	public async updateModule(
+		name: string,
+		body: SaveProjectFlagModuleRequest,
+	): Promise<ProjectFlagModule> {
+		return this.client.request<ProjectFlagModule>('/moderation/project-flag/module', {
 			api: 'labrinth',
 			version: 'internal',
 			method: 'PUT',

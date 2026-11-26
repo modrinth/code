@@ -1381,6 +1381,28 @@ impl PreparedMutations {
                 .await
                 .internal_context("completing approval execution")?;
         }
+        self.dispatch_reconciliation(temporal).await
+    }
+
+    /// Uploads do not exit review, so they need no approval-run completion lookup.
+    /// Publishes their files and search changes before making any Temporal request.
+    pub(crate) async fn commit_with_post_commit(
+        self,
+        transaction: PgTransaction<'_>,
+        redis: &RedisPool,
+        temporal: &TemporalClient,
+        post_commit: impl std::future::Future<Output = ()>,
+    ) -> Result<(), ApiError> {
+        self.commit_without_reconciliation(transaction, redis)
+            .await?;
+        post_commit.await;
+        self.dispatch_reconciliation(temporal).await
+    }
+
+    async fn dispatch_reconciliation(
+        &self,
+        temporal: &TemporalClient,
+    ) -> Result<(), ApiError> {
         for state in &self.states {
             crate::workflow::project_flag::reconcile_project_review_state(
                 temporal,

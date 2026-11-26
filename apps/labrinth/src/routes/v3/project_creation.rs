@@ -411,13 +411,16 @@ pub async fn project_create_internal(
         }
     };
 
-    prepared.commit(transaction, &redis, temporal).await?;
-    crate::queue::delphi_scan::publish_new_files(
-        &kafka_client,
-        &delphi_scan_files,
-    )
-    .await;
-    search_state.queue.push_project_change(project_id).await;
+    prepared
+        .commit_with_post_commit(transaction, &redis, temporal, async {
+            crate::queue::delphi_scan::publish_new_files(
+                &kafka_client,
+                &delphi_scan_files,
+            )
+            .await;
+            search_state.queue.push_project_change(project_id).await;
+        })
+        .await?;
     Ok(response)
 }
 
@@ -499,13 +502,16 @@ pub async fn project_create_with_id(
         }
     };
 
-    prepared.commit(transaction, &redis, &temporal).await?;
-    crate::queue::delphi_scan::publish_new_files(
-        &kafka_client,
-        &delphi_scan_files,
-    )
-    .await;
-    search_state.queue.push_project_change(project_id).await;
+    prepared
+        .commit_with_post_commit(transaction, &redis, &temporal, async {
+            crate::queue::delphi_scan::publish_new_files(
+                &kafka_client,
+                &delphi_scan_files,
+            )
+            .await;
+            search_state.queue.push_project_change(project_id).await;
+        })
+        .await?;
     Ok(response)
 }
 
