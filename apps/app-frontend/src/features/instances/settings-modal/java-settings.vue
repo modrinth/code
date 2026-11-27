@@ -6,38 +6,17 @@ import { computed } from 'vue'
 import JavaSelector from '@/features/java/java-selector/index.vue'
 import MemorySlider from '@/features/java/memory-slider.vue'
 import { javaVersionsQueryOptions } from '@/features/java/queries'
-import { edit } from '@/helpers/instance'
 import { appSettingsQueryOptions, parseEnvVars, serializeEnvVars } from '@/helpers/settings.ts'
 import { instanceRecommendedJavaQueryOptions } from '@/pages/instance/query-options'
 
 import { injectInstanceSettings } from './instance-settings-context'
 import SettingsSourceHeader from './settings-source-header.vue'
-import { useInstanceSettingsDraft } from './use-instance-settings-draft'
 import { useSettingsSource } from './use-settings-source'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const { instance } = injectInstanceSettings()
-
-const draft = useInstanceSettingsDraft(
-	() => ({
-		javaPath: instance.value.java_path ?? null,
-		javaArgs: instance.value.extra_launch_args?.join(' ') ?? null,
-		envVars: instance.value.custom_env_vars
-			? serializeEnvVars(instance.value.custom_env_vars)
-			: null,
-		memory: instance.value.memory?.maximum ?? null,
-	}),
-	(value) =>
-		edit(instance.value.id, {
-			java_path: value.javaPath ? value.javaPath.replace('java.exe', 'javaw.exe') : null,
-			extra_launch_args:
-				value.javaArgs !== null ? value.javaArgs.trim().split(/\s+/).filter(Boolean) : null,
-			custom_env_vars: value.envVars !== null ? parseEnvVars(value.envVars) : null,
-			memory: value.memory !== null ? { maximum: value.memory } : null,
-		}),
-)
 
 const settingsQuery = useQuery(appSettingsQueryOptions())
 const javaVersionsQuery = useQuery(javaVersionsQueryOptions())
@@ -61,12 +40,41 @@ const defaultJavaArgs = computed(() => settingsQuery.data.value?.extra_launch_ar
 const defaultEnvVars = computed(() => serializeEnvVars(settingsQuery.data.value?.custom_env_vars))
 const defaultMemory = computed(() => settingsQuery.data.value?.memory.maximum ?? 0)
 
-const source = useSettingsSource(draft, () => ({
-	javaPath: defaultJavaPath.value,
-	javaArgs: defaultJavaArgs.value,
-	envVars: defaultEnvVars.value,
-	memory: defaultMemory.value,
-}))
+const {
+	source,
+	values: javaSettings,
+	update,
+	debouncedField,
+} = useSettingsSource({
+	read: (current) => ({
+		javaPath: current.java_path ?? null,
+		javaArgs: current.extra_launch_args?.join(' ') ?? null,
+		envVars: current.custom_env_vars ? serializeEnvVars(current.custom_env_vars) : null,
+		memory: current.memory?.maximum ?? null,
+	}),
+	write: (value) => ({
+		java_path: value.javaPath ? value.javaPath.replace('java.exe', 'javaw.exe') : null,
+		extra_launch_args:
+			value.javaArgs !== null ? value.javaArgs.trim().split(/\s+/).filter(Boolean) : null,
+		custom_env_vars: value.envVars !== null ? parseEnvVars(value.envVars) : null,
+		memory: value.memory !== null ? { maximum: value.memory } : null,
+	}),
+	defaults: () => ({
+		javaPath: defaultJavaPath.value,
+		javaArgs: defaultJavaArgs.value,
+		envVars: defaultEnvVars.value,
+		memory: defaultMemory.value,
+	}),
+})
+
+const javaArgs = debouncedField(
+	() => javaSettings.value.javaArgs ?? defaultJavaArgs.value,
+	(value) => update({ javaArgs: value }),
+)
+const envVars = debouncedField(
+	() => javaSettings.value.envVars ?? defaultEnvVars.value,
+	(value) => update({ envVars: value }),
+)
 
 const messages = defineMessages({
 	settingsHeading: {
@@ -132,9 +140,9 @@ const messages = defineMessages({
 				<div class="pt-3">
 					<MemorySlider
 						id="max-memory"
-						:model-value="draft.memory ?? defaultMemory"
+						:model-value="javaSettings.memory ?? defaultMemory"
 						:aria-label="formatMessage(messages.javaMemory)"
-						@update:model-value="(value) => (draft.memory = value)"
+						@update:model-value="(value) => update({ memory: value })"
 					/>
 				</div>
 			</section>
@@ -153,9 +161,9 @@ const messages = defineMessages({
 				<div class="pt-3">
 					<JavaSelector
 						id="java-installation"
-						:model-value="{ path: draft.javaPath ?? defaultJavaPath }"
+						:model-value="{ path: javaSettings.javaPath ?? defaultJavaPath }"
 						:placeholder="formatMessage(messages.javaPathPlaceholder)"
-						@update:model-value="(val) => (draft.javaPath = val?.path ?? '')"
+						@update:model-value="(val) => update({ javaPath: val?.path ?? '' })"
 					/>
 				</div>
 			</section>
@@ -167,11 +175,13 @@ const messages = defineMessages({
 				<div class="pt-3">
 					<Input
 						id="java-args"
-						:model-value="draft.javaArgs ?? defaultJavaArgs"
+						:model-value="javaArgs.model"
 						autocomplete="off"
 						:placeholder="formatMessage(messages.enterJavaArguments)"
 						wrapper-class="w-full"
-						@update:model-value="(value) => (draft.javaArgs = String(value ?? ''))"
+						@focus="javaArgs.onFocus"
+						@blur="javaArgs.onBlur"
+						@update:model-value="(value) => (javaArgs.model = String(value ?? ''))"
 					/>
 				</div>
 			</section>
@@ -183,11 +193,13 @@ const messages = defineMessages({
 				<div class="pt-3">
 					<Input
 						id="env-vars"
-						:model-value="draft.envVars ?? defaultEnvVars"
+						:model-value="envVars.model"
 						autocomplete="off"
 						:placeholder="formatMessage(messages.enterEnvironmentVariables)"
 						wrapper-class="w-full"
-						@update:model-value="(value) => (draft.envVars = String(value ?? ''))"
+						@focus="envVars.onFocus"
+						@blur="envVars.onBlur"
+						@update:model-value="(value) => (envVars.model = String(value ?? ''))"
 					/>
 				</div>
 			</section>

@@ -55,32 +55,24 @@
 					<Avatar :src="displayedAvatarUrl" size="md" circle :alt="auth.user.value.username" />
 					<div class="flex flex-col gap-2">
 						<FileButton
-							:disabled="!globals?.max_user_icon_size"
+							:disabled="!globals?.max_user_icon_size || avatarSaving"
 							:max-size="globals?.max_user_icon_size"
 							:prompt="formatMessage(commonMessages.uploadImageButton)"
 							accept="image/png,image/jpeg,image/gif,image/webp"
 							size="md"
-							@change="showPreviewImage"
+							@change="uploadAvatar"
 						>
 							<UploadIcon aria-hidden="true" />
 						</FileButton>
 						<Button
-							v-if="avatarUrl && !pendingAvatarDeletion"
+							v-if="displayedAvatarUrl"
 							native-type="button"
 							size="md"
-							@click="removePreviewImage"
+							:disabled="avatarSaving"
+							@click="removeAvatar"
 						>
 							<TrashIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.removeImageButton) }}
-						</Button>
-						<Button
-							v-if="avatarFile || pendingAvatarDeletion"
-							native-type="button"
-							size="md"
-							@click="resetAvatar"
-						>
-							<UndoIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.resetButton) }}
 						</Button>
 					</div>
 				</div>
@@ -98,7 +90,7 @@
 					<Button
 						native-type="button"
 						size="md"
-						:disabled="refreshing || refreshCooldown || hasChanges"
+						:disabled="refreshing || refreshCooldown || saving || hasUnsavedProfileFields"
 						@click="refreshProfile"
 					>
 						<RefreshCwIcon aria-hidden="true" />
@@ -110,18 +102,18 @@
 						<Input
 							id="username-field"
 							ref="usernameInput"
-							v-model="current.username"
+							v-model="profile.username"
 							class="w-full max-w-md"
-							:error="current.username.length > 39"
+							:error="!usernameValid"
 							:readonly="usernameLocked"
 							@focus="onUsernameFocus"
 						/>
 						<span
-							v-if="current.username.length >= 30"
+							v-if="profile.username.length >= 30"
 							class="shrink-0 text-secondary"
-							:class="{ 'text-red': current.username.length > 39 }"
+							:class="{ 'text-red': profile.username.length > USERNAME_MAX_LENGTH }"
 						>
-							{{ current.username.length }}/39
+							{{ profile.username.length }}/{{ USERNAME_MAX_LENGTH }}
 						</span>
 					</div>
 					<p class="m-0 text-secondary">
@@ -134,9 +126,9 @@
 				<h2 class="m-0 text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.bioTitle) }}
 				</h2>
-				<Textarea id="bio-field" v-model="current.bio" :error="current.bio.length > 160" />
-				<div class="text-secondary" :class="{ 'text-red': current.bio.length > 160 }">
-					{{ current.bio.length }}/160
+				<Textarea id="bio-field" v-model="profile.bio" :error="!bioValid" />
+				<div class="text-secondary" :class="{ 'text-red': !bioValid }">
+					{{ profile.bio.length }}/{{ BIO_MAX_LENGTH }}
 				</div>
 				<p class="m-0 text-secondary">
 					{{ formatMessage(messages.bioDescription) }}
@@ -152,11 +144,11 @@ import {
 	RefreshCwIcon,
 	ThinkingRinthbot,
 	TrashIcon,
-	UndoIcon,
 	UploadIcon,
 	UserPenIcon,
 } from '@modrinth/assets'
-import { computed, nextTick, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
+import { useDebounceFn } from '@vueuse/core'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import Avatar from '#ui/components/base/Avatar.vue'
@@ -173,6 +165,9 @@ type ProfileFields = {
 	username: string
 	bio: string
 }
+
+const USERNAME_MAX_LENGTH = 39
+const BIO_MAX_LENGTH = 160
 
 const { data: globals } = useGlobals()
 
@@ -199,42 +194,37 @@ const notificationManager = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const activeUserId = ref<string | null>(null)
-const original = ref<ProfileFields>({ username: '', bio: '' })
-const current = ref<ProfileFields>({ username: '', bio: '' })
+const savedProfile = ref<ProfileFields>({ username: '', bio: '' })
+const profile = ref<ProfileFields>({ username: '', bio: '' })
 const avatarUrl = ref<string | null>(null)
-const avatarFile = shallowRef<File | null>(null)
 const previewImageUrl = ref<string | null>(null)
-const pendingAvatarDeletion = ref(false)
+const avatarSaving = ref(false)
 const usernameInput = ref<{ focus: () => void; blur: () => void } | null>(null)
 const usernameLocked = ref(props.prepareUsernameChange != null)
 let usernamePrompted = false
-const saving = ref(false)
+const activeSaves = ref(0)
 const refreshing = ref(false)
 const refreshCooldown = ref(false)
 let refreshCooldownTimer: ReturnType<typeof setTimeout> | undefined
+let profileSaveQueue = Promise.resolve()
+let profileFieldsSavePending = false
 
-const displayedAvatarUrl = computed(() => {
-	if (previewImageUrl.value) return previewImageUrl.value
-	if (pendingAvatarDeletion.value) return null
-	return avatarUrl.value
-})
+const saving = computed(() => activeSaves.value > 0)
+const displayedAvatarUrl = computed(() => previewImageUrl.value ?? avatarUrl.value)
 const profilePath = computed(
-	() => `/user/${encodeURIComponent(auth.user.value?.username ?? current.value.username)}`,
+	() => `/user/${encodeURIComponent(auth.user.value?.username ?? profile.value.username)}`,
 )
-const originalState = computed(() => ({
-	...original.value,
-	avatarChanged: false,
-}))
-const modifiedState = computed(() => ({
-	...current.value,
-	avatarChanged: Boolean(avatarFile.value || pendingAvatarDeletion.value),
-}))
-const hasChanges = computed(
+const usernameValid = computed(
+	() => profile.value.username.length > 0 && profile.value.username.length <= USERNAME_MAX_LENGTH,
+)
+const bioValid = computed(() => profile.value.bio.length <= BIO_MAX_LENGTH)
+const hasUnsavedProfileFields = computed(
 	() =>
-		(!props.changeUsername && current.value.username !== original.value.username) ||
-		current.value.bio !== original.value.bio ||
-		Boolean(avatarFile.value || pendingAvatarDeletion.value),
+		(!props.changeUsername && profile.value.username !== savedProfile.value.username) ||
+		profile.value.bio !== savedProfile.value.bio,
 )
+
+const debouncedSaveProfileFields = useDebounceFn(flushProfileFieldsSave, 500)
 
 watch(
 	() => auth.user.value,
@@ -246,17 +236,24 @@ watch(
 	{ immediate: true },
 )
 
+watch(
+	() => [profile.value.username, profile.value.bio],
+	() => {
+		if (!hasUnsavedProfileFields.value) return
+		profileFieldsSavePending = true
+		void debouncedSaveProfileFields()
+	},
+)
+
 function syncFromUser(user: AuthUser | null): void {
 	revokePreviewImage()
 	activeUserId.value = user?.id ?? null
-	original.value = {
+	savedProfile.value = {
 		username: user?.username ?? '',
 		bio: user?.bio ?? '',
 	}
-	current.value = { ...original.value }
+	profile.value = { ...savedProfile.value }
 	avatarUrl.value = user?.avatar_url ?? null
-	avatarFile.value = null
-	pendingAvatarDeletion.value = false
 }
 
 function revokePreviewImage(): void {
@@ -266,26 +263,107 @@ function revokePreviewImage(): void {
 	}
 }
 
-function showPreviewImage(files: File[]): void {
+function queueProfileSave(task: () => Promise<void>): Promise<void> {
+	activeSaves.value++
+	const run = profileSaveQueue.then(task).finally(() => {
+		activeSaves.value--
+	})
+	profileSaveQueue = run.catch(() => undefined)
+	return run
+}
+
+function notifySaveError(error: unknown): void {
+	if (error instanceof Error && error.name === 'ReauthCancelled') {
+		return
+	}
+	notificationManager.addNotification({
+		type: 'error',
+		title: formatMessage(messages.saveError),
+		text: error instanceof Error ? error.message : formatMessage(messages.saveErrorDescription),
+	})
+}
+
+async function refreshAuthUser(): Promise<AuthUser> {
+	const refreshedUser = await props.getAuthenticatedUser()
+	auth.user.value = refreshedUser
+	return refreshedUser
+}
+
+function flushProfileFieldsSave(): Promise<void> {
+	if (!profileFieldsSavePending) return Promise.resolve()
+	profileFieldsSavePending = false
+	return queueProfileSave(saveProfileFields)
+}
+
+async function saveProfileFields(): Promise<void> {
+	const user = auth.user.value
+	if (!user || user.id !== activeUserId.value) return
+
+	const patch: Partial<ProfileFields> = {}
+	if (
+		!props.changeUsername &&
+		usernameValid.value &&
+		profile.value.username !== savedProfile.value.username
+	) {
+		patch.username = profile.value.username
+	}
+	if (bioValid.value && profile.value.bio !== savedProfile.value.bio) {
+		patch.bio = profile.value.bio
+	}
+	if (Object.keys(patch).length === 0) return
+
+	try {
+		await props.patchUser(user.id, patch)
+		savedProfile.value = { ...savedProfile.value, ...patch }
+		await refreshAuthUser()
+	} catch (error) {
+		notifySaveError(error)
+	}
+}
+
+function uploadAvatar(files: File[]): void {
 	const file = files[0]
-	if (!file) return
+	const user = auth.user.value
+	if (!file || !user) return
 
 	revokePreviewImage()
-	avatarFile.value = file
-	previewImageUrl.value = URL.createObjectURL(file)
-	pendingAvatarDeletion.value = false
+	const preview = URL.createObjectURL(file)
+	previewImageUrl.value = preview
+	avatarSaving.value = true
+	void queueProfileSave(async () => {
+		try {
+			const extension = file.type.split('/').at(-1)
+			if (!extension) throw new Error('The selected image does not have a valid file type.')
+			await props.changeAvatar(user.id, file, extension)
+			avatarUrl.value = (await refreshAuthUser()).avatar_url ?? null
+		} catch (error) {
+			notifySaveError(error)
+		} finally {
+			if (previewImageUrl.value === preview) revokePreviewImage()
+			avatarSaving.value = false
+		}
+	})
 }
 
-function removePreviewImage(): void {
-	revokePreviewImage()
-	avatarFile.value = null
-	pendingAvatarDeletion.value = true
-}
+function removeAvatar(): void {
+	const user = auth.user.value
+	if (!user) return
 
-function resetAvatar(): void {
+	const previousAvatarUrl = avatarUrl.value
 	revokePreviewImage()
-	avatarFile.value = null
-	pendingAvatarDeletion.value = false
+	avatarUrl.value = null
+	avatarSaving.value = true
+	void queueProfileSave(async () => {
+		try {
+			await props.deleteAvatar(user.id)
+			avatarUrl.value = (await refreshAuthUser()).avatar_url ?? null
+		} catch (error) {
+			avatarUrl.value = previousAvatarUrl
+			notifySaveError(error)
+		} finally {
+			avatarSaving.value = false
+		}
+	})
 }
 
 function startRefreshCooldown(): void {
@@ -297,7 +375,7 @@ function startRefreshCooldown(): void {
 }
 
 async function refreshProfile(): Promise<void> {
-	if (refreshing.value || refreshCooldown.value || saving.value || hasChanges.value) {
+	if (refreshing.value || refreshCooldown.value || saving.value || hasUnsavedProfileFields.value) {
 		return
 	}
 	refreshing.value = true
@@ -318,11 +396,6 @@ async function refreshProfile(): Promise<void> {
 	} finally {
 		refreshing.value = false
 	}
-}
-
-function reset(): void {
-	current.value = { ...original.value }
-	resetAvatar()
 }
 
 async function onUsernameFocus(): Promise<void> {
@@ -356,60 +429,10 @@ function handleProfileLinkClick(
 	}
 }
 
-async function save(): Promise<void> {
-	const user = auth.user.value
-	if (!user || saving.value) return
-
-	saving.value = true
-	try {
-		const patch: Partial<ProfileFields> = {}
-		if (!props.changeUsername && current.value.username !== original.value.username) {
-			patch.username = current.value.username
-		}
-		if (current.value.bio !== original.value.bio) {
-			patch.bio = current.value.bio
-		}
-		if (Object.keys(patch).length > 0) {
-			await props.patchUser(user.id, patch)
-		}
-
-		if (pendingAvatarDeletion.value) {
-			await props.deleteAvatar(user.id)
-		} else if (avatarFile.value) {
-			const extension = avatarFile.value.type.split('/').at(-1)
-			if (!extension) throw new Error('The selected image does not have a valid file type.')
-			await props.changeAvatar(user.id, avatarFile.value, extension)
-		}
-
-		const refreshedUser = await props.getAuthenticatedUser()
-		auth.user.value = refreshedUser
-		syncFromUser(refreshedUser)
-	} catch (error) {
-		if (error instanceof Error && error.name === 'ReauthCancelled') {
-			return
-		}
-		notificationManager.addNotification({
-			type: 'error',
-			title: formatMessage(messages.saveError),
-			text: error instanceof Error ? error.message : formatMessage(messages.saveErrorDescription),
-		})
-	} finally {
-		saving.value = false
-	}
-}
-
 onBeforeUnmount(() => {
+	void flushProfileFieldsSave()
 	revokePreviewImage()
 	clearTimeout(refreshCooldownTimer)
-})
-
-defineExpose({
-	originalState,
-	modifiedState,
-	saving,
-	hasChanges,
-	reset,
-	save,
 })
 
 const messages = defineMessages({

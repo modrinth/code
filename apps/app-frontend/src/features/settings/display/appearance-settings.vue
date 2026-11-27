@@ -2,154 +2,135 @@
 import {
 	AppearanceSettingsLayout,
 	injectAuth,
+	injectNotificationManager,
 	injectUserPreferences,
 	provideAppearanceSettings,
-	useSavable,
 } from '@modrinth/ui'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { platform } from '@tauri-apps/plugin-os'
-import { computed, onBeforeUnmount, onMounted, watch } from 'vue'
+import { computed } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { type ColorTheme, isDarkTheme, useTheme } from '@/composables/use-theme.ts'
-import { injectAppSettingsModal } from '@/features/settings/app-settings-modal/context'
-import { type AppSettings, get, set } from '@/helpers/settings.ts'
+import { type ColorTheme, type DarkTheme, isDarkTheme, useTheme } from '@/composables/use-theme.ts'
+import { type AppSettings, appSettingsKeys, get, set } from '@/helpers/settings.ts'
 
 const theme = useTheme()
 const appSettings = useAppSettings()
 const auth = injectAuth()
+const { handleError } = injectNotificationManager()
 const { updatePreferences } = injectUserPreferences()
-const settingsModal = injectAppSettingsModal()
+const queryClient = useQueryClient()
 const os = platform()
 
-type AppearanceSettingsState = {
-	theme: ColorTheme
-	syncAcrossDevices: boolean
-	advancedRendering: boolean
-	nativeDecorations: boolean
-}
+type AppearanceSettingKey =
+	| 'theme'
+	| 'sync_theme_across_devices'
+	| 'advanced_rendering'
+	| 'native_decorations'
 
-function getAppearanceSettingsState(): AppearanceSettingsState {
+type AppearanceSettings = Pick<AppSettings, AppearanceSettingKey>
+
+function readAppearanceSettings(): AppearanceSettings {
 	return {
 		theme: theme.preferred,
-		syncAcrossDevices: theme.syncAcrossDevices,
-		advancedRendering: theme.advancedRendering,
-		nativeDecorations: appSettings.nativeDecorations,
+		sync_theme_across_devices: theme.syncAcrossDevices,
+		advanced_rendering: theme.advancedRendering,
+		native_decorations: appSettings.nativeDecorations,
 	}
 }
 
-const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
-	getAppearanceSettingsState,
-	async (appearanceChanges) => {
-		const value = current.value
-		if (
-			value.syncAcrossDevices &&
-			auth.user.value &&
-			(appearanceChanges.theme !== undefined || appearanceChanges.syncAcrossDevices !== undefined)
-		) {
-			await updatePreferences({
-				appearance: value.theme === 'system' ? { auto: true } : { auto: false, theme: value.theme },
-			})
-		}
+function applyAppearanceSettings(value: AppearanceSettings, preferredDark?: DarkTheme): void {
+	if (preferredDark) {
+		theme.preferredDark = preferredDark
+	} else if (isDarkTheme(value.theme)) {
+		theme.preferredDark = value.theme
+	}
+	theme.preferred = value.theme
+	theme.syncAcrossDevices = value.sync_theme_across_devices
+	theme.advancedRendering = value.advanced_rendering
+	appSettings.nativeDecorations = value.native_decorations
+}
 
-		const nextSettings: AppSettings = {
-			...(await get()),
-			theme: value.theme,
-			sync_theme_across_devices: value.syncAcrossDevices,
-			advanced_rendering: value.advancedRendering,
-			native_decorations: value.nativeDecorations,
-		}
-
-		await set(nextSettings)
-		if (isDarkTheme(value.theme)) {
-			theme.preferredDark = value.theme
-		}
-		theme.preferred = value.theme
-		theme.syncAcrossDevices = value.syncAcrossDevices
-		theme.advancedRendering = value.advancedRendering
-		appSettings.nativeDecorations = value.nativeDecorations
+const settingsMutation = useMutation({
+	mutationKey: appSettingsKeys.update,
+	scope: { id: 'app-settings' },
+	mutationFn: async (patch: Partial<AppearanceSettings>) => {
+		await set({ ...(await get()), ...patch })
 	},
-)
+	onMutate: async (patch) => {
+		const previousAppearance = readAppearanceSettings()
+		const previousPreferredDark = theme.preferredDark
+		applyAppearanceSettings({ ...previousAppearance, ...patch })
+
+		await queryClient.cancelQueries({ queryKey: appSettingsKeys.all })
+		const previousSettings = queryClient.getQueryData<AppSettings>(appSettingsKeys.all)
+		if (previousSettings) {
+			queryClient.setQueryData(appSettingsKeys.all, { ...previousSettings, ...patch })
+		}
+
+		return { previousAppearance, previousPreferredDark, previousSettings }
+	},
+	onError: (error, _patch, context) => {
+		if (context) {
+			applyAppearanceSettings(context.previousAppearance, context.previousPreferredDark)
+			if (context.previousSettings) {
+				queryClient.setQueryData(appSettingsKeys.all, context.previousSettings)
+			}
+		}
+		handleError(error)
+	},
+	onSettled: async () => {
+		if (queryClient.isMutating({ mutationKey: appSettingsKeys.update }) === 1) {
+			await queryClient.invalidateQueries({ queryKey: appSettingsKeys.all })
+		}
+	},
+})
 
 const themeOptions = computed(() =>
 	theme.options.filter(
-		(option) => option !== 'retro' || appSettings.devMode || current.value.theme === 'retro',
+		(option) => option !== 'retro' || appSettings.devMode || theme.preferred === 'retro',
 	),
 )
 
-const preferredDarkTheme = computed(() =>
-	isDarkTheme(current.value.theme) ? current.value.theme : theme.preferredDark,
-)
+const preferredDarkTheme = computed(() => theme.preferredDark)
 
 function setTheme(value: ColorTheme): void {
-	current.value.theme = value
+	settingsMutation.mutate({ theme: value })
 }
 
 function setSyncAcrossDevices(enabled: boolean): void {
-	current.value.syncAcrossDevices = enabled
+	settingsMutation.mutate({ sync_theme_across_devices: enabled })
 }
 
 function setAdvancedRendering(enabled: boolean): void {
-	current.value.advancedRendering = enabled
+	settingsMutation.mutate({ advanced_rendering: enabled })
 }
 
 function setNativeDecorations(enabled: boolean): void {
-	current.value.nativeDecorations = enabled
+	settingsMutation.mutate({ native_decorations: enabled })
 }
-
-watch(
-	[() => current.value.theme, () => saved.value.theme],
-	([selectedTheme, savedTheme]) => {
-		theme.preview = selectedTheme === savedTheme ? null : selectedTheme
-	},
-	{ immediate: true },
-)
-
-async function saveAppearanceSettings(): Promise<void> {
-	try {
-		await save()
-	} catch {
-		return
-	}
-}
-
-onMounted(() => {
-	settingsModal.registerUnsavedChangesController({
-		hasChanges: () => hasChanges.value,
-		getOriginal: () => saved.value,
-		getModified: () => changes.value,
-		isSaving: () => saving.value,
-		reset,
-		save: saveAppearanceSettings,
-	})
-})
-
-onBeforeUnmount(() => {
-	theme.preview = null
-	settingsModal.registerUnsavedChangesController(null)
-})
 
 provideAppearanceSettings({
-	deferPersistence: true,
 	theme: {
-		current: computed(() => current.value.theme),
+		current: computed(() => theme.preferred),
 		options: themeOptions,
 		system: computed(() => (theme.native === 'light' ? 'light' : preferredDarkTheme.value)),
 		preferredDark: preferredDarkTheme,
 		set: setTheme,
 		syncAcrossDevices: {
-			value: computed(() => current.value.syncAcrossDevices),
+			value: computed(() => theme.syncAcrossDevices),
 			set: setSyncAcrossDevices,
 		},
 		syncDisabled: computed(() => !auth.user.value),
 	},
 	advancedRendering: {
-		value: computed(() => current.value.advancedRendering),
+		value: computed(() => theme.advancedRendering),
 		set: setAdvancedRendering,
 	},
 	nativeDecorations:
 		os !== 'macos'
 			? {
-					value: computed(() => current.value.nativeDecorations),
+					value: computed(() => appSettings.nativeDecorations),
 					set: setNativeDecorations,
 				}
 			: undefined,

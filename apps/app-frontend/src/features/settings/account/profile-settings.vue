@@ -1,6 +1,5 @@
 <template>
 	<AccountProfileSettings
-		ref="profileSettings"
 		:patch-user="patchUser"
 		:change-avatar="changeAvatar"
 		:delete-avatar="deleteAvatar"
@@ -13,7 +12,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { AccountProfileSettings, injectAuth, injectPageContext } from '@modrinth/ui'
-import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { config } from '@/config'
 import { injectAppSettingsModal } from '@/features/settings/app-settings-modal/context'
@@ -31,22 +29,6 @@ const { openExternalUrl } = injectPageContext()
 function openUsernameSettings(): void {
 	openExternalUrl(`${config.siteUrl}/settings/profile`)
 }
-const profileSettings = ref<InstanceType<typeof AccountProfileSettings> | null>(null)
-
-onMounted(() => {
-	settingsModal.registerUnsavedChangesController({
-		hasChanges: () => profileSettings.value?.hasChanges ?? false,
-		getOriginal: () => profileSettings.value?.originalState ?? {},
-		getModified: () => profileSettings.value?.modifiedState ?? {},
-		isSaving: () => profileSettings.value?.saving ?? false,
-		reset: () => profileSettings.value?.reset(),
-		save: () => profileSettings.value?.save(),
-	})
-})
-
-onBeforeUnmount(() => {
-	settingsModal.registerUnsavedChangesController(null)
-})
 
 function handleProfileLinkClick(event: MouseEvent): void {
 	if (!settingsModal.close()) {

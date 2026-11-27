@@ -3,33 +3,13 @@ import { defineMessages, injectNotificationManager, Input, Toggle, useVIntl } fr
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
-import { edit } from '@/helpers/instance'
 import { appSettingsQueryOptions } from '@/helpers/settings.ts'
 
-import { injectInstanceSettings } from './instance-settings-context'
 import SettingsSourceHeader from './settings-source-header.vue'
-import { useInstanceSettingsDraft } from './use-instance-settings-draft'
 import { useSettingsSource } from './use-settings-source'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
-
-const { instance } = injectInstanceSettings()
-
-const draft = useInstanceSettingsDraft<{
-	fullscreen: boolean | null
-	resolution: [number, number] | null
-}>(
-	() => ({
-		fullscreen: instance.value.force_fullscreen ?? null,
-		resolution: instance.value.game_resolution ?? null,
-	}),
-	(value) =>
-		edit(instance.value.id, {
-			force_fullscreen: value.fullscreen,
-			game_resolution: value.resolution,
-		}),
-)
 
 const settingsQuery = useQuery(appSettingsQueryOptions())
 await settingsQuery.suspense().catch(handleError)
@@ -39,19 +19,43 @@ const defaultResolution = computed(
 	() => (settingsQuery.data.value?.game_resolution.slice() ?? [0, 0]) as [number, number],
 )
 
-const source = useSettingsSource(draft, () => ({
-	fullscreen: defaultFullscreen.value,
-	resolution: defaultResolution.value,
-}))
+const {
+	source,
+	values: windowSettings,
+	update,
+	debouncedField,
+} = useSettingsSource<{
+	fullscreen: boolean | null
+	resolution: [number, number] | null
+}>({
+	read: (current) => ({
+		fullscreen: current.force_fullscreen ?? null,
+		resolution: current.game_resolution ?? null,
+	}),
+	write: (value) => ({
+		force_fullscreen: value.fullscreen,
+		game_resolution: value.resolution,
+	}),
+	defaults: () => ({
+		fullscreen: defaultFullscreen.value,
+		resolution: defaultResolution.value,
+	}),
+})
 
-const fullscreen = computed(() => draft.value.fullscreen ?? defaultFullscreen.value)
-const resolution = computed(() => draft.value.resolution ?? defaultResolution.value)
+const fullscreen = computed(() => windowSettings.value.fullscreen ?? defaultFullscreen.value)
+const resolution = computed(() => windowSettings.value.resolution ?? defaultResolution.value)
 
-function setDimension(index: 0 | 1, value: number) {
-	const next = resolution.value.slice() as [number, number]
-	next[index] = value
-	draft.value.resolution = next
+function isDimension(value: number | undefined): value is number {
+	return typeof value === 'number' && Number.isFinite(value)
 }
+
+function saveResolution() {
+	if (!isDimension(width.model) || !isDimension(height.model)) return
+	update({ resolution: [width.model, height.model] })
+}
+
+const width = debouncedField<number | undefined>(() => resolution.value[0], saveResolution)
+const height = debouncedField<number | undefined>(() => resolution.value[1], saveResolution)
 
 const messages = defineMessages({
 	settingsHeading: {
@@ -118,7 +122,7 @@ const messages = defineMessages({
 				<Toggle
 					id="fullscreen"
 					:model-value="fullscreen"
-					@update:model-value="(value) => (draft.fullscreen = value)"
+					@update:model-value="(value) => update({ fullscreen: value })"
 				/>
 			</div>
 
@@ -133,12 +137,14 @@ const messages = defineMessages({
 				</div>
 				<Input
 					id="width"
-					:model-value="resolution[0]"
+					:model-value="width.model"
 					autocomplete="off"
 					:disabled="fullscreen"
 					type="number"
 					:placeholder="formatMessage(messages.enterWidth)"
-					@update:model-value="(value) => setDimension(0, Number(value))"
+					@focus="width.onFocus"
+					@blur="width.onBlur"
+					@update:model-value="(value) => (width.model = typeof value === 'number' ? value : undefined)"
 				/>
 			</div>
 
@@ -153,12 +159,14 @@ const messages = defineMessages({
 				</div>
 				<Input
 					id="height"
-					:model-value="resolution[1]"
+					:model-value="height.model"
 					autocomplete="off"
 					:disabled="fullscreen"
 					type="number"
 					:placeholder="formatMessage(messages.enterHeight)"
-					@update:model-value="(value) => setDimension(1, Number(value))"
+					@focus="height.onFocus"
+					@blur="height.onBlur"
+					@update:model-value="(value) => (height.model = typeof value === 'number' ? value : undefined)"
 				/>
 			</div>
 		</div>

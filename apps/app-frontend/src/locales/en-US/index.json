@@ -3315,7 +3315,7 @@
     "message": "Edit game settings"
   },
   "app.settings.synced-options.game-settings.conflict-text": {
-    "message": "We loaded the latest settings. Check your changes, then save again."
+    "message": "We loaded the latest settings. Check your change and try again."
   },
   "app.settings.synced-options.game-settings.conflict-title": {
     "message": "These settings changed elsewhere"
@@ -3353,9 +3353,6 @@
   "app.settings.synced-options.game-settings.retry": {
     "message": "Retry"
   },
-  "app.settings.synced-options.game-settings.save": {
-    "message": "Save settings"
-  },
   "app.settings.synced-options.game-settings.search": {
     "message": "Search settings..."
   },
@@ -3373,9 +3370,6 @@
   },
   "app.settings.synced-options.game-settings.title": {
     "message": "Game settings"
-  },
-  "app.settings.synced-options.game-settings.unsaved-changes": {
-    "message": "You have unsaved changes."
   },
   "app.settings.synced-options.game-settings.unsync-setting": {
     "message": "Stop syncing {setting} across instances"
@@ -4430,6 +4424,9 @@
   "instance.settings.tabs.sharing": {
     "message": "Sharing"
   },
+  "instance.settings.tabs.synced-options.app-settings": {
+    "message": "App settings"
+  },
   "instance.settings.tabs.synced-options.command-history": {
     "message": "Unsync command history"
   },
@@ -4457,6 +4454,9 @@
   "instance.settings.tabs.synced-options.game-settings.disabled-in-app": {
     "message": "Game settings syncing is turned off in app settings."
   },
+  "instance.settings.tabs.synced-options.heading": {
+    "message": "Synced settings"
+  },
   "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
     "message": "The version being replaced will be backed up before anything changes."
   },
@@ -4481,11 +4481,8 @@
   "instance.settings.tabs.synced-options.multiplayer-servers.override-description": {
     "message": "Keep this instance's multiplayer servers separate from synced servers."
   },
-  "instance.settings.tabs.synced-options.open-app-settings": {
-    "message": "Manage synced settings"
-  },
   "instance.settings.tabs.synced-options.shared-settings.description": {
-    "message": "Enable an override to keep a synced setting separate for this instance."
+    "message": "Enable an override to stop syncing for this instance."
   },
   "instance.settings.tabs.syncing": {
     "message": "Syncing"

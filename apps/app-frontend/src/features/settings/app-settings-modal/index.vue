@@ -25,7 +25,6 @@ import {
 	injectNotificationManager,
 	ProgressBar,
 	TabbedModal,
-	UnsavedChangesPopup,
 	useVIntl,
 } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -52,7 +51,6 @@ import ResourceManagementSettings from '@/features/settings/system/resource-mana
 import TroubleshootingSettings from '@/features/settings/system/troubleshooting-settings.vue'
 import { appSettingsKeys, appSettingsQueryOptions, set } from '@/helpers/settings.ts'
 import { injectAppUpdateDownloadProgress } from '@/providers/download-progress.ts'
-import { useUnsavedChangesHost } from '@/shared/unsaved-changes/use-unsaved-changes-host'
 
 import { provideAppSettingsModal } from './context'
 
@@ -225,17 +223,6 @@ const availableTabs = computed(() =>
 )
 
 const modal = ref<InstanceType<typeof TabbedModal> | null>(null)
-const {
-	popup: unsavedChangesPopup,
-	original: originalUnsavedChangesState,
-	modified: modifiedUnsavedChangesState,
-	saving: savingUnsavedChanges,
-	hasUnsavedChanges,
-	canLeave: canLeaveCurrentTab,
-	register: registerUnsavedChangesController,
-	reset: resetUnsavedChanges,
-	save: saveUnsavedChanges,
-} = useUnsavedChangesHost()
 
 function close(): boolean {
 	return modal.value?.hide() ?? false
@@ -243,7 +230,6 @@ function close(): boolean {
 
 provideAppSettingsModal({
 	close,
-	registerUnsavedChangesController,
 })
 
 function show() {
@@ -354,21 +340,7 @@ const messages = defineMessages({
 		ref="modal"
 		:tabs="availableTabs"
 		:header="formatMessage(commonMessages.settingsLabel)"
-		:before-hide="canLeaveCurrentTab"
-		:before-tab-change="canLeaveCurrentTab"
-		:floating-action-bar-shown="hasUnsavedChanges"
 	>
-		<template #floating-action-bar>
-			<UnsavedChangesPopup
-				ref="unsavedChangesPopup"
-				:original="originalUnsavedChangesState"
-				:modified="modifiedUnsavedChangesState"
-				:saving="savingUnsavedChanges"
-				inline
-				@reset="resetUnsavedChanges"
-				@save="saveUnsavedChanges"
-			/>
-		</template>
 		<template #footer>
 			<div class="mt-auto text-secondary text-sm">
 				<div v-if="progress > 0 && progress < 1" class="mb-3">

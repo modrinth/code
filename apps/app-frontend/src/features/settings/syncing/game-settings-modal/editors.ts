@@ -1,26 +1,13 @@
-import { toRaw } from 'vue'
-
 import type {
 	EditableGameSetting,
 	GameOptionCanonicalValue,
-	GameSettingChange,
 	GameSettingsEditorState,
 } from '@/helpers/game-options'
 
-function clonePlainValue(value: unknown): unknown {
-	if (Array.isArray(value)) {
-		return toRaw(value).map(clonePlainValue)
-	}
-	if (value !== null && typeof value === 'object') {
-		return Object.fromEntries(
-			Object.entries(toRaw(value)).map(([key, nestedValue]) => [key, clonePlainValue(nestedValue)]),
-		)
-	}
-	return value
-}
-
-export function cloneGameSettingsState(state: GameSettingsEditorState): GameSettingsEditorState {
-	return clonePlainValue(state) as GameSettingsEditorState
+export type GameSettingEdit = {
+	option_id: string
+	sync_enabled?: boolean
+	canonical_value?: GameOptionCanonicalValue | null
 }
 
 export function canonicalValuesEqual(
@@ -30,38 +17,55 @@ export function canonicalValuesEqual(
 	return JSON.stringify(left ?? null) === JSON.stringify(right ?? null)
 }
 
-export function gameSettingChanges(
-	base: GameSettingsEditorState | null,
-	draft: GameSettingsEditorState | null,
-	forcedValueOptionIds: ReadonlySet<string> = new Set(),
-): GameSettingChange[] {
-	if (!base || !draft) return []
+export function applyGameSettingEdits(
+	state: GameSettingsEditorState,
+	edits: readonly GameSettingEdit[],
+): GameSettingsEditorState {
+	if (edits.length === 0) return state
 
-	const baseSettings = new Map(base.settings.map((setting) => [setting.option_id, setting]))
-	return draft.settings.flatMap((setting) => {
-		const previous = baseSettings.get(setting.option_id)
-		if (!previous) return []
-
-		const syncChanged = previous.sync_enabled !== setting.sync_enabled
-		const valueChanged = !canonicalValuesEqual(previous.canonical_value, setting.canonical_value)
-		const promoteLocalValue =
-			forcedValueOptionIds.has(setting.option_id) &&
-			previous.value_state !== 'canonical' &&
-			setting.canonical_value !== null &&
-			setting.canonical_value !== undefined
-		if (!syncChanged && !valueChanged && !promoteLocalValue) return []
-
-		return [
-			{
-				option_id: setting.option_id,
-				base_option_revision: previous.option_revision,
-				...(syncChanged ? { sync_enabled: setting.sync_enabled } : {}),
-				...(valueChanged || promoteLocalValue
-					? { canonical_value: setting.canonical_value ?? null }
+	const editsById = new Map<string, GameSettingEdit>()
+	for (const edit of edits) {
+		editsById.set(edit.option_id, { ...editsById.get(edit.option_id), ...edit })
+	}
+	return {
+		...state,
+		settings: state.settings.map((setting): EditableGameSetting => {
+			const edit = editsById.get(setting.option_id)
+			if (!edit) return setting
+			return {
+				...setting,
+				...(edit.sync_enabled !== undefined ? { sync_enabled: edit.sync_enabled } : {}),
+				...(edit.canonical_value !== undefined
+					? {
+							canonical_value: edit.canonical_value,
+							value_state: edit.canonical_value ? 'canonical' : 'unset',
+						}
 					: {}),
-			},
-		]
-	})
+				validation_error: null,
+			}
+		}),
+	}
+}
+
+export function restoreGameSettingValues(
+	state: GameSettingsEditorState,
+	snapshot: readonly EditableGameSetting[],
+): GameSettingsEditorState {
+	const previousById = new Map(snapshot.map((setting) => [setting.option_id, setting]))
+	return {
+		...state,
+		settings: state.settings.map((setting) => {
+			const previous = previousById.get(setting.option_id)
+			if (!previous) return setting
+			return {
+				...setting,
+				sync_enabled: previous.sync_enabled,
+				canonical_value: previous.canonical_value,
+				value_state: previous.value_state,
+				validation_error: previous.validation_error,
+			}
+		}),
+	}
 }
 
 export function gameSettingNumberScale(setting: EditableGameSetting): number {

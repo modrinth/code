@@ -3,36 +3,15 @@ import { defineMessages, injectNotificationManager, Input, useVIntl } from '@mod
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
-import { edit } from '@/helpers/instance'
 import { appSettingsQueryOptions } from '@/helpers/settings.ts'
 
-import { injectInstanceSettings } from './instance-settings-context'
 import SettingsSourceHeader from './settings-source-header.vue'
-import { useInstanceSettingsDraft } from './use-instance-settings-draft'
 import { useSettingsSource } from './use-settings-source'
 
 type HookKey = 'pre_launch' | 'wrapper' | 'post_exit'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
-
-const { instance } = injectInstanceSettings()
-
-const hooks = useInstanceSettingsDraft<Record<HookKey, string | null>>(
-	() => ({
-		pre_launch: instance.value.hooks.pre_launch || null,
-		wrapper: instance.value.hooks.wrapper || null,
-		post_exit: instance.value.hooks.post_exit || null,
-	}),
-	(value) =>
-		edit(instance.value.id, {
-			hooks: {
-				pre_launch: value.pre_launch ?? '',
-				wrapper: value.wrapper ?? '',
-				post_exit: value.post_exit ?? '',
-			},
-		}),
-)
 
 const settingsQuery = useQuery(appSettingsQueryOptions())
 await settingsQuery.suspense().catch(handleError)
@@ -43,7 +22,37 @@ const defaultHooks = computed<Record<HookKey, string>>(() => ({
 	post_exit: settingsQuery.data.value?.hooks.post_exit ?? '',
 }))
 
-const source = useSettingsSource(hooks, () => defaultHooks.value)
+const {
+	source,
+	values: hooks,
+	update,
+	debouncedField,
+} = useSettingsSource<Record<HookKey, string | null>>({
+	read: (current) => ({
+		pre_launch: current.hooks.pre_launch || null,
+		wrapper: current.hooks.wrapper || null,
+		post_exit: current.hooks.post_exit || null,
+	}),
+	write: (value) => ({
+		hooks: {
+			pre_launch: value.pre_launch ?? '',
+			wrapper: value.wrapper ?? '',
+			post_exit: value.post_exit ?? '',
+		},
+	}),
+	defaults: () => defaultHooks.value,
+})
+
+function hookField(key: HookKey) {
+	return debouncedField(
+		() => hooks.value[key] ?? defaultHooks.value[key],
+		(value) => update({ [key]: value }),
+	)
+}
+
+const preLaunch = hookField('pre_launch')
+const wrapper = hookField('wrapper')
+const postExit = hookField('post_exit')
 
 const messages = defineMessages({
 	settingsHeading: {
@@ -137,11 +146,13 @@ const messages = defineMessages({
 				</h2>
 				<Input
 					id="pre-launch"
-					:model-value="hooks.pre_launch ?? defaultHooks.pre_launch"
+					:model-value="preLaunch.model"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.preLaunchEnter)"
 					wrapper-class="w-full"
-					@update:model-value="(value) => (hooks.pre_launch = String(value ?? ''))"
+					@focus="preLaunch.onFocus"
+					@blur="preLaunch.onBlur"
+					@update:model-value="(value) => (preLaunch.model = String(value ?? ''))"
 				/>
 				<p class="m-0">
 					{{ formatMessage(messages.preLaunchDescription) }}
@@ -154,11 +165,13 @@ const messages = defineMessages({
 				</h2>
 				<Input
 					id="wrapper"
-					:model-value="hooks.wrapper ?? defaultHooks.wrapper"
+					:model-value="wrapper.model"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.wrapperEnter)"
 					wrapper-class="w-full"
-					@update:model-value="(value) => (hooks.wrapper = String(value ?? ''))"
+					@focus="wrapper.onFocus"
+					@blur="wrapper.onBlur"
+					@update:model-value="(value) => (wrapper.model = String(value ?? ''))"
 				/>
 				<p class="m-0">
 					{{ formatMessage(messages.wrapperDescription) }}
@@ -171,11 +184,13 @@ const messages = defineMessages({
 				</h2>
 				<Input
 					id="post-exit"
-					:model-value="hooks.post_exit ?? defaultHooks.post_exit"
+					:model-value="postExit.model"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.postExitEnter)"
 					wrapper-class="w-full"
-					@update:model-value="(value) => (hooks.post_exit = String(value ?? ''))"
+					@focus="postExit.onFocus"
+					@blur="postExit.onBlur"
+					@update:model-value="(value) => (postExit.model = String(value ?? ''))"
 				/>
 				<p class="m-0">
 					{{ formatMessage(messages.postExitDescription) }}
