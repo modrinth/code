@@ -97,6 +97,7 @@
 </template>
 
 <script setup lang="ts">
+import { getApiErrorMessage } from '@modrinth/api-client'
 import { CheckIcon, XIcon } from '@modrinth/assets'
 import {
 	Avatar,
@@ -132,16 +133,7 @@ const getQueryString = (
 	return typeof firstValue === 'string' ? firstValue : ''
 }
 
-const getErrorMessage = (error: unknown): string => {
-	const apiError = error as ApiErrorShape
-	if (typeof apiError?.data?.description === 'string') {
-		return apiError.data.description
-	}
-	if (error instanceof Error) {
-		return error.message
-	}
-	return String(error)
-}
+const getErrorMessage = (error: unknown): string => getApiErrorMessage(error)
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -257,7 +249,10 @@ const authorizationError = computed(() => {
 
 	const apiError = (error.value as ApiErrorShape | null)?.data
 	if (apiError) {
-		return apiError
+		return {
+			...apiError,
+			description: getApiErrorMessage(error.value),
+		}
 	}
 
 	if (error.value) {

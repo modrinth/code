@@ -342,6 +342,7 @@
 </template>
 
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import { ImageIcon, ScaleIcon, TrashIcon, UploadIcon } from '@modrinth/assets'
 import {
 	Avatar,
@@ -749,7 +750,7 @@ const uploadBanner = async () => {
 	} catch (err) {
 		addNotification({
 			title: 'Failed to update banner',
-			text: err.data?.description ?? String(err),
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -770,7 +771,7 @@ const deleteBanner = async () => {
 	} catch (err) {
 		addNotification({
 			title: 'Failed to remove banner',
-			text: err.data?.description ?? String(err),
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}

@@ -194,6 +194,7 @@
 	</div>
 </template>
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	CheckIcon,
 	CurrencyIcon,
@@ -343,7 +344,7 @@ async function applyCredit() {
 	} catch (err) {
 		addNotification({
 			title: 'Error applying credit',
-			text: err.data?.description ?? String(err),
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -367,7 +368,7 @@ async function refundCharge() {
 	} catch (err) {
 		addNotification({
 			title: 'Error refunding',
-			text: err.data?.description ?? err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -389,7 +390,7 @@ async function modifyCharge() {
 	} catch (err) {
 		addNotification({
 			title: 'Error while sending request',
-			text: err.data?.description ?? err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}

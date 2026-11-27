@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '@modrinth/api-client'
 import type { AbstractWebNotificationManager } from '@modrinth/ui'
 import { injectNotificationManager } from '@modrinth/ui'
 
@@ -17,7 +18,7 @@ type useClientTry = <TArgs extends any[], TResult>(
 const defaultOnError: ErrorFunction = (error, addNotification) => {
 	addNotification({
 		title: 'An error occurred',
-		text: error?.data?.description || error.message || error || 'Unknown error',
+		text: getApiErrorMessage(error),
 		type: 'error',
 	})
 }

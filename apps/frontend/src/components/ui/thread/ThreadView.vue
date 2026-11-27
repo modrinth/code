@@ -116,7 +116,7 @@
 </template>
 
 <script setup lang="ts" generic="T">
-import type { Labrinth } from '@modrinth/api-client'
+import { getApiErrorMessage, type Labrinth } from '@modrinth/api-client'
 import {
 	ArrowUpFromLineIcon,
 	ChevronDownIcon,
@@ -282,7 +282,7 @@ async function sendReply(privateMessage = false) {
 	} catch (err: any) {
 		addNotification({
 			title: 'Error sending message',
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}

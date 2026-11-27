@@ -197,6 +197,7 @@
 </template>
 
 <script setup lang="ts">
+import { getApiErrorMessage } from '@modrinth/api-client'
 import { BoxIcon, UserIcon } from '@modrinth/assets'
 import {
 	buildDependentsSearchFilters,
@@ -1053,23 +1054,7 @@ function setDependentProjectSearchInput(query: string) {
 }
 
 function getDependentProjectSearchErrorMessage(error: unknown): string {
-	if (error && typeof error === 'object') {
-		const dataDescription = (error as { data?: { description?: unknown } }).data?.description
-		if (typeof dataDescription === 'string' && dataDescription.length > 0) {
-			return dataDescription
-		}
-
-		const message = (error as { message?: unknown }).message
-		if (typeof message === 'string' && message.length > 0) {
-			return message
-		}
-	}
-
-	if (typeof error === 'string' && error.length > 0) {
-		return error
-	}
-
-	return 'Please try searching again or changing the selected projects.'
+	return getApiErrorMessage(error, 'Please try searching again or changing the selected projects.')
 }
 
 function getDateTimestamp(date: string | undefined): number | undefined {

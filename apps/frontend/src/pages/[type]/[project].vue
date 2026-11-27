@@ -565,6 +565,7 @@
 </template>
 
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	ChartIcon,
 	ClipboardCopyIcon,
@@ -1415,11 +1416,7 @@ function mergeV3ProjectPatch(old, data) {
 }
 
 function addProjectMutationErrorNotification(error) {
-	const description =
-		error?.v1Error?.description ??
-		error?.responseData?.description ??
-		error?.data?.description ??
-		error?.message
+	const description = getApiErrorMessage(error)
 	const response = error?.responseData ?? error?.data ?? error?.v1Error
 	const isProjectValidationError =
 		Array.isArray(response?.details?.nags) || description === PROJECT_REVIEW_VALIDATION_ERROR
@@ -2005,7 +2002,7 @@ async function checkModpackArchives() {
 	} catch (error) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: error?.data?.description ?? error?.message ?? String(error),
+			text: getApiErrorMessage(error),
 			type: 'error',
 		})
 	} finally {

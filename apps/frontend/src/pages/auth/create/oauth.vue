@@ -24,6 +24,7 @@
 </template>
 
 <script setup lang="ts">
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	commonMessages,
 	defineMessages,
@@ -46,22 +47,8 @@ import {
 	launcherAuthMessages,
 	type LauncherHandoff,
 } from '@/composables/launcher-auth.ts'
-interface ApiErrorShape {
-	data?: {
-		description?: string
-	}
-}
 
-const getErrorMessage = (error: unknown): string => {
-	const apiError = error as ApiErrorShape
-	if (typeof apiError?.data?.description === 'string') {
-		return apiError.data.description
-	}
-	if (error instanceof Error) {
-		return error.message
-	}
-	return String(error)
-}
+const getErrorMessage = (error: unknown): string => getApiErrorMessage(error)
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()

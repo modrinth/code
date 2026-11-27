@@ -142,7 +142,7 @@
 	</template>
 </template>
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import { getApiErrorMessage, type Labrinth } from '@modrinth/api-client'
 import { IssuesIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	Admonition,
@@ -563,11 +563,6 @@ async function setStatus(status: Labrinth.Projects.v2.ProjectStatus, reviewReaso
 }
 
 function getErrorDescription(err: unknown): string {
-	if (typeof err === 'object' && err !== null && 'data' in err) {
-		const data = (err as { data?: { description?: string } }).data
-		if (data?.description) return data.description
-	}
-
-	return err instanceof Error ? err.message : String(err)
+	return getApiErrorMessage(err)
 }
 </script>

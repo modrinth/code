@@ -621,6 +621,7 @@
 </template>
 
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	BoxIcon,
 	GameIcon,
@@ -1100,7 +1101,7 @@ const handleError = (err) => {
 	addNotification({
 		title: formatMessage(commonMessages.errorNotificationTitle),
 		type: 'error',
-		text: err.message ?? (err.data ? err.data.description : err),
+		text: getApiErrorMessage(err),
 	})
 }
 

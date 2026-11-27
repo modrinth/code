@@ -557,7 +557,7 @@
 					addNotification({
 						title: formatMessage(commonMessages.errorNotificationTitle),
 						type: 'error',
-						text: err.message ?? (err.data ? err.data.description : err),
+						text: getApiErrorMessage(err),
 					})
 			"
 			:customer="customer"
@@ -682,6 +682,7 @@
 </template>
 
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
 	CheckCircleIcon,
@@ -1187,7 +1188,7 @@ async function editPaymentMethod(index, primary) {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -1202,7 +1203,7 @@ async function removePaymentMethod(index) {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -1220,7 +1221,7 @@ async function cancelSubscription(id, cancelled) {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}

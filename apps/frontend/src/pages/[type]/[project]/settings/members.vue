@@ -558,6 +558,7 @@
 </template>
 
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	CheckIcon,
 	CrownIcon,
@@ -727,7 +728,7 @@ const inviteTeamMember = async () => {
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',
-			text: err?.data?.description || err?.message || err || 'Unknown error',
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -752,7 +753,7 @@ const removeTeamMember = async (index) => {
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',
-			text: err?.data?.description || err?.message || err || 'Unknown error',
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -789,7 +790,7 @@ const updateTeamMember = async (index) => {
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',
-			text: err?.data?.description || err?.message || err || 'Unknown error',
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -841,7 +842,7 @@ const transferOwnership = async (index) => {
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',
-			text: err?.data?.description || err?.message || err || 'Unknown error',
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -885,7 +886,7 @@ async function updateOrgMember(index) {
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',
-			text: err?.data?.description || err?.message || err || 'Unknown error',
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}

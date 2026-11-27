@@ -272,6 +272,7 @@
 	</div>
 </template>
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	CheckIcon,
 	EditIcon,
@@ -638,7 +639,7 @@ async function createPat() {
 		if (!isReauthCancelled(err)) {
 			addNotification({
 				title: formatMessage(commonMessages.errorNotificationTitle),
-				text: err.data ? err.data.description : err,
+				text: getApiErrorMessage(err),
 				type: 'error',
 			})
 		}
@@ -664,7 +665,7 @@ async function editPat() {
 		if (!isReauthCancelled(err)) {
 			addNotification({
 				title: formatMessage(commonMessages.errorNotificationTitle),
-				text: err.data ? err.data.description : err,
+				text: getApiErrorMessage(err),
 				type: 'error',
 			})
 		}
@@ -687,7 +688,7 @@ async function removePat(id) {
 		if (!isReauthCancelled(err)) {
 			addNotification({
 				title: formatMessage(commonMessages.errorNotificationTitle),
-				text: err.data ? err.data.description : err,
+				text: getApiErrorMessage(err),
 				type: 'error',
 			})
 		}

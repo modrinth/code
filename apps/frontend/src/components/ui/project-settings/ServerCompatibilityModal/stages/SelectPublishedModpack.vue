@@ -64,6 +64,7 @@
 </template>
 
 <script setup lang="ts">
+import { getApiErrorMessage } from '@modrinth/api-client'
 import { getLoaderIcon } from '@modrinth/assets'
 import {
 	Combobox,
@@ -128,7 +129,7 @@ watch(
 			const err = error as { data?: { description?: string } }
 			addNotification({
 				title: 'Failed to load versions',
-				text: err.data?.description || String(error),
+				text: getApiErrorMessage(err),
 				type: 'error',
 			})
 		} finally {

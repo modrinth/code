@@ -515,6 +515,7 @@
 </template>
 
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	CheckIcon,
 	DownloadIcon,
@@ -916,7 +917,7 @@ async function saveEmail() {
 		if (!isReauthCancelled(err)) {
 			addNotification({
 				title: formatMessage(commonMessages.errorNotificationTitle),
-				text: err.data ? err.data.description : err,
+				text: getApiErrorMessage(err),
 				type: 'error',
 			})
 		}
@@ -987,7 +988,7 @@ async function savePassword() {
 		if (!isReauthCancelled(err)) {
 			addNotification({
 				title: formatMessage(commonMessages.errorNotificationTitle),
-				text: err.data ? err.data.description : err,
+				text: getApiErrorMessage(err),
 				type: 'error',
 			})
 		}
@@ -1035,7 +1036,7 @@ async function showTwoFactorModal() {
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -1173,7 +1174,7 @@ async function deleteAccount() {
 		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -1203,7 +1204,7 @@ async function exportData() {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}

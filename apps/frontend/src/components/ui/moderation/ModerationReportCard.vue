@@ -243,6 +243,7 @@
 	</div>
 </template>
 <script setup lang="ts">
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
 	ExternalIcon,
@@ -446,7 +447,7 @@ async function closeReport(reply = false) {
 	} catch (err: any) {
 		addNotification({
 			title: 'Error closing report',
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -468,7 +469,7 @@ async function reopenReport() {
 	} catch (err: any) {
 		addNotification({
 			title: 'Error reopening report',
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 		if (reportClosed.value) {

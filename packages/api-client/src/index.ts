@@ -18,7 +18,7 @@ export {
 	type WebSocketEventHandler,
 	type WebSocketStatus,
 } from './core/abstract-websocket'
-export { ModrinthApiError, ModrinthServerError } from './core/errors'
+export { getApiErrorMessage, ModrinthApiError, ModrinthServerError } from './core/errors'
 export { type AuthConfig, AuthFeature } from './features/auth'
 export {
 	type CircuitBreakerConfig,

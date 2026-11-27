@@ -140,7 +140,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import { getApiErrorMessage, type Labrinth } from '@modrinth/api-client'
 import { OrganizationIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import {
@@ -493,7 +493,7 @@ async function createProject() {
 		const error = err as { data?: { description?: string } }
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: error.data?.description ?? String(err),
+			text: getApiErrorMessage(error),
 			type: 'error',
 		})
 	}

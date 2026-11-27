@@ -108,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
+import { type Archon, getApiErrorMessage } from '@modrinth/api-client'
 import { PlusIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Avatar,
@@ -176,7 +176,7 @@ async function refreshHistory() {
 			}
 		}
 	} catch (err: any) {
-		error.value = err?.data?.description ?? err?.message ?? String(err)
+		error.value = getApiErrorMessage(err)
 	} finally {
 		loading.value = false
 	}
@@ -276,7 +276,7 @@ async function confirmCancel() {
 	} catch (err: any) {
 		addNotification({
 			title: 'Error cancelling transfer',
-			text: err?.data?.description ?? err?.message ?? String(err),
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}

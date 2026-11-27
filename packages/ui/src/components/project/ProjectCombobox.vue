@@ -18,6 +18,7 @@
 </template>
 
 <script lang="ts" setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import { PackageIcon } from '@modrinth/assets'
 import { useDebounceFn } from '@vueuse/core'
 import Fuse from 'fuse.js'
@@ -255,10 +256,9 @@ const search = async (query: string) => {
 
 		options.value = uniqueHits.map(hitToOption)
 	} catch (error: unknown) {
-		const err = error as { data?: { description?: string } }
 		addNotification({
 			title: 'An error occurred',
-			text: err.data ? err.data.description : String(error),
+			text: getApiErrorMessage(error),
 			type: 'error',
 		})
 	}

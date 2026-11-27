@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import { getApiErrorMessage, type Labrinth } from '@modrinth/api-client'
 import {
 	ArrowDownIcon,
 	ArrowUpIcon,
@@ -221,7 +221,7 @@ async function cancelPayout(): Promise<void> {
 	} catch (err: any) {
 		addNotification({
 			title: 'Failed to cancel transaction',
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}

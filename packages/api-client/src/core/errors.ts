@@ -141,6 +141,70 @@ function formatV1ErrorMessage(error: ModrinthErrorResponse): string {
 	return readableErrorDetail(error.details) ?? error.description
 }
 
+function findModrinthErrorResponse(error: unknown): ModrinthErrorResponse | undefined {
+	if (isModrinthErrorResponse(error)) {
+		return error
+	}
+
+	if (!error || typeof error !== 'object') {
+		return undefined
+	}
+
+	const record = error as {
+		v1Error?: unknown
+		responseData?: unknown
+		data?: unknown
+	}
+
+	if (isModrinthErrorResponse(record.v1Error)) {
+		return record.v1Error
+	}
+	if (isModrinthErrorResponse(record.responseData)) {
+		return record.responseData
+	}
+	if (isModrinthErrorResponse(record.data)) {
+		return record.data
+	}
+
+	return undefined
+}
+
+export function getApiErrorMessage(error: unknown, fallback = 'Unknown error'): string {
+	const response = findModrinthErrorResponse(error)
+	if (response) {
+		const message =
+			response.error === 'internal_error'
+				? response.description.trim() || readableErrorDetail(response.details)
+				: formatV1ErrorMessage(response).trim()
+		if (message) {
+			return message
+		}
+	}
+
+	if (typeof error === 'string') {
+		const trimmed = error.trim()
+		if (trimmed) {
+			return trimmed
+		}
+	}
+
+	if (error instanceof Error) {
+		const message = error.message.trim()
+		if (message) {
+			return message
+		}
+	}
+
+	if (error && typeof error === 'object' && 'message' in error) {
+		const message = (error as { message?: unknown }).message
+		if (typeof message === 'string' && message.trim()) {
+			return message.trim()
+		}
+	}
+
+	return fallback
+}
+
 function readableErrorDetail(details: unknown): string | undefined {
 	if (typeof details === 'string') {
 		const trimmed = details.trim()
