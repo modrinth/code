@@ -9,8 +9,8 @@
 		:style="{ height }"
 	>
 		<component
-			:is="editorComponent"
-			v-if="editorComponent"
+			:is="resolvedRuntime.component"
+			v-if="resolvedRuntime"
 			:value="model"
 			lang="rhai"
 			theme="modrinth"
@@ -40,7 +40,9 @@
 import { LoaderCircleIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import type { Ace } from 'ace-builds'
-import { type Component, computed, onMounted, ref, shallowRef, watchEffect } from 'vue'
+import { computed, onMounted, ref, shallowRef, watchEffect } from 'vue'
+
+import { loadRhaiEditor, type RhaiEditorRuntime } from './rhai-editor-runtime'
 
 const model = defineModel<string>({ required: true })
 const props = withDefaults(
@@ -53,15 +55,16 @@ const props = withDefaults(
 		label?: string
 		variant?: 'default' | 'source'
 		wordWrap?: boolean
+		runtime?: RhaiEditorRuntime
 	}>(),
 	{ wordWrap: true, label: 'Rhai expression' },
 )
-const editorComponent = shallowRef<Component | null>(null)
-const languageOptions = shallowRef<Partial<Ace.EditorOptions>>({})
+const localRuntime = shallowRef<RhaiEditorRuntime>()
+const resolvedRuntime = computed(() => props.runtime ?? localRuntime.value)
 const loadFailed = ref(false)
 const editorInput = shallowRef<HTMLTextAreaElement>()
 const editorOptions = computed(() => ({
-	...languageOptions.value,
+	...resolvedRuntime.value?.options,
 	enableKeyboardAccessibility: true,
 	readOnly: props.disabled ?? false,
 	wrap: props.wordWrap,
@@ -70,14 +73,7 @@ const editorOptions = computed(() => ({
 async function loadEditor() {
 	loadFailed.value = false
 	try {
-		await import('@modrinth/ui/src/utils/ace-theme')
-		const [{ VAceEditor }, { RHAI_EDITOR_OPTIONS }] = await Promise.all([
-			import('vue3-ace-editor'),
-			import('../ace-rhai'),
-			import('ace-builds/src-noconflict/ext-language_tools'),
-		])
-		languageOptions.value = RHAI_EDITOR_OPTIONS
-		editorComponent.value = VAceEditor
+		localRuntime.value = await loadRhaiEditor()
 	} catch {
 		loadFailed.value = true
 	}
@@ -106,7 +102,9 @@ watchEffect(() => {
 	}
 })
 
-onMounted(loadEditor)
+onMounted(() => {
+	if (!props.runtime) void loadEditor()
+})
 </script>
 
 <style scoped>

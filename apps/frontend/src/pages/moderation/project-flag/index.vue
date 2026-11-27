@@ -42,17 +42,15 @@
 				/>
 			</template>
 			<ProjectFlagRunHistory v-if="activeTab === 'runs'" />
-			<ProjectFlagModules v-else-if="activeTab === 'modules'" />
 		</ProjectFlagRules>
 		<ProjectFlagRuleEditor />
 	</div>
 </template>
 
 <script setup lang="ts">
-import { BoxIcon, HistoryIcon, TagCategoryFlagIcon } from '@modrinth/assets'
+import { HistoryIcon, TagCategoryFlagIcon } from '@modrinth/assets'
 import { Tabs, type TabsValue } from '@modrinth/ui'
 
-import ProjectFlagModules from '~/components/ui/moderation/project-flag/ProjectFlagModules.vue'
 import ProjectFlagRules from '~/components/ui/moderation/project-flag/rules/index.vue'
 import ProjectFlagRuleEditor from '~/components/ui/moderation/project-flag/rules/rule-editor/overlay.vue'
 import ProjectFlagRunHistory from '~/components/ui/moderation/project-flag/run-history.vue'
@@ -61,18 +59,15 @@ useHead({ title: 'Project flag rules - Modrinth' })
 
 const route = useRoute()
 const router = useRouter()
-const activeTab = computed(() =>
-	route.query.tab === 'runs' || route.query.tab === 'modules' ? route.query.tab : 'rules',
-)
+const activeTab = computed(() => (route.query.tab === 'runs' ? 'runs' : 'rules'))
 const tabs = [
 	{ label: 'Flag rules', value: 'rules', icon: TagCategoryFlagIcon },
 	{ label: 'Flag rule runs', value: 'runs', icon: HistoryIcon },
-	{ label: 'Modules', value: 'modules', icon: BoxIcon },
 ]
 
 function switchTab(tab: TabsValue) {
 	return router.push({
-		query: { ...route.query, tab: tab === 'runs' || tab === 'modules' ? tab : undefined },
+		query: { ...route.query, tab: tab === 'runs' ? tab : undefined },
 	})
 }
 </script>

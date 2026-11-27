@@ -19,16 +19,23 @@
 			<div
 				v-if="isPending"
 				role="status"
-				class="universal-card flex items-center justify-center gap-2 py-8"
+				class="universal-card m-0 flex h-[102px] items-center justify-center gap-2"
 			>
 				<LoaderCircleIcon class="animate-spin" />
 				Loading project flag rules…
 			</div>
-			<div v-if="isError" role="alert" class="universal-card flex flex-col items-start gap-3">
+			<div
+				v-if="isError"
+				role="alert"
+				class="universal-card m-0 flex h-[102px] items-center justify-center"
+			>
 				<Button :disabled="isFetching" @click="refetch()">Try again</Button>
 			</div>
 			<template v-if="data">
-				<div v-if="rules.length === 0" class="universal-card flex flex-col gap-2 py-8 text-center">
+				<div
+					v-if="rules.length === 0"
+					class="universal-card m-0 flex h-[102px] flex-col justify-center gap-2 text-center"
+				>
 					<h2 class="m-0 text-lg font-bold text-contrast">No project flag rules</h2>
 					<p class="m-0 text-secondary">Create a rule to get started.</p>
 				</div>

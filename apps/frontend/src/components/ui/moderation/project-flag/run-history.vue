@@ -32,7 +32,7 @@
 					color="brand"
 					:disabled="isStarting"
 					class="ml-auto max-w-full shrink-0"
-					@click="startRun()"
+					@click="startRunModal?.show()"
 				>
 					<LoaderCircleIcon v-if="isStarting" class="animate-spin" />
 					<PlayIcon v-else />
@@ -43,10 +43,18 @@
 				Runs are listed while Temporal history is available. Stored results and deployed rulesets
 				can outlive it.
 			</p>
-			<div v-if="isPending" role="status" class="universal-card flex items-center gap-2">
+			<div
+				v-if="isPending"
+				role="status"
+				class="universal-card m-0 flex h-[102px] items-center justify-center gap-2"
+			>
 				<LoaderCircleIcon class="animate-spin" /> Loading project flag runs…
 			</div>
-			<div v-if="isError" role="alert" class="universal-card flex flex-col items-start gap-3">
+			<div
+				v-if="isError"
+				role="alert"
+				class="universal-card m-0 flex h-[102px] items-center justify-center"
+			>
 				<Button :disabled="isFetching" @click="refetch()">Try again</Button>
 			</div>
 			<ul v-if="runs.length" class="m-0 flex list-none flex-col gap-3 p-0">
@@ -113,7 +121,10 @@
 					</div>
 				</li>
 			</ul>
-			<p v-else-if="data" class="universal-card m-0 py-6 text-center text-secondary">
+			<p
+				v-else-if="data"
+				class="universal-card m-0 flex h-[102px] items-center justify-center text-center text-secondary"
+			>
 				{{
 					data.length ? 'No runs match your search and time period.' : 'No project flag runs yet.'
 				}}
@@ -132,6 +143,22 @@
 				/>
 			</div>
 		</ProjectFlagRunActions>
+		<NewModal ref="startRunModal" header="Start flag rule run?" :disable-close="isStarting">
+			<div class="flex w-[32rem] max-w-full flex-col gap-4">
+				<p class="m-0 text-secondary">
+					Run the current flag rules against all projects in the review queue to preview their
+					outcomes.
+				</p>
+				<div class="flex justify-end gap-2">
+					<Button :disabled="isStarting" @click="startRunModal?.hide()">Cancel</Button>
+					<Button type="colored" color="brand" :disabled="isStarting" @click="startRun()">
+						<LoaderCircleIcon v-if="isStarting" class="animate-spin" />
+						<PlayIcon v-else />
+						{{ isStarting ? 'Starting run…' : 'Start run' }}
+					</Button>
+				</div>
+			</div>
+		</NewModal>
 	</div>
 </template>
 
@@ -150,7 +177,9 @@ import {
 	Avatar,
 	Button,
 	injectModrinthClient,
+	injectNotificationManager,
 	Input,
+	NewModal,
 	Pagination,
 	TagItem,
 	TeleportOverflowMenu,
@@ -175,6 +204,7 @@ import ProjectFlagScanBadge from './scan-badge.vue'
 
 const client = injectModrinthClient()
 const api = client.labrinth.project_flags_internal
+const { addNotification } = injectNotificationManager()
 const PAGE_SIZE = 25
 const offset = ref(0)
 const search = ref('')
@@ -190,24 +220,41 @@ const timeframe = reactive<TimeFramePickerSelection>({
 })
 const { data: activity, error: activityError } = useQuery(projectFlagRunActivityOptions(client))
 const queryClient = useQueryClient()
+const historyOptions = projectFlagRunHistoryOptions(client)
+const startRunModal = useTemplateRef<InstanceType<typeof NewModal>>('startRunModal')
 const {
 	mutate: startRun,
 	isPending: isStarting,
-	error: startError,
+	isSuccess: startSucceeded,
 } = useMutation({
 	mutationFn: () => api.startRun(),
 	retry: false,
-	onSuccess: async () => {
-		offset.value = 0
-		await Promise.all([
-			queryClient.invalidateQueries({ queryKey: projectFlagRunHistoryKey }),
-			queryClient.invalidateQueries({ queryKey: projectFlagRunActivityKey }),
+	onSuccess: async (run) => {
+		addNotification({ type: 'success', title: 'Flag rule run started' })
+		await queryClient.cancelQueries({ queryKey: projectFlagRunHistoryKey })
+		queryClient.setQueryData(historyOptions.queryKey, (runs) => [
+			run,
+			...(runs ?? []).filter(({ id }) => id !== run.id),
 		])
+		search.value = ''
+		timeframe.mode = 'preset'
+		timeframe.preset = 'all_time'
+		offset.value = 0
+		void queryClient.invalidateQueries({ queryKey: projectFlagRunHistoryKey })
+		void queryClient.invalidateQueries({ queryKey: projectFlagRunActivityKey })
+	},
+	onError: (error) => {
+		addNotification({ type: 'error', title: 'Could not start the run', text: error.message })
 	},
 })
-const { data, isPending, isError, error, isFetching, refetch } = useQuery(
-	projectFlagRunHistoryOptions(client),
+watch(
+	startSucceeded,
+	(success) => {
+		if (success) startRunModal.value?.hide()
+	},
+	{ flush: 'post' },
 )
+const { data, isPending, isError, error, isFetching, refetch } = useQuery(historyOptions)
 const timeFilteredRuns = computed(() => {
 	const history = data.value ?? []
 	if (timeframe.mode === 'preset' && timeframe.preset === 'all_time') return history
@@ -273,7 +320,6 @@ function runPath(id: string) {
 }
 
 useFlagErrorNotification(activityError, 'Could not load scan activity')
-useFlagErrorNotification(startError, 'Could not start the run')
 useFlagErrorNotification(error, 'Could not load runs')
 useFlagErrorNotification(startersError, 'Could not load run starters')
 </script>

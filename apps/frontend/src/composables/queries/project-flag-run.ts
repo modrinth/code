@@ -11,6 +11,7 @@ const COMPLETED_RESULTS_CACHE_TIME = 3 * 60 * 60_000
 
 export const projectFlagRunHistoryKey = ['moderation', 'project-flag', 'runs', 'history'] as const
 export const projectFlagRunActivityKey = ['moderation', 'project-flag', 'runs', 'activity'] as const
+export const projectFlagHiddenRunIdsKey = ['moderation', 'project-flag', 'hidden-run-ids'] as const
 
 export function projectFlagRunActivityOptions(client: AbstractModrinthClient) {
 	return queryOptions({
@@ -23,17 +24,29 @@ export function projectFlagRunActivityOptions(client: AbstractModrinthClient) {
 export function projectFlagRunHistoryOptions(client: AbstractModrinthClient) {
 	return queryOptions({
 		queryKey: projectFlagRunHistoryKey,
-		queryFn: async ({ signal }) => {
+		queryFn: async ({ client: queryClient, queryKey, signal }) => {
+			const api = client.labrinth.project_flags_internal
 			const runs = new Map<string, ProjectFlagRun>()
 			for (let offset = 0; ; offset += PAGE_LIMIT) {
 				signal.throwIfAborted()
-				const page = await client.labrinth.project_flags_internal.listRuns({
-					limit: PAGE_LIMIT,
-					offset,
-				})
+				const page = await api.listRuns({ limit: PAGE_LIMIT, offset })
 				for (const run of page) runs.set(run.id, run)
-				if (page.length < PAGE_LIMIT) return [...runs.values()]
+				if (page.length < PAGE_LIMIT) break
 			}
+
+			// Temporal can describe a new run before it appears in the visibility index.
+			signal.throwIfAborted()
+			const cachedRuns = queryClient.getQueryData<ProjectFlagRun[]>(queryKey) ?? []
+			const missingRuns = cachedRuns.filter((run) => !runs.has(run.id))
+			const describedRuns = await Promise.all(missingRuns.map(({ id }) => api.getRun(id)))
+			for (const run of describedRuns) {
+				if (run) runs.set(run.id, run)
+			}
+			// Temporal can still list a deleted run while its visibility index catches up.
+			for (const id of queryClient.getQueryData<string[]>(projectFlagHiddenRunIdsKey) ?? []) {
+				runs.delete(id)
+			}
+			return [...runs.values()].sort((a, b) => Date.parse(b.started_at) - Date.parse(a.started_at))
 		},
 		refetchInterval: (query) =>
 			query.state.data?.some((run) => typeof run.status === 'object') ? REFRESH_INTERVAL : false,

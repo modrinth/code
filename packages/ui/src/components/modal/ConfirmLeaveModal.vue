@@ -1,5 +1,11 @@
 <template>
-	<NewModal ref="modal" :header="localizeIfPossible(title)" fade="warning" max-width="500px">
+	<NewModal
+		ref="modal"
+		:header="localizeIfPossible(title)"
+		fade="warning"
+		max-width="500px"
+		:on-hide="cancel"
+	>
 		<div class="flex flex-col gap-6">
 			<Admonition :type="admonitionType" :header="localizeIfPossible(header)">
 				{{ localizeIfPossible(body) }}
@@ -8,7 +14,7 @@
 
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<Button type="outlined" @click="cancel">
+				<Button type="outlined" @click="modal?.hide()">
 					<XIcon />
 					{{ localizeIfPossible(stayLabel) }}
 				</Button>
@@ -23,7 +29,7 @@
 
 <script setup lang="ts">
 import { RightArrowIcon, XIcon } from '@modrinth/assets'
-import { ref } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import { Button } from '#ui/components/base/buttons'
@@ -77,26 +83,38 @@ function localizeIfPossible(message: MessageDescriptor | string) {
 }
 
 const modal = ref<InstanceType<typeof NewModal>>()
-let resolvePromise: ((value: boolean) => void) | null = null
+let pendingPrompt: Promise<boolean> | undefined
+let resolvePrompt: ((confirmed: boolean) => void) | undefined
 
 function prompt(): Promise<boolean> {
-	return new Promise((resolve) => {
-		resolvePromise = resolve
-		modal.value?.show()
+	if (pendingPrompt) return pendingPrompt
+	const confirmationModal = modal.value
+	if (!confirmationModal) return Promise.resolve(false)
+
+	const promise = new Promise<boolean>((resolve) => {
+		resolvePrompt = resolve
 	})
+	pendingPrompt = promise
+	confirmationModal.show()
+	return promise
 }
 
 function leave() {
+	finish(true)
 	modal.value?.hide()
-	resolvePromise?.(true)
-	resolvePromise = null
 }
 
 function cancel() {
-	modal.value?.hide()
-	resolvePromise?.(false)
-	resolvePromise = null
+	finish(false)
 }
 
+function finish(confirmed: boolean) {
+	const resolve = resolvePrompt
+	resolvePrompt = undefined
+	pendingPrompt = undefined
+	resolve?.(confirmed)
+}
+
+onBeforeUnmount(cancel)
 defineExpose({ prompt })
 </script>

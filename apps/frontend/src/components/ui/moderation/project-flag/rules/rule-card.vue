@@ -37,18 +37,32 @@
 				aria-label="Rhai expression preview"
 			><code v-if="preview"><template v-for="(line, index) in preview" :key="index"><span v-for="(token, tokenIndex) in line" :key="tokenIndex" :class="token.type.split('.').map((part) => 'ace_' + part)">{{ token.value }}</span>{{ index < preview.length - 1 ? '\n' : '' }}</template></code><code v-else>{{ rule.params.expression }}</code></pre>
 
-			<section class="flex min-w-0 flex-col gap-2" aria-label="File scan patterns">
-				<h3 class="m-0 text-sm font-semibold text-contrast">File scan patterns</h3>
-				<dl v-if="patterns.length" class="m-0 divide-y divide-surface-4">
-					<div v-for="[name, regex] in patterns" :key="name" class="flex flex-col gap-1 py-2">
-						<dt class="break-words text-sm font-medium text-primary">{{ name }}</dt>
-						<dd class="m-0 min-w-0 break-all text-sm text-secondary">
-							<code class="whitespace-pre-wrap">{{ regex }}</code>
-						</dd>
-					</div>
-				</dl>
-				<p v-else class="m-0 text-sm text-secondary">No file scan patterns.</p>
-			</section>
+			<div class="flex min-w-0 flex-col gap-4">
+				<section class="flex min-w-0 flex-col gap-2" aria-label="File scan patterns">
+					<h3 class="m-0 text-sm font-semibold text-contrast">File scan patterns</h3>
+					<dl v-if="patterns.length" class="m-0 divide-y divide-surface-4">
+						<div v-for="[name, regex] in patterns" :key="name" class="flex flex-col gap-1 py-2">
+							<dt class="break-words text-sm font-medium text-primary">{{ name }}</dt>
+							<dd class="m-0 min-w-0 break-all text-sm text-secondary">
+								<code class="whitespace-pre-wrap">{{ regex }}</code>
+							</dd>
+						</div>
+					</dl>
+					<p v-else class="m-0 text-sm text-secondary">No file scan patterns.</p>
+				</section>
+				<section class="flex min-w-0 flex-col gap-2" aria-label="AI questions">
+					<h3 class="m-0 text-sm font-semibold text-contrast">AI questions</h3>
+					<dl v-if="questions.length" class="m-0 divide-y divide-surface-4">
+						<div v-for="[key, { question }] in questions" :key="key" class="flex flex-col gap-1 py-2">
+							<dt class="break-words text-sm font-medium text-primary">{{ key }}</dt>
+							<dd class="m-0 min-w-0 whitespace-pre-wrap break-words text-sm text-secondary">
+								{{ question }}
+							</dd>
+						</div>
+					</dl>
+					<p v-else class="m-0 text-sm text-secondary">No AI questions.</p>
+				</section>
+			</div>
 		</div>
 
 		<p class="m-0 text-sm text-secondary">
@@ -85,6 +99,7 @@ const deploymentStatus = {
 	not_deployed: 'Not deployed',
 }
 const patterns = computed(() => Object.entries(props.rule.params.scan_files_for))
+const questions = computed(() => Object.entries(props.rule.params.decision_questions ?? {}))
 const tokenize = shallowRef<typeof tokenizeRhai>()
 const preview = computed(() => tokenize.value?.(props.rule.params.expression))
 

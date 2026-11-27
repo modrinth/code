@@ -1,4 +1,5 @@
 import type { StoryObj } from '@storybook/vue3-vite'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { ref } from 'vue'
 
 import { Button } from '../../components/base/buttons'
@@ -33,6 +34,26 @@ export const Default: Story = {
 			</div>
 		`,
 	}),
+}
+
+export const DismissWithEscape: Story = {
+	render: Default.render,
+	play: async ({ canvasElement }) => {
+		const canvas = within(canvasElement)
+		const body = within(canvasElement.ownerDocument.body)
+		const trigger = canvas.getByRole('button', { name: 'Trigger Leave Confirmation' })
+
+		await userEvent.click(trigger)
+		await body.findByRole('dialog', { name: 'Leave page?' })
+		await userEvent.keyboard('{Escape}')
+		await expect(await canvas.findByText('User chose to stay')).toBeVisible()
+		await waitFor(() => expect(body.queryByRole('dialog', { name: 'Leave page?' })).toBeNull())
+
+		await userEvent.click(trigger)
+		const dialog = await body.findByRole('dialog', { name: 'Leave page?' })
+		await userEvent.click(within(dialog).getByRole('button', { name: 'Leave page' }))
+		await expect(await canvas.findByText('User chose to leave')).toBeVisible()
+	},
 }
 
 export const CustomMessages: Story = {

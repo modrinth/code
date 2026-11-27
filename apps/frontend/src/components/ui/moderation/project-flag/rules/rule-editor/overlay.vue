@@ -1,194 +1,135 @@
 <template>
-	<span ref="anchor" hidden />
-	<Teleport v-if="target" :to="target">
+	<NewModal
+		ref="modal"
+		header="Project flag rule editor"
+		:close-on-click-outside="false"
+		:animate-resize="false"
+		:before-hide="() => !editorOpen"
+		:on-escape="closeEditor"
+		:on-after-hide="clearClosedEditor"
+		hide-header
+		no-padding
+		noblur
+		class="project-flag-editor-dialog !inset-0 !h-dvh !max-h-none !w-full !max-w-none !rounded-none !border-0 !bg-surface-2 !shadow-none ![scale:1]"
+	>
 		<div
-			v-if="selection"
-			ref="dialog"
-			role="dialog"
-			aria-modal="true"
-			aria-label="Project flag rule editor"
-			tabindex="-1"
-			class="project-flag-editor-dialog fixed inset-0 z-[9000] h-dvh overflow-auto overscroll-none bg-surface-2 text-primary outline-none lg:[@media_(min-height:36rem)]:overflow-hidden"
+			v-if="editor"
+			class="h-dvh overflow-auto overscroll-none lg:[@media_(min-height:36rem)]:overflow-hidden"
 		>
 			<RuleEditor
-				v-if="selection === 'new' || ruleReady || selection === createdRuleId"
-				:key="editorSession"
-				:initial-rule="rule"
-				:initial-project-id="sampleProjectId"
+				:key="editor.key"
+				:initial-rule="editor.rule"
+				:initial-project-id="editor.project"
+				:rhai-editor="editor.rhaiEditor"
 				:back-label="backLabel"
 				@close="closeEditor"
-				@created="showSavedRule"
+				@saved="onRuleSaved"
 			/>
-			<div v-else class="flex flex-col items-start gap-4 p-4">
-				<Button type="quiet" @click="closeEditor">← {{ backLabel }}</Button>
-				<p
-					v-if="isFetching || !error"
-					role="status"
-					class="m-0 flex items-center gap-2 text-secondary"
-				>
-					<LoaderCircleIcon class="size-4 animate-spin" /> Loading rule…
-				</p>
-				<template v-else>
-					<p role="alert" class="m-0 text-red">
-						{{ notFound ? 'This rule could not be found.' : 'Could not load the rule.' }}
-					</p>
-					<Button v-if="!notFound" @click="loadRule">Try again</Button>
-				</template>
-			</div>
 		</div>
-	</Teleport>
+	</NewModal>
 </template>
 
 <script setup lang="ts">
-import { LoaderCircleIcon } from '@modrinth/assets'
-import { Button, injectModrinthClient } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
+import type { ProjectFlagRule } from '@modrinth/api-client'
+import { injectModrinthClient, injectNotificationManager, NewModal } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 
-import { projectFlagRuleQueryOptions } from '~/composables/queries/project-flag'
+import {
+	projectFlagInputSchemaQueryOptions,
+	projectFlagModulesQueryOptions,
+	projectFlagRuleQueryOptions,
+} from '~/composables/queries/project-flag'
 
 import RuleEditor from './index.vue'
+import { loadRhaiEditor, type RhaiEditorRuntime } from './rhai-editor-runtime'
 
 withDefaults(defineProps<{ backLabel?: string }>(), { backLabel: 'Rules' })
 
 const route = useRoute()
 const router = useRouter()
-const anchor = useTemplateRef<HTMLElement>('anchor')
-const dialog = useTemplateRef<HTMLElement>('dialog')
-const target = shallowRef<HTMLElement>()
+const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
+let editorOpen = false
+let nextEditorKey = 0
 const selection = computed(() => {
 	const id = route.query.rule
 	return typeof id === 'string' && /^[A-Za-z0-9]+$/.test(id) ? id : undefined
 })
-const ruleId = computed(() => (selection.value === 'new' ? undefined : selection.value))
 const sampleProjectId = computed(() => {
 	const id = route.query.ruleProject ?? route.query.project
 	return typeof id === 'string' && /^[A-Za-z0-9]+$/.test(id) ? id : undefined
 })
-const createdRuleId = ref<string>()
-const editorSession = ref(0)
-const ruleReady = ref(false)
-let loadAttempt = 0
+const editor = shallowRef<{
+	key: number
+	rule?: ProjectFlagRule
+	project?: string
+	rhaiEditor: RhaiEditorRuntime
+}>()
 const client = injectModrinthClient()
-const {
-	data: rule,
-	isFetching,
-	error,
-	refetch,
-} = useQuery(
-	computed(() => ({
-		...projectFlagRuleQueryOptions(client, ruleId.value ?? ''),
-		enabled: false,
-	})),
-)
-const notFound = computed(() => (error.value as { statusCode?: number } | null)?.statusCode === 404)
+const queryClient = useQueryClient()
+const { addNotification } = injectNotificationManager()
 
 useHead(() =>
-	selection.value
+	editor.value
 		? {
-				title:
-					(ruleReady.value || selection.value === createdRuleId.value) && rule.value
-						? `${rule.value.name} - Project flag rules`
-						: 'Project flag rule editor - Modrinth',
+				title: editor.value.rule
+					? `${editor.value.rule.name} - Project flag rules`
+					: 'Project flag rule editor - Modrinth',
 			}
 		: {},
 )
 
 onMounted(() => {
-	target.value = anchor.value?.ownerDocument.body
 	watch(
 		[selection, sampleProjectId],
-		([current, project], [previous, previousProject]) => {
+		async ([current, project], [previous, previousProject], onCleanup) => {
 			if (
 				previous === 'new' &&
 				current &&
-				current === createdRuleId.value &&
+				current === editor.value?.rule?.id &&
 				project === previousProject
 			) {
 				return
 			}
 
-			createdRuleId.value = undefined
-			editorSession.value++
-			void loadRule()
+			if (editorOpen) {
+				editorOpen = false
+				modal.value?.hide()
+			}
+			if (!current) return
+
+			let cancelled = false
+			onCleanup(() => {
+				cancelled = true
+			})
+			try {
+				const [rule, rhaiEditor] = await Promise.all([
+					current === 'new'
+						? undefined
+						: queryClient.fetchQuery(projectFlagRuleQueryOptions(client, current)),
+					loadRhaiEditor(),
+					queryClient.prefetchQuery(projectFlagInputSchemaQueryOptions(client, project)),
+					queryClient.prefetchQuery(projectFlagModulesQueryOptions(client)),
+				])
+				if (cancelled) return
+				editor.value = { key: ++nextEditorKey, rule, project, rhaiEditor }
+				editorOpen = true
+				modal.value?.show()
+			} catch (error) {
+				if (cancelled) return
+				addNotification({
+					type: 'error',
+					title: 'Could not open the rule editor',
+					text: error instanceof Error ? error.message : String(error),
+				})
+				void closeEditor()
+			}
 		},
 		{ immediate: true },
 	)
 })
 
-watch(dialog, (element, _, onCleanup) => {
-	if (!element) return
-	const ownerDocument = element.ownerDocument
-	const previousFocus = ownerDocument.activeElement as HTMLElement | null
-	const background = Array.from(ownerDocument.body.children).filter(
-		(child) => child !== element && !child.hasAttribute('inert'),
-	)
-	for (const child of background) child.setAttribute('inert', '')
-	element.focus({ preventScroll: true })
-	ownerDocument.addEventListener('keydown', onDialogKeydown)
-	onCleanup(() => {
-		ownerDocument.removeEventListener('keydown', onDialogKeydown)
-		for (const child of background) child.removeAttribute('inert')
-		if (previousFocus?.isConnected) previousFocus.focus?.({ preventScroll: true })
-	})
-})
-
-function onDialogKeydown(event: KeyboardEvent) {
-	if (event.key !== 'Escape' && event.key !== 'Tab') return
-	const element = dialog.value
-	if (
-		!element ||
-		event.defaultPrevented ||
-		event.isComposing ||
-		element.querySelector('dialog[open]')
-	) {
-		return
-	}
-	const { ownerDocument } = element
-	const target = event.target as Node | null
-	if (
-		!element.contains(target) &&
-		target !== ownerDocument.body &&
-		target !== ownerDocument.documentElement &&
-		target !== ownerDocument
-	) {
-		return
-	}
-	if (event.key === 'Escape') {
-		if (event.repeat) return
-		event.preventDefault()
-		void closeEditor()
-		return
-	}
-
-	const active = ownerDocument.activeElement
-	const tabbable = Array.from(
-		element.querySelectorAll<HTMLElement>('a[href], button, input, select, textarea, [tabindex]'),
-	).filter(
-		(entry) =>
-			entry.tabIndex >= 0 &&
-			!entry.matches(':disabled') &&
-			!entry.closest('[inert]') &&
-			entry.getClientRects().length > 0,
-	)
-	const edge = event.shiftKey ? tabbable.at(-1) : tabbable[0]
-	if (
-		active === element ||
-		!element.contains(active) ||
-		active === (event.shiftKey ? tabbable[0] : tabbable.at(-1)) ||
-		!edge
-	) {
-		event.preventDefault()
-		const next = edge ?? element
-		next.focus()
-	}
-}
-
-async function loadRule() {
-	const attempt = ++loadAttempt
-	ruleReady.value = false
-	if (!ruleId.value) return
-	const result = await refetch()
-	if (attempt === loadAttempt) ruleReady.value = result.isSuccess
+function clearClosedEditor() {
+	if (!editorOpen) editor.value = undefined
 }
 
 function closeEditor() {
@@ -202,13 +143,20 @@ function closeEditor() {
 	return router.replace(destination)
 }
 
-function showSavedRule(id: string) {
-	createdRuleId.value = id
-	return router.replace({ query: { ...route.query, rule: id }, hash: route.hash })
+function onRuleSaved(rule: ProjectFlagRule) {
+	if (editor.value) editor.value = { ...editor.value, rule }
+	if (selection.value === 'new') {
+		return router.replace({ query: { ...route.query, rule: rule.id }, hash: route.hash })
+	}
 }
 </script>
 
 <style scoped>
+:global(.modal-container:has(> .project-flag-editor-dialog)) {
+	--modal-mouse-x-offset: 0px;
+	--modal-mouse-y-offset: 0px;
+}
+
 :global(html:has(.project-flag-editor-dialog)) {
 	overflow: hidden;
 	overscroll-behavior: none;

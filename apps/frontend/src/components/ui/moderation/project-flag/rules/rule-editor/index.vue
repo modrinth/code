@@ -207,6 +207,7 @@
 						@keydown.capture="onEditorKeydown"
 					>
 						<RhaiExpressionEditor
+							:runtime="rhaiEditor"
 							:id="expressionId"
 							v-model="expression"
 							class="h-96 lg:h-auto lg:min-h-24 lg:flex-1"
@@ -251,6 +252,7 @@
 							</p>
 						</div>
 						<RhaiExpressionEditor
+							:runtime="rhaiEditor"
 							:id="moduleEditorId"
 							:key="activeModule.id"
 							v-model="activeModule.script"
@@ -306,14 +308,15 @@
 				/>
 			</aside>
 		</div>
-		<ConfirmDialog
+		<ConfirmLeaveModal
 			ref="leaveDialog"
 			title="Leave rule editor?"
-			description="Unsaved changes to this rule and its open modules will be lost."
-			cancel-label="Stay"
-			confirm-label="Leave"
+			header="You have unsaved changes"
+			body="Unsaved changes to this rule and its open modules will be lost."
+			stay-label="Cancel"
+			leave-label="Leave"
 		/>
-		<ConfirmDialog
+		<ConfirmModal
 			ref="discardModal"
 			title="Discard changes?"
 			:description="
@@ -321,8 +324,33 @@
 					? 'Discard unsaved changes to this rule and its open modules?'
 					: 'Discard unsaved changes to this module?'
 			"
-			confirm-label="Discard"
+			:markdown="false"
+			proceed-label="Discard"
+			:on-after-hide="() => (discardTarget = undefined)"
+			@proceed="applyDiscard"
 		/>
+		<NewModal
+			ref="renameModuleModal"
+			header="Rename shared module?"
+			max-width="32rem"
+			:on-after-hide="clearModuleRename"
+		>
+			<div v-if="moduleRename" class="flex flex-col gap-3">
+				<p class="m-0">Rename “{{ moduleRename.oldName }}” to “{{ moduleRename.newName }}”?</p>
+				<p class="m-0 text-secondary">
+					Rules and modules that import “{{ moduleRename.oldName }}” may fail in staging until their
+					imports are updated.
+				</p>
+			</div>
+			<template #actions>
+				<div class="flex flex-wrap justify-end gap-2">
+					<Button @click="renameModuleModal?.hide()">Cancel</Button>
+					<Button type="colored" color="brand" :disabled="isSaving" @click="confirmModuleRename">
+						Rename module
+					</Button>
+				</div>
+			</template>
+		</NewModal>
 	</div>
 </template>
 
@@ -343,10 +371,13 @@ import {
 import {
 	Button,
 	type ButtonMenuOption,
+	ConfirmLeaveModal,
+	ConfirmModal,
 	CopyCode,
 	IconButton,
 	Input,
 	injectModrinthClient,
+	NewModal,
 	TeleportOverflowMenu,
 	TeleportPopoutMenu,
 	Toggle,
@@ -363,21 +394,22 @@ import { projectFlagModulesQueryOptions } from '~/composables/queries/project-fl
 import { formatDate } from '../../run-format'
 import { useFlagErrorNotification } from '../../use-flag-error-notification'
 import { useSaveRule } from '../use-rules'
-import ConfirmDialog from './confirm-dialog.vue'
 import DecisionQuestionsEditor, {
 	type DecisionQuestionEntry,
 } from './decision-questions-editor.vue'
 import RhaiExpressionEditor from './expression-editor.vue'
 import FileScanPatternsEditor, { type FileScanPattern } from './file-scan-patterns-editor.vue'
 import ProjectFlagInputSchema from './input-schema/index.vue'
+import type { RhaiEditorRuntime } from './rhai-editor-runtime'
 import ProjectFlagRuleTester from './tester.vue'
 
 const props = defineProps<{
 	initialRule?: ProjectFlagRule
 	initialProjectId?: string
 	backLabel: string
+	rhaiEditor: RhaiEditorRuntime
 }>()
-const emit = defineEmits<{ close: []; created: [id: string] }>()
+const emit = defineEmits<{ close: []; saved: [rule: ProjectFlagRule] }>()
 
 const DEFAULT_EXPRESSION = `print(\`\${project.name}: \${project.summary}\`);
 if project.slug == "foo" {
@@ -418,8 +450,10 @@ const name = ref('')
 const editingName = ref(!props.initialRule)
 const nameInput = useTemplateRef<InstanceType<typeof Input>>('nameInput')
 const nameButton = useTemplateRef<HTMLButtonElement>('nameButton')
-const leaveDialog = useTemplateRef<InstanceType<typeof ConfirmDialog>>('leaveDialog')
-const discardModal = useTemplateRef<InstanceType<typeof ConfirmDialog>>('discardModal')
+const leaveDialog = useTemplateRef<InstanceType<typeof ConfirmLeaveModal>>('leaveDialog')
+const discardModal = useTemplateRef<InstanceType<typeof ConfirmModal>>('discardModal')
+const renameModuleModal = useTemplateRef<InstanceType<typeof NewModal>>('renameModuleModal')
+const moduleRename = shallowRef<{ tab: ModuleTab; oldName: string; newName: string }>()
 const discardTarget = shallowRef<'rule' | ModuleTab>()
 const auth = useAuthState()
 const testProjectsByRule = useLocalStorage<Record<string, string[]>>(
@@ -583,16 +617,18 @@ useFlagErrorNotification(saveError, 'Could not save the rule')
 
 function discardRule() {
 	if (!isDirty.value || isSaving.value) return
-	void confirmDiscard('rule')
+	confirmDiscard('rule')
 }
 
-async function confirmDiscard(target: 'rule' | ModuleTab) {
-	if (discardTarget.value) return
+function confirmDiscard(target: 'rule' | ModuleTab) {
+	if (discardTarget.value || !discardModal.value) return
 	discardTarget.value = target
-	await nextTick()
-	const confirmed = await discardModal.value?.prompt()
-	discardTarget.value = undefined
-	if (!confirmed || isSaving.value) return
+	discardModal.value.show()
+}
+
+function applyDiscard() {
+	const target = discardTarget.value
+	if (!target || isSaving.value) return
 	if (target === 'rule') {
 		resetSave()
 		resetRule()
@@ -619,7 +655,7 @@ async function saveRule() {
 		}
 		rule.value = saved
 		resetRule()
-		if (isNew) emit('created', saved.id)
+		emit('saved', saved)
 	} catch {
 		// The save error is reported by the mutation notification.
 	}
@@ -676,8 +712,33 @@ const isSaving = computed(() => isSavingRule.value || isSavingModule.value)
 useFlagErrorNotification(moduleSaveError, 'Could not save the module')
 
 function saveModule(tab?: ModuleTab) {
-	if (!tab || isSaving.value || !moduleDirty(tab) || moduleValidationError(tab)) return
+	if (!tab || isSaving.value || moduleRename.value || !moduleDirty(tab)) return
+	if (moduleValidationError(tab)) return
+
+	const oldName = tab.saved?.name
+	const newName = tab.name
+	if (oldName && oldName !== newName) {
+		if (!renameModuleModal.value) return
+		moduleRename.value = { tab, oldName, newName }
+		renameModuleModal.value.show()
+		return
+	}
+
 	submitModule(tab)
+}
+
+function confirmModuleRename() {
+	const rename = moduleRename.value
+	if (!rename || isSaving.value) return
+	const { tab, oldName, newName } = rename
+	if (!renameModuleModal.value?.hide()) return
+	if (tab.saved?.name === oldName && tab.name === newName && !moduleValidationError(tab)) {
+		submitModule(tab)
+	}
+}
+
+function clearModuleRename() {
+	moduleRename.value = undefined
 }
 
 function onModuleSaveKeydown(event: KeyboardEvent) {
@@ -830,7 +891,7 @@ function newModule() {
 function closeModule(tab: ModuleTab) {
 	if (isSaving.value) return
 	if (moduleDirty(tab)) {
-		void confirmDiscard(tab)
+		confirmDiscard(tab)
 		return
 	}
 	removeModuleTab(tab)

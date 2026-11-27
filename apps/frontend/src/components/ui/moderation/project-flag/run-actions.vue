@@ -9,9 +9,10 @@
 	>
 		<div v-if="runToDeploy" class="flex w-[32rem] max-w-full flex-col gap-4">
 			<p class="m-0 break-words">
-				Deploy revision <code>{{ runToDeploy.ruleset_id }}</code> for live project reconciliation?
-				This revision contains the rules and modules tested by this run. Deployment does not apply
-				the run results to projects.
+				Deploy revision <code>{{ runToDeploy.ruleset_id }}</code> for live project reviews? This
+				revision contains the rules and modules tested by this run. The run results are a preview.
+				During live review, projects can be automatically approved or withheld when those actions are
+				enabled.
 			</p>
 			<p v-if="deploymentPending" class="m-0 text-secondary">Loading deployment status…</p>
 			<p v-else-if="deploymentError" role="alert" class="m-0 text-red">
@@ -84,6 +85,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import { projectFlagDeploymentQueryOptions } from '~/composables/queries/project-flag'
 import {
+	projectFlagHiddenRunIdsKey,
 	projectFlagRunActivityKey,
 	projectFlagRunDetailOptions,
 	projectFlagRunHistoryKey,
@@ -164,28 +166,45 @@ function closeDeploy() {
 }
 const deleteModal = useTemplateRef<InstanceType<typeof NewModal>>('deleteModal')
 const runToDelete = ref<ProjectFlagRun | null>(null)
-const {
-	mutate: deleteRun,
-	isPending: isDeleting,
-	error: deleteError,
-	reset: resetDelete,
-} = useMutation({
+const { mutate: deleteRun, isPending: isDeleting } = useMutation({
 	mutationFn: (id: string) => api.deleteRun(id),
 	retry: false,
-	onSuccess: async (_, id) => {
-		runToDelete.value = null
-		await nextTick()
-		deleteModal.value?.hide()
+	onMutate: async (id) => {
 		await queryClient.cancelQueries({ queryKey: projectFlagRunHistoryKey })
-		queryClient.removeQueries({ queryKey: ['moderation', 'project-flag', 'runs', id] })
+		queryClient.setQueryData<string[]>(projectFlagHiddenRunIdsKey, (ids) => [...(ids ?? []), id])
+		const previousRun = queryClient
+			.getQueryData<ProjectFlagRun[]>(projectFlagRunHistoryKey)
+			?.find((run) => run.id === id)
 		queryClient.setQueryData<ProjectFlagRun[]>(projectFlagRunHistoryKey, (runs) =>
 			runs?.filter((run) => run.id !== id),
 		)
+		return previousRun
+	},
+	onSuccess: async (_, id) => {
+		addNotification({ type: 'success', title: 'Flag rule run deleted' })
+		runToDelete.value = null
+		await nextTick()
+		deleteModal.value?.hide()
+		queryClient.removeQueries({ queryKey: ['moderation', 'project-flag', 'runs', id] })
 		emit('deleted', id)
 		await Promise.all([
 			queryClient.invalidateQueries({ queryKey: projectFlagRunHistoryKey }),
 			queryClient.invalidateQueries({ queryKey: projectFlagRunActivityKey }),
 		])
+	},
+	onError: (error, id, previousRun) => {
+		queryClient.setQueryData<string[]>(projectFlagHiddenRunIdsKey, (ids) =>
+			ids?.filter((hiddenId) => hiddenId !== id),
+		)
+		if (previousRun) {
+			queryClient.setQueryData<ProjectFlagRun[]>(projectFlagRunHistoryKey, (runs) =>
+				[previousRun, ...(runs ?? []).filter((run) => run.id !== id)].sort(
+					(a, b) => Date.parse(b.started_at) - Date.parse(a.started_at),
+				),
+			)
+		}
+		addNotification({ type: 'error', title: 'Could not delete the run', text: error.message })
+		void queryClient.invalidateQueries({ queryKey: projectFlagRunHistoryKey })
 	},
 })
 
@@ -273,16 +292,13 @@ function runOptions(run: ProjectFlagRun): ButtonMenuOption[] {
 }
 
 function confirmDelete(run: ProjectFlagRun) {
-	resetDelete()
 	runToDelete.value = run
 	deleteModal.value?.show()
 }
 
 function closeDelete() {
 	runToDelete.value = null
-	resetDelete()
 }
 
 useFlagErrorNotification(deployError, 'Could not deploy tested rules')
-useFlagErrorNotification(deleteError, 'Could not delete the run')
 </script>
