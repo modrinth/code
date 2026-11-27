@@ -222,7 +222,7 @@ pub async fn rate_limit_middleware(
         .expect("Rate limiter not configured properly")
         .clone();
 
-    if req.path() == "/healthz" {
+    if req.path() == "/healthz" || req.match_pattern().is_none() {
         return Ok(next.call(req).await?.map_into_left_body());
     }
 
