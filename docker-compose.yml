@@ -102,7 +102,7 @@ services:
       timeout: 5s
       retries: 30
   redis:
-    image: redis:alpine
+    image: redis:8.12-alpine
     container_name: labrinth-redis
     restart: on-failure
     ports:
@@ -117,7 +117,7 @@ services:
   redis-cluster-0:
     profiles:
       - clustered-redis
-    image: redis:alpine
+    image: redis:8.12-alpine
     container_name: labrinth-redis-cluster-0
     restart: on-failure
     networks:
@@ -135,6 +135,8 @@ services:
         'nodes.conf',
         '--cluster-node-timeout',
         '5000',
+        '--cluster-bus-port-protected-mode',
+        'no',
         '--appendonly',
         'no',
         '--save',
@@ -150,7 +152,7 @@ services:
   redis-cluster-1:
     profiles:
       - clustered-redis
-    image: redis:alpine
+    image: redis:8.12-alpine
     container_name: labrinth-redis-cluster-1
     restart: on-failure
     networks:
@@ -168,6 +170,8 @@ services:
         'nodes.conf',
         '--cluster-node-timeout',
         '5000',
+        '--cluster-bus-port-protected-mode',
+        'no',
         '--appendonly',
         'no',
         '--save',
@@ -183,7 +187,7 @@ services:
   redis-cluster-2:
     profiles:
       - clustered-redis
-    image: redis:alpine
+    image: redis:8.12-alpine
     container_name: labrinth-redis-cluster-2
     restart: on-failure
     networks:
@@ -201,6 +205,8 @@ services:
         'nodes.conf',
         '--cluster-node-timeout',
         '5000',
+        '--cluster-bus-port-protected-mode',
+        'no',
         '--appendonly',
         'no',
         '--save',
@@ -216,7 +222,7 @@ services:
   redis-cluster-3:
     profiles:
       - clustered-redis
-    image: redis:alpine
+    image: redis:8.12-alpine
     container_name: labrinth-redis-cluster-3
     restart: on-failure
     networks:
@@ -234,6 +240,8 @@ services:
         'nodes.conf',
         '--cluster-node-timeout',
         '5000',
+        '--cluster-bus-port-protected-mode',
+        'no',
         '--appendonly',
         'no',
         '--save',
@@ -249,7 +257,7 @@ services:
   redis-cluster-4:
     profiles:
       - clustered-redis
-    image: redis:alpine
+    image: redis:8.12-alpine
     container_name: labrinth-redis-cluster-4
     restart: on-failure
     networks:
@@ -267,6 +275,8 @@ services:
         'nodes.conf',
         '--cluster-node-timeout',
         '5000',
+        '--cluster-bus-port-protected-mode',
+        'no',
         '--appendonly',
         'no',
         '--save',
@@ -282,7 +292,7 @@ services:
   redis-cluster-5:
     profiles:
       - clustered-redis
-    image: redis:alpine
+    image: redis:8.12-alpine
     container_name: labrinth-redis-cluster-5
     restart: on-failure
     networks:
@@ -300,6 +310,8 @@ services:
         'nodes.conf',
         '--cluster-node-timeout',
         '5000',
+        '--cluster-bus-port-protected-mode',
+        'no',
         '--appendonly',
         'no',
         '--save',
@@ -315,7 +327,7 @@ services:
   redis-cluster-creator:
     profiles:
       - clustered-redis
-    image: redis:alpine
+    image: redis:8.12-alpine
     container_name: labrinth-redis-cluster-creator
     networks:
       - redis-cluster-mesh
