@@ -1,3 +1,4 @@
+
 <template>
 	<Button
 		v-if="showUpdatePill"
@@ -65,10 +66,13 @@ const isUpdateDownloading = computed(
 		downloading.value ||
 		(downloadProgress.value > 0 && downloadProgress.value < 1 && !finishedDownloading.value),
 )
+
 const showUpdatePill = computed(
 	() => isUpdateVisible.value && (finishedDownloading.value || metered.value),
 )
+
 const animateReadyPill = ref(false)
+
 const updateLabel = computed(() => {
 	if (isUpdateDownloading.value) {
 		return formatMessage(messages.downloadingUpdate)
@@ -80,29 +84,39 @@ const updateLabel = computed(() => {
 
 	return formatMessage(messages.update)
 })
+
 let readyPillAnimationFrame: number | null = null
-watch([showUpdatePill, finishedDownloading], async ([show, ready], [wasShown, wasReady]) => {
-	if (readyPillAnimationFrame !== null) {
-		cancelAnimationFrame(readyPillAnimationFrame)
-		readyPillAnimationFrame = null
-	}
 
-	if (!show || !ready) {
+watch(
+	[showUpdatePill, finishedDownloading],
+	async ([show, ready], previous) => {
+		const [wasShown, wasReady] = previous ?? []
+
+		if (readyPillAnimationFrame !== null) {
+			cancelAnimationFrame(readyPillAnimationFrame)
+			readyPillAnimationFrame = null
+		}
+
+		if (!show || !ready) {
+			animateReadyPill.value = false
+			return
+		}
+
+		if (wasShown && wasReady) {
+			return
+		}
+
 		animateReadyPill.value = false
-		return
-	}
+		await nextTick()
 
-	if (wasShown && wasReady) {
-		return
-	}
+		readyPillAnimationFrame = requestAnimationFrame(() => {
+			animateReadyPill.value = true
+			readyPillAnimationFrame = null
+		})
+	},
+	{ immediate: true },
+)
 
-	animateReadyPill.value = false
-	await nextTick()
-	readyPillAnimationFrame = requestAnimationFrame(() => {
-		animateReadyPill.value = true
-		readyPillAnimationFrame = null
-	})
-})
 async function handleUpdateClick() {
 	if (isUpdateDownloading.value) {
 		return
