@@ -25,7 +25,6 @@ import { useRouter } from 'vue-router'
 
 import IconEditorModal from '@/components/ui/instance_settings/InstanceIconEditorModal.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
-import { trackEvent } from '@/helpers/analytics'
 import { install_duplicate_instance } from '@/helpers/install'
 import { edit, edit_icon, getInstanceIconUrl, remove } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
@@ -69,10 +68,6 @@ watch(
 
 async function duplicateInstance() {
 	await install_duplicate_instance(instance.value.id).catch(handleError)
-	trackEvent('InstanceDuplicate', {
-		loader: instance.value.loader,
-		game_version: instance.value.game_version,
-	})
 }
 
 function formatReleaseChannelLabel(channel: ReleaseChannel) {
@@ -128,9 +123,7 @@ async function resetIcon() {
 		iconConfig.value = null
 	} catch (error) {
 		handleError(error)
-		return
 	}
-	trackEvent('InstanceRemoveIcon')
 }
 
 async function setIcon() {
@@ -152,21 +145,16 @@ async function setIcon() {
 		iconConfig.value = null
 	} catch (error) {
 		handleError(error)
-		return
 	}
-
-	trackEvent('InstanceSetIcon')
 }
 
 function openIconEditor() {
 	iconEditorModal.value?.show()
-	trackEvent(iconConfig.value ? 'InstanceEditCreatedIcon' : 'InstanceCreateIcon')
 }
 
 function onGeneratedIconSaved(iconPath: string, config: IconConfig) {
 	icon.value = iconPath
 	iconConfig.value = config
-	trackEvent('InstanceSaveCreatedIcon')
 }
 
 const editInstanceObject = computed(() => ({
@@ -186,11 +174,6 @@ const removing = ref(false)
 async function removeInstance() {
 	removing.value = true
 	const path = instance.value.id
-
-	trackEvent('InstanceRemove', {
-		loader: instance.value.loader,
-		game_version: instance.value.game_version,
-	})
 
 	await router.push({ path: '/' })
 	await remove(path).catch(handleError)

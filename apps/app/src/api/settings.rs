@@ -11,7 +11,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             store_cleanup,
             store_set_cache_limit,
             cancel_directory_change,
-            default_app_directory
+            default_app_directory,
+            reset_analytics_installation_id
         ])
         .build()
 }
@@ -50,6 +51,15 @@ pub async fn settings_get() -> Result<Settings> {
 pub async fn settings_set(settings: Settings) -> Result<()> {
     settings::set(settings).await?;
     Ok(())
+}
+
+/// Replaces the analytics installation ID with a new random one and returns
+/// it.
+///
+/// invoke('plugin:settings|reset_analytics_installation_id')
+#[tauri::command]
+pub async fn reset_analytics_installation_id() -> Result<uuid::Uuid> {
+    Ok(theseus::analytics::reset_installation_id().await?)
 }
 
 #[tauri::command]

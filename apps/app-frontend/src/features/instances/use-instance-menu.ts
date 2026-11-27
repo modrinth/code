@@ -22,7 +22,6 @@ import {
 } from '@modrinth/ui'
 
 import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
-import { trackEvent } from '@/helpers/analytics'
 import { toError } from '@/helpers/errors'
 import { install_duplicate_instance } from '@/helpers/install'
 import { edit, edit_icon } from '@/helpers/instance'
@@ -110,7 +109,6 @@ export function useInstanceMenu() {
 
 		try {
 			await edit_icon(item.instance.id, iconPath)
-			trackEvent('InstanceSetIcon')
 		} catch (error) {
 			handleError(toError(error))
 		}
@@ -119,7 +117,6 @@ export function useInstanceMenu() {
 	const removeInstanceIcon = async (item: InstanceCard) => {
 		try {
 			await edit_icon(item.instance.id, null)
-			trackEvent('InstanceRemoveIcon')
 		} catch (error) {
 			handleError(toError(error))
 		}
@@ -164,7 +161,7 @@ export function useInstanceMenu() {
 				icon: StopCircleIcon,
 				shown: item.playing,
 				tone: 'red',
-				action: () => void item.stop(null, 'InstanceGridContextMenu'),
+				action: () => void item.stop(null),
 			},
 			{
 				id: 'play',
@@ -173,7 +170,7 @@ export function useInstanceMenu() {
 				shown: !item.playing && !item.instance.launch_blocked,
 				disabled: installing,
 				tone: 'brand',
-				action: () => void item.play(null, 'InstanceGridContextMenu'),
+				action: () => void item.play(null),
 			},
 			{
 				id: isFavorite ? 'remove_from_favorites' : 'add_to_favorites',

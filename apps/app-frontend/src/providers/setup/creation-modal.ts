@@ -11,7 +11,6 @@ import { useRouter } from 'vue-router'
 import type UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import type ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_search_results } from '@/helpers/cache.js'
 import { import_instance } from '@/helpers/import.js'
 import {
@@ -77,13 +76,11 @@ export function setupCreationModal(
 			icon_url: project.raw_icon_url,
 		})
 		await navigateToCreatedInstance(job)
-		trackEvent('InstanceCreate', { source: 'CreationModalModpack' })
 	}
 
 	async function proceedWithModpackFileCreation(location: CreatePackLocation) {
 		const job = await install_create_modpack_instance(location)
 		await navigateToCreatedInstance(job)
-		trackEvent('InstanceCreate', { source: 'CreationModalModpackFile' })
 	}
 
 	async function handleCreate(config: CreationFlowContextValue) {
@@ -120,7 +117,6 @@ export function setupCreationModal(
 						}
 					}
 				}
-				trackEvent('InstanceCreate', { source: 'CreationModalImport' })
 				if (importCount === 1 && importedInstanceId) {
 					await router.push(`/instance/${encodeURIComponent(importedInstanceId)}`)
 				}
@@ -179,10 +175,6 @@ export function setupCreationModal(
 				iconConfig: iconPath ? getGeneratedIconConfig?.(iconPath) : null,
 			})
 			await navigateToCreatedInstance(job)
-
-			trackEvent('InstanceCreate', {
-				source: 'CreationModal',
-			})
 		} catch (err) {
 			handleError(err as Error)
 		}

@@ -2958,7 +2958,22 @@
     "message": "Discord Rich Presence"
   },
   "app.settings.privacy.telemetry.description": {
-    "message": "Modrinth collects anonymized analytics and usage data to improve our user experience and customize your experience. By disabling this option, you opt out and your data will no longer be collected."
+    "message": "Modrinth collects analytics and usage data, such as which features are used, to help us improve the app. This data isn't linked to your name, email, or Modrinth account. By disabling this option, you opt out and your data will no longer be collected."
+  },
+  "app.settings.privacy.telemetry.enable.title": {
+    "message": "Enable telemetry"
+  },
+  "app.settings.privacy.telemetry.installation-id.description": {
+    "message": "The installation ID is a randomly generated identifier for this copy of the Modrinth app. It isn't linked to your name, email, or account."
+  },
+  "app.settings.privacy.telemetry.installation-id.title": {
+    "message": "Installation ID"
+  },
+  "app.settings.privacy.telemetry.reset-installation-id": {
+    "message": "Reset installation ID"
+  },
+  "app.settings.privacy.telemetry.reset-installation-id.success.title": {
+    "message": "Installation ID reset"
   },
   "app.settings.privacy.telemetry.title": {
     "message": "Telemetry"

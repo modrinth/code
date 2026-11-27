@@ -13,7 +13,6 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { trackEvent } from '@/helpers/analytics'
 import { getInstanceIconUrl, list } from '@/helpers/instance'
 import { add_server_to_instance, get_instance_worlds } from '@/helpers/worlds.ts'
 import { instanceKeys } from '@/pages/instance/query-options'
@@ -75,8 +74,6 @@ defineExpose({
 
 		instances.value = instanceValues
 		modal.value.show()
-
-		trackEvent('AddServerToInstanceStart', { source: 'AddServerToInstanceModal' })
 	},
 })
 
@@ -86,12 +83,6 @@ async function addServer(instance) {
 		await add_server_to_instance(instance.id, serverName.value, serverAddress.value, 'prompt')
 		instance.added = true
 		await queryClient.invalidateQueries({ queryKey: instanceKeys.worlds(instance.id) })
-
-		trackEvent('AddServerToInstance', {
-			server_name: serverName.value,
-			instance_name: instance.name,
-			source: 'AddServerToInstanceModal',
-		})
 	} catch (err) {
 		handleError(err)
 	}

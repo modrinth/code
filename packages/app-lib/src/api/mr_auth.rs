@@ -1,9 +1,12 @@
+use crate::analytics::{self, AppEventType};
 use crate::state::{FeatureFlag, ModrinthCredentials, Settings};
 use anyhow::bail;
 use serde::Deserialize;
 
 const LOCALHOST_LOGIN_URL: &str = "http://localhost:3000/auth/sign-in";
 const LOCALHOST_SIGNUP_URL: &str = "http://localhost:3000/auth/sign-up";
+
+/// Analytics source of Modrinth account events.
 
 #[derive(Clone, Copy, Debug, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -63,7 +66,20 @@ pub async fn authenticate_finish_flow(
 #[tracing::instrument]
 pub async fn logout() -> crate::Result<()> {
     let state = crate::State::get().await?;
+    let was_signed_in = ModrinthCredentials::get_active(&state.pool)
+        .await?
+        .is_some();
     ModrinthCredentials::deactivate_all(&state.pool).await?;
+
+    if was_signed_in {
+        analytics::add_event(
+            "Generic",
+            AppEventType::ModrinthSignOut {
+                is_refresh_failed: false,
+            },
+        );
+    }
+
     state.presence.friends_socket.disconnect().await?;
 
     Ok(())
@@ -92,13 +108,27 @@ pub async fn set_active(user_id: &str) -> crate::Result<()> {
     Ok(())
 }
 
+/// Removes a stored Modrinth account.
+///
+/// Set `initial_session_validation_failed` when the account is removed
+/// because its stored session was invalid when the app started, so the
+/// sign-out is recorded as a failed refresh.
 #[tracing::instrument]
-pub async fn remove_user(user_id: &str) -> crate::Result<()> {
+pub async fn remove_user(
+    user_id: &str,
+    initial_session_validation_failed: bool,
+) -> crate::Result<()> {
     let state = crate::State::get().await?;
     let current = ModrinthCredentials::get_active(&state.pool).await?;
     ModrinthCredentials::remove(user_id, &state.pool).await?;
 
     if current.is_some_and(|creds| creds.user_id == user_id) {
+        analytics::add_event(
+            "Generic",
+            AppEventType::ModrinthSignOut {
+                is_refresh_failed: initial_session_validation_failed,
+            },
+        );
         state.presence.friends_socket.disconnect().await?;
     }
 

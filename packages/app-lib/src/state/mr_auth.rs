@@ -1,3 +1,4 @@
+use crate::analytics::{self, AppEventType};
 use crate::state::{CacheBehaviour, CachedEntry};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced};
 use chrono::{DateTime, Duration, TimeZone, Utc};
@@ -51,6 +52,13 @@ impl ModrinthCredentials {
                     Ok(Some(creds))
                 } else {
                     Self::remove(&creds.user_id, exec).await?;
+
+                    analytics::add_event(
+                        "Generic",
+                        AppEventType::ModrinthSignOut {
+                            is_refresh_failed: true,
+                        },
+                    );
 
                     Ok(None)
                 }

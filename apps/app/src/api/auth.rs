@@ -1,8 +1,10 @@
 use crate::api::Result;
 use anyhow::Context;
 use chrono::{Duration, Utc};
+use std::time::Instant;
 use tauri::plugin::TauriPlugin;
 use tauri::{Manager, Runtime, UserAttentionType};
+use theseus::analytics::{self, AppEventType, MicrosoftSignInFailureReason};
 use theseus::prelude::*;
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
@@ -31,6 +33,66 @@ pub async fn check_reachable() -> Result<()> {
 pub async fn login<R: Runtime>(
     app: tauri::AppHandle<R>,
 ) -> Result<Option<Credentials>> {
+    let started_at = Instant::now();
+    let result = sign_in(&app).await;
+    let duration_ms = analytics::elapsed_ms(started_at);
+
+    let (event, credentials) = match result {
+        Ok(SignInOutcome::SignedIn {
+            credentials,
+            nth_account,
+            is_new_account,
+        }) => (
+            AppEventType::MicrosoftSignIn {
+                nth_account,
+                is_new_account,
+                duration_ms,
+            },
+            Some(credentials),
+        ),
+        Ok(SignInOutcome::Cancelled) => (
+            AppEventType::MicrosoftSignInFailed {
+                reason: MicrosoftSignInFailureReason::Cancelled,
+                duration_ms,
+            },
+            None,
+        ),
+        Ok(SignInOutcome::TimedOut) => (
+            AppEventType::MicrosoftSignInFailed {
+                reason: MicrosoftSignInFailureReason::TimedOut,
+                duration_ms,
+            },
+            None,
+        ),
+        Err(error) => {
+            analytics::add_event(
+                "Generic",
+                AppEventType::MicrosoftSignInFailed {
+                    reason: minecraft_auth::sign_in_failure_reason(&error),
+                    duration_ms,
+                },
+            );
+            return Err(error.into());
+        }
+    };
+
+    analytics::add_event("Generic", event);
+    Ok(credentials)
+}
+
+enum SignInOutcome {
+    SignedIn {
+        credentials: Credentials,
+        nth_account: u32,
+        is_new_account: bool,
+    },
+    Cancelled,
+    TimedOut,
+}
+
+async fn sign_in<R: Runtime>(
+    app: &tauri::AppHandle<R>,
+) -> theseus::Result<SignInOutcome> {
     let flow = minecraft_auth::begin_login().await?;
 
     let start = Utc::now();
@@ -40,7 +102,7 @@ pub async fn login<R: Runtime>(
     }
 
     let window = tauri::WebviewWindowBuilder::new(
-        &app,
+        app,
         "signin",
         tauri::WebviewUrl::External(
             flow.auth_request_uri
@@ -61,7 +123,7 @@ pub async fn login<R: Runtime>(
     while (Utc::now() - start) < Duration::minutes(10) {
         if window.title().is_err() {
             // user closed window, cancelling flow
-            return Ok(None);
+            return Ok(SignInOutcome::Cancelled);
         }
 
         if window
@@ -72,16 +134,29 @@ pub async fn login<R: Runtime>(
                 window.url()?.query_pairs().find(|x| x.0 == "code")
         {
             window.close()?;
-            let val = minecraft_auth::finish_login(&code.clone(), flow).await?;
+            let previous_users = minecraft_auth::users().await?;
+            let credentials =
+                minecraft_auth::finish_login(&code.clone(), flow).await?;
 
-            return Ok(Some(val));
+            let is_new_account = !previous_users.iter().any(|user| {
+                user.offline_profile.id == credentials.offline_profile.id
+            });
+            let nth_account = u32::try_from(previous_users.len())
+                .unwrap_or(u32::MAX)
+                .saturating_add(u32::from(is_new_account));
+
+            return Ok(SignInOutcome::SignedIn {
+                credentials,
+                nth_account,
+                is_new_account,
+            });
         }
 
         tokio::time::sleep(std::time::Duration::from_millis(50)).await;
     }
 
     window.close()?;
-    Ok(None)
+    Ok(SignInOutcome::TimedOut)
 }
 
 #[tauri::command]

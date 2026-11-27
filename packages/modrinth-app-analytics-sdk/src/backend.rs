@@ -1,16 +1,37 @@
 use std::time::Duration;
 
+use uuid::Uuid;
+
 #[derive(Debug)]
 pub(crate) enum AnalyticsBackend {
     OptedOut,
-    Enabled { http_pool: reqwest::Client },
+    Enabled {
+        http_pool: reqwest::Client,
+        installation_id: Uuid,
+    },
 }
 
 impl AnalyticsBackend {
-    pub(crate) fn clone_pool(&self) -> Option<reqwest::Client> {
+    /// Returns the HTTP pool and installation ID to send a batch with, or
+    /// `None` when opted out.
+    pub(crate) fn sender(&self) -> Option<(reqwest::Client, Uuid)> {
         match self {
             AnalyticsBackend::OptedOut => None,
-            AnalyticsBackend::Enabled { http_pool } => Some(http_pool.clone()),
+            AnalyticsBackend::Enabled {
+                http_pool,
+                installation_id,
+            } => Some((http_pool.clone(), *installation_id)),
+        }
+    }
+
+    /// Returns the installation ID events are sent under, or `None` when
+    /// opted out.
+    pub(crate) fn installation_id(&self) -> Option<Uuid> {
+        match self {
+            AnalyticsBackend::OptedOut => None,
+            AnalyticsBackend::Enabled {
+                installation_id, ..
+            } => Some(*installation_id),
         }
     }
 

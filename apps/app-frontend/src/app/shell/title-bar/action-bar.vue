@@ -148,7 +148,6 @@ import { useRouter } from 'vue-router'
 import AppUpdateButton from '@/components/ui/app-update-button/index.vue'
 import DownloadManager from '@/components/ui/download-manager/index.vue'
 import { useAppEvent } from '@/composables/use-app-event'
-import { trackEvent } from '@/helpers/analytics'
 import { get_many as getInstances } from '@/helpers/instance'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
 import type { LoadingBar } from '@/helpers/state'
@@ -300,12 +299,6 @@ useAppEvent('process', async () => {
 const stop = async (process: RunningProcess) => {
 	try {
 		await killProcess(process.uuid).catch(handleError)
-
-		trackEvent('InstanceStop', {
-			loader: process.instance.loader,
-			game_version: process.instance.game_version,
-			source: 'AppBar',
-		})
 	} catch (e) {
 		console.error(e)
 	}

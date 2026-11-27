@@ -57,8 +57,8 @@
 				:can-hide-from-library="canHideInstance"
 				:hidden-from-library="hiddenFromLibrary"
 				@repair="() => repairInstance()"
-				@stop="() => stopInstance('InstancePage')"
-				@play="() => startInstance('InstancePage')"
+				@stop="() => stopInstance()"
+				@play="() => startInstance()"
 				@play-server="() => handlePlayServer()"
 				@settings="() => settingsModal?.show()"
 				@open-folder="() => instance && showInstanceInFolder(instance.id)"
@@ -147,7 +147,6 @@ import { useLinkedServer } from '@/features/instances/linked-server/use-linked-s
 import InstanceSettingsModal from '@/features/instances/settings-modal/index.vue'
 import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import { serverStatusQueryOptions } from '@/features/servers/queries'
-import { trackEvent } from '@/helpers/analytics'
 import { toError } from '@/helpers/errors'
 import {
 	getSharedInstanceUnavailableReason,
@@ -411,9 +410,7 @@ const checkingSharedInstanceLaunch = ref(false)
 const subpagePending = ref(false)
 const stopping = ref(false)
 const serverOfflineModal = ref<InstanceType<typeof ConfirmModal>>()
-const pendingOfflineLaunch = ref<{ instanceId: string; context: string; address?: string } | null>(
-	null,
-)
+const pendingOfflineLaunch = ref<{ instanceId: string; address?: string } | null>(null)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 const sharedInstanceUpdateModal = ref<InstanceType<typeof SharedInstanceUpdateModal>>()
@@ -628,7 +625,7 @@ watch(
 
 const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 
-const launchInstance = async (context: string, address?: string) => {
+const launchInstance = async (address?: string) => {
 	if (!instance.value || instance.value.launch_blocked) return
 	const currentInstance = instance.value
 	loading.value = true
@@ -642,13 +639,6 @@ const launchInstance = async (context: string, address?: string) => {
 		handleSevereError(err, { instanceId: currentInstance.id })
 	}
 	loading.value = false
-
-	if (!instance.value) return
-	trackEvent('InstanceStart', {
-		loader: instance.value.loader,
-		game_version: instance.value.game_version,
-		source: context,
-	})
 }
 
 async function handleSharedInstanceUnavailable(
@@ -702,10 +692,10 @@ async function launchDespiteOfflineServer() {
 	const pending = pendingOfflineLaunch.value
 	pendingOfflineLaunch.value = null
 	if (!pending || instance.value?.id !== pending.instanceId) return
-	await startInstance(pending.context, pending.address, true)
+	await startInstance(pending.address, true)
 }
 
-const startInstance = async (context: string, address?: string, skipOfflineWarning = false) => {
+const startInstance = async (address?: string, skipOfflineWarning = false) => {
 	if (!instance.value || instance.value.launch_blocked) return
 	if (
 		checkingSharedInstanceLaunch.value ||
@@ -726,7 +716,7 @@ const startInstance = async (context: string, address?: string, skipOfflineWarni
 		}
 		if (instance.value?.id !== instanceId) return
 		if (status === 'stopped') {
-			pendingOfflineLaunch.value = { instanceId, context, address }
+			pendingOfflineLaunch.value = { instanceId, address }
 			serverOfflineModal.value?.show()
 			return
 		}
@@ -758,7 +748,7 @@ const startInstance = async (context: string, address?: string, skipOfflineWarni
 		if (isSharedInstanceMember && preview?.updateAvailable && sharedInstanceUpdateModal.value) {
 			sharedInstanceUpdateModal.value.show(instance.value, preview, async () => {
 				await refreshInstance()
-				await launchInstance(context, address)
+				await launchInstance(address)
 			})
 			return
 		}
@@ -768,7 +758,7 @@ const startInstance = async (context: string, address?: string, skipOfflineWarni
 		if (isSharedInstanceMember) {
 			updateToPlayModal.value.show(instance.value, null, async () => {
 				await refreshInstance()
-				await launchInstance(context, address)
+				await launchInstance(address)
 			})
 		} else {
 			updateToPlayModal.value.show(instance.value)
@@ -776,27 +766,21 @@ const startInstance = async (context: string, address?: string, skipOfflineWarni
 		return
 	}
 
-	await launchInstance(context, address)
+	await launchInstance(address)
 }
 
-const stopInstance = async (context: string) => {
+const stopInstance = async () => {
 	const currentInstance = instance.value
 	if (!currentInstance) return
 	stopping.value = true
 	await kill(currentInstance.id).catch((error) => handleError(toError(error)))
 	stopping.value = false
 	queryClient.setQueryData(instanceKeys.processes(currentInstance.id), [])
-
-	trackEvent('InstanceStop', {
-		loader: currentInstance.loader,
-		game_version: currentInstance.game_version,
-		source: context,
-	})
 }
 
 const handlePlayServer = async () => {
 	if (hosting.isHostingInstance.value) {
-		if (serverAddress.value) await startInstance('InstancePage', serverAddress.value)
+		if (serverAddress.value) await startInstance(serverAddress.value)
 		return
 	}
 	if (!instance.value?.link?.project_id || instance.value.launch_blocked) return
@@ -904,10 +888,6 @@ async function deleteSelectedInstance() {
 	selectedInstanceToDelete.value = null
 	if (!selectedInstance) return
 
-	trackEvent('InstanceRemove', {
-		loader: selectedInstance.loader,
-		game_version: selectedInstance.game_version,
-	})
 	await router.push({ path: '/' })
 	await remove(selectedInstance.id).catch((error) => handleError(toError(error)))
 }
@@ -922,7 +902,7 @@ const handleRightClick = (event: MouseEvent) => {
 			icon: StopCircleIcon,
 			shown: playing.value,
 			tone: 'red',
-			action: () => void stopInstance('InstancePageContextMenu'),
+			action: () => void stopInstance(),
 		},
 		{
 			id: 'play',
@@ -930,7 +910,7 @@ const handleRightClick = (event: MouseEvent) => {
 			icon: PlayIcon,
 			shown: !playing.value && canAddContent,
 			tone: 'brand',
-			action: () => void startInstance('InstancePageContextMenu'),
+			action: () => void startInstance(),
 		},
 		{
 			id: 'add_content',
