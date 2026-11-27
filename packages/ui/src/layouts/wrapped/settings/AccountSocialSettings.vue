@@ -208,7 +208,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { LogInIcon, SpinnerIcon, ThinkingRinthbot } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
+import { computed, type Ref, ref, watch } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import { Button } from '#ui/components/base/buttons'
@@ -225,11 +225,7 @@ type BlockedUserTableColumn = 'user' | 'actions'
 type BlockedUser = Labrinth.Users.v2.User & Record<BlockedUserTableColumn, unknown>
 type FriendPrivacy = Labrinth.Users.v3.FriendPrivacy
 type InvitePrivacy = Labrinth.Users.v3.InvitePrivacy
-type SocialSettingsState = {
-	friendPrivacy: FriendPrivacy
-	sharedInstancesPrivacy: InvitePrivacy
-	hostingAccessPrivacy: InvitePrivacy
-}
+type SocialPreferencesPatch = NonNullable<Labrinth.Users.v3.PartialUserPreferences['social']>
 
 const props = defineProps<{
 	getBlockedUsers: () => Promise<Labrinth.BlockedUsers.v3.BlockedUserId[]>
@@ -250,7 +246,6 @@ const { formatMessage } = useVIntl()
 const blockedUsersTable = ref<HTMLElement | null>(null)
 const unblockingUserId = ref<string | null>(null)
 const saving = ref(false)
-const preferencesInitialized = ref(false)
 const friendPrivacy = ref<FriendPrivacy>('everyone')
 const sharedInstancesPrivacy = ref<InvitePrivacy>('everyone')
 const hostingAccessPrivacy = ref<InvitePrivacy>('everyone')
@@ -265,24 +260,6 @@ const preferenceControlsTooltip = computed(() => {
 	return formatMessage(messages.preferencesUnavailable)
 })
 const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(blockedUsersTable)
-
-const originalState = computed<SocialSettingsState>(() => ({
-	friendPrivacy: preferences.value?.social.friend_privacy ?? 'everyone',
-	sharedInstancesPrivacy: preferences.value?.social.shared_instances_privacy ?? 'everyone',
-	hostingAccessPrivacy: preferences.value?.social.hosting_access_privacy ?? 'everyone',
-}))
-const modifiedState = computed<Partial<SocialSettingsState>>(() => ({
-	...(friendPrivacy.value !== originalState.value.friendPrivacy
-		? { friendPrivacy: friendPrivacy.value }
-		: {}),
-	...(sharedInstancesPrivacy.value !== originalState.value.sharedInstancesPrivacy
-		? { sharedInstancesPrivacy: sharedInstancesPrivacy.value }
-		: {}),
-	...(hostingAccessPrivacy.value !== originalState.value.hostingAccessPrivacy
-		? { hostingAccessPrivacy: hostingAccessPrivacy.value }
-		: {}),
-}))
-const hasChanges = computed(() => Object.keys(modifiedState.value).length > 0)
 
 function formatInteractionSource(source: FriendPrivacy | InvitePrivacy): string {
 	switch (source) {
@@ -300,58 +277,48 @@ function formatInteractionSource(source: FriendPrivacy | InvitePrivacy): string 
 watch(
 	preferences,
 	(value) => {
-		if (!value) return
-		if (preferencesInitialized.value && hasChanges.value && !saving.value) return
+		if (!value || saving.value) return
 
 		friendPrivacy.value = value.social.friend_privacy
 		sharedInstancesPrivacy.value = value.social.shared_instances_privacy
 		hostingAccessPrivacy.value = value.social.hosting_access_privacy
-		preferencesInitialized.value = true
 	},
 	{ immediate: true, flush: 'sync' },
 )
 
-function setFriendPrivacy(value: FriendPrivacy | null): void {
-	if (!value) return
-	friendPrivacy.value = value
-}
+async function updateSocialPreference<T extends FriendPrivacy | InvitePrivacy>(
+	target: Ref<T>,
+	value: T,
+	patch: SocialPreferencesPatch,
+): Promise<void> {
+	if (value === target.value || saving.value) return
 
-function setSharedInstancesPrivacy(value: InvitePrivacy | null): void {
-	if (!value) return
-	sharedInstancesPrivacy.value = value
-}
-
-function setHostingAccessPrivacy(value: InvitePrivacy | null): void {
-	if (!value) return
-	hostingAccessPrivacy.value = value
-}
-
-function reset(): void {
-	friendPrivacy.value = originalState.value.friendPrivacy
-	sharedInstancesPrivacy.value = originalState.value.sharedInstancesPrivacy
-	hostingAccessPrivacy.value = originalState.value.hostingAccessPrivacy
-}
-
-async function save(): Promise<void> {
-	if (!hasChanges.value || saving.value) return
-
+	const previous = target.value
+	target.value = value
 	saving.value = true
 	try {
-		await updatePreferences({
-			social: {
-				friend_privacy: friendPrivacy.value,
-				shared_instances_privacy: sharedInstancesPrivacy.value,
-				hosting_access_privacy: hostingAccessPrivacy.value,
-			},
-		})
+		await updatePreferences({ social: patch })
 	} catch {
-		return
+		target.value = previous
 	} finally {
 		saving.value = false
 	}
 }
 
-defineExpose({ hasChanges, originalState, modifiedState, saving, reset, save })
+function setFriendPrivacy(value: FriendPrivacy | null): void {
+	if (!value) return
+	void updateSocialPreference(friendPrivacy, value, { friend_privacy: value })
+}
+
+function setSharedInstancesPrivacy(value: InvitePrivacy | null): void {
+	if (!value) return
+	void updateSocialPreference(sharedInstancesPrivacy, value, { shared_instances_privacy: value })
+}
+
+function setHostingAccessPrivacy(value: InvitePrivacy | null): void {
+	if (!value) return
+	void updateSocialPreference(hostingAccessPrivacy, value, { hosting_access_privacy: value })
+}
 
 const columns = computed<TableColumn<BlockedUserTableColumn>[]>(() => [
 	{

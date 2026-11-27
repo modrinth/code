@@ -1493,6 +1493,9 @@
   "app.modal.install-to-play.reviewed-files": {
     "message": "Files that aren't published to Modrinth aren't reviewed."
   },
+  "app.modal.install-to-play.sandbox-and-install": {
+    "message": "Sandbox and install"
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Shared instance"
   },
@@ -1554,7 +1557,7 @@
     "message": "Update required"
   },
   "app.modal.update-to-play.update-required-description": {
-    "message": "An update is required to play {name}. Please update to latest version to launch the game."
+    "message": "An update is required to play <name>{name}</name>. Please update to the latest version to launch the game."
   },
   "app.nav.add-account": {
     "message": "Add account"
@@ -3134,6 +3137,93 @@
   "app.settings.resource-management.store.unused.label": {
     "message": "Orphaned"
   },
+  "app.settings.sandbox.description": {
+    "message": "Launch instances in a sandbox to restrict what mods can access."
+  },
+  "app.settings.sandbox.disable.confirm": {
+    "message": "Disable sandbox"
+  },
+  "app.settings.sandbox.disable.description": {
+    "message": "If someone online or a mod asks you to disable the sandbox, they may be trying to gain access to your personal data. Before disabling it, confirm that you understand the risks below."
+  },
+  "app.settings.sandbox.disable.header": {
+    "message": "Disable the sandbox?"
+  },
+  "app.settings.sandbox.disable.help": {
+    "message": "If you have any questions, <support>contact support</support> or read our <article>help article</article> before continuing."
+  },
+  "app.settings.sandbox.disable.risk.account.description": {
+    "message": "Someone could gain access to your account, impersonate you, or lock you out."
+  },
+  "app.settings.sandbox.disable.risk.account.title": {
+    "message": "Take over your Minecraft account"
+  },
+  "app.settings.sandbox.disable.risk.files.description": {
+    "message": "Your documents, photos, and other files could be stolen or erased."
+  },
+  "app.settings.sandbox.disable.risk.files.title": {
+    "message": "Read, change, or delete your files"
+  },
+  "app.settings.sandbox.disable.risk.passwords.description": {
+    "message": "Your Discord, browser passwords, and banking credentials could be stolen."
+  },
+  "app.settings.sandbox.disable.risk.passwords.title": {
+    "message": "Steal your passwords and logins"
+  },
+  "app.settings.sandbox.disable.risks-title": {
+    "message": "A malicious mod could:"
+  },
+  "app.settings.sandbox.documents": {
+    "message": "Read-only access to documents folder"
+  },
+  "app.settings.sandbox.documents.description": {
+    "message": "Allows mods to read files in your Documents folder."
+  },
+  "app.settings.sandbox.downloads": {
+    "message": "Read-only access to downloads folder"
+  },
+  "app.settings.sandbox.downloads.description": {
+    "message": "Allows mods to read files in your Downloads folder."
+  },
+  "app.settings.sandbox.folders": {
+    "message": "Access other folders"
+  },
+  "app.settings.sandbox.folders.add": {
+    "message": "Add"
+  },
+  "app.settings.sandbox.folders.browse": {
+    "message": "Browse for a folder"
+  },
+  "app.settings.sandbox.folders.description": {
+    "message": "Allows mods to read or modify files you choose. Only add folders you’re comfortable giving them access to."
+  },
+  "app.settings.sandbox.folders.placeholder": {
+    "message": "Path to folder..."
+  },
+  "app.settings.sandbox.info": {
+    "message": "The sandbox isolates Minecraft, limiting mods to your system files, .minecraft, and anything we allow or you allow below. Some mods may not work if the sandbox blocks access they need. <link>Learn more</link>"
+  },
+  "app.settings.sandbox.instance.description": {
+    "message": "Launch this instance in a sandbox to restrict what mods can access."
+  },
+  "app.settings.sandbox.instance.title": {
+    "message": "Sandbox instance"
+  },
+  "app.settings.sandbox.network": {
+    "message": "Access network"
+  },
+  "app.settings.sandbox.network.description": {
+    "message": "Allows connections to the internet, multiplayer servers, and online services."
+  },
+  "app.settings.sandbox.settings-title": {
+    "message": "Sandbox settings"
+  },
+  "app.settings.sandbox.title": {
+    "message": "Sandbox instances"
+  },
+  "app.settings.sandbox.unavailable": {
+    "message": "Sandboxing is unavailable on this system, so instances that need the sandbox will not launch: {reason}"
+  },
   "app.settings.sidebar.label.instance-defaults": {
     "message": "Instance defaults"
   },
@@ -3225,7 +3315,7 @@
     "message": "Edit game settings"
   },
   "app.settings.synced-options.game-settings.conflict-text": {
-    "message": "We loaded the latest settings. Check your changes, then save again."
+    "message": "We loaded the latest settings. Check your change and try again."
   },
   "app.settings.synced-options.game-settings.conflict-title": {
     "message": "These settings changed elsewhere"
@@ -3263,9 +3353,6 @@
   "app.settings.synced-options.game-settings.retry": {
     "message": "Retry"
   },
-  "app.settings.synced-options.game-settings.save": {
-    "message": "Save settings"
-  },
   "app.settings.synced-options.game-settings.search": {
     "message": "Search settings..."
   },
@@ -3283,9 +3370,6 @@
   },
   "app.settings.synced-options.game-settings.title": {
     "message": "Game settings"
-  },
-  "app.settings.synced-options.game-settings.unsaved-changes": {
-    "message": "You have unsaved changes."
   },
   "app.settings.synced-options.game-settings.unsync-setting": {
     "message": "Stop syncing {setting} across instances"
@@ -3388,6 +3472,9 @@
   },
   "app.settings.tabs.resources": {
     "message": "Resources"
+  },
+  "app.settings.tabs.sandbox": {
+    "message": "Sandboxing"
   },
   "app.settings.tabs.syncing": {
     "message": "Syncing"
@@ -4091,20 +4178,26 @@
   "instance.server-modal.resource-pack": {
     "message": "Resource pack"
   },
-  "instance.settings.defaults.open-app-settings": {
-    "message": "Manage default settings"
-  },
-  "instance.settings.reset-setting-to-default": {
-    "message": "Reset {setting} to default"
-  },
-  "instance.settings.reset-to-default": {
-    "message": "Reset to default"
-  },
   "instance.settings.sidebar.label.game": {
     "message": "Game"
   },
   "instance.settings.sidebar.label.instance": {
     "message": "Instance"
+  },
+  "instance.settings.source.app-settings": {
+    "message": "App settings"
+  },
+  "instance.settings.source.customize": {
+    "message": "Customize"
+  },
+  "instance.settings.source.reset-to-defaults": {
+    "message": "Reset to app defaults"
+  },
+  "instance.settings.source.using-app-defaults": {
+    "message": "Using the defaults from your app settings."
+  },
+  "instance.settings.source.using-custom": {
+    "message": "Using custom settings for this instance"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Turn off this override to edit synced data."
@@ -4226,9 +4319,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Select update channel"
   },
-  "instance.settings.tabs.hooks.default-settings-description": {
-    "message": "Your instance uses the default launch hooks unless you override them here."
-  },
   "instance.settings.tabs.hooks.label": {
     "message": "Launch hooks"
   },
@@ -4249,6 +4339,9 @@
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Enter pre-launch command..."
+  },
+  "instance.settings.tabs.hooks.settings-heading": {
+    "message": "Launch hooks settings"
   },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Hooks run in the working directory of the instance, with the following variables:"
@@ -4289,9 +4382,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Installation settings are unavailable while this instance is locked."
   },
-  "instance.settings.tabs.java.default-settings-description": {
-    "message": "Your instance uses the default Java and memory settings unless you override them here."
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Enter environmental variables..."
   },
@@ -4322,8 +4412,20 @@
   "instance.settings.tabs.java.recommended-java-version": {
     "message": "Java {version} is recommended for the Minecraft version of this instance."
   },
+  "instance.settings.tabs.java.settings-heading": {
+    "message": "Java and memory settings"
+  },
+  "instance.settings.tabs.sandbox": {
+    "message": "Sandboxing"
+  },
+  "instance.settings.tabs.sandbox.settings-heading": {
+    "message": "Sandboxing settings"
+  },
   "instance.settings.tabs.sharing": {
     "message": "Sharing"
+  },
+  "instance.settings.tabs.synced-options.app-settings": {
+    "message": "App settings"
   },
   "instance.settings.tabs.synced-options.command-history": {
     "message": "Unsync command history"
@@ -4352,6 +4454,9 @@
   "instance.settings.tabs.synced-options.game-settings.disabled-in-app": {
     "message": "Game settings syncing is turned off in app settings."
   },
+  "instance.settings.tabs.synced-options.heading": {
+    "message": "Synced settings"
+  },
   "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
     "message": "The version being replaced will be backed up before anything changes."
   },
@@ -4376,17 +4481,11 @@
   "instance.settings.tabs.synced-options.multiplayer-servers.override-description": {
     "message": "Keep this instance's multiplayer servers separate from synced servers."
   },
-  "instance.settings.tabs.synced-options.open-app-settings": {
-    "message": "Manage synced settings"
-  },
   "instance.settings.tabs.synced-options.shared-settings.description": {
-    "message": "Enable an override to keep a synced setting separate for this instance."
+    "message": "Enable an override to stop syncing for this instance."
   },
   "instance.settings.tabs.syncing": {
     "message": "Syncing"
-  },
-  "instance.settings.tabs.window.default-settings-description": {
-    "message": "Your instance uses the default window settings unless you override them here."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Fullscreen"
@@ -4406,6 +4505,9 @@
   "instance.settings.tabs.window.label": {
     "message": "Window"
   },
+  "instance.settings.tabs.window.settings-heading": {
+    "message": "Window settings"
+  },
   "instance.settings.tabs.window.width": {
     "message": "Width"
   },
@@ -4414,9 +4516,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Enter width..."
-  },
-  "instance.settings.using-defaults": {
-    "message": "Using defaults"
   },
   "instance.shared-instance.error.title": {
     "message": "Something has gone wrong"

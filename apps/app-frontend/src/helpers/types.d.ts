@@ -49,6 +49,7 @@ export type GameInstance = {
 	force_fullscreen?: boolean
 	game_resolution?: [number, number]
 	hooks: Hooks
+	sandbox: SandboxOverrides
 	visible_tabs: {
 		files: boolean
 		worlds: boolean
@@ -179,6 +180,20 @@ type Hooks = {
 	post_exit?: string
 }
 
+type SandboxMode = 'never' | 'unrecognized' | 'always'
+
+type SandboxSettings = {
+	mode: SandboxMode
+	allow_network: boolean
+	allow_downloads: boolean
+	allow_documents: boolean
+	extra_paths: string[]
+}
+
+type SandboxOverrides = {
+	[K in keyof SandboxSettings]: SandboxSettings[K] | null
+}
+
 export type Manifest = {
 	gameVersions: ManifestGameVersion[]
 	versionGroups?: ManifestVersionGroup[]
@@ -246,6 +261,7 @@ export type AppSettings = {
 	warn_on_unknown_modpacks: boolean
 	skip_non_essential_warnings: boolean
 	hooks: Hooks
+	sandbox: SandboxSettings
 
 	custom_dir?: string
 	prev_custom_dir?: string

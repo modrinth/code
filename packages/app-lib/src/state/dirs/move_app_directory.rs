@@ -342,11 +342,8 @@ async fn verify_file(
 fn flush_path(path: &Path) -> std::io::Result<()> {
     #[cfg(unix)]
     {
-        use std::os::fd::AsRawFd;
         let file = std::fs::File::open(path)?;
-        if unsafe { libc::fsync(file.as_raw_fd()) } != 0 {
-            return Err(std::io::Error::last_os_error());
-        }
+        rustix::fs::fsync(&file)?;
         Ok(())
     }
     #[cfg(windows)]

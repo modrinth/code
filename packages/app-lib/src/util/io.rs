@@ -3,7 +3,7 @@
 
 use anyhow::{Context, Result};
 use std::{
-    io::{ErrorKind, Write},
+    io::{ErrorKind, Read, Write},
     path::Path,
 };
 use tempfile::NamedTempFile;
@@ -146,6 +146,187 @@ pub async fn read(
             source: e,
             path: path.to_string_lossy().to_string(),
         })
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum OpenMode {
+    Read,
+    /// Empties the file, and opens it for appending.
+    Truncate,
+}
+
+/// Opens a file in a folder which can be modified by the game, such as an instance.
+///
+/// The game could have replaced the file, or the folders that it's in, with a link to
+/// something that it can't access itself. To prevent this, nothing in `path` is allowed
+/// to be a link. `folder` can be a link, so the game must not be able to replace it.
+///
+/// Folders in `path` are created if necessary, unless the file is opened for reading.
+#[cfg(unix)]
+pub fn open_no_follow(
+    folder: &Path,
+    path: &Path,
+    mode: OpenMode,
+) -> std::io::Result<std::fs::File> {
+    use rustix::{
+        fs::{Mode, OFlags, mkdirat, openat},
+        io::Errno,
+    };
+    use std::{fs::File, os::fd::OwnedFd, path::Component};
+
+    // Without NONBLOCK, opening a pipe would wait for the other end
+    const COMMON_FLAGS: OFlags = OFlags::NOFOLLOW
+        .union(OFlags::NONBLOCK)
+        .union(OFlags::CLOEXEC);
+    const FOLDER_FLAGS: OFlags =
+        COMMON_FLAGS.union(OFlags::RDONLY).union(OFlags::DIRECTORY);
+
+    let invalid_path =
+        || std::io::Error::new(ErrorKind::InvalidInput, "invalid path");
+    let names = path
+        .components()
+        .map(|component| match component {
+            Component::Normal(name) => Ok(name),
+            _ => Err(invalid_path()),
+        })
+        .collect::<std::io::Result<Vec<_>>>()?;
+    let (file_name, folder_names) =
+        names.split_last().ok_or_else(invalid_path)?;
+
+    let (flags, create_mode) = match mode {
+        OpenMode::Read => (OFlags::RDONLY, Mode::empty()),
+        OpenMode::Truncate => (
+            OFlags::WRONLY | OFlags::APPEND | OFlags::CREATE,
+            Mode::from_raw_mode(0o666),
+        ),
+    };
+    let flags = COMMON_FLAGS | flags;
+
+    let mut folder: OwnedFd = File::open(folder)?.into();
+    let file = if let Some(file) =
+        try_openat2(&folder, path, flags, create_mode)?
+    {
+        file
+    } else {
+        // Open each folder in order, creating it if it doesn't exist
+        for name in folder_names {
+            let mut child = openat(&folder, *name, FOLDER_FLAGS, Mode::empty());
+            if mode != OpenMode::Read && matches!(child, Err(Errno::NOENT)) {
+                match mkdirat(&folder, *name, Mode::from_raw_mode(0o777)) {
+                    Ok(()) | Err(Errno::EXIST) => {}
+                    Err(err) => return Err(err.into()),
+                }
+                child = openat(&folder, *name, FOLDER_FLAGS, Mode::empty());
+            }
+            folder = child?;
+        }
+        openat(&folder, *file_name, flags, create_mode)?
+    };
+
+    let file = File::from(file);
+    if !file.metadata()?.is_file() {
+        return Err(std::io::Error::other("not a regular file"));
+    }
+    if mode == OpenMode::Truncate {
+        file.set_len(0)?;
+    }
+    Ok(file)
+}
+
+/// Returns `None` if the path can't be opened this way, or if one of the folders that
+/// it's in may need to be created.
+#[cfg(target_os = "linux")]
+fn try_openat2(
+    folder: &std::os::fd::OwnedFd,
+    path: &Path,
+    flags: rustix::fs::OFlags,
+    create_mode: rustix::fs::Mode,
+) -> std::io::Result<Option<std::os::fd::OwnedFd>> {
+    use rustix::{
+        fs::{OFlags, ResolveFlags, openat2},
+        io::Errno,
+    };
+    use std::sync::atomic::{AtomicBool, Ordering};
+
+    static SUPPORTS_OPENAT2: AtomicBool = AtomicBool::new(true);
+    if !SUPPORTS_OPENAT2.load(Ordering::Relaxed) {
+        return Ok(None);
+    }
+
+    // Retry up to 3 times if receiving EAGAIN
+    for _ in 0..3 {
+        let result = openat2(
+            folder,
+            path,
+            flags,
+            create_mode,
+            ResolveFlags::BENEATH | ResolveFlags::NO_SYMLINKS,
+        );
+        match result {
+            Ok(file) => return Ok(Some(file)),
+            Err(Errno::AGAIN) => {}
+            Err(Errno::NOENT) if flags.contains(OFlags::CREATE) => {
+                return Ok(None);
+            }
+            Err(Errno::NOSYS | Errno::PERM) => {
+                SUPPORTS_OPENAT2.store(false, Ordering::Relaxed);
+                return Ok(None);
+            }
+            Err(err) => return Err(err.into()),
+        }
+    }
+    Ok(None)
+}
+
+#[cfg(all(unix, not(target_os = "linux")))]
+fn try_openat2(
+    _folder: &std::os::fd::OwnedFd,
+    _path: &Path,
+    _flags: rustix::fs::OFlags,
+    _create_mode: rustix::fs::Mode,
+) -> std::io::Result<Option<std::os::fd::OwnedFd>> {
+    Ok(None)
+}
+
+/// The sandbox can't create links on Windows, other than to folders that it can
+/// already write to, so we don't need any special logic here.
+#[cfg(not(unix))]
+pub fn open_no_follow(
+    folder: &Path,
+    path: &Path,
+    mode: OpenMode,
+) -> std::io::Result<std::fs::File> {
+    let path = folder.join(path);
+    match mode {
+        OpenMode::Read => std::fs::File::open(path),
+        OpenMode::Truncate => {
+            if let Some(parent) = path.parent() {
+                std::fs::create_dir_all(parent)?;
+            }
+            // A file opened for appending can't be truncated on Windows
+            std::fs::File::create(&path)?;
+            std::fs::OpenOptions::new().append(true).open(path)
+        }
+    }
+}
+
+/// Reads a file in a folder which can be modified by the game, see [`open_no_follow`].
+pub async fn read_no_follow(
+    folder: &Path,
+    path: &Path,
+) -> Result<Vec<u8>, IOError> {
+    let full_path = folder.join(path);
+    let folder = folder.to_owned();
+    let path = path.to_owned();
+    spawn_blocking(move || {
+        let mut contents = Vec::new();
+        open_no_follow(&folder, &path, OpenMode::Read)?
+            .read_to_end(&mut contents)?;
+        std::io::Result::Ok(contents)
+    })
+    .await
+    .map_err(|_| std::io::Error::other("background task failed"))?
+    .map_err(|e| IOError::with_path(e, full_path))
 }
 
 pub async fn write(

@@ -174,6 +174,7 @@ pub struct Instance {
     pub force_fullscreen: Option<bool>,
     pub game_resolution: Option<WindowSize>,
     pub hooks: Hooks,
+    pub sandbox: SandboxOverrides,
     pub visible_tabs: InstanceTabVisibility,
 }
 
@@ -317,6 +318,7 @@ pub struct EditInstance {
     )]
     pub game_resolution: Option<Option<WindowSize>>,
     pub hooks: Option<Hooks>,
+    pub sandbox: Option<SandboxOverrides>,
     pub visible_tabs: Option<InstanceTabVisibility>,
 }
 
@@ -358,6 +360,7 @@ impl From<InstanceMetadata> for Instance {
             force_fullscreen: metadata.launch_overrides.force_fullscreen,
             game_resolution: metadata.launch_overrides.game_resolution,
             hooks: metadata.launch_overrides.hooks,
+            sandbox: metadata.launch_overrides.sandbox,
             visible_tabs: metadata.launch_overrides.visible_tabs,
         }
     }
@@ -517,9 +520,13 @@ fn edit_to_core(edit_instance: EditInstance) -> Result<CoreEditInstance> {
             force_fullscreen: edit_instance.force_fullscreen,
             game_resolution: edit_instance.game_resolution,
             hooks: edit_instance.hooks,
+            sandbox: edit_instance.sandbox,
             visible_tabs: edit_instance.visible_tabs,
         }),
-        content_set_patch: Some(AppliedContentSetPatch {
+        content_set_patch: (edit_instance.game_version.is_some()
+            || edit_instance.loader.is_some()
+            || edit_instance.loader_version.is_some())
+        .then(|| AppliedContentSetPatch {
             source_kind: None,
             game_version: edit_instance.game_version,
             protocol_version: Some(None),

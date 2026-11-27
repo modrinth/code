@@ -4,6 +4,7 @@ import { type Ref, ref } from 'vue'
 import type { Router } from 'vue-router'
 
 import { handleSevereError } from '@/composables/use-error.js'
+import { enableInstanceSandbox } from '@/features/sandbox/enable-instance-sandbox'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version } from '@/helpers/cache.js'
 import {
@@ -30,7 +31,7 @@ export interface ServerInstallContext {
 	startInstallingServer: (projectId: string) => void
 	stopInstallingServer: (projectId: string) => void
 	isServerInstalling: (projectId: string) => boolean
-	installServerProject: (serverProjectId: string) => Promise<void>
+	installServerProject: (serverProjectId: string, options?: { sandbox?: boolean }) => Promise<void>
 	playServerProject: (projectId: string) => Promise<void>
 	setInstallToPlayModal: (
 		ref: ModalRef<
@@ -226,7 +227,7 @@ export function createServerInstall(opts: {
 	 * the server project id and link.version_id as the modpack content version id.
 	 * The modpack content version can be of the same server project, or from a different project.
 	 */
-	async function installServerProject(serverProjectId: string) {
+	async function installServerProject(serverProjectId: string, options?: { sandbox?: boolean }) {
 		const [project, projectV3] = await Promise.all([
 			get_project(serverProjectId, 'bypass'),
 			get_project_v3(serverProjectId, 'bypass'),
@@ -263,6 +264,7 @@ export function createServerInstall(opts: {
 		)
 		const instanceId = installJobInstanceId(createJob)
 		if (!instanceId) return
+		if (options?.sandbox) await enableInstanceSandbox(instanceId)
 
 		await wait_for_install_job(opts.appEvents, createJob.job_id)
 		await ensureManagedServerWorldExists(instanceId, project.title, serverAddress)

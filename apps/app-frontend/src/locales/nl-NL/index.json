@@ -3845,9 +3845,6 @@
   "instance.server-modal.resource-pack": {
     "message": "Bronpakket"
   },
-  "instance.settings.defaults.open-app-settings": {
-    "message": "Standaardinstellingen beheren"
-  },
   "instance.settings.sidebar.label.game": {
     "message": "Game"
   },
@@ -3971,9 +3968,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecteer updatekanaal"
   },
-  "instance.settings.tabs.hooks.default-settings-description": {
-    "message": "Je instantie gebruikt de standaard launch-hooks tenzij je ze hier overschrijft."
-  },
   "instance.settings.tabs.hooks.label": {
     "message": "Opstart-hooks"
   },
@@ -4033,9 +4027,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Installatie-instellingen zijn niet beschikbaar zolang deze instantie is vergrendeld."
-  },
-  "instance.settings.tabs.java.default-settings-description": {
-    "message": "Je instantie gebruikt de standaard Java en geheugen -instellingen tenzij je ze hier overschrijft."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Voer omgevingsvariabelen in…"
@@ -4114,9 +4105,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Syncen"
-  },
-  "instance.settings.tabs.window.default-settings-description": {
-    "message": "Je instantie gebruikt de standaard vensterwaarden tenzij je ze hier overschrijft."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Volledig scherm"

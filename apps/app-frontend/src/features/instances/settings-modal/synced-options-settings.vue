@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EditIcon, RefreshCwIcon, RotateCounterClockwiseIcon, XIcon } from '@modrinth/assets'
+import { EditIcon, RotateCounterClockwiseIcon, SettingsIcon, XIcon } from '@modrinth/assets'
 import {
 	Button,
 	commonMessages,
@@ -94,13 +94,17 @@ const messages = defineMessages({
 		id: 'app.settings.synced-options.multiplayer-servers.none-synced-yet',
 		defaultMessage: "You haven't synced any servers yet",
 	},
-	sharedSettingsDescription: {
-		id: 'instance.settings.tabs.synced-options.shared-settings.description',
-		defaultMessage: 'Enable an override to keep a synced setting separate for this instance.',
+	syncedSettingsHeading: {
+		id: 'instance.settings.tabs.synced-options.heading',
+		defaultMessage: 'Synced settings',
 	},
-	openSyncedOptions: {
-		id: 'instance.settings.tabs.synced-options.open-app-settings',
-		defaultMessage: 'Manage synced settings',
+	syncedSettingsDescription: {
+		id: 'instance.settings.tabs.synced-options.shared-settings.description',
+		defaultMessage: 'Enable an override to stop syncing for this instance.',
+	},
+	appSettings: {
+		id: 'instance.settings.tabs.synced-options.app-settings',
+		defaultMessage: 'App settings',
 	},
 	gameSettings: {
 		id: 'instance.settings.tabs.synced-options.game-settings',
@@ -562,12 +566,17 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 		<div
 			class="flex items-center justify-between gap-4 border-0 border-b border-solid border-surface-5 pb-6"
 		>
-			<p class="m-0 text-secondary">
-				{{ formatMessage(messages.sharedSettingsDescription) }}
-			</p>
+			<div class="flex min-w-0 flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.syncedSettingsHeading) }}
+				</h2>
+				<p class="m-0 text-secondary">
+					{{ formatMessage(messages.syncedSettingsDescription) }}
+				</p>
+			</div>
 			<Button class="shrink-0" @click="showAppSyncedOptions">
-				<RefreshCwIcon />
-				{{ formatMessage(messages.openSyncedOptions) }}
+				<SettingsIcon aria-hidden="true" />
+				{{ formatMessage(messages.appSettings) }}
 			</Button>
 		</div>
 

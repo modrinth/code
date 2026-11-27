@@ -73,6 +73,8 @@ pub struct Settings {
     #[serde(default)]
     pub skip_non_essential_warnings: bool,
     pub hooks: Hooks,
+    #[serde(default)]
+    pub sandbox: SandboxSettings,
 
     pub custom_dir: Option<String>,
     pub prev_custom_dir: Option<String>,
@@ -121,7 +123,7 @@ impl Settings {
                 discord_rpc, developer_mode, telemetry, personalized_ads,
                 json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,
                 mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,
-                hook_pre_launch, hook_wrapper, hook_post_exit,
+                hook_pre_launch, hook_wrapper, hook_post_exit, json(sandbox) sandbox,
                 custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar,
                 skipped_update, pending_update_toast_for_version, auto_download_updates,
 				sync_theme_across_devices, sync_behavior_across_devices, sync_features_across_devices,
@@ -199,6 +201,11 @@ impl Settings {
                 wrapper: res.hook_wrapper,
                 post_exit: res.hook_post_exit,
             },
+            sandbox: res
+                .sandbox
+                .as_ref()
+                .and_then(|x| serde_json::from_str(x).ok())
+                .unwrap_or_default(),
             custom_dir: res.custom_dir,
             prev_custom_dir: res.prev_custom_dir,
             migrated: res.migrated == 1,
@@ -236,6 +243,7 @@ impl Settings {
         let extra_launch_args = serde_json::to_string(&self.extra_launch_args)?;
         let custom_env_vars = serde_json::to_string(&self.custom_env_vars)?;
         let feature_flags = serde_json::to_string(&self.feature_flags)?;
+        let sandbox = serde_json::to_string(&self.sandbox)?;
         let version = self.version as i64;
 
         sqlx::query!(
@@ -303,7 +311,8 @@ impl Settings {
 				friends_active_collapsed = $50,
 				friends_online_collapsed = $51,
 				friends_offline_collapsed = $52,
-				friends_pending_collapsed = $53
+				friends_pending_collapsed = $53,
+				sandbox = jsonb($54)
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -358,6 +367,7 @@ impl Settings {
             self.friends_online_collapsed,
             self.friends_offline_collapsed,
             self.friends_pending_collapsed,
+            sandbox,
         )
         .execute(exec)
         .await?;
@@ -487,6 +497,75 @@ pub struct Hooks {
     pub wrapper: Option<String>,
     #[serde_as(as = "serde_with::NoneAsEmptyString")]
     pub post_exit: Option<String>,
+}
+
+/// When to run instances inside the sandbox
+#[derive(
+    Serialize, Deserialize, Debug, Clone, Copy, Default, PartialEq, Eq,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum SandboxMode {
+    #[default]
+    Never,
+    Unrecognized,
+    Always,
+}
+
+/// Sandbox mode and the extra access granted to sandboxed instances
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(default)]
+pub struct SandboxSettings {
+    pub mode: SandboxMode,
+    pub allow_network: bool,
+    pub allow_downloads: bool,
+    pub allow_documents: bool,
+    pub extra_paths: Vec<String>,
+}
+
+/// Per-instance sandbox overrides; [`None`] fields use the app defaults
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq)]
+#[serde(default)]
+pub struct SandboxOverrides {
+    pub mode: Option<SandboxMode>,
+    pub allow_network: Option<bool>,
+    pub allow_downloads: Option<bool>,
+    pub allow_documents: Option<bool>,
+    pub extra_paths: Option<Vec<String>>,
+}
+
+impl SandboxOverrides {
+    pub fn is_empty(&self) -> bool {
+        *self == Self::default()
+    }
+
+    pub fn apply(&self, defaults: SandboxSettings) -> SandboxSettings {
+        SandboxSettings {
+            mode: self.mode.unwrap_or(defaults.mode),
+            allow_network: self.allow_network.unwrap_or(defaults.allow_network),
+            allow_downloads: self
+                .allow_downloads
+                .unwrap_or(defaults.allow_downloads),
+            allow_documents: self
+                .allow_documents
+                .unwrap_or(defaults.allow_documents),
+            extra_paths: self
+                .extra_paths
+                .clone()
+                .unwrap_or(defaults.extra_paths),
+        }
+    }
+}
+
+impl Default for SandboxSettings {
+    fn default() -> Self {
+        Self {
+            mode: SandboxMode::default(),
+            allow_network: true,
+            allow_downloads: true,
+            allow_documents: false,
+            extra_paths: Vec::new(),
+        }
+    }
 }
 
 /// Opening window to start with

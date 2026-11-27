@@ -5,7 +5,8 @@
 		:admonition-header="
 			formatMessage(isOwner ? messages.ownerUpdateAdmonitionHeader : messages.updateRequired)
 		"
-		:description="description"
+		:description="isOwner ? formatMessage(messages.ownerUpdateDescription) : undefined"
+		:offer-sandbox="offerSandbox"
 		:diffs="diffs"
 		:confirm-label="formatMessage(commonMessages.updateButton)"
 		:confirm-icon="DownloadIcon"
@@ -14,10 +15,19 @@
 		:show-report-button="!isOwner"
 		:show-external-warnings="!isOwner"
 		:external-warning-description="formatMessage(messages.externalWarningDescription)"
-		@confirm="update"
+		@confirm="update(false)"
+		@sandbox="update(true)"
 		@cancel="emit('cancel')"
 		@report="emit('report', $event)"
-	/>
+	>
+		<template v-if="instance && !isOwner" #description>
+			<IntlFormatted :message-id="messages.description" :values="{ name: instance.name }">
+				<template #name="{ children }">
+					<span class="font-medium"><component :is="() => children" /></span>
+				</template>
+			</IntlFormatted>
+		</template>
+	</ContentDiffModal>
 </template>
 
 <script setup lang="ts">
@@ -27,10 +37,13 @@ import {
 	type ContentDiffItem,
 	ContentDiffModal,
 	defineMessages,
+	IntlFormatted,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import { enableInstanceSandbox } from '@/features/sandbox/enable-instance-sandbox'
+import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
 import {
 	getSharedInstanceUnavailableReason,
 	install_update_shared_instance,
@@ -54,18 +67,13 @@ const emit = defineEmits<{
 }>()
 const modal = ref<InstanceType<typeof ContentDiffModal>>()
 const instance = ref<GameInstance | null>(null)
+const offerSandbox = useOfferSandbox(() => instance.value?.sandbox)
 const preview = ref<SharedInstanceUpdatePreview | null>(null)
 const onComplete = ref<UpdateCompleteCallback>(() => {})
 const { formatMessage } = useVIntl()
 const appEvents = injectAppEvents()
 const { notifySharedInstanceError } = useSharedInstanceErrors()
 const isOwner = computed(() => instance.value?.shared_instance?.role === 'owner')
-const description = computed(() => {
-	if (!instance.value) return ''
-	return isOwner.value
-		? formatMessage(messages.ownerUpdateDescription)
-		: formatMessage(messages.description, { name: instance.value.name })
-})
 const diffs = computed<ContentDiffItem[]>(
 	() =>
 		preview.value?.diffs
@@ -84,11 +92,12 @@ const diffs = computed<ContentDiffItem[]>(
 			})) ?? [],
 )
 
-async function update() {
+async function update(sandbox: boolean) {
 	let successful = false
 	emit('accepted')
 	try {
 		if (instance.value) {
+			if (sandbox) await enableInstanceSandbox(instance.value.id)
 			const job = await install_update_shared_instance(instance.value.id)
 			await wait_for_install_job(appEvents, job.job_id)
 			await onComplete.value()
@@ -129,7 +138,7 @@ const messages = defineMessages({
 	description: {
 		id: 'app.modal.update-to-play.update-required-description',
 		defaultMessage:
-			'An update is required to play {name}. Please update to latest version to launch the game.',
+			'An update is required to play <name>{name}</name>. Please update to the latest version to launch the game.',
 	},
 	ownerUpdateHeader: {
 		id: 'app.modal.update-to-play.owner-header',

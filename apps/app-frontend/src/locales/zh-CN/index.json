@@ -3998,9 +3998,6 @@
   "instance.server-modal.resource-pack": {
     "message": "资源包"
   },
-  "instance.settings.defaults.open-app-settings": {
-    "message": "管理默认设置"
-  },
   "instance.settings.sidebar.label.game": {
     "message": "游戏"
   },
@@ -4124,9 +4121,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "选择更新渠道"
   },
-  "instance.settings.tabs.hooks.default-settings-description": {
-    "message": "您的实例使用默认启动hook，除非您在这里覆盖它们。"
-  },
   "instance.settings.tabs.hooks.label": {
     "message": "启动 hook"
   },
@@ -4186,9 +4180,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "当实例被锁定时，安装设置不可用。"
-  },
-  "instance.settings.tabs.java.default-settings-description": {
-    "message": "您的实例使用默认的Java和内存设置，除非您在这里覆盖它们。"
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "输入环境变量……"
@@ -4267,9 +4258,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "同步"
-  },
-  "instance.settings.tabs.window.default-settings-description": {
-    "message": "您的实例使用默认的窗口设置，除非您在这里覆盖它们。"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "全屏"

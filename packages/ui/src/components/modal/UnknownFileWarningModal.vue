@@ -23,7 +23,7 @@
 				}}
 			</Admonition>
 
-			<p class="m-0 w-full leading-6 text-primary">
+			<p v-if="!offerSandbox" class="m-0 w-full leading-6 text-primary">
 				{{ formatMessage(messages.reviewedFiles) }}
 			</p>
 
@@ -74,22 +74,46 @@
 				</Transition>
 			</div>
 
-			<p class="m-0 w-full font-medium leading-6 text-orange">
-				{{ formatMessage(messages.malwareWarning) }}
-			</p>
+			<UnknownFileSandboxNotice v-if="offerSandbox" />
+			<template v-else>
+				<p class="m-0 w-full font-medium leading-6 text-orange">
+					{{ formatMessage(messages.malwareWarning) }}
+				</p>
 
-			<Checkbox
-				v-if="mode === 'mod'"
-				v-model="dontShowAgain"
-				class="w-full"
-				:label="formatMessage(messages.dontShowAgain)"
-			/>
+				<Checkbox
+					v-if="mode === 'mod'"
+					v-model="dontShowAgain"
+					class="w-full"
+					:label="formatMessage(messages.dontShowAgain)"
+				/>
+			</template>
 
 			<div class="flex items-center gap-2">
-				<Button type="quiet" color="orange" native-type="button" @click="continueInstallation">
+				<Button
+					type="quiet"
+					:color="offerSandbox ? undefined : 'orange'"
+					native-type="button"
+					@click="continueInstallation"
+				>
 					{{ formatMessage(messages.installAnyway) }}
 				</Button>
-				<Button type="colored" color="brand" native-type="button" @click="cancelInstallation">
+				<Button
+					v-if="offerSandbox"
+					type="colored"
+					color="brand"
+					native-type="button"
+					@click="sandboxInstallation"
+				>
+					<ShieldCheckIcon aria-hidden="true" />
+					{{ formatMessage(messages.sandboxAndInstall) }}
+				</Button>
+				<Button
+					v-else
+					type="colored"
+					color="brand"
+					native-type="button"
+					@click="cancelInstallation"
+				>
 					<BanIcon aria-hidden="true" />
 					{{ formatMessage(messages.dontInstall) }}
 				</Button>
@@ -99,7 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { BanIcon } from '@modrinth/assets'
+import { BanIcon, ShieldCheckIcon } from '@modrinth/assets'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
@@ -110,28 +134,36 @@ import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
 import Table, { type TableColumn } from '../base/Table.vue'
 import NewModal from './NewModal.vue'
+import UnknownFileSandboxNotice from './UnknownFileSandboxNotice.vue'
 
 const props = withDefaults(
 	defineProps<{
 		mode: 'modpack' | 'mod'
 		fileName: string
 		externalFilesInModpack?: string[]
+		offerSandbox?: boolean
 	}>(),
 	{
 		externalFilesInModpack: () => [],
+		offerSandbox: false,
 	},
 )
 
 const emit = defineEmits<{
 	cancel: []
 	continue: [dontShowAgain: boolean]
+	sandbox: []
 }>()
 
 const { formatMessage } = useVIntl()
 const modal = useTemplateRef('modal')
 const externalFileTableBody = ref<HTMLElement | null>(null)
 const dontShowAgain = ref(false)
-let pendingAction: { type: 'cancel' } | { type: 'continue'; dontShowAgain: boolean } | null = null
+let pendingAction:
+	| { type: 'cancel' }
+	| { type: 'sandbox' }
+	| { type: 'continue'; dontShowAgain: boolean }
+	| null = null
 const {
 	showTopFade: showTableTopFade,
 	showBottomFade: showTableBottomFade,
@@ -183,9 +215,13 @@ const messages = defineMessages({
 		id: 'unknown-file-warning-modal.install-anyway',
 		defaultMessage: 'Install anyway',
 	},
+	sandboxAndInstall: {
+		id: 'unknown-file-warning-modal.sandbox-and-install',
+		defaultMessage: 'Sandbox and install',
+	},
 	dontInstall: {
 		id: 'unknown-file-warning-modal.dont-install',
-		defaultMessage: 'Dont install',
+		defaultMessage: 'Don’t install',
 	},
 })
 
@@ -232,6 +268,8 @@ function handleAfterHide() {
 
 	if (action?.type === 'continue') {
 		emit('continue', action.dontShowAgain)
+	} else if (action?.type === 'sandbox') {
+		emit('sandbox')
 	} else {
 		emit('cancel')
 	}
@@ -243,7 +281,12 @@ function cancelInstallation() {
 }
 
 function continueInstallation() {
-	pendingAction = { type: 'continue', dontShowAgain: dontShowAgain.value }
+	pendingAction = { type: 'continue', dontShowAgain: !props.offerSandbox && dontShowAgain.value }
+	modal.value?.hide()
+}
+
+function sandboxInstallation() {
+	pendingAction = { type: 'sandbox' }
 	modal.value?.hide()
 }
 

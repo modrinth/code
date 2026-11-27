@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { ref } from 'vue'
 
 import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
+import { enableInstallJobSandbox } from '@/features/sandbox/enable-instance-sandbox'
 import { install_shared_instance, wait_for_install_job } from '@/helpers/install'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import {
@@ -54,7 +55,7 @@ async function install(
 
 		installModal.value?.show(
 			instance.icon_path ? { ...preview, iconUrl: instance.icon_path } : preview,
-			async () => {
+			async ({ sandbox }) => {
 				if (loadingIds.value.has(sharedInstanceId)) return
 				setLoading(sharedInstanceId, true)
 				let jobId: string
@@ -69,6 +70,7 @@ async function install(
 						instance.icon_path ? (instance.icon_config ?? null) : null,
 					)
 					jobId = job.job_id
+					if (sandbox) await enableInstallJobSandbox(job)
 					await queryClient.invalidateQueries({ queryKey: ['instances'] })
 					options.onInstalled?.()
 				} catch (error) {

@@ -2,6 +2,7 @@
 use crate::ErrorKind;
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
 use anyhow::anyhow;
+use modrinth_sandbox::SandboxEnv;
 use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, LazyLock};
 use tokio::sync::watch::Sender;
@@ -125,6 +126,11 @@ pub struct State {
     pub(crate) pool: SqlitePool,
 
     pub(crate) file_watcher: FileWatcher,
+    /// Created from [`SandboxEnv::new`], or the reason sandboxing is
+    /// unavailable on this system.
+    pub sandbox_env: Result<SandboxEnv, String>,
+    /// Created from [`SandboxEnv::noop`].
+    pub sandbox_env_noop: SandboxEnv,
 }
 
 impl State {
@@ -349,6 +355,12 @@ impl State {
 
         let process_manager = ProcessManager::new();
 
+        let sandbox_env = SandboxEnv::new().await.map_err(|error| {
+            tracing::error!("Failed to set up sandboxing: {error:?}");
+            format!("{error:#}")
+        });
+        let sandbox_env_noop = SandboxEnv::noop();
+
         Ok(Arc::new(Self {
             startup_complete: AtomicBool::new(false),
             directories,
@@ -364,7 +376,8 @@ impl State {
             restart_after_pending_update: AtomicBool::new(false),
             pool,
             file_watcher,
-            // app_identifier,
+            sandbox_env,
+            sandbox_env_noop,
         }))
     }
 }

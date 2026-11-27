@@ -50,7 +50,6 @@ export interface AppearanceSettingsContext {
 }
 
 export interface AppearanceSettingsProviderOptions {
-	deferPersistence?: boolean
 	theme: {
 		current: AppearanceRef<AppearanceThemeSelection>
 		options: AppearanceRef<readonly AppearanceThemeSelection[]>
@@ -130,7 +129,6 @@ export function provideAppearanceSettings(
 
 	async function updateTheme(theme: AppearanceThemeSelection): Promise<void> {
 		await options.theme.set(theme)
-		if (options.deferPersistence) return
 		if (!toValue(options.theme.syncAcrossDevices.value) || toValue(options.theme.syncDisabled)) {
 			return
 		}
@@ -142,7 +140,6 @@ export function provideAppearanceSettings(
 		if (toValue(options.theme.syncDisabled)) return
 
 		await options.theme.syncAcrossDevices.set(enabled)
-		if (options.deferPersistence) return
 		if (enabled) {
 			await syncThemeOrDisable(toValue(options.theme.current))
 		}
@@ -159,7 +156,6 @@ export function provideAppearanceSettings(
 		)?.layout
 
 		await projectLayouts.set(type, layout)
-		if (options.deferPersistence) return
 		try {
 			const layouts: Partial<Labrinth.Users.v3.LayoutPreferences> = {}
 			layouts[layoutPreferenceKeys[type]] = layout
@@ -182,7 +178,6 @@ export function provideAppearanceSettings(
 
 		const previousValue = toValue(sidebarPreferences.value)[key]
 		await sidebarPreferences.set(key, enabled)
-		if (options.deferPersistence) return
 		try {
 			const sidebars: Partial<SidebarPreferences> = {}
 			sidebars[key] = enabled

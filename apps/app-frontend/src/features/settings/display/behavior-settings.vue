@@ -5,14 +5,12 @@ import {
 	injectNotificationManager,
 	injectUserPreferences,
 	Toggle,
-	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { onBeforeUnmount, onMounted } from 'vue'
+import { computed } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { injectAppSettingsModal } from '@/features/settings/app-settings-modal/context'
 import HiddenInstancesSettings from '@/features/settings/display/hidden-instances-settings/index.vue'
 import {
 	type AppSettings,
@@ -27,7 +25,6 @@ const { formatMessage } = useVIntl()
 const auth = injectAuth()
 const { handleError } = injectNotificationManager()
 const { updatePreferences } = injectUserPreferences()
-const settingsModal = injectAppSettingsModal()
 const queryClient = useQueryClient()
 
 const messages = defineMessages({
@@ -132,111 +129,85 @@ const messages = defineMessages({
 	},
 })
 
-type BehaviorSettingsState = {
-	syncBehaviorAcrossDevices: boolean
-	minimizeApp: boolean
-	refocusOnGameClose: boolean
-	hideRightSidebar: boolean
-	compactInstanceCards: boolean
-	showPlayTime: boolean
-	hideNametag: boolean
-	warnOnUnknownModpacks: boolean
-	skipNonEssentialWarnings: boolean
-}
+type BehaviorSettingKey =
+	| 'sync_behavior_across_devices'
+	| 'hide_on_process_start'
+	| 'refocus_on_game_close'
+	| 'toggle_sidebar'
+	| 'compact_instance_cards'
+	| 'show_play_time'
+	| 'hide_nametag_skins_page'
+	| 'warn_on_unknown_modpacks'
+	| 'skip_non_essential_warnings'
+
+type BehaviorSettingsPatch = Partial<Pick<AppSettings, BehaviorSettingKey>>
 
 const settingsQuery = useQuery(appSettingsQueryOptions())
 await settingsQuery.suspense()
 
-function getBehaviorSettingsState(settings: AppSettings): BehaviorSettingsState {
-	return {
-		syncBehaviorAcrossDevices: settings.sync_behavior_across_devices,
-		minimizeApp: settings.hide_on_process_start,
-		refocusOnGameClose: settings.refocus_on_game_close,
-		compactInstanceCards: settings.compact_instance_cards,
-		showPlayTime: settings.show_play_time,
-		warnOnUnknownModpacks: settings.warn_on_unknown_modpacks,
-		skipNonEssentialWarnings: settings.skip_non_essential_warnings,
-		hideRightSidebar: settings.toggle_sidebar,
-		hideNametag: settings.hide_nametag_skins_page,
-	}
+const settings = computed(() => settingsQuery.data.value!)
+
+function applyBehaviorSettings(value: AppSettings): void {
+	appSettings.setBehaviorSyncAcrossDevices(value.sync_behavior_across_devices)
+	appSettings.refocusOnGameClose = value.refocus_on_game_close
+	appSettings.compactInstanceCards = value.compact_instance_cards
+	appSettings.showPlayTime = value.show_play_time
+	appSettings.warnOnUnknownModpacks = value.warn_on_unknown_modpacks
+	appSettings.skipNonEssentialWarnings = value.skip_non_essential_warnings
+	appSettings.toggleSidebar = value.toggle_sidebar
+	appSettings.hideNametagSkinsPage = value.hide_nametag_skins_page
 }
 
 const settingsMutation = useMutation({
 	mutationKey: appSettingsKeys.update,
 	scope: { id: 'app-settings' },
-	mutationFn: async (value: BehaviorSettingsState) => {
-		if (value.syncBehaviorAcrossDevices && auth.user.value) {
+	mutationFn: async (patch: BehaviorSettingsPatch) => {
+		const nextSettings: AppSettings = { ...(await get()), ...patch }
+
+		if (nextSettings.sync_behavior_across_devices && auth.user.value) {
 			await updatePreferences({
 				behavior: {
-					minimize_app: value.minimizeApp,
-					refocus_on_game_close: value.refocusOnGameClose,
-					hide_right_sidebar: value.hideRightSidebar,
-					compact_instance_cards: value.compactInstanceCards,
-					show_play_time: value.showPlayTime,
-					hide_nametag: value.hideNametag,
-					warn_on_unknown_modpacks: value.warnOnUnknownModpacks,
-					skip_non_essential_warnings: value.skipNonEssentialWarnings,
+					minimize_app: nextSettings.hide_on_process_start,
+					refocus_on_game_close: nextSettings.refocus_on_game_close,
+					hide_right_sidebar: nextSettings.toggle_sidebar,
+					compact_instance_cards: nextSettings.compact_instance_cards,
+					show_play_time: nextSettings.show_play_time,
+					hide_nametag: nextSettings.hide_nametag_skins_page,
+					warn_on_unknown_modpacks: nextSettings.warn_on_unknown_modpacks,
+					skip_non_essential_warnings: nextSettings.skip_non_essential_warnings,
 				},
 			})
 		}
 
-		const latestSettings = await get()
-		const nextSettings: AppSettings = {
-			...latestSettings,
-			sync_behavior_across_devices: value.syncBehaviorAcrossDevices,
-			hide_on_process_start: value.minimizeApp,
-			toggle_sidebar: value.hideRightSidebar,
-			hide_nametag_skins_page: value.hideNametag,
-			refocus_on_game_close: value.refocusOnGameClose,
-			compact_instance_cards: value.compactInstanceCards,
-			show_play_time: value.showPlayTime,
-			warn_on_unknown_modpacks: value.warnOnUnknownModpacks,
-			skip_non_essential_warnings: value.skipNonEssentialWarnings,
-		}
-
 		await set(nextSettings)
-		queryClient.setQueryData(appSettingsKeys.all, nextSettings)
-		appSettings.setBehaviorSyncAcrossDevices(value.syncBehaviorAcrossDevices)
-		appSettings.refocusOnGameClose = value.refocusOnGameClose
-		appSettings.compactInstanceCards = value.compactInstanceCards
-		appSettings.showPlayTime = value.showPlayTime
-		appSettings.warnOnUnknownModpacks = value.warnOnUnknownModpacks
-		appSettings.skipNonEssentialWarnings = value.skipNonEssentialWarnings
-		appSettings.toggleSidebar = value.hideRightSidebar
-		appSettings.hideNametagSkinsPage = value.hideNametag
 	},
-	onMutate: () => queryClient.cancelQueries({ queryKey: appSettingsKeys.all }),
-	onError: handleError,
-	onSettled: () => queryClient.invalidateQueries({ queryKey: appSettingsKeys.all }),
+	onMutate: async (patch) => {
+		await queryClient.cancelQueries({ queryKey: appSettingsKeys.all })
+		const previousSettings = queryClient.getQueryData<AppSettings>(appSettingsKeys.all)
+		if (previousSettings) {
+			const nextSettings = { ...previousSettings, ...patch }
+			queryClient.setQueryData(appSettingsKeys.all, nextSettings)
+			applyBehaviorSettings(nextSettings)
+		}
+		return { previousSettings }
+	},
+	onError: (error, _patch, context) => {
+		if (context?.previousSettings) {
+			queryClient.setQueryData(appSettingsKeys.all, context.previousSettings)
+			applyBehaviorSettings(context.previousSettings)
+		}
+		handleError(error)
+	},
+	onSettled: async () => {
+		if (queryClient.isMutating({ mutationKey: appSettingsKeys.update }) === 1) {
+			await queryClient.invalidateQueries({ queryKey: appSettingsKeys.all })
+		}
+	},
 })
 
-const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
-	() => getBehaviorSettingsState(settingsQuery.data.value!),
-	() => settingsMutation.mutateAsync({ ...current.value }),
-)
-
-async function saveBehaviorSettings(): Promise<void> {
-	try {
-		await save()
-	} catch {
-		return
-	}
+function updateSetting<K extends BehaviorSettingKey>(key: K, value: AppSettings[K]): void {
+	settingsMutation.mutate({ [key]: value } as BehaviorSettingsPatch)
 }
-
-onMounted(() => {
-	settingsModal.registerUnsavedChangesController({
-		hasChanges: () => hasChanges.value,
-		getOriginal: () => saved.value,
-		getModified: () => changes.value,
-		isSaving: () => saving.value,
-		reset,
-		save: saveBehaviorSettings,
-	})
-})
-
-onBeforeUnmount(() => {
-	settingsModal.registerUnsavedChangesController(null)
-})
 </script>
 <template>
 	<section class="border-0 border-b border-solid border-divider pb-6">
@@ -257,10 +228,10 @@ onBeforeUnmount(() => {
 			>
 				<Toggle
 					id="sync-behavior-across-devices"
-					:model-value="Boolean(auth.user.value) && current.syncBehaviorAcrossDevices"
+					:model-value="Boolean(auth.user.value) && settings.sync_behavior_across_devices"
 					:disabled="!auth.user.value"
 					aria-labelledby="sync-behavior-across-devices-label"
-					@update:model-value="current.syncBehaviorAcrossDevices = $event"
+					@update:model-value="updateSetting('sync_behavior_across_devices', $event)"
 				/>
 			</span>
 		</div>
@@ -280,7 +251,11 @@ onBeforeUnmount(() => {
 						{{ formatMessage(messages.minimizeLauncherDescription) }}
 					</p>
 				</div>
-				<Toggle id="minimize-launcher" v-model="current.minimizeApp" />
+				<Toggle
+					id="minimize-launcher"
+					:model-value="settings.hide_on_process_start"
+					@update:model-value="updateSetting('hide_on_process_start', $event)"
+				/>
 			</div>
 
 			<div class="flex items-center justify-between gap-4">
@@ -294,9 +269,10 @@ onBeforeUnmount(() => {
 				</div>
 				<Toggle
 					id="refocus-on-game-close"
-					v-model="current.refocusOnGameClose"
+					:model-value="settings.refocus_on_game_close"
 					aria-labelledby="refocus-on-game-close-label"
 					aria-describedby="refocus-on-game-close-description"
+					@update:model-value="updateSetting('refocus_on_game_close', $event)"
 				/>
 			</div>
 
@@ -307,7 +283,11 @@ onBeforeUnmount(() => {
 					</h3>
 					<p class="m-0 mt-1">{{ formatMessage(messages.toggleSidebarDescription) }}</p>
 				</div>
-				<Toggle id="toggle-sidebar" v-model="current.hideRightSidebar" />
+				<Toggle
+					id="toggle-sidebar"
+					:model-value="settings.toggle_sidebar"
+					@update:model-value="updateSetting('toggle_sidebar', $event)"
+				/>
 			</div>
 		</div>
 	</section>
@@ -324,7 +304,11 @@ onBeforeUnmount(() => {
 					</h3>
 					<p class="m-0 mt-1">{{ formatMessage(messages.compactModeDescription) }}</p>
 				</div>
-				<Toggle id="compact-mode" v-model="current.compactInstanceCards" />
+				<Toggle
+					id="compact-mode"
+					:model-value="settings.compact_instance_cards"
+					@update:model-value="updateSetting('compact_instance_cards', $event)"
+				/>
 			</div>
 
 			<div class="flex items-center justify-between gap-4">
@@ -334,7 +318,11 @@ onBeforeUnmount(() => {
 					</h3>
 					<p class="m-0 mt-1">{{ formatMessage(messages.showPlayTimeDescription) }}</p>
 				</div>
-				<Toggle id="show-play-time" v-model="current.showPlayTime" />
+				<Toggle
+					id="show-play-time"
+					:model-value="settings.show_play_time"
+					@update:model-value="updateSetting('show_play_time', $event)"
+				/>
 			</div>
 
 			<div class="flex items-center justify-between gap-4">
@@ -344,7 +332,11 @@ onBeforeUnmount(() => {
 					</h3>
 					<p class="m-0 mt-1">{{ formatMessage(messages.hideNametagDescription) }}</p>
 				</div>
-				<Toggle id="hide-nametag-skins-page" v-model="current.hideNametag" />
+				<Toggle
+					id="hide-nametag-skins-page"
+					:model-value="settings.hide_nametag_skins_page"
+					@update:model-value="updateSetting('hide_nametag_skins_page', $event)"
+				/>
 			</div>
 		</div>
 	</section>
@@ -365,7 +357,8 @@ onBeforeUnmount(() => {
 				</div>
 				<Toggle
 					id="warn-before-installing-unknown-modpacks"
-					v-model="current.warnOnUnknownModpacks"
+					:model-value="settings.warn_on_unknown_modpacks"
+					@update:model-value="updateSetting('warn_on_unknown_modpacks', $event)"
 				/>
 			</div>
 
@@ -378,7 +371,11 @@ onBeforeUnmount(() => {
 						{{ formatMessage(messages.skipNonEssentialWarningsDescription) }}
 					</p>
 				</div>
-				<Toggle id="skip-non-essential-warnings" v-model="current.skipNonEssentialWarnings" />
+				<Toggle
+					id="skip-non-essential-warnings"
+					:model-value="settings.skip_non_essential_warnings"
+					@update:model-value="updateSetting('skip_non_essential_warnings', $event)"
+				/>
 			</div>
 		</div>
 	</section>

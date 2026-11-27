@@ -6,18 +6,17 @@ import {
 	injectUserPreferences,
 	Slider,
 	Toggle,
-	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { onBeforeUnmount, onMounted } from 'vue'
+import { useDebounceFn } from '@vueuse/core'
+import { computed, onBeforeUnmount, ref } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import {
 	QUICK_INSTANCE_LIMIT_MAX,
 	useQuickInstanceLimit,
 } from '@/composables/use-quick-instance-limit.ts'
-import { injectAppSettingsModal } from '@/features/settings/app-settings-modal/context'
 import { type GlobalSyncedOptions, set_global_synced_option } from '@/helpers/instance.ts'
 import {
 	type AppSettings,
@@ -34,7 +33,6 @@ const { formatMessage } = useVIntl()
 const auth = injectAuth()
 const { handleError } = injectNotificationManager()
 const { updatePreferences } = injectUserPreferences()
-const settingsModal = injectAppSettingsModal()
 const quickInstances = useQuickInstanceLimit()
 const queryClient = useQueryClient()
 
@@ -112,140 +110,148 @@ const messages = defineMessages({
 	},
 })
 
-type FeaturesSettingsState = {
-	syncFeaturesAcrossDevices: boolean
-	showFilesTab: boolean
-	showWorldsTab: boolean
-	showScreenshotsTab: boolean
-	showAllScreenshots: boolean
-	showSkinSelector: boolean
-	quickInstanceCount: number
-	showJumpIn: boolean
+type FeatureSettingKey =
+	| 'sync_features_across_devices'
+	| 'show_files_tab_in_instances'
+	| 'show_worlds_tab_in_instances'
+	| 'show_screenshots_tab_in_instances'
+	| 'show_skin_selector_in_sidebar'
+	| 'show_jump_in'
+
+type FeaturesSettingsPatch = {
+	settings?: Partial<Pick<AppSettings, FeatureSettingKey>>
+	showAllScreenshots?: boolean
+	quickInstanceCount?: number
 }
 
 const settingsQuery = useQuery(appSettingsQueryOptions())
 const globalOptionsQuery = useQuery(globalSyncedOptionsQueryOptions())
 await Promise.all([settingsQuery.suspense(), globalOptionsQuery.suspense()])
 
-function getFeaturesSettingsState(
-	settings: AppSettings,
-	globalSyncedOptions: GlobalSyncedOptions,
-): FeaturesSettingsState {
-	return {
-		syncFeaturesAcrossDevices: settings.sync_features_across_devices,
-		showFilesTab: settings.show_files_tab_in_instances,
-		showWorldsTab: settings.show_worlds_tab_in_instances,
-		showScreenshotsTab: settings.show_screenshots_tab_in_instances,
-		showAllScreenshots: globalSyncedOptions.screenshots,
-		showSkinSelector: settings.show_skin_selector_in_sidebar,
-		quickInstanceCount: quickInstances.limit.value ?? QUICK_INSTANCE_LIMIT_MAX,
-		showJumpIn: settings.show_jump_in,
-	}
+const settings = computed(() => settingsQuery.data.value!)
+const showAllScreenshots = computed(() => globalOptionsQuery.data.value!.screenshots)
+
+const pendingQuickInstanceCount = ref<number | null>(null)
+const quickInstanceCount = computed(
+	() =>
+		pendingQuickInstanceCount.value ?? quickInstances.limit.value ?? QUICK_INSTANCE_LIMIT_MAX,
+)
+
+function applyFeatureSettings(value: AppSettings): void {
+	appSettings.setFeaturesSyncAcrossDevices(value.sync_features_across_devices)
+	appSettings.showFilesTabInInstances = value.show_files_tab_in_instances
+	appSettings.showWorldsTabInInstances = value.show_worlds_tab_in_instances
+	appSettings.showScreenshotsTabInInstances = value.show_screenshots_tab_in_instances
+	appSettings.showSkinSelectorInSidebar = value.show_skin_selector_in_sidebar
+	appSettings.showJumpIn = value.show_jump_in
 }
 
 const settingsMutation = useMutation({
 	mutationKey: appSettingsKeys.update,
 	scope: { id: 'app-settings' },
-	mutationFn: async ({
-		value,
-		updateQuickInstanceCount,
-	}: {
-		value: FeaturesSettingsState
-		updateQuickInstanceCount: boolean
-	}) => {
-		if (value.syncFeaturesAcrossDevices && auth.user.value) {
+	mutationFn: async (patch: FeaturesSettingsPatch) => {
+		const nextSettings: AppSettings = { ...(await get()), ...patch.settings }
+
+		if (nextSettings.sync_features_across_devices && auth.user.value) {
 			await updatePreferences({
 				behavior: {
-					show_jump_in: value.showJumpIn,
-					show_files_tab_in_instances: value.showFilesTab,
-					show_worlds_tab_in_instances: value.showWorldsTab,
-					show_screenshots_tab_in_instances: value.showScreenshotsTab,
-					show_all_screenshots: value.showAllScreenshots,
-					show_skin_selector_in_sidebar: value.showSkinSelector,
-					quick_instance_count: value.quickInstanceCount,
+					show_jump_in: nextSettings.show_jump_in,
+					show_files_tab_in_instances: nextSettings.show_files_tab_in_instances,
+					show_worlds_tab_in_instances: nextSettings.show_worlds_tab_in_instances,
+					show_screenshots_tab_in_instances: nextSettings.show_screenshots_tab_in_instances,
+					show_all_screenshots: patch.showAllScreenshots ?? showAllScreenshots.value,
+					show_skin_selector_in_sidebar: nextSettings.show_skin_selector_in_sidebar,
+					quick_instance_count:
+						patch.quickInstanceCount ?? quickInstances.limit.value ?? QUICK_INSTANCE_LIMIT_MAX,
 				},
 			})
 		}
 
-		const latestSettings = await get()
-		const nextSettings: AppSettings = {
-			...latestSettings,
-			sync_features_across_devices: value.syncFeaturesAcrossDevices,
-			show_files_tab_in_instances: value.showFilesTab,
-			show_worlds_tab_in_instances: value.showWorldsTab,
-			show_screenshots_tab_in_instances: value.showScreenshotsTab,
-			show_skin_selector_in_sidebar: value.showSkinSelector,
-			show_jump_in: value.showJumpIn,
-		}
-
-		const screenshotsChanged =
-			value.showAllScreenshots !== globalOptionsQuery.data.value!.screenshots
-		const [, updatedGlobalSyncedOptions] = await Promise.all([
-			set(nextSettings),
-			screenshotsChanged
-				? set_global_synced_option('screenshots', value.showAllScreenshots)
-				: Promise.resolve(globalOptionsQuery.data.value!),
+		await Promise.all([
+			patch.settings ? set(nextSettings) : undefined,
+			patch.showAllScreenshots !== undefined
+				? set_global_synced_option('screenshots', patch.showAllScreenshots)
+				: undefined,
 		])
-		queryClient.setQueryData(appSettingsKeys.all, nextSettings)
-		queryClient.setQueryData(syncedOptionsKeys.global, updatedGlobalSyncedOptions)
-		if (screenshotsChanged) {
+		if (patch.showAllScreenshots !== undefined) {
 			await queryClient.invalidateQueries({ queryKey: screenshotKeys.all })
 		}
-		appSettings.setFeaturesSyncAcrossDevices(value.syncFeaturesAcrossDevices)
-		appSettings.showFilesTabInInstances = value.showFilesTab
-		appSettings.showWorldsTabInInstances = value.showWorldsTab
-		appSettings.showScreenshotsTabInInstances = value.showScreenshotsTab
-		appSettings.showSkinSelectorInSidebar = value.showSkinSelector
-		appSettings.showJumpIn = value.showJumpIn
-
-		if (updateQuickInstanceCount) {
-			quickInstances.setLimit(value.quickInstanceCount)
-		}
 	},
-	onMutate: () =>
-		Promise.all([
+	onMutate: async (patch) => {
+		const previousQuickInstanceLimit = quickInstances.limit.value
+		if (patch.quickInstanceCount !== undefined) {
+			quickInstances.setLimit(patch.quickInstanceCount)
+		}
+
+		await Promise.all([
 			queryClient.cancelQueries({ queryKey: appSettingsKeys.all }),
 			queryClient.cancelQueries({ queryKey: syncedOptionsKeys.global }),
-		]),
-	onError: handleError,
-	onSettled: () =>
-		Promise.all([
-			queryClient.invalidateQueries({ queryKey: appSettingsKeys.all }),
-			queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.global }),
-		]),
+		])
+		const previousSettings = queryClient.getQueryData<AppSettings>(appSettingsKeys.all)
+		const previousGlobalOptions = queryClient.getQueryData<GlobalSyncedOptions>(
+			syncedOptionsKeys.global,
+		)
+
+		if (previousSettings && patch.settings) {
+			const nextSettings = { ...previousSettings, ...patch.settings }
+			queryClient.setQueryData(appSettingsKeys.all, nextSettings)
+			applyFeatureSettings(nextSettings)
+		}
+		if (previousGlobalOptions && patch.showAllScreenshots !== undefined) {
+			queryClient.setQueryData(syncedOptionsKeys.global, {
+				...previousGlobalOptions,
+				screenshots: patch.showAllScreenshots,
+			})
+		}
+
+		return { previousSettings, previousGlobalOptions, previousQuickInstanceLimit }
+	},
+	onError: (error, patch, context) => {
+		if (context?.previousSettings && patch.settings) {
+			queryClient.setQueryData(appSettingsKeys.all, context.previousSettings)
+			applyFeatureSettings(context.previousSettings)
+		}
+		if (context?.previousGlobalOptions && patch.showAllScreenshots !== undefined) {
+			queryClient.setQueryData(syncedOptionsKeys.global, context.previousGlobalOptions)
+		}
+		if (context && patch.quickInstanceCount !== undefined) {
+			quickInstances.setLimit(context.previousQuickInstanceLimit)
+		}
+		handleError(error)
+	},
+	onSettled: async () => {
+		if (queryClient.isMutating({ mutationKey: appSettingsKeys.update }) === 1) {
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: appSettingsKeys.all }),
+				queryClient.invalidateQueries({ queryKey: syncedOptionsKeys.global }),
+			])
+		}
+	},
 })
 
-const { saved, current, changes, saving, hasChanges, reset, save } = useSavable(
-	() => getFeaturesSettingsState(settingsQuery.data.value!, globalOptionsQuery.data.value!),
-	(changedValues) =>
-		settingsMutation.mutateAsync({
-			value: { ...current.value },
-			updateQuickInstanceCount: changedValues.quickInstanceCount !== undefined,
-		}),
-)
-
-async function saveFeaturesSettings(): Promise<void> {
-	try {
-		await save()
-	} catch {
-		return
-	}
+function updateSetting<K extends FeatureSettingKey>(key: K, value: AppSettings[K]): void {
+	settingsMutation.mutate({ settings: { [key]: value } as Pick<AppSettings, K> })
 }
 
-onMounted(() => {
-	settingsModal.registerUnsavedChangesController({
-		hasChanges: () => hasChanges.value,
-		getOriginal: () => saved.value,
-		getModified: () => changes.value,
-		isSaving: () => saving.value,
-		reset,
-		save: saveFeaturesSettings,
-	})
-})
+function updateShowAllScreenshots(enabled: boolean): void {
+	settingsMutation.mutate({ showAllScreenshots: enabled })
+}
 
-onBeforeUnmount(() => {
-	settingsModal.registerUnsavedChangesController(null)
-})
+function flushQuickInstanceCount(): void {
+	const count = pendingQuickInstanceCount.value
+	if (count === null) return
+	pendingQuickInstanceCount.value = null
+	settingsMutation.mutate({ quickInstanceCount: count })
+}
+
+const saveQuickInstanceCount = useDebounceFn(flushQuickInstanceCount, 500)
+
+function updateQuickInstanceCount(count: number): void {
+	pendingQuickInstanceCount.value = count
+	saveQuickInstanceCount()
+}
+
+onBeforeUnmount(flushQuickInstanceCount)
 </script>
 
 <template>
@@ -267,10 +273,10 @@ onBeforeUnmount(() => {
 			>
 				<Toggle
 					id="sync-features-across-devices"
-					:model-value="Boolean(auth.user.value) && current.syncFeaturesAcrossDevices"
+					:model-value="Boolean(auth.user.value) && settings.sync_features_across_devices"
 					:disabled="!auth.user.value"
 					aria-labelledby="sync-features-across-devices-label"
-					@update:model-value="current.syncFeaturesAcrossDevices = $event"
+					@update:model-value="updateSetting('sync_features_across_devices', $event)"
 				/>
 			</span>
 		</div>
@@ -289,8 +295,9 @@ onBeforeUnmount(() => {
 				</div>
 				<Toggle
 					id="show-worlds-tab-in-instances"
-					v-model="current.showWorldsTab"
+					:model-value="settings.show_worlds_tab_in_instances"
 					:aria-label="formatMessage(messages.showWorldsTabTitle)"
+					@update:model-value="updateSetting('show_worlds_tab_in_instances', $event)"
 				/>
 			</div>
 
@@ -302,8 +309,9 @@ onBeforeUnmount(() => {
 				</div>
 				<Toggle
 					id="show-files-tab-in-instances"
-					v-model="current.showFilesTab"
+					:model-value="settings.show_files_tab_in_instances"
 					:aria-label="formatMessage(messages.showFilesTabTitle)"
+					@update:model-value="updateSetting('show_files_tab_in_instances', $event)"
 				/>
 			</div>
 
@@ -315,8 +323,9 @@ onBeforeUnmount(() => {
 				</div>
 				<Toggle
 					id="show-screenshots-tab-in-instances"
-					v-model="current.showScreenshotsTab"
+					:model-value="settings.show_screenshots_tab_in_instances"
 					:aria-label="formatMessage(messages.showScreenshotsTabTitle)"
+					@update:model-value="updateSetting('show_screenshots_tab_in_instances', $event)"
 				/>
 			</div>
 		</div>
@@ -338,8 +347,9 @@ onBeforeUnmount(() => {
 				</div>
 				<Toggle
 					id="show-all-screenshots"
-					v-model="current.showAllScreenshots"
+					:model-value="showAllScreenshots"
 					:aria-label="formatMessage(messages.showAllScreenshotsTitle)"
+					@update:model-value="updateShowAllScreenshots"
 				/>
 			</div>
 
@@ -352,8 +362,9 @@ onBeforeUnmount(() => {
 				</div>
 				<Toggle
 					id="show-skin-selector-in-sidebar"
-					v-model="current.showSkinSelector"
+					:model-value="settings.show_skin_selector_in_sidebar"
 					:aria-label="formatMessage(messages.showSkinSelectorTitle)"
+					@update:model-value="updateSetting('show_skin_selector_in_sidebar', $event)"
 				/>
 			</div>
 
@@ -363,11 +374,12 @@ onBeforeUnmount(() => {
 				</h3>
 				<Slider
 					id="quick-instances-in-sidebar"
-					v-model="current.quickInstanceCount"
+					:model-value="quickInstanceCount"
 					:aria-label="formatMessage(messages.quickInstancesTitle)"
 					:min="0"
 					:max="QUICK_INSTANCE_LIMIT_MAX"
 					:step="1"
+					@update:model-value="updateQuickInstanceCount"
 				/>
 				<p class="m-0 leading-tight">
 					{{ formatMessage(messages.quickInstancesDescription) }}
@@ -389,8 +401,9 @@ onBeforeUnmount(() => {
 			</div>
 			<Toggle
 				id="show-jump-in-section"
-				v-model="current.showJumpIn"
+				:model-value="settings.show_jump_in"
 				:aria-label="formatMessage(messages.showJumpInTitle)"
+				@update:model-value="updateSetting('show_jump_in', $event)"
 			/>
 		</div>
 	</section>

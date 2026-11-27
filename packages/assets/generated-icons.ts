@@ -295,6 +295,7 @@ import _ShareIcon from './icons/share.svg?component'
 import _ShieldIcon from './icons/shield.svg?component'
 import _ShieldAlertIcon from './icons/shield-alert.svg?component'
 import _ShieldCheckIcon from './icons/shield-check.svg?component'
+import _ShieldOffIcon from './icons/shield-off.svg?component'
 import _ShirtIcon from './icons/shirt.svg?component'
 import _ShredderIcon from './icons/shredder.svg?component'
 import _SignalIcon from './icons/signal.svg?component'
@@ -794,6 +795,7 @@ export const ShareIcon = _ShareIcon
 export const ShieldIcon = _ShieldIcon
 export const ShieldAlertIcon = _ShieldAlertIcon
 export const ShieldCheckIcon = _ShieldCheckIcon
+export const ShieldOffIcon = _ShieldOffIcon
 export const ShirtIcon = _ShirtIcon
 export const ShredderIcon = _ShredderIcon
 export const SignalIcon = _SignalIcon

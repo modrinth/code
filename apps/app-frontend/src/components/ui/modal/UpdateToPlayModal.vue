@@ -2,9 +2,7 @@
 	<ContentDiffModal
 		ref="diffModal"
 		:header="formatMessage(messages.updateToPlay)"
-		:description="
-			instance ? formatMessage(messages.updateRequiredDescription, { name: instance.name }) : ''
-		"
+		:offer-sandbox="offerSandbox"
 		:diffs="normalizedDiffs"
 		:version-date="versionDate"
 		:show-external-warnings="showExternalWarnings"
@@ -12,9 +10,21 @@
 		:confirm-label="formatMessage(commonMessages.updateButton)"
 		:confirm-icon="DownloadIcon"
 		:removed-label="formatMessage(messages.removed)"
-		@confirm="handleUpdate"
+		@confirm="handleUpdate(false)"
+		@sandbox="handleUpdate(true)"
 		@cancel="handleDecline"
-	/>
+	>
+		<template v-if="instance" #description>
+			<IntlFormatted
+				:message-id="messages.updateRequiredDescription"
+				:values="{ name: instance.name }"
+			>
+				<template #name="{ children }">
+					<span class="font-medium"><component :is="() => children" /></span>
+				</template>
+			</IntlFormatted>
+		</template>
+	</ContentDiffModal>
 </template>
 
 <script setup lang="ts">
@@ -25,11 +35,14 @@ import {
 	type ContentDiffItem,
 	ContentDiffModal,
 	defineMessages,
+	IntlFormatted,
 	useVIntl,
 } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
+import { enableInstanceSandbox } from '@/features/sandbox/enable-instance-sandbox'
+import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
 import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { wait_for_install_job } from '@/helpers/install'
 import { update_managed_modrinth_version } from '@/helpers/instance'
@@ -90,6 +103,7 @@ const emit = defineEmits<{
 
 const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
 const instance = ref<GameInstance | null>(null)
+const offerSandbox = useOfferSandbox(() => instance.value?.sandbox)
 const onUpdateComplete = ref<UpdateCompleteCallback>(() => {})
 const diffs = ref<DependencyDiff[]>([])
 const modpackVersionId = ref<string | null>(null)
@@ -249,11 +263,12 @@ async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[
 	return null
 }
 
-async function handleUpdate() {
+async function handleUpdate(sandbox: boolean) {
 	const serverProjectId = instance.value?.link?.project_id
 	if (serverProjectId) startInstallingServer(serverProjectId)
 	try {
 		if (modpackVersionId.value && instance.value) {
+			if (sandbox) await enableInstanceSandbox(instance.value.id)
 			const job = await update_managed_modrinth_version(instance.value.id, modpackVersionId.value)
 			await wait_for_install_job(appEvents, job.job_id)
 			await onUpdateComplete.value()
@@ -301,7 +316,7 @@ const messages = defineMessages({
 	updateRequiredDescription: {
 		id: 'app.modal.update-to-play.update-required-description',
 		defaultMessage:
-			'An update is required to play {name}. Please update to latest version to launch the game.',
+			'An update is required to play <name>{name}</name>. Please update to the latest version to launch the game.',
 	},
 	removed: {
 		id: 'app.modal.update-to-play.removed',

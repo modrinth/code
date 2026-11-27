@@ -3905,9 +3905,6 @@
   "instance.server-modal.resource-pack": {
     "message": "Paquete de recursos"
   },
-  "instance.settings.defaults.open-app-settings": {
-    "message": "Administrar ajustes predeterminados"
-  },
   "instance.settings.sidebar.label.game": {
     "message": "Juego"
   },
@@ -4031,9 +4028,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Seleccionar canal de actualizaciones"
   },
-  "instance.settings.tabs.hooks.default-settings-description": {
-    "message": "Tu instancia utiliza los hooks de lanzamiento predeterminados a menos que los cambies aquí."
-  },
   "instance.settings.tabs.hooks.label": {
     "message": "Hooks de lanzamiento"
   },
@@ -4093,9 +4087,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Los ajustes de instalación no están disponibles mientras esta instancia esté bloqueada."
-  },
-  "instance.settings.tabs.java.default-settings-description": {
-    "message": "Tu instancia utiliza los ajustes de Java y de memoria predeterminados a menos que los cambies aquí."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Introduce las variables de entorno..."
@@ -4174,9 +4165,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Sincronizando"
-  },
-  "instance.settings.tabs.window.default-settings-description": {
-    "message": "Tu instancia utiliza los ajustes de ventana predeterminados a menos que los cambies aquí."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Pantalla completa"

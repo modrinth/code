@@ -629,6 +629,9 @@
   "content.diff-modal.reviewed-files": {
     "defaultMessage": "Files that aren't published to Modrinth aren't reviewed."
   },
+  "content.diff-modal.sandbox-and-install": {
+    "defaultMessage": "Sandbox and install"
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Some content on your server could not be analyzed and may be affected by this change."
   },
@@ -8339,8 +8342,17 @@
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Dismiss all"
   },
+  "unknown-file-sandbox-notice.description": {
+    "defaultMessage": "The sandbox isolates Minecraft, limiting mods to your system files, .minecraft, and anything we allow or you allow below. Some mods may not work if the sandbox blocks access they need."
+  },
+  "unknown-file-sandbox-notice.learn-more": {
+    "defaultMessage": "Learn more"
+  },
+  "unknown-file-sandbox-notice.title": {
+    "defaultMessage": "Limit mod access with a sandbox"
+  },
   "unknown-file-warning-modal.dont-install": {
-    "defaultMessage": "Dont install"
+    "defaultMessage": "Don’t install"
   },
   "unknown-file-warning-modal.dont-show-again": {
     "defaultMessage": "Don’t show this warning again"
@@ -8368,6 +8380,9 @@
   },
   "unknown-file-warning-modal.reviewed-files": {
     "defaultMessage": "Files that aren't published to Modrinth aren't reviewed."
+  },
+  "unknown-file-warning-modal.sandbox-and-install": {
+    "defaultMessage": "Sandbox and install"
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Unrecognized files"

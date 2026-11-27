@@ -1,0 +1,23 @@
+set working-directory := "../.."
+set positional-arguments
+
+sandbox := "packages/modrinth-sandbox"
+output := "target/modrinth-sandbox-example"
+cc := env("CC", "cc")
+rpath := if os() == "macos" { "@loader_path" } else { "$ORIGIN" }
+
+# Show available recipes.
+default:
+	@just --list --justfile {{sandbox}}/justfile
+
+# Compile the C example against the shared library (Linux/macOS).
+compile-c:
+	cargo build --release -p modrinth-sandbox --target-dir {{output}}
+	{{cc}} -std=c11 -Wall -Wextra -Werror -pedantic \
+		-I {{sandbox}} {{sandbox}}/examples/run.c \
+		-L {{output}}/release -lmodrinth_sandbox -Wl,-rpath,'{{rpath}}' \
+		-o {{output}}/release/sandbox-run-c
+
+# Compile and run, forwarding options, the executable, and its arguments.
+run-c *args: compile-c
+	{{output}}/release/sandbox-run-c "$@"

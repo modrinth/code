@@ -3692,9 +3692,6 @@
   "instance.server-modal.resource-pack": {
     "message": "حزمة الموارد"
   },
-  "instance.settings.defaults.open-app-settings": {
-    "message": "إدارة الإعدادات الافتراضية"
-  },
   "instance.settings.sidebar.label.game": {
     "message": "لعبة"
   },
@@ -3818,9 +3815,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "اختر قناة التحديث"
   },
-  "instance.settings.tabs.hooks.default-settings-description": {
-    "message": "يستخدم مثيل الخادم الخاص بك روابط التشغيل الافتراضية إلا إذا قمت بتجاوزها هنا."
-  },
   "instance.settings.tabs.hooks.label": {
     "message": "إطلاق الروابط"
   },
@@ -3880,9 +3874,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "إعدادات التثبيت غير متاحة أثناء قفل هذه النسخة."
-  },
-  "instance.settings.tabs.java.default-settings-description": {
-    "message": "المثيل الخاص بك يستخدم إعدادات جافا والذاكرة الافتراضية ما لم تقم بتجاوزها هنا."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "أدخل المتغيرات البيئية..."

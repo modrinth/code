@@ -2,20 +2,12 @@
 	<section v-if="auth.user" class="universal-card">
 		<RestrictedActionAlert scope="USER_WRITE" />
 		<AccountProfileSettings
-			ref="profileSettings"
 			:patch-user="patchUser"
 			:change-avatar="changeAvatar"
 			:delete-avatar="deleteAvatar"
 			:get-authenticated-user="getAuthenticatedUser"
 			:prepare-username-change="prepareUsernameChange"
 			disclaimer-position="bottom"
-		/>
-		<UnsavedChangesPopup
-			:original="profileSettings?.originalState ?? emptyProfileState"
-			:modified="profileSettings?.modifiedState ?? emptyProfileState"
-			:saving="profileSettings?.saving ?? false"
-			@reset="resetProfileSettings"
-			@save="saveProfileSettings"
 		/>
 	</section>
 </template>
@@ -26,7 +18,6 @@ import {
 	AccountProfileSettings,
 	commonSettingsMessages,
 	injectModrinthClient,
-	UnsavedChangesPopup,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -40,12 +31,6 @@ definePageMeta({
 const auth = await useAuth()
 const client = injectModrinthClient()
 const { formatMessage } = useVIntl()
-const profileSettings = ref<InstanceType<typeof AccountProfileSettings> | null>(null)
-const emptyProfileState = {
-	username: '',
-	bio: '',
-	avatarChanged: false,
-}
 
 function prepareUsernameChange(): Promise<boolean> {
 	return ensurePrivileged()
@@ -74,14 +59,6 @@ async function getAuthenticatedUser(): Promise<Labrinth.Users.v3.User> {
 	const user = await client.labrinth.users_v3.getAuthenticated()
 	auth.value.user = user
 	return user
-}
-
-function resetProfileSettings(): void {
-	profileSettings.value?.reset()
-}
-
-function saveProfileSettings(): void {
-	void profileSettings.value?.save()
 }
 
 useHead({

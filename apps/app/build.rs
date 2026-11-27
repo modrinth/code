@@ -344,6 +344,7 @@ fn main() {
                         "store_set_cache_limit",
                         "cancel_directory_change",
                         "default_app_directory",
+                        "settings_sandbox_unavailable_reason",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

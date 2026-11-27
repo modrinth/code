@@ -3,33 +3,13 @@ import { defineMessages, injectNotificationManager, Input, Toggle, useVIntl } fr
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
-import { edit } from '@/helpers/instance'
 import { appSettingsQueryOptions } from '@/helpers/settings.ts'
 
-import DefaultSettingsIntro from './default-settings-intro.vue'
-import { injectInstanceSettings } from './instance-settings-context'
-import ResetToDefaultButton from './reset-to-default-button.vue'
-import { useInstanceSettingsDraft } from './use-instance-settings-draft'
+import SettingsSourceHeader from './settings-source-header.vue'
+import { useSettingsSource } from './use-settings-source'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
-
-const { instance } = injectInstanceSettings()
-
-const draft = useInstanceSettingsDraft<{
-	fullscreen: boolean | null
-	resolution: [number, number] | null
-}>(
-	() => ({
-		fullscreen: instance.value.force_fullscreen ?? null,
-		resolution: instance.value.game_resolution ?? null,
-	}),
-	(value) =>
-		edit(instance.value.id, {
-			force_fullscreen: value.fullscreen,
-			game_resolution: value.resolution,
-		}),
-)
 
 const settingsQuery = useQuery(appSettingsQueryOptions())
 await settingsQuery.suspense().catch(handleError)
@@ -39,26 +19,48 @@ const defaultResolution = computed(
 	() => (settingsQuery.data.value?.game_resolution.slice() ?? [0, 0]) as [number, number],
 )
 
-const fullscreen = computed(() => draft.value.fullscreen ?? defaultFullscreen.value)
-const resolution = computed(() => draft.value.resolution ?? defaultResolution.value)
+const {
+	source,
+	values: windowSettings,
+	update,
+	debouncedField,
+} = useSettingsSource<{
+	fullscreen: boolean | null
+	resolution: [number, number] | null
+}>({
+	read: (current) => ({
+		fullscreen: current.force_fullscreen ?? null,
+		resolution: current.game_resolution ?? null,
+	}),
+	write: (value) => ({
+		force_fullscreen: value.fullscreen,
+		game_resolution: value.resolution,
+	}),
+	defaults: () => ({
+		fullscreen: defaultFullscreen.value,
+		resolution: defaultResolution.value,
+	}),
+})
 
-function setDimension(index: 0 | 1, value: number) {
-	const next = resolution.value.slice() as [number, number]
-	next[index] = value
-	draft.value.resolution = next
+const fullscreen = computed(() => windowSettings.value.fullscreen ?? defaultFullscreen.value)
+const resolution = computed(() => windowSettings.value.resolution ?? defaultResolution.value)
+
+function isDimension(value: number | undefined): value is number {
+	return typeof value === 'number' && Number.isFinite(value)
 }
 
-function resetDimension(index: 0 | 1) {
-	setDimension(index, defaultResolution.value[index])
-	if (resolution.value.every((dimension, i) => Number(dimension) === defaultResolution.value[i])) {
-		draft.value.resolution = null
-	}
+function saveResolution() {
+	if (!isDimension(width.model) || !isDimension(height.model)) return
+	update({ resolution: [width.model, height.model] })
 }
+
+const width = debouncedField<number | undefined>(() => resolution.value[0], saveResolution)
+const height = debouncedField<number | undefined>(() => resolution.value[1], saveResolution)
 
 const messages = defineMessages({
-	defaultSettingsDescription: {
-		id: 'instance.settings.tabs.window.default-settings-description',
-		defaultMessage: 'Your instance uses the default window settings unless you override them here.',
+	settingsHeading: {
+		id: 'instance.settings.tabs.window.settings-heading',
+		defaultMessage: 'Window settings',
 	},
 	fullscreen: {
 		id: 'instance.settings.tabs.window.fullscreen',
@@ -97,83 +99,74 @@ const messages = defineMessages({
 
 <template>
 	<div class="flex flex-col gap-6">
-		<DefaultSettingsIntro
+		<SettingsSourceHeader
+			v-model="source"
 			tab="window"
-			:description="formatMessage(messages.defaultSettingsDescription)"
+			:title="formatMessage(messages.settingsHeading)"
 		/>
-		<div class="flex items-center gap-4 justify-between">
-			<div class="flex flex-col gap-1">
-				<h2 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.fullscreen) }}
-				</h2>
-				<p class="m-0">
-					{{ formatMessage(messages.fullscreenDescription) }}
-				</p>
-			</div>
-			<div class="flex shrink-0 items-center gap-2">
+
+		<div
+			class="flex flex-col gap-6 transition-opacity"
+			:class="{ 'opacity-60': source === 'app' }"
+			:inert="source === 'app'"
+		>
+			<div class="flex items-center gap-4 justify-between">
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.fullscreen) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.fullscreenDescription) }}
+					</p>
+				</div>
 				<Toggle
 					id="fullscreen"
 					:model-value="fullscreen"
-					@update:model-value="(value) => (draft.fullscreen = value)"
-				/>
-				<ResetToDefaultButton
-					:disabled="draft.fullscreen === null"
-					:setting="formatMessage(messages.fullscreen)"
-					@reset="draft.fullscreen = null"
+					@update:model-value="(value) => update({ fullscreen: value })"
 				/>
 			</div>
-		</div>
 
-		<div class="flex items-center gap-4 justify-between">
-			<div class="flex flex-col gap-1">
-				<h2 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.width) }}
-				</h2>
-				<p class="m-0">
-					{{ formatMessage(messages.widthDescription) }}
-				</p>
-			</div>
-			<div class="flex shrink-0 items-center gap-2">
+			<div class="flex items-center gap-4 justify-between">
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.width) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.widthDescription) }}
+					</p>
+				</div>
 				<Input
 					id="width"
-					:model-value="resolution[0]"
+					:model-value="width.model"
 					autocomplete="off"
 					:disabled="fullscreen"
 					type="number"
 					:placeholder="formatMessage(messages.enterWidth)"
-					@update:model-value="(value) => setDimension(0, Number(value))"
-				/>
-				<ResetToDefaultButton
-					:disabled="draft.resolution === null"
-					:setting="formatMessage(messages.width)"
-					@reset="resetDimension(0)"
+					@focus="width.onFocus"
+					@blur="width.onBlur"
+					@update:model-value="(value) => (width.model = typeof value === 'number' ? value : undefined)"
 				/>
 			</div>
-		</div>
 
-		<div class="flex items-center gap-4 justify-between">
-			<div class="flex flex-col gap-1">
-				<h2 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.height) }}
-				</h2>
-				<p class="m-0">
-					{{ formatMessage(messages.heightDescription) }}
-				</p>
-			</div>
-			<div class="flex shrink-0 items-center gap-2">
+			<div class="flex items-center gap-4 justify-between">
+				<div class="flex flex-col gap-1">
+					<h2 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.height) }}
+					</h2>
+					<p class="m-0">
+						{{ formatMessage(messages.heightDescription) }}
+					</p>
+				</div>
 				<Input
 					id="height"
-					:model-value="resolution[1]"
+					:model-value="height.model"
 					autocomplete="off"
 					:disabled="fullscreen"
 					type="number"
 					:placeholder="formatMessage(messages.enterHeight)"
-					@update:model-value="(value) => setDimension(1, Number(value))"
-				/>
-				<ResetToDefaultButton
-					:disabled="draft.resolution === null"
-					:setting="formatMessage(messages.height)"
-					@reset="resetDimension(1)"
+					@focus="height.onFocus"
+					@blur="height.onBlur"
+					@update:model-value="(value) => (height.model = typeof value === 'number' ? value : undefined)"
 				/>
 			</div>
 		</div>

@@ -2762,6 +2762,9 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Säkerhetskopior av appdatabas"
   },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "Var Modrinth App lagrar instanser och andra filer. Ändringar träder i kraft efter appen startas om."
+  },
   "app.settings.resource-management.app-directory.open-folder": {
     "message": "Öppna mapp"
   },
@@ -3754,6 +3757,15 @@
   },
   "instance.settings.tabs.java.hooks": {
     "message": "Hooks"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Anpassade Java-argument"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Anpassad Java-installation"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Anpassad minnestilldelning"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/sökväg/till/java"

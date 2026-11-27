@@ -4,11 +4,14 @@ use crate::event::emit::{emit_instance, emit_process};
 use crate::event::{InstancePayloadType, ProcessPayloadType};
 #[cfg(feature = "tauri")]
 use crate::event::{LogEvent, LogPayload};
-use crate::util::io::IOError;
+use crate::util::io::{IOError, OpenMode, open_no_follow};
 use crate::util::rpc::RpcServer;
 use anyhow::Context;
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use dashmap::DashMap;
+use modrinth_sandbox::{
+    SandboxChild, SandboxEnv, SandboxExitStatus, minecraft::MinecraftCommand,
+};
 use quick_xml::Reader;
 use quick_xml::events::Event;
 use serde::Deserialize;
@@ -16,19 +19,18 @@ use serde::Serialize;
 use sqlx::SqlitePool;
 use std::collections::VecDeque;
 use std::fmt::Debug;
-use std::fs::OpenOptions;
+use std::fs::File;
 use std::io::Write;
-use std::path::{Path, PathBuf};
-use std::process::ExitStatus;
+use std::path::PathBuf;
 use std::sync::{Arc, LazyLock};
 use std::time::{Duration, Instant};
-use tempfile::TempDir;
 use tokio::io::{AsyncBufReadExt, BufReader};
-use tokio::process::{Child, Command};
-use tokio::task::JoinHandle;
+use tokio::process::Command;
+use tracing::info;
 use uuid::Uuid;
 
-const LAUNCHER_LOG_PATH: &str = "launcher_log.txt";
+/// Relative to the instance directory.
+const LAUNCHER_LOG_PATH: [&str; 2] = ["logs", "launcher_log.txt"];
 const LOG_BUFFER_CAPACITY: usize = 50_000;
 const LAUNCH_HANDSHAKE_TIMEOUT: Duration = Duration::from_secs(120);
 const OUTPUT_DRAIN_TIMEOUT: Duration = Duration::from_secs(5);
@@ -209,12 +211,12 @@ impl ProcessManager {
         instance_id: &str,
         instance_path: &str,
         instance_name: &str,
-        mut mc_command: Command,
+        sandbox_env: &SandboxEnv,
+        mc_command: MinecraftCommand,
+        wrapper: Option<Vec<String>>,
         post_exit_command: Option<String>,
         post_exit_env_vars: Vec<(String, String)>,
-        logs_folder: PathBuf,
         xml_logging: bool,
-        main_class_keep_alive: TempDir,
         rpc_server: RpcServer,
         state: &Arc<State>,
         post_process_init: impl AsyncFnOnce(
@@ -222,50 +224,103 @@ impl ProcessManager {
             &RpcServer,
         ) -> crate::Result<()>,
     ) -> crate::Result<ProcessMetadata> {
-        mc_command.stdout(std::process::Stdio::piped());
-        mc_command.stderr(std::process::Stdio::piped());
-        mc_command.stdin(std::process::Stdio::piped());
         let executable = mc_command
-            .as_std()
-            .get_program()
+            .jre_path
+            .join("bin/java")
             .to_string_lossy()
             .into_owned();
 
-        if !logs_folder.exists() {
-            tokio::fs::create_dir_all(&logs_folder)
-                .await
-                .map_err(|e| IOError::with_path(e, &logs_folder))?;
-        }
-
-        let log_path = logs_folder.join(LAUNCHER_LOG_PATH);
+        let instance_dir =
+            state.directories.instances_dir().join(instance_path);
+        let relative_log_path = PathBuf::from_iter(LAUNCHER_LOG_PATH);
+        let log_path = instance_dir.join(&relative_log_path);
 
         clear_log_buffer(instance_id);
 
-        {
-            let mut log_file = OpenOptions::new()
-                .write(true)
-                .create(true)
-                .truncate(true)
-                .open(&log_path)
-                .map_err(|e| IOError::with_path(e, &log_path))?;
+        let log_header = format!(
+            "# Minecraft launcher log started at {}\n# Instance: {instance_path} \n\n\n",
+            chrono::Local::now().format("%Y-%m-%d %H:%M:%S")
+        );
+        let log_file = open_no_follow(
+            &instance_dir,
+            &relative_log_path,
+            OpenMode::Truncate,
+        )
+        .and_then(|mut file| {
+            file.write_all(log_header.as_bytes())?;
+            Ok(Arc::new(file))
+        })
+        .inspect_err(|error| {
+            tracing::warn!(
+                "Unable to write launcher log {}: {error}",
+                log_path.display()
+            );
+        })
+        .ok();
 
-            let now = chrono::Local::now();
-            writeln!(
-                log_file,
-                "# Minecraft launcher log started at {}",
-                now.format("%Y-%m-%d %H:%M:%S")
-            )
-            .map_err(|e| IOError::with_path(e, &log_path))?;
-            writeln!(log_file, "# Instance: {instance_path} \n")
-                .map_err(|e| IOError::with_path(e, &log_path))?;
-            writeln!(log_file).map_err(|e| IOError::with_path(e, &log_path))?;
+        let mut command =
+            modrinth_sandbox::minecraft::setup_minecraft_command(mc_command)
+                .await
+                .map_err(|error| anyhow::Error::from_boxed(error.into()))?;
+        let synced_options_dir = state.directories.synced_options_dir();
+        command.ensure_dirs_exist.push(synced_options_dir.clone());
+        command.read_write_paths.push(synced_options_dir);
+        if let Some(mut wrapper) = wrapper {
+            let wrapper_executable = wrapper.remove(0);
+            let java = std::mem::replace(
+                &mut command.executable,
+                PathBuf::from(wrapper_executable),
+            );
+            let mut args =
+                Vec::with_capacity(wrapper.len() + 1 + command.args.len());
+            args.extend(wrapper.into_iter().map(Into::into));
+            args.push(java.into_os_string().into());
+            args.append(&mut command.args);
+            command.args = args;
         }
-
-        let mut mc_proc = mc_command.spawn().map_err(IOError::from)?;
+        info!("spawning Minecraft process using sandbox {sandbox_env:?}");
+        let mut mc_proc = sandbox_env
+            .spawn(command)
+            .await
+            .map_err(|error| anyhow::Error::from_boxed(error.into()))?;
         let child_pid = mc_proc.id();
 
-        let stdout = mc_proc.stdout.take();
-        let stderr = mc_proc.stderr.take();
+        let stdout = mc_proc
+            .stdout
+            .take()
+            .map(|reader| {
+                #[cfg(unix)]
+                {
+                    tokio::net::unix::pipe::Receiver::from_owned_fd(
+                        reader.into(),
+                    )
+                }
+                #[cfg(windows)]
+                {
+                    Ok::<_, std::io::Error>(
+                        crate::util::blocking_reader::Blocking::new(reader),
+                    )
+                }
+            })
+            .expect("`stdout` is set to `Pipe` so should be available")?;
+        let stderr = mc_proc
+            .stderr
+            .take()
+            .map(|reader| {
+                #[cfg(unix)]
+                {
+                    tokio::net::unix::pipe::Receiver::from_owned_fd(
+                        reader.into(),
+                    )
+                }
+                #[cfg(windows)]
+                {
+                    Ok::<_, std::io::Error>(
+                        crate::util::blocking_reader::Blocking::new(reader),
+                    )
+                }
+            })
+            .expect("`stderr` is set to `Pipe` so should be available")?;
 
         let mut process = Process {
             metadata: ProcessMetadata {
@@ -277,7 +332,43 @@ impl ProcessManager {
             },
             child: mc_proc,
             rpc_server,
-            _main_class_keep_alive: main_class_keep_alive,
+        };
+        let metadata = process.metadata.clone();
+
+        let stdout_reader = {
+            let log_file = log_file.clone();
+            let instance_id = metadata.instance_id.clone();
+            let instance_path = metadata.instance_path.clone();
+            let pool = state.pool.clone();
+            tokio::spawn(async move {
+                Process::process_output(
+                    &instance_id,
+                    &instance_path,
+                    stdout,
+                    log_file,
+                    xml_logging,
+                    &pool,
+                )
+                .await;
+            })
+        };
+
+        let stderr_reader = {
+            let log_file = log_file.clone();
+            let instance_id = metadata.instance_id.clone();
+            let instance_path = metadata.instance_path.clone();
+            let pool = state.pool.clone();
+            tokio::spawn(async move {
+                Process::process_output(
+                    &instance_id,
+                    &instance_path,
+                    stderr,
+                    log_file,
+                    xml_logging,
+                    &pool,
+                )
+                .await;
+            })
         };
 
         let persisted_process = child_pid.map(|pid| {
@@ -313,40 +404,52 @@ impl ProcessManager {
             }
         }
 
-        let output_readers = [
-            stdout.map(|stdout| {
-                Process::spawn_output_reader(
-                    stdout,
-                    &process.metadata,
-                    &log_path,
-                    xml_logging,
-                    &state.pool,
-                )
-            }),
-            stderr.map(|stderr| {
-                Process::spawn_output_reader(
-                    stderr,
-                    &process.metadata,
-                    &log_path,
-                    xml_logging,
-                    &state.pool,
-                )
-            }),
-        ];
+        let rpc_address = process.rpc_server.address();
+        info!(
+            %rpc_address,
+            log_path = %log_path.display(),
+            "waiting for Minecraft launcher RPC initialization"
+        );
 
-        let launch_failure = tokio::select! {
-            result = post_process_init(&process.metadata, &process.rpc_server) => result.err(),
-            status = process.child.wait() => Some(match status {
-                Ok(status) => anyhow::anyhow!("Minecraft exited with {status}"),
-                Err(error) => anyhow::Error::from(error),
-            }),
-            () = tokio::time::sleep(LAUNCH_HANDSHAKE_TIMEOUT) => Some(anyhow::anyhow!(
-                "Minecraft did not start within {} seconds",
-                LAUNCH_HANDSHAKE_TIMEOUT.as_secs()
-            )),
+        let post_process_result = {
+            let mut child_poll =
+                tokio::time::interval(Duration::from_millis(100));
+            child_poll.set_missed_tick_behavior(
+                tokio::time::MissedTickBehavior::Skip,
+            );
+            let timeout = tokio::time::sleep(LAUNCH_HANDSHAKE_TIMEOUT);
+            tokio::pin!(timeout);
+            let initialization =
+                post_process_init(&process.metadata, &process.rpc_server);
+            tokio::pin!(initialization);
+
+            loop {
+                tokio::select! {
+                    result = &mut initialization => break result,
+                    _ = &mut timeout => {
+                        break Err(crate::ErrorKind::LauncherError(format!(
+                            "Timed out waiting for Minecraft launcher initialization at {rpc_address}; see {}",
+                            log_path.display(),
+                        )).into());
+                    }
+                    // TODO: it's not good that we're polling here. we should use `child.wait()`,
+                    // but that's not cancel-safe (bwrap's isnt cancel safe yet).
+                    _ = child_poll.tick() => {
+                        match process.child.try_wait() {
+                            Ok(Some(status)) => {
+                                break Err(crate::ErrorKind::LauncherError(format!(
+                                    "Minecraft launcher exited with {status} before initializing; see {}",
+                                    log_path.display(),
+                                )).into());
+                            }
+                            Ok(None) => {}
+                            Err(error) => break Err(anyhow::Error::from_boxed(error.into())),
+                        }
+                    }
+                }
+            }
         };
-
-        if let Some(error) = launch_failure {
+        if let Err(error) = post_process_result {
             tracing::error!("Failed to launch Minecraft: {error:#}");
             clear_persisted_process(&state.pool, persisted_process).await;
             let exit_status = match process.child.try_wait() {
@@ -356,8 +459,7 @@ impl ProcessManager {
                     process.child.wait().await.ok()
                 }
             };
-            let mut readers =
-                output_readers.into_iter().flatten().collect::<Vec<_>>();
+            let mut readers = [stdout_reader, stderr_reader];
             let _ = tokio::time::timeout(
                 OUTPUT_DRAIN_TIMEOUT,
                 futures::future::join_all(readers.iter_mut()),
@@ -368,7 +470,7 @@ impl ProcessManager {
             }
             if let Some(status) = exit_status
                 && let Err(e) = Process::append_to_log_file(
-                    &log_path,
+                    log_file.as_deref(),
                     &format!("\n# Process exited with status: {status}\n"),
                 )
             {
@@ -382,15 +484,15 @@ impl ProcessManager {
                 .map(String::as_str)
                 .collect::<Vec<_>>()
                 .join("\n");
-            let message = if output_tail.is_empty() {
-                format!("{error}")
-            } else {
-                format!("{error}. Last output:\n{output_tail}")
-            };
-            return Err(ErrorKind::LauncherError(message).into());
+            if output_tail.is_empty() {
+                return Err(error);
+            }
+            return Err(ErrorKind::LauncherError(format!(
+                "{error}. Last output:\n{output_tail}"
+            ))
+            .into());
         }
-
-        let metadata = process.metadata.clone();
+        info!(%rpc_address, "Minecraft launcher RPC initialization completed");
 
         self.processes.insert(process.metadata.uuid, process);
 
@@ -401,6 +503,7 @@ impl ProcessManager {
             post_exit_env_vars,
             metadata.uuid,
             persisted_process,
+            log_file,
             Arc::clone(state),
         ));
 
@@ -433,9 +536,11 @@ impl ProcessManager {
     pub fn try_wait(
         &self,
         id: Uuid,
-    ) -> crate::Result<Option<Option<ExitStatus>>> {
+    ) -> crate::Result<Option<Option<SandboxExitStatus>>> {
         if let Some(mut process) = self.processes.get_mut(&id) {
-            Ok(Some(process.child.try_wait()?))
+            Ok(Some(process.child.try_wait().map_err(|error| {
+                anyhow::Error::from_boxed(error.into())
+            })?))
         } else {
             Ok(None)
         }
@@ -443,14 +548,22 @@ impl ProcessManager {
 
     pub async fn wait_for(&self, id: Uuid) -> crate::Result<()> {
         if let Some(mut process) = self.processes.get_mut(&id) {
-            process.child.wait().await?;
+            process
+                .child
+                .wait()
+                .await
+                .map_err(|error| anyhow::Error::from_boxed(error.into()))?;
         }
         Ok(())
     }
 
     pub async fn kill(&self, id: Uuid) -> crate::Result<()> {
         if let Some(mut process) = self.processes.get_mut(&id) {
-            process.child.kill().await?;
+            process
+                .child
+                .kill()
+                .await
+                .map_err(|error| anyhow::Error::from_boxed(error.into()))?;
         }
 
         Ok(())
@@ -473,8 +586,7 @@ pub struct ProcessMetadata {
 #[derive(Debug)]
 struct Process {
     metadata: ProcessMetadata,
-    child: Child,
-    _main_class_keep_alive: TempDir,
+    child: SandboxChild,
     rpc_server: RpcServer,
 }
 
@@ -493,38 +605,11 @@ pub struct Log4jEvent {
 }
 
 impl Process {
-    fn spawn_output_reader<R>(
-        reader: R,
-        metadata: &ProcessMetadata,
-        log_path: &Path,
-        xml_logging: bool,
-        pool: &SqlitePool,
-    ) -> JoinHandle<()>
-    where
-        R: tokio::io::AsyncRead + Unpin + Send + 'static,
-    {
-        let instance_id = metadata.instance_id.clone();
-        let instance_path = metadata.instance_path.clone();
-        let log_path = log_path.to_path_buf();
-        let pool = pool.clone();
-        tokio::spawn(async move {
-            Process::process_output(
-                &instance_id,
-                &instance_path,
-                reader,
-                log_path,
-                xml_logging,
-                &pool,
-            )
-            .await;
-        })
-    }
-
     async fn process_output<R>(
         instance_id: &str,
         _instance_path: &str,
         reader: R,
-        log_path: impl AsRef<Path>,
+        log_file: Option<Arc<File>>,
         xml_logging: bool,
         pool: &SqlitePool,
     ) where
@@ -620,7 +705,7 @@ impl Process {
                                     Self::format_log4j_entry(&current_event)
                                 {
                                     if let Err(e) = Process::append_to_log_file(
-                                        &log_path,
+                                        log_file.as_deref(),
                                         &formatted_log,
                                     ) {
                                         tracing::error!(
@@ -633,7 +718,8 @@ impl Process {
                                         current_event.throwable
                                         && let Err(e) =
                                             Process::append_to_log_file(
-                                                &log_path, throwable,
+                                                log_file.as_deref(),
+                                                throwable,
                                             )
                                     {
                                         tracing::error!(
@@ -658,7 +744,7 @@ impl Process {
                                         Self::format_log4j_entry(&current_event)
                                         && let Err(e) =
                                             Process::append_to_log_file(
-                                                &log_path,
+                                                log_file.as_deref(),
                                                 &formatted_log,
                                             )
                                     {
@@ -707,7 +793,7 @@ impl Process {
                         {
                             let text = e.xml11_content();
                             if let Err(e) = Process::append_to_log_file(
-                                &log_path,
+                                log_file.as_deref(),
                                 &format!("{text}\n"),
                             ) {
                                 tracing::error!(
@@ -736,7 +822,9 @@ impl Process {
                 }
 
                 if !line.is_empty() {
-                    if let Err(e) = Self::append_to_log_file(&log_path, &line) {
+                    if let Err(e) =
+                        Self::append_to_log_file(log_file.as_deref(), &line)
+                    {
                         tracing::warn!("Failed to write to log file: {}", e);
                     }
                     Self::emit_legacy_log(instance_id, line.trim_ascii_end());
@@ -843,14 +931,13 @@ impl Process {
     }
 
     fn append_to_log_file(
-        path: impl AsRef<Path>,
+        log_file: Option<&File>,
         line: &str,
     ) -> std::io::Result<()> {
-        let mut file =
-            OpenOptions::new().append(true).create(true).open(path)?;
-
-        file.write_all(line.as_bytes())?;
-        Ok(())
+        let Some(mut log_file) = log_file else {
+            return Ok(());
+        };
+        log_file.write_all(line.as_bytes())
     }
 
     async fn maybe_handle_server_join_logging(
@@ -963,6 +1050,7 @@ impl Process {
         post_exit_env_vars: Vec<(String, String)>,
         uuid: Uuid,
         persisted_process: Option<(i64, i64)>,
+        log_file: Option<Arc<File>>,
         state: Arc<State>,
     ) -> crate::Result<()> {
         async fn update_playtime(
@@ -1004,7 +1092,7 @@ impl Process {
                     break;
                 }
             } else {
-                mc_exit_status = ExitStatus::default();
+                mc_exit_status = SandboxExitStatus::default();
                 break;
             }
 
@@ -1072,17 +1160,13 @@ impl Process {
             }
         });
 
-        let logs_folder = state.directories.instance_logs_dir(&instance_path);
-        let log_path = logs_folder.join(LAUNCHER_LOG_PATH);
-
-        if log_path.exists()
-            && let Err(e) = Process::append_to_log_file(
-                &log_path,
-                &format!("\n# Process exited with status: {mc_exit_status}\n"),
-            )
-        {
+        if let Err(e) = Process::append_to_log_file(
+            log_file.as_deref(),
+            &format!("\n# Process exited with status: {mc_exit_status}\n"),
+        ) {
             tracing::warn!("Failed to write exit status to log file: {}", e);
         }
+        drop(log_file);
 
         let _ = state
             .presence

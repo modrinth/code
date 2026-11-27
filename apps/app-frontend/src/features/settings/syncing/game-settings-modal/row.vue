@@ -46,19 +46,18 @@ const props = withDefaults(
 		keybindConflicts?: string[]
 		disabled?: boolean
 		showSyncToggle?: boolean
-		sourceNavigationDisabled?: boolean
 	}>(),
 	{
 		keybindConflicts: () => [],
 		disabled: false,
 		showSyncToggle: true,
-		sourceNavigationDisabled: false,
 	},
 )
 
 const emit = defineEmits<{
 	'update:sync-enabled': [enabled: boolean]
 	'update:canonical-value': [value: GameOptionCanonicalValue | null]
+	'input:canonical-value': [value: GameOptionCanonicalValue | null]
 	'open-source': [location: RouteLocationRaw]
 }>()
 
@@ -227,6 +226,10 @@ const syncStatusTooltip = computed(() =>
 function updateValue(value: string | number | boolean | undefined) {
 	emit('update:canonical-value', canonicalValueFromInput(props.setting, value))
 }
+
+function inputValueChanged(value: string | number | boolean | undefined) {
+	emit('input:canonical-value', canonicalValueFromInput(props.setting, value))
+}
 </script>
 
 <template>
@@ -263,11 +266,9 @@ function updateValue(value: string | number | boolean | undefined) {
 			</div>
 			<RouterLink v-if="settingSource" v-slot="{ href }" :to="sourceLocation" custom>
 				<a
-					:href="sourceNavigationDisabled ? undefined : href"
-					:aria-disabled="sourceNavigationDisabled || undefined"
-					class="mt-2 inline-flex max-w-full items-center gap-1.5 text-primary"
-					:class="sourceNavigationDisabled ? 'cursor-default' : 'hover:underline'"
-					@click.prevent="!sourceNavigationDisabled && emit('open-source', sourceLocation)"
+					:href="href"
+					class="mt-2 inline-flex max-w-full items-center gap-1.5 text-primary hover:underline"
+					@click.prevent="emit('open-source', sourceLocation)"
 				>
 					<Avatar
 						v-if="settingSource.project"
@@ -299,7 +300,7 @@ function updateValue(value: string | number | boolean | undefined) {
 				:placeholder="placeholder"
 				:aria-label="settingLabel"
 				:disabled="editorDisabled"
-				@update:model-value="updateValue"
+				@update:model-value="inputValueChanged"
 			/>
 
 			<GameSettingBooleanControl
@@ -359,7 +360,7 @@ function updateValue(value: string | number | boolean | undefined) {
 				:disabled="editorDisabled"
 				:aria-label="settingLabel"
 				wrapper-class="w-full"
-				@update:model-value="updateValue"
+				@update:model-value="inputValueChanged"
 			/>
 		</div>
 

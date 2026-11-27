@@ -12,14 +12,18 @@
 	>
 		<div class="flex flex-col gap-4" :class="hasExternalDiffs ? 'px-6 py-4' : 'p-4'">
 			<template v-if="hasExternalDiffs">
-				<p v-if="description" class="m-0 text-primary">{{ description }}</p>
+				<p v-if="description || $slots.description" class="m-0 text-primary">
+					<slot name="description">{{ description }}</slot>
+				</p>
 				<Admonition type="warning" :header="formatMessage(messages.unknownFilesWarning)">
 					{{ externalWarningDescription || formatMessage(messages.unknownFilesDescription) }}
 				</Admonition>
 			</template>
 			<Admonition v-else :type="hasUnknownContent ? 'warning' : 'info'" :header="admonitionHeader">
 				<div class="flex flex-col gap-2">
-					<span>{{ description }}</span>
+					<span>
+						<slot name="description">{{ description }}</slot>
+					</span>
 					<span v-if="hasUnknownContent">{{ formatMessage(messages.unknownContentBody) }}</span>
 				</div>
 			</Admonition>
@@ -72,7 +76,8 @@
 
 		<template #actions>
 			<div v-if="hasExternalDiffs" class="flex flex-col gap-6 p-2">
-				<p class="m-0 text-primary">{{ formatMessage(messages.reviewedFiles) }}</p>
+				<UnknownFileSandboxNotice v-if="offerSandbox" />
+				<p v-else class="m-0 text-primary">{{ formatMessage(messages.reviewedFiles) }}</p>
 				<div class="flex justify-between gap-2">
 					<div>
 						<Button
@@ -88,13 +93,23 @@
 					<div class="flex gap-2">
 						<Button
 							type="quiet"
-							color="orange"
+							:color="offerSandbox ? undefined : 'orange'"
 							:disabled="buttonsDisabled || confirmDisabled"
 							@click="handleConfirm"
 						>
 							{{ formatMessage(messages.installAnyway) }}
 						</Button>
-						<Button type="colored" color="brand" @click="handleCancel">
+						<Button
+							v-if="offerSandbox"
+							type="colored"
+							color="brand"
+							:disabled="buttonsDisabled || confirmDisabled"
+							@click="handleSandbox"
+						>
+							<ShieldCheckIcon />
+							{{ formatMessage(messages.sandboxAndInstall) }}
+						</Button>
+						<Button v-else type="colored" color="brand" @click="handleCancel">
 							<BanIcon />
 							{{ formatMessage(messages.dontInstall) }}
 						</Button>
@@ -136,6 +151,7 @@ import {
 	PlusIcon,
 	RefreshCwIcon,
 	ReportIcon,
+	ShieldCheckIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { type Component, computed, ref } from 'vue'
@@ -143,6 +159,7 @@ import { type Component, computed, ref } from 'vue'
 import Admonition from '#ui/components/base/Admonition.vue'
 import { Button } from '#ui/components/base/buttons'
 import NewModal from '#ui/components/modal/NewModal.vue'
+import UnknownFileSandboxNotice from '#ui/components/modal/UnknownFileSandboxNotice.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -166,12 +183,14 @@ const props = defineProps<{
 	confirmDisabled?: boolean
 	disableClose?: boolean
 	showExternalWarnings?: boolean
+	offerSandbox?: boolean
 	externalWarningDescription?: string
 	versionDate?: string
 }>()
 
 const emit = defineEmits<{
 	confirm: []
+	sandbox: []
 	cancel: []
 	report: [event?: MouseEvent]
 }>()
@@ -213,6 +232,13 @@ function handleConfirm() {
 	closingFromAction.value = true
 	hide()
 	emit('confirm')
+	closingFromAction.value = false
+}
+
+function handleSandbox() {
+	closingFromAction.value = true
+	hide()
+	emit('sandbox')
 	closingFromAction.value = false
 }
 
@@ -273,6 +299,10 @@ const messages = defineMessages({
 	installAnyway: {
 		id: 'content.diff-modal.install-anyway',
 		defaultMessage: 'Install anyway',
+	},
+	sandboxAndInstall: {
+		id: 'content.diff-modal.sandbox-and-install',
+		defaultMessage: 'Sandbox and install',
 	},
 	dontInstall: {
 		id: 'content.diff-modal.dont-install',

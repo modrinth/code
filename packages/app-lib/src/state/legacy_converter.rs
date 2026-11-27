@@ -11,7 +11,8 @@ use crate::state::{
     Credentials, DefaultPage, DependencyType, DeviceToken, DeviceTokenKey,
     DeviceTokenPair, FileType, Hooks, InstanceInstallStage,
     LauncherFeatureVersion, MemorySettings, ModrinthCredentials,
-    ReleaseChannel, TeamMember, Theme, VersionFile, WindowSize,
+    ReleaseChannel, SandboxOverrides, TeamMember, Theme, VersionFile,
+    WindowSize,
 };
 use crate::util::fetch::{IoSemaphore, read_json};
 use chrono::{DateTime, Utc};
@@ -640,6 +641,7 @@ where
         force_fullscreen: input.force_fullscreen,
         game_resolution: input.game_resolution,
         hooks: input.hooks,
+        sandbox: SandboxOverrides::default(),
         visible_tabs: InstanceTabVisibility::default(),
     };
     let launch_overrides_data = serde_json::to_string(

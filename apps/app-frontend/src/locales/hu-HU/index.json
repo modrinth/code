@@ -3725,9 +3725,6 @@
   "instance.server-modal.resource-pack": {
     "message": "Forráscsomag"
   },
-  "instance.settings.defaults.open-app-settings": {
-    "message": "Alapértelmezett beállítások kezelése"
-  },
   "instance.settings.sidebar.label.game": {
     "message": "Játék"
   },
@@ -3851,9 +3848,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Frissítési csatorna kiválasztása"
   },
-  "instance.settings.tabs.hooks.default-settings-description": {
-    "message": "A példányod az alapértelmezett indítási hookokat használja, ameddig nem írod azokat felül itt."
-  },
   "instance.settings.tabs.hooks.label": {
     "message": "Indítási hookok"
   },
@@ -3913,9 +3907,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "A telepítési beállítások nem érhetők el, amíg ez a példány zárolva van."
-  },
-  "instance.settings.tabs.java.default-settings-description": {
-    "message": "A példányod az alapértelmezett Java és memóriabeállításaidat használja, ameddig nem írod azokat felül itt."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Környezeti változók megadása..."
@@ -3994,9 +3985,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Szinkronizálás"
-  },
-  "instance.settings.tabs.window.default-settings-description": {
-    "message": "A példányod az alapértelmezett ablak beállításaidat használja ameddig nem írod azokat felül itt."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Teljes képernyő"

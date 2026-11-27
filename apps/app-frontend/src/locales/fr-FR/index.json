@@ -3923,9 +3923,6 @@
   "instance.server-modal.resource-pack": {
     "message": "Pack de ressources"
   },
-  "instance.settings.defaults.open-app-settings": {
-    "message": "Modifier les paramètres par défaut"
-  },
   "instance.settings.sidebar.label.game": {
     "message": "Jeu"
   },
@@ -4049,9 +4046,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Sélectionner le canal de mise à jour"
   },
-  "instance.settings.tabs.hooks.default-settings-description": {
-    "message": "Votre instance utilise les paramètres de Java et de mémoire par défaut à moins que ne les remplaciez ici."
-  },
   "instance.settings.tabs.hooks.label": {
     "message": "Commandes de lancement"
   },
@@ -4111,9 +4105,6 @@
   },
   "instance.settings.tabs.installation.locked": {
     "message": "Les paramètres d'installation ne sont pas disponible pendant que cette instance est verrouillée."
-  },
-  "instance.settings.tabs.java.default-settings-description": {
-    "message": "Votre instance utilise les paramètres de Java et de mémoire par défaut à moins que ne les remplaciez ici."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Entrer une variable d'environnement..."
@@ -4195,9 +4186,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Synchronisation"
-  },
-  "instance.settings.tabs.window.default-settings-description": {
-    "message": "Votre instance utilise les paramètres de fenêtre par défaut, sauf si vous les remplacez ici."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Plein écran"

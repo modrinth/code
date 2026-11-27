@@ -101,9 +101,12 @@
 				</Transition>
 			</div>
 
-			<p v-if="hasExternalFiles" class="m-0 text-primary">
-				{{ formatMessage(messages.reviewedFiles) }}
-			</p>
+			<template v-if="hasExternalFiles">
+				<UnknownFileSandboxNotice v-if="offerSandbox" />
+				<p v-else class="m-0 text-primary">
+					{{ formatMessage(messages.reviewedFiles) }}
+				</p>
+			</template>
 
 			<div class="flex w-full items-center justify-between gap-2">
 				<Button type="quiet" color="red" @click="handleReport">
@@ -113,10 +116,18 @@
 
 				<div class="flex items-center gap-2">
 					<template v-if="hasExternalFiles">
-						<Button type="quiet" color="orange" @click="handleAccept">
+						<Button
+							type="quiet"
+							:color="offerSandbox ? undefined : 'orange'"
+							@click="handleAccept(false)"
+						>
 							{{ formatMessage(messages.installAnyway) }}
 						</Button>
-						<Button type="colored" color="brand" @click="handleDecline">
+						<Button v-if="offerSandbox" type="colored" color="brand" @click="handleAccept(true)">
+							<ShieldCheckIcon />
+							{{ formatMessage(messages.sandboxAndInstall) }}
+						</Button>
+						<Button v-else type="colored" color="brand" @click="handleDecline">
 							<BanIcon />
 							{{ formatMessage(messages.dontInstall) }}
 						</Button>
@@ -126,7 +137,7 @@
 							<XIcon />
 							{{ formatMessage(commonMessages.cancelButton) }}
 						</Button>
-						<Button type="colored" color="brand" @click="handleAccept">
+						<Button type="colored" color="brand" @click="handleAccept(false)">
 							<DownloadIcon />
 							{{ formatMessage(messages.installButton) }}
 						</Button>
@@ -162,7 +173,14 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { BanIcon, DownloadIcon, EyeIcon, ReportIcon, XIcon } from '@modrinth/assets'
+import {
+	BanIcon,
+	DownloadIcon,
+	EyeIcon,
+	ReportIcon,
+	ShieldCheckIcon,
+	XIcon,
+} from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import {
 	Admonition,
@@ -175,12 +193,14 @@ import {
 	NewModal,
 	Table,
 	type TableColumn,
+	UnknownFileSandboxNotice,
 	useScrollIndicator,
 	useVIntl,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, ref } from 'vue'
 
+import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
 import { get_project, get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { injectServerInstall } from '@/providers/server-install'
 
@@ -199,6 +219,7 @@ const externalFiles = ref<string[]>([])
 const externalFileTable = ref<HTMLElement | null>(null)
 const onInstallComplete = ref<() => void>(() => {})
 const { formatMessage } = useVIntl()
+const offerSandbox = useOfferSandbox()
 
 const props = defineProps<{
 	showExternalWarnings?: boolean
@@ -261,12 +282,12 @@ async function fetchData(versionId: string) {
 	}
 }
 
-async function handleAccept() {
+async function handleAccept(sandbox: boolean) {
 	hide()
 	const serverProjectId = project.value?.id
 	startInstallingServer(serverProjectId)
 	try {
-		await installServerProject(serverProjectId)
+		await installServerProject(serverProjectId, { sandbox })
 		onInstallComplete.value()
 	} catch (error) {
 		console.error('Failed to install server project from InstallToPlayModal:', error)
@@ -438,6 +459,10 @@ const messages = defineMessages({
 	dontInstall: {
 		id: 'app.modal.install-to-play.external-files-dont-install',
 		defaultMessage: "Don't install",
+	},
+	sandboxAndInstall: {
+		id: 'app.modal.install-to-play.sandbox-and-install',
+		defaultMessage: 'Sandbox and install',
 	},
 	unavailableHeader: {
 		id: 'app.modal.install-to-play.unavailable-header',

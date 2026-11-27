@@ -6,7 +6,6 @@ import {
 	MessageIcon,
 	MonitorIcon,
 	RefreshCwIcon,
-	SaveIcon,
 	SearchIcon,
 	SettingsIcon,
 	ShirtIcon,
@@ -14,14 +13,10 @@ import {
 	TagCategoryGamepad2Icon,
 	UnlinkIcon,
 	WrenchIcon,
-	XIcon,
 } from '@modrinth/assets'
 import {
 	Button,
-	commonMessages,
-	ConfirmLeaveModal,
 	defineMessages,
-	FloatingActionBar,
 	Input,
 	TabbedModal,
 	type TabbedModalTab,
@@ -111,37 +106,24 @@ const messages = defineMessages({
 		id: 'app.settings.synced-options.game-settings.retry',
 		defaultMessage: 'Retry',
 	},
-	saveSettings: {
-		id: 'app.settings.synced-options.game-settings.save',
-		defaultMessage: 'Save settings',
-	},
-	unsavedChanges: {
-		id: 'app.settings.synced-options.game-settings.unsaved-changes',
-		defaultMessage: 'You have unsaved changes.',
-	},
 })
 
 const modal = ref<InstanceType<typeof TabbedModal> | null>(null)
-const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
 const activeCategoryId = ref('')
 const search = ref('')
 const opened = ref(false)
-let allowClose = false
 
 const {
-	draftState,
+	state,
 	isLocalEditor,
-	isDirty,
-	hasBlockingDraft,
 	loading,
 	loadError,
-	saving,
 	load,
 	reset: resetEditor,
-	cancelChanges,
+	flushPendingValues,
 	setSyncEnabled,
 	setCanonicalValue,
-	save,
+	queueCanonicalValue,
 } = useGameSettingsEditor(
 	() => props.instanceId,
 	() => emit('saved'),
@@ -164,7 +146,7 @@ const categoryIcons: Record<string, Component> = {
 const localeLabels = useGameSettingLabels(
 	opened,
 	() => props.instanceId,
-	() => draftState.value?.settings ?? [],
+	() => state.value?.settings ?? [],
 )
 
 function settingLabel(setting: EditableGameSetting) {
@@ -177,10 +159,10 @@ function settingLabel(setting: EditableGameSetting) {
 }
 
 const categories = computed<GameSettingCategory[]>(() => {
-	if (!draftState.value) return []
+	if (!state.value) return []
 
-	const settings = draftState.value.settings
-	const visible = draftState.value.categories.filter(
+	const settings = state.value.settings
+	const visible = state.value.categories.filter(
 		(category) =>
 			category.is_custom || settings.some((setting) => setting.category_id === category.id),
 	)
@@ -205,10 +187,10 @@ const activeCategory = computed(() =>
 )
 
 const categorySettings = computed(() => {
-	if (!draftState.value) return []
+	if (!state.value) return []
 
 	const query = search.value.trim().toLocaleLowerCase()
-	return draftState.value.settings.filter((setting) => {
+	return state.value.settings.filter((setting) => {
 		if (!query && setting.category_id !== activeCategoryId.value) return false
 		if (
 			query &&
@@ -228,10 +210,10 @@ const categorySettings = computed(() => {
 })
 
 const keybindConflicts = computed(() => {
-	if (!draftState.value) return new Map<string, string[]>()
+	if (!state.value) return new Map<string, string[]>()
 
 	const bindings = new Map<string, EditableGameSetting[]>()
-	for (const setting of draftState.value.settings) {
+	for (const setting of state.value.settings) {
 		if (!isKeybindSetting(setting)) continue
 		const key = minecraftKeybindConflictKey(setting.option_id, canonicalValueText(setting))
 		if (!key) continue
@@ -297,7 +279,6 @@ watch(
 
 function show() {
 	opened.value = true
-	allowClose = false
 	search.value = ''
 	void load()
 	modal.value?.show()
@@ -310,26 +291,11 @@ function hide() {
 function reset() {
 	opened.value = false
 	resetEditor()
-	allowClose = false
-}
-
-function beforeHide(): boolean {
-	if (allowClose || !isDirty.value) return true
-	void confirmDiscard()
-	return false
-}
-
-async function confirmDiscard() {
-	const discard = await confirmLeaveModal.value?.prompt()
-	if (!discard) return
-	allowClose = true
-	modal.value?.hide()
 }
 
 async function openSource(location: RouteLocationRaw) {
-	if (isDirty.value || saving.value) return
+	flushPendingValues()
 	if (appSettingsModal && !appSettingsModal.close()) return
-	allowClose = true
 	modal.value?.hide()
 	if (instanceSettings?.closeModal) {
 		instanceSettings.closeModal(() => void router.push(location))
@@ -355,11 +321,9 @@ defineExpose({ show, hide })
 		ref="modal"
 		:tabs="categoryTabs"
 		:header="modalTitle"
-		:before-hide="beforeHide"
 		:before-tab-change="changeCategory"
 		:hide-tab-selection="search.trim().length > 0"
 		:on-after-hide="reset"
-		:floating-action-bar-shown="isDirty"
 		max-width="min(1080px, calc(95vw - 2rem))"
 		width="min(1080px, calc(95vw - 2rem))"
 	>
@@ -447,40 +411,14 @@ defineExpose({ show, hide })
 							:locale-label="localeLabels[setting.option_id]"
 							:keybind-conflicts="keybindConflicts.get(setting.option_id)"
 							:show-sync-toggle="!isLocalEditor"
-							:source-navigation-disabled="isDirty || saving"
 							@open-source="openSource"
 							@update:sync-enabled="setSyncEnabled([setting.option_id], $event)"
 							@update:canonical-value="setCanonicalValue(setting.option_id, $event)"
+							@input:canonical-value="queueCanonicalValue(setting.option_id, $event)"
 						/>
 					</div>
 				</div>
 			</div>
 		</template>
-
-		<template #floating-action-bar>
-			<FloatingActionBar v-if="isDirty" shown inline :aria-label="modalTitle">
-				<p class="m-0 text-sm font-semibold md:text-base">
-					{{ formatMessage(messages.unsavedChanges) }}
-				</p>
-				<div class="ml-auto flex gap-2">
-					<Button type="outlined" @click="cancelChanges">
-						<XIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
-					<Button
-						type="colored"
-						color="brand"
-						:disabled="!isDirty || loading || saving || hasBlockingDraft"
-						:loading="saving"
-						@click="save"
-					>
-						<SaveIcon aria-hidden="true" />
-						{{ formatMessage(messages.saveSettings) }}
-					</Button>
-				</div>
-			</FloatingActionBar>
-		</template>
 	</TabbedModal>
-
-	<ConfirmLeaveModal ref="confirmLeaveModal" />
 </template>

@@ -5,6 +5,7 @@ import {
 	CoffeeIcon,
 	InfoIcon,
 	Settings2Icon,
+	ShieldIcon,
 	UsersIcon,
 	WindowIcon,
 	WrenchIcon,
@@ -16,7 +17,6 @@ import {
 	defineMessages,
 	TabbedModal,
 	type TabbedModalTab,
-	UnsavedChangesPopup,
 	useVIntl,
 } from '@modrinth/ui'
 import type { PlatformTag } from '@modrinth/utils'
@@ -28,13 +28,13 @@ import { get_linked_modpack_info, getInstanceIconUrl } from '@/helpers/instance'
 import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
-import { useUnsavedChangesHost } from '@/shared/unsaved-changes/use-unsaved-changes-host'
 
 import GeneralSettings from './general-settings.vue'
 import HooksSettings from './hooks-settings.vue'
 import InstallationSettings from './installation-settings.vue'
 import { provideInstanceSettings } from './instance-settings-context.ts'
 import JavaSettings from './java-settings.vue'
+import SandboxSettings from './sandbox-settings.vue'
 import SharingSettings from './sharing-settings/index.vue'
 import SyncedOptionsSettings from './synced-options-settings.vue'
 import WindowSettings from './window-settings.vue'
@@ -68,25 +68,12 @@ function handleAfterHide() {
 	callback?.()
 }
 
-const {
-	popup: unsavedChangesPopup,
-	original: originalUnsavedChangesState,
-	modified: modifiedUnsavedChangesState,
-	saving: savingUnsavedChanges,
-	hasUnsavedChanges,
-	canLeave: canLeaveCurrentTab,
-	register: registerUnsavedChangesController,
-	reset: resetUnsavedChanges,
-	save: saveUnsavedChanges,
-} = useUnsavedChangesHost()
-
 provideInstanceSettings({
 	instance: instanceRef,
 	offline: props.offline,
 	isMinecraftServer,
 	onUnlinked: handleUnlinked,
 	closeModal: hide,
-	registerUnsavedChangesController,
 })
 
 watch(
@@ -145,6 +132,15 @@ const tabs = computed<TabbedModalTab[]>(() => [
 		icon: UsersIcon,
 		content: SharingSettings,
 		shown: props.instance.shared_instance?.role === 'owner' && !props.instance.quarantined,
+	},
+	{
+		name: defineMessage({
+			id: 'instance.settings.tabs.sandbox',
+			defaultMessage: 'Sandboxing',
+		}),
+		icon: ShieldIcon,
+		category: tabCategories.game,
+		content: SandboxSettings,
 	},
 	{
 		name: defineMessage({
@@ -249,9 +245,6 @@ defineExpose({ show, hide })
 		:tabs="tabs"
 		:header="formatMessage(commonMessages.settingsLabel)"
 		:on-after-hide="handleAfterHide"
-		:before-hide="canLeaveCurrentTab"
-		:before-tab-change="canLeaveCurrentTab"
-		:floating-action-bar-shown="hasUnsavedChanges"
 	>
 		<template #breadcrumb>
 			<Avatar
@@ -261,17 +254,6 @@ defineExpose({ show, hide })
 				pad-transparent-corners
 			/>
 			<span class="truncate">{{ instance.name }}</span>
-		</template>
-		<template #floating-action-bar>
-			<UnsavedChangesPopup
-				ref="unsavedChangesPopup"
-				:original="originalUnsavedChangesState"
-				:modified="modifiedUnsavedChangesState"
-				:saving="savingUnsavedChanges"
-				inline
-				@reset="resetUnsavedChanges"
-				@save="saveUnsavedChanges"
-			/>
 		</template>
 	</TabbedModal>
 </template>

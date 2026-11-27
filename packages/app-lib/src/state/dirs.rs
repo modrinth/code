@@ -10,6 +10,7 @@ use tokio::fs;
 pub const CACHES_FOLDER_NAME: &str = "caches";
 pub const LAUNCHER_LOGS_FOLDER_NAME: &str = "launcher_logs";
 pub const INSTANCES_FOLDER_NAME: &str = "profiles";
+pub const INSTANCE_DATA_FOLDER_NAME: &str = "instance-data";
 pub const METADATA_FOLDER_NAME: &str = "meta";
 pub const SYNCED_OPTIONS_FOLDER_NAME: &str = "synced-options";
 pub const STORE_FOLDER_NAME: &str = "store";
@@ -168,6 +169,22 @@ impl DirectoryInfo {
     #[inline]
     pub fn instances_dir(&self) -> PathBuf {
         self.config_dir.join(INSTANCES_FOLDER_NAME)
+    }
+
+    /// Get the directory for files that are used to launch the game, such as JARs. This
+    /// must not be modifiable by sandboxed instances.
+    #[inline]
+    pub fn launcher_files_dir(&self) -> PathBuf {
+        self.metadata_dir().join("launcher-files")
+    }
+
+    /// Get the persistent directory shared by sandboxed instances.
+    ///
+    /// This must not be used by the launcher, since anything in it can be tampered
+    /// with by the game.
+    #[inline]
+    pub fn instance_data_dir(&self) -> PathBuf {
+        self.config_dir.join(INSTANCE_DATA_FOLDER_NAME)
     }
 
     #[inline]

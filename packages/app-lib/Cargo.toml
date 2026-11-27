@@ -47,9 +47,10 @@ itertools = { workspace = true }
 json5 = { workspace = true }
 minecraft-meta-manifest = { workspace = true }
 modrinth-content-management = { workspace = true }
+modrinth-sandbox = { workspace = true }
 modrinth-skin-rendering = { workspace = true, features = ["serde"] }
 notify = { workspace = true }
-notify-debouncer-mini = { workspace = true }
+notify-debouncer-full = { workspace = true }
 p256 = { workspace = true, features = ["ecdsa"] }
 parking_lot = { workspace = true }
 paste = { workspace = true }
@@ -133,7 +134,7 @@ dunce = { workspace = true }
 cidre = { workspace = true, features = ["blocks", "nw"] }
 
 [target."cfg(unix)".dependencies]
-libc = { workspace = true }
+rustix = { workspace = true, features = ["fs"] }
 
 [target."cfg(windows)".dependencies]
 windows = { workspace = true, features = ["Networking_Connectivity", "Win32_Storage_FileSystem"] }

@@ -125,6 +125,8 @@ async fn run_credentials(
         .or(settings.hooks.post_exit)
         .filter(|hook_command| !hook_command.is_empty());
 
+    let sandbox_settings =
+        context.launch_overrides.sandbox.apply(settings.sandbox);
     let memory = context.launch_overrides.memory.unwrap_or(settings.memory);
     let resolution = context
         .launch_overrides
@@ -280,6 +282,7 @@ async fn run_credentials(
         &launch_env_args,
         &mc_set_options,
         &wrapper,
+        &sandbox_settings,
         &memory,
         &resolution,
         credentials,

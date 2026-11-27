@@ -48,6 +48,7 @@ impl RpcServerBuilder {
             .await
             .context("binding rpc server socket")?;
         let address = socket.local_addr()?;
+        tracing::info!(%address, "Minecraft launcher RPC server listening");
         let (message_sender, message_receiver) = mpsc::unbounded_channel();
         let waiting_responses = Arc::new(Mutex::new(HashMap::new()));
 
@@ -132,7 +133,7 @@ impl RpcServer {
             bail!("rpc connection closed while sending");
         }
 
-        tracing::debug!("Waiting on result for {id}");
+        tracing::debug!(%id, %method, "waiting for Minecraft launcher RPC response");
         let Ok(result) = recv.await else {
             self.waiting_responses.lock().unwrap().remove(&id);
             bail!("rpc connection closed while waiting for response");
@@ -157,7 +158,8 @@ struct RunningRpcServer {
 
 impl RunningRpcServer {
     async fn run(&mut self, listener: TcpListener) -> Result<()> {
-        let (socket, _) = listener.accept().await?;
+        let (socket, peer_address) = listener.accept().await?;
+        tracing::info!(%peer_address, "Minecraft launcher RPC client connected");
         drop(listener);
 
         let mut socket = LinesCodec::new().framed(socket);
