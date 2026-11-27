@@ -39,6 +39,7 @@ const project: Labrinth.Projects.v3.Project = {
 	gallery: [],
 	thread_id: 'storybook-thread',
 	monetization_status: 'monetized',
+	featured_in: [],
 	side_types_migration_review_status: 'reviewed',
 	environment: ['unknown'],
 }

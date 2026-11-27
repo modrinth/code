@@ -91,6 +91,7 @@ const project: Labrinth.Projects.v3.Project = {
 	})),
 	thread_id: 'storybook-thread',
 	monetization_status: 'monetized',
+	featured_in: [],
 	side_types_migration_review_status: 'reviewed',
 	environment: ['unknown'],
 }
@@ -122,6 +123,7 @@ const legacyProject: Labrinth.Projects.v2.Project = {
 	gallery: [],
 	thread_id: project.thread_id,
 	monetization_status: project.monetization_status,
+	featured_in: [],
 }
 
 export function provideIssueCatalogueProject() {

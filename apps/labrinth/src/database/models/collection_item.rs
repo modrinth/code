@@ -1,6 +1,8 @@
 use super::ids::*;
 use crate::database::{PgTransaction, models};
-use crate::models::collections::CollectionStatus;
+use crate::models::collections::{
+    CollectionFlags, CollectionStatus, is_public_featured,
+};
 use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
@@ -8,7 +10,7 @@ use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
-const COLLECTIONS_NAMESPACE: &str = "collections:v4";
+const COLLECTIONS_NAMESPACE: &str = "collections:v7";
 
 #[derive(Clone)]
 pub struct CollectionBuilder {
@@ -17,6 +19,7 @@ pub struct CollectionBuilder {
     pub name: String,
     pub description: Option<String>,
     pub status: CollectionStatus,
+    pub flags: CollectionFlags,
     pub projects: Vec<DBProjectId>,
 }
 
@@ -36,6 +39,8 @@ impl CollectionBuilder {
             raw_icon_url: None,
             color: None,
             status: self.status,
+            flags: self.flags,
+            follows: 0,
             projects: self.projects,
         };
         collection_struct
@@ -58,6 +63,9 @@ pub struct DBCollection {
     pub raw_icon_url: Option<String>,
     pub color: Option<u32>,
     pub status: CollectionStatus,
+    #[serde(default)]
+    pub flags: CollectionFlags,
+    pub follows: i32,
     pub projects: Vec<DBProjectId>,
 }
 
@@ -70,11 +78,11 @@ impl DBCollection {
             "
             INSERT INTO collections (
                 id, user_id, name, description,
-                created, icon_url, raw_icon_url, status
+                created, icon_url, raw_icon_url, status, flags
             )
             VALUES (
                 $1, $2, $3, $4,
-                $5, $6, $7, $8
+                $5, $6, $7, $8, $9
             )
             ",
             self.id as DBCollectionId,
@@ -85,6 +93,7 @@ impl DBCollection {
             self.icon_url.as_ref(),
             self.raw_icon_url.as_ref(),
             self.status.to_string(),
+            self.flags.to_db(),
         )
         .execute(&mut *transaction)
         .await
@@ -112,12 +121,34 @@ impl DBCollection {
         id: DBCollectionId,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
-    ) -> Result<Option<()>> {
+    ) -> Result<Option<Vec<DBProjectId>>> {
         let collection = Self::get(id, &mut *transaction, redis)
             .await
             .context("fetching collection to remove")?;
 
         if let Some(collection) = collection {
+            let locked = sqlx::query_scalar!(
+                "
+                SELECT id FROM collections
+                WHERE id = $1
+                FOR UPDATE
+                ",
+                id as DBCollectionId,
+            )
+            .fetch_optional(&mut *transaction)
+            .await
+            .context("locking collection to remove")?;
+            if locked.is_none() {
+                return Ok(None);
+            }
+
+            let refresh_projects =
+                if is_public_featured(collection.status, collection.flags) {
+                    collection.projects.clone()
+                } else {
+                    Vec::new()
+                };
+
             sqlx::query!(
                 "
                 DELETE FROM collections_mods
@@ -128,6 +159,17 @@ impl DBCollection {
             .execute(&mut *transaction)
             .await
             .context("deleting collection projects")?;
+
+            sqlx::query!(
+                "
+                DELETE FROM collection_follows
+                WHERE collection_id = $1
+                ",
+                id as DBCollectionId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .context("deleting collection follows")?;
 
             sqlx::query!(
                 "
@@ -144,7 +186,7 @@ impl DBCollection {
                 .await
                 .context("clearing removed collection cache")?;
 
-            Ok(Some(()))
+            Ok(Some(refresh_projects))
         } else {
             Ok(None)
         }
@@ -181,7 +223,7 @@ impl DBCollection {
                         "
                     SELECT c.id id, c.name name, c.description description,
                     c.icon_url icon_url, c.raw_icon_url raw_icon_url, c.color color, c.created created, c.user_id user_id,
-                    c.updated updated, c.status status,
+                    c.updated updated, c.status status, c.flags flags, c.follows follows,
                     ARRAY_AGG(DISTINCT cm.mod_id) filter (where cm.mod_id is not null) mods
                     FROM collections c
                     LEFT JOIN collections_mods cm ON cm.collection_id = c.id
@@ -203,6 +245,8 @@ impl DBCollection {
                             created: m.created,
                             updated: m.updated,
                             status: CollectionStatus::from_string(&m.status),
+                            flags: CollectionFlags::from_db(m.flags),
+                            follows: m.follows,
                             projects: m
                                 .mods
                                 .unwrap_or_default()
@@ -237,6 +281,29 @@ impl DBCollection {
             .delete(&key)
             .await
             .context("clearing collection cache")?;
+        Ok(())
+    }
+
+    pub async fn clear_many_caches(
+        ids: &[DBCollectionId],
+        redis: &RedisPool,
+    ) -> Result<()> {
+        if ids.is_empty() {
+            return Ok(());
+        }
+
+        let mut redis = redis
+            .connect()
+            .await
+            .context("connecting to redis to clear collection caches")?;
+        let keys = ids
+            .iter()
+            .map(|id| redis.key().entity(COLLECTIONS_NAMESPACE, id.0))
+            .collect::<Vec<_>>();
+        redis
+            .delete_many(&keys)
+            .await
+            .context("clearing collection caches")?;
         Ok(())
     }
 }

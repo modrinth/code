@@ -18,6 +18,7 @@ use crate::{
     database::models::{DBModerationNote, DBOrganization, DBProjectId, DBUser},
     file_hosting::{FileHost, FileHostPublicity},
     models::{
+        collections::Collection,
         ids::OrganizationId,
         notifications::Notification,
         organizations::Organization,
@@ -54,6 +55,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(user_icon_delete_route)
         .service(user_delete_route)
         .service(user_follows_route)
+        .service(user_collection_follows)
         .service(user_notifications_route)
         .service(get_user_preferences)
         .service(edit_user_preferences)
@@ -1440,7 +1442,19 @@ pub async fn user_delete(
         .await
         .internal_context("failed to commit transaction")?;
 
-    if result.is_some() {
+    if let Some(removed) = result {
+        crate::database::models::DBProject::clear_many_caches(
+            &removed.featured_projects,
+            &redis,
+        )
+        .await
+        .internal_context("clearing featured project caches")?;
+        crate::database::models::DBCollection::clear_many_caches(
+            &removed.followed_collections,
+            &redis,
+        )
+        .await
+        .internal_context("clearing followed collection caches")?;
         Ok(())
     } else {
         Err(ApiError::NotFound(anyhow!("resource not found")))
@@ -1506,6 +1520,74 @@ pub async fn user_follows(
     } else {
         Err(ApiError::NotFound(anyhow!("resource not found")))
     }
+}
+
+#[utoipa::path(tag = "users", responses((status = OK)))]
+#[get("/user/{id}/follows/collections")]
+pub async fn user_collection_follows(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Vec<Collection>>, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &***ro_pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_READ,
+    )
+    .await
+    .auth_context("authenticating API request")?;
+
+    let id = DBUser::get(&info.into_inner().0, &***ro_pool, &redis)
+        .await
+        .internal_context("fetching user from database")?
+        .not_found_context("resource not found")?
+        .id;
+
+    if !user.scopes.contains(Scopes::ADMIN_READ) && user.user.id != id.into() {
+        return Err(ApiError::Auth(anyhow!(
+            "you do not have permission to see the collections this user follows"
+        )));
+    }
+
+    let collection_ids = DBUser::get_collection_follows(id, &***ro_pool)
+        .await
+        .internal_context("fetching collection follows")?;
+    let collections = crate::database::models::DBCollection::get_many(
+        &collection_ids,
+        &***ro_pool,
+        &redis,
+    )
+    .await
+    .internal_context("fetching collections from database")?;
+    let mut collections: Vec<Collection> = collections
+        .into_iter()
+        .filter(|collection| {
+            !collection.status.is_hidden()
+                || user.scopes.contains(Scopes::MODERATION_READ)
+                || user.user.id == collection.user_id.into()
+        })
+        .map(Collection::from)
+        .collect();
+
+    let order: HashMap<_, _> = collection_ids
+        .iter()
+        .enumerate()
+        .map(|(index, collection_id)| {
+            (
+                crate::models::ids::CollectionId::from(*collection_id),
+                index,
+            )
+        })
+        .collect();
+    collections.sort_by_key(|collection| {
+        order.get(&collection.id).copied().unwrap_or(usize::MAX)
+    });
+
+    Ok(web::Json(collections))
 }
 
 #[utoipa::path(tag = "users", responses((status = OK)))]

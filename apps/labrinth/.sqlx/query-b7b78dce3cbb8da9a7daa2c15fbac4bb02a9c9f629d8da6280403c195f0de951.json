@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT cf.collection_id FROM collection_follows cf\n            WHERE cf.follower_id = $1\n            ORDER BY cf.created DESC, cf.collection_id DESC\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "collection_id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "collection_follows",
+            "name": "collection_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "b7b78dce3cbb8da9a7daa2c15fbac4bb02a9c9f629d8da6280403c195f0de951"
+}

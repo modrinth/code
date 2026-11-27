@@ -1,9 +1,64 @@
 use super::ids::ProjectId;
+use crate::bitflags_serde_impl;
 use crate::database;
 use crate::models::ids::CollectionId;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+
+bitflags::bitflags! {
+    /// Staff-assigned collection flags.
+    ///
+    /// Stored and exposed as a bitfield. `1` is featured, `2` is potw.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    pub struct CollectionFlags: i64 {
+        const FEATURED = 1 << 0;
+        const POTW = 1 << 1;
+    }
+}
+
+impl Default for CollectionFlags {
+    fn default() -> Self {
+        Self::empty()
+    }
+}
+
+impl CollectionFlags {
+    pub fn from_db(bits: i64) -> Self {
+        Self::from_bits_truncate(bits)
+    }
+
+    pub fn to_db(self) -> i64 {
+        self.bits()
+    }
+}
+
+impl utoipa::PartialSchema for CollectionFlags {
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        i64::schema()
+    }
+}
+
+impl utoipa::ToSchema for CollectionFlags {
+    fn schemas(
+        schemas: &mut Vec<(
+            String,
+            utoipa::openapi::RefOr<utoipa::openapi::schema::Schema>,
+        )>,
+    ) {
+        i64::schemas(schemas);
+    }
+}
+
+bitflags_serde_impl!(CollectionFlags, i64);
+
+/// A `listed` collection with the `featured` flag is public for project metadata.
+pub fn is_public_featured(
+    status: CollectionStatus,
+    flags: CollectionFlags,
+) -> bool {
+    status.is_searchable() && flags.contains(CollectionFlags::FEATURED)
+}
 
 /// A collection returned from the API
 #[derive(Serialize, Deserialize, Clone)]
@@ -27,11 +82,18 @@ pub struct Collection {
     /// The status of the collection (eg: whether collection is public or not)
     pub status: CollectionStatus,
 
+    /// Staff-assigned flags. Empty unless set by a moderator.
+    #[serde(default)]
+    pub collection_flags: CollectionFlags,
+
     /// The date at which the collection was first published.
     pub created: DateTime<Utc>,
 
     /// The date at which the collection was updated.
     pub updated: DateTime<Utc>,
+
+    /// The number of users following this collection.
+    pub follows: u32,
 
     /// A list of ProjectIds that are in this collection.
     pub projects: Vec<ProjectId>,
@@ -51,6 +113,8 @@ impl From<database::models::DBCollection> for Collection {
             raw_icon_url: c.raw_icon_url,
             color: c.color,
             status: c.status,
+            collection_flags: c.flags,
+            follows: c.follows as u32,
         }
     }
 }

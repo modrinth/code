@@ -4,8 +4,8 @@ use crate::database::models::project_item::{LinkUrl, ProjectQueryResult};
 use crate::database::models::version_item::VersionQueryResult;
 use crate::models::exp;
 use crate::models::ids::{
-    FileId, GalleryImageId, OrganizationId, ProjectId, TeamId, ThreadId,
-    ThreadIssueId, VersionId,
+    CollectionId, FileId, GalleryImageId, OrganizationId, ProjectId, TeamId,
+    ThreadId, ThreadIssueId, VersionId,
 };
 use crate::models::minecraft::legacy_game_version_name;
 use crate::routes::{FileHash, HashAlgorithm};
@@ -166,6 +166,10 @@ pub struct Project {
 
     /// The color of the project (picked from icon)
     pub color: Option<u32>,
+
+    /// Listed collections with the `featured` flag that include this project.
+    #[serde(default)]
+    pub featured_in: Vec<CollectionId>,
 
     /// The thread of the moderation messages of the project
     pub thread_id: ThreadId,
@@ -358,6 +362,11 @@ impl From<ProjectQueryResult> for Project {
                 })
                 .collect(),
             color: m.color,
+            featured_in: data
+                .featured_in
+                .into_iter()
+                .map(|id| id.into())
+                .collect(),
             thread_id: data.thread_id.into(),
             monetization_status: m.monetization_status,
             side_types_migration_review_status: m

@@ -916,6 +916,7 @@ mod tests {
                 },
             ],
             color: None,
+            featured_in: Vec::new(),
             thread_id: ThreadId(3),
             monetization_status: MonetizationStatus::Monetized,
             side_types_migration_review_status:

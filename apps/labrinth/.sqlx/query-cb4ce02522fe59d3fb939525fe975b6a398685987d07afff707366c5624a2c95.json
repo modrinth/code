@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        DELETE FROM collection_follows\n        WHERE follower_id = $1 AND collection_id = $2\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "cb4ce02522fe59d3fb939525fe975b6a398685987d07afff707366c5624a2c95"
+}

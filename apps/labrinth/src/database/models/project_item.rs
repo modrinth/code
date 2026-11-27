@@ -2,6 +2,7 @@ use super::{DBUser, ids::*};
 
 use crate::database::{PgTransaction, ReadOnlyPgPool, models};
 use crate::file_hosting::FileHost;
+use crate::models::collections::{CollectionFlags, CollectionStatus};
 use crate::models::exp;
 use crate::models::exp::minecraft::{Environment, MrpackLoader};
 use crate::models::ids::ProjectId;
@@ -24,7 +25,7 @@ use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use xredis::RedisPool;
 
-pub const PROJECTS_NAMESPACE: &str = "projects:v11";
+pub const PROJECTS_NAMESPACE: &str = "projects:v12";
 pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v6";
 const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v4";
 
@@ -944,6 +945,43 @@ impl DBProject {
                 .await
                 .context("fetching project rows")?;
 
+                let featured_flag = CollectionFlags::FEATURED.bits();
+                let listed_status = CollectionStatus::Listed.as_str();
+                let featured_project_ids = project_rows
+                    .iter()
+                    .map(|row| row.id)
+                    .collect::<Vec<_>>();
+                let featured_in_rows = sqlx::query!(
+                    r#"
+                    SELECT cm.mod_id,
+                        ARRAY_AGG(DISTINCT c.id) filter (where c.id is not null) collection_ids
+                    FROM collections_mods cm
+                    INNER JOIN collections c ON c.id = cm.collection_id
+                    WHERE cm.mod_id = ANY($1)
+                        AND c.status = $2
+                        AND (c.flags & $3) = $3
+                    GROUP BY cm.mod_id
+                    "#,
+                    &featured_project_ids,
+                    listed_status,
+                    featured_flag,
+                )
+                .fetch_all(&mut exec)
+                .await
+                .context("fetching featured collections")?;
+                let featured_in: DashMap<DBProjectId, Vec<DBCollectionId>> =
+                    DashMap::new();
+                for row in featured_in_rows {
+                    let mut collection_ids = row
+                        .collection_ids
+                        .unwrap_or_default()
+                        .into_iter()
+                        .map(DBCollectionId)
+                        .collect::<Vec<_>>();
+                    collection_ids.sort_by_key(|id| id.0);
+                    featured_in.insert(DBProjectId(row.mod_id), collection_ids);
+                }
+
                 let project_components = project_rows
                     .iter()
                     .map(|row| {
@@ -1035,6 +1073,10 @@ impl DBProject {
                             minecraft_mod_metadata,
                             thread_id: DBThreadId(m.thread_id),
                             components,
+                            featured_in: featured_in
+                                .remove(&project_id)
+                                .map(|(_, ids)| ids)
+                                .unwrap_or_default(),
                         };
 
                         acc.insert(m.id, (m.slug, project));
@@ -1156,6 +1198,32 @@ impl DBProject {
             .context("clearing project cache")?;
         Ok(())
     }
+
+    pub async fn clear_many_caches(
+        ids: &[DBProjectId],
+        redis: &RedisPool,
+    ) -> Result<()> {
+        let mut ids = ids.to_vec();
+        ids.sort_by_key(|id| id.0);
+        ids.dedup();
+        if ids.is_empty() {
+            return Ok(());
+        }
+
+        let mut redis = redis
+            .connect()
+            .await
+            .context("connecting to redis to clear project caches")?;
+        let keys = ids
+            .iter()
+            .map(|id| redis.key().entity(PROJECTS_NAMESPACE, id.0))
+            .collect::<Vec<_>>();
+        redis
+            .delete_many(&keys)
+            .await
+            .context("clearing project caches")?;
+        Ok(())
+    }
 }
 
 #[serde_binhum]
@@ -1173,4 +1241,5 @@ pub struct ProjectQueryResult {
     pub thread_id: DBThreadId,
     pub minecraft_mod_metadata: Option<MinecraftModMetadata>,
     pub components: exp::ProjectQuery,
+    pub featured_in: Vec<DBCollectionId>,
 }

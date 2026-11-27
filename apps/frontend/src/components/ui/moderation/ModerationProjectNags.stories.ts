@@ -48,6 +48,7 @@ function createProject(status: Labrinth.Projects.v2.ProjectStatus): Labrinth.Pro
 		gallery: [],
 		thread_id: 'storybook-thread',
 		monetization_status: 'monetized',
+		featured_in: [],
 	}
 }
 
@@ -79,6 +80,7 @@ function createProjectV3(status: Labrinth.Projects.v2.ProjectStatus): Labrinth.P
 		gallery: [],
 		thread_id: 'storybook-thread',
 		monetization_status: 'monetized',
+		featured_in: [],
 		side_types_migration_review_status: 'reviewed',
 		environment: ['unknown'],
 	}
