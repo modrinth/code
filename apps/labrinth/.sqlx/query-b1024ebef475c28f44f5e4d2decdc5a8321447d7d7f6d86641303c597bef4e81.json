@@ -1,0 +1,51 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        WITH delphi_versions AS (\n            SELECT files.id, MAX(reports.delphi_version) AS version FROM delphi_reports reports\n            JOIN files ON files.id = reports.file_id\n            JOIN versions ON versions.id = files.version_id\n            WHERE versions.mod_id = $1\n            GROUP BY files.id\n        )\n        SELECT\n            statuses.id AS \"issue_detail_id!\",\n            statuses.status AS \"status!: DelphiStatus\"\n        FROM delphi_issue_details_with_statuses statuses\n        JOIN delphi_report_issues issues ON issues.id = statuses.issue_id\n        JOIN delphi_reports reports ON reports.id = issues.report_id\n        JOIN delphi_versions versions ON versions.id = reports.file_id\n        WHERE\n            statuses.project_id = $1 AND\n            statuses.severity != 'hidden' AND\n            versions.version = reports.delphi_version\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "issue_detail_id!",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "delphi_issue_details_with_statuses",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "status!: DelphiStatus",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_report_issue_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "safe",
+                "unsafe"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "delphi_issue_details_with_statuses",
+            "name": "status"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      true,
+      true
+    ]
+  },
+  "hash": "b1024ebef475c28f44f5e4d2decdc5a8321447d7d7f6d86641303c597bef4e81"
+}

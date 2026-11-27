@@ -1170,26 +1170,24 @@ pub async fn submit_report(
 
     let issue_details = sqlx::query!(
         r#"
+        WITH delphi_versions AS (
+            SELECT files.id, MAX(reports.delphi_version) AS version FROM delphi_reports reports
+            JOIN files ON files.id = reports.file_id
+            JOIN versions ON versions.id = files.version_id
+            WHERE versions.mod_id = $1
+            GROUP BY files.id
+        )
         SELECT
-            didws.id AS "issue_detail_id!",
-            didws.status AS "status!: DelphiStatus"
-        FROM mods m
-        INNER JOIN versions v ON v.mod_id = m.id
-        INNER JOIN files f ON f.version_id = v.id
-        INNER JOIN delphi_reports dr
-            ON dr.file_id = f.id
-            AND NOT EXISTS (
-                SELECT 1
-                FROM delphi_reports newer_dr
-                WHERE
-                    newer_dr.file_id = dr.file_id
-                    AND newer_dr.delphi_version > dr.delphi_version
-            )
-        INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
-        INNER JOIN delphi_issue_details_with_statuses didws ON didws.issue_id = dri.id
+            statuses.id AS "issue_detail_id!",
+            statuses.status AS "status!: DelphiStatus"
+        FROM delphi_issue_details_with_statuses statuses
+        JOIN delphi_report_issues issues ON issues.id = statuses.issue_id
+        JOIN delphi_reports reports ON reports.id = issues.report_id
+        JOIN delphi_versions versions ON versions.id = reports.file_id
         WHERE
-            m.id = $1
-            AND didws.severity != 'hidden'
+            statuses.project_id = $1 AND
+            statuses.severity != 'hidden' AND
+            versions.version = reports.delphi_version
         "#,
         project_id as _,
     )
