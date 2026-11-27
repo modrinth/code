@@ -8354,11 +8354,17 @@
   "unknown-file-warning-modal.dont-install": {
     "defaultMessage": "Don’t install"
   },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "Don’t show this warning again"
+  },
   "unknown-file-warning-modal.header": {
     "defaultMessage": "Confirm installation"
   },
   "unknown-file-warning-modal.install-anyway": {
     "defaultMessage": "Install anyway"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "Malware is often distributed through mod files by sharing them on platforms like Discord."
   },
   "unknown-file-warning-modal.mod-warning-body": {
     "defaultMessage": " isn’t published on Modrinth. We strongly recommend only installing files from sources you trust."

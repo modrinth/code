@@ -9,7 +9,7 @@
 					:file-name="unknownFileName"
 					:offer-sandbox="offerSandbox"
 					@cancel="resolveUnknownFileWarning(false)"
-					@continue="resolveUnknownFileWarning(true)"
+					@continue="handleUnknownFileContinue"
 				/>
 				<ShareModalWrapper
 					ref="shareModal"
@@ -151,6 +151,7 @@ import {
 } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import { listenNativeDragDrop } from '@/helpers/native-drag-drop'
+import { get as getSettings, set as setSettings } from '@/helpers/settings'
 import { set_synced_pack_enabled, syncedPackKeys } from '@/helpers/synced-packs'
 import type { CacheBehaviour } from '@/helpers/types'
 import { highlightModInInstance } from '@/helpers/utils.js'
@@ -808,6 +809,20 @@ function resolveUnknownFileWarning(confirmed: boolean) {
 	resolveUnknownFileConfirmation = null
 	unknownFileName.value = ''
 	resolve?.(confirmed)
+}
+
+async function handleUnknownFileContinue(dontShowAgain: boolean) {
+	if (dontShowAgain) {
+		appSettings.warnOnUnknownModpacks = false
+		try {
+			const settings = await getSettings()
+			settings.warn_on_unknown_modpacks = false
+			await setSettings(settings)
+		} catch (error) {
+			handleError(error as Error)
+		}
+	}
+	resolveUnknownFileWarning(true)
 }
 
 type ContentToggleVariables = {

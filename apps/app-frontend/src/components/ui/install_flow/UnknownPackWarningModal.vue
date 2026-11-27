@@ -16,6 +16,7 @@ import { ref, useTemplateRef } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
+import { get as getSettings, set as setSettings } from '@/helpers/settings'
 
 const appSettings = useAppSettings()
 const offerSandbox = useOfferSandbox()
@@ -48,7 +49,14 @@ function reset() {
 	externalFilesInModpack.value = []
 }
 
-function proceed() {
+async function proceed(dontShowAgain: boolean) {
+	if (dontShowAgain) {
+		appSettings.warnOnUnknownModpacks = false
+		const settings = await getSettings()
+		settings.warn_on_unknown_modpacks = false
+		await setSettings(settings)
+	}
+
 	const createInstance = onProceed.value
 	reset()
 	if (createInstance) void createInstance()
