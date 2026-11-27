@@ -15,6 +15,7 @@ use super::shared_instance::{
 };
 use super::{diagnostics, recovery, store};
 use crate::ErrorKind;
+use crate::analytics::{self, AppEventType};
 use crate::api::pack::install_from::{
     CreatePackLocation, generate_pack_from_file,
     generate_pack_from_version_id_with_reporter, get_instance_from_pack,
@@ -893,6 +894,39 @@ async fn prepare_initial_instance(
     Ok(())
 }
 
+/// Queues an `InstanceCreated` analytics event for the instance a
+/// succeeded install job created, using its final loader and game version.
+async fn track_instance_created(
+    request: &InstallRequest,
+    instance_id: &str,
+    state: &State,
+) {
+    let source = match request {
+        InstallRequest::CreateInstance { .. } => "GenericCreate",
+        InstallRequest::CreateModpackInstance { .. } => "GenericModpack",
+        InstallRequest::CreateSharedInstance { .. } => "GenericShared",
+        InstallRequest::ImportInstance { .. } => "GenericImport",
+        InstallRequest::DuplicateInstance { .. } => "GenericDuplicate",
+        InstallRequest::InstallExistingInstance { .. }
+        | InstallRequest::InstallPackToExistingInstance { .. }
+        | InstallRequest::BulkUpdateContent { .. }
+        | InstallRequest::UpdateSharedInstance { .. } => return,
+    };
+
+    match crate::state::get_instance(instance_id, &state.pool).await {
+        Ok(Some(metadata)) => analytics::add_event(
+            source,
+            AppEventType::InstanceCreated {
+                info: metadata.applied_content_set.to_analytics_instance_info(),
+            },
+        ),
+        Ok(None) => {}
+        Err(error) => tracing::warn!(
+            "Failed to load created instance {instance_id} for analytics: {error}"
+        ),
+    }
+}
+
 fn spawn_job(
     job_id: Uuid,
     registration: super::control::Registration,
@@ -1040,6 +1074,7 @@ async fn run_job_inner(
                 }
                 recovery::clear_staging_dir(&job_state, &state.content_store)
                     .await;
+                track_instance_created(&request, &instance_id, state).await;
                 if let Err(error) =
                     emit_instance(&instance_id, InstancePayloadType::Edited)
                         .await

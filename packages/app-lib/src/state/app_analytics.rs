@@ -1,6 +1,8 @@
 use modrinth_app_analytics_sdk::types::enums::{AppArch, AppOs};
+use modrinth_app_analytics_sdk::types::event::AppEventType;
 use modrinth_app_analytics_sdk::{AppAnalytics, AppAnalyticsParameters};
 use sqlx::SqlitePool;
+use tracing::info;
 use url::Url;
 use uuid::Uuid;
 
@@ -49,7 +51,19 @@ pub(crate) async fn init(
     };
 
     match params.await {
-        Ok(params) => Some(AppAnalytics::new(params).await),
+        Ok(params) => {
+            let a = AppAnalytics::new(params).await;
+            info!(analytics.url = PUSH_URL, "Initialized app analytics");
+            a.add_event(modrinth_app_analytics_sdk::create_event(
+                "Generic",
+                AppEventType::AppStart {
+                    arch,
+                    os,
+                    app_version: env!("CARGO_PKG_VERSION").into(),
+                },
+            ));
+            Some(a)
+        }
         Err(error) => {
             tracing::warn!("Failed to set up analytics: {error}");
             None

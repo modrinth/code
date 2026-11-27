@@ -1,4 +1,4 @@
-use crate::analytics::AppEventType;
+use crate::analytics::{self, AppEventType};
 use crate::state::{FeatureFlag, ModrinthCredentials, Settings};
 use anyhow::bail;
 use serde::Deserialize;
@@ -7,9 +7,6 @@ const LOCALHOST_LOGIN_URL: &str = "http://localhost:3000/auth/sign-in";
 const LOCALHOST_SIGNUP_URL: &str = "http://localhost:3000/auth/sign-up";
 
 /// Analytics source of Modrinth account events.
-/// TODO add more detailed sources, would require larger frontend
-/// refactor because this would touch code shared between web & app
-pub const ANALYTICS_SOURCE: &str = "ModrinthAccounts";
 
 #[derive(Clone, Copy, Debug, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -75,8 +72,8 @@ pub async fn logout() -> crate::Result<()> {
     ModrinthCredentials::deactivate_all(&state.pool).await?;
 
     if was_signed_in {
-        crate::analytics::add_event(
-            ANALYTICS_SOURCE,
+        analytics::add_event(
+            "Generic",
             AppEventType::ModrinthSignOut {
                 is_refresh_failed: false,
             },
@@ -126,8 +123,8 @@ pub async fn remove_user(
     ModrinthCredentials::remove(user_id, &state.pool).await?;
 
     if current.is_some_and(|creds| creds.user_id == user_id) {
-        crate::analytics::add_event(
-            ANALYTICS_SOURCE,
+        analytics::add_event(
+            "Generic",
             AppEventType::ModrinthSignOut {
                 is_refresh_failed: initial_session_validation_failed,
             },

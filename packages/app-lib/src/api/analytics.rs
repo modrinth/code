@@ -2,7 +2,8 @@
 use std::time::{Duration, Instant};
 
 pub use modrinth_app_analytics_sdk::types::event::{
-    AppEventType, MicrosoftSignInFailureReason, ModrinthSignInFailureReason,
+    AppEventType, InstanceInfo, MicrosoftSignInFailureReason,
+    ModrinthSignInFailureReason,
 };
 
 use uuid::Uuid;

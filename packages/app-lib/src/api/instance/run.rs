@@ -1,5 +1,6 @@
 use super::content::get_projects;
 use crate::ErrorKind;
+use crate::analytics::{self, AppEventType};
 use crate::server_address::ServerAddress;
 use crate::state::{
     Credentials, InstanceLink, ProcessMetadata, Settings, State,
@@ -274,8 +275,14 @@ async fn run_credentials(
         }
     }
 
+    let analytics_source = match quick_play_type {
+        QuickPlayType::None => "Instance",
+        QuickPlayType::Singleplayer(_) => "QuickPlaySingleplayer",
+        QuickPlayType::Server(_) => "QuickPlayServer",
+    };
+
     crate::minecraft_skins::flush_pending_skin_change().await?;
-    crate::launcher::launch_minecraft(
+    let process = crate::launcher::launch_minecraft(
         &java_args,
         &launch_env_args,
         &mc_set_options,
@@ -288,7 +295,16 @@ async fn run_credentials(
         quick_play_type,
         &state,
     )
-    .await
+    .await?;
+
+    analytics::add_event(
+        analytics_source,
+        AppEventType::InstanceStart {
+            info: context.applied_content_set.to_analytics_instance_info(),
+        },
+    );
+
+    Ok(process)
 }
 
 fn server_play_project_id(link: &InstanceLink) -> Option<&String> {

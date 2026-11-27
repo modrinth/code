@@ -66,7 +66,7 @@ pub async fn login<R: Runtime>(
         ),
         Err(error) => {
             analytics::add_event(
-                minecraft_auth::ANALYTICS_SOURCE,
+                "Generic",
                 AppEventType::MicrosoftSignInFailed {
                     reason: minecraft_auth::sign_in_failure_reason(&error),
                     duration_ms,
@@ -76,7 +76,7 @@ pub async fn login<R: Runtime>(
         }
     };
 
-    analytics::add_event(minecraft_auth::ANALYTICS_SOURCE, event);
+    analytics::add_event("Generic", event);
     Ok(credentials)
 }
 

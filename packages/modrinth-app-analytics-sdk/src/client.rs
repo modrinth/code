@@ -7,7 +7,7 @@ use parking_lot::Mutex;
 use reqwest::Url;
 use smol_str::SmolStr;
 use tokio::sync::{mpsc, oneshot};
-use tracing::warn;
+use tracing::{trace, warn};
 use uuid::Uuid;
 
 use crate::backend::{AnalyticsBackend, init_pool};
@@ -225,7 +225,13 @@ impl AnalyticsInner {
 
         match result {
             // we don't care about the response
-            Ok(_) => Ok(()),
+            Ok(_) => {
+                trace!(
+                    events.len = batch.events.len(),
+                    "Sent a batch of events for analytics"
+                );
+                Ok(())
+            }
             Err(e) => {
                 warn!(
                     events.len = batch.events.len(),

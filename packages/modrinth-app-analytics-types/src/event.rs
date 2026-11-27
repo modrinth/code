@@ -48,13 +48,11 @@ pub enum AppEventType {
     },
     /// The user signed in to their Modrinth account.
     ModrinthSignIn {
-        is_sign_up: bool,
         /// Time from opening the sign-in page to being signed in.
         duration_ms: u64,
     },
     /// Signing in to a Modrinth account failed.
     ModrinthSignInFailed {
-        is_sign_up: bool,
         reason: ModrinthSignInFailureReason,
         /// Time from opening the sign-in page to the failure.
         duration_ms: u64,

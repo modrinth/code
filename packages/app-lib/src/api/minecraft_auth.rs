@@ -4,14 +4,11 @@ use anyhow::Context;
 use reqwest::StatusCode;
 
 use crate::State;
-use crate::analytics::{AppEventType, MicrosoftSignInFailureReason};
+use crate::analytics::{self, AppEventType, MicrosoftSignInFailureReason};
 use crate::state::{
     Credentials, MinecraftAuthenticationError, MinecraftLoginFlow,
 };
 use crate::util::fetch::INSECURE_REQWEST_CLIENT;
-
-/// Analytics source of Microsoft account events.
-pub const ANALYTICS_SOURCE: &str = "MinecraftAccounts";
 
 #[tracing::instrument]
 pub async fn check_reachable() -> crate::Result<()> {
@@ -85,8 +82,8 @@ pub async fn remove_user(uuid: uuid::Uuid) -> crate::Result<()> {
     if let Some((uuid, user)) = users.remove(&uuid) {
         Credentials::remove(uuid, &state.pool).await?;
 
-        crate::analytics::add_event(
-            ANALYTICS_SOURCE,
+        analytics::add_event(
+            "Generic",
             AppEventType::MicrosoftSignOut {
                 num_accounts_left: u32::try_from(users.len())
                     .unwrap_or(u32::MAX),

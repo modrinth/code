@@ -38,24 +38,19 @@ pub async fn modrinth_login<R: Runtime>(
     let started_at = Instant::now();
     let result = sign_in(&app, flow, add_account.unwrap_or(false)).await;
     let duration_ms = analytics::elapsed_ms(started_at);
-    let is_sign_up = matches!(flow, mr_auth::ModrinthAuthFlow::SignUp);
 
     match result {
         Ok(credentials) => {
             analytics::add_event(
-                mr_auth::ANALYTICS_SOURCE,
-                AppEventType::ModrinthSignIn {
-                    is_sign_up,
-                    duration_ms,
-                },
+                "Generic",
+                AppEventType::ModrinthSignIn { duration_ms },
             );
             Ok(credentials)
         }
         Err((reason, error)) => {
             analytics::add_event(
-                mr_auth::ANALYTICS_SOURCE,
+                "Generic",
                 AppEventType::ModrinthSignInFailed {
-                    is_sign_up,
                     reason,
                     duration_ms,
                 },
