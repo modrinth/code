@@ -164,8 +164,7 @@
 					class="lg:h-[var(--tester-drag-height,var(--tester-height,22rem))] lg:max-h-[calc(100%_-_192px)] lg:border-t-0"
 					:style="{ '--tester-height': testerHeight === null ? undefined : `${testerHeight}px` }"
 					:params="params"
-					v-model:project-ids="testProjectIds"
-					:max-projects="MAX_TEST_PROJECTS"
+					:initial-project-id="initialProjectId"
 					:disabled="isSaving"
 					:has-unsaved-modules="Boolean(moduleEditor?.isDirty)"
 					:can-test="!expressionError && invalidPatternIndex === -1 && invalidQuestionIndex === -1"
@@ -239,7 +238,7 @@ import {
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { useEventListener, useLocalStorage } from '@vueuse/core'
-import { computed, nextTick, onMounted, ref, shallowRef, useId, useTemplateRef } from 'vue'
+import { computed, nextTick, ref, shallowRef, useId, useTemplateRef } from 'vue'
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 
 import HeightDivider from '~/components/project-review/tech-review/height-divider.vue'
@@ -266,8 +265,6 @@ const props = defineProps<{
 	rhaiEditor: RhaiEditorRuntime
 }>()
 const emit = defineEmits<{ close: []; saved: [rule: ProjectFlagRule] }>()
-
-const MAX_TEST_PROJECTS = 100
 
 const id = useId()
 const nameErrorId = `${id}-name-error`
@@ -302,31 +299,6 @@ const nameButton = useTemplateRef<HTMLButtonElement>('nameButton')
 const leaveDialog = useTemplateRef<InstanceType<typeof ConfirmLeaveModal>>('leaveDialog')
 const discardModal = useTemplateRef<InstanceType<typeof ConfirmModal>>('discardModal')
 const moduleEditor = useTemplateRef<InstanceType<typeof SharedModuleEditorModal>>('moduleEditor')
-const auth = useAuthState()
-const storedTestProjects = useLocalStorage<Partial<Record<string, string[]>>>(
-	`moderation-project-flag-test-projects:${auth.value.user?.id ?? ''}`,
-	{},
-	{ initOnMounted: true },
-)
-const testProjectIds = computed({
-	get: () => storedTestProjects.value.shared ?? [],
-	set: (ids: string[]) => {
-		storedTestProjects.value.shared = ids
-	},
-})
-
-onMounted(() => {
-	if (!storedTestProjects.value.shared) {
-		const legacyProjects = Object.values(storedTestProjects.value).flatMap((ids) => ids ?? [])
-		testProjectIds.value = [...new Set(legacyProjects)].slice(0, MAX_TEST_PROJECTS)
-	}
-
-	const id = props.initialProjectId
-	const projects = testProjectIds.value
-	if (id && projects.length < MAX_TEST_PROJECTS && !projects.includes(id)) {
-		testProjectIds.value = [...projects, id]
-	}
-})
 
 async function editName() {
 	editingName.value = true

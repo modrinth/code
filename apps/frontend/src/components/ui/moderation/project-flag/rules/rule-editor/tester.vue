@@ -30,40 +30,44 @@
 
 		<div class="test-panes grid min-h-0 flex-1" :style="testPanesStyle">
 			<div
-				ref="projectListPane"
 				class="flex min-h-0 min-w-0 flex-col gap-2 border-0 border-solid border-surface-4 p-2 max-[420px]:border-b"
 			>
-				<Combobox
-					:options="addOptions"
-					:search-value="searchInput"
-					:no-options-message="
-						searchPending
-							? 'Searching…'
-							: searchError
-								? 'Could not search projects'
-								: 'No projects found'
-					"
-					:sync-with-selection="false"
-					:show-chevron="false"
-					:disabled="disabled"
-					:min-search-length-to-open="1"
-					:search-input-attrs="{
-						'aria-label': 'Add test projects',
-						class: '[&::-webkit-search-cancel-button]:hidden',
-					}"
-					searchable
-					disable-search-filter
-					search-placeholder="Add name, slug or IDs…"
-					search-type="search"
-					search-name="flag-rule-add-test-projects"
-					search-autocomplete="off"
-					:search-spellcheck="false"
-					dropdown-width="24rem"
-					@search-input="searchInput = $event"
-					@select="addFromOption"
-					@paste.capture="pasteIds"
-				/>
-				<p v-if="addError" role="alert" class="m-0 text-xs text-red">{{ addError }}</p>
+				<div class="flex items-center gap-1">
+					<Combobox
+						:model-value="selectedListName"
+						:options="listOptions"
+						:disabled="disabled"
+						class="min-w-0 flex-1"
+						placeholder="Project list"
+						trigger-size="sm"
+						dropdown-min-width="12rem"
+						@update:model-value="selectList"
+					/>
+					<IconButton
+						v-tooltip="'Edit project list'"
+						class="shrink-0"
+						label="Edit project list"
+						aria-haspopup="dialog"
+						size="sm"
+						:circular="false"
+						:disabled="disabled || !selectedListName"
+						@click="openListEditor(selectedListName)"
+					>
+						<EditIcon aria-hidden="true" />
+					</IconButton>
+					<IconButton
+						v-tooltip="'New project list'"
+						class="shrink-0"
+						label="New project list"
+						aria-haspopup="dialog"
+						size="sm"
+						:circular="false"
+						:disabled="disabled"
+						@click="openListEditor()"
+					>
+						<PlusIcon aria-hidden="true" />
+					</IconButton>
+				</div>
 				<ul class="m-0 flex min-h-0 list-none flex-col gap-1 overflow-y-auto p-0">
 					<li
 						v-for="id in projectIds"
@@ -82,17 +86,6 @@
 							<span class="min-w-0 flex-1 truncate">{{ projectName(id) }}</span>
 							<span class="shrink-0 text-xs" :class="status(id).color">{{ status(id).label }}</span>
 						</button>
-						<IconButton
-							v-tooltip="'Remove test project'"
-							class="shrink-0 enabled:hover:text-red"
-							type="quiet"
-							size="xs"
-							:disabled="disabled"
-							:label="`Remove ${projectName(id)} from test projects`"
-							@click="removeProject(id)"
-						>
-							<TrashIcon aria-hidden="true" />
-						</IconButton>
 					</li>
 				</ul>
 			</div>
@@ -176,41 +169,215 @@
 			</section>
 			<p v-else class="m-0 p-3 text-sm text-secondary">Add projects to test this rule.</p>
 		</div>
+		<NewModal
+			ref="listModal"
+			:header="editingListName ? 'Edit project list' : 'New project list'"
+			width="100%"
+			max-width="36rem"
+			:initial-focus="() => listForm?.querySelector('input') ?? null"
+		>
+			<form
+				:id="listFormId"
+				ref="listForm"
+				class="flex flex-col gap-4"
+				@submit.prevent="saveList"
+			>
+				<div class="flex flex-col gap-2">
+					<label :for="listNameId" class="text-sm font-medium text-contrast">List name</label>
+					<Input
+						:id="listNameId"
+						v-model="draftListName"
+						:disabled="disabled"
+						autocomplete="off"
+						@input="listError = ''"
+					/>
+				</div>
+				<div class="flex flex-col gap-2">
+					<span class="text-sm font-medium text-contrast">
+						Projects ({{ draftProjectIds.length }})
+					</span>
+					<Combobox
+						:options="addOptions"
+						:search-value="searchInput"
+						:no-options-message="
+							searchPending
+								? 'Searching…'
+								: searchError
+									? 'Could not search projects'
+									: 'No projects found'
+						"
+						:sync-with-selection="false"
+						:show-chevron="false"
+						:disabled="disabled"
+						:min-search-length-to-open="1"
+						:search-input-attrs="{
+							'aria-label': 'Add test projects',
+							class: '[&::-webkit-search-cancel-button]:hidden',
+						}"
+						searchable
+						disable-search-filter
+						search-placeholder="Project name, id or slug"
+						search-type="search"
+						search-name="flag-rule-add-test-projects"
+						search-autocomplete="off"
+						:search-spellcheck="false"
+						@search-input="searchInput = $event"
+						@select="addFromOption"
+					/>
+					<ul
+						v-if="draftProjectIds.length"
+						class="m-0 max-h-40 list-none overflow-y-auto rounded-xl bg-surface-3 p-1"
+					>
+						<li
+							v-for="id in draftProjectIds"
+							:key="id"
+							class="flex items-center gap-2 px-2 py-1 text-sm"
+						>
+							<Avatar :src="draftProjects.get(id)?.icon_url ?? undefined" size="1.5rem" no-shadow />
+							<span class="min-w-0 flex-1 truncate">{{ draftProjects.get(id)?.title ?? id }}</span>
+							<IconButton
+								v-tooltip="'Remove project'"
+								:label="`Remove ${draftProjects.get(id)?.title ?? id}`"
+								:disabled="disabled"
+								type="quiet"
+								size="xs"
+								@click="removeDraftProject(id)"
+							>
+								<TrashIcon aria-hidden="true" />
+							</IconButton>
+						</li>
+					</ul>
+				</div>
+				<div class="flex flex-col gap-2">
+					<label :for="importInputId" class="text-sm text-secondary">
+						Add comma-separated project IDs
+					</label>
+					<Textarea
+						:id="importInputId"
+						v-model="importInput"
+						:rows="5"
+						:spellcheck="false"
+						:disabled="disabled"
+						:error="Boolean(importError)"
+						:aria-describedby="importError ? importErrorId : undefined"
+						@input="importError = ''"
+					/>
+					<p v-if="importError" :id="importErrorId" role="alert" class="m-0 text-sm text-red">
+						{{ importError }}
+					</p>
+					<Button
+						class="self-start"
+						:disabled="disabled || !importInput.trim()"
+						@click="addImportedIds"
+					>
+						Add IDs
+					</Button>
+				</div>
+				<p v-if="listError" role="alert" class="m-0 text-sm text-red">{{ listError }}</p>
+			</form>
+			<template #actions>
+				<div class="flex justify-end gap-2">
+					<Button @click="listModal?.hide()">Cancel</Button>
+					<Button
+						native-type="submit"
+						:form="listFormId"
+						type="colored"
+						color="brand"
+						:disabled="disabled || !draftListName.trim()"
+					>
+						Save list
+					</Button>
+				</div>
+			</template>
+		</NewModal>
 	</section>
 </template>
 
 <script setup lang="ts">
-import type { EvalProjectFlagRuleRequest, ProjectFlagRuleParams } from '@modrinth/api-client'
+import type {
+	EvalProjectFlagRuleRequest,
+	Labrinth,
+	ProjectFlagEvaluationResult,
+	ProjectFlagRuleParams,
+} from '@modrinth/api-client'
 import { ModrinthServerError } from '@modrinth/api-client'
-import { PlayIcon, TrashIcon } from '@modrinth/assets'
+import { EditIcon, PlayIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	Button,
 	Combobox,
 	type ComboboxOption,
 	IconButton,
+	Input,
 	injectModrinthClient,
+	NewModal,
 	Tabs,
 	type TabsValue,
+	Textarea,
 } from '@modrinth/ui'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { refDebounced, useLocalStorage } from '@vueuse/core'
-import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+import { computed, onMounted, ref, useId, useTemplateRef, watch } from 'vue'
 
 import PanelDivider from '~/components/project-review/tech-review/panel-divider.vue'
 import { projectFlagProjectContextQueryKey } from '~/composables/queries/project-flag'
 
 const projectIdPattern = /^[A-Za-z0-9]{1,11}$/
 const base62Digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+const defaultListName = 'Default'
+const projectRequestBatchSize = 100
 const props = defineProps<{
+	initialProjectId?: string
 	params: ProjectFlagRuleParams
-	maxProjects: number
 	hasUnsavedModules: boolean
 	canTest: boolean
 	disabled: boolean
 }>()
-const projectIds = defineModel<string[]>('projectIds', { required: true })
-const projectListPane = useTemplateRef<HTMLElement>('projectListPane')
+const accountId = useAuthState().value.user?.id ?? ''
+const legacyTestProjects = useLocalStorage<Partial<Record<string, string[]>>>(
+	`moderation-project-flag-test-projects:${accountId}`,
+	{},
+	{ initOnMounted: true, writeDefaults: false },
+)
+const savedLists = useLocalStorage<{ lists: Record<string, string[]>; selectedName: string }>(
+	`moderation-project-flag-test-project-lists:${accountId}`,
+	{ lists: {}, selectedName: '' },
+	{ initOnMounted: true },
+)
+const listNames = computed(() => Object.keys(savedLists.value.lists))
+const selectedListName = computed(() => {
+	const { lists, selectedName } = savedLists.value
+	return Object.hasOwn(lists, selectedName) ? selectedName : (listNames.value[0] ?? '')
+})
+const listOptions = computed(() => listNames.value.map((name) => ({ label: name, value: name })))
+const projectIds = computed(() => savedLists.value.lists[selectedListName.value] ?? [])
+
+onMounted(() => {
+	if (!listNames.value.length) {
+		const legacyIds =
+			legacyTestProjects.value.shared ??
+			Object.values(legacyTestProjects.value).flatMap((ids) => ids ?? [])
+		savedLists.value = {
+			lists: { [defaultListName]: [...new Set(legacyIds)] },
+			selectedName: defaultListName,
+		}
+	}
+
+	const id = props.initialProjectId
+	if (id && !projectIds.value.includes(id)) {
+		const selectedName = selectedListName.value
+		savedLists.value = {
+			lists: { ...savedLists.value.lists, [selectedName]: [...projectIds.value, id] },
+			selectedName,
+		}
+	}
+})
+
+function selectList(name: string) {
+	savedLists.value = { ...savedLists.value, selectedName: name }
+	activeProjectId.value = undefined
+}
+
 const savedProjectListWidth = useLocalStorage('moderation-flag-rule-test-list-width', 0)
 const testPanesStyle = computed(() => ({
 	'--project-list-width': savedProjectListWidth.value
@@ -235,19 +402,53 @@ const query = refDebounced(
 	computed(() => searchInput.value.trim()),
 	250,
 )
-const addError = ref('')
+const listModal = useTemplateRef<InstanceType<typeof NewModal>>('listModal')
+const listForm = useTemplateRef<HTMLFormElement>('listForm')
+const listFormId = useId()
+const listNameId = `${listFormId}-name`
+const importInputId = `${listFormId}-ids`
+const importErrorId = `${listFormId}-error`
+const editingListName = ref('')
+const draftListName = ref('')
+const draftProjectIds = ref<string[]>([])
+const listError = ref('')
+const importInput = ref('')
+const importError = ref('')
 
-const { data: projectDetails } = useQuery(
-	computed(() => ({
-		queryKey: ['moderation', 'project-flag', 'test-projects', projectIds.value] as const,
-		queryFn: ({ queryKey: [, , , ids] }) => client.labrinth.projects_v2.getMultiple([...ids]),
-		enabled: projectIds.value.length > 0,
-		placeholderData: (previous) => previous,
+function* projectBatches(ids: string[]) {
+	for (let offset = 0; offset < ids.length; offset += projectRequestBatchSize) {
+		yield ids.slice(offset, offset + projectRequestBatchSize)
+	}
+}
+
+function projectDetailsOptions(ids: string[]) {
+	return queryOptions({
+		queryKey: ['moderation', 'project-flag', 'test-projects', ids] as const,
+		queryFn: async ({ signal }) => {
+			const projects: Labrinth.Projects.v2.Project[] = []
+			for (const batch of projectBatches(ids)) {
+				signal.throwIfAborted()
+				projects.push(...(await client.labrinth.projects_v2.getMultiple(batch)))
+			}
+			return projects
+		},
+		enabled: ids.length > 0,
 		staleTime: 60_000,
+	})
+}
+
+const { data: projectDetails } = useQuery(computed(() => projectDetailsOptions(projectIds.value)))
+const { data: draftProjectDetails } = useQuery(
+	computed(() => ({
+		...projectDetailsOptions(draftProjectIds.value),
+		placeholderData: (previous) => previous,
 	})),
 )
 const projects = computed(
 	() => new Map(projectDetails.value?.map((project) => [project.id, project])),
+)
+const draftProjects = computed(
+	() => new Map(draftProjectDetails.value?.map((project) => [project.id, project])),
 )
 function projectName(id: string) {
 	return projects.value.get(id)?.title ?? id
@@ -274,14 +475,8 @@ const {
 	})),
 )
 
-function parseIds(input: string) {
-	const ids = input
-		.trim()
-		.split(/[,\s]+/)
-		.filter(Boolean)
-		.map((id) => id.replace(/^0+(?=.)/, ''))
-	if (!ids.length || !ids.every(isProjectId)) return undefined
-	return ids
+function normalizeProjectId(input: string) {
+	return input.trim().replace(/^0+(?=.)/, '')
 }
 
 function isProjectId(id: string) {
@@ -293,68 +488,79 @@ function isProjectId(id: string) {
 	return value < 1n << 64n
 }
 
-const addOptions = computed<ComboboxOption<string[]>[]>(() => {
+const addOptions = computed<ComboboxOption<string>[]>(() => {
 	const term = searchInput.value.trim()
 	if (!term) return []
-	const ids = parseIds(term)
 	if (term !== query.value || searchPending.value) return []
-	const options = new Map<string, ComboboxOption<string[]>>()
+	const options = new Map<string, ComboboxOption<string>>()
 	const exact = search.value?.exact
-	if (exact) options.set(exact.id, { label: exact.title, subLabel: exact.slug, value: [exact.id] })
+	if (exact) options.set(exact.id, { label: exact.title, subLabel: exact.slug, value: exact.id })
 	for (const hit of search.value?.hits ?? []) {
 		if (!options.has(hit.project_id))
-			options.set(hit.project_id, { label: hit.title, subLabel: hit.slug, value: [hit.project_id] })
+			options.set(hit.project_id, { label: hit.title, subLabel: hit.slug, value: hit.project_id })
 	}
-	for (const id of projectIds.value) options.delete(id)
-	const [id] = ids ?? []
-	if (id && ids?.length === 1 && !exact && !options.has(id) && !projectIds.value.includes(id)) {
-		options.set(id, { label: `Add ID ${id}`, value: ids })
-	} else if (ids && ids.length > 1) {
-		options.set(term, { label: `Add ${ids.length} project IDs`, value: ids })
+	for (const id of draftProjectIds.value) options.delete(id)
+	const id = normalizeProjectId(term)
+	if (isProjectId(id) && !exact && !options.has(id) && !draftProjectIds.value.includes(id)) {
+		options.set(id, { label: `Add ID ${id}`, value: id })
 	}
 	return [...options.values()]
 })
 
-function addFromOption(option: ComboboxOption<string[]>) {
-	if (!option.value) return
-	addProjects(option.value)
+function openListEditor(name = '') {
+	editingListName.value = name
+	draftListName.value = name
+	draftProjectIds.value = name ? [...(savedLists.value.lists[name] ?? [])] : []
+	listError.value = ''
+	importInput.value = ''
+	importError.value = ''
+	searchInput.value = ''
+	listModal.value?.show()
+}
+
+function addDraftProjects(ids: string[]) {
+	draftProjectIds.value = [...new Set([...draftProjectIds.value, ...ids])]
+}
+
+function addFromOption(option: ComboboxOption<string>) {
+	if (props.disabled || !option.value) return
+	addDraftProjects([option.value])
 	searchInput.value = ''
 }
 
-function pasteIds(event: ClipboardEvent) {
-	const text = event.clipboardData?.getData('text').trim() ?? ''
-	const ids = parseIds(text)
-	if (!ids || ids.length < 2) return
-	if (!/[,\r\n\t]/.test(text) && !ids.every((id) => id.length === 8)) return
-	event.preventDefault()
-	searchInput.value = ''
-	addProjects(ids)
+function removeDraftProject(id: string) {
+	draftProjectIds.value = draftProjectIds.value.filter((entry) => entry !== id)
+	listError.value = ''
+	importError.value = ''
 }
 
-function addProjects(ids: string[]) {
-	addError.value = ''
-	const next = [...new Set([...projectIds.value, ...ids])]
-	if (next.length > props.maxProjects) {
-		addError.value = `Add up to ${props.maxProjects} unique project IDs.`
+function addImportedIds() {
+	if (props.disabled) return false
+	if (!importInput.value.trim()) return true
+	const ids = importInput.value.split(',').map(normalizeProjectId)
+	if (!ids.every(isProjectId)) {
+		importError.value = 'Enter valid project IDs separated by commas.'
+		return false
+	}
+	addDraftProjects(ids)
+	importError.value = ''
+	importInput.value = ''
+	return true
+}
+
+function saveList() {
+	const name = draftListName.value.trim()
+	if (props.disabled || !name) return
+	if (name !== editingListName.value && Object.hasOwn(savedLists.value.lists, name)) {
+		listError.value = 'A project list with this name already exists.'
 		return
 	}
-	projectIds.value = next
-}
+	if (!addImportedIds()) return
 
-async function removeProject(id: string) {
-	const index = projectIds.value.indexOf(id)
-	const remaining = projectIds.value.filter((entry) => entry !== id)
-	const nextIndex = Math.min(index, remaining.length - 1)
-	if (activeId.value === id) activeId.value = remaining[nextIndex]
-	projectIds.value = remaining
-	addError.value = ''
-	await nextTick()
-	const pane = projectListPane.value
-	const nextProject = pane?.querySelectorAll<HTMLButtonElement>('li > button[aria-pressed]')[
-		nextIndex
-	]
-	const focusTarget = nextProject ?? pane?.querySelector('input')
-	focusTarget?.focus()
+	const lists = { ...savedLists.value.lists, [name]: [...draftProjectIds.value] }
+	if (editingListName.value && editingListName.value !== name) delete lists[editingListName.value]
+	savedLists.value = { lists, selectedName: name }
+	listModal.value?.hide()
 }
 
 const {
@@ -366,12 +572,26 @@ const {
 } = useMutation({
 	mutationFn: async (request: EvalProjectFlagRuleRequest) => {
 		const start = performance.now()
-		const results = await client.labrinth.project_flags_internal.evalRule(request)
-		return { results, elapsedMs: Math.round(performance.now() - start) }
+		const results: ProjectFlagEvaluationResult[] = []
+		const requestErrors = new Map<string, string>()
+		for (const batch of projectBatches(request.project_ids)) {
+			try {
+				const evaluated = await client.labrinth.project_flags_internal.evalRule({
+					...request,
+					project_ids: batch,
+				})
+				results.push(...evaluated)
+			} catch (failure) {
+				const message = formatRequestError(failure)
+				for (const id of batch) requestErrors.set(id, message)
+			}
+		}
+		return { results, requestErrors, elapsedMs: Math.round(performance.now() - start) }
 	},
 	retry: false,
-	onSuccess: (_, { project_ids }) => {
-		const testedProjects = new Set(project_ids)
+	onSuccess: ({ results }) => {
+		if (!results.length) return
+		const testedProjects = new Set(results.map((result) => result.project_id))
 		void queryClient.invalidateQueries({
 			queryKey: projectFlagProjectContextQueryKey,
 			predicate: ({ queryKey }) => {
@@ -386,9 +606,10 @@ const results = computed(
 	() => new Map(data.value?.results.map((result) => [result.project_id, result])),
 )
 const result = computed(() => (activeId.value ? results.value.get(activeId.value) : undefined))
-const requestError = computed(() => {
-	const failure = error.value
-	if (!(failure instanceof ModrinthServerError) || !failure.v1Error) return failure?.message
+function formatRequestError(failure: unknown) {
+	if (!(failure instanceof ModrinthServerError) || !failure.v1Error) {
+		return failure instanceof Error && failure.message ? failure.message : 'Test request failed.'
+	}
 
 	const { description, details } = failure.v1Error
 	if (details == null) return description
@@ -397,11 +618,16 @@ const requestError = computed(() => {
 		description,
 		...causes.map((cause) => (typeof cause === 'string' ? cause : JSON.stringify(cause, null, 2))),
 	].join('\n')
-})
+}
+
+function projectRequestError(id: string) {
+	if (error.value && requestedProjects.value.has(id)) return formatRequestError(error.value)
+	return data.value?.requestErrors.get(id)
+}
+
 const activeError = computed(() => {
 	if (!activeId.value) return undefined
-	if (requestedProjects.value.has(activeId.value) && requestError.value) return requestError.value
-	return result.value?.error
+	return projectRequestError(activeId.value) ?? result.value?.error
 })
 watch([activeId, activeError], ([id, failure], [previousId]) => {
 	if (failure) {
@@ -423,7 +649,7 @@ function isProjectRunning(id: string) {
 
 function status(id: string) {
 	if (isProjectRunning(id)) return { label: 'Running…', color: 'text-secondary' }
-	if (error.value && requestedProjects.value.has(id)) return { label: 'Error', color: 'text-red' }
+	if (projectRequestError(id)) return { label: 'Error', color: 'text-red' }
 	const result = results.value.get(id)
 	if (!result) return { label: 'Not run', color: 'text-secondary' }
 	if (result.error === 'project not found') return { label: 'Not found', color: 'text-orange' }
