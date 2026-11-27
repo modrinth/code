@@ -2072,15 +2072,6 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Vänligen fyll i skatteblanketten"
   },
-  "discover.install.back-to-server": {
-    "message": "Tillbaka till server"
-  },
-  "discover.install.cancel-reset": {
-    "message": "Avbryt återställning"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "Ingen servervärld är tillgänglig att installera."
-  },
   "discover.seo.description": {
     "message": "Sök och bläddra bland tusen av Minecraft {projectType} på Modrinth med snabba, träffsäkra resultat. Våra filter hjälper dig att snabbt hitta de bästa Minecraft {projectType}."
   },

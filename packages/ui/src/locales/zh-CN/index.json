@@ -152,9 +152,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "选定的项目尚未安装"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "显示数量："
-  },
   "button.accept": {
     "defaultMessage": "接受"
   },
@@ -826,18 +823,6 @@
   },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "搜索到 {count, number}个{contentType}…"
-  },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "名称（英文首字母A-Z）"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "名称（英文首字母Z-A）"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "按从新到旧顺序"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "按从旧到新顺序"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "更新所有"
@@ -4850,17 +4835,11 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "必需或可选"
   },
-  "search.filter.dependent_project": {
-    "defaultMessage": "依赖于：{project}"
-  },
   "search.filter.dependent_project.clear": {
     "defaultMessage": "清除依赖过滤器"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "搜索项目……"
-  },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "排除：{projects}"
   },
   "search.filter.included_content.exclude": {
     "defaultMessage": "排除"
@@ -4876,9 +4855,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "搜索内容……"
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "包含：{projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "筛选已锁定"

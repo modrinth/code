@@ -2186,18 +2186,6 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Vui lòng hoàn thành biểu mẫu thuế"
   },
-  "discover.install.back-to-server": {
-    "message": "Quay lại máy chủ"
-  },
-  "discover.install.back-to-setup": {
-    "message": "Quay lại cài đặt"
-  },
-  "discover.install.cancel-reset": {
-    "message": "Hủy cài lại"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "Không thế giới máy chủ có sẵn để tải."
-  },
   "discover.install.error.unsupported-content-type": {
     "message": "Loại nội dung này không thể tải từ trang khám phá vào máy chủ."
   },

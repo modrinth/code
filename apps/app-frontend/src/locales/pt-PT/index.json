@@ -278,9 +278,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Adicionar conteúdo pode impedi-lo de entrar neste servidor. Qualquer conteúdo que adicione será removido quando o conteúdo do servidor gerido for atualizado."
   },
-  "app.browse.server.installing": {
-    "message": "Instalação"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Nenhuma versão disponível corresponde a {compatibilityLabel}. Selecione uma versão para instalar mesmo assim. As dependências não serão instaladas automaticamente."
   },

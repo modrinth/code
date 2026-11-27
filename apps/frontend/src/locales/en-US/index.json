@@ -2234,23 +2234,11 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Please complete tax form"
   },
-  "discover.install.back-to-server": {
-    "message": "Back to server"
-  },
-  "discover.install.back-to-setup": {
-    "message": "Back to setup"
-  },
-  "discover.install.cancel-reset": {
-    "message": "Cancel reset"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "No server world is available for install."
-  },
   "discover.install.error.unsupported-content-type": {
     "message": "This content type cannot be installed to a server from Discover."
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "Selecting content to install after reset"
+  "discover.project-types": {
+    "message": "Project types"
   },
   "discover.seo.description": {
     "message": "Search and browse thousands of Minecraft {projectType} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType}."

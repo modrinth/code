@@ -296,9 +296,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Dodawanie treści może uniemożliwić Ci dołączenie do tego serwera. Każda dodana zawartość zostanie usunięta po aktualizacji zarządzanej zawartości serwera."
   },
-  "app.browse.server.installing": {
-    "message": "Instalowanie"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Nie znaleziono żadnych wersji pasujących do {compatibilityLabel}. Wybierz wersję, by zainstalować ją mimo tego. Zależności nie zostaną zainstalowane automatycznie."
   },
@@ -3877,9 +3874,6 @@
   },
   "hosting.play.update-to-play": {
     "message": "Zaktualizuj, by grać"
-  },
-  "installation-settings.advanced.title": {
-    "message": "Zaawansowane"
   },
   "installation-settings.relink-shared-instance.button": {
     "message": "Podłącz ponownie wspólną instancję"

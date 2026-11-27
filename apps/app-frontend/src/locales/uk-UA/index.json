@@ -296,9 +296,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Додавання вмісту може завадити вам приєднатися до цього сервера. Будь-який доданий вміст буде видалено під час оновлення керованого вмісту сервера."
   },
-  "app.browse.server.installing": {
-    "message": "Установлення"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Жодна доступна версія не сумісна з {compatibilityLabel}. Виберіть версію, щоб усе одно встановити. Залежності не встановлюватимуться автоматично."
   },
@@ -3889,9 +3886,6 @@
   },
   "hosting.play.world-changed": {
     "message": "Цей світ уже не активний або не є спільним. Відкрийте панель сервера та натисніть «Грати на сервері» знову."
-  },
-  "installation-settings.advanced.title": {
-    "message": "Розширені"
   },
   "installation-settings.relink-shared-instance.button": {
     "message": "Знову приєднати спільний примірник"

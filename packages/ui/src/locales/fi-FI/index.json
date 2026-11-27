@@ -86,9 +86,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Valittuja töitä ei vielä asennettu"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Hakutulokset per sivu:"
-  },
   "button.accept": {
     "defaultMessage": "Hyväksy"
   },
@@ -643,18 +640,6 @@
   },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Etsi {count, number} {contentType}..."
-  },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Nimi (A-Ö)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Nimi (Ö-A)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Uusin ensin"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Vanhin ensin"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Päivitä kaikki"

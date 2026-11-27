@@ -102,25 +102,26 @@
 			<ModpackScanModal ref="scanModal" :project_id="project.id" />
 
 			<div
-				v-if="projectInstallContext && !isSettings"
+				v-if="projectInstallTarget && !isSettings"
 				ref="stickyInstallHeaderRef"
 				class="sticky top-0 z-20 mx-auto max-w-[80rem] border-0 border-solid border-divider bg-surface-1 px-6 pt-4"
 				:class="[isInstallHeaderStuck ? 'border-t' : '']"
 			>
-				<BrowseInstallHeader
-					:install-context="projectHeaderInstallContext"
-					divider
-					bottom-padding
+				<BrowseInstallHeader :target="projectInstallTarget" divider bottom-padding />
+				<div
+					aria-hidden="true"
+					class="pointer-events-none absolute inset-x-0 top-full h-6 bg-gradient-to-b from-surface-1 to-transparent transition-opacity duration-200 motion-reduce:transition-none"
+					:class="isInstallHeaderStuck ? 'opacity-100' : 'opacity-0'"
 				/>
 			</div>
 			<SelectedProjectsFloatingBar
-				v-if="projectInstallContext && !isSettings"
-				:install-context="projectInstallContext"
+				v-if="projectInstallTarget && !isSettings"
+				:selection="serverInstall.selection"
 			/>
 			<div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
 				<div
 					class="normal-page__header relative mb-4"
-					:class="projectInstallContext && !isSettings ? 'mt-0' : 'mt-4'"
+					:class="projectInstallTarget && !isSettings ? 'mt-0' : 'mt-4'"
 				>
 					<div class="mb-6">
 						<ModerationProjectNags
@@ -1056,16 +1057,7 @@ function dismissGameAwardsVotingDetails() {
 const routeProjectType = computed(() =>
 	Array.isArray(route.params.type) ? route.params.type[0] : route.params.type,
 )
-const projectInstallType = computed(() => ({
-	id: project.value?.actualProjectType ?? routeProjectType.value,
-}))
-const serverInstallModalRef = ref(null)
-const serverInstallDebug = useDebugLogger('ProjectServerInstall')
-const { installContext: serverBrowseInstallContext } = useServerInstallContent({
-	projectType: projectInstallType,
-	onboardingModalRef: serverInstallModalRef,
-	debug: serverInstallDebug,
-})
+const { target: serverInstallTarget, serverInstall } = useServerInstallContent()
 const projectDiscoverBackUrl = computed(() => {
 	const discoverType =
 		routeProjectType.value === 'project'
@@ -1074,27 +1066,12 @@ const projectDiscoverBackUrl = computed(() => {
 
 	return `/discover/${discoverType}s${getInstallContextQueryString(['sid', 'wid', 'from', 'shi'])}`
 })
-const projectInstallContext = computed(() => {
-	const context = serverBrowseInstallContext.value
-	if (!context) return null
+const projectInstallTarget = computed(() => {
+	const target = serverInstallTarget.value
+	if (!target) return null
 	return {
-		...context,
-		backUrl: projectDiscoverBackUrl.value,
-		backLabel: formatMessage(messages.backToDiscover),
-		discardSelectedAndBack: async () => {
-			await (context.clearSelected ?? context.clearQueued)?.()
-			await navigateTo(projectDiscoverBackUrl.value)
-		},
-	}
-})
-const projectHeaderInstallContext = computed(() => {
-	const context = projectInstallContext.value
-	if (!context) return null
-	return {
-		...context,
-		onBack: undefined,
-		selectedProjects: [],
-		isInstallingSelected: false,
+		...target,
+		back: { to: projectDiscoverBackUrl.value, label: formatMessage(messages.backToDiscover) },
 	}
 })
 

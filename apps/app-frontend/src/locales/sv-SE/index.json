@@ -293,9 +293,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Att lägga till innehåll kan förhindra dig från att ansluta till den här servern. Allt innehåll du lägger till kommer att tas bort när den hanterade servern uppdateras."
   },
-  "app.browse.server.installing": {
-    "message": "Installerar"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Ingen tillgänglig version matchar {compatibilityLabel}. Välj en version att installera ändå. Beroenden kommer inte installeras automatiskt."
   },

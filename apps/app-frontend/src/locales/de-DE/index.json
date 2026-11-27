@@ -296,9 +296,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Das Hinzufügen von Inhalten kann verhindern, dass du diesem Server beitreten kannst. Alle Inhalte, die du hinzufügst, werden entfernt, wenn die verwalteten Serverinhalte aktualisiert werden."
   },
-  "app.browse.server.installing": {
-    "message": "Wird installiert"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Keine verfügbaren Versionen stimmen mit {compatibilityLabel} überein. Wähle eine Version aus, um sie trotzdem zu installieren. Abhängigkeiten werden nicht automatisch installiert."
   },
@@ -3898,9 +3895,6 @@
   },
   "hosting.play.world-changed": {
     "message": "Diese Welt ist nicht mehr aktiv oder wurde nicht geteilt. Öffne das Server-Panel und klicke erneut auf „Server spielen“."
-  },
-  "installation-settings.advanced.title": {
-    "message": "Fortgeschritten"
   },
   "installation-settings.relink-shared-instance.button": {
     "message": "Geteilte Instanz erneut verknüpfen"

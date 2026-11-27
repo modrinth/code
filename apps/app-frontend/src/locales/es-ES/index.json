@@ -296,9 +296,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Añadir contenido puede impedir que te unas a este servidor. Cualquier contenido que añadas se eliminará cuando se actualice el contenido administrado del servidor."
   },
-  "app.browse.server.installing": {
-    "message": "Instalando"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "No hay versiones disponibles que coincidan con {compatibilityLabel}. Selecciona una versión para instalarla de todas formas. Las dependencias no se instalarán automáticamente."
   },

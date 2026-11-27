@@ -101,7 +101,7 @@ const {
 	activeType,
 	typeItems,
 	sortMode,
-	hasDateAdded,
+	sortFields,
 	searchQuery,
 	filters,
 	metadataFilterCategories,
@@ -166,6 +166,7 @@ const busyMessage = computed(() => ctx.busy.value?.message)
 const addTooltip = computed(
 	() => busyMessage.value ?? (ctx.canAdd.value ? undefined : ctx.addDeniedReason),
 )
+const supportsUpdateAll = computed(() => !!ctx.applyUpdates)
 const hasOutdatedItems = computed(() => getUpdateCandidates(typeItems.value).length > 0)
 const toggleableSelectedItems = computed(() =>
 	selectedItems.value.filter((item) => ctx.permissions(item).toggle),
@@ -315,13 +316,13 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 						:types="types"
 						:add-disabled="isBusy || !ctx.canAdd.value"
 						:add-tooltip="addTooltip"
-						:show-update-all="!!updateAllFlow?.supported && hasOutdatedItems"
+						:show-update-all="supportsUpdateAll && hasOutdatedItems"
 						:update-all-disabled="isContentOperating"
 						:refreshing="refreshing"
 						:refresh-disabled="isContentOperating"
 						:busy-tooltip="busyMessage"
 						:filter-categories="metadataFilterCategories"
-						:show-date-sort="hasDateAdded"
+						:sort-fields="sortFields"
 						@add="ctx.browse(activeType)"
 						@upload="ctx.upload()"
 						@update-all="updateAllFlow?.promptUpdate(typeItems)"
@@ -442,7 +443,7 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 		>
 			<template #actions>
 				<Button
-					v-if="updateAllFlow?.supported && getUpdateCandidates(selectedItems).length > 0"
+					v-if="supportsUpdateAll && getUpdateCandidates(selectedItems).length > 0"
 					v-tooltip="busyMessage ?? formatMessage(commonMessages.updateButton)"
 					type="quiet"
 					color="green"

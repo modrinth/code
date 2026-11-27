@@ -296,9 +296,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "콘텐츠를 추가하면 이 서버에 접속하지 못할 수 있습니다. 관리되는 서버 콘텐츠가 업데이트되면 직접 추가한 모든 콘텐츠가 삭제됩니다."
   },
-  "app.browse.server.installing": {
-    "message": "설치 중"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "{compatibilityLabel} 버전과 일치하는 버전이 없지만, 그래도 계속하려면 버전을 선택하세요. 그러나 의존성은 자동으로 설치되지 않습니다."
   },
@@ -3898,9 +3895,6 @@
   },
   "hosting.play.world-changed": {
     "message": "세계를 더 이상 사용할 수 없거나 공유되지 않았습니다. 서버 패널을 열고 서버 플레이를 다시 눌러주세요."
-  },
-  "installation-settings.advanced.title": {
-    "message": "고급"
   },
   "installation-settings.relink-shared-instance.button": {
     "message": "공유 인스턴스 재연동"

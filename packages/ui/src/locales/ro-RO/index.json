@@ -86,9 +86,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Proiectele selectate nu sunt instalate încă"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Afișează:"
-  },
   "button.accept": {
     "defaultMessage": "Acceptă"
   },
@@ -586,12 +583,6 @@
   },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Conținut numai pentru client"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Cele noi mai întâi"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Cele vechi mai întâi"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Actualizează tot"

@@ -152,9 +152,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Вибрані проєкти ще не встановлено"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Показувати:"
-  },
   "button.accept": {
     "defaultMessage": "Прийняти"
   },
@@ -823,18 +820,6 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Зачекайте"
-  },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Назва (А-Я)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Назва (Я-А)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Спершу найновіші"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Спершу найстаріші"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Оновити все"
@@ -4934,17 +4919,11 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "Необхідно чи опціонально"
   },
-  "search.filter.dependent_project": {
-    "defaultMessage": "Залежить від: {project}"
-  },
   "search.filter.dependent_project.clear": {
     "defaultMessage": "Скинути фільтр залежностей"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Пошук проєкту..."
-  },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "Виключити: {projects}"
   },
   "search.filter.included_content.exclude": {
     "defaultMessage": "Виключити"
@@ -4960,9 +4939,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "Пошук умісту…"
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "Містить: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Фільтр заблоковано"

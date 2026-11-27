@@ -278,9 +278,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Adăugarea de conținut poate împiedica conectarea la acest server. Orice conținut adăugat va fi eliminat atunci când conținutul serverului gestionat este actualizat."
   },
-  "app.browse.server.installing": {
-    "message": "Se instalează"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Nicio versiune disponibilă nu corespunde cu {compatibilityLabel}. Selectați o versiune pentru a o instala oricum. Dependențele nu vor fi instalate automat."
   },

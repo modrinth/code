@@ -272,9 +272,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "הוספת תוכן עשויה למנוע ממך להצטרף לשרת זה. כל תוכן שתוסיף יוסר בעת עדכון התוכן המנוהל של השרת."
   },
-  "app.browse.server.installing": {
-    "message": "מוריד"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "אין גרסאות זמינות התואמות ל-{compatibilityLabel}. בחר גרסה להתקנה בכל זאת. תלויות לא יותקנו באופן אוטומטי."
   },

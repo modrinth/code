@@ -281,9 +281,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Ha saját tartalmat adsz hozzá, előfordulhat, hogy nem tudsz csatlakozni ehhez a szerverhez. Minden általad hozzáadott tartalom törlődik, amikor a szerver által kezelt tartalom frissül."
   },
-  "app.browse.server.installing": {
-    "message": "Letöltés..."
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Nincs olyan elérhető verzió, amely kompatibilis a(z) {compatibilityLabel} értékkel. Válassz ki egy verziót a telepítés mindenképp történő folytatásához. A függőségek nem lesznek automatikusan telepítve."
   },

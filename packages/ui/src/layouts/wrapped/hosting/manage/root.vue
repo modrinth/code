@@ -134,8 +134,14 @@
 				:class="['server-stagger-item', fillLayout ? 'shrink-0' : '', { 'mt-4': isNuxt }]"
 				:style="{ '--si': 0 }"
 			>
-				<PageHeader :title="serverData?.name || 'Server'">
+				<PageHeader :title="serverData?.name || 'Server'" row-class="md:items-center">
 					<template #leading>
+						<PageHeaderBackButton
+							:label="formatMessage(commonMessages.backButton)"
+							:hidden="!browseTransition.active"
+							inert
+							aria-hidden="true"
+						/>
 						<ServerIcon
 							:image="serverHeaderImage"
 							:config="serverData.is_medal ? null : serverIconConfig"
@@ -167,40 +173,24 @@
 								Configuring server...
 							</PageHeaderMetadataItem>
 
-							<template v-else>
-								<PageHeaderMetadataItem
-									v-if="headerPlatform.loader"
-									:icon="TagIcon"
-									:icon-props="{ tag: headerPlatform.loader, enforceType: 'loader' }"
-								>
-									{{ formatLoaderLabel(headerPlatform.loader) }} {{ headerPlatform.gameVersion }}
-								</PageHeaderMetadataItem>
-								<PageHeaderMetadataItem
-									v-if="serverData.net?.domain && !serverPreferences.hideSubdomainLabel"
-									:icon="LinkIcon"
-									tooltip="Copy server address"
-									:action="copyServerAddress"
-								>
-									{{ serverData.net.domain }}.modrinth.gg
-								</PageHeaderMetadataItem>
-								<PageHeaderMetadataItem v-if="showServerUptime" :icon="TimerIcon">
-									{{ formattedUptime }}
-								</PageHeaderMetadataItem>
-								<PageHeaderMetadataItem
-									v-if="serverProject"
-									:to="serverProjectLink"
-									class="!text-primary"
-								>
-									Linked to
-									<Avatar :src="serverProject.icon_url" :alt="serverProject.title" size="24px" />
-									{{ serverProject.title }}
-								</PageHeaderMetadataItem>
-							</template>
+							<ServerHeaderMetadataItems
+								v-else
+								:server-id="serverId"
+								:loader="headerPlatform.loader"
+								:game-version="headerPlatform.gameVersion"
+								:uptime="showServerUptime ? formattedUptime : null"
+							/>
+							<PageHeaderMetadataFadeItem :shown="browseTransition.active">
+								{{ browseHeading }}
+							</PageHeaderMetadataFadeItem>
 						</PageHeaderMetadata>
 					</template>
 
 					<template #actions>
-						<PageHeaderActions>
+						<PageHeaderActions
+							:fade-in="browseTransition.arrived"
+							:fade-out="browseTransition.leaving"
+						>
 							<PanelServerActionButton />
 							<IconButton
 								v-tooltip="'Server settings'"
@@ -232,8 +222,23 @@
 			/>
 
 			<template v-if="!isOnboarding">
-				<div class="server-stagger-item -mb-3" :class="fillLayout ? 'shrink-0' : ''">
-					<NavTabs :links="navLinks" replace page-nav data-pyro-navigation :style="{ '--si': 1 }" />
+				<div class="server-stagger-item -mb-4" :class="fillLayout ? 'shrink-0' : ''">
+					<Collapsible
+						:collapsed="browseTransition.active"
+						:duration-ms="200"
+						overflow-visible
+						fade
+					>
+						<div class="pb-1">
+							<NavTabs
+								:links="navLinks"
+								replace
+								page-nav
+								data-pyro-navigation
+								:style="{ '--si': 1 }"
+							/>
+						</div>
+					</Collapsible>
 				</div>
 
 				<div
@@ -350,7 +355,6 @@ import {
 	FolderOpenIcon,
 	IssuesIcon,
 	LayoutTemplateIcon,
-	LinkIcon,
 	LoaderCircleIcon,
 	LockIcon,
 	LockOpenIcon,
@@ -358,7 +362,6 @@ import {
 	PlayIcon,
 	ServerIcon as ServerAssetIcon,
 	SettingsIcon,
-	TimerIcon,
 	TransferIcon,
 	TriangleAlertIcon,
 	UsersIcon,
@@ -369,18 +372,19 @@ import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import Avatar from '#ui/components/base/Avatar.vue'
 import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import Collapsible from '#ui/components/base/Collapsible.vue'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
+import PageHeaderMetadataFadeItem from '#ui/components/base/page-header/metadata/page-header-metadata-fade-item.vue'
 import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
 import PageHeaderActions from '#ui/components/base/page-header/page-header-actions.vue'
+import PageHeaderBackButton from '#ui/components/base/page-header/page-header-back-button.vue'
 import PageHeaderBadgeItem from '#ui/components/base/page-header/page-header-badge-item.vue'
 import ServerNotice from '#ui/components/base/ServerNotice.vue'
-import TagIcon from '#ui/components/base/TagIcon.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
@@ -388,7 +392,10 @@ import LiftSuspensionModal from '#ui/components/servers/LiftSuspensionModal.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
 import { injectServerOnboardingFlow } from '#ui/components/servers/onboarding/context'
 import ServerPlayMigrationModal from '#ui/components/servers/play-migration/ServerPlayMigrationModal.vue'
-import { PanelServerActionButton } from '#ui/components/servers/server-header'
+import {
+	PanelServerActionButton,
+	ServerHeaderMetadataItems,
+} from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
 import ServerInviteLinkModal from '#ui/components/sharing/server-invite-link/ServerInviteLinkModal.vue'
 import {
@@ -403,6 +410,7 @@ import {
 	useServerProject,
 } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useRouteLinkTransition } from '#ui/composables/route-transitions'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import type {
 	ServerInstallationKey,
@@ -410,8 +418,10 @@ import type {
 } from '#ui/composables/server-installation-tracker'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
 import { useServerPanelSync } from '#ui/composables/server-panel-sync'
-import { useHideSupportFeatures, useServerPreferences } from '#ui/composables/server-preferences'
+import { useHideSupportFeatures } from '#ui/composables/server-preferences'
 import { serverKeys } from '#ui/composables/server-queries'
+import { formatServerUptime } from '#ui/composables/server-uptime'
+import { serverInstallHeadingMessage } from '#ui/layouts/shared/browse-tab/composables/use-server-install'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
 import {
@@ -499,6 +509,12 @@ const client = injectModrinthClient()
 const constrainWidth = computed(() => props.constrainWidth)
 const fillLayout = computed(() => props.layoutMode === 'fill')
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
+const browseTransition = useRouteLinkTransition((route) => route.query.sid === props.serverId)
+const browseHeading = computed(() =>
+	formatMessage(
+		serverInstallHeadingMessage(browseTransition.value.route?.query.from === 'reset-server'),
+	),
+)
 const queryClient = useQueryClient()
 const route = useRoute()
 const router = useRouter()
@@ -508,8 +524,6 @@ const debug = useDebugLogger('ServerManage')
 const isReconnecting = ref(false)
 const isLoading = ref(true)
 const isMounted = ref(true)
-
-const serverPreferences = useServerPreferences(props.serverId)
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
 const liftSuspensionModal = ref<InstanceType<typeof LiftSuspensionModal> | null>(null)
@@ -693,14 +707,11 @@ const serverHeaderImage = computed(() =>
 	serverData.value?.is_medal ? 'https://cdn.modrinth.com/medal_icon.webp' : serverIconImage.value,
 )
 
-const showServerUptime = computed(() => props.showUptime && serverPowerState.value === 'running')
+const showServerUptime = computed(
+	() => props.showUptime && serverPowerState.value === 'running' && uptimeSeconds.value > 0,
+)
 
-const formattedUptime = computed(() => formatUptime(uptimeSeconds.value))
-
-const serverProjectLink = computed(() => {
-	if (!serverProject.value) return ''
-	return `/project/${serverProject.value.slug ?? serverProject.value.id}`
-})
+const formattedUptime = computed(() => formatServerUptime(uptimeSeconds.value))
 
 const serverMenuOptions = computed(() => [
 	{
@@ -717,31 +728,6 @@ const serverMenuOptions = computed(() => [
 		shown: props.showCopyIdAction,
 	},
 ])
-
-function formatUptime(uptime: number) {
-	const days = Math.floor(uptime / (24 * 3600))
-	const hours = Math.floor((uptime % (24 * 3600)) / 3600)
-	const minutes = Math.floor((uptime % 3600) / 60)
-	const seconds = uptime % 60
-
-	let formatted = ''
-	if (days > 0) formatted += `${days}d `
-	if (hours > 0 || days > 0) formatted += `${hours}h `
-	formatted += `${minutes}m ${seconds}s`
-	return formatted.trim()
-}
-
-function copyServerAddress() {
-	const domain = serverData.value?.net?.domain
-	if (!domain) return
-
-	void navigator.clipboard.writeText(`${domain}.modrinth.gg`)
-	addNotification({
-		title: 'Server address copied',
-		text: "Your server's address has been copied to your clipboard.",
-		type: 'success',
-	})
-}
 
 function copyServerId() {
 	void navigator.clipboard.writeText(props.serverId)
@@ -785,19 +771,17 @@ type CachedWsState = {
 	cpuData: number[]
 	ramData: number[]
 	powerState: Archon.Websocket.v0.PowerState
-	uptimeSeconds: number
 	consoleLines: LogLine[]
 }
 
 const modrinthServersConsole = useModrinthServersConsole()
-const wsStateCacheKey = ['servers', 'ws-state', props.serverId] as const
+const wsStateCacheKey = serverKeys.wsState(props.serverId)
 const cachedWsState = queryClient.getQueryData<CachedWsState>(wsStateCacheKey)
 if (cachedWsState) {
 	stats.value = cachedWsState.stats
 	cpuData.value = cachedWsState.cpuData
 	ramData.value = cachedWsState.ramData
 	serverPowerState.value = cachedWsState.powerState
-	uptimeSeconds.value = cachedWsState.uptimeSeconds
 }
 
 const log = useDebugLogger('server-panel-reveal')
@@ -817,10 +801,16 @@ const saveWsStateToCache = () => {
 		cpuData: cpuData.value,
 		ramData: ramData.value,
 		powerState: serverPowerState.value,
-		uptimeSeconds: uptimeSeconds.value,
 		consoleLines: modrinthServersConsole.output.value,
 	} satisfies CachedWsState)
 }
+
+watch(
+	() => browseTransition.value.leaving,
+	(leaving) => {
+		if (leaving) saveWsStateToCache()
+	},
+)
 
 watch([stats, serverPowerState], () => {
 	if (!isConnected.value) return

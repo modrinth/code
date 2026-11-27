@@ -296,9 +296,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "新增內容可能會導致你無法加入這個伺服器。當受管理的伺服器內容更新時，你新增的任何內容都會被移除。"
   },
-  "app.browse.server.installing": {
-    "message": "安裝中"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "沒有符合 {compatibilityLabel} 的可用版本。請選擇一個版本強制安裝。不會自動安裝相依模組。"
   },
@@ -3835,9 +3832,6 @@
   },
   "hosting.play.update-to-play": {
     "message": "更新以遊玩"
-  },
-  "installation-settings.advanced.title": {
-    "message": "進階"
   },
   "installation-settings.relink-shared-instance.button": {
     "message": "重新連結共用實例"

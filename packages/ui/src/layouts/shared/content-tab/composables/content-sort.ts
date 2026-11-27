@@ -4,23 +4,43 @@ import { computed, ref } from 'vue'
 
 import type { ContentItem } from '../types'
 
-export type ContentSortMode =
-	| 'alphabetical-asc'
-	| 'alphabetical-desc'
-	| 'date-added-newest'
-	| 'date-added-oldest'
+export type ContentSortField = 'name' | 'author' | 'updated' | 'added'
+export type ContentSortDirection = 'asc' | 'desc'
 
-export const contentSortModes: readonly ContentSortMode[] = [
-	'alphabetical-asc',
-	'alphabetical-desc',
-	'date-added-newest',
-	'date-added-oldest',
-]
+export interface ContentSortMode {
+	field: ContentSortField
+	direction: ContentSortDirection
+}
 
-const defaultSortMode: ContentSortMode = 'alphabetical-asc'
+export const contentSortFields: readonly ContentSortField[] = ['name', 'author', 'updated', 'added']
+
+export const contentSortDefaultDirections: Record<ContentSortField, ContentSortDirection> = {
+	name: 'asc',
+	author: 'asc',
+	updated: 'desc',
+	added: 'desc',
+}
+
+export const defaultContentSortMode: ContentSortMode = { field: 'name', direction: 'asc' }
+
+export function isContentSortMode(value: unknown): value is ContentSortMode {
+	if (!value || typeof value !== 'object') return false
+	const { field, direction } = value as Partial<ContentSortMode>
+	return (
+		contentSortFields.includes(field as ContentSortField) &&
+		(direction === 'asc' || direction === 'desc')
+	)
+}
 
 export function getContentItemDisplayName(item: ContentItem) {
 	return item.project?.title ?? item.embedded_metadata?.name ?? item.file_name
+}
+
+const sortKeys: Record<ContentSortField, (item: ContentItem) => string | undefined> = {
+	name: (item) => getContentItemDisplayName(item).toLowerCase(),
+	author: (item) => item.owner?.name.toLowerCase(),
+	updated: (item) => item.version?.date_published,
+	added: (item) => item.date_added,
 }
 
 function compareByName(a: ContentItem, b: ContentItem) {
@@ -33,39 +53,39 @@ function compareByName(a: ContentItem, b: ContentItem) {
 }
 
 export function sortContentItems(items: ContentItem[], mode: ContentSortMode) {
-	const sorted = [...items]
-	switch (mode) {
-		case 'alphabetical-desc':
-			return sorted.sort((a, b) => compareByName(b, a))
-		case 'date-added-newest':
-			return sorted.sort(
-				(a, b) => (b.date_added ?? '').localeCompare(a.date_added ?? '') || compareByName(a, b),
-			)
-		case 'date-added-oldest':
-			return sorted.sort(
-				(a, b) => (a.date_added ?? '').localeCompare(b.date_added ?? '') || compareByName(a, b),
-			)
-		default:
-			return sorted.sort(compareByName)
-	}
+	const key = sortKeys[mode.field]
+	const sign = mode.direction === 'asc' ? 1 : -1
+	return [...items].sort((a, b) => {
+		const aKey = key(a)
+		const bKey = key(b)
+		if (aKey && bKey) return sign * aKey.localeCompare(bKey) || compareByName(a, b)
+		if (aKey || bKey) return aKey ? -1 : 1
+		return compareByName(a, b)
+	})
+}
+
+export function getAvailableContentSortFields(items: ContentItem[]) {
+	return contentSortFields.filter(
+		(field) => field === 'name' || items.some((item) => !!sortKeys[field](item)),
+	)
 }
 
 /**
- * Sorts content items by the selected mode, defaulting to A-Z. When `persistKey` is provided the
- * mode is kept in session storage.
+ * Sorts content items by the selected mode, defaulting to name A-Z. When `persistKey` is provided
+ * the mode is kept in session storage.
  */
 export function useContentSort(items: Ref<ContentItem[]>, persistKey?: string) {
 	const sortMode = persistKey
-		? useSessionStorage<ContentSortMode>(`content-sort:${persistKey}`, defaultSortMode)
-		: ref<ContentSortMode>(defaultSortMode)
-	if (!contentSortModes.includes(sortMode.value)) sortMode.value = defaultSortMode
+		? useSessionStorage<ContentSortMode>(`content-sort:${persistKey}`, defaultContentSortMode)
+		: ref<ContentSortMode>(defaultContentSortMode)
+	if (!isContentSortMode(sortMode.value)) sortMode.value = defaultContentSortMode
 
-	const hasDateAdded = computed(() => items.value.some((item) => !!item.date_added))
+	const sortFields = computed(() => getAvailableContentSortFields(items.value))
 	const sortedItems = computed(() => sortContentItems(items.value, sortMode.value))
 
 	function resetSortMode() {
-		sortMode.value = defaultSortMode
+		sortMode.value = defaultContentSortMode
 	}
 
-	return { sortMode, sortedItems, hasDateAdded, resetSortMode }
+	return { sortMode, sortedItems, sortFields, resetSortMode }
 }

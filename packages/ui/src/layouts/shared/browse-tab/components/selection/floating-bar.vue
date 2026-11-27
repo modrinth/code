@@ -76,8 +76,7 @@ import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import { injectBrowseManager } from '../providers/browse-manager'
-import type { BrowseInstallContext } from '../types'
+import type { BrowseSelection } from '../../types'
 
 const { formatMessage } = useVIntl()
 
@@ -97,15 +96,13 @@ const messages = defineMessages({
 })
 
 const props = defineProps<{
-	installContext?: BrowseInstallContext | null
+	selection: BrowseSelection
 }>()
 
-const ctx = injectBrowseManager(null)
-const installContext = computed(() => props.installContext ?? ctx?.installContext?.value ?? null)
-const selectedProjects = computed(() => installContext.value?.selectedProjects ?? [])
-const selectedCount = computed(() => selectedProjects.value.length)
 const iconStackOffset = 24
-const isInstallingSelected = computed(() => installContext.value?.isInstallingSelected ?? false)
+const selectedProjects = computed(() => props.selection.projects.value)
+const selectedCount = computed(() => selectedProjects.value.length)
+const isInstallingSelected = computed(() => props.selection.installing.value)
 const shown = computed(() => selectedCount.value > 0 && !isInstallingSelected.value)
 const visibleProjects = computed(() => selectedProjects.value.slice(0, 3))
 const overflowCount = computed(() => Math.max(0, selectedCount.value - 3))
@@ -124,12 +121,12 @@ const installButtonText = computed(() =>
 
 function clearSelected() {
 	if (isInstallingSelected.value) return
-	void (installContext.value?.clearSelected ?? installContext.value?.clearQueued)?.()
+	props.selection.clear()
 }
 
 function installSelected() {
 	if (isInstallingSelected.value) return
-	void installContext.value?.installSelected?.()
+	void props.selection.installAndBack()
 }
 </script>
 

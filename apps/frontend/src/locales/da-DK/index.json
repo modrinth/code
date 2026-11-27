@@ -1448,12 +1448,6 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Antal er for lavt"
   },
-  "discover.install.back-to-server": {
-    "message": "Tilbage til server"
-  },
-  "discover.install.back-to-setup": {
-    "message": "Tilbage til opsætning"
-  },
   "discover.seo.title": {
     "message": "Søg efter {projectType}"
   },

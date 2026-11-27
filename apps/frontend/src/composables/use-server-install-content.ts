@@ -1,790 +1,145 @@
-import type { Archon, Labrinth } from '@modrinth/api-client'
-import type {
-	BrowseInstallContentType,
-	BrowseInstallPlan,
-	BrowseSearchState,
-	CreationFlowContextValue,
-	EnvironmentSearchOverride,
-	FilterValue,
-	ServerContentEnvironment,
-	UpdateChannelPolicy,
-} from '@modrinth/ui'
+import type { AbstractModrinthClient } from '@modrinth/api-client'
+import type { BrowseTarget, ServerSetupModalHandle } from '@modrinth/ui'
 import {
-	commonMessages,
-	defineMessages,
-	flushStoredServerAddonInstallQueue,
-	getHostingModEnvironmentOverride,
-	getServerAddonInstallPlanProjectIds,
-	getStoredServerAddonInstallQueue,
-	getTargetInstallPreferences,
 	injectModrinthClient,
 	injectNotificationManager,
-	injectServerOnboardingFlow,
-	parseServerContentEnvironment,
-	readStoredServerInstallQueue,
-	requestInstall,
-	resolveServerAddonInstallPlans,
 	resolveServerPlatform,
-	stripServerRuntimeInstallFilters,
-	stripServerRuntimeInstallOverrides,
-	useGeneratedIconSrc,
-	useServerContextRuntime,
-	useServerIcon,
-	useServerPanelSync,
-	useVIntl,
-	waitForServerContextRuntimeReady,
-	writeStoredServerInstallQueue,
+	serverDetailQueryOptions,
+	useServerInstall,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import type { ComputedRef, Ref } from 'vue'
-import { computed, nextTick, ref, watch } from 'vue'
+import { type QueryClient, useQuery, useQueryClient } from '@tanstack/vue-query'
+import type { Ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
-import { navigateTo, useRoute, useRuntimeConfig } from '#app'
+import { useRoute, useRuntimeConfig } from '#app'
 import { queryAsString } from '~/utils/router'
 
-type ServerInstallBrowseSearchState = Pick<
-	BrowseSearchState,
-	'currentFilters' | 'overriddenProvidedFilterTypes'
->
-type ServerInstallProjectType = {
-	id?: string
-}
-type ServerInstallDebug = (...args: unknown[]) => void
-
-export interface ServerInstallModalHandle {
-	show: () => void | Promise<void>
-	hide: () => void
-	ctx?: CreationFlowContextValue | null
+function serverContentQueryOptions(
+	client: AbstractModrinthClient,
+	serverId: string,
+	worldId: string,
+) {
+	return {
+		queryKey: ['content', 'list', serverId] as const,
+		queryFn: () => client.archon.content_v1.getAddons(serverId, worldId),
+		staleTime: 30_000,
+	}
 }
 
-export interface ServerInstallSearchResult extends Labrinth.Search.v3.ResultSearchProject {
-	installed?: boolean
+export async function prefetchServerInstallContent(
+	queryClient: QueryClient,
+	client: AbstractModrinthClient,
+	serverId: string,
+	worldId: string | null,
+) {
+	await Promise.allSettled([
+		queryClient.ensureQueryData(serverDetailQueryOptions(client, serverId)),
+		worldId
+			? queryClient.ensureQueryData(serverContentQueryOptions(client, serverId, worldId))
+			: undefined,
+	])
 }
 
-export interface UseServerInstallContentOptions {
-	projectType: ComputedRef<ServerInstallProjectType | undefined>
-	onboardingModalRef: Ref<ServerInstallModalHandle | null>
-	debug?: ServerInstallDebug
-}
+export function useServerInstallContentPrefetch() {
+	const client = injectModrinthClient()
+	const queryClient = useQueryClient()
+	const route = useRoute()
 
-const messages = defineMessages({
-	unsupportedContentType: {
-		id: 'discover.install.error.unsupported-content-type',
-		defaultMessage: 'This content type cannot be installed to a server from Discover.',
-	},
-	noServerWorld: {
-		id: 'discover.install.error.no-server-world',
-		defaultMessage: 'No server world is available for install.',
-	},
-	backToSetup: {
-		id: 'discover.install.back-to-setup',
-		defaultMessage: 'Back to setup',
-	},
-	cancelReset: {
-		id: 'discover.install.cancel-reset',
-		defaultMessage: 'Cancel reset',
-	},
-	backToServer: {
-		id: 'discover.install.back-to-server',
-		defaultMessage: 'Back to server',
-	},
-	resetModpackHeading: {
-		id: 'discover.install.heading.reset-modpack',
-		defaultMessage: 'Selecting content to install after reset',
-	},
-})
+	return async () => {
+		const serverId = queryAsString(route.query.sid)
+		if (!serverId) return
+		await prefetchServerInstallContent(
+			queryClient,
+			client,
+			serverId,
+			queryAsString(route.query.wid) || null,
+		)
+	}
+}
 
 export function useServerInstallContent({
-	projectType,
-	onboardingModalRef,
-	debug = () => {},
-}: UseServerInstallContentOptions) {
-	const { formatMessage } = useVIntl()
+	setupModal,
+}: {
+	setupModal?: Ref<ServerSetupModalHandle | null>
+} = {}) {
 	const client = injectModrinthClient()
-	const onboardingFlow = injectServerOnboardingFlow()
 	const queryClient = useQueryClient()
-	const siteUrl = useRuntimeConfig().public.siteUrl as string
-	const route = useRoute()
 	const { handleError } = injectNotificationManager()
-	let browseSearchState: ServerInstallBrowseSearchState | null = null
+	const route = useRoute()
 
-	function getInstallProjectName(project: ServerInstallSearchResult) {
-		const legacyTitle = (project as ServerInstallSearchResult & { title?: string }).title
-		return project.name || legacyTitle || formatMessage(commonMessages.projectLabel)
-	}
+	const serverId = computed(() => queryAsString(route.query.sid) || null)
+	const worldId = computed(() => queryAsString(route.query.wid) || null)
+	const from = computed(() => queryAsString(route.query.from) || null)
 
-	const currentServerId = computed(() => queryAsString(route.query.sid) || null)
-	const fromContext = computed(() => queryAsString(route.query.from) || null)
-	const isSetupServerContext = computed(
-		() =>
-			!!currentServerId.value && ['onboarding', 'reset-server'].includes(fromContext.value ?? ''),
-	)
-	const currentWorldId = computed(() => queryAsString(route.query.wid) || null)
-	useServerContextRuntime(currentServerId)
-	useServerPanelSync({
-		serverId: currentServerId,
-		worldId: currentWorldId,
-	})
-
-	const {
-		data: serverData,
-		isLoading: serverDataLoading,
-		error: serverDataError,
-	} = useQuery({
-		queryKey: computed(() => ['servers', 'detail', currentServerId.value] as const),
-		queryFn: () => {
-			debug('serverData queryFn firing for:', currentServerId.value)
-			return client.archon.servers_v0.get(currentServerId.value!)
-		},
-		enabled: computed(() => {
-			const enabled = !!currentServerId.value
-			debug('serverData enabled:', enabled)
-			return enabled
-		}),
-	})
-
-	watch(serverData, (val) =>
-		debug('serverData changed:', val?.server_id, val?.name, val?.loader, val?.mc_version),
-	)
-	watch(serverDataLoading, (val) => debug('serverData loading:', val))
-	watch(serverDataError, (val) => {
-		if (val) debug('serverData error:', val)
-	})
-
-	const { config: serverIconConfig, image: serverIconImage } = useServerIcon(
-		() => currentServerId.value ?? '',
-	)
-	const serverIconGeneratedSrc = useGeneratedIconSrc(serverIconConfig)
-	const serverIcon = computed(() => serverIconGeneratedSrc.value ?? serverIconImage.value)
-
-	const serverHideInstalled = ref(false)
-	const serverEnvironment = ref<ServerContentEnvironment | null>(
-		parseServerContentEnvironment(route.query.env),
-	)
-	const hideSelectedServerInstalls = ref(false)
-	const installingProjectIds = ref<Set<string>>(new Set())
-	const optimisticallyInstalledProjectIds = ref<Set<string>>(new Set())
-	const hiddenInstalledProjectIds = ref<Set<string>>(new Set())
-	const hiddenInstalledProjectIdsInitialized = ref(false)
-	const queuedServerInstalls = ref<Map<string, BrowseInstallPlan<ServerInstallSearchResult>>>(
-		readStoredServerInstallQueue(currentServerId.value, currentWorldId.value),
-	)
-	const queuedServerInstallRootProjectIds = computed(
-		() => new Set(queuedServerInstalls.value.keys()),
-	)
-	const queuedServerInstallProjectIds = computed(() =>
-		getServerAddonInstallPlanProjectIds(queuedServerInstalls.value.values()),
-	)
-	const queuedServerInstallCount = computed(() => queuedServerInstalls.value.size)
-	const selectedServerInstallProjects = computed(() =>
-		Array.from(queuedServerInstalls.value.values()).map((plan) => ({
-			id: plan.projectId,
-			name: getInstallProjectName(plan.project),
-			iconUrl: plan.project.icon_url ?? null,
+	const { data: serverData } = useQuery(
+		computed(() => ({
+			...serverDetailQueryOptions(client, serverId.value ?? ''),
+			enabled: !!serverId.value,
 		})),
 	)
-	const isInstallingQueuedServerInstalls = ref(false)
-	const queuedInstallProgress = ref({ completed: 0, total: 0 })
-	const serverInstallQueue = {
-		get: () => queuedServerInstalls.value,
-		set: (plans: Map<string, BrowseInstallPlan<ServerInstallSearchResult>>) => {
-			queuedServerInstalls.value = plans
-			writeStoredServerInstallQueue(currentServerId.value, currentWorldId.value, plans)
-		},
-	}
 
-	const contentQueryKey = computed(() => ['content', 'list', currentServerId.value ?? ''] as const)
-	const { data: serverContentData, error: serverContentError } = useQuery({
-		queryKey: contentQueryKey,
-		queryFn: () =>
-			client.archon.content_v1.getAddons(currentServerId.value!, currentWorldId.value!),
-		enabled: computed(() => !!currentServerId.value && !!currentWorldId.value),
-	})
-
-	const serverPlatform = computed(() =>
-		resolveServerPlatform(serverData.value, serverContentData.value),
+	const { data: serverContent, error: serverContentError } = useQuery(
+		computed(() => ({
+			...serverContentQueryOptions(client, serverId.value ?? '', worldId.value ?? ''),
+			enabled: !!serverId.value && !!worldId.value,
+		})),
 	)
-
-	function setBrowseSearchState(state: ServerInstallBrowseSearchState) {
-		browseSearchState = state
-	}
-
-	function setStoredServerInstallPlans(
-		serverId: string,
-		worldId: string,
-		plans: Map<string, BrowseInstallPlan<ServerInstallSearchResult>>,
-	) {
-		if (serverId === currentServerId.value && worldId === currentWorldId.value) {
-			queuedServerInstalls.value = plans
-		}
-		writeStoredServerInstallQueue(serverId, worldId, plans)
-	}
-
-	function setProjectInstalling(projectId: string, installing: boolean) {
-		const next = new Set(installingProjectIds.value)
-		if (installing) {
-			next.add(projectId)
-		} else {
-			next.delete(projectId)
-		}
-		installingProjectIds.value = next
-	}
-
-	function markProjectInstalled(projectId: string) {
-		optimisticallyInstalledProjectIds.value = new Set([
-			...optimisticallyInstalledProjectIds.value,
-			projectId,
-		])
-	}
-
-	function getServerInstalledProjectIds(data = serverContentData.value) {
-		return new Set(
-			(data?.addons ?? [])
-				.map((addon) => addon.project_id)
-				.filter((projectId): projectId is string => !!projectId),
-		)
-	}
-
-	function syncHiddenInstalledProjectIds() {
-		hiddenInstalledProjectIds.value = new Set([
-			...getServerInstalledProjectIds(),
-			...optimisticallyInstalledProjectIds.value,
-		])
-		hiddenInstalledProjectIdsInitialized.value = true
-	}
-
-	const serverFilters = computed<FilterValue[]>(() => {
-		debug(
-			'serverFilters recomputing, serverData:',
-			!!serverData.value,
-			'projectType:',
-			projectType.value?.id,
-		)
-		const filters: FilterValue[] = []
-		if (serverData.value && projectType.value?.id !== 'modpack' && !isSetupServerContext.value) {
-			const gameVersion = serverPlatform.value.gameVersion
-			if (gameVersion) {
-				filters.push({ type: 'game_version', option: gameVersion })
-			}
-
-			const platform = serverPlatform.value.loader?.toLowerCase()
-
-			const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
-			if (projectType.value?.id === 'mod' && platform && modLoaders.includes(platform)) {
-				filters.push({ type: 'mod_loader', option: platform })
-			}
-
-			const pluginLoaders = ['paper', 'purpur']
-			if (projectType.value?.id === 'plugin' && platform && pluginLoaders.includes(platform)) {
-				filters.push({ type: 'plugin_loader', option: platform })
-			}
-
-			if (serverHideInstalled.value && hiddenInstalledProjectIds.value.size > 0) {
-				for (const x of hiddenInstalledProjectIds.value) {
-					filters.push({
-						type: 'project_id',
-						option: `project_id:${x}`,
-						negative: true,
-					})
-				}
-			}
-
-			if (hideSelectedServerInstalls.value && queuedServerInstallProjectIds.value.size > 0) {
-				for (const id of queuedServerInstallProjectIds.value) {
-					filters.push({
-						type: 'project_id',
-						option: `project_id:${id}`,
-						negative: true,
-					})
-				}
-			}
-		}
-
-		if (currentServerId.value && projectType.value?.id === 'modpack') {
-			filters.push({ type: 'environment', option: 'server' })
-		}
-		debug('serverFilters result:', filters)
-		return filters
-	})
-
-	const showServerEnvironment = computed(
-		() => !!currentServerId.value && !isSetupServerContext.value,
-	)
-
-	const serverEnvironmentOverride = computed<EnvironmentSearchOverride | undefined>(() => {
-		if (showServerEnvironment.value && projectType.value?.id === 'mod') {
-			return getHostingModEnvironmentOverride(serverEnvironment.value)
-		}
-		return isSetupServerContext.value ? getHostingModEnvironmentOverride(null) : undefined
-	})
-
-	function getCurrentServerInstallType(): BrowseInstallContentType {
-		const type = projectType.value?.id
-		if (
-			type === 'modpack' ||
-			type === 'mod' ||
-			type === 'plugin' ||
-			type === 'datapack' ||
-			type === 'resourcepack' ||
-			type === 'shader'
-		) {
-			return type
-		}
-		throw new Error(formatMessage(messages.unsupportedContentType))
-	}
-
-	function getServerInstallTargetPreferences(contentType: BrowseInstallContentType) {
-		if (isSetupServerContext.value) return {}
-		return getTargetInstallPreferences(
-			{
-				gameVersion: serverPlatform.value.gameVersion,
-				loader: serverPlatform.value.loader,
-			},
-			contentType,
-		)
-	}
-
-	function toResolvePreferences(
-		preferences?: BrowseInstallPlan<ServerInstallSearchResult>['preferences'],
-	): Labrinth.Content.v3.ResolutionPreferences {
-		return {
-			game_versions: preferences?.gameVersions,
-			loaders: preferences?.loaders,
-		}
-	}
-
-	async function resolveAddonPlan(
-		plan: BrowseInstallPlan<ServerInstallSearchResult>,
-		existingProjectIds: string[],
-	) {
-		const resolved = await client.labrinth.content_v3.resolve({
-			project_id: plan.projectId,
-			version_id: plan.versionId,
-			content_type: plan.contentType as Labrinth.Content.v3.ContentType,
-			selected: toResolvePreferences(plan.preferences),
-			target: toResolvePreferences(getServerInstallTargetPreferences(plan.contentType)),
-			existing_project_ids: existingProjectIds,
-			update_channel: await getServerUpdateChannel(),
-		})
-
-		return [resolved.primary, ...resolved.dependencies].map((item) => ({
-			projectId: item.project_id,
-			versionId: item.version_id,
-		}))
-	}
-
-	async function resolveAndStoreQueuedAddonPlan(
-		plan: BrowseInstallPlan<ServerInstallSearchResult>,
-	) {
-		const resolvedContent = await resolveAddonPlan(plan, Array.from(getServerInstalledProjectIds()))
-		const storedPlan = queuedServerInstalls.value.get(plan.projectId)
-		if (!storedPlan || storedPlan.versionId !== plan.versionId) return
-
-		const nextPlans = new Map(queuedServerInstalls.value)
-		nextPlans.set(plan.projectId, { ...storedPlan, resolvedContent })
-		serverInstallQueue.set(nextPlans)
-	}
-
-	async function resolveQueuedAddonPlans(plans: BrowseInstallPlan<ServerInstallSearchResult>[]) {
-		return await resolveServerAddonInstallPlans({
-			plans,
-			existingProjectIds: getServerInstalledProjectIds(),
-			resolvePlan: resolveAddonPlan,
-		})
-	}
-
-	function getInstallProjectVersions(projectId: string) {
-		return client.labrinth.versions_v2.getProjectVersions(projectId, {
-			include_changelog: false,
-		})
-	}
-
-	/**
-	 * Release channel configured on the target world, used to avoid installing alpha or beta
-	 * versions when the world is set to release.
-	 */
-	async function getServerUpdateChannel(): Promise<UpdateChannelPolicy | undefined> {
-		const serverId = currentServerId.value
-		if (!serverId) return undefined
-
-		const server = await queryClient.fetchQuery({
-			queryKey: ['servers', 'v1', 'detail', serverId],
-			queryFn: () => client.archon.servers_v1.get(serverId),
-			staleTime: 30_000,
-		})
-		const world =
-			server.worlds.find((world) => world.id === currentWorldId.value) ??
-			server.worlds.find((world) => world.is_active) ??
-			server.worlds[0]
-		return world?.update_channel
-	}
-
-	function clearQueuedServerInstalls() {
-		serverInstallQueue.set(new Map())
-	}
-
-	function removeQueuedServerInstall(projectId: string) {
-		const nextPlans = new Map(queuedServerInstalls.value)
-		nextPlans.delete(projectId)
-		serverInstallQueue.set(nextPlans)
-	}
-
-	async function flushQueuedServerInstalls(
-		serverId: string | null = currentServerId.value,
-		worldId: string | null = currentWorldId.value,
-	) {
-		if (isInstallingQueuedServerInstalls.value) return false
-
-		if (!serverId || !worldId) {
-			handleError(new Error(formatMessage(messages.noServerWorld)))
-			return false
-		}
-
-		const queuedPlans = getStoredServerAddonInstallQueue<ServerInstallSearchResult>(
-			serverId,
-			worldId,
-		)
-		if (queuedPlans.size === 0) return true
-
-		try {
-			await waitForServerContextRuntimeReady(client, serverId)
-		} catch (error) {
-			handleError(error as Error)
-			return false
-		}
-
-		isInstallingQueuedServerInstalls.value = true
-		queuedInstallProgress.value = {
-			completed: 0,
-			total: queuedPlans.size,
-		}
-
-		try {
-			const result = await flushStoredServerAddonInstallQueue({
-				serverId,
-				worldId,
-				install: async (plans) => {
-					const addons = await resolveQueuedAddonPlans(plans)
-					if (addons.length > 0) {
-						await client.archon.content_v1.addAddons(serverId, worldId, addons)
-					}
-				},
-				onQueueChange: (plans) => setStoredServerInstallPlans(serverId, worldId, plans),
-			})
-
-			if (!result.ok) {
-				handleError(result.error as Error)
-				return false
-			}
-
-			for (const plan of result.flushedPlans) {
-				markProjectInstalled(plan.projectId)
-			}
-			queuedInstallProgress.value = {
-				completed: result.flushedPlans.length,
-				total: result.flushedPlans.length,
-			}
-			if (result.flushedPlans.length > 0) {
-				await queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
-			}
-
-			return true
-		} finally {
-			isInstallingQueuedServerInstalls.value = false
-			queuedInstallProgress.value = { completed: 0, total: 0 }
-		}
-	}
-
-	async function discardQueuedServerInstallsAndBack() {
-		clearQueuedServerInstalls()
-		await navigateTo(serverBackUrl.value)
-	}
-
-	async function installQueuedServerInstallsAndBack() {
-		const sid = currentServerId.value
-		const wid = currentWorldId.value
-		const backUrl = serverBackUrl.value
-		const plans = new Map(queuedServerInstalls.value)
-
-		if (sid && wid) {
-			writeStoredServerInstallQueue(sid, wid, plans)
-		}
-		const installed = await flushQueuedServerInstalls(sid, wid)
-		if (!installed) return false
-		await navigateTo(backUrl)
-
-		return true
-	}
-
-	async function serverInstall(project: ServerInstallSearchResult) {
-		if (!serverData.value || !currentServerId.value || !currentWorldId.value) {
-			handleError(new Error('No server to install to.'))
-			return
-		}
-
-		if (!browseSearchState) {
-			handleError(new Error('Search state is not ready.'))
-			return
-		}
-
-		const contentType = getCurrentServerInstallType()
-		const isModpack = contentType === 'modpack'
-
-		try {
-			if (
-				!isModpack &&
-				!isSetupServerContext.value &&
-				queuedServerInstallRootProjectIds.value.has(project.project_id)
-			) {
-				removeQueuedServerInstall(project.project_id)
-				return
-			}
-			if (
-				!isModpack &&
-				!isSetupServerContext.value &&
-				queuedServerInstallProjectIds.value.has(project.project_id)
-			)
-				return
-
-			if (isModpack || !queuedServerInstallProjectIds.value.has(project.project_id)) {
-				setProjectInstalling(project.project_id, true)
-			}
-
-			const plan = await requestInstall({
-				project,
-				contentType,
-				mode: isModpack || isSetupServerContext.value ? 'immediate' : 'queue',
-				selectedFilters: isModpack
-					? []
-					: stripServerRuntimeInstallFilters(browseSearchState.currentFilters.value),
-				providedFilters: isModpack ? [] : serverFilters.value,
-				overriddenProvidedFilterTypes: isModpack
-					? []
-					: stripServerRuntimeInstallOverrides(
-							browseSearchState.overriddenProvidedFilterTypes.value,
-						),
-				targetPreferences: getServerInstallTargetPreferences(contentType),
-				updateChannel: await getServerUpdateChannel(),
-				getProjectVersions: getInstallProjectVersions,
-				queue: serverInstallQueue,
-				install: async (plan) => {
-					if (fromContext.value === 'onboarding') {
-						await onboardingFlow.open({
-							serverId: currentServerId.value!,
-							worldId: currentWorldId.value!,
-							siteUrl,
-							project: {
-								projectId: plan.projectId,
-								versionId: plan.versionId,
-								contentType: plan.contentType,
-								name: getInstallProjectName(plan.project),
-								iconUrl: plan.project.icon_url ?? undefined,
-							},
-							backToBrowse: true,
-							onHide: () => setProjectInstalling(plan.projectId, false),
-						})
-						return
-					}
-
-					const modalInstance = onboardingModalRef.value
-					if (!modalInstance) {
-						setProjectInstalling(plan.projectId, false)
-						return
-					}
-
-					onboardingInstallingProject.value = plan.project
-					await modalInstance.show()
-					await nextTick()
-					const ctx = modalInstance.ctx
-					if (!ctx) return
-
-					if (!isModpack) {
-						await ctx.selectProject(plan.projectId, plan.contentType, plan.versionId)
-						return
-					}
-
-					ctx.setupType.value = 'modpack'
-					ctx.modpackSelection.value = {
-						projectId: plan.projectId,
-						versionId: plan.versionId,
-						name: getInstallProjectName(plan.project),
-						iconUrl: plan.project.icon_url ?? undefined,
-					}
-					ctx.modal.value?.setStage('final-config')
-				},
-			})
-			if (!isModpack && !isSetupServerContext.value) await resolveAndStoreQueuedAddonPlan(plan)
-		} catch (e) {
-			console.error(e)
-			if (isModpack) {
-				setProjectInstalling(project.project_id, false)
-			} else if (!isSetupServerContext.value) {
-				removeQueuedServerInstall(project.project_id)
-			}
-			handleError(e instanceof Error ? e : new Error(`Error installing content ${e}`))
-		} finally {
-			if (!isModpack) {
-				setProjectInstalling(project.project_id, false)
-			}
-		}
-	}
-
-	const onboardingInstallingProject = ref<ServerInstallSearchResult | null>(null)
-
-	function onOnboardingHide() {
-		if (onboardingInstallingProject.value) {
-			setProjectInstalling(onboardingInstallingProject.value.project_id, false)
-			onboardingInstallingProject.value = null
-		}
-	}
-
-	function onOnboardingBack() {
-		onboardingModalRef.value?.hide()
-	}
-
-	async function onModpackFlowCreate(config: CreationFlowContextValue) {
-		if (
-			!currentServerId.value ||
-			!currentWorldId.value ||
-			(!config.modpackSelection.value && !config.projectInstall.value)
-		)
-			return
-
-		try {
-			if (config.projectInstall.value) {
-				await config.installServerContent(currentServerId.value, currentWorldId.value)
-			} else {
-				await client.archon.content_v1.installContent(currentServerId.value, currentWorldId.value, {
-					content_variant: 'modpack',
-					spec: {
-						platform: 'modrinth',
-						project_id: config.modpackSelection.value!.projectId,
-						version_id: config.modpackSelection.value!.versionId,
-					},
-					soft_override: false,
-					properties: config.buildProperties(),
-				} satisfies Archon.Content.v1.InstallWorldContent)
-			}
-
-			onboardingModalRef.value?.hide()
-			navigateTo(`/hosting/manage/${currentServerId.value}?openSettings=installation`)
-		} catch (e) {
-			handleError(new Error(`Error installing content: ${e}`))
-			config.loading.value = false
-		}
-	}
-
-	const serverBackUrl = computed(() => {
-		if (!serverData.value) return ''
-		const id = serverData.value.server_id
-		if (fromContext.value === 'onboarding') return `/hosting/manage/${id}?resumeModal=setup-type`
-		if (fromContext.value === 'reset-server')
-			return `/hosting/manage/${id}?openSettings=installation`
-		return `/hosting/manage/${id}/content`
-	})
-
-	const serverBackLabel = computed(() => {
-		if (fromContext.value === 'onboarding') return formatMessage(messages.backToSetup)
-		if (fromContext.value === 'reset-server') return formatMessage(messages.cancelReset)
-		return formatMessage(messages.backToServer)
-	})
-
-	const serverBrowseHeading = computed(() =>
-		fromContext.value === 'reset-server'
-			? formatMessage(messages.resetModpackHeading)
-			: formatMessage(commonMessages.installingContentLabel),
-	)
-
-	const installContext = computed(() => {
-		if (!serverData.value) return null
-		return {
-			name: serverData.value.name,
-			loader: serverPlatform.value.loader ?? '',
-			gameVersion: serverPlatform.value.gameVersion ?? '',
-			serverId: currentServerId.value,
-			upstream: serverData.value.upstream,
-			iconSrc: serverIcon.value,
-			isMedal: serverData.value.is_medal,
-			backUrl: serverBackUrl.value,
-			backLabel: serverBackLabel.value,
-			heading: serverBrowseHeading.value,
-			queuedCount: queuedServerInstallCount.value,
-			selectedProjects: selectedServerInstallProjects.value,
-			isInstallingSelected: isInstallingQueuedServerInstalls.value,
-			installProgress: queuedInstallProgress.value,
-			clearQueued: clearQueuedServerInstalls,
-			clearSelected: clearQueuedServerInstalls,
-			onBack: flushQueuedServerInstalls,
-			discardSelectedAndBack: discardQueuedServerInstallsAndBack,
-			installSelected: installQueuedServerInstallsAndBack,
-		}
-	})
 
 	watch(serverContentError, (error) => {
-		if (error) {
-			console.error('Failed to load server content:', error)
-			handleError(error)
-		}
+		if (error) handleError(error)
 	})
 
-	watch(
-		serverContentData,
-		(data) => {
-			if (!data) return
-			if (!hiddenInstalledProjectIdsInitialized.value) {
-				syncHiddenInstalledProjectIds()
-			}
-		},
-		{ immediate: true },
+	const platform = computed(() => resolveServerPlatform(serverData.value, serverContent.value))
+
+	const optimisticallyInstalledIds = ref(new Set<string>())
+	const installedProjectIds = computed(
+		() =>
+			new Set([
+				...(serverContent.value?.addons ?? [])
+					.map((addon) => addon.project_id)
+					.filter((projectId): projectId is string => !!projectId),
+				...optimisticallyInstalledIds.value,
+			]),
 	)
 
-	if (route.query.shi && projectType.value?.id !== 'modpack') {
-		serverHideInstalled.value = route.query.shi === 'true'
-	}
-
-	watch(serverHideInstalled, (hideInstalled) => {
-		if (hideInstalled) {
-			syncHiddenInstalledProjectIds()
-		}
+	const serverInstall = useServerInstall({
+		serverId,
+		worldId,
+		from,
+		platform,
+		installedProjectIds,
+		siteUrl: useRuntimeConfig().public.siteUrl as string,
+		setupModal,
+		onInstalled: async (_, projectIds) => {
+			optimisticallyInstalledIds.value = new Set([
+				...optimisticallyInstalledIds.value,
+				...projectIds,
+			])
+			await queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
+		},
 	})
 
-	watch([currentServerId, currentWorldId], ([serverId, worldId], [prevServerId, prevWorldId]) => {
-		if (serverId !== prevServerId || worldId !== prevWorldId) {
-			queuedServerInstalls.value = readStoredServerInstallQueue(serverId, worldId)
-		}
-	})
-
-	watch(queuedServerInstallCount, (count) => {
-		if (count === 0) {
-			hideSelectedServerInstalls.value = false
+	const target = computed<BrowseTarget | null>(() => {
+		const server = serverData.value
+		if (!server) return null
+		return {
+			name: server.name,
+			serverId: serverId.value,
+			isMedal: server.is_medal,
+			gameVersion: platform.value.gameVersion,
+			loader: platform.value.loader,
+			heading: serverInstall.heading.value,
+			back: serverInstall.back.value,
 		}
 	})
 
 	return {
-		currentServerId,
-		fromContext,
-		isSetupServerContext,
-		currentWorldId,
+		serverId,
+		worldId,
 		serverData,
-		serverContentData,
-		serverFilters,
-		serverHideInstalled,
-		serverEnvironment,
-		showServerEnvironment,
-		serverEnvironmentOverride,
-		hideSelectedServerInstalls,
-		installingProjectIds,
-		optimisticallyInstalledProjectIds,
-		queuedServerInstallRootProjectIds,
-		queuedServerInstallProjectIds,
-		queuedServerInstallCount,
-		isInstallingQueuedServerInstalls,
-		installContext,
-		setBrowseSearchState,
-		syncHiddenInstalledProjectIds,
+		platform,
+		installedProjectIds,
 		serverInstall,
-		onOnboardingHide,
-		onOnboardingBack,
-		onModpackFlowCreate,
+		target,
 	}
 }

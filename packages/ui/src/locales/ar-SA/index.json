@@ -86,9 +86,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "المشاريع المحددة لم يتم تثبيتها بعد"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "عرض:"
-  },
   "button.accept": {
     "defaultMessage": "اقبل"
   },
@@ -643,18 +640,6 @@
   },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "البحث عن {count, number} {contentType}..."
-  },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "الاسم (A-Z)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "الاسم (Z-A)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "الأحدث أولًا"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "الأقدم أولا"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "حدّث الكلّ"

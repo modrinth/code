@@ -68,9 +68,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Proyek terpilih belum terpasang"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Lihat:"
-  },
   "button.accept": {
     "defaultMessage": "Terima"
   },
@@ -406,12 +403,6 @@
   },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Cari {count, number} {contentType}..."
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Terbaru dahulu"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Tertua dahulu"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Perbarui semua"

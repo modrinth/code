@@ -278,9 +278,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Việc thêm nội dung có thể khiến bạn không thể tham gia máy chủ này. Mọi nội dung bạn thêm sẽ bị gỡ khi nội dung máy chủ được quản lý được cập nhật."
   },
-  "app.browse.server.installing": {
-    "message": "Đang cài đặt"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Không có phiên bản khả dụng nào phù hợp với {compatibilityLabel}. Hãy chọn một phiên bản nếu vẫn muốn cài đặt. Các phần phụ thuộc sẽ không được cài tự động."
   },

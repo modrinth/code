@@ -233,9 +233,6 @@
   "app.browse.project-type.shaders": {
     "message": "Shaderi"
   },
-  "app.browse.server.installing": {
-    "message": "Instaliranje"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Nijedna dostupna verzija ne odgovara {compatibilityLabel}. Izaberite verziju za instaliranje u svakom slučaju. Zavisnosti se neće instalirati automatski."
   },

@@ -26,21 +26,21 @@
 						class="!text-brand [&>svg]:!text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]"
 						:disabled="
 							isProjectInstalling(project.id) ||
-							serverInstallContent.serverContentProjectIds.value.has(project.id)
+							serverInstallContent.installedProjectIds.value.has(project.id)
 						"
 						@click.stop="toggleServerProject(project)"
 					>
 						<SpinnerIcon v-if="isProjectInstalling(project.id)" class="animate-spin" />
 						<CheckIcon
 							v-else-if="
-								serverInstallContent.serverContentProjectIds.value.has(project.id) ||
+								serverInstallContent.installedProjectIds.value.has(project.id) ||
 								isServerProjectSelected(project.id)
 							"
 						/>
 						<PlusIcon v-else />
 						{{
 							formatMessage(
-								serverInstallContent.serverContentProjectIds.value.has(project.id)
+								serverInstallContent.installedProjectIds.value.has(project.id)
 									? commonMessages.installedLabel
 									: isServerProjectSelected(project.id)
 										? commonMessages.selectedLabel
@@ -71,7 +71,10 @@
 				</Button>
 			</template>
 		</UserProfilePageLayout>
-		<SelectedProjectsFloatingBar v-if="serverContext" :install-context="serverContext" />
+		<SelectedProjectsFloatingBar
+			v-if="serverContext"
+			:selection="serverInstallContent.serverInstall.selection"
+		/>
 	</div>
 </template>
 
@@ -83,10 +86,8 @@ import {
 	Button,
 	commonMessages,
 	defineMessages,
-	getTargetInstallPreferences,
 	injectNotificationManager,
 	provideUserProfile,
-	requestInstall,
 	SelectedProjectsFloatingBar,
 	UserProfilePageLayout,
 	useVIntl,
@@ -170,40 +171,19 @@ const SERVER_INSTALLABLE_CONTENT_TYPES: BrowseInstallContentType[] = [
 	'shader',
 ]
 
-const serverInstallContent = useServerInstallContent({
-	serverSetupModalRef: ref(null),
-	inheritBreadcrumbServer: true,
-})
-serverInstallContent.watchServerContextChanges()
+const serverInstallContent = useServerInstallContent({ inheritBreadcrumbServer: true })
+const { serverInstall } = serverInstallContent
 
-/** Install context for the server panel this page was reached from, if any. */
-const serverContext = computed(() => {
-	const server = serverInstallContent.serverContextServerData.value
-	if (!server || serverInstallContent.isSetupServerContext.value) return null
-	return {
-		name: server.name,
-		loader: serverInstallContent.serverContextPlatform.value.loader ?? '',
-		gameVersion: serverInstallContent.serverContextPlatform.value.gameVersion ?? '',
-		serverId: serverInstallContent.serverIdQuery.value,
-		backUrl: serverInstallContent.serverBackUrl.value,
-		backLabel: serverInstallContent.serverBackLabel.value,
-		heading: serverInstallContent.serverBrowseHeading.value,
-		selectedProjects: serverInstallContent.selectedServerInstallProjects.value,
-		isInstallingSelected: serverInstallContent.isInstallingQueuedServerInstalls.value,
-		installProgress: serverInstallContent.queuedInstallProgress.value,
-		clearQueued: serverInstallContent.clearQueuedServerInstalls,
-		clearSelected: serverInstallContent.clearQueuedServerInstalls,
-		discardSelectedAndBack: serverInstallContent.discardQueuedServerInstallsAndBack,
-		installSelected: serverInstallContent.installQueuedServerInstallsAndBack,
-	}
-})
+const serverContext = computed(() =>
+	serverInstall.isSetup.value ? null : serverInstallContent.target.value,
+)
 
 function getServerContentType(project: Labrinth.Projects.v3.Project) {
 	return SERVER_INSTALLABLE_CONTENT_TYPES.find((type) => project.project_types.includes(type))
 }
 
 function isServerProjectSelected(projectId: string): boolean {
-	return serverInstallContent.queuedServerInstallRootProjectIds.value.has(projectId)
+	return serverInstall.rootProjectIds.value.has(projectId)
 }
 
 async function getInstallProjectVersions(projectId: string) {
@@ -215,39 +195,15 @@ async function getInstallProjectVersions(projectId: string) {
 }
 
 async function toggleServerProject(project: Labrinth.Projects.v3.Project): Promise<void> {
-	if (isServerProjectSelected(project.id)) {
-		serverInstallContent.removeQueuedServerInstall(project.id)
-		return
-	}
-
 	const contentType = getServerContentType(project)
-	const server = serverInstallContent.serverContextServerData.value
-	if (!contentType || !server || isProjectInstalling(project.id)) return
+	if (!contentType || !serverContext.value || isProjectInstalling(project.id)) return
 
 	setProjectInstalling(project.id, true)
 	try {
-		const plan = await requestInstall({
-			project: { project_id: project.id, name: project.name, icon_url: project.icon_url },
-			contentType,
-			mode: 'queue',
-			selectedFilters: [],
-			providedFilters: [],
-			overriddenProvidedFilterTypes: [],
-			targetPreferences: getTargetInstallPreferences(
-				serverInstallContent.serverContextPlatform.value,
-				contentType,
-			),
-			updateChannel: await serverInstallContent.getServerUpdateChannel(),
-			getProjectVersions: getInstallProjectVersions,
-			queue: {
-				get: serverInstallContent.getQueuedServerInstallPlans,
-				set: serverInstallContent.setQueuedServerInstallPlans,
-			},
-		})
-		await serverInstallContent.resolveQueuedServerInstallPlan(plan)
-	} catch (error) {
-		serverInstallContent.removeQueuedServerInstall(project.id)
-		handleError(error as Error)
+		await serverInstall.install(
+			{ project_id: project.id, name: project.name, icon_url: project.icon_url },
+			{ contentType, getProjectVersions: getInstallProjectVersions },
+		)
 	} finally {
 		setProjectInstalling(project.id, false)
 	}
@@ -359,5 +315,5 @@ onBeforeRouteUpdate(async (to) => {
 	await ensureUserProfileData(id)
 })
 
-await Promise.all([ensureUserProfileData(userId.value), serverInstallContent.initServerContext()])
+await Promise.all([ensureUserProfileData(userId.value), serverInstallContent.ready()])
 </script>

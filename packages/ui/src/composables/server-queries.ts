@@ -9,6 +9,7 @@ export const serverKeys = {
 	detailV1: (serverId: string) => ['servers', 'v1', 'detail', serverId] as const,
 	content: (serverId: string) => ['content', 'list', 'v1', serverId] as const,
 	startup: (serverId: string) => ['servers', 'startup', 'v1', serverId] as const,
+	wsState: (serverId: string) => ['servers', 'ws-state', serverId] as const,
 	shareDiff: (serverId: string, ...scope: [worldId?: string, userId?: string]) =>
 		['servers', 'share-diff', serverId, ...scope] as const,
 	shareFiles: (serverId: string, worldId: string, userId: string | undefined) =>
@@ -26,6 +27,22 @@ export const sharedInstanceKeys = {
 	invites: (instanceId: string, ...scope: [userId?: string]) =>
 		['shared-instances', instanceId, 'invites', ...scope] as const,
 	friends: (userId: string | undefined) => ['shared-instances', 'friends', userId] as const,
+}
+
+export function serverDetailQueryOptions(client: AbstractModrinthClient, serverId: string) {
+	return {
+		queryKey: serverKeys.detail(serverId),
+		queryFn: () => client.archon.servers_v0.get(serverId),
+		staleTime: 30_000,
+	}
+}
+
+export function serverDetailV1QueryOptions(client: AbstractModrinthClient, serverId: string) {
+	return {
+		queryKey: serverKeys.detailV1(serverId),
+		queryFn: () => client.archon.servers_v1.get(serverId),
+		staleTime: 30_000,
+	}
 }
 
 export function serverListQueryOptions(client: AbstractModrinthClient) {

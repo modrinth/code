@@ -2213,18 +2213,6 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Gelieve het belastingformulier in te vullen"
   },
-  "discover.install.back-to-server": {
-    "message": "Terug naar de server"
-  },
-  "discover.install.back-to-setup": {
-    "message": "Terug naar de installatie"
-  },
-  "discover.install.cancel-reset": {
-    "message": "Reset annuleren"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "Er is geen serverwereld beschikbaar om te installeren."
-  },
   "discover.install.error.unsupported-content-type": {
     "message": "Dit inhoudstype kan niet vanuit Ontdekken op een server worden geïnstalleerd."
   },

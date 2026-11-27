@@ -299,9 +299,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Adding content may prevent you from joining this server. Any content you add will be removed when the managed server content is updated."
   },
-  "app.browse.server.installing": {
-    "message": "Installing"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "No available versions match {compatibilityLabel}. Select a version to install anyway. Dependencies will not be installed automatically."
   },
@@ -4073,8 +4070,23 @@
   "instance.locked.play-tooltip": {
     "message": "This instance has been locked"
   },
+  "instance.metadata.loader-tooltip": {
+    "message": "Mod loader and Minecraft version"
+  },
+  "instance.metadata.playtime-tooltip": {
+    "message": "Total playtime"
+  },
+  "instance.playtime.hours": {
+    "message": "{count, plural, one {# hour} other {# hours}}"
+  },
+  "instance.playtime.minutes": {
+    "message": "{count, plural, one {# minute} other {# minutes}}"
+  },
   "instance.playtime.never-played": {
     "message": "Never played"
+  },
+  "instance.playtime.seconds": {
+    "message": "{count, plural, one {# second} other {# seconds}}"
   },
   "instance.server-modal.address": {
     "message": "Address"

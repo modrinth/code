@@ -119,14 +119,47 @@
   "browse.advanced-filters.persistence-note": {
     "defaultMessage": "Advanced exclusions are saved across sessions. Opening a shared link with filters will override them."
   },
+  "browse.change-display-mode": {
+    "defaultMessage": "Change display mode"
+  },
   "browse.filter-results": {
     "defaultMessage": "Filter results..."
+  },
+  "browse.install.back-to-server": {
+    "defaultMessage": "Back to server"
+  },
+  "browse.install.back-to-setup": {
+    "defaultMessage": "Back to setup"
+  },
+  "browse.install.cancel-reset": {
+    "defaultMessage": "Cancel reset"
+  },
+  "browse.install.error.no-server-world": {
+    "defaultMessage": "No server world is available for install."
+  },
+  "browse.install.error.setup-modal-unavailable": {
+    "defaultMessage": "Server setup is unavailable."
+  },
+  "browse.install.heading.reset-modpack": {
+    "defaultMessage": "Selecting content to install after reset"
   },
   "browse.no-results": {
     "defaultMessage": "No results found for your query!"
   },
   "browse.offline": {
     "defaultMessage": "You are currently offline. Connect to the internet to browse Modrinth!"
+  },
+  "browse.project-types": {
+    "defaultMessage": "Project types"
+  },
+  "browse.results-per-page": {
+    "defaultMessage": "Results per page"
+  },
+  "browse.results-per-page.current": {
+    "defaultMessage": "Results per page: {count}"
+  },
+  "browse.results-per-page.option": {
+    "defaultMessage": "{count, plural, one {# item} other {# items}}"
   },
   "browse.search.placeholder": {
     "defaultMessage": "Search {projectType}..."
@@ -151,6 +184,9 @@
   },
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Selected projects not installed yet"
+  },
+  "browse.sort.current": {
+    "defaultMessage": "Sort: {mode}"
   },
   "browse.view-prefix": {
     "defaultMessage": "View:"
@@ -851,20 +887,35 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Search {count, number} {contentType}..."
   },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Name (A-Z)"
+  "content.page-layout.sort.current-mode": {
+    "defaultMessage": "Sort: {field, select, author {Author} updated {Last updated} added {Date added} other {Name}}, {direction, select, za {Z-A} newest {Newest first} oldest {Oldest first} other {A-Z}}"
   },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Name (Z-A)"
+  "content.page-layout.sort.direction.alphabetical-ascending": {
+    "defaultMessage": "A-Z"
   },
-  "content.page-layout.sort.current": {
-    "defaultMessage": "Sort: {mode}"
+  "content.page-layout.sort.direction.alphabetical-descending": {
+    "defaultMessage": "Z-A"
   },
-  "content.page-layout.sort.date-added-newest": {
+  "content.page-layout.sort.direction.date-ascending": {
+    "defaultMessage": "Oldest first"
+  },
+  "content.page-layout.sort.direction.date-descending": {
     "defaultMessage": "Newest first"
   },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Oldest first"
+  "content.page-layout.sort.direction.label": {
+    "defaultMessage": "Sort direction"
+  },
+  "content.page-layout.sort.field.added": {
+    "defaultMessage": "Date added"
+  },
+  "content.page-layout.sort.field.author": {
+    "defaultMessage": "Author"
+  },
+  "content.page-layout.sort.field.name": {
+    "defaultMessage": "Name"
+  },
+  "content.page-layout.sort.field.updated": {
+    "defaultMessage": "Last updated"
   },
   "content.page-layout.type-tabs.label": {
     "defaultMessage": "Content types"
@@ -5045,17 +5096,14 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "Required or optional"
   },
-  "search.filter.dependent_project": {
-    "defaultMessage": "Depends on: {project}"
-  },
   "search.filter.dependent_project.clear": {
     "defaultMessage": "Clear dependency filter"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Search for a project..."
   },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "Excludes: {projects}"
+  "search.filter.excluded_category": {
+    "defaultMessage": "{name} (excluded)"
   },
   "search.filter.included_content.exclude": {
     "defaultMessage": "Exclude"
@@ -5071,9 +5119,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "Search content..."
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "Includes: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filter locked"
@@ -6343,6 +6388,18 @@
   },
   "servers.grant-access-modal.target.searching": {
     "defaultMessage": "Searching..."
+  },
+  "servers.header.address-copied.text": {
+    "defaultMessage": "Your server's address has been copied to your clipboard."
+  },
+  "servers.header.address-copied.title": {
+    "defaultMessage": "Server address copied"
+  },
+  "servers.header.copy-address": {
+    "defaultMessage": "Copy server address"
+  },
+  "servers.header.linked-to": {
+    "defaultMessage": "Linked to {project}"
   },
   "servers.installing-banner.description.applying": {
     "defaultMessage": "Applying your installation changes..."

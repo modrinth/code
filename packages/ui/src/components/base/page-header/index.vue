@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-2" :class="rootClass">
-		<div class="flex flex-wrap items-start gap-4 max-md:flex-col" :class="rowClass">
+		<div class="relative flex flex-wrap items-start gap-4 max-md:flex-col" :class="rowClass">
 			<div class="flex min-w-0 flex-1 gap-4" :class="mainClass">
 				<div v-if="$slots.leading" class="flex shrink-0 items-center gap-4">
 					<slot name="leading" />
@@ -38,8 +38,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useSlots } from 'vue'
+import { computed, ref, useSlots } from 'vue'
 
+import { providePageHeaderContext } from './context'
 import type { PageHeaderProps } from './types'
 
 const props = withDefaults(defineProps<PageHeaderProps>(), {
@@ -55,6 +56,8 @@ const props = withDefaults(defineProps<PageHeaderProps>(), {
 })
 
 const slots = useSlots()
+
+providePageHeaderContext({ fadeItemCount: ref(0) })
 
 const rootClass = computed(() => [
 	props.divider ? 'border-0 border-b border-solid border-divider' : '',

@@ -296,9 +296,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "コンテンツを追加すると、このサーバーに参加できなくなる場合があります。追加したコンテンツは、サーバーで管理されているコンテンツが更新されると削除されます。"
   },
-  "app.browse.server.installing": {
-    "message": "インストール中"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "{compatibilityLabel} に一致する利用可能なバージョンがありません。このままインストールしますか？依存関係は自動的にインストールされません。"
   },
@@ -3898,9 +3895,6 @@
   },
   "hosting.play.world-changed": {
     "message": "このワールドはアクティブでないか、共有されていません。サーバーパネルを開き、もう一度「サーバーを開始」をしてください。"
-  },
-  "installation-settings.advanced.title": {
-    "message": "高度"
   },
   "installation-settings.relink-shared-instance.button": {
     "message": "共有インスタンスを再リンク"

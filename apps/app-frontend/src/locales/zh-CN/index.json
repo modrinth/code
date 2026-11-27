@@ -296,9 +296,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "添加内容可能会阻止你加入此服务器，当管理服务器内容更新时，您添加的所有内容都会被删除。"
   },
-  "app.browse.server.installing": {
-    "message": "安装中"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "没有与 {compatibilityLabel} 匹配的可用版本。如果仍要安装，请选择一个版本。依赖项将不会自动安装。"
   },

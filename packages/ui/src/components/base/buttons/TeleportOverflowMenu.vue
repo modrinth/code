@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, shallowRef, toRef, useId, watch } from 'vue'
 
+import { useAnimatedWidth } from '../../../composables/animated-width'
 import { useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
 import Button from './Button.vue'
 import {
@@ -48,6 +49,7 @@ const props = withDefaults(
 		placement?: TeleportPlacement
 		distance?: number
 		hoverable?: boolean
+		animatePanelWidth?: boolean
 	}>(),
 	{
 		type: 'base',
@@ -58,6 +60,7 @@ const props = withDefaults(
 		placement: 'bottom-end',
 		distance: 8,
 		hoverable: false,
+		animatePanelWidth: false,
 	},
 )
 
@@ -72,6 +75,7 @@ const triggerElement = computed(() => triggerButton.value?.element ?? null)
 const menuDocument = shallowRef<Document>()
 const panel = ref<InstanceType<typeof ButtonMenuPanel> | null>(null)
 const panelElement = computed(() => panel.value?.element ?? null)
+useAnimatedWidth(panelElement, { enabled: () => props.animatePanelWidth })
 const resolvedPlacement = toRef(props, 'placement')
 const resolvedDistance = toRef(props, 'distance')
 const menuId = `button-overflow-${useId()}`
@@ -87,11 +91,30 @@ const { focusedIndex, getItems, focusItem, handleKeydown, reset } = useMenuKeybo
 	panel: panelElement,
 	rows: () => rowOptions.value,
 	onEscape: () => closeMenu(true),
-	onTab: () => {
+	onTab: (event) => {
+		if (footerKeepsTabFocus(event)) return
 		triggerElement.value?.focus()
 		closeMenu()
 	},
 })
+
+const footerElement = ref<HTMLElement | null>(null)
+
+function footerKeepsTabFocus(event: KeyboardEvent) {
+	const focusable = Array.from(
+		footerElement.value?.querySelectorAll<HTMLElement>('button:not(:disabled)') ?? [],
+	)
+	if (focusable.length === 0) return false
+
+	const index = focusable.indexOf(event.target as HTMLElement)
+	if (index === -1) return !event.shiftKey
+	if (event.shiftKey && index === 0) {
+		event.preventDefault()
+		focusItem(Math.max(focusedIndex.value, 0))
+		return true
+	}
+	return event.shiftKey || index < focusable.length - 1
+}
 
 const { handleMouseEnter, handleMouseLeave, cancelLeave } = useHoverIntent({
 	closeDelay: HOVER_CLOSE_DELAY,
@@ -235,6 +258,9 @@ defineExpose({ open: openMenu, close: closeMenu })
 						</slot>
 					</ButtonMenuItem>
 				</template>
+				<div v-if="$slots.footer" ref="footerElement">
+					<slot name="footer" :close="closeMenu" />
+				</div>
 			</ButtonMenuPanel>
 		</Teleport>
 	</component>

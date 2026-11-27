@@ -110,9 +110,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Vybrané projekty ještě nejsou nainstalované"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Na stránku:"
-  },
   "button.accept": {
     "defaultMessage": "Přijmout"
   },
@@ -670,18 +667,6 @@
   },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Prohledat {count, number} {contentType}..."
-  },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Název (A-Z)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Název (Z-A)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Od nejnovějších"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Od nejstarších"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Aktualizovat vše"
@@ -3712,9 +3697,6 @@
   },
   "search.filter.included_content.remove_project.tooltip": {
     "defaultMessage": "Odebrat projekt"
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "Obsahuje: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filtr uzamčen"

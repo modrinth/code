@@ -2093,18 +2093,6 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "يرجى تعبئة نموذج الضريبة"
   },
-  "discover.install.back-to-server": {
-    "message": "العودة إلى الخادم"
-  },
-  "discover.install.back-to-setup": {
-    "message": "العودة إلى الإعداد"
-  },
-  "discover.install.cancel-reset": {
-    "message": "إلغاء إعادة التعيين"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "لا يوجد عالم خادم متاح للتثبيت."
-  },
   "discover.install.error.unsupported-content-type": {
     "message": "لا يمكن تثبيت هذا النوع من المحتوى على خادم من قسم الاستكشاف."
   },

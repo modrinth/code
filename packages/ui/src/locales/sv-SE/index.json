@@ -110,9 +110,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Valda projekt är inte installerade än"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Visa:"
-  },
   "button.accept": {
     "defaultMessage": "Acceptera"
   },
@@ -700,18 +697,6 @@
   },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Sök {count, number} {contentType}..."
-  },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Namn (A–Z)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Namn (Z–A)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Nyaste först"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Äldsta först"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Uppdatera alla"
@@ -4355,9 +4340,6 @@
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Sök efter ett projekt..."
   },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "Exkluderar: {projects}"
-  },
   "search.filter.included_content.exclude": {
     "defaultMessage": "Exkludera"
   },
@@ -4372,9 +4354,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "Sök innehåll..."
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "Inkluderar: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filter låst"

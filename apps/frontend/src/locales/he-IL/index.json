@@ -950,9 +950,6 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "יש להשלים את מילוי טופס המס"
   },
-  "discover.install.back-to-server": {
-    "message": "חזרה לשרת"
-  },
   "error.collection.404.list_item.1": {
     "message": "ייתכן שהקלדת כתובת URL שגויה של האוסף."
   },
