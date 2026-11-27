@@ -1,6 +1,6 @@
 import type { CreateProjectFlagRuleRequest, ProjectFlagRule } from '@modrinth/api-client'
-import { injectModrinthClient } from '@modrinth/ui'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
+import { useMutation, useMutationState, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import {
@@ -8,13 +8,19 @@ import {
 	projectFlagRuleQueryOptions,
 } from '~/composables/queries/project-flag'
 
-const FETCH_PAGE_SIZE = 100
-const queryKey = ['moderation', 'project-flag', 'rules'] as const
+import { addUndoNotification } from './undo-notification'
 
-export function useRules(active: () => boolean, onDeleted: () => void) {
+const FETCH_PAGE_SIZE = 100
+const UNDO_WINDOW_SECONDS = 10
+const queryKey = ['moderation', 'project-flag', 'rules'] as const
+const deleteRuleKey = [...queryKey, 'delete'] as const
+type RuleToDelete = Pick<ProjectFlagRule, 'id' | 'name'>
+
+export function useRules(active: () => boolean) {
 	const client = injectModrinthClient()
 	const api = client.labrinth.project_flags_internal
 	const queryClient = useQueryClient()
+	const notificationManager = injectNotificationManager()
 
 	const { data, isPending, isError, error, isFetching, refetch } = useQuery({
 		queryKey,
@@ -29,19 +35,62 @@ export function useRules(active: () => boolean, onDeleted: () => void) {
 		},
 		enabled: computed(() => active()),
 	})
-	const rules = computed(() => data.value ?? [])
+	const pendingRuleIds = useMutationState({
+		filters: { mutationKey: deleteRuleKey, exact: true, status: 'pending' },
+		select: (mutation) => (mutation.state.variables as RuleToDelete).id,
+	})
+	const rules = computed(() =>
+		(data.value ?? []).filter((rule) => !pendingRuleIds.value.includes(rule.id)),
+	)
 
-	const {
-		mutate: deleteRule,
-		isPending: isDeleting,
-		error: deleteError,
-		reset: resetDelete,
-	} = useMutation({
-		mutationFn: (id: string) => api.delete(id),
-		onSuccess: async (_, id) => {
+	const { mutate: deleteRule } = useMutation({
+		mutationKey: deleteRuleKey,
+		networkMode: 'always',
+		retry: false,
+		mutationFn: async ({ id, name }: RuleToDelete) => {
+			const notificationId = `project-flag-rule-delete:${id}`
+			const shouldDelete = await new Promise<boolean>((resolve) => {
+				const timer = setTimeout(() => {
+					notificationManager.removeNotification(notificationId)
+					resolve(true)
+				}, UNDO_WINDOW_SECONDS * 1000)
+
+				addUndoNotification(notificationManager, {
+					id: notificationId,
+					title: 'Rule removed',
+					text: `“${name}” will be permanently deleted in ${UNDO_WINDOW_SECONDS} seconds.`,
+					autoCloseMs: null,
+					copyable: false,
+					buttons: [
+						{
+							label: 'Undo',
+							action: () => {
+								clearTimeout(timer)
+								resolve(false)
+							},
+						},
+					],
+				})
+			})
+			if (shouldDelete) await api.delete(id)
+			return shouldDelete
+		},
+		onSuccess: async (deleted, { id }) => {
+			if (!deleted) return
+			await queryClient.cancelQueries({ queryKey })
 			queryClient.removeQueries({ queryKey: projectFlagRuleQueryOptions(client, id).queryKey })
-			onDeleted()
-			await queryClient.invalidateQueries({ queryKey })
+			queryClient.setQueryData<ProjectFlagRule[]>(queryKey, (rules) =>
+				rules?.filter((rule) => rule.id !== id),
+			)
+			void queryClient.invalidateQueries({ queryKey })
+		},
+		onError: (error) => {
+			notificationManager.addNotification({
+				type: 'error',
+				title: 'Could not delete the rule',
+				text: error.message,
+			})
+			void queryClient.invalidateQueries({ queryKey })
 		},
 	})
 
@@ -54,9 +103,6 @@ export function useRules(active: () => boolean, onDeleted: () => void) {
 		refetch,
 		rules,
 		deleteRule,
-		isDeleting,
-		deleteError,
-		resetDelete,
 	}
 }
 

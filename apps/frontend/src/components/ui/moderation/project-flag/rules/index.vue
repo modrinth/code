@@ -6,7 +6,6 @@
 				v-if="active"
 				type="colored"
 				color="brand"
-				:disabled="isDeleting"
 				:to="{ query: { ...$route.query, rule: 'new' }, hash: $route.hash }"
 			>
 				<PlusIcon />
@@ -44,8 +43,7 @@
 					:key="rule.id"
 					:id="`rule-${rule.id}`"
 					:rule="rule"
-					:edit-disabled="isDeleting"
-					:delete-disabled="isDeleting || ruleToDelete?.id === rule.id"
+					:delete-disabled="ruleToDelete?.id === rule.id"
 					@request-delete="confirmDelete(rule)"
 				>
 					<template #delete-confirmation>
@@ -56,21 +54,13 @@
 							aria-label="Confirm rule deletion"
 							@click.stop
 						>
-							<p class="m-0 text-contrast">Delete “{{ rule.name }}”? This cannot be undone.</p>
+							<p class="m-0 text-contrast">Delete “{{ rule.name }}”?</p>
 							<p class="m-0 text-sm text-secondary">
-								Existing flags will be preserved without a link to this rule.
+								Existing flags will be preserved without a link to this rule after deletion.
 							</p>
 							<div class="flex justify-end gap-2">
-								<Button :disabled="isDeleting" @click="ruleToDelete = null">Cancel</Button>
-								<Button
-									type="colored"
-									color="red"
-									:disabled="isDeleting"
-									@click="deleteRule(rule.id)"
-								>
-									<LoaderCircleIcon v-if="isDeleting" class="animate-spin" />
-									{{ isDeleting ? 'Deleting…' : 'Delete rule' }}
-								</Button>
+								<Button @click="ruleToDelete = null">Cancel</Button>
+								<Button type="colored" color="red" @click="removeRule(rule)">Delete rule</Button>
 							</div>
 						</div>
 					</template>
@@ -93,36 +83,26 @@ import { useRules } from './use-rules'
 const props = defineProps<{ active: boolean }>()
 const route = useRoute()
 const ruleToDelete = ref<ProjectFlagRule | null>(null)
-const {
-	data,
-	isPending,
-	isError,
-	error,
-	isFetching,
-	refetch,
-	rules,
-	deleteRule,
-	isDeleting,
-	deleteError,
-	resetDelete,
-} = useRules(() => props.active, handleDeleted)
+const { data, isPending, isError, error, isFetching, refetch, rules, deleteRule } = useRules(
+	() => props.active,
+)
 
 watch(
 	() => route.query.rule,
 	(rule) => {
-		if (rule && !isDeleting.value) ruleToDelete.value = null
+		if (rule) ruleToDelete.value = null
 	},
 )
 
-function handleDeleted() {
+function removeRule(rule: ProjectFlagRule) {
+	if (ruleToDelete.value?.id !== rule.id) return
 	ruleToDelete.value = null
+	deleteRule({ id: rule.id, name: rule.name })
 }
 
 function confirmDelete(rule: ProjectFlagRule) {
-	resetDelete()
 	ruleToDelete.value = rule
 }
 
 useFlagErrorNotification(error, 'Could not load project flag rules')
-useFlagErrorNotification(deleteError, 'Could not delete the rule')
 </script>

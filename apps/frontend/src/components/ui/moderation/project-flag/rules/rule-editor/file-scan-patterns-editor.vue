@@ -22,7 +22,7 @@
 			>
 				<Accordion
 					:open-by-default="isExpanded(entry, index)"
-					button-class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-3 px-3 py-2 text-left font-mono text-sm font-medium text-contrast transition-[filter] hover:brightness-125 focus-visible:-outline-offset-2 focus-visible:brightness-125 motion-reduce:transition-none"
+					button-class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-3 px-3 py-2 text-left text-sm font-medium text-contrast transition-[filter] hover:brightness-125 focus-visible:-outline-offset-2 focus-visible:brightness-125 motion-reduce:transition-none"
 					content-class="flex min-w-0 flex-col gap-3 px-3 pb-3 pt-1"
 					@on-open="expandedId = rowId(entry)"
 					@on-close="expandedId = null"
@@ -89,7 +89,7 @@
 							size="sm"
 							:disabled="disabled"
 							:label="`Remove pattern ${index + 1}`"
-							@click="patterns.splice(index, 1)"
+							@click="removePattern(index)"
 						>
 							<TrashIcon aria-hidden="true" />
 						</IconButton>
@@ -105,13 +105,20 @@ import { ChevronDownIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
 import { Accordion, Button, IconButton, Input } from '@modrinth/ui'
 import { nextTick, ref, useId, useTemplateRef } from 'vue'
 
+import { useUndoableDraftRemoval } from './use-undoable-draft-removal'
+
 export interface FileScanPattern {
 	name: string
 	pattern: string
 }
 
 const patterns = defineModel<FileScanPattern[]>({ required: true })
-defineProps<{ disabled?: boolean; errors: FileScanPattern[] }>()
+const props = defineProps<{ disabled?: boolean; errors: FileScanPattern[] }>()
+const removePattern = useUndoableDraftRemoval(
+	patterns,
+	() => props.disabled,
+	({ name }) => ({ title: 'File scan pattern removed', text: name.trim() || undefined }),
+)
 
 const id = useId()
 const headingId = `${id}-heading`

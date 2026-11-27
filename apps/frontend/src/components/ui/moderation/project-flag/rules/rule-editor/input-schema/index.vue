@@ -23,7 +23,7 @@
 			<div class="flex min-w-0 items-center gap-2">
 				<span
 					v-tooltip="
-						'Preview cached project context. Running a test evaluates the rule separately.'
+						'The schema example shows configured pattern names. Selecting a project previews its cached context. File scans run during rule tests.'
 					"
 					class="text-sm text-secondary"
 					>Sample</span
@@ -60,29 +60,6 @@
 			</div>
 		</Accordion>
 
-		<Accordion
-			v-if="!filter || visiblePatterns.length"
-			role="region"
-			aria-label="Patterns"
-			open-by-default
-			:button-class="sectionButtonClass"
-			content-class="flex min-w-0 flex-col gap-1 pt-1"
-		>
-			<template #title>Patterns</template>
-			<ul class="m-0 list-none p-0 font-mono text-sm">
-				<li
-					v-for="pattern in visiblePatterns"
-					:key="pattern.name"
-					class="flex min-w-0 items-baseline justify-between gap-2 py-1"
-				>
-					<span class="min-w-0 break-all text-link">{{ pattern.name }}</span>
-					<code class="max-w-[50%] truncate text-secondary" :title="pattern.pattern">{{
-						pattern.pattern
-					}}</code>
-				</li>
-			</ul>
-		</Accordion>
-
 		<div class="relative">
 			<Accordion
 				role="region"
@@ -103,7 +80,7 @@
 					<li v-for="module in filteredModules" :key="module.name">
 						<button
 							type="button"
-							class="cursor-pointer break-all border-0 bg-transparent p-0 text-left font-mono text-sm text-link hover:underline"
+							class="custom-focus-indicator cursor-pointer break-all border-0 bg-transparent p-0 text-left font-mono text-sm text-link hover:underline focus-visible:underline focus-visible:decoration-brand focus-visible:decoration-2 focus-visible:underline-offset-2"
 							@click="emit('openModule', module)"
 						>
 							{{ module.name }}
@@ -125,7 +102,7 @@
 				label="New module"
 				@click="emit('newModule')"
 			>
-				<PlusIcon aria-hidden="true" />
+				<PackagePlusIcon aria-hidden="true" />
 			</IconButton>
 		</div>
 
@@ -161,7 +138,6 @@
 				!isError &&
 				!modulesError &&
 				!visibleFields.length &&
-				!visiblePatterns.length &&
 				!filteredModules.length &&
 				!filteredPackages.length
 			"
@@ -179,7 +155,7 @@ import type {
 	ProjectFlagRuleParams,
 	ProjectFlagValue,
 } from '@modrinth/api-client'
-import { ExternalIcon, LoaderCircleIcon, PlusIcon } from '@modrinth/assets'
+import { ExternalIcon, LoaderCircleIcon, PackagePlusIcon } from '@modrinth/assets'
 import { Accordion, Button, IconButton, Input, injectModrinthClient } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
@@ -233,16 +209,6 @@ const packages = [
 ]
 const filterInput = ref('')
 const filter = computed(() => filterInput.value.trim().toLowerCase())
-const visiblePatterns = computed(() =>
-	props.patterns
-		.filter(
-			({ name, pattern }) =>
-				name.trim() && `${name} ${pattern}`.toLowerCase().includes(filter.value),
-		)
-		.filter(
-			({ name }, index, entries) => entries.findIndex((entry) => entry.name === name) === index,
-		),
-)
 const filteredModules = computed(
 	() => modules.value?.filter(({ name }) => name.toLowerCase().includes(filter.value)) ?? [],
 )
@@ -273,6 +239,20 @@ const fields = computed<[string, ProjectFlagValue][]>(() => {
 			}),
 	)
 	values.push(['ai', { ...aiFields, decisions }])
+	if (!projectId.value && Array.isArray(rest.scanned_files)) {
+		const foundPatterns = [
+			...new Set(
+				props.patterns
+					.filter(({ pattern }) => pattern.trim())
+					.map(({ name }) => name.trim())
+					.filter(Boolean),
+			),
+		]
+		rest.scanned_files = rest.scanned_files.map((file) => {
+			const fields = recordValue(file)
+			return fields ? { ...fields, found_patterns: foundPatterns } : file
+		})
+	}
 	return values.concat(Object.entries(rest))
 })
 const visibleFields = computed(() =>

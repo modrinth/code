@@ -37,8 +37,8 @@
 			>
 				<Accordion
 					:open-by-default="expandedId === rowId(entry)"
-					button-class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-3 px-3 py-2 text-left font-mono text-sm font-medium text-contrast transition-[filter] hover:brightness-125 focus-visible:-outline-offset-2 focus-visible:brightness-125 motion-reduce:transition-none"
-					content-class="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-2 px-3 pb-3 pt-1"
+					button-class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-3 px-3 py-2 text-left text-sm font-medium text-contrast transition-[filter] hover:brightness-125 focus-visible:-outline-offset-2 focus-visible:brightness-125 motion-reduce:transition-none"
+					content-class="flex min-w-0 flex-col gap-3 px-3 pb-3 pt-1"
 					@on-open="expandedId = rowId(entry)"
 					@on-close="expandedId = undefined"
 				>
@@ -64,17 +64,7 @@
 							@keydown.enter.prevent
 						/>
 					</div>
-					<IconButton
-						class="mt-6 enabled:hover:text-red"
-						type="quiet"
-						:disabled="disabled"
-						:circular="false"
-						:label="`Remove question ${index + 1}`"
-						@click="entries.splice(index, 1)"
-					>
-						<TrashIcon />
-					</IconButton>
-					<div class="col-span-full flex min-w-0 flex-col gap-1">
+					<div class="flex min-w-0 flex-col gap-1">
 						<label :for="`${rowId(entry)}-question`" class="text-sm font-medium text-secondary">
 							Question
 						</label>
@@ -88,7 +78,7 @@
 							@update:model-value="entry.question = $event ?? ''"
 						/>
 					</div>
-					<div class="col-span-full flex min-w-0 flex-col gap-1">
+					<div class="flex min-w-0 flex-col gap-1">
 						<span :id="`${rowId(entry)}-context`" class="text-sm font-medium text-secondary">
 							Include context
 						</span>
@@ -103,9 +93,25 @@
 							search-placeholder="Search context fields"
 						/>
 					</div>
-					<p v-if="errors[index]" role="alert" class="col-span-full m-0 text-sm text-red">
+					<p v-if="errors[index]" role="alert" class="m-0 text-sm text-red">
 						{{ errors[index] }}
 					</p>
+					<div class="flex min-w-0 items-center gap-1">
+						<p class="m-0 min-w-0 flex-1 break-words text-xs text-secondary">
+							Answers appear by key in <code class="text-link">ai.decisions</code> as a confidence
+							value from 0 to 1.
+						</p>
+						<IconButton
+							class="shrink-0 enabled:hover:text-red"
+							type="quiet"
+							size="sm"
+							:disabled="disabled"
+							:label="`Remove question ${index + 1}`"
+							@click="removeQuestion(index)"
+						>
+							<TrashIcon aria-hidden="true" />
+						</IconButton>
+					</div>
 				</Accordion>
 			</li>
 		</ul>
@@ -126,12 +132,14 @@ import {
 } from '@modrinth/ui'
 import { nextTick, ref, useId, useTemplateRef } from 'vue'
 
+import { useUndoableDraftRemoval } from './use-undoable-draft-removal'
+
 export interface DecisionQuestionEntry extends ProjectFlagDecisionQuestion {
 	key: string
 }
 
 const decisionQuestionsHelp =
-	'Each question uses only its selected project context. Each uncached question makes an independent AI call, including in the tester. Answers remain available by key in "ai.decisions".'
+	'Each question uses only its selected project context. Each uncached question makes an independent AI call, including in the tester.'
 
 const contextFields: MultiSelectOption<ProjectFlagContextField>[] = [
 	{ value: 'title', label: 'Title' },
@@ -152,7 +160,15 @@ const contextFields: MultiSelectOption<ProjectFlagContextField>[] = [
 ]
 
 const entries = defineModel<DecisionQuestionEntry[]>({ required: true })
-defineProps<{ disabled?: boolean; errors: string[] }>()
+const props = defineProps<{ disabled?: boolean; errors: string[] }>()
+const removeQuestion = useUndoableDraftRemoval(
+	entries,
+	() => props.disabled,
+	({ key }) => {
+		const trimmedKey = key.trim()
+		return { title: trimmedKey ? `Question “${trimmedKey}” removed` : 'Question removed' }
+	},
+)
 
 const id = useId()
 const headingId = `${id}-heading`

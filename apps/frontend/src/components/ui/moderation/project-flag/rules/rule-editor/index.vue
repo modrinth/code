@@ -1,8 +1,5 @@
 <template>
-	<div
-		class="flex min-w-0 flex-col bg-surface-2 lg:h-dvh lg:min-h-[36rem]"
-		@keydown.capture="onModuleSaveKeydown"
-	>
+	<div class="flex min-w-0 flex-col bg-surface-2 lg:h-dvh lg:min-h-[36rem]">
 		<header
 			class="flex shrink-0 flex-wrap items-center justify-between gap-x-5 gap-y-2 border-0 border-b border-solid border-surface-4 px-4 py-3"
 		>
@@ -61,7 +58,7 @@
 				</template>
 			</div>
 			<div class="ml-auto flex shrink-0 flex-wrap items-center gap-2">
-				<Button :disabled="!isDirty || isSaving" @click="discardRule">Discard</Button>
+				<Button :disabled="!hasChanges || isSaving" @click="discardRule">Discard</Button>
 				<span v-tooltip="saveDisabledReason" class="inline-flex rounded-xl">
 					<Button
 						type="colored"
@@ -116,65 +113,10 @@
 				class="flex min-h-0 min-w-0 flex-col bg-surface-2"
 				aria-label="Rhai editor"
 			>
-				<div class="flex shrink-0 flex-wrap items-center gap-2 bg-surface-2 px-3 py-2 pb-0">
-					<div class="flex min-w-0 flex-1 items-center gap-1">
-						<div
-							class="inline-flex min-w-0 flex-wrap items-center gap-1 rounded-xl border border-solid border-surface-5 p-0.5 shadow-sm"
-							role="tablist"
-							aria-label="Open editors"
-						>
-							<div
-								v-for="(tab, index) in editorTabs"
-								:key="tab.value"
-								role="presentation"
-								class="relative h-8 min-w-0 max-w-full"
-								@mousedown.middle="tab.module && $event.preventDefault()"
-								@auxclick.middle="closeTabWithMiddleClick($event, tab.module)"
-							>
-								<button
-									:id="`${id}-tab-${tab.value}`"
-									type="button"
-									role="tab"
-									:aria-controls="editorPanelId"
-									:aria-selected="tab.value === activeEditorTab"
-									:tabindex="tab.value === activeEditorTab ? 0 : -1"
-									class="flex h-full max-w-full items-center rounded-[10px] border border-solid px-2.5 text-sm font-medium outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow sm:max-w-56"
-									:class="[
-										tab.module && 'pe-9',
-										tab.value === activeEditorTab
-											? 'border-surface-5 bg-surface-4 text-contrast'
-											: 'border-transparent bg-transparent text-primary hover:bg-surface-4',
-									]"
-									@click="activeModuleId = tab.module?.id"
-									@keydown="onEditorTabKeydown($event, index, tab.module)"
-								>
-									<span class="truncate">{{ tab.label }}</span>
-								</button>
-								<IconButton
-									v-if="tab.module"
-									class="!absolute inset-y-0 end-1 my-auto"
-									type="quiet"
-									size="xs"
-									circular
-									:label="`Close ${tab.module.name || 'new module'}`"
-									:disabled="isSaving"
-									@click="closeModule(tab.module)"
-								>
-									<XIcon aria-hidden="true" />
-								</IconButton>
-							</div>
-						</div>
-						<TeleportOverflowMenu
-							type="quiet"
-							size="sm"
-							label="Open or create a module"
-							placement="bottom-start"
-							:options="moduleMenuOptions"
-						>
-							<PlusIcon aria-hidden="true" />
-						</TeleportOverflowMenu>
-					</div>
-					<div class="ml-auto flex shrink-0 items-center gap-2">
+				<div class="relative flex min-h-0 flex-1 flex-col" @keydown.capture="onEditorKeydown">
+					<div
+						class="absolute right-2 top-2 z-10 flex items-center gap-2 rounded-lg bg-surface-2 px-2"
+					>
 						<a
 							href="https://rhai.rs/book/"
 							target="_blank"
@@ -193,78 +135,22 @@
 							</template>
 						</TeleportPopoutMenu>
 					</div>
+					<RhaiExpressionEditor
+						:runtime="rhaiEditor"
+						:id="expressionId"
+						v-model="expression"
+						class="h-96 lg:h-auto lg:min-h-24 lg:flex-1"
+						:disabled="isSaving"
+						:error-id="expressionError ? expressionErrorId : undefined"
+						:word-wrap="wordWrap"
+						variant="source"
+						frameless
+					/>
+					<p v-if="expressionError" :id="expressionErrorId" class="m-0 px-3 py-1 text-sm text-red">
+						{{ expressionError }}
+					</p>
 				</div>
 
-				<div
-					:id="editorPanelId"
-					role="tabpanel"
-					:aria-labelledby="`${id}-tab-${activeEditorTab}`"
-					class="flex min-h-0 flex-1 flex-col"
-				>
-					<div
-						v-show="!activeModule"
-						class="flex min-h-0 flex-1 flex-col"
-						@keydown.capture="onEditorKeydown"
-					>
-						<RhaiExpressionEditor
-							:runtime="rhaiEditor"
-							:id="expressionId"
-							v-model="expression"
-							class="h-96 lg:h-auto lg:min-h-24 lg:flex-1"
-							:disabled="isSaving"
-							:error-id="expressionError ? expressionErrorId : undefined"
-							:word-wrap="wordWrap"
-							variant="source"
-							frameless
-						/>
-						<p
-							v-if="expressionError"
-							:id="expressionErrorId"
-							class="m-0 px-3 py-1 text-sm text-red"
-						>
-							{{ expressionError }}
-						</p>
-					</div>
-					<div v-if="activeModule" class="flex min-h-0 flex-1 flex-col">
-						<div class="flex shrink-0 flex-wrap items-center gap-2 px-3 py-1.5">
-							<Input
-								v-model="activeModule.name"
-								class="min-w-0 max-w-80 flex-1 basis-40"
-								size="small"
-								aria-label="Module name"
-								:disabled="isSaving"
-								placeholder="folder/module"
-								autocomplete="off"
-							/>
-							<Button
-								type="colored"
-								color="brand"
-								size="sm"
-								aria-keyshortcuts="Meta+S Control+S"
-								:loading="isSavingModule"
-								:disabled="isSaving || !moduleDirty(activeModule) || Boolean(activeModuleError)"
-								@click="saveModule(activeModule)"
-							>
-								Save module
-							</Button>
-							<p v-if="activeModuleError" role="alert" class="m-0 w-full text-sm text-red">
-								{{ activeModuleError }}
-							</p>
-						</div>
-						<RhaiExpressionEditor
-							:runtime="rhaiEditor"
-							:id="moduleEditorId"
-							:key="activeModule.id"
-							v-model="activeModule.script"
-							class="h-96 lg:h-auto lg:min-h-24 lg:flex-1"
-							:disabled="isSaving"
-							:word-wrap="wordWrap"
-							label="Module script"
-							variant="source"
-							frameless
-						/>
-					</div>
-				</div>
 				<HeightDivider
 					v-model="testerHeight"
 					class="hidden lg:block"
@@ -280,8 +166,9 @@
 					:style="{ '--tester-height': testerHeight === null ? undefined : `${testerHeight}px` }"
 					:params="params"
 					v-model:project-ids="testProjectIds"
+					:max-projects="MAX_TEST_PROJECTS"
 					:disabled="isSaving"
-					:has-unsaved-modules="dirtyModules.length > 0"
+					:has-unsaved-modules="Boolean(moduleEditor?.isDirty)"
 					:can-test="!expressionError && invalidPatternIndex === -1 && invalidQuestionIndex === -1"
 				/>
 			</section>
@@ -312,45 +199,24 @@
 			ref="leaveDialog"
 			title="Leave rule editor?"
 			header="You have unsaved changes"
-			body="Unsaved changes to this rule and its open modules will be lost."
+			body="Unsaved changes in the rule editor will be lost."
 			stay-label="Cancel"
 			leave-label="Leave"
 		/>
 		<ConfirmModal
 			ref="discardModal"
 			title="Discard changes?"
-			:description="
-				discardTarget === 'rule'
-					? 'Discard unsaved changes to this rule and its open modules?'
-					: 'Discard unsaved changes to this module?'
-			"
+			description="Discard unsaved changes to this rule?"
 			:markdown="false"
 			proceed-label="Discard"
-			:on-after-hide="() => (discardTarget = undefined)"
 			@proceed="applyDiscard"
 		/>
-		<NewModal
-			ref="renameModuleModal"
-			header="Rename shared module?"
-			max-width="32rem"
-			:on-after-hide="clearModuleRename"
-		>
-			<div v-if="moduleRename" class="flex flex-col gap-3">
-				<p class="m-0">Rename “{{ moduleRename.oldName }}” to “{{ moduleRename.newName }}”?</p>
-				<p class="m-0 text-secondary">
-					Rules and modules that import “{{ moduleRename.oldName }}” may fail in staging until their
-					imports are updated.
-				</p>
-			</div>
-			<template #actions>
-				<div class="flex flex-wrap justify-end gap-2">
-					<Button @click="renameModuleModal?.hide()">Cancel</Button>
-					<Button type="colored" color="brand" :disabled="isSaving" @click="confirmModuleRename">
-						Rename module
-					</Button>
-				</div>
-			</template>
-		</NewModal>
+		<SharedModuleEditorModal
+			ref="moduleEditor"
+			:runtime="rhaiEditor"
+			:modules="modules"
+			:word-wrap="wordWrap"
+		/>
 	</div>
 </template>
 
@@ -360,29 +226,19 @@ import type {
 	ProjectFlagRule,
 	ProjectFlagRuleParams,
 } from '@modrinth/api-client'
-import {
-	ArrowLeftIcon,
-	EditIcon,
-	ExternalIcon,
-	PlusIcon,
-	SettingsIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { ArrowLeftIcon, EditIcon, ExternalIcon, SettingsIcon, XIcon } from '@modrinth/assets'
 import {
 	Button,
-	type ButtonMenuOption,
 	ConfirmLeaveModal,
 	ConfirmModal,
 	CopyCode,
 	IconButton,
 	Input,
 	injectModrinthClient,
-	NewModal,
-	TeleportOverflowMenu,
 	TeleportPopoutMenu,
 	Toggle,
 } from '@modrinth/ui'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQuery } from '@tanstack/vue-query'
 import { useEventListener, useLocalStorage } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref, shallowRef, useId, useTemplateRef } from 'vue'
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
@@ -401,6 +257,7 @@ import RhaiExpressionEditor from './expression-editor.vue'
 import FileScanPatternsEditor, { type FileScanPattern } from './file-scan-patterns-editor.vue'
 import ProjectFlagInputSchema from './input-schema/index.vue'
 import type { RhaiEditorRuntime } from './rhai-editor-runtime'
+import SharedModuleEditorModal from './shared-module-editor-modal.vue'
 import ProjectFlagRuleTester from './tester.vue'
 
 const props = defineProps<{
@@ -411,6 +268,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ close: []; saved: [rule: ProjectFlagRule] }>()
 
+const MAX_TEST_PROJECTS = 100
 const DEFAULT_EXPRESSION = `print(\`\${project.name}: \${project.summary}\`);
 if project.slug == "foo" {
 	[#{ key: "illegal_slug", reason: "Project has illegal slug" }]
@@ -422,8 +280,6 @@ const id = useId()
 const nameErrorId = `${id}-name-error`
 const expressionId = `${id}-expression`
 const expressionErrorId = `${id}-expression-error`
-const moduleEditorId = `${id}-module`
-const editorPanelId = `${id}-editor-panel`
 const wordWrapId = `${id}-word-wrap`
 const wordWrap = useLocalStorage('moderation-project-flag-rule-word-wrap', true)
 const savedInputsWidth = useLocalStorage('moderation-flag-rule-inputs-width', 0)
@@ -452,27 +308,30 @@ const nameInput = useTemplateRef<InstanceType<typeof Input>>('nameInput')
 const nameButton = useTemplateRef<HTMLButtonElement>('nameButton')
 const leaveDialog = useTemplateRef<InstanceType<typeof ConfirmLeaveModal>>('leaveDialog')
 const discardModal = useTemplateRef<InstanceType<typeof ConfirmModal>>('discardModal')
-const renameModuleModal = useTemplateRef<InstanceType<typeof NewModal>>('renameModuleModal')
-const moduleRename = shallowRef<{ tab: ModuleTab; oldName: string; newName: string }>()
-const discardTarget = shallowRef<'rule' | ModuleTab>()
+const moduleEditor = useTemplateRef<InstanceType<typeof SharedModuleEditorModal>>('moduleEditor')
 const auth = useAuthState()
-const testProjectsByRule = useLocalStorage<Record<string, string[]>>(
+const storedTestProjects = useLocalStorage<Partial<Record<string, string[]>>>(
 	`moderation-project-flag-test-projects:${auth.value.user?.id ?? ''}`,
 	{},
 	{ initOnMounted: true },
 )
-const testProjectsKey = computed(() => (rule.value ? `rule:${rule.value.id}` : 'draft'))
 const testProjectIds = computed({
-	get: () => testProjectsByRule.value[testProjectsKey.value] ?? [],
+	get: () => storedTestProjects.value.shared ?? [],
 	set: (ids: string[]) => {
-		testProjectsByRule.value[testProjectsKey.value] = ids
+		storedTestProjects.value.shared = ids
 	},
 })
 
 onMounted(() => {
+	if (!storedTestProjects.value.shared) {
+		const legacyProjects = Object.values(storedTestProjects.value).flatMap((ids) => ids ?? [])
+		testProjectIds.value = [...new Set(legacyProjects)].slice(0, MAX_TEST_PROJECTS)
+	}
+
 	const id = props.initialProjectId
-	if (id && testProjectIds.value.length < 100 && !testProjectIds.value.includes(id)) {
-		testProjectIds.value = [...testProjectIds.value, id]
+	const projects = testProjectIds.value
+	if (id && projects.length < MAX_TEST_PROJECTS && !projects.includes(id)) {
+		testProjectIds.value = [...projects, id]
 	}
 })
 
@@ -564,7 +423,6 @@ const saveDisabledReason = computed(() => {
 	if (invalidQuestionIndex.value !== -1) {
 		return `Question ${invalidQuestionIndex.value + 1}: ${decisionQuestionErrors.value[invalidQuestionIndex.value]}`
 	}
-	if (!rule.value && dirtyModules.value.length) return 'Save or discard module changes first.'
 	return hasChanges.value ? undefined : 'Make a change to save this rule.'
 })
 const params = computed<ProjectFlagRuleParams>(() => ({
@@ -616,43 +474,22 @@ const {
 useFlagErrorNotification(saveError, 'Could not save the rule')
 
 function discardRule() {
-	if (!isDirty.value || isSaving.value) return
-	confirmDiscard('rule')
-}
-
-function confirmDiscard(target: 'rule' | ModuleTab) {
-	if (discardTarget.value || !discardModal.value) return
-	discardTarget.value = target
-	discardModal.value.show()
+	if (hasChanges.value && !isSaving.value) discardModal.value?.show()
 }
 
 function applyDiscard() {
-	const target = discardTarget.value
-	if (!target || isSaving.value) return
-	if (target === 'rule') {
-		resetSave()
-		resetRule()
-		moduleTabs.value = moduleTabs.value.flatMap((tab) =>
-			tab.saved ? [{ ...tab, ...tab.saved }] : [],
-		)
-		if (!activeModule.value) activeModuleId.value = undefined
-	} else {
-		removeModuleTab(target)
-	}
+	if (isSaving.value) return
+	resetSave()
+	resetRule()
 }
 
 async function saveRule() {
 	if (saveDisabledReason.value || isSaving.value) return
-	const isNew = !rule.value
 	try {
 		const saved = await save({
 			id: rule.value?.id,
 			body: { name: name.value, params: params.value },
 		})
-		if (isNew) {
-			testProjectsByRule.value[`rule:${saved.id}`] = [...testProjectIds.value]
-			delete testProjectsByRule.value[testProjectsKey.value]
-		}
 		rule.value = saved
 		resetRule()
 		emit('saved', saved)
@@ -668,242 +505,19 @@ function onEditorKeydown(event: KeyboardEvent) {
 	if (!event.repeat) tester.value?.evaluate()
 }
 
-interface ModuleTab extends ProjectFlagModule {
-	id: number
-	saved?: ProjectFlagModule
-}
-
 const client = injectModrinthClient()
-const api = client.labrinth.project_flags_internal
-const queryClient = useQueryClient()
-const moduleOptions = projectFlagModulesQueryOptions(client)
-const {
-	data: modules,
-	isPending: modulesPending,
-	isError: modulesError,
-	refetch: refetchModules,
-} = useQuery(moduleOptions)
-const moduleTabs = ref<ModuleTab[]>([])
-const activeModuleId = ref<number>()
-let nextModuleId = 0
-const activeModule = computed(() => moduleTabs.value.find((tab) => tab.id === activeModuleId.value))
-
-function moduleDirty(tab: ModuleTab) {
-	return tab.saved
-		? tab.name !== tab.saved.name || tab.script !== tab.saved.script
-		: Boolean(tab.name || tab.script)
-}
-
-const dirtyModules = computed(() => moduleTabs.value.filter(moduleDirty))
-
-const {
-	mutate: submitModule,
-	isPending: isSavingModule,
-	error: moduleSaveError,
-} = useMutation({
-	mutationFn: ({ name, script, saved }: ModuleTab) =>
-		saved ? api.updateModule(saved.name, { name, script }) : api.createModule({ name, script }),
-	onSuccess: async (module, tab) => {
-		tab.saved = module
-		await queryClient.invalidateQueries({ queryKey: moduleOptions.queryKey })
-	},
-})
-const isSaving = computed(() => isSavingRule.value || isSavingModule.value)
-useFlagErrorNotification(moduleSaveError, 'Could not save the module')
-
-function saveModule(tab?: ModuleTab) {
-	if (!tab || isSaving.value || moduleRename.value || !moduleDirty(tab)) return
-	if (moduleValidationError(tab)) return
-
-	const oldName = tab.saved?.name
-	const newName = tab.name
-	if (oldName && oldName !== newName) {
-		if (!renameModuleModal.value) return
-		moduleRename.value = { tab, oldName, newName }
-		renameModuleModal.value.show()
-		return
-	}
-
-	submitModule(tab)
-}
-
-function confirmModuleRename() {
-	const rename = moduleRename.value
-	if (!rename || isSaving.value) return
-	const { tab, oldName, newName } = rename
-	if (!renameModuleModal.value?.hide()) return
-	if (tab.saved?.name === oldName && tab.name === newName && !moduleValidationError(tab)) {
-		submitModule(tab)
-	}
-}
-
-function clearModuleRename() {
-	moduleRename.value = undefined
-}
-
-function onModuleSaveKeydown(event: KeyboardEvent) {
-	const tab = activeModule.value
-	if (
-		!tab ||
-		event.key.toLowerCase() !== 's' ||
-		!(event.metaKey || event.ctrlKey) ||
-		event.altKey ||
-		event.shiftKey ||
-		event.isComposing
-	)
-		return
-
-	event.preventDefault()
-	event.stopPropagation()
-	if (!event.repeat) saveModule(tab)
-}
-
-function moduleValidationError(tab: ModuleTab) {
-	if (!tab.name || Array.from(tab.name).length > 1024)
-		return 'Enter a module name of at most 1,024 characters.'
-	if (
-		/[\\\0]/.test(tab.name) ||
-		tab.name.split('/').some((part) => !part || part === '.' || part === '..')
-	)
-		return 'Enter a valid slash-separated module name.'
-	if (Array.from(tab.script).length > 65535 || tab.script.includes('\0'))
-		return 'Enter a script of at most 65,535 characters without null characters.'
-	if (
-		modules.value?.some(({ name }) => name === tab.name && name !== tab.saved?.name) ||
-		moduleTabs.value.some(
-			(other) => other !== tab && (other.name === tab.name || other.saved?.name === tab.name),
-		)
-	)
-		return 'A module with this name already exists.'
-	return undefined
-}
-
-const activeModuleError = computed(() =>
-	activeModule.value && moduleDirty(activeModule.value)
-		? moduleValidationError(activeModule.value)
-		: undefined,
-)
-
-const activeEditorTab = computed(() => activeModuleId.value ?? 'expression')
-const editorTabs = computed<{ value: string | number; label: string; module?: ModuleTab }[]>(() => [
-	{ value: 'expression', label: 'Rule expression' },
-	...moduleTabs.value.map((tab) => ({
-		value: tab.id,
-		label: `${tab.name || 'New module'}${moduleDirty(tab) ? ' *' : ''}`,
-		module: tab,
-	})),
-])
-const moduleMenuOptions = computed<ButtonMenuOption[]>(() => [
-	{ id: 'new', label: 'New module', icon: PlusIcon, action: newModule },
-	...(modules.value ?? []).map((module) => ({
-		id: `module:${module.name}`,
-		label: module.name,
-		action: () => openModule(module),
-	})),
-	...(modulesError.value
-		? [
-				{
-					id: 'retry',
-					label: 'Retry loading modules',
-					action: () => {
-						void refetchModules()
-					},
-				},
-			]
-		: modules.value?.length
-			? []
-			: [
-					{
-						id: 'empty',
-						label: modulesPending.value ? 'Loading…' : 'No saved modules',
-						disabled: true,
-						action: () => {},
-					},
-				]),
-])
-
-function closeTabWithMiddleClick(event: MouseEvent, tab?: ModuleTab) {
-	if (!tab) return
-	event.preventDefault()
-	closeModule(tab)
-}
-
-function onEditorTabKeydown(event: KeyboardEvent, index: number, tab?: ModuleTab) {
-	const tabs = editorTabs.value
-	let nextIndex: number
-	switch (event.key) {
-		case 'ArrowLeft':
-			nextIndex = (index + tabs.length - 1) % tabs.length
-			break
-		case 'ArrowRight':
-			nextIndex = (index + 1) % tabs.length
-			break
-		case 'Home':
-			nextIndex = 0
-			break
-		case 'End':
-			nextIndex = tabs.length - 1
-			break
-		case 'Delete':
-			if (!tab) return
-			event.preventDefault()
-			closeModule(tab)
-			return
-		default:
-			return
-	}
-	event.preventDefault()
-	void selectModuleTab(tabs[nextIndex]?.module?.id)
-}
-
-function selectModuleTab(id?: number) {
-	activeModuleId.value = id
-	return focusEditorTab()
-}
-
-async function focusEditorTab() {
-	await nextTick()
-	editorPane.value?.querySelector<HTMLButtonElement>('[role="tab"][aria-selected="true"]')?.focus()
-}
+const { data: modules } = useQuery(projectFlagModulesQueryOptions(client))
+const isSaving = computed(() => isSavingRule.value || Boolean(moduleEditor.value?.isBusy))
 
 function openModule(module: ProjectFlagModule) {
-	if (isSaving.value) return
-	const existing = moduleTabs.value.find((tab) => tab.saved?.name === module.name)
-	if (existing) {
-		return selectModuleTab(existing.id)
-	}
-	const id = nextModuleId++
-	moduleTabs.value.push({ ...module, id, saved: module })
-	return selectModuleTab(id)
+	if (!isSaving.value) moduleEditor.value?.show(module)
 }
 
 function newModule() {
-	if (isSaving.value) return
-	const draft = moduleTabs.value.find((tab) => !tab.saved && !moduleDirty(tab))
-	if (draft) {
-		return selectModuleTab(draft.id)
-	}
-	const id = nextModuleId++
-	moduleTabs.value.push({ id, name: '', script: '' })
-	return selectModuleTab(id)
+	if (!isSaving.value) moduleEditor.value?.show()
 }
 
-function closeModule(tab: ModuleTab) {
-	if (isSaving.value) return
-	if (moduleDirty(tab)) {
-		confirmDiscard(tab)
-		return
-	}
-	removeModuleTab(tab)
-}
-
-function removeModuleTab(tab: ModuleTab) {
-	moduleTabs.value = moduleTabs.value.filter(({ id }) => id !== tab.id)
-	if (activeModuleId.value === tab.id) activeModuleId.value = undefined
-	void focusEditorTab()
-}
-
-const isDirty = computed(() => hasChanges.value || dirtyModules.value.length > 0)
+const isDirty = computed(() => hasChanges.value || Boolean(moduleEditor.value?.isDirty))
 
 useEventListener(
 	computed(() => (isDirty.value ? editorPane.value?.ownerDocument.defaultView : null)),

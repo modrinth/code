@@ -206,11 +206,11 @@ import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import PanelDivider from '~/components/project-review/tech-review/panel-divider.vue'
 import { projectFlagProjectContextQueryKey } from '~/composables/queries/project-flag'
 
-const MAX_PROJECTS = 100
 const projectIdPattern = /^[A-Za-z0-9]{1,11}$/
 const base62Digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 const props = defineProps<{
 	params: ProjectFlagRuleParams
+	maxProjects: number
 	hasUnsavedModules: boolean
 	canTest: boolean
 	disabled: boolean
@@ -343,8 +343,8 @@ function pasteIds(event: ClipboardEvent) {
 function addProjects(ids: string[]) {
 	addError.value = ''
 	const next = [...new Set([...projectIds.value, ...ids])]
-	if (next.length > MAX_PROJECTS) {
-		addError.value = `Add up to ${MAX_PROJECTS} unique project IDs.`
+	if (next.length > props.maxProjects) {
+		addError.value = `Add up to ${props.maxProjects} unique project IDs.`
 		return
 	}
 	projectIds.value = next

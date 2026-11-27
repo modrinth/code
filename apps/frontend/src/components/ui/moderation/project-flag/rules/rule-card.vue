@@ -50,8 +50,8 @@
 					</dl>
 					<p v-else class="m-0 text-sm text-secondary">No file scan patterns.</p>
 				</section>
-				<section class="flex min-w-0 flex-col gap-2" aria-label="AI questions">
-					<h3 class="m-0 text-sm font-semibold text-contrast">AI questions</h3>
+				<section class="flex min-w-0 flex-col gap-2" aria-label="Questions">
+					<h3 class="m-0 text-sm font-semibold text-contrast">Questions</h3>
 					<dl v-if="questions.length" class="m-0 divide-y divide-surface-4">
 						<div v-for="[key, { question }] in questions" :key="key" class="flex flex-col gap-1 py-2">
 							<dt class="break-words text-sm font-medium text-primary">{{ key }}</dt>
@@ -60,7 +60,7 @@
 							</dd>
 						</div>
 					</dl>
-					<p v-else class="m-0 text-sm text-secondary">No AI questions.</p>
+					<p v-else class="m-0 text-sm text-secondary">No questions.</p>
 				</section>
 			</div>
 		</div>
