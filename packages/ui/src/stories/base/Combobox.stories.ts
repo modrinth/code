@@ -1,4 +1,5 @@
 import {
+	BoxIcon,
 	DownloadIcon,
 	EyeIcon,
 	EyeOffIcon,
@@ -380,18 +381,19 @@ export const DropdownFooterOnly: StoryObj = {
 	},
 }
 
-/** Custom `#option` + `#search-selection-affix` (idle search field overlay), with `sync-with-selection`. */
+/** Search input slots alongside custom options and an idle selection affix. */
 export const SearchableWithOptionAndSelectionAffix: StoryObj = {
 	render: () => ({
 		components: { Combobox },
+		setup: () => ({ BoxIcon }),
 		data: () => ({
-			selected: '100',
+			selected: '99',
 		}),
 		computed: {
 			options(): { value: string; label: string; tag?: 'BETA' }[] {
 				return [
-					{ value: '100', label: 'Build 100' },
-					{ value: '99', label: 'Build 99', tag: 'BETA' },
+					{ value: '100', label: '100' },
+					{ value: '99', label: '99', tag: 'BETA' },
 				]
 			},
 		},
@@ -401,9 +403,13 @@ export const SearchableWithOptionAndSelectionAffix: StoryObj = {
 				:options="options"
 				searchable
 				sync-with-selection
+				search-input-size="small"
+				:search-icon="BoxIcon"
 				placeholder="Select build"
 				search-placeholder="Search builds..."
 			>
+				<template #prefix>#</template>
+				<template #suffix><span class="pl-1">Paper</span></template>
 				<template #option="{ item, isSelected }">
 					<div class="flex w-full items-center justify-between gap-2">
 						<span

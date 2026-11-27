@@ -1,6 +1,6 @@
 <template>
 	<section ref="section" class="flex min-w-0 flex-col gap-1" :aria-labelledby="headingId">
-		<div class="flex flex-wrap items-center justify-between gap-2">
+		<div class="flex min-h-[38px] flex-wrap items-center justify-between gap-2">
 			<div class="flex items-center gap-1.5">
 				<h3 :id="headingId" class="m-0 text-sm font-semibold text-primary">Questions</h3>
 				<button

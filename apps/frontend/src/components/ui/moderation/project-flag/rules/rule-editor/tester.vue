@@ -56,7 +56,7 @@
 					search-placeholder="Add name, slug or IDs…"
 					search-type="search"
 					search-name="flag-rule-add-test-projects"
-					search-autocomplete="new-password"
+					search-autocomplete="off"
 					:search-spellcheck="false"
 					dropdown-width="24rem"
 					@search-input="searchInput = $event"

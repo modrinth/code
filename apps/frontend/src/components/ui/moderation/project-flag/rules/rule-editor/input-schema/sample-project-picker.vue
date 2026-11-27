@@ -6,6 +6,7 @@
 		:search-value="selectedOption?.label ?? ''"
 		:no-options-message="searchMessage"
 		:show-chevron="false"
+		:search-icon="BoxIcon"
 		:search-input-attrs="{
 			'aria-label': 'Sample project',
 			class: '[&::-webkit-search-cancel-button]:hidden',
@@ -13,10 +14,11 @@
 		searchable
 		disable-search-filter
 		clearable
-		search-placeholder="Select project"
+		search-placeholder="Project name or ID"
+		search-input-size="small"
 		search-type="search"
 		search-name="flag-rule-sample-project-search"
-		search-autocomplete="new-password"
+		search-autocomplete="off"
 		dropdown-width="22rem"
 		@search-input="onSearchInput"
 		@search-blur="searchInput = ''"
@@ -31,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import { BoxIcon } from '@modrinth/assets'
 import { Avatar, Combobox, type ComboboxOption, injectModrinthClient, TagItem } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { refDebounced } from '@vueuse/core'

@@ -2,20 +2,10 @@
 	<div ref="containerRef" class="relative inline-block w-full">
 		<!-- Searchable mode: input trigger -->
 		<div v-if="searchable" class="relative w-full rounded-xl">
-			<!-- Selection mirror must match InputFrame's leading and trailing slot geometry. -->
-			<div
-				v-if="searchSelectionOverlayVisible"
-				class="pointer-events-none absolute inset-y-0 left-0 right-0 z-[2] flex min-w-0 items-center gap-2 font-medium text-primary"
-				:class="[showSearchIcon ? 'pl-10' : 'pl-3', showChevron ? 'pr-10' : 'pr-3']"
-				aria-hidden="true"
-			>
-				<span class="min-w-0 truncate">{{ searchQuery }}</span>
-				<slot name="search-selection-affix" :option="selectedOption" />
-			</div>
 			<Input
 				ref="searchTriggerRef"
 				v-model="searchQuery"
-				:icon="showSearchIcon ? SearchIcon : undefined"
+				:icon="resolvedSearchIcon"
 				:type="searchType"
 				:name="searchName"
 				:placeholder="searchPlaceholder || placeholder"
@@ -28,6 +18,7 @@
 				:inputmode="searchInputmode"
 				:input-attrs="searchInputAttrs"
 				:appearance="searchInputVariant"
+				:size="searchInputSize"
 				wrapper-class="w-full"
 				:input-class="resolvedSearchInputClass"
 				class="relative z-[1]"
@@ -38,6 +29,18 @@
 				@click="handleSearchClick"
 				@clear="handleSearchClear"
 			>
+				<template v-if="$slots.prefix" #prefix>
+					<slot name="prefix" />
+				</template>
+				<template v-if="$slots.suffix" #suffix>
+					<slot name="suffix" />
+				</template>
+				<template v-if="searchSelectionOverlayVisible" #control-overlay>
+					<div class="flex min-w-0 items-center gap-2">
+						<span class="min-w-0 truncate">{{ searchQuery }}</span>
+						<slot name="search-selection-affix" :option="selectedOption" />
+					</div>
+				</template>
 				<template v-if="showChevron" #trailing>
 					<button
 						type="button"
@@ -236,6 +239,7 @@ import type {
 	ButtonType,
 } from './buttons/types'
 import Input from './inputs/Input.vue'
+import type { InputSize } from './inputs/types'
 
 export interface ComboboxOption<T> {
 	value: T
@@ -328,6 +332,8 @@ const props = withDefaults(
 		selectSearchTextOnFocus?: boolean
 		/** Show a search icon in the searchable input */
 		showSearchIcon?: boolean
+		/** Custom leading icon for the searchable input */
+		searchIcon?: Component
 		searchType?: 'text' | 'search'
 		searchName?: string
 		searchInputmode?: 'text' | 'search'
@@ -337,6 +343,7 @@ const props = withDefaults(
 		searchSpellcheck?: boolean
 		searchInputAttrs?: Record<string, string | number | boolean | undefined>
 		searchInputVariant?: ComboboxSearchInputVariant
+		searchInputSize?: InputSize
 	}>(),
 	{
 		placeholder: 'Select an option',
@@ -355,6 +362,7 @@ const props = withDefaults(
 		showSearchIcon: false,
 		searchType: 'text',
 		searchInputVariant: 'surface',
+		searchInputSize: 'standard',
 		triggerType: 'base',
 		triggerSize: 'md',
 		triggerInteraction: 'surface',
@@ -446,6 +454,10 @@ const searchSelectionOverlayVisible = computed(() => {
 	if (isOpen.value || userHasTyped.value) return false
 	return true
 })
+
+const resolvedSearchIcon = computed(
+	() => props.searchIcon ?? (props.showSearchIcon ? SearchIcon : undefined),
+)
 
 const resolvedSearchInputClass = computed(() => {
 	const parts: string[] = []

@@ -100,7 +100,7 @@
 			<PanelDivider
 				v-model="savedScopeWidth"
 				class="hidden md:block"
-				label="Resize in scope width"
+				label="Resize rule reference width"
 				side="left"
 				width-property="--scope-width"
 				responsive
