@@ -26,7 +26,7 @@ import { trackEvent } from '@/helpers/analytics'
 import { toError } from '@/helpers/errors'
 import { install_duplicate_instance } from '@/helpers/install'
 import { edit, edit_icon } from '@/helpers/instance'
-import { FAVORITES_GROUP_ID } from '@/helpers/instance-groups'
+import { FAVORITES_GROUP_ID } from '@/platform/app-lib/instance-groups/types'
 
 import { injectInstanceActions } from './instance-actions/context'
 import type { InstanceCard } from './use-instance-actions'

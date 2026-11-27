@@ -19,7 +19,7 @@ import {
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
-import { get_all as getRunningProcesses } from '@/helpers/process.js'
+import { processListQueryOptions } from '@/features/instances/queries'
 import { pickDirectory } from '@/platform/dialogs'
 
 import { isDriveRoot, isNestedPath, normalizePath } from './paths'
@@ -98,12 +98,7 @@ const modal = ref<InstanceType<typeof NewModal>>()
 const newDir = ref<string | null>(null)
 const locked = ref(false)
 
-const processesQuery = useQuery({
-	queryKey: ['processes', 'list'],
-	networkMode: 'always',
-	queryFn: (): Promise<unknown[]> => getRunningProcesses(),
-	staleTime: 0,
-})
+const processesQuery = useQuery(processListQueryOptions())
 const instancesRunning = computed(() => (processesQuery.data.value?.length ?? 0) > 0)
 
 const normalizedNew = computed(() =>

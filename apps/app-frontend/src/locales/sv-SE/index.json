@@ -1028,23 +1028,8 @@
   "app.library.context-menu.create-instance": {
     "message": "Ny instans"
   },
-  "app.library.filter.add": {
-    "message": "Lägg till filter"
-  },
-  "app.library.filter.clear": {
-    "message": "Rensa filter"
-  },
   "app.library.filter.game-version": {
     "message": "Spelversion"
-  },
-  "app.library.filter.install-state": {
-    "message": "Installationsstatus"
-  },
-  "app.library.filter.install-state.installed": {
-    "message": "Installerad"
-  },
-  "app.library.filter.install-state.not-installed": {
-    "message": "Inte installerad"
   },
   "app.library.filter.instance-type": {
     "message": "Instanstyp"
@@ -1057,9 +1042,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "Server"
-  },
-  "app.library.filter.label": {
-    "message": "Filtrera efter"
   },
   "app.library.filter.loader": {
     "message": "Läsare"
@@ -1301,9 +1283,6 @@
   "app.library.search.no-results.title": {
     "message": "Inga instanser matchar din sökning."
   },
-  "app.library.search.placeholder": {
-    "message": "Sök"
-  },
   "app.library.selection.aria-label": {
     "message": "Markerade instanser"
   },
@@ -1330,9 +1309,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "Timmar spelade"
-  },
-  "app.library.sort.label": {
-    "message": "Sortera efter"
   },
   "app.library.sort.last-played": {
     "message": "Senast spelade"

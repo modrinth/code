@@ -1028,23 +1028,8 @@
   "app.library.context-menu.create-instance": {
     "message": "Новая сборка"
   },
-  "app.library.filter.add": {
-    "message": "Добавить фильтр"
-  },
-  "app.library.filter.clear": {
-    "message": "Очистить фильтры"
-  },
   "app.library.filter.game-version": {
     "message": "Версия игры"
-  },
-  "app.library.filter.install-state": {
-    "message": "Статус установки"
-  },
-  "app.library.filter.install-state.installed": {
-    "message": "Установлено"
-  },
-  "app.library.filter.install-state.not-installed": {
-    "message": "Не установлено"
   },
   "app.library.filter.instance-type": {
     "message": "Тип сборки"
@@ -1057,9 +1042,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "Сервер"
-  },
-  "app.library.filter.label": {
-    "message": "Фильтры:"
   },
   "app.library.filter.loader": {
     "message": "Загрузчик"
@@ -1301,9 +1283,6 @@
   "app.library.search.no-results.title": {
     "message": "Нет сборок по вашему запросу."
   },
-  "app.library.search.placeholder": {
-    "message": "Поиск"
-  },
   "app.library.selection.aria-label": {
     "message": "Выбранные сборки"
   },
@@ -1330,9 +1309,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "Часы игры"
-  },
-  "app.library.sort.label": {
-    "message": "Сортировка:"
   },
   "app.library.sort.last-played": {
     "message": "Последний запуск"

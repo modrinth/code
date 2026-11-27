@@ -4,9 +4,9 @@ import { type ButtonMenuOption, useVIntl } from '@modrinth/ui'
 import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import { libraryInstanceMessages } from '@/features/library/messages'
 
-import { injectSharedInstanceActions, type SharedInstanceInstallOptions } from './actions-context'
+import { injectSharedInstanceActions } from './actions-context'
 import { getSharedInstanceRemovalMode, sharedInstanceRemovalButtonMessages } from './removal'
-import type { UninstalledSharedInstance } from './types'
+import type { SharedInstanceInstallOptions, UninstalledSharedInstance } from './types'
 
 export function useSharedInstanceMenu() {
 	const { formatMessage } = useVIntl()

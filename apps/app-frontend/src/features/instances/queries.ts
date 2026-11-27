@@ -11,7 +11,7 @@ import {
 	list_synced_screenshots,
 } from '@/helpers/instance'
 import { loadInstanceContentData } from '@/helpers/instance-content'
-import { get_by_instance_id } from '@/helpers/process'
+import { get_all as getRunningProcesses, get_by_instance_id } from '@/helpers/process'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { getRecommendedJavaVersion } from '@/platform/app-lib/instances/commands'
 import { refreshSharedInstanceLock } from '@/platform/app-lib/shared-instances/commands'
@@ -58,6 +58,17 @@ export const instanceKeys = {
 		] as const,
 }
 
+export type RunningProcess = {
+	uuid: string
+	instance_id: string
+	start_time: string
+}
+
+export const processKeys = {
+	all: ['processes'] as const,
+	list: () => [...processKeys.all, 'list'] as const,
+}
+
 export const screenshotKeys = {
 	all: ['screenshots'] as const,
 	global: () => [...screenshotKeys.all, 'global'] as const,
@@ -71,6 +82,15 @@ export function instanceListQueryOptions() {
 		networkMode: 'always',
 		queryFn: listInstances,
 		staleTime: 30_000,
+	})
+}
+
+export function processListQueryOptions() {
+	return queryOptions({
+		queryKey: processKeys.list(),
+		networkMode: 'always',
+		queryFn: (): Promise<RunningProcess[]> => getRunningProcesses(),
+		staleTime: 0,
 	})
 }
 

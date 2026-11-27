@@ -980,12 +980,6 @@
   "app.library.context-menu.create-instance": {
     "message": "Új példány"
   },
-  "app.library.filter.add": {
-    "message": "Szűrő hozzáadása"
-  },
-  "app.library.filter.clear": {
-    "message": "Szűrők törlése"
-  },
   "app.library.filter.game-version": {
     "message": "Játékverzió"
   },
@@ -1000,9 +994,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "Szerver"
-  },
-  "app.library.filter.label": {
-    "message": "Szűrés"
   },
   "app.library.filter.loader": {
     "message": "Betöltő"
@@ -1190,9 +1181,6 @@
   "app.library.search.no-results.title": {
     "message": "Egy példány se egyezik a kereséseddel."
   },
-  "app.library.search.placeholder": {
-    "message": "Keresés"
-  },
   "app.library.selection.aria-label": {
     "message": "Kiválasztott példányok"
   },
@@ -1219,9 +1207,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "Játszott órák"
-  },
-  "app.library.sort.label": {
-    "message": "Rendezés"
   },
   "app.library.sort.last-played": {
     "message": "Legutóbb játszva"

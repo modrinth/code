@@ -989,23 +989,8 @@
   "app.library.context-menu.create-instance": {
     "message": "Nieuwe instantie"
   },
-  "app.library.filter.add": {
-    "message": "Filter toevoegen"
-  },
-  "app.library.filter.clear": {
-    "message": "Filters verwijderen"
-  },
   "app.library.filter.game-version": {
     "message": "Spel versie"
-  },
-  "app.library.filter.install-state": {
-    "message": "Installatiestatus"
-  },
-  "app.library.filter.install-state.installed": {
-    "message": "Geïnstalleerd"
-  },
-  "app.library.filter.install-state.not-installed": {
-    "message": "Niet geïnstalleerd"
   },
   "app.library.filter.instance-type": {
     "message": "Type instantie"
@@ -1018,9 +1003,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "Server"
-  },
-  "app.library.filter.label": {
-    "message": "Filteren op"
   },
   "app.library.filter.loader": {
     "message": "Lader"
@@ -1271,9 +1253,6 @@
   "app.library.search.no-results.title": {
     "message": "Geen talen komen overeen met je zoekopdracht."
   },
-  "app.library.search.placeholder": {
-    "message": "Zoeken"
-  },
   "app.library.selection.aria-label": {
     "message": "Selecteer instantie"
   },
@@ -1303,9 +1282,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "Uren gespeeld"
-  },
-  "app.library.sort.label": {
-    "message": "Sorteer op"
   },
   "app.library.sort.last-played": {
     "message": "Laatst afgespeeld"

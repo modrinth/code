@@ -171,8 +171,8 @@ import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountR
 import SharedInstancePublishModal from '@/components/ui/shared-instances/SharedInstancePublishModal.vue'
 import { injectInstancePage } from '@/features/instances/instance-context'
 import { injectSharedInstance } from '@/features/instances/shared-instance-context'
+import { useOwnedSharedInstanceLimit } from '@/features/instances/use-owned-shared-instance-limit'
 import { OWNED_SHARED_INSTANCES_FILTER } from '@/features/library/library-instance'
-import { useOwnedSharedInstanceLimit } from '@/features/library/shared-instances/use-owned-shared-instance-limit'
 import {
 	getSharedInstanceUnavailableReason,
 	isSharedInstanceLimitReachedError,

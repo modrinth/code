@@ -11,13 +11,13 @@ import {
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import InstanceSharedBadge from '@/components/ui/library/instance-group/instance-shared-badge.vue'
 import {
 	isUninstalledSharedInstance,
 	type LibraryInstance,
 	type SharedInstanceOwner,
 } from '@/features/library/library-instance'
 import { libraryInstanceMessages } from '@/features/library/messages'
+import InstanceSharedBadge from '@/features/library/shared-instances/InstanceSharedBadge.vue'
 import { getInstanceIconUrl } from '@/helpers/instance'
 
 const props = defineProps<{

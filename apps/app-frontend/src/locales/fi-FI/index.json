@@ -884,9 +884,6 @@
   "app.java-selector.installing": {
     "message": "Asennetaan..."
   },
-  "app.library.filter.add": {
-    "message": "Lisää suodatin"
-  },
   "app.library.filter.game-version": {
     "message": "Peliversio"
   },

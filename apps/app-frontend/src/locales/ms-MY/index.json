@@ -362,9 +362,6 @@
   "app.library.instance.stop": {
     "message": "Hentikan"
   },
-  "app.library.search.placeholder": {
-    "message": "Cari"
-  },
   "app.library.sort.loader": {
     "message": "Pemuat"
   },

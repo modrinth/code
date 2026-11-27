@@ -464,12 +464,6 @@
   "app.library.context-menu.create-instance": {
     "message": "Instans baru"
   },
-  "app.library.filter.add": {
-    "message": "Tambah filter"
-  },
-  "app.library.filter.clear": {
-    "message": "Bersihkan filter"
-  },
   "app.library.filter.instance-type.server": {
     "message": "Peladen"
   },

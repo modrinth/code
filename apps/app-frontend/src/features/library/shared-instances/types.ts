@@ -14,3 +14,19 @@ export type UninstalledSharedInstance = {
 	game_version: string
 	loader: InstanceLoader
 }
+
+export type SharedInstanceInstallOptions = {
+	event?: MouseEvent
+	onInstalled?: () => void
+}
+
+export interface SharedInstanceModalsExposed {
+	loadingIds: Set<string>
+	removing: boolean
+	install: (
+		instance: UninstalledSharedInstance,
+		options?: SharedInstanceInstallOptions,
+	) => Promise<void>
+	prefetchInstall: (instance: UninstalledSharedInstance) => void
+	requestRemove: (instances: UninstalledSharedInstance[], event?: MouseEvent) => void
+}

@@ -857,12 +857,6 @@
   "app.library.context-menu.create-instance": {
     "message": "העתק חדש"
   },
-  "app.library.filter.add": {
-    "message": "הוספת מסנן"
-  },
-  "app.library.filter.clear": {
-    "message": "נקה מסננים"
-  },
   "app.library.filter.game-version": {
     "message": "גרסת משחק"
   },
@@ -877,9 +871,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "שרת"
-  },
-  "app.library.filter.label": {
-    "message": "סנן לפי"
   },
   "app.library.filter.loader": {
     "message": "מפעיל"
@@ -1076,9 +1067,6 @@
   "app.library.search.no-results.title": {
     "message": "שום התקן מתאים לחיפוש שלך."
   },
-  "app.library.search.placeholder": {
-    "message": "חפש"
-  },
   "app.library.selection.aria-label": {
     "message": "התקנים בחורים"
   },
@@ -1105,9 +1093,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "שעות משחק"
-  },
-  "app.library.sort.label": {
-    "message": "סדר לפי"
   },
   "app.library.sort.last-played": {
     "message": "אחרון ששוחק"

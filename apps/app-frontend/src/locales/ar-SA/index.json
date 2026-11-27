@@ -947,12 +947,6 @@
   "app.library.context-menu.create-instance": {
     "message": "نسخة جديدة"
   },
-  "app.library.filter.add": {
-    "message": "أضف فلتر"
-  },
-  "app.library.filter.clear": {
-    "message": "مسح الفلاتر"
-  },
   "app.library.filter.game-version": {
     "message": "إصدار اللُعبة"
   },
@@ -967,9 +961,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "خادم"
-  },
-  "app.library.filter.label": {
-    "message": "التصفية حسب"
   },
   "app.library.filter.loader": {
     "message": "محمل"
@@ -1157,9 +1148,6 @@
   "app.library.search.no-results.title": {
     "message": "ما من نسخة تتطابق مع بحثك."
   },
-  "app.library.search.placeholder": {
-    "message": "البحث"
-  },
   "app.library.selection.aria-label": {
     "message": "حدد النسخة"
   },
@@ -1186,9 +1174,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "ساعات اللعب"
-  },
-  "app.library.sort.label": {
-    "message": "فرز حسب"
   },
   "app.library.sort.last-played": {
     "message": "آخر لُعبَة"

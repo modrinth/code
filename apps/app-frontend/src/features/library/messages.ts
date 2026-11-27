@@ -40,3 +40,9 @@ export const libraryInstanceMessages = defineMessages({
 		defaultMessage: 'Shared by you',
 	},
 })
+
+export const libraryInstanceTypeMessages = defineMessages({
+	modpack: { id: 'app.library.filter.instance-type.modpack', defaultMessage: 'Modpack' },
+	server: { id: 'app.library.filter.instance-type.server', defaultMessage: 'Server' },
+	custom: { id: 'app.library.filter.instance-type.custom', defaultMessage: 'Custom' },
+})

@@ -1016,23 +1016,8 @@
   "app.library.context-menu.create-instance": {
     "message": "Crear instancia"
   },
-  "app.library.filter.add": {
-    "message": "Añadir filtro"
-  },
-  "app.library.filter.clear": {
-    "message": "Limpiar filtros"
-  },
   "app.library.filter.game-version": {
     "message": "Versión del juego"
-  },
-  "app.library.filter.install-state": {
-    "message": "Estado de instalación"
-  },
-  "app.library.filter.install-state.installed": {
-    "message": "Instalado"
-  },
-  "app.library.filter.install-state.not-installed": {
-    "message": "No instalado"
   },
   "app.library.filter.instance-type": {
     "message": "Tipo de instancia"
@@ -1045,9 +1030,6 @@
   },
   "app.library.filter.instance-type.server": {
     "message": "Servidor"
-  },
-  "app.library.filter.label": {
-    "message": "Filtrar por"
   },
   "app.library.filter.loader": {
     "message": "Cargador"
@@ -1298,9 +1280,6 @@
   "app.library.search.no-results.title": {
     "message": "Ninguna instancia coincide con tu búsqueda."
   },
-  "app.library.search.placeholder": {
-    "message": "Buscar"
-  },
   "app.library.selection.aria-label": {
     "message": "Instancias seleccionadas"
   },
@@ -1330,9 +1309,6 @@
   },
   "app.library.sort.hours-played": {
     "message": "Horas jugadas"
-  },
-  "app.library.sort.label": {
-    "message": "Ordenar por"
   },
   "app.library.sort.last-played": {
     "message": "Última vez jugado"
