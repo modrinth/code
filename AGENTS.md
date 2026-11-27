@@ -81,6 +81,7 @@ Task-specific instructions live in `.agents/skills/<name>/SKILL.md`. When a task
 - `api-module` — adding an endpoint module to `packages/api-client`
 - `i18n-pass` — localizing hard-coded strings
 - `review-changelog` — reviewing a `packages/blog/changelog.ts` entry
+- `options-syncing-update` — updating the game options sync catalog for a new Minecraft version
 
 ## Working on Tasks
 

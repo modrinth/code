@@ -43,7 +43,7 @@ pub(in crate::api::instance) const GRAPHICS_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "graphicsPreset",
         since: "1.21.11",
-        until: "26.3",
+        until: "26.4",
         mapping: GameOptionMappingKind::Direct,
     },
 ];
@@ -64,7 +64,7 @@ pub(in crate::api::instance) const AMBIENT_OCCLUSION_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "ao",
         since: "1.19.3",
-        until: "26.3",
+        until: "26.4",
         mapping: GameOptionMappingKind::Direct,
     },
 ];
@@ -73,7 +73,7 @@ pub(in crate::api::instance) const FOV_KEYS: &[VersionedKey] =
     &[VersionedKey {
         key: "fov",
         since: "1.0",
-        until: "26.3",
+        until: "26.4",
         mapping: GameOptionMappingKind::Direct,
     }];
 
@@ -93,7 +93,7 @@ pub(in crate::api::instance) const CLOUD_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "renderClouds",
         since: "1.8.1",
-        until: "26.3",
+        until: "26.4",
         mapping: GameOptionMappingKind::Direct,
     },
 ];
@@ -124,7 +124,7 @@ pub(in crate::api::instance) const MENU_BACKGROUND_BLUR_KEYS:
     VersionedKey {
         key: "menuBackgroundBlurriness",
         since: "1.21",
-        until: "26.3",
+        until: "26.4",
         mapping: GameOptionMappingKind::Direct,
     },
 ];
@@ -139,7 +139,7 @@ pub(in crate::api::instance) const MASTER_VOLUME_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "soundCategory_master",
         since: "1.7.2",
-        until: "26.3",
+        until: "26.4",
         mapping: GameOptionMappingKind::Direct,
     },
 ];
@@ -154,7 +154,7 @@ pub(in crate::api::instance) const MUSIC_VOLUME_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "soundCategory_music",
         since: "1.7.2",
-        until: "26.3",
+        until: "26.4",
         mapping: GameOptionMappingKind::Direct,
     },
 ];
@@ -169,7 +169,7 @@ pub(in crate::api::instance) const CAPE_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "modelPart_cape",
         since: "1.8",
-        until: "26.3",
+        until: "26.4",
         mapping: GameOptionMappingKind::Direct,
     },
 ];
@@ -184,7 +184,7 @@ pub(in crate::api::instance) const MUSIC_TOAST_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "musicToast",
         since: "1.21.11",
-        until: "26.3",
+        until: "26.4",
         mapping: GameOptionMappingKind::Direct,
     },
 ];
@@ -199,7 +199,22 @@ pub(in crate::api::instance) const SWAP_OFFHAND_KEYS: &[VersionedKey] = &[
     VersionedKey {
         key: "key_key.swapOffhand",
         since: "1.16",
+        until: "26.4",
+        mapping: GameOptionMappingKind::Direct,
+    },
+];
+
+pub(in crate::api::instance) const OTHER_PLAYERS_KEYS: &[VersionedKey] = &[
+    VersionedKey {
+        key: "key_key.socialInteractions",
+        since: "1.16.4",
         until: "26.3",
+        mapping: GameOptionMappingKind::Legacy,
+    },
+    VersionedKey {
+        key: "key_key.otherPlayers",
+        since: "26.4",
+        until: "26.4",
         mapping: GameOptionMappingKind::Direct,
     },
 ];
