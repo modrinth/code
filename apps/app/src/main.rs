@@ -184,19 +184,24 @@ fn main() {
     }
 
     builder = builder
-        .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
-            if let Some(payload) = args.get(1) {
-                tracing::info!("Handling command-line deep link");
-                let payload = payload.clone();
-                tauri::async_runtime::spawn(api::utils::handle_command(
-                    payload,
-                ));
-            }
+        .plugin(
+            tauri_plugin_single_instance::Builder::new()
+                .dbus_id("com.modrinth.ModrinthApp")
+                .callback(|app, args, _cwd| {
+                    if let Some(payload) = args.get(1) {
+                        tracing::info!("Handling command-line deep link");
+                        let payload = payload.clone();
+                        tauri::async_runtime::spawn(
+                            api::utils::handle_command(payload),
+                        );
+                    }
 
-            if let Some(win) = app.get_window("main") {
-                let _ = win.set_focus();
-            }
-        }))
+                    if let Some(win) = app.get_window("main") {
+                        let _ = win.set_focus();
+                    }
+                })
+                .build(),
+        )
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
