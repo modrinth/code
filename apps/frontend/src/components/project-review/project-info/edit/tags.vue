@@ -1,5 +1,6 @@
 <!-- eventually extract content from project settings to be a component so it can be shared here. -->
 <script setup lang="ts">
+import { TagsIcon } from '@modrinth/assets'
 import { Checkbox, EmptyState, sortProjectTypes, TagItem } from '@modrinth/ui'
 import { capitalizeString, sortedCategories } from '@modrinth/utils'
 import { computed, ref, useTemplateRef } from 'vue'
@@ -203,7 +204,7 @@ defineExpose({ show })
 	>
 		<EmptyState
 			v-if="!canSelectTags"
-			type="no-documents"
+			:icon="TagsIcon"
 			heading="Upload versions before adding tags"
 			description="Upload a version before selecting project tags."
 		/>

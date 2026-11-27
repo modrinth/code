@@ -6,7 +6,7 @@ import {
 	LockIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
@@ -15,6 +15,7 @@ import { Button } from '#ui/components/base/buttons'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { useRelativeTime } from '#ui/composables/how-ago'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { truncatedTooltip } from '#ui/utils/truncate'
 
 import type { ManagedContentCardData } from '../../types'
 
@@ -34,6 +35,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	'primary-action': [event: MouseEvent]
+	'prefetch-primary-action': []
 }>()
 
 const { formatMessage } = useVIntl()
@@ -73,6 +75,8 @@ const messages = defineMessages({
 		defaultMessage: 'Updating...',
 	},
 })
+
+const managerNameRef = ref<HTMLElement | null>(null)
 
 const isExternalManagerLink = computed(
 	() => typeof props.data.manager.link === 'string' && props.data.manager.link.startsWith('http'),
@@ -138,7 +142,11 @@ const showAction = computed(
 							no-shadow
 							:class="data.kind === 'shared-instance' ? '' : '!rounded-[6px]'"
 						/>
-						<span class="truncate">
+						<span
+							ref="managerNameRef"
+							v-tooltip="truncatedTooltip(managerNameRef, data.manager.name)"
+							class="truncate"
+						>
 							{{ data.manager.name }}
 						</span>
 					</AutoLink>
@@ -180,6 +188,8 @@ const showAction = computed(
 			:disabled="disabled"
 			class="w-full shadow-[0_0_0_1px_var(--surface-5)] @[480px]:w-auto @[480px]:shadow-none"
 			@click="emit('primary-action', $event)"
+			@mouseenter="emit('prefetch-primary-action')"
+			@focus="emit('prefetch-primary-action')"
 		>
 			<SpinnerIcon v-if="disabled" aria-hidden="true" class="animate-spin" />
 			<ArrowLeftRightIcon v-else-if="data.kind === 'modpack'" aria-hidden="true" />

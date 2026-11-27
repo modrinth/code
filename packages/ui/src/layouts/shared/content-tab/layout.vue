@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
 import {
+	BoxIcon,
 	CodeIcon,
 	CompassIcon,
 	DownloadIcon,
@@ -8,62 +8,39 @@ import {
 	FileIcon,
 	FolderOpenIcon,
 	LinkIcon,
-	RefreshCwIcon,
-	SearchIcon,
 	ShareIcon,
 	TextCursorInputIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { useQueryClient } from '@tanstack/vue-query'
-import { chunk } from 'es-toolkit'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
-import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
-import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
+import { Button, type ButtonMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import EmptyState from '#ui/components/base/EmptyState.vue'
-import FilterPills from '#ui/components/base/FilterPills.vue'
-import Input from '#ui/components/base/inputs/Input.vue'
-import UpdateAllModal from '#ui/components/modal/update-all-modal/index.vue'
-import type {
-	UpdateAllItem,
-	UpdateAllSelection,
-} from '#ui/components/modal/update-all-modal/update-all-modal-types'
-import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { injectModrinthClient } from '#ui/providers/api-client'
-import { injectNotificationManager } from '#ui/providers/web-notifications'
-import {
-	commonMessages,
-	formatContentTypeSentence,
-	normalizeProjectType,
-} from '#ui/utils/common-messages'
-import { versionMatchesCompatibilityTarget } from '#ui/utils/version-compatibility'
+import { getProjectTypeIcon } from '#ui/utils/auto-icons'
+import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
-import ContentCardTable from './components/ContentCardTable.vue'
+import ContentTable from './components/content-table/index.vue'
 import ContentSelectionBar from './components/ContentSelectionBar.vue'
-import ContentSortMenu from './components/ContentSortMenu.vue'
+import DeleteFlow from './components/flows/delete-flow.vue'
+import ToggleFlow from './components/flows/toggle-flow.vue'
+import type { ContentFlowState } from './components/flows/types'
+import UpdateAllFlow from './components/flows/update-all-flow.vue'
+import UpdateFlow from './components/flows/update-flow.vue'
 import ManagedContentCard from './components/managed-content-card/index.vue'
-import ConfirmDeletionModal from './components/modals/ConfirmDeletionModal.vue'
-import ConfirmDisableModal from './components/modals/ConfirmDisableModal.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
-import ContentDependencyWarningModal from './components/modals/ContentDependencyWarningModal.vue'
+import ContentToolbar from './components/toolbar.vue'
 import {
-	type ContentMetadataFilterValue,
-	getClientWarningType,
-	getContentWarningType,
 	useBulkOperation,
 	useChangingItems,
-	useContentFilters,
-	useContentMetadataFilters,
-	useContentSearch,
+	useContentPrefetch,
+	useContentRows,
 	useContentSelection,
-	useContentSort,
+	useContentViewState,
 } from './composables'
 import { injectContentManager } from './providers/content-manager'
-import type { ContentActionWarning, ContentCardTableItem, ContentItem } from './types'
-
-const { formatMessage } = useVIntl()
-const debug = useDebugLogger('ContentPageLayout')
+import { getUpdateCandidates } from './queries'
+import type { ContentItem, ContentSide } from './types'
 
 const props = withDefaults(
 	defineProps<{
@@ -75,10 +52,12 @@ const props = withDefaults(
 	},
 )
 
+const { formatMessage } = useVIntl()
+
 const messages = defineMessages({
-	loadingContent: {
-		id: 'content.page-layout.loading',
-		defaultMessage: 'Loading content...',
+	uploadFiles: {
+		id: 'content.page-layout.upload-files',
+		defaultMessage: 'Upload files',
 	},
 	failedToLoad: {
 		id: 'content.page-layout.failed-to-load',
@@ -92,22 +71,6 @@ const messages = defineMessages({
 		id: 'content.page-layout.search-placeholder',
 		defaultMessage: 'Search {count, number} {contentType}...',
 	},
-	browseContent: {
-		id: 'content.page-layout.browse-content',
-		defaultMessage: 'Browse content',
-	},
-	uploadFiles: {
-		id: 'content.page-layout.upload-files',
-		defaultMessage: 'Upload files',
-	},
-	filter: {
-		id: 'content.page-layout.filter.add',
-		defaultMessage: 'Filter',
-	},
-	updateAll: {
-		id: 'content.page-layout.update-all',
-		defaultMessage: 'Update all',
-	},
 	noContentFound: {
 		id: 'content.page-layout.no-content-found',
 		defaultMessage: 'No content found.',
@@ -120,13 +83,25 @@ const messages = defineMessages({
 		id: 'content.page-layout.empty.no-content-installed',
 		defaultMessage: 'No content installed',
 	},
-	emptyModpackHint: {
-		id: 'content.page-layout.empty.modpack-hint',
-		defaultMessage: 'Add additional content on top of this modpack',
-	},
 	emptyHint: {
-		id: 'content.page-layout.empty.hint',
-		defaultMessage: 'Browse or upload {contentType} to get started',
+		id: 'content.page-layout.empty.projects-hint',
+		defaultMessage: 'Upload or browse for content to get started.',
+	},
+	noTypeInstalled: {
+		id: 'content.page-layout.empty.no-type-installed',
+		defaultMessage: 'No {contentType} installed',
+	},
+	typeHint: {
+		id: 'content.page-layout.empty.type-hint',
+		defaultMessage: 'Upload or browse for {contentType} to get started.',
+	},
+	browseType: {
+		id: 'content.page-layout.empty.browse-type',
+		defaultMessage: 'Browse {contentType}',
+	},
+	browseContent: {
+		id: 'content.page-layout.empty.browse-content',
+		defaultMessage: 'Browse content',
 	},
 	shareProjectNames: {
 		id: 'content.page-layout.share.project-names',
@@ -148,876 +123,209 @@ const messages = defineMessages({
 		id: 'content.page-layout.share.label',
 		defaultMessage: 'Share',
 	},
-	pleaseWait: {
-		id: 'content.page-layout.please-wait',
-		defaultMessage: 'Please wait',
-	},
-	failedToLoadUpdates: {
-		id: 'content.page-layout.failed-to-load-updates',
-		defaultMessage: 'Failed to load available updates',
-	},
-	failedToLoadChangelog: {
-		id: 'content.page-layout.failed-to-load-changelog',
-		defaultMessage: 'Failed to load changelog',
-	},
 })
 
 const ctx = injectContentManager()
-const skipNonEssentialWarnings = computed(() => ctx.skipNonEssentialWarnings?.value ?? false)
+const isServer = computed(() => ctx.target.value.kind === 'server')
 
-function getItemId(item: ContentItem) {
-	return ctx.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
-}
-
-const { sortMode, sortedItems } = useContentSort(ctx.items, ctx.filterPersistKey)
-
-const { searchQuery, search } = useContentSearch(
-	sortedItems,
-	['project.title', 'owner.name', 'file_name'],
-	{ queryParam: ctx.searchQueryParam },
-)
-
-const retainedRowIds = ref(new Set<string>())
-const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useContentFilters(
-	ctx.items,
-	{
-		showTypeFilters: true,
-		showUpdateFilter: false,
-		showWarningsFilter: true,
-		showStatusFilters: false,
-		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
-		retainSelectedWarnings: computed(() => retainedRowIds.value.size > 0),
-		isPackLocked: ctx.isPackLocked,
-		persistKey: ctx.filterPersistKey,
-	},
-)
-
-const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters } =
-	useContentMetadataFilters(ctx.items, ctx.filterPersistKey, {
-		showSharedContent: ctx.showSharedContentFilter,
-		showEnabledFor: !!ctx.setEnabledFor,
-		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
-	})
-
-const visibleFilterOptions = computed(() => {
-	const metadataMatches = applyMetadataFilters(ctx.items.value)
-	const warningMatches = metadataMatches.filter(
-		(item) => getContentWarningType(item, ctx.showEnvironmentWarnings) !== null,
-	)
-	const availableTypes = new Set(
-		(selectedFilters.value.includes('warnings') ? warningMatches : metadataMatches).map((item) =>
-			normalizeProjectType(item.project_type),
-		),
-	)
-	for (const item of ctx.items.value) {
-		if (retainedRowIds.value.has(getItemId(item))) {
-			availableTypes.add(normalizeProjectType(item.project_type))
-		}
-	}
-	return filterOptions.value.filter((option) =>
-		option.id === 'warnings'
-			? warningMatches.length > 0 ||
-				(selectedFilters.value.includes('warnings') && retainedRowIds.value.size > 0)
-			: availableTypes.has(option.id),
-	)
+const {
+	types,
+	activeType,
+	typeItems,
+	sortMode,
+	hasDateAdded,
+	searchQuery,
+	filters,
+	metadataFilterCategories,
+	visibleItems,
+	retain,
+	clearRetained,
+	reveal,
+} = useContentViewState({
+	items: ctx.items,
+	types: ctx.types,
+	persistKey: ctx.persistKey,
+	searchQueryParam: ctx.searchQueryParam,
+	showSharedContentFilter: ctx.showSharedContentFilter,
+	showEnabledFor: !!ctx.setEnabledFor,
+	showEnvironmentWarnings: isServer,
 })
 
-watch(
-	visibleFilterOptions,
-	(options) => {
-		const availableTypes = new Set(options.map((option) => option.id))
-		const validFilters = selectedFilters.value.filter((filter) => availableTypes.has(filter))
-		if (validFilters.length !== selectedFilters.value.length) selectedFilters.value = validFilters
-	},
-	{ immediate: true },
+const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useContentSelection(
+	ctx.items,
+	(item) => item.id,
+)
+watch(activeType, clearSelection)
+
+const bulk = useBulkOperation()
+const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, bulkWaiting } = bulk
+const { isChanging, markChanging, unmarkChanging } = useChangingItems()
+const isBulkToggling = computed(
+	() => bulkOperation.value === 'enable' || bulkOperation.value === 'disable',
 )
 
-watch(searchQuery, () => retainedRowIds.value.clear())
+const { toRow, toDisplayRow } = useContentRows({
+	ctx,
+	isServer,
+	isPending: (item) =>
+		ctx.disableWhileMutating !== false &&
+		(isChanging(item.id) || (isBulkOperating.value && !isBulkToggling.value)),
+})
+const rows = computed(() => visibleItems.value.map(toRow))
 
-function updateMetadataFilters(filters: ContentMetadataFilterValue) {
-	retainedRowIds.value.clear()
-	selectedMetadataFilters.value = filters
+const flowState: ContentFlowState = {
+	selectedItems,
+	clearSelection,
+	removeFromSelection,
+	bulk,
+	markChanging,
+	unmarkChanging,
+	retain,
+	itemType: activeType,
 }
+
+const toggleFlow = ref<InstanceType<typeof ToggleFlow>>()
+const deleteFlow = ref<InstanceType<typeof DeleteFlow>>()
+const updateAllFlow = ref<InstanceType<typeof UpdateAllFlow>>()
+const updateFlow = ref<InstanceType<typeof UpdateFlow>>()
+const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
+
+const isBusy = computed(() => !!ctx.busy.value)
+const isContentOperating = computed(
+	() => isBusy.value || isBulkOperating.value || !!updateAllFlow.value?.loading,
+)
+const busyMessage = computed(() => ctx.busy.value?.message)
+const addTooltip = computed(
+	() => busyMessage.value ?? (ctx.canAdd.value ? undefined : ctx.addDeniedReason),
+)
+const hasOutdatedItems = computed(() => getUpdateCandidates(typeItems.value).length > 0)
+const toggleableSelectedItems = computed(() =>
+	selectedItems.value.filter((item) => ctx.permissions(item).toggle),
+)
+const removableSelectedItems = computed(() =>
+	selectedItems.value.filter((item) => ctx.permissions(item).remove),
+)
+const searchPlaceholder = computed(() =>
+	formatMessage(messages.searchPlaceholder, {
+		count: typeItems.value.length,
+		contentType: formatContentTypeSentence(formatMessage, activeType.value, typeItems.value.length),
+	}),
+)
+const activeTypePlural = computed(() =>
+	formatContentTypeSentence(formatMessage, activeType.value, 2),
+)
 
 watch(
 	() => props.highlightedItemId,
 	(id) => {
-		if (!id) return
-		searchQuery.value = ''
-		selectedFilters.value = []
-		selectedMetadataFilters.value = {}
+		const item = id ? ctx.items.value.find((candidate) => candidate.id === id) : undefined
+		if (item) reveal(item)
 	},
 	{ immediate: true },
 )
 
-const metadataFilterTriggerClass =
-	'!h-[34px] !rounded-xl !border !border-solid !border-surface-5 !bg-transparent !px-3 !text-sm !font-medium !text-primary !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-surface-3 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
-const metadataFilterPreviewTriggerClass =
-	'!h-[34px] !rounded-xl !border !border-solid !border-brand !bg-brand-highlight !px-3 !text-sm !font-medium !text-brand !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-brand-highlight focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5 [&>svg]:!text-brand'
-
-const filterControlsRef = ref<HTMLElement | null>(null)
-const filterPillsRef = ref<HTMLElement | null>(null)
-const metadataFiltersRef = ref<HTMLElement | null>(null)
-const filterPillsWrapped = ref(false)
-const metadataFiltersWrapped = ref(false)
-let filterControlsResizeObserver: ResizeObserver | null = null
-
-function isAtLineStart(element: HTMLElement | null) {
-	return (
-		!!filterControlsRef.value &&
-		!!element &&
-		element.offsetLeft <= filterControlsRef.value.offsetLeft
-	)
-}
-
-function updateFiltersWrapped() {
-	filterPillsWrapped.value = isAtLineStart(filterPillsRef.value)
-	metadataFiltersWrapped.value = isAtLineStart(metadataFiltersRef.value)
-}
-
-function observeFilterControls() {
-	filterControlsResizeObserver?.disconnect()
-	for (const element of [filterControlsRef.value, filterPillsRef.value, metadataFiltersRef.value]) {
-		if (element) filterControlsResizeObserver?.observe(element)
-	}
-	updateFiltersWrapped()
-}
-
-onMounted(() => {
-	if (typeof ResizeObserver === 'undefined') return
-	filterControlsResizeObserver = new ResizeObserver(updateFiltersWrapped)
-	observeFilterControls()
-})
-
-watch([filterControlsRef, filterPillsRef, metadataFiltersRef], observeFilterControls, {
-	flush: 'post',
-})
-
-onBeforeUnmount(() => {
-	filterControlsResizeObserver?.disconnect()
-})
-
-function updateFilterChips(nextFilters: string[]) {
-	retainedRowIds.value.clear()
-	if (nextFilters.length === 0) {
-		selectedFilters.value = []
-		return
-	}
-
-	const changedFilter =
-		nextFilters.find((filter) => !selectedFilters.value.includes(filter)) ??
-		selectedFilters.value.find((filter) => !nextFilters.includes(filter))
-	if (changedFilter) toggleFilter(changedFilter)
-}
-
-const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useContentSelection(
-	ctx.items,
-	getItemId,
-)
-
-const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, runBulk } = useBulkOperation()
-
-// Sync bulk operation state back to the content manager so providers can suppress refreshes
-if (ctx.isBulkOperating) {
-	watch(isBulkOperating, (val) => {
-		ctx.isBulkOperating!.value = val
-	})
-}
-
-const { isChanging, markChanging, unmarkChanging } = useChangingItems()
-
-const bulkWaiting = ref(false)
-const bulkStatusMessage = ref<string | null>(null)
-const bulkItemCount = ref(0)
-const bulkUpdateItems = ref<ContentItem[]>([])
-
 const refreshing = ref(false)
-async function handleRefresh() {
+async function refresh() {
 	if (refreshing.value) return
-	retainedRowIds.value.clear()
+	clearRetained()
 	refreshing.value = true
 	try {
-		await ctx.refresh()
+		await Promise.all([ctx.refresh(), new Promise((resolve) => setTimeout(resolve, 250))])
 	} finally {
 		refreshing.value = false
 	}
 }
 
-const filteredItems = computed(() => {
-	const sorted = sortedItems.value
-	const searched = search(sorted)
-	const matching = applyMetadataFilters(applyFilters(searched))
-	if (retainedRowIds.value.size === 0) return matching
-	const matchingIds = new Set(matching.map(getItemId))
-	return searched.filter((item) => {
-		const id = getItemId(item)
-		return matchingIds.has(id) || retainedRowIds.value.has(id)
-	})
-})
-const tableItems = computed<ContentCardTableItem[]>(() => {
-	const items = filteredItems.value.map((item) => {
-		const base = ctx.mapToTableItem(item)
-		const id = getItemId(item)
-		const mutationPending =
-			ctx.disableWhileMutating !== false && (isChanging(id) || isBulkOperating.value)
-		const locked = base.locked ?? item.locked ?? false
-		const clientWarning = base.enabledFor
-			? null
-			: getClientWarningType(item, ctx.showEnvironmentWarnings)
-		return {
-			...base,
-			id,
-			projectType: item.project_type,
-			locked,
-			disabled: mutationPending || ctx.isBusy.value || item.installing === true,
-			disabledTooltip: ctx.isBusy.value
-				? (ctx.busyMessage?.value ?? null)
-				: mutationPending
-					? formatMessage(messages.pleaseWait)
-					: item.installing
-						? formatMessage(commonMessages.installingLabel)
-						: null,
-			toggleDisabled: ctx.isBusy.value || base.toggleDisabled,
-			toggleDisabledTooltip: ctx.isBusy.value
-				? (ctx.busyMessage?.value ?? null)
-				: base.toggleDisabledTooltip,
-			installing: item.installing === true,
-			installProgress: item.installProgress,
-			hasUpdate: base.hasUpdate ?? item.has_update,
-			isClientOnly: clientWarning !== null,
-			clientWarning,
-			hideDelete: base.hideDelete,
-			hideSwitchVersion: base.hideSwitchVersion ?? !base.versionLink,
-			overflowOptions: ctx.getOverflowOptions?.(item),
-		}
-	})
-
-	const updatable = items.filter((i) => i.hasUpdate)
-	if (updatable.length > 0) {
-		debug('tableItems: items with hasUpdate=true', {
-			count: updatable.length,
-			ids: updatable.map((i) => i.id),
-			isPackLocked: ctx.isPackLocked.value,
-		})
-	}
-
-	return items
-})
-
-const hasOutdatedProjects = computed(() => {
-	const outdated = ctx.items.value.filter((p) => p.has_update && !p.locked)
-	if (outdated.length > 0) {
-		debug('hasOutdatedProjects: raw items with has_update=true', {
-			count: outdated.length,
-			items: outdated.map((p) => ({
-				id: p.id,
-				fileName: p.file_name,
-				title: p.project?.title,
-				has_update: p.has_update,
-				update_version_id: p.update_version_id,
-			})),
-		})
-	}
-	return outdated.length > 0
-})
-
-//  Deletion
-const pendingDeletionItems = ref<ContentItem[]>([])
-const pendingDeletionWarning = ref<ContentActionWarning | null>(null)
-const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
-const confirmDisableModal = ref<InstanceType<typeof ConfirmDisableModal>>()
-const contentDependencyWarningModal = ref<InstanceType<typeof ContentDependencyWarningModal>>()
-const pendingDisableItems = ref<ContentItem[]>([])
-const pendingDisableWarning = ref<ContentActionWarning | null>(null)
-const pendingDependencyWarningItems = ref<ContentCardTableItem[]>([])
-const pendingDependencyWarningDependents = ref<
-	Array<{
-		item: ContentCardTableItem
-		dependencies: ContentCardTableItem[]
-	}>
->([])
-const pendingDependencyWarningDisableTargets = ref<ContentItem[]>([])
-
-function mapToDisplayItem(item: ContentItem) {
-	return {
-		...ctx.mapToTableItem(item),
-		id: getItemId(item),
-	}
+function findItem(id: string) {
+	return ctx.items.value.find((item) => item.id === id)
 }
 
-function canDeleteItem(item: ContentItem) {
-	return ctx.canDeleteItem?.(item) ?? true
+const { prefetchItem, prefetchUpdates } = useContentPrefetch()
+
+function prefetchRow(id: string) {
+	const item = findItem(id)
+	if (item) prefetchItem(item)
 }
 
-function canToggleItem(item: ContentItem) {
-	return (
-		ctx.canToggleItem?.(item) ??
-		!!(ctx.toggleEnabled || ctx.bulkEnableItems || ctx.bulkDisableItems)
-	)
+const updateCandidatesKey = computed(() =>
+	ctx.loading.value
+		? ''
+		: ctx.items.value
+				.filter((item) => item.has_update && !item.locked && item.update_version_id)
+				.map((item) => `${item.id}:${item.update_version_id}`)
+				.join('|'),
+)
+watch(
+	updateCandidatesKey,
+	(key) => {
+		if (key && ctx.applyUpdates) prefetchUpdates(ctx.items.value)
+	},
+	{ immediate: true },
+)
+
+function toggleItem(id: string, enabled: boolean) {
+	const item = findItem(id)
+	if (item) void toggleFlow.value?.toggle(item, enabled)
 }
 
-const deletableSelectedItems = computed(() => selectedItems.value.filter(canDeleteItem))
-const toggleableSelectedItems = computed(() => selectedItems.value.filter(canToggleItem))
-
-async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
-	const deletableItems = items.filter(canDeleteItem)
-	if (deletableItems.length === 0) return
-	pendingDeletionItems.value = deletableItems
-	pendingDeletionWarning.value = ctx.getDeleteWarning?.(deletableItems) ?? null
-	pendingDependencyWarningItems.value = []
-	pendingDependencyWarningDependents.value = []
-	pendingDependencyWarningDisableTargets.value = []
-	const deletingIds = new Set(deletableItems.map(getItemId))
-
-	const warning = ctx.getDeleteDependencyWarning
-		? await Promise.resolve()
-				.then(() => ctx.getDeleteDependencyWarning!(deletableItems))
-				.catch(() => null)
-		: null
-	if (warning) {
-		const remainingDependents = warning.dependents.filter(
-			(dependent) => !deletingIds.has(getItemId(dependent.item)),
-		)
-
-		if (remainingDependents.length === 0) {
-			showDeletionConfirmation(event)
-			return
-		}
-
-		const relevantDependencyIds = new Set(
-			remainingDependents.flatMap((dependent) => dependent.dependencies.map(getItemId)),
-		)
-		const warningItems = deletableItems.filter((item) => relevantDependencyIds.has(getItemId(item)))
-		if (warningItems.length === 0) {
-			showDeletionConfirmation(event)
-			return
-		}
-
-		pendingDependencyWarningItems.value = warningItems.map(mapToDisplayItem)
-		pendingDependencyWarningDependents.value = remainingDependents.map((dependent) => ({
-			item: mapToDisplayItem(dependent.item),
-			dependencies: dependent.dependencies
-				.filter((dependency) => relevantDependencyIds.has(getItemId(dependency)))
-				.map(mapToDisplayItem),
-		}))
-		pendingDependencyWarningDisableTargets.value = remainingDependents.map(
-			(dependent) => dependent.item,
-		)
-		contentDependencyWarningModal.value?.show()
-		return
-	}
-
-	showDeletionConfirmation(event)
+function removeItem(id: string, event: MouseEvent) {
+	const item = findItem(id)
+	if (item) void deleteFlow.value?.promptDelete([item], event)
 }
 
-async function showDeletionConfirmation(event?: MouseEvent) {
-	const confirmed = await ctx.confirmDeleteItems?.(pendingDeletionItems.value)
-	if (confirmed !== undefined) {
-		if (!confirmed) return
-		if (pendingDeletionWarning.value) {
-			confirmDeletionModal.value?.show()
-		} else {
-			await confirmDelete()
-		}
-		return
-	}
-	if (
-		!pendingDeletionWarning.value &&
-		(event?.shiftKey || skipNonEssentialWarnings.value) &&
-		!ctx.isBusy.value
-	) {
-		confirmDelete()
-	} else {
-		await nextTick()
-		confirmDeletionModal.value?.show()
-	}
+function updateItem(id: string) {
+	const item = findItem(id)
+	if (item) updateFlow.value?.openUpdate(item)
 }
 
-async function handleDeleteById(id: string, event?: MouseEvent) {
-	const item = ctx.items.value.find((i) => getItemId(i) === id)
-	if (item) {
-		await promptDeleteItems([item], event)
-	}
+function switchVersion(id: string) {
+	const item = findItem(id)
+	if (item) updateFlow.value?.openSwitch(item)
 }
 
-async function showBulkDeleteModal(event?: MouseEvent) {
-	await promptDeleteItems([...selectedItems.value], event)
+function switchItemVersion(item: ContentItem) {
+	updateFlow.value?.openSwitch(item)
 }
 
-async function confirmDependencyWarningDelete(disableDependentsAfterDeleting: boolean) {
-	if (disableDependentsAfterDeleting) {
-		pendingDependencyWarningDisableTargets.value =
-			pendingDependencyWarningDisableTargets.value.filter((item) => item.enabled)
-	} else {
-		pendingDependencyWarningDisableTargets.value = []
-	}
-
-	pendingDependencyWarningItems.value = []
-	pendingDependencyWarningDependents.value = []
-	if ((await ctx.confirmDeleteItems?.(pendingDeletionItems.value)) === false) return
-	if (pendingDeletionWarning.value) {
-		confirmDeletionModal.value?.show()
-		return
-	}
-
-	await confirmDelete()
+function managedPrimaryAction(event?: MouseEvent) {
+	const managed = ctx.managed.value
+	if (managed?.update) updateFlow.value?.openModpack()
+	else managed?.primaryAction?.(event)
 }
 
-async function disablePendingDependencyWarningDependents() {
-	const items = pendingDependencyWarningDisableTargets.value.filter((item) => item.enabled)
-	pendingDependencyWarningDisableTargets.value = []
-	if (items.length === 0) return
-
-	await promptDisableItems(items)
-}
-
-async function disableItemsWithoutWarning(items: ContentItem[]) {
-	if (ctx.bulkDisableItems) {
-		await ctx.bulkDisableItems(items)
-		return
-	}
-	if (!ctx.toggleEnabled) return
-
-	for (const item of items) {
-		const id = getItemId(item)
-		markChanging(id)
-		try {
-			await ctx.toggleEnabled(item)
-		} finally {
-			unmarkChanging(id)
-		}
-	}
-}
-
-async function confirmDelete() {
-	if (ctx.isBusy.value) return
-	const itemsToDelete = [...pendingDeletionItems.value]
-	pendingDeletionItems.value = []
-	pendingDeletionWarning.value = null
-	if (itemsToDelete.length === 0) return
-
-	if (ctx.bulkDeleteItems && itemsToDelete.length > 1) {
-		isBulkOperating.value = true
-		bulkOperation.value = 'delete'
-		bulkProgress.value = 0
-		bulkTotal.value = itemsToDelete.length
-		bulkWaiting.value = true
-		try {
-			await ctx.bulkDeleteItems(itemsToDelete)
-			await disablePendingDependencyWarningDependents()
-		} finally {
-			clearSelection()
-			isBulkOperating.value = false
-			bulkOperation.value = null
-			bulkProgress.value = 0
-			bulkTotal.value = 0
-			bulkWaiting.value = false
-		}
-		return
-	}
-
-	if (itemsToDelete.length === 1) {
-		const item = itemsToDelete[0]
-		const id = getItemId(item)
-		markChanging(id)
-		try {
-			await ctx.deleteItem(item)
-			removeFromSelection(id)
-			await disablePendingDependencyWarningDependents()
-		} finally {
-			unmarkChanging(id)
-		}
-		return
-	}
-
-	await runBulk(
-		'delete',
-		itemsToDelete,
-		async (item) => {
-			await ctx.deleteItem(item)
-			removeFromSelection(getItemId(item))
-		},
-		{ onComplete: clearSelection },
-	)
-	await disablePendingDependencyWarningDependents()
-}
-
-async function promptDisableItems(items: ContentItem[]) {
-	const toggleableItems = items.filter(canToggleItem)
-	if (toggleableItems.length === 0) return
-	if (ctx.confirmAction && !(await ctx.confirmAction('disable', toggleableItems))) return
-	pendingDisableItems.value = toggleableItems
-	const warning = ctx.getDisableWarning?.(toggleableItems) ?? null
-	if (warning) {
-		pendingDisableWarning.value = warning
-		confirmDisableModal.value?.show()
-		return
-	}
-
-	await confirmDisable()
-}
-
-async function confirmDisable() {
-	if (ctx.isBusy.value) return
-	const itemsToDisable = [...pendingDisableItems.value]
-	pendingDisableItems.value = []
-	pendingDisableWarning.value = null
-	if (itemsToDisable.length === 0) return
-
-	if (ctx.bulkDisableItems && itemsToDisable.length > 1) {
-		isBulkOperating.value = true
-		bulkOperation.value = 'disable'
-		bulkProgress.value = 0
-		bulkTotal.value = itemsToDisable.length
-		bulkWaiting.value = true
-		try {
-			await disableItemsWithoutWarning(itemsToDisable)
-		} finally {
-			clearSelection()
-			isBulkOperating.value = false
-			bulkOperation.value = null
-			bulkProgress.value = 0
-			bulkTotal.value = 0
-			bulkWaiting.value = false
-		}
-		return
-	}
-
-	if (itemsToDisable.length === 1) {
-		const item = itemsToDisable[0]
-		const id = getItemId(item)
-		markChanging(id)
-		try {
-			retainedRowIds.value.add(id)
-			if (ctx.bulkDisableItems) {
-				await ctx.bulkDisableItems(itemsToDisable)
-			} else {
-				await ctx.toggleEnabled?.(item)
-			}
-		} finally {
-			unmarkChanging(id)
-		}
-		return
-	}
-
-	await runBulk('disable', itemsToDisable, (item) => disableItemsWithoutWarning([item]), {
-		onComplete: clearSelection,
-	})
-}
-
-async function handleToggleEnabledById(id: string, _value: boolean) {
-	if (ctx.isBusy.value || !ctx.toggleEnabled) return
-	const item = ctx.items.value.find((i) => getItemId(i) === id)
-	if (!item) return
-	if (!canToggleItem(item)) return
-	if (!_value) {
-		await promptDisableItems([item])
-		return
-	}
-	if (ctx.confirmAction && !(await ctx.confirmAction('enable', [item]))) return
-	markChanging(id)
-	try {
-		retainedRowIds.value.add(id)
-		await ctx.toggleEnabled(item)
-	} finally {
-		unmarkChanging(id)
-	}
-}
-
-async function bulkEnable() {
-	if (ctx.isBusy.value) return
-	const items = toggleableSelectedItems.value.filter((item) => !item.enabled)
-	if (items.length === 0) return
-	if (ctx.confirmAction && !(await ctx.confirmAction('enable', items))) return
-	if (ctx.bulkEnableItems) {
-		isBulkOperating.value = true
-		bulkOperation.value = 'enable'
-		bulkProgress.value = 0
-		bulkTotal.value = items.length
-		bulkWaiting.value = true
-		try {
-			await ctx.bulkEnableItems(items)
-		} finally {
-			clearSelection()
-			isBulkOperating.value = false
-			bulkOperation.value = null
-			bulkProgress.value = 0
-			bulkTotal.value = 0
-			bulkWaiting.value = false
-		}
-		return
-	}
-	if (!ctx.toggleEnabled) return
-	await runBulk('enable', items, (item) => ctx.toggleEnabled!(item), { onComplete: clearSelection })
-}
-
-async function bulkDisable() {
-	if (ctx.isBusy.value) return
-	const items = toggleableSelectedItems.value.filter((item) => item.enabled)
-	if (items.length === 0) return
-	await promptDisableItems(items)
-}
-
-function handleUpdateById(id: string) {
-	const item = ctx.items.value.find((item) => getItemId(item) === id)
-	if (!item || item.locked) return
-	ctx.updateItem?.(id)
-}
-
-function handleSwitchVersionById(id: string) {
-	const item = ctx.items.value.find((i) => getItemId(i) === id)
-	if (item && !item.locked) {
-		ctx.switchVersion?.(item)
-	}
-}
-
-async function handleSetEnabledForById(id: string, side: 'server' | 'player', enabled: boolean) {
-	if (ctx.isBusy.value || !ctx.setEnabledFor) return
-	const item = ctx.items.value.find((candidate) => getItemId(candidate) === id)
-	if (!item) return
-
-	retainedRowIds.value.add(id)
+async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
+	const item = findItem(id)
+	if (!item || isBusy.value || !ctx.setEnabledFor) return
+	retain(id)
 	await ctx.setEnabledFor(item, side, enabled)
 }
 
-const queryClient = useQueryClient()
-const client = injectModrinthClient()
-const { addNotification } = injectNotificationManager()
-const updateAllModal = ref<InstanceType<typeof UpdateAllModal>>()
-const updateAllItems = ref<UpdateAllItem[]>([])
-const loadingUpdateAll = ref(false)
-const loadingUpdateAllChangelog = ref(false)
-let updateAllRequestId = 0
-
-const hasBulkUpdateSupport = computed(() => !!ctx.bulkUpdateSelections)
-
-function getUpdateAllCandidates(items: ContentItem[]) {
-	return items.filter(
-		(item) =>
-			item.has_update &&
-			!item.locked &&
-			item.project?.id &&
-			item.version?.id &&
-			item.update_version_id,
-	)
-}
-
-async function loadRecommendedUpdateVersions(items: ContentItem[]) {
-	const ids = [...new Set(items.map((item) => item.update_version_id!))].sort()
-	const batches = await Promise.all(
-		chunk(ids, 100).map(async (batch) => {
-			try {
-				const versions = await queryClient.fetchQuery({
-					queryKey: ['labrinth', 'versions', 'v2', 'recommended', batch],
-					queryFn: () =>
-						client.labrinth.versions_v2.getVersions(batch, { include_changelog: false }),
-					staleTime: 5 * 60_000,
-				})
-				for (const version of versions) {
-					queryClient.setQueryData(['labrinth', 'version', 'v2', 'summary', version.id], version)
-				}
-				return versions
-			} catch {
-				return []
-			}
-		}),
-	)
-	return new Map(batches.flat().map((version) => [version.id, version]))
-}
-
-async function openUpdateAll(items: ContentItem[]) {
-	if (
-		!ctx.bulkUpdateSelections ||
-		ctx.isBusy.value ||
-		isBulkOperating.value ||
-		loadingUpdateAll.value
-	)
-		return
-	const candidates = getUpdateAllCandidates(items)
-	if (candidates.length === 0) return
-	if (candidates.length === 1 && ctx.updateItem) {
-		handleUpdateById(getItemId(candidates[0]))
-		return
-	}
-
-	const requestId = ++updateAllRequestId
-	updateAllItems.value = []
-	loadingUpdateAll.value = true
-	loadingUpdateAllChangelog.value = false
-	await nextTick()
-	if (requestId !== updateAllRequestId) return
-	updateAllModal.value?.show()
-
-	const recommendedPromise = loadRecommendedUpdateVersions(candidates)
-	const projectVersions = new Map<string, Labrinth.Versions.v2.Version[]>()
-	let failedToLoadVersions = false
-	const projectIds = [...new Set(candidates.map((item) => item.project!.id))]
-	for (const batch of chunk(projectIds, 8)) {
-		await Promise.all(
-			batch.map(async (projectId) => {
-				try {
-					const versions = await queryClient.fetchQuery({
-						queryKey: ['labrinth', 'versions', 'v2', projectId],
-						queryFn: () =>
-							client.labrinth.versions_v2.getProjectVersions(projectId, {
-								include_changelog: false,
-							}),
-						staleTime: 5 * 60_000,
-					})
-					projectVersions.set(projectId, versions)
-				} catch {
-					failedToLoadVersions = true
-				}
-			}),
-		)
-		if (requestId !== updateAllRequestId) return
-	}
-	const recommended = await recommendedPromise
-	if (requestId !== updateAllRequestId) return
-
-	updateAllItems.value = candidates.map((item) => {
-		const preferredVersionId = item.update_version_id!
-		const versions = projectVersions.get(item.project!.id) ?? []
-		const preferredVersion =
-			queryClient.getQueryData<Labrinth.Versions.v2.Version>([
-				'labrinth',
-				'version',
-				'v2',
-				preferredVersionId,
-			]) ??
-			recommended.get(preferredVersionId) ??
-			versions.find((version) => version.id === preferredVersionId)
-		const sorted = [
-			...versions,
-			...(preferredVersion && !versions.some((version) => version.id === preferredVersion.id)
-				? [preferredVersion]
-				: []),
-		].sort((a, b) => Date.parse(b.date_published) - Date.parse(a.date_published))
-		const currentIndex = sorted.findIndex((version) => version.id === item.version!.id)
-		const newer = currentIndex < 0 ? sorted : sorted.slice(0, currentIndex)
-		if (preferredVersion && !newer.some((version) => version.id === preferredVersion.id)) {
-			newer.unshift(preferredVersion)
-		}
-		const compatible = newer.filter(
-			(version) =>
-				version.id === preferredVersionId ||
-				versionMatchesCompatibilityTarget(version, {
-					gameVersion: ctx.currentGameVersion?.value ?? '',
-					loader: ctx.currentLoader?.value ?? '',
-					projectType: item.project_type,
-				}),
-		)
-		return {
-			id: getItemId(item),
-			project: item.project!,
-			currentVersion: item.version!,
-			versions:
-				compatible.length > 0
-					? compatible
-					: [
-							preferredVersion ?? {
-								id: preferredVersionId,
-								version_number: formatMessage(commonMessages.updateAvailableLabel),
-							},
-						],
-			initialVersionId: preferredVersionId,
-		}
-	})
-	loadingUpdateAll.value = false
-	if (failedToLoadVersions) {
-		addNotification({ type: 'error', title: formatMessage(messages.failedToLoadUpdates) })
-	}
-}
-
-function preloadUpdateAllChangelog(selection: UpdateAllSelection) {
-	if (selection.version.changelog != null) return
-	void queryClient.prefetchQuery({
-		queryKey: ['labrinth', 'version', 'v2', selection.version.id],
-		queryFn: () => client.labrinth.versions_v2.getVersion(selection.version.id),
-		staleTime: 5 * 60_000,
-	})
-}
-
-async function loadUpdateAllChangelog(selection: UpdateAllSelection) {
-	if (selection.version.changelog != null) return
-	const requestId = updateAllRequestId
-	loadingUpdateAllChangelog.value = true
-	try {
-		const version = await queryClient.fetchQuery({
-			queryKey: ['labrinth', 'version', 'v2', selection.version.id],
-			queryFn: () => client.labrinth.versions_v2.getVersion(selection.version.id),
-			staleTime: 5 * 60_000,
-		})
-		if (requestId !== updateAllRequestId) return
-		updateAllItems.value = updateAllItems.value.map((item) => ({
-			...item,
-			versions: item.versions.map((candidate) =>
-				candidate.id === version.id ? version : candidate,
-			),
-		}))
-	} catch (error) {
-		addNotification({
-			type: 'error',
-			title: formatMessage(messages.failedToLoadChangelog),
-			text: error instanceof Error ? error.message : undefined,
-		})
-	} finally {
-		if (requestId === updateAllRequestId) loadingUpdateAllChangelog.value = false
-	}
-}
-
-async function updateAllSelected(selections: UpdateAllSelection[]) {
-	if (
-		!ctx.bulkUpdateSelections ||
-		ctx.isBusy.value ||
-		isBulkOperating.value ||
-		selections.length === 0
-	)
-		return
-	++updateAllRequestId
-	isBulkOperating.value = true
-	bulkOperation.value = 'update'
-	bulkItemCount.value = selections.length
-	bulkTotal.value = selections.length
-	bulkProgress.value = 0
-	bulkUpdateItems.value = selections.flatMap((selection) => {
-		const item = ctx.items.value.find((item) => getItemId(item) === selection.id)
-		return item ? [item] : []
-	})
-	bulkWaiting.value = true
-	try {
-		await ctx.bulkUpdateSelections(selections, (completed) => {
-			bulkWaiting.value = false
-			bulkProgress.value = completed
-		})
-		clearSelection()
-	} catch {
-		return
-	} finally {
-		isBulkOperating.value = false
-		bulkOperation.value = null
-		bulkItemCount.value = 0
-		bulkTotal.value = 0
-		bulkProgress.value = 0
-		bulkUpdateItems.value = []
-		bulkWaiting.value = false
-	}
-}
-
-function promptUpdateAll() {
-	void openUpdateAll(ctx.items.value)
-}
-
-function cancelUpdateAll() {
-	++updateAllRequestId
-	loadingUpdateAll.value = false
-}
-
-function promptUpdateSelected() {
-	void openUpdateAll(selectedItems.value)
-}
-
-const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
+const shareOptions = computed<ButtonMenuOption[]>(() => {
+	const share = ctx.share
+	if (!share) return []
+	return [
+		{
+			id: 'share-names',
+			label: formatMessage(messages.shareProjectNames),
+			action: () => share(selectedItems.value, 'names'),
+		},
+		{
+			id: 'share-file-names',
+			label: formatMessage(messages.shareFileNames),
+			action: () => share(selectedItems.value, 'file-names'),
+		},
+		{
+			id: 'share-urls',
+			label: formatMessage(messages.shareProjectLinks),
+			action: () => share(selectedItems.value, 'urls'),
+		},
+		{
+			id: 'share-markdown',
+			label: formatMessage(messages.shareMarkdownLinks),
+			action: () => share(selectedItems.value, 'markdown'),
+		},
+	]
+})
 </script>
 
 <template>
@@ -1030,7 +338,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				<div class="universal-card flex flex-col items-center gap-4 p-6">
 					<h2 class="m-0 text-xl font-bold">{{ formatMessage(messages.failedToLoad) }}</h2>
 					<p class="text-secondary">{{ ctx.error.value.message }}</p>
-					<Button type="colored" color="brand" @click="handleRefresh">{{
+					<Button type="colored" color="brand" @click="refresh">{{
 						formatMessage(commonMessages.retryButton)
 					}}</Button>
 				</div>
@@ -1038,234 +346,133 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 			<template v-else>
 				<ManagedContentCard
-					v-if="ctx.managedContent.value"
-					:data="ctx.managedContent.value.card"
-					:disabled="ctx.managedContent.value.disabled"
-					:disabled-text="ctx.managedContent.value.disabledText"
-					:show-view-content="!!ctx.viewManagedContent"
-					:show-settings="!!ctx.openManagedContentSettings"
-					:show-primary-action="!!ctx.runManagedContentPrimaryAction"
-					@view-content="ctx.viewManagedContent?.()"
-					@settings="ctx.openManagedContentSettings?.()"
-					@primary-action="ctx.runManagedContentPrimaryAction?.($event)"
+					v-if="ctx.managed.value"
+					:data="ctx.managed.value.card"
+					:disabled="!!ctx.managed.value.disabledReason"
+					:disabled-text="ctx.managed.value.disabledReason"
+					:show-view-content="!!ctx.managed.value.view"
+					:show-settings="!!ctx.managed.value.openSettings"
+					:show-primary-action="!!(ctx.managed.value.update || ctx.managed.value.primaryAction)"
+					@view-content="ctx.managed.value?.view?.()"
+					@settings="ctx.managed.value?.openSettings?.()"
+					@primary-action="managedPrimaryAction"
+					@prefetch-view-content="ctx.managed.value?.prefetchView?.()"
+					@prefetch-primary-action="ctx.managed.value?.prefetchPrimaryAction?.()"
 				/>
 
-				<template v-if="ctx.items.value.length > 0">
-					<div class="flex flex-col gap-2">
-						<span v-if="ctx.managedContent.value" class="mb-2 text-xl font-semibold text-contrast">
-							{{ formatMessage(messages.additionalContent) }}
-						</span>
+				<div v-if="ctx.items.value.length > 0" class="flex flex-col gap-4">
+					<span v-if="ctx.managed.value" class="text-2xl font-semibold leading-8 text-contrast">
+						{{ formatMessage(messages.additionalContent) }}
+					</span>
 
-						<div class="flex flex-wrap items-center gap-2">
-							<Input
-								v-model="searchQuery"
-								:icon="SearchIcon"
-								type="text"
-								autocomplete="off"
-								:spellcheck="false"
-								size="medium"
-								wrapper-class="flex-1 min-w-0"
-								clearable
-								:placeholder="
-									formatMessage(messages.searchPlaceholder, {
-										count: tableItems.length,
-										contentType: formatContentTypeSentence(
-											formatMessage,
-											'project',
-											tableItems.length,
-										),
-									})
-								"
-							/>
+					<ContentToolbar
+						v-model:search="searchQuery"
+						v-model:type="activeType"
+						v-model:filters="filters"
+						v-model:sort="sortMode"
+						:search-placeholder="searchPlaceholder"
+						:types="types"
+						:add-disabled="isBusy || !ctx.canAdd.value"
+						:add-tooltip="addTooltip"
+						:show-update-all="!!updateAllFlow?.supported && hasOutdatedItems"
+						:update-all-disabled="isContentOperating"
+						:refreshing="refreshing"
+						:refresh-disabled="isContentOperating"
+						:busy-tooltip="busyMessage"
+						:filter-categories="metadataFilterCategories"
+						:show-date-sort="hasDateAdded"
+						@add="ctx.browse(activeType)"
+						@upload="ctx.upload()"
+						@update-all="updateAllFlow?.promptUpdate(typeItems)"
+						@prefetch-update-all="prefetchUpdates(typeItems)"
+						@refresh="refresh"
+					/>
 
-							<div class="flex gap-2">
-								<Button
-									v-tooltip="
-										ctx.busyMessage?.value ??
-										(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-									"
-									type="outlined"
-									size="lg"
-									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-									@click="ctx.uploadFiles"
-								>
-									<FolderOpenIcon class="size-5" />
-									{{ formatMessage(messages.uploadFiles) }}
-								</Button>
-								<Button
-									v-tooltip="
-										ctx.busyMessage?.value ??
-										(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-									"
-									type="colored"
-									color="brand"
-									size="lg"
-									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-									@click="ctx.browse"
-								>
-									<CompassIcon class="size-5" />
-									<span>{{ formatMessage(messages.browseContent) }}</span>
-								</Button>
-							</div>
-						</div>
-
-						<div class="@container flex items-start gap-2">
-							<div
-								ref="filterControlsRef"
-								class="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2"
+					<EmptyState
+						v-if="typeItems.length === 0"
+						:icon="getProjectTypeIcon(activeType)"
+						:heading="formatMessage(messages.noTypeInstalled, { contentType: activeTypePlural })"
+						:description="formatMessage(messages.typeHint, { contentType: activeTypePlural })"
+					>
+						<template #actions>
+							<Button
+								v-tooltip="addTooltip"
+								type="outlined"
+								size="lg"
+								:disabled="isBusy || !ctx.canAdd.value"
+								@click="ctx.upload()"
 							>
-								<ContentSortMenu v-model="sortMode" />
-								<div ref="filterPillsRef" class="relative min-w-0">
-									<div
-										class="absolute -left-2 top-[5px] h-6 w-px bg-surface-5"
-										:class="{ invisible: filterPillsWrapped }"
-									/>
-									<FilterPills
-										:model-value="selectedFilters"
-										:options="visibleFilterOptions"
-										@update:model-value="updateFilterChips"
-									>
-										<template #all>
-											{{ formatMessage(commonMessages.allProjectType) }}
-										</template>
-									</FilterPills>
-								</div>
-								<div
-									v-if="metadataFilterCategories.length > 0"
-									ref="metadataFiltersRef"
-									class="relative flex flex-wrap items-center gap-1.5 [&>div:last-of-type]:!h-[34px] [&>div:last-of-type]:!gap-1.5 [&_[data-button]]:!h-[34px]"
-								>
-									<div
-										class="absolute -left-2 top-[5px] h-6 w-px bg-surface-5"
-										:class="{ invisible: metadataFiltersWrapped }"
-									/>
-									<DropdownFilterBar
-										:model-value="selectedMetadataFilters"
-										:categories="metadataFilterCategories"
-										:show-label="false"
-										:add-label="formatMessage(messages.filter)"
-										:add-button-class="metadataFilterTriggerClass"
-										:preview-trigger-class="metadataFilterPreviewTriggerClass"
-										add-button-size="sm"
-										checkbox-position="right"
-										apply-immediately
-										@update:model-value="updateMetadataFilters"
-									>
-										<template #preview-content="{ label, summary }">
-											<span class="min-w-0 flex-1 truncate">
-												<span class="font-medium">{{ label }}:</span>
-												<span class="ml-1 font-semibold text-contrast">{{ summary }}</span>
-											</span>
-										</template>
-										<template #option="{ option, selected }">
-											<span
-												class="min-w-0 truncate font-semibold leading-tight"
-												:class="selected ? 'text-contrast' : 'text-primary'"
-											>
-												{{ option.label }}
-											</span>
-										</template>
-									</DropdownFilterBar>
-								</div>
-							</div>
+								<FolderOpenIcon />
+								{{ formatMessage(messages.uploadFiles) }}
+							</Button>
+							<Button
+								v-tooltip="addTooltip"
+								type="colored"
+								color="brand"
+								size="lg"
+								:disabled="isBusy || !ctx.canAdd.value"
+								@click="ctx.browse(activeType)"
+							>
+								<CompassIcon />
+								{{ formatMessage(messages.browseType, { contentType: activeTypePlural }) }}
+							</Button>
+						</template>
+					</EmptyState>
 
-							<div class="flex shrink-0 items-center gap-2">
-								<Button
-									v-if="hasBulkUpdateSupport && hasOutdatedProjects"
-									v-tooltip="formatMessage(messages.updateAll)"
-									type="quiet"
-									color="green"
-									:disabled="isBulkOperating || loadingUpdateAll"
-									class="!text-sm !font-medium hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
-									@click="promptUpdateAll"
-								>
-									<DownloadIcon />
-									{{ formatMessage(messages.updateAll) }}
-								</Button>
+					<ContentTable
+						v-else
+						v-model:selected-ids="selectedIds"
+						:sections="[{ id: activeType, items: rows }]"
+						:columns="{
+							selection: true,
+							enabledFor: !!ctx.setEnabledFor,
+							actions: ['update', 'switchVersion', 'toggle', 'remove'],
+						}"
+						:highlighted-item-id="highlightedItemId"
+						@toggle="toggleItem"
+						@enabled-for="setEnabledFor"
+						@remove="removeItem"
+						@update="updateItem"
+						@switch-version="switchVersion"
+						@prefetch="prefetchRow"
+					>
+						<template #empty>
+							<span>{{ formatMessage(messages.noContentFound) }}</span>
+						</template>
+					</ContentTable>
+				</div>
 
-								<Button
-									type="quiet"
-									:disabled="refreshing"
-									class="!text-sm !font-medium"
-									@click="handleRefresh"
-								>
-									<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
-									{{ formatMessage(commonMessages.refreshButton) }}
-								</Button>
-							</div>
-						</div>
-
-						<ContentCardTable
-							v-model:selected-ids="selectedIds"
-							class="mt-2"
-							:items="tableItems"
-							:highlighted-item-id="highlightedItemId"
-							:show-selection="true"
-							:show-enabled-for-column="!!ctx.setEnabledFor"
-							@update:enabled="handleToggleEnabledById"
-							@update:enabled-for="handleSetEnabledForById"
-							@delete="handleDeleteById"
-							@update="handleUpdateById"
-							@switch-version="handleSwitchVersionById"
-						>
-							<template #empty>
-								<span>{{ formatMessage(messages.noContentFound) }}</span>
-							</template>
-						</ContentCardTable>
-					</div>
-				</template>
-
-				<EmptyState v-else type="empty-inbox">
-					<template #heading>
-						{{
-							formatMessage(
-								ctx.managedContent.value
-									? messages.noExtraContentInstalled
-									: messages.noContentInstalled,
-							)
-						}}
-					</template>
-					<template #description>
-						{{
-							ctx.managedContent.value
-								? formatMessage(messages.emptyModpackHint)
-								: formatMessage(messages.emptyHint, {
-										contentType: formatContentTypeSentence(
-											formatMessage,
-											ctx.contentTypeLabel.value,
-											2,
-											'content',
-										),
-									})
-						}}
-					</template>
+				<EmptyState
+					v-else
+					:icon="BoxIcon"
+					:heading="
+						formatMessage(
+							ctx.managed.value ? messages.noExtraContentInstalled : messages.noContentInstalled,
+						)
+					"
+					:description="formatMessage(messages.emptyHint)"
+				>
 					<template #actions>
 						<Button
-							v-tooltip="
-								ctx.busyMessage?.value ??
-								(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-							"
+							v-tooltip="addTooltip"
 							type="outlined"
 							size="lg"
-							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-							@click="ctx.uploadFiles"
+							:disabled="isBusy || !ctx.canAdd.value"
+							@click="ctx.upload()"
 						>
-							<FolderOpenIcon class="size-5" />
+							<FolderOpenIcon />
 							{{ formatMessage(messages.uploadFiles) }}
 						</Button>
 						<Button
-							v-tooltip="
-								ctx.busyMessage?.value ??
-								(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-							"
+							v-tooltip="addTooltip"
 							type="colored"
 							color="brand"
 							size="lg"
-							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-							@click="ctx.browse"
+							:disabled="isBusy || !ctx.canAdd.value"
+							@click="ctx.browse(activeType)"
 						>
-							<CompassIcon class="size-5" />
-							<span>{{ formatMessage(messages.browseContent) }}</span>
+							<CompassIcon />
+							{{ formatMessage(messages.browseContent) }}
 						</Button>
 					</template>
 				</EmptyState>
@@ -1273,65 +480,47 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 		</template>
 
 		<ContentSelectionBar
-			v-if="!ctx.bulkUpdatesInBackground || bulkOperation !== 'update'"
-			:selected-items="bulkOperation === 'update' ? bulkUpdateItems : selectedItems"
-			:content-type-label="ctx.contentTypeLabel.value"
-			:is-busy="ctx.isBusy.value"
-			:busy-tooltip="ctx.busyMessage?.value"
+			v-if="!ctx.updatesRunInBackground || bulkOperation !== 'update'"
+			:selected-items="
+				bulkOperation === 'update' ? (updateAllFlow?.bulkUpdateItems ?? []) : selectedItems
+			"
+			:content-type-label="activeType"
+			:is-busy="isBusy"
+			:busy-tooltip="busyMessage"
 			:is-bulk-operating="isBulkOperating"
 			:bulk-operation="bulkOperation"
 			:bulk-progress="bulkProgress"
 			:bulk-total="bulkTotal"
 			:bulk-waiting="bulkWaiting"
-			:bulk-status-message="bulkStatusMessage"
-			:bulk-item-count="bulkItemCount"
+			:bulk-item-count="updateAllFlow?.bulkItemCount ?? 0"
 			:aria-label="formatMessage(commonMessages.selectionActionsLabel)"
-			:get-item-id="getItemId"
 			:toggle-items="toggleableSelectedItems"
 			@clear="clearSelection"
-			@enable="bulkEnable"
-			@disable="bulkDisable"
+			@enable="toggleFlow?.enableItems(toggleableSelectedItems)"
+			@disable="toggleFlow?.disableEnabledItems(toggleableSelectedItems)"
 		>
 			<template #actions>
 				<Button
-					v-if="hasBulkUpdateSupport && selectedItems.some((m) => m.has_update && !m.locked)"
-					v-tooltip="formatMessage(commonMessages.updateButton)"
+					v-if="updateAllFlow?.supported && getUpdateCandidates(selectedItems).length > 0"
+					v-tooltip="busyMessage ?? formatMessage(commonMessages.updateButton)"
 					type="quiet"
 					color="green"
-					:disabled="loadingUpdateAll"
+					:disabled="isBusy || !!updateAllFlow?.loading"
 					class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
-					@click="promptUpdateSelected"
+					@click="updateAllFlow?.promptUpdate(selectedItems)"
+					@mouseenter="prefetchUpdates(selectedItems)"
+					@focus="prefetchUpdates(selectedItems)"
 				>
 					<DownloadIcon />
 					<span class="bar-label">{{ formatMessage(commonMessages.updateButton) }}</span>
 				</Button>
 
 				<TeleportOverflowMenu
-					v-if="ctx.shareItems"
+					v-if="ctx.share"
 					type="quiet"
-					:label="formatMessage(commonMessages.moreOptionsButton)"
-					:options="[
-						{
-							id: 'share-names',
-							label: formatMessage(messages.shareProjectNames),
-							action: () => ctx.shareItems!(selectedItems, 'names'),
-						},
-						{
-							id: 'share-file-names',
-							label: formatMessage(messages.shareFileNames),
-							action: () => ctx.shareItems!(selectedItems, 'file-names'),
-						},
-						{
-							id: 'share-urls',
-							label: formatMessage(messages.shareProjectLinks),
-							action: () => ctx.shareItems!(selectedItems, 'urls'),
-						},
-						{
-							id: 'share-markdown',
-							label: formatMessage(messages.shareMarkdownLinks),
-							action: () => ctx.shareItems!(selectedItems, 'markdown'),
-						},
-					]"
+					:label="formatMessage(messages.share)"
+					:tooltip="formatMessage(messages.share)"
+					:options="shareOptions"
 					class="!w-auto !px-2.5 !rounded-xl"
 				>
 					<ShareIcon />
@@ -1357,15 +546,16 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			</template>
 
 			<template #actions-end>
-				<div v-if="deletableSelectedItems.length > 0" class="mx-1 h-6 w-px bg-surface-5" />
+				<div v-if="removableSelectedItems.length > 0" class="mx-1 h-6 w-px bg-surface-5" />
 
 				<Button
-					v-if="deletableSelectedItems.length > 0"
-					v-tooltip="formatMessage(commonMessages.deleteLabel)"
+					v-if="removableSelectedItems.length > 0"
+					v-tooltip="busyMessage ?? formatMessage(commonMessages.deleteLabel)"
 					type="quiet"
 					color="red"
+					:disabled="isBusy"
 					class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
-					@click="showBulkDeleteModal"
+					@click="deleteFlow?.promptDelete([...selectedItems], $event)"
 				>
 					<TrashIcon />
 					<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
@@ -1373,60 +563,29 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			</template>
 		</ContentSelectionBar>
 
-		<ConfirmDeletionModal
-			ref="confirmDeletionModal"
-			:count="pendingDeletionItems.length"
-			:item-type="ctx.contentTypeLabel.value"
-			:warning="pendingDeletionWarning"
-			:variant="ctx.deletionContext ?? 'instance'"
-			:backup-tip="pendingDeletionItems.map((i) => i.project?.title ?? i.file_name).join(', ')"
-			:action-disabled="ctx.isBusy.value"
-			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
-			@delete="confirmDelete"
+		<ToggleFlow ref="toggleFlow" :state="flowState" />
+		<DeleteFlow
+			ref="deleteFlow"
+			:state="flowState"
+			:to-display-row="toDisplayRow"
+			:disable-items="(items) => toggleFlow?.disableItems(items) ?? Promise.resolve()"
 		/>
-		<ConfirmDisableModal
-			ref="confirmDisableModal"
-			:count="pendingDisableItems.length"
-			:item-type="ctx.contentTypeLabel.value"
-			:warning="pendingDisableWarning"
-			:action-disabled="ctx.isBusy.value"
-			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
-			@disable="confirmDisable"
+		<UpdateAllFlow
+			ref="updateAllFlow"
+			:state="flowState"
+			:update-item="(item) => updateFlow?.openUpdate(item)"
 		/>
-		<ContentDependencyWarningModal
-			ref="contentDependencyWarningModal"
-			:items="pendingDependencyWarningItems"
-			:dependents="pendingDependencyWarningDependents"
-			:item-type="ctx.contentTypeLabel.value"
-			:variant="ctx.deletionContext ?? 'instance'"
-			:backup-tip="pendingDeletionItems.map((i) => i.project?.title ?? i.file_name).join(', ')"
-			:action-disabled="ctx.isBusy.value"
-			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
-			@delete="confirmDependencyWarningDelete"
-		/>
-		<UpdateAllModal
-			v-if="hasBulkUpdateSupport"
-			ref="updateAllModal"
-			:items="updateAllItems"
-			:server="ctx.deletionContext === 'server'"
-			:loading="loadingUpdateAll"
-			:loading-changelog="loadingUpdateAllChangelog"
-			:action-disabled="ctx.isBusy.value"
-			@changelog="loadUpdateAllChangelog"
-			@preload-changelog="preloadUpdateAllChangelog"
-			@cancel="cancelUpdateAll"
-			@update="updateAllSelected"
-		/>
+		<UpdateFlow ref="updateFlow" />
 		<ConfirmUnlinkModal
-			v-if="ctx.unlinkModpack"
+			v-if="ctx.managed.value?.unlink"
 			ref="confirmUnlinkModal"
-			:server="ctx.deletionContext === 'server'"
-			:backup-tip="ctx.managedContent.value?.card.manager.name"
-			:action-disabled="ctx.isBusy.value"
-			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
-			@unlink="ctx.unlinkModpack!()"
+			:server="isServer"
+			:backup-tip="ctx.managed.value.card.manager.name"
+			:action-disabled="isBusy"
+			:action-disabled-tooltip="busyMessage"
+			@unlink="ctx.managed.value?.unlink?.()"
 		/>
 
-		<slot name="modals" />
+		<slot name="modals" :switch-version="switchItemVersion" />
 	</div>
 </template>

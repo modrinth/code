@@ -20,6 +20,7 @@ type ButtonLinkProps = ButtonLinkDestination & {
 	rel?: string
 	download?: string | boolean
 	disabled?: boolean
+	animateWidth?: boolean
 }
 
 const props = withDefaults(defineProps<ButtonLinkProps>(), {
@@ -29,6 +30,7 @@ const props = withDefaults(defineProps<ButtonLinkProps>(), {
 	rel: undefined,
 	download: undefined,
 	disabled: false,
+	animateWidth: false,
 })
 
 const usesRouter = computed(() => props.to !== undefined && !props.disabled)
@@ -57,6 +59,7 @@ function handleClick(event: MouseEvent) {
 		:color="props.color"
 		:size="props.size"
 		:interaction="props.interaction"
+		:animate-width="props.animateWidth"
 		v-bind="linkAttrs"
 		:target="props.target"
 		:rel="resolvedRel"

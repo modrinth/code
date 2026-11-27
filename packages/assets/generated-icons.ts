@@ -8,6 +8,7 @@ export type IconComponent = FunctionalComponent<SVGAttributes>
 import _AffiliateIcon from './icons/affiliate.svg?component'
 import _AlignLeftIcon from './icons/align-left.svg?component'
 import _AnvilIcon from './icons/anvil.svg?component'
+import _AppWindowIcon from './icons/app-window.svg?component'
 import _ArchiveIcon from './icons/archive.svg?component'
 import _ArrowBigRightDashIcon from './icons/arrow-big-right-dash.svg?component'
 import _ArrowBigUpIcon from './icons/arrow-big-up.svg?component'
@@ -73,6 +74,7 @@ import _BugIcon from './icons/bug.svg?component'
 import _CalendarIcon from './icons/calendar.svg?component'
 import _CalendarArrowDownIcon from './icons/calendar-arrow-down.svg?component'
 import _CalendarClockIcon from './icons/calendar-clock.svg?component'
+import _CameraIcon from './icons/camera.svg?component'
 import _CardIcon from './icons/card.svg?component'
 import _ChartIcon from './icons/chart.svg?component'
 import _ChartAreaIcon from './icons/chart-area.svg?component'
@@ -99,10 +101,12 @@ import _CircuitBoardIcon from './icons/circuit-board.svg?component'
 import _ClearIcon from './icons/clear.svg?component'
 import _ClientIcon from './icons/client.svg?component'
 import _ClipboardCopyIcon from './icons/clipboard-copy.svg?component'
+import _ClipboardListIcon from './icons/clipboard-list.svg?component'
 import _ClockIcon from './icons/clock.svg?component'
 import _ClockArrowDownIcon from './icons/clock-arrow-down.svg?component'
 import _ClockArrowUpIcon from './icons/clock-arrow-up.svg?component'
 import _CloudIcon from './icons/cloud.svg?component'
+import _CloudAlertIcon from './icons/cloud-alert.svg?component'
 import _CodeIcon from './icons/code.svg?component'
 import _CoffeeIcon from './icons/coffee.svg?component'
 import _CogIcon from './icons/cog.svg?component'
@@ -139,6 +143,7 @@ import _FileCogIcon from './icons/file-cog.svg?component'
 import _FileExclamationPointIcon from './icons/file-exclamation-point.svg?component'
 import _FileImageIcon from './icons/file-image.svg?component'
 import _FilePlusIcon from './icons/file-plus.svg?component'
+import _FileQuestionMarkIcon from './icons/file-question-mark.svg?component'
 import _FileScanIcon from './icons/file-scan.svg?component'
 import _FileSearchCornerIcon from './icons/file-search-corner.svg?component'
 import _FileTextIcon from './icons/file-text.svg?component'
@@ -151,9 +156,11 @@ import _FolderCogIcon from './icons/folder-cog.svg?component'
 import _FolderOpenIcon from './icons/folder-open.svg?component'
 import _FolderSearchIcon from './icons/folder-search.svg?component'
 import _FolderUpIcon from './icons/folder-up.svg?component'
+import _FootprintsIcon from './icons/footprints.svg?component'
 import _GameIcon from './icons/game.svg?component'
 import _GapIcon from './icons/gap.svg?component'
 import _GaugeIcon from './icons/gauge.svg?component'
+import _GavelIcon from './icons/gavel.svg?component'
 import _GenericListIcon from './icons/generic-list.svg?component'
 import _GiftIcon from './icons/gift.svg?component'
 import _GitCommitHorizontalIcon from './icons/git-commit-horizontal.svg?component'
@@ -165,6 +172,7 @@ import _GridIcon from './icons/grid.svg?component'
 import _GripVerticalIcon from './icons/grip-vertical.svg?component'
 import _HamburgerIcon from './icons/hamburger.svg?component'
 import _HammerIcon from './icons/hammer.svg?component'
+import _HandCoinsIcon from './icons/hand-coins.svg?component'
 import _HandHelpingIcon from './icons/hand-helping.svg?component'
 import _HashIcon from './icons/hash.svg?component'
 import _Heading1Icon from './icons/heading-1.svg?component'
@@ -176,7 +184,9 @@ import _HeartMinusIcon from './icons/heart-minus.svg?component'
 import _HighlighterIcon from './icons/highlighter.svg?component'
 import _HistoryIcon from './icons/history.svg?component'
 import _HomeIcon from './icons/home.svg?component'
+import _HourglassIcon from './icons/hourglass.svg?component'
 import _ImageIcon from './icons/image.svg?component'
+import _ImageOffIcon from './icons/image-off.svg?component'
 import _ImagesIcon from './icons/images.svg?component'
 import _ImportIcon from './icons/import.svg?component'
 import _InProgressIcon from './icons/in-progress.svg?component'
@@ -257,6 +267,7 @@ import _PanelRightOpenIcon from './icons/panel-right-open.svg?component'
 import _PanelTopIcon from './icons/panel-top.svg?component'
 import _PanelTopCloseIcon from './icons/panel-top-close.svg?component'
 import _PanelTopOpenIcon from './icons/panel-top-open.svg?component'
+import _PartyPopperIcon from './icons/party-popper.svg?component'
 import _PauseIcon from './icons/pause.svg?component'
 import _PencilIcon from './icons/pencil.svg?component'
 import _PickaxeIcon from './icons/pickaxe.svg?component'
@@ -279,13 +290,17 @@ import _RightArrowIcon from './icons/right-arrow.svg?component'
 import _RocketIcon from './icons/rocket.svg?component'
 import _RotateClockwiseIcon from './icons/rotate-clockwise.svg?component'
 import _RotateCounterClockwiseIcon from './icons/rotate-counter-clockwise.svg?component'
+import _RouteOffIcon from './icons/route-off.svg?component'
 import _RssIcon from './icons/rss.svg?component'
 import _SaveIcon from './icons/save.svg?component'
 import _ScaleIcon from './icons/scale.svg?component'
 import _ScanEyeIcon from './icons/scan-eye.svg?component'
+import _ScanSearchIcon from './icons/scan-search.svg?component'
 import _SearchIcon from './icons/search.svg?component'
+import _SearchXIcon from './icons/search-x.svg?component'
 import _SendIcon from './icons/send.svg?component'
 import _ServerIcon from './icons/server.svg?component'
+import _ServerCrashIcon from './icons/server-crash.svg?component'
 import _ServerPlusIcon from './icons/server-plus.svg?component'
 import _ServerSearchIcon from './icons/server-search.svg?component'
 import _ServerStackIcon from './icons/server-stack.svg?component'
@@ -507,6 +522,7 @@ import _ZoomOutIcon from './icons/zoom-out.svg?component'
 export const AffiliateIcon = _AffiliateIcon
 export const AlignLeftIcon = _AlignLeftIcon
 export const AnvilIcon = _AnvilIcon
+export const AppWindowIcon = _AppWindowIcon
 export const ArchiveIcon = _ArchiveIcon
 export const ArrowBigRightDashIcon = _ArrowBigRightDashIcon
 export const ArrowBigUpIcon = _ArrowBigUpIcon
@@ -572,6 +588,7 @@ export const BugIcon = _BugIcon
 export const CalendarIcon = _CalendarIcon
 export const CalendarArrowDownIcon = _CalendarArrowDownIcon
 export const CalendarClockIcon = _CalendarClockIcon
+export const CameraIcon = _CameraIcon
 export const CardIcon = _CardIcon
 export const ChartIcon = _ChartIcon
 export const ChartAreaIcon = _ChartAreaIcon
@@ -598,10 +615,12 @@ export const CircuitBoardIcon = _CircuitBoardIcon
 export const ClearIcon = _ClearIcon
 export const ClientIcon = _ClientIcon
 export const ClipboardCopyIcon = _ClipboardCopyIcon
+export const ClipboardListIcon = _ClipboardListIcon
 export const ClockIcon = _ClockIcon
 export const ClockArrowDownIcon = _ClockArrowDownIcon
 export const ClockArrowUpIcon = _ClockArrowUpIcon
 export const CloudIcon = _CloudIcon
+export const CloudAlertIcon = _CloudAlertIcon
 export const CodeIcon = _CodeIcon
 export const CoffeeIcon = _CoffeeIcon
 export const CogIcon = _CogIcon
@@ -638,6 +657,7 @@ export const FileCogIcon = _FileCogIcon
 export const FileExclamationPointIcon = _FileExclamationPointIcon
 export const FileImageIcon = _FileImageIcon
 export const FilePlusIcon = _FilePlusIcon
+export const FileQuestionMarkIcon = _FileQuestionMarkIcon
 export const FileScanIcon = _FileScanIcon
 export const FileSearchCornerIcon = _FileSearchCornerIcon
 export const FileTextIcon = _FileTextIcon
@@ -650,9 +670,11 @@ export const FolderCogIcon = _FolderCogIcon
 export const FolderOpenIcon = _FolderOpenIcon
 export const FolderSearchIcon = _FolderSearchIcon
 export const FolderUpIcon = _FolderUpIcon
+export const FootprintsIcon = _FootprintsIcon
 export const GameIcon = _GameIcon
 export const GapIcon = _GapIcon
 export const GaugeIcon = _GaugeIcon
+export const GavelIcon = _GavelIcon
 export const GenericListIcon = _GenericListIcon
 export const GiftIcon = _GiftIcon
 export const GitCommitHorizontalIcon = _GitCommitHorizontalIcon
@@ -664,6 +686,7 @@ export const GridIcon = _GridIcon
 export const GripVerticalIcon = _GripVerticalIcon
 export const HamburgerIcon = _HamburgerIcon
 export const HammerIcon = _HammerIcon
+export const HandCoinsIcon = _HandCoinsIcon
 export const HandHelpingIcon = _HandHelpingIcon
 export const HashIcon = _HashIcon
 export const Heading1Icon = _Heading1Icon
@@ -675,7 +698,9 @@ export const HeartMinusIcon = _HeartMinusIcon
 export const HighlighterIcon = _HighlighterIcon
 export const HistoryIcon = _HistoryIcon
 export const HomeIcon = _HomeIcon
+export const HourglassIcon = _HourglassIcon
 export const ImageIcon = _ImageIcon
+export const ImageOffIcon = _ImageOffIcon
 export const ImagesIcon = _ImagesIcon
 export const ImportIcon = _ImportIcon
 export const InProgressIcon = _InProgressIcon
@@ -756,6 +781,7 @@ export const PanelRightOpenIcon = _PanelRightOpenIcon
 export const PanelTopIcon = _PanelTopIcon
 export const PanelTopCloseIcon = _PanelTopCloseIcon
 export const PanelTopOpenIcon = _PanelTopOpenIcon
+export const PartyPopperIcon = _PartyPopperIcon
 export const PauseIcon = _PauseIcon
 export const PencilIcon = _PencilIcon
 export const PickaxeIcon = _PickaxeIcon
@@ -778,13 +804,17 @@ export const RightArrowIcon = _RightArrowIcon
 export const RocketIcon = _RocketIcon
 export const RotateClockwiseIcon = _RotateClockwiseIcon
 export const RotateCounterClockwiseIcon = _RotateCounterClockwiseIcon
+export const RouteOffIcon = _RouteOffIcon
 export const RssIcon = _RssIcon
 export const SaveIcon = _SaveIcon
 export const ScaleIcon = _ScaleIcon
 export const ScanEyeIcon = _ScanEyeIcon
+export const ScanSearchIcon = _ScanSearchIcon
 export const SearchIcon = _SearchIcon
+export const SearchXIcon = _SearchXIcon
 export const SendIcon = _SendIcon
 export const ServerIcon = _ServerIcon
+export const ServerCrashIcon = _ServerCrashIcon
 export const ServerPlusIcon = _ServerPlusIcon
 export const ServerSearchIcon = _ServerSearchIcon
 export const ServerStackIcon = _ServerStackIcon

@@ -350,18 +350,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} diperbarui"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Dimatikan"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Dihidupkan"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Pembaruan"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Peringatan"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Membuat cadangan..."
   },
@@ -395,14 +383,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Konten tambahan"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Jelajahi konten"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Mohon tunggu hingga proses selesai sebelum menyunting konten."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Telusuri atau unggah {contentType} untuk memulai"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Tambahkan konten tambahan di atas paket mod ini"
@@ -415,9 +397,6 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Gagal memuat konten"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Sedang memuat konten..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Konten tidak ditemukan."
@@ -448,9 +427,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Tertua dahulu"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Urutkan berdasarkan {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Perbarui semua"
@@ -2859,4 +2835,3 @@
     "defaultMessage": "Anda memiliki perubahan yang belum tersimpan."
   }
 }
-

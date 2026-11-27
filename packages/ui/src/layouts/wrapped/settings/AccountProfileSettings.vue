@@ -1,19 +1,10 @@
 <template>
 	<EmptyState
 		v-if="!auth.user.value"
-		type="empty"
-		class="[&>div:last-child]:!mt-6"
+		:icon="CircleUserIcon"
 		:heading="formatMessage(messages.signInRequiredTitle)"
 		:description="formatMessage(messages.signInRequiredDescription)"
 	>
-		<template #illustration>
-			<div class="relative mb-4 h-[200px]">
-				<img :src="ThinkingRinthbot" alt="" class="h-full w-auto object-contain" />
-				<div
-					class="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-surface-2 to-transparent"
-				/>
-			</div>
-		</template>
 		<template #actions>
 			<Button type="colored" color="brand" size="xl" native-type="button" @click="requestSignIn">
 				<LogInIcon aria-hidden="true" />
@@ -148,9 +139,9 @@
 
 <script setup lang="ts">
 import {
+	CircleUserIcon,
 	LogInIcon,
 	RefreshCwIcon,
-	ThinkingRinthbot,
 	TrashIcon,
 	UndoIcon,
 	UploadIcon,

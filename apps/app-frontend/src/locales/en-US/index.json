@@ -1076,6 +1076,12 @@
   "app.library.context-menu.create-instance": {
     "message": "New instance"
   },
+  "app.library.empty.description": {
+    "message": "Create an instance to start playing."
+  },
+  "app.library.empty.heading": {
+    "message": "No instances yet"
+  },
   "app.library.filter.add": {
     "message": "Add filter"
   },

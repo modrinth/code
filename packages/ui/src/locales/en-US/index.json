@@ -680,18 +680,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Install this content on your server."
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Disabled"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Enabled"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Updates"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Warnings"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Creating backup..."
   },
@@ -806,26 +794,35 @@
   "content.metadata-filter.warnings": {
     "defaultMessage": "Warnings"
   },
+  "content.page-layout.add-content": {
+    "defaultMessage": "Add content"
+  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Additional content"
-  },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Browse content"
   },
   "content.page-layout.busy-description": {
     "defaultMessage": "Please wait for the operation to complete before editing content."
   },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Browse or upload {contentType} to get started"
+  "content.page-layout.empty.browse-content": {
+    "defaultMessage": "Browse content"
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Add additional content on top of this modpack"
+  "content.page-layout.empty.browse-type": {
+    "defaultMessage": "Browse {contentType}"
   },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "No content installed"
   },
   "content.page-layout.empty.no-extra-content-installed": {
     "defaultMessage": "No extra content installed"
+  },
+  "content.page-layout.empty.no-type-installed": {
+    "defaultMessage": "No {contentType} installed"
+  },
+  "content.page-layout.empty.projects-hint": {
+    "defaultMessage": "Upload or browse for content to get started."
+  },
+  "content.page-layout.empty.type-hint": {
+    "defaultMessage": "Upload or browse for {contentType} to get started."
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Failed to load content"
@@ -839,14 +836,17 @@
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
   },
-  "content.page-layout.loading": {
-    "defaultMessage": "Loading content..."
+  "content.page-layout.more-add-options": {
+    "defaultMessage": "More ways to add content"
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "No content found."
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Please wait"
+  },
+  "content.page-layout.refreshing": {
+    "defaultMessage": "Refreshing..."
   },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Search {count, number} {contentType}..."
@@ -872,14 +872,17 @@
   "content.page-layout.sort.alphabetical-descending": {
     "defaultMessage": "Name (Z-A)"
   },
+  "content.page-layout.sort.current": {
+    "defaultMessage": "Sort: {mode}"
+  },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Newest first"
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Oldest first"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sort by {mode}"
+  "content.page-layout.type-tabs.label": {
+    "defaultMessage": "Content types"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Update all"
@@ -934,6 +937,12 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} selected"
+  },
+  "content.update-flow.failed-to-load-changelog": {
+    "defaultMessage": "Failed to load changelog"
+  },
+  "content.update-flow.failed-to-load-versions": {
+    "defaultMessage": "Failed to load versions"
   },
   "creation-flow.button.create-instance": {
     "defaultMessage": "Create instance"
@@ -2146,9 +2155,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Failed to load modpack content"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Failed to load versions"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Failed to remove content"

@@ -614,18 +614,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "İçeriği sunucun için indir."
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Devre dışı"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Etkin"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Güncellemeler"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Uyarı"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Yedekleniyor..."
   },
@@ -734,14 +722,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Fazladan içerik"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "İçerik ara"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Lütfen içeriği düzenlemeye devam etmeden önce işlemin nitmesini bekleyin."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Başlamak için {contentType} arayın ya da yükleyin"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Bu mod paketinin üzerine ek içerik ekle"
@@ -763,9 +745,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtre"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "İçerik yükleniyor..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Hiç içerik bulunamadı."
@@ -802,9 +781,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Önce en eski"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sıralama şekli {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Tümünü güncelle"
@@ -1975,9 +1951,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Mod paketinin içeriği yüklenemedi"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Sürümler yüklenemedi"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "İçerik çıkarılamadı"

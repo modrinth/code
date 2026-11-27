@@ -608,18 +608,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Installe ce contenu sur votre serveur."
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Désactiver"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Activer"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Mises à jour"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Avertissements"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Création d'une sauvegarde..."
   },
@@ -728,14 +716,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Contenu supplémentaire"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Parcourir du contenu"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Veuillez attendre qué l'opération se termine avant de modifier le contenu."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Parcourez ou téléchargez des {contentType} pour commencer"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Ajoutez du contenu supplémentaire par-dessus ce modpack"
@@ -751,9 +733,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtre"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Chargement du contenu..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Aucun contenu trouvé."
@@ -790,9 +769,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Plus ancien en premier"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Trier par {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Tout mettre à jour"
@@ -1966,9 +1942,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Impossible de charger le contenu du modpack"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Impossible de charger les versions"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Impossible de retirer le contenu"

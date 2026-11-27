@@ -55,6 +55,7 @@ export interface ButtonProps {
 	nativeType?: ButtonNativeType
 	disabled?: boolean
 	loading?: boolean
+	animateWidth?: boolean
 }
 
 export type ButtonLinkDestination =

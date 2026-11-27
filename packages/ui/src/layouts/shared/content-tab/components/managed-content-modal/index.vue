@@ -10,13 +10,12 @@ import {
 	SpinnerIcon,
 } from '@modrinth/assets'
 import Fuse from 'fuse.js'
-import { computed, nextTick, ref, watchSyncEffect } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { ButtonLink } from '#ui/components/base/buttons'
-import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
@@ -24,26 +23,28 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectPageContext } from '#ui/providers/page-context'
 import {
 	commonMessages,
-	commonProjectTypeCategoryMessages,
 	commonProjectTypeTitleMessages,
 	normalizeProjectType,
 } from '#ui/utils/common-messages'
 
-import { getClientWarningType, getContentWarningType } from '../../composables/content-filtering'
+import { getClientWarningType } from '../../composables/content-filtering'
 import { type ContentSortMode, useContentSort } from '../../composables/content-sort'
 import {
 	type ContentMetadataFilterValue,
 	useContentMetadataFilters,
 } from '../../composables/use-content-metadata-filters'
+import { contentTypeOf, contentTypeOrder } from '../../composables/use-content-view-state'
 import type {
 	ContentCardProject,
 	ContentCardTableItem,
 	ContentItem,
 	ContentSide,
+	ContentType,
 } from '../../types'
-import ContentCardTable from '../ContentCardTable.vue'
+import ContentTable from '../content-table/index.vue'
+import type { ContentTableColumns } from '../content-table/types'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
-import ContentSortMenu from '../ContentSortMenu.vue'
+import FilterRow from '../filter-row.vue'
 
 const { formatMessage } = useVIntl()
 const pageContext = injectPageContext(null)
@@ -118,14 +119,6 @@ const messages = defineMessages({
 		id: 'instances.managed-content-modal.no-results',
 		defaultMessage: 'No projects match your search.',
 	},
-	filter: {
-		id: 'content.page-layout.filter.add',
-		defaultMessage: 'Filter',
-	},
-	warnings: {
-		id: 'content.filter.warnings',
-		defaultMessage: 'Warnings',
-	},
 	openInSlicer: {
 		id: 'instances.managed-content-modal.open-in-slicer',
 		defaultMessage: 'Open in Slicer',
@@ -153,6 +146,7 @@ export interface ManagedContentModalState {
 	searchQuery: string
 	selectedFilters: string[]
 	selectedMetadataFilters?: ContentMetadataFilterValue
+	activeType?: ContentType
 	sortMode?: ContentSortMode
 	scrollTop: number
 }
@@ -166,21 +160,47 @@ const loading = ref(false)
 const searchQuery = ref('')
 const selectedFilters = ref<string[]>([])
 const { sortMode, sortedItems, hasDateAdded, resetSortMode } = useContentSort(items)
-const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters } =
-	useContentMetadataFilters(items, undefined, {
+const showTypeTabs = computed(() => props.filterMode === 'content')
+
+const types = computed<ContentType[]>(() => {
+	const present = new Set(items.value.map(contentTypeOf))
+	return [
+		...contentTypeOrder.filter((type) => present.has(type)),
+		...[...present].filter((type) => !contentTypeOrder.includes(type)),
+	]
+})
+const activeType = ref<ContentType>('mod')
+watch(types, (next) => {
+	if (next.length > 0 && !next.includes(activeType.value)) activeType.value = next[0]
+})
+
+function inActiveType(item: ContentItem) {
+	return !showTypeTabs.value || contentTypeOf(item) === activeType.value
+}
+
+const typeItems = computed(() => items.value.filter(inActiveType))
+
+const metadataFiltersByType = ref<Partial<Record<ContentType, ContentMetadataFilterValue>>>({})
+const selectedMetadataFilters = computed<ContentMetadataFilterValue>({
+	get: () => metadataFiltersByType.value[activeType.value] ?? {},
+	set: (value) => {
+		metadataFiltersByType.value = { ...metadataFiltersByType.value, [activeType.value]: value }
+	},
+})
+const { metadataFilterCategories, applyMetadataFilters } = useContentMetadataFilters(
+	typeItems,
+	selectedMetadataFilters,
+	{
 		showEnabledFor: props.enableEnabledFor,
 		showEnvironmentWarnings: props.showEnvironmentWarnings,
 		showUpdates: false,
-	})
-const metadataFilterTriggerClass =
-	'!h-[34px] !rounded-xl !border !border-solid !border-surface-5 !bg-transparent !px-3 !text-sm !font-medium !text-primary !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-surface-3 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
-const metadataFilterPreviewTriggerClass =
-	'!h-[34px] !rounded-xl !border !border-solid !border-brand !bg-brand-highlight !px-3 !text-sm !font-medium !text-brand !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-brand-highlight focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5 [&>svg]:!text-brand'
+	},
+)
 const selectedIds = ref<string[]>([])
 const highlightedItemId = ref<string>()
 
 function updateFilters(filters: string[]) {
-	selectedFilters.value = props.filterMode === 'status' ? filters.slice(-1) : filters
+	selectedFilters.value = filters.slice(-1)
 }
 
 const selectedItems = computed(() =>
@@ -197,87 +217,34 @@ const fuse = computed(
 		}),
 )
 
-const filterOptions = computed(() => {
-	if (props.filterMode === 'status') {
-		return [
-			{ id: 'enabled', label: formatMessage(messages.enabled) },
-			{ id: 'disabled', label: formatMessage(messages.disabled) },
-		]
-	}
-
-	const frequency = items.value.reduce(
-		(map, item) => {
-			const normalized = normalizeProjectType(item.project_type)
-			map[normalized] = (map[normalized] || 0) + 1
-			return map
-		},
-		{} as Record<string, number>,
-	)
-
-	const options = Object.entries(frequency)
-		.sort(([, a], [, b]) => b - a)
-		.map(([type]) => {
-			const msg =
-				commonProjectTypeCategoryMessages[type as keyof typeof commonProjectTypeCategoryMessages]
-			return {
-				id: type,
-				label: msg ? formatMessage(msg) : type.charAt(0).toUpperCase() + type.slice(1) + 's',
-			}
-		})
-
-	if (
-		applyMetadataFilters(items.value).some(
-			(item) => getContentWarningType(item, props.showEnvironmentWarnings) !== null,
-		)
-	) {
-		options.push({ id: 'warnings', label: formatMessage(messages.warnings) })
-	}
-
-	return options
-})
-
-watchSyncEffect(() => {
-	if (items.value.length === 0) return
-	const availableFilters = new Set(filterOptions.value.map((option) => option.id))
-	const validFilters = selectedFilters.value.filter((filter) => availableFilters.has(filter))
-	if (validFilters.length !== selectedFilters.value.length) selectedFilters.value = validFilters
-})
-
-const attributeFilterIds = new Set(['enabled', 'disabled', 'warnings'])
+const statusFilterOptions = computed(() => [
+	{ id: 'enabled', label: formatMessage(messages.enabled) },
+	{ id: 'disabled', label: formatMessage(messages.disabled) },
+])
 
 function matchesSelectedFilters(item: ContentItem) {
-	const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
+	if (!inActiveType(item)) return false
 	const hasEnabledFilter = props.enableToggle && selectedFilters.value.includes('enabled')
 	const hasDisabledFilter = props.enableToggle && selectedFilters.value.includes('disabled')
-	const hasWarningsFilter = selectedFilters.value.includes('warnings')
-	if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
-		return false
-	if (hasEnabledFilter !== hasDisabledFilter && Boolean(item.enabled) !== hasEnabledFilter)
-		return false
-	if (hasWarningsFilter && getContentWarningType(item, props.showEnvironmentWarnings) === null)
-		return false
-	return true
+	return hasEnabledFilter === hasDisabledFilter || Boolean(item.enabled) === hasEnabledFilter
 }
 
 const searchableCount = computed(
 	() => applyMetadataFilters(items.value.filter(matchesSelectedFilters)).length,
 )
 
-const filteredItems = computed(() => {
+const searchedItems = computed(() => {
 	const query = searchQuery.value.trim()
-
-	let result = query ? fuse.value.search(query).map(({ item }) => item) : sortedItems.value
-
-	if (selectedFilters.value.length > 0) {
-		result = result.filter(matchesSelectedFilters)
-	}
-
-	return applyMetadataFilters(result)
+	return query ? fuse.value.search(query).map(({ item }) => item) : sortedItems.value
 })
+
+const filteredItems = computed(() =>
+	applyMetadataFilters(searchedItems.value.filter(matchesSelectedFilters)),
+)
 
 const stats = computed(() => {
 	const counts: Record<string, number> = {}
-	for (const item of filteredItems.value) {
+	for (const item of searchedItems.value) {
 		const normalized = normalizeProjectType(item.project_type)
 		counts[normalized] = (counts[normalized] || 0) + 1
 	}
@@ -338,8 +305,6 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 		installing: item.installing === true,
 		toggleDisabled: props.actionDisabled,
 		toggleDisabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
-		isClientOnly:
-			!props.enableEnabledFor && getClientWarningType(item, props.showEnvironmentWarnings) !== null,
 		clientWarning: props.enableEnabledFor
 			? null
 			: getClientWarningType(item, props.showEnvironmentWarnings),
@@ -385,8 +350,22 @@ const externalUrls = computed(() => {
 })
 const hasExternalSlicerUrls = computed(() => Object.keys(externalSlicerUrls.value).length > 0)
 const showTableActions = computed(
-	() => props.enableToggle || props.enableEnabledFor || hasExternalSlicerUrls.value,
+	() =>
+		props.enableToggle ||
+		props.enableEnabledFor ||
+		hasExternalSlicerUrls.value ||
+		tableItems.value.some((item) => item.overflowOptions?.length || item.synced || item.locked),
 )
+const tableColumns = computed<ContentTableColumns>(() => ({
+	selection: props.enableToggle,
+	version: props.showVersion,
+	enabledFor: props.enableEnabledFor,
+	actions: showTableActions.value
+		? props.enableToggle || props.enableEnabledFor
+			? ['toggle']
+			: []
+		: undefined,
+}))
 
 function getTypeIcon(type: string) {
 	switch (type) {
@@ -434,12 +413,18 @@ function bulkDisable() {
 	selectedIds.value = []
 }
 
+function resetTypeFilters(highlightId?: string) {
+	const highlighted = highlightId ? items.value.find((item) => item.id === highlightId) : undefined
+	activeType.value = highlighted ? contentTypeOf(highlighted) : (types.value[0] ?? 'mod')
+	metadataFiltersByType.value = {}
+}
+
 function show(contentItems: ContentItem[], highlightId?: string) {
 	items.value = contentItems.map((item) => ({ ...item }))
 	highlightedItemId.value = highlightId
 	searchQuery.value = ''
 	selectedFilters.value = []
-	selectedMetadataFilters.value = {}
+	resetTypeFilters(highlightId)
 	resetSortMode()
 	selectedIds.value = []
 	disabledIds.value = new Set()
@@ -452,7 +437,7 @@ function showLoading() {
 	highlightedItemId.value = undefined
 	searchQuery.value = ''
 	selectedFilters.value = []
-	selectedMetadataFilters.value = {}
+	resetTypeFilters()
 	resetSortMode()
 	selectedIds.value = []
 	loading.value = true
@@ -476,12 +461,13 @@ function handleHide() {
 }
 
 function getState(): ManagedContentModalState | null {
-	if (!items.value.length) return null
+	if (!isOpen.value || !items.value.length) return null
 	return {
 		items: items.value,
 		searchQuery: searchQuery.value,
 		selectedFilters: [...selectedFilters.value],
 		selectedMetadataFilters: { ...selectedMetadataFilters.value },
+		activeType: activeType.value,
 		sortMode: sortMode.value,
 		scrollTop: scrollContainer.value?.scrollTop ?? 0,
 	}
@@ -492,6 +478,10 @@ async function restore(state: ManagedContentModalState) {
 	highlightedItemId.value = undefined
 	searchQuery.value = state.searchQuery
 	selectedFilters.value = state.selectedFilters
+	resetTypeFilters()
+	if (state.activeType && types.value.includes(state.activeType)) {
+		activeType.value = state.activeType
+	}
 	selectedMetadataFilters.value = state.selectedMetadataFilters ?? {}
 	if (state.sortMode) sortMode.value = state.sortMode
 	else resetSortMode()
@@ -574,13 +564,19 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					clearable
 				/>
 
-				<div class="flex flex-wrap items-center gap-2">
-					<ContentSortMenu v-model="sortMode" :show-date-options="hasDateAdded" />
-					<template v-if="filterOptions.length > 0">
-						<div class="h-6 w-px shrink-0 bg-surface-5" />
+				<FilterRow
+					v-model:type="activeType"
+					v-model:filters="selectedMetadataFilters"
+					v-model:sort="sortMode"
+					:types="types"
+					:filter-categories="metadataFilterCategories"
+					:show-date-sort="hasDateAdded"
+					flat
+				>
+					<template v-if="filterMode === 'status'" #leading>
 						<FilterPills
 							:model-value="selectedFilters"
-							:options="filterOptions"
+							:options="statusFilterOptions"
 							@update:model-value="updateFilters"
 						>
 							<template #all>
@@ -588,38 +584,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 							</template>
 						</FilterPills>
 					</template>
-					<div
-						v-if="metadataFilterCategories.length > 0"
-						class="flex flex-wrap items-center gap-1.5 [&>div:last-of-type]:!h-[34px] [&>div:last-of-type]:!gap-1.5 [&_[data-button]]:!h-[34px]"
-					>
-						<DropdownFilterBar
-							v-model="selectedMetadataFilters"
-							:categories="metadataFilterCategories"
-							:show-label="false"
-							:add-label="formatMessage(messages.filter)"
-							:add-button-class="metadataFilterTriggerClass"
-							:preview-trigger-class="metadataFilterPreviewTriggerClass"
-							add-button-size="sm"
-							checkbox-position="right"
-							apply-immediately
-						>
-							<template #preview-content="{ label, summary }">
-								<span class="min-w-0 flex-1 truncate">
-									<span class="font-medium">{{ label }}:</span>
-									<span class="ml-1 font-semibold text-contrast">{{ summary }}</span>
-								</span>
-							</template>
-							<template #option="{ option, selected }">
-								<span
-									class="min-w-0 truncate font-semibold leading-tight"
-									:class="selected ? 'text-contrast' : 'text-primary'"
-								>
-									{{ option.label }}
-								</span>
-							</template>
-						</DropdownFilterBar>
-					</div>
-				</div>
+				</FilterRow>
 			</div>
 
 			<div class="flex min-h-0 flex-col overflow-hidden">
@@ -652,30 +617,22 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 
 				<div v-else class="@container flex min-h-0 flex-col">
 					<div ref="scrollContainer" class="min-h-0 overflow-y-auto">
-						<ContentCardTable
+						<ContentTable
 							v-model:selected-ids="selectedIds"
-							:items="tableItems"
+							:sections="[{ id: 'managed', items: tableItems }]"
+							:columns="tableColumns"
 							:highlighted-item-id="highlightedItemId"
-							:show-selection="props.enableToggle"
-							:show-item-actions="showTableActions"
-							:get-additional-action-widths="
+							:extra-action-widths="
 								(item) => [
 									...(externalSlicerUrls[item.id] ? [36] : []),
 									...(externalUrls[item.id] ? [36] : []),
 								]
 							"
-							:show-version="showVersion"
-							:show-enabled-for-column="props.enableEnabledFor"
-							hide-delete
 							flat
-							v-on="
-								props.enableToggle || props.enableEnabledFor
-									? { 'update:enabled': (id: string, val: boolean) => handleEnabledChange(id, val) }
-									: {}
-							"
-							@update:enabled-for="handleEnabledForChange"
+							@toggle="handleEnabledChange"
+							@enabled-for="handleEnabledForChange"
 						>
-							<template #itemButtonsRight="{ item }">
+							<template #row-actions-after="{ item }">
 								<ButtonLink
 									v-if="externalSlicerUrls[item.id]"
 									v-tooltip="formatMessage(messages.openInSlicer)"
@@ -699,7 +656,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 									<FileIcon class="size-4" />
 								</ButtonLink>
 							</template>
-						</ContentCardTable>
+						</ContentTable>
 					</div>
 				</div>
 			</div>

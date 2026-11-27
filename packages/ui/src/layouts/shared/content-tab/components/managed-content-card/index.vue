@@ -33,6 +33,8 @@ const emit = defineEmits<{
 	'view-content': []
 	settings: []
 	'primary-action': [event: MouseEvent]
+	'prefetch-view-content': []
+	'prefetch-primary-action': []
 }>()
 
 const { formatMessage } = useVIntl()
@@ -103,12 +105,15 @@ const title = computed(() =>
 					:disabled="disabled"
 					class="grow"
 					@click="emit('view-content')"
+					@mouseenter="emit('prefetch-view-content')"
+					@focus="emit('prefetch-view-content')"
 				>
 					<EyeIcon aria-hidden="true" />
 					{{ formatMessage(messages.viewContent) }}
 				</Button>
 				<IconButton
 					v-if="showSettings"
+					v-tooltip="formatMessage(messages.settings)"
 					type="outlined"
 					size="lg"
 					:disabled="disabled"
@@ -128,6 +133,7 @@ const title = computed(() =>
 			:disabled-text="disabledText"
 			:show-primary-action="showPrimaryAction"
 			@primary-action="emit('primary-action', $event)"
+			@prefetch-primary-action="emit('prefetch-primary-action')"
 		/>
 	</section>
 </template>

@@ -25,7 +25,6 @@ export interface ContentOwner {
 export interface ContentSource {
 	project: ContentCardProject
 	link?: string | RouteLocationRaw | (() => void)
-	/** Text shown before the source project, like "Provided by". */
 	label?: string
 }
 
@@ -93,7 +92,6 @@ export interface ContentCardTableItem {
 	installing?: boolean
 	installProgress?: number | null
 	hasUpdate?: boolean
-	isClientOnly?: boolean
 	clientWarning?: ClientWarningType | null
 	synced?: boolean
 	syncUpdatePending?: boolean
@@ -104,9 +102,6 @@ export interface ContentCardTableItem {
 	embeddedIcon?: ContentCardEmbeddedIcon
 }
 
-export type ContentCardTableSortColumn = 'project' | 'version'
-export type ContentCardTableSortDirection = 'asc' | 'desc'
-
 export interface BulkOperationStatus {
 	message?: string
 	progress?: number
@@ -114,34 +109,49 @@ export interface BulkOperationStatus {
 	waiting?: boolean
 }
 
-/** Content item returned from the app backend API - maps to ContentCardTableItem for display */
-export interface ContentItem extends Omit<
-	ContentCardTableItem,
-	'id' | 'projectLink' | 'disabled' | 'overflowOptions'
-> {
+export type ContentType = 'mod' | 'plugin' | 'resourcepack' | 'datapack' | 'shader'
+
+export interface ContentItem {
 	id: string
+	project_type: ContentType
+	file_name: string
+	file_path?: string
+	size?: number
+	date_added?: string
+	project?: ContentCardProject
+	version?: ContentCardVersion
+	owner?: ContentOwner
+	embedded_metadata?: EmbeddedContentMetadata | null
+	embeddedIcon?: ContentCardEmbeddedIcon
+	enabled: boolean
+	locked?: boolean
+	has_update: boolean
+	update_version_id: string | null
+	installing?: boolean
+	installProgress?: number | null
+	source_kind?: ContentSourceKind | null
 	synced_pack?: {
 		id: string
 		instance_ids: string[]
 		update_pending: boolean
 	} | null
-	file_name: string
-	file_path?: string
-	size?: number
-	project_type: string
-	has_update: boolean
-	update_version_id: string | null
-	date_added?: string
 	environment?: Labrinth.Projects.v3.Environment
 	pack_client_retained?: boolean
 	pack_client_depends?: boolean
-	installing?: boolean
-	installProgress?: number | null
-	source_kind?: ContentSourceKind | null
 	external?: boolean
 	external_url?: string
-	embedded_metadata?: EmbeddedContentMetadata | null
+	source?: ContentSource
+	enabledFor?: ContentEnabledForState
 }
+
+export interface ContentPermissions {
+	toggle: boolean
+	remove: boolean
+	changeVersion: boolean
+	reason?: string
+}
+
+export type ContentConfirmResult = 'confirmed' | 'cancelled' | 'unhandled'
 
 export type ManagedContentProject = Pick<
 	Labrinth.Projects.v2.Project,
@@ -187,3 +197,24 @@ export type ManagedContentCardData =
 			syncedAt?: number
 			updateAvailable: boolean
 	  })
+
+export interface ManagedContentUpdate {
+	currentVersionId: string | null
+	initialVersionId?: string
+	external?: boolean
+	fetchVersions: () => Promise<Labrinth.Versions.v2.Version[]>
+	install: (version: Labrinth.Versions.v2.Version) => Promise<void>
+}
+
+export interface ManagedContent {
+	card: ManagedContentCardData
+	locked: boolean
+	disabledReason?: string
+	view?: () => void
+	update?: ManagedContentUpdate
+	primaryAction?: (event?: MouseEvent) => void
+	openSettings?: () => void
+	unlink?: () => void
+	prefetchView?: () => void
+	prefetchPrimaryAction?: () => void
+}

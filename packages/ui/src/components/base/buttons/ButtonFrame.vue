@@ -2,6 +2,8 @@
 import type { Component, CSSProperties } from 'vue'
 import { computed, ref } from 'vue'
 
+import { useAnimatedWidth } from '#ui/composables/animated-width'
+
 import type {
 	ButtonColor,
 	ButtonInteraction,
@@ -80,6 +82,7 @@ const props = withDefaults(
 		iconOnly?: boolean
 		circular?: boolean
 		nativeType?: ButtonNativeType
+		animateWidth?: boolean
 	}>(),
 	{
 		type: 'base',
@@ -88,10 +91,12 @@ const props = withDefaults(
 		iconOnly: false,
 		circular: false,
 		nativeType: undefined,
+		animateWidth: false,
 	},
 )
 
 const element = ref<HTMLElement | null>(null)
+useAnimatedWidth(element, { enabled: () => props.animateWidth })
 const classes = computed(() => [
 	baseClasses,
 	typeClasses[props.type],
@@ -99,6 +104,7 @@ const classes = computed(() => [
 	sizeClasses[props.size],
 	props.iconOnly ? iconOnlySizeClasses[props.size] : '',
 	props.circular ? '!rounded-full' : '',
+	props.animateWidth ? 'overflow-hidden [justify-content:safe_center]' : '',
 ])
 const style = computed((): CSSProperties | undefined => {
 	if ((props.type === 'outlined' || props.type === 'quiet') && !props.color) return undefined

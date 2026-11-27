@@ -677,18 +677,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "在你的服务器上安装此内容。"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "已禁用"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "已启用"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "更新"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "警告"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "正在创建备份…"
   },
@@ -806,14 +794,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "附加内容"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "浏览内容"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "请等待操作完成后再编辑内容。"
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "浏览或上传{contentType}以开始使用"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "在这个整合包的基础上添加更多内容"
@@ -835,9 +817,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "筛选过滤"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "正在加载内容…"
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "未找到内容。"
@@ -874,9 +853,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "按从旧到新顺序"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "按{mode}排序"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "更新所有"
@@ -2101,9 +2077,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "加载整合包内容失败"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "加载版本失败"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "移除内容失败"
@@ -7908,4 +7881,3 @@
     "defaultMessage": "类型"
   }
 }
-

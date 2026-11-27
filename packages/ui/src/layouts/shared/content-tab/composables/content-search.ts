@@ -9,7 +9,7 @@ export function useContentSearch<T>(
 	options?: { threshold?: number; distance?: number; queryParam?: string },
 ) {
 	const searchQuery = ref('')
-	if (options?.queryParam) syncSearchQueryToRoute(searchQuery, options.queryParam)
+	if (options?.queryParam) syncRefToRouteQuery(searchQuery, options.queryParam, '')
 	const fuse = new Fuse<T>([], {
 		keys,
 		threshold: options?.threshold ?? 0.4,
@@ -26,19 +26,22 @@ export function useContentSearch<T>(
 	return { searchQuery, search }
 }
 
-/**
- * Keeps the search in the route query so back navigation restores it, while fresh visits to the
- * page start with an empty search.
- */
-function syncSearchQueryToRoute(searchQuery: Ref<string>, param: string) {
+export function syncRefToRouteQuery<T extends string>(
+	value: Ref<T>,
+	param: string,
+	defaultValue: T,
+	isValid: (candidate: string) => candidate is T = (candidate): candidate is T => true,
+) {
 	const route = useRoute()
 	const router = useRouter()
 	const path = route.path
 	const initial = route.query[param]
-	if (typeof initial === 'string') searchQuery.value = initial
+	if (typeof initial === 'string' && isValid(initial)) value.value = initial
 
-	watch(searchQuery, (value) => {
+	watch(value, (next) => {
 		if (route.path !== path) return
-		router.replace({ query: { ...route.query, [param]: value || undefined } })
+		router.replace({
+			query: { ...route.query, [param]: next === defaultValue ? undefined : next },
+		})
 	})
 }

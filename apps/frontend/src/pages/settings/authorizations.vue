@@ -43,7 +43,7 @@
 		</template>
 		<EmptyState
 			v-else-if="showEmptyState"
-			type="done"
+			:icon="PlugIcon"
 			:heading="formatMessage(messages.emptyStateHeading)"
 			:description="formatMessage(messages.emptyStateDescription)"
 		/>
@@ -58,6 +58,7 @@
 	</div>
 </template>
 <script setup>
+import { PlugIcon } from '@modrinth/assets'
 import {
 	commonMessages,
 	commonSettingsMessages,

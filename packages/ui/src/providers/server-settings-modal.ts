@@ -1,3 +1,4 @@
+import type { ContentType } from '#ui/layouts/shared/content-tab/types'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
 
 import { createContext } from './create-context'
@@ -5,7 +6,7 @@ import { createContext } from './create-context'
 export interface BrowseServerContentArgs {
 	serverId: string
 	worldId: string | null
-	type: 'mod' | 'plugin' | 'datapack'
+	type: ContentType
 }
 
 export interface ServerSettingsModalContext {

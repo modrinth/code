@@ -8,18 +8,28 @@
 		<template v-else>{{ effectiveLabel }}</template>
 	</span>
 
-	<template v-for="preview in appliedFilterPreviews" :key="preview.key">
+	<template v-for="preview in showPreviews ? appliedFilterPreviews : []" :key="preview.key">
 		<Button
 			v-if="preview.category.direct"
-			type="outlined"
+			type="base"
 			native-type="button"
-			size="lg"
+			:size="compact ? 'sm' : 'lg'"
 			:class="effectivePreviewTriggerClass"
 			:aria-label="formatMessage(messages.clearNamedFilter, { name: preview.label })"
 			@click="clearFilterCategory(preview.key)"
 		>
-			<span class="font-semibold">{{ preview.label }}</span>
-			<XIcon class="size-4" />
+			<div
+				class="flex min-w-0 max-w-full items-center gap-2 sm:max-w-80"
+				:class="compact ? 'min-h-6' : 'min-h-8'"
+			>
+				<FilterIcon
+					v-if="showPreviewFilterIcon"
+					class="size-5 shrink-0 text-primary"
+					aria-hidden="true"
+				/>
+				<span class="min-w-0 flex-1 truncate font-semibold text-contrast">{{ preview.label }}</span>
+				<XIcon class="size-4 shrink-0 text-primary" />
+			</div>
 		</Button>
 		<MultiSelect
 			v-else
@@ -33,7 +43,7 @@
 			:searchable="preview.category.searchable"
 			:search-placeholder="preview.category.searchPlaceholder"
 			trigger-type="base"
-			trigger-size="lg"
+			:trigger-size="compact ? 'sm' : 'lg'"
 			:trigger-class="effectivePreviewTriggerClass"
 			:dropdown-width="getPreviewDropdownWidth(preview.category)"
 			:dropdown-min-width="getPreviewDropdownMinWidth(preview.category)"
@@ -62,7 +72,10 @@
 				></slot>
 			</template>
 			<template #input-content="{ isOpen, openDirection }">
-				<div class="flex min-h-8 min-w-0 max-w-full items-center gap-2 sm:max-w-80">
+				<div
+					class="flex min-w-0 max-w-full items-center gap-2 sm:max-w-80"
+					:class="compact ? 'min-h-6' : 'min-h-8'"
+				>
 					<FilterIcon
 						v-if="showPreviewFilterIcon"
 						class="size-5 shrink-0 text-primary"
@@ -129,25 +142,35 @@
 		</MultiSelect>
 	</template>
 
-	<div class="flex h-10 min-w-0 max-w-full items-center gap-2">
+	<div class="flex min-w-0 max-w-full items-center gap-2" :class="compact ? 'h-8' : 'h-10'">
 		<Button
+			v-if="showAddButton"
 			ref="addMenuTrigger"
+			v-tooltip="$slots['add-button'] && !isAddMenuOpen ? effectiveAddLabel : undefined"
 			type="outlined"
 			native-type="button"
 			:size="addButtonSize"
 			:class="addButtonClass ?? '!border'"
+			:aria-label="$slots['add-button'] ? effectiveAddLabel : undefined"
 			:aria-expanded="isAddMenuOpen"
 			aria-haspopup="menu"
 			@click="handleAddMenuTriggerClick"
 			@keydown="handleAddMenuTriggerKeydown"
 		>
-			<PlusIcon />
-			{{ effectiveAddLabel }}
+			<slot name="add-button">
+				<PlusIcon />
+				{{ effectiveAddLabel }}
+			</slot>
 		</Button>
 
-		<Button v-if="shouldShowClear" type="quiet" native-type="button" @click="clearAllFilters">{{
-			effectiveClearLabel
-		}}</Button>
+		<Button
+			v-if="shouldShowClear"
+			type="quiet"
+			native-type="button"
+			:size="compact ? 'sm' : 'md'"
+			@click="clearAllFilters"
+			>{{ effectiveClearLabel }}</Button
+		>
 	</div>
 
 	<Teleport v-if="isClient" to="#teleports">
@@ -505,6 +528,7 @@ type MenuPositionOptions = {
 	dropdownRect: DOMRect
 	dropdownHeight: number
 	viewport: ViewportRect
+	alignEnd: boolean
 }
 
 type SubmenuPositionOptions = {
@@ -521,6 +545,7 @@ type SubmenuOpenDirectionOptions = {
 	menuRect: DOMRect
 	widestSubmenuWidth: number
 	viewport: ViewportRect
+	preferLeft: boolean
 }
 
 const ADD_MENU_WIDTH = 250
@@ -581,8 +606,17 @@ const props = withDefaults(
 		emptyOptionsLabel?: string
 		emptySearchLabel?: string
 		checkboxPosition?: 'left' | 'right'
+		menuAlign?: 'start' | 'end'
+		showPreviews?: boolean
+		showAddButton?: boolean
+		showClearButton?: boolean
+		compact?: boolean
 	}>(),
 	{
+		showPreviews: true,
+		showAddButton: true,
+		showClearButton: true,
+		compact: false,
 		showClear: false,
 		showLabel: true,
 		useFilterIcon: false,
@@ -590,6 +624,7 @@ const props = withDefaults(
 		applyImmediately: false,
 		showPreviewFilterIcon: false,
 		checkboxPosition: 'left',
+		menuAlign: 'start',
 	},
 )
 
@@ -817,10 +852,14 @@ const appliedFilterPreviews = computed(() =>
 )
 
 const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
-const shouldShowClear = computed(() => hasAppliedFilters.value || props.showClear)
+const shouldShowClear = computed(
+	() => props.showClearButton && (hasAppliedFilters.value || props.showClear),
+)
 const DEFAULT_PREVIEW_TRIGGER_CLASS = 'max-w-[16rem] !rounded-xl'
 const effectivePreviewTriggerClass = computed(
-	() => (props.previewTriggerClass ?? DEFAULT_PREVIEW_TRIGGER_CLASS) + ' h-9',
+	() =>
+		(props.previewTriggerClass ?? DEFAULT_PREVIEW_TRIGGER_CLASS) +
+		(props.compact ? ' h-8 !px-3' : ' h-9'),
 )
 
 function cloneSelectedFilters(filters: DropdownFilterBarValue): DropdownFilterBarValue {
@@ -1562,12 +1601,14 @@ function getAddMenuPosition({
 	dropdownRect,
 	dropdownHeight,
 	viewport,
+	alignEnd,
 }: MenuPositionOptions) {
 	const dropdownWidth = Math.max(ADD_MENU_WIDTH, triggerRect.width)
 	const positionedDropdownWidth = Math.max(dropdownRect.width, dropdownWidth)
 	const triggerTop = triggerRect.top + viewport.offsetTop
 	const triggerBottom = triggerRect.bottom + viewport.offsetTop
 	const triggerLeft = triggerRect.left + viewport.offsetLeft
+	const triggerRight = triggerRect.right + viewport.offsetLeft
 	const viewportTop = viewport.offsetTop
 	const viewportBottom = viewport.offsetTop + viewport.height
 	const viewportLeft = viewport.offsetLeft
@@ -1590,7 +1631,8 @@ function getAddMenuPosition({
 	const top = opensUp
 		? triggerTop - positionedDropdownHeight - DROPDOWN_GAP
 		: triggerBottom + DROPDOWN_GAP
-	const left = Math.min(Math.max(minLeft, triggerLeft), maxLeft)
+	const preferredLeft = alignEnd ? triggerRight - positionedDropdownWidth : triggerLeft
+	const left = Math.min(Math.max(minLeft, preferredLeft), maxLeft)
 
 	return {
 		left: `${left}px`,
@@ -1638,6 +1680,7 @@ function getSubmenuOpenDirection({
 	menuRect,
 	widestSubmenuWidth,
 	viewport,
+	preferLeft,
 }: SubmenuOpenDirectionOptions): SubmenuOpenDirection {
 	const menuLeft = menuRect.left + viewport.offsetLeft
 	const menuRight = menuRect.right + viewport.offsetLeft
@@ -1645,6 +1688,10 @@ function getSubmenuOpenDirection({
 	const viewportRight = viewport.offsetLeft + viewport.width
 	const rightSpace = viewportRight - menuRight - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN
 	const leftSpace = menuLeft - viewportLeft - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN
+
+	if (preferLeft && leftSpace >= widestSubmenuWidth) {
+		return 'left'
+	}
 
 	if (rightSpace >= widestSubmenuWidth) {
 		return 'right'
@@ -1723,8 +1770,26 @@ function updateAddMenuPosition(): boolean {
 		dropdownRect,
 		dropdownHeight: positioningElement.scrollHeight,
 		viewport,
+		alignEnd: props.menuAlign === 'end',
 	})
 	return true
+}
+
+function getMenuLayoutRect(menu: HTMLElement) {
+	const viewport = getViewportRect()
+	const left = Number.parseFloat(String(addMenuStyle.value.left)) - viewport.offsetLeft
+	const top = Number.parseFloat(String(addMenuStyle.value.top)) - viewport.offsetTop
+	return new DOMRect(left, top, menu.offsetWidth, menu.offsetHeight)
+}
+
+function getButtonLayoutRect(menu: HTMLElement, button: HTMLElement) {
+	const menuRect = getMenuLayoutRect(menu)
+	return new DOMRect(
+		menuRect.left,
+		menuRect.top + button.offsetTop - menu.scrollTop,
+		menuRect.width,
+		button.offsetHeight,
+	)
 }
 
 function updateSubmenuOpenDirection(): boolean {
@@ -1733,9 +1798,10 @@ function updateSubmenuOpenDirection(): boolean {
 	}
 
 	submenuOpenDirection.value = getSubmenuOpenDirection({
-		menuRect: menuContainer.value.getBoundingClientRect(),
+		menuRect: getMenuLayoutRect(menuContainer.value),
 		widestSubmenuWidth: getWidestSubmenuWidthInPixels(filterCategories.value),
 		viewport: getViewportRect(),
+		preferLeft: props.menuAlign === 'end',
 	})
 	return true
 }
@@ -1784,12 +1850,13 @@ function updateSubmenuPosition(): boolean {
 		return false
 	}
 
-	const buttonRect = activeButton.getBoundingClientRect()
-	const submenuRect = submenu.value?.getBoundingClientRect()
+	const buttonRect = menuContainer.value
+		? getButtonLayoutRect(menuContainer.value, activeButton)
+		: activeButton.getBoundingClientRect()
 	const submenuWidth =
-		submenuRect?.width ??
+		submenu.value?.offsetWidth ||
 		(activeCategory.value ? getSubmenuWidthInPixels(activeCategory.value) : 256)
-	const submenuHeight = submenuRect?.height ?? 320
+	const submenuHeight = submenu.value?.offsetHeight || 320
 
 	updateSubmenuOpenDirection()
 	const viewport = getViewportRect()

@@ -506,18 +506,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} päivitetty"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Pois käytöstä"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Käytössä"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Päivitykset"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Varoitukset"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Luodaan varmuuskopiota..."
   },
@@ -623,14 +611,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Lisäsisältö"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Selaa sisältöä"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Odota toiminnon valmistumista ennen sisällön muokkausta."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Selaa tai lataa {contentType} aloittaaksesi"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Lisää lisäsisältöä modipaketin päälle"
@@ -652,9 +634,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Suodatin"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Ladataan sisältöä..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Sisältöä ei löytynyt."
@@ -1161,4 +1140,3 @@
     "defaultMessage": "Sinulla on tallentamattomia muutoksia."
   }
 }
-

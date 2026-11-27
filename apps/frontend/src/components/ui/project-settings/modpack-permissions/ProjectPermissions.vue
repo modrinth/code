@@ -4,10 +4,12 @@ import {
 	ArrowDown10Icon,
 	ArrowDownWideNarrowIcon,
 	ClockArrowDownIcon,
+	FileSearchCornerIcon,
 	FoldVerticalIcon,
 	PauseIcon,
 	ScaleIcon,
 	SearchIcon,
+	ShieldCheckIcon,
 	SpinnerIcon,
 	TrashIcon,
 	UnfoldVerticalIcon,
@@ -704,7 +706,7 @@ function dismissInfoBanner() {
 				<EmptyState
 					v-if="filteredGroups.length === 0"
 					:heading="formatMessage(messages.noResults)"
-					type="no-search-result"
+					:icon="FileSearchCornerIcon"
 				/>
 			</TransitionGroup>
 		</div>
@@ -718,7 +720,7 @@ function dismissInfoBanner() {
 		<EmptyState
 			:heading="formatMessage(messages.emptyStateHeading)"
 			:description="formatMessage(messages.emptyStateDescription)"
-			type="done"
+			:icon="ShieldCheckIcon"
 		/>
 	</template>
 </template>

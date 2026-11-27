@@ -626,18 +626,6 @@
   "content.enabled-for.server-only-filter": {
     "defaultMessage": "僅伺服器"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "停用"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "啟用"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "更新"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "警告"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "正在建立備份..."
   },
@@ -743,14 +731,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "額外內容"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "瀏覽內容"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "請待操作完成後再進行編輯。"
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "瀏覽或上傳{contentType}即可開始"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "在這個模組包之上新增額外內容"
@@ -772,9 +754,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "篩選條件"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "正在載入內容..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "找不到內容。"
@@ -811,9 +790,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "由舊到新"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "排序依據：{mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "更新全部"
@@ -2026,9 +2002,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "無法載入模組包內容"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "無法載入版本"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "無法移除內容"

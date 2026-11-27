@@ -1,19 +1,10 @@
 <template>
 	<EmptyState
 		v-if="!auth.user.value"
-		type="empty"
-		class="[&>div:last-child]:!mt-6"
+		:icon="MessagesSquareIcon"
 		:heading="formatMessage(messages.signInRequiredTitle)"
 		:description="formatMessage(messages.signInRequiredDescription)"
 	>
-		<template #illustration>
-			<div class="relative mb-4 h-[200px]">
-				<img :src="ThinkingRinthbot" alt="" class="h-full w-auto object-contain" />
-				<div
-					class="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-surface-2 to-transparent"
-				/>
-			</div>
-		</template>
 		<template #actions>
 			<Button type="colored" color="brand" size="xl" native-type="button" @click="requestSignIn">
 				<LogInIcon aria-hidden="true" />
@@ -206,7 +197,7 @@
 <script setup lang="ts">
 // TODO this will be moved in with the rest of the xplat settings.
 import type { Labrinth } from '@modrinth/api-client'
-import { LogInIcon, SpinnerIcon, ThinkingRinthbot } from '@modrinth/assets'
+import { LogInIcon, MessagesSquareIcon, SpinnerIcon } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 

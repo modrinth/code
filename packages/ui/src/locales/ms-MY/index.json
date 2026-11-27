@@ -338,18 +338,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} dikemas kini"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Dinyahdayakan"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Didayakan"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Kemas kini"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Amaran"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Sedang mencipta sandaran..."
   },
@@ -383,14 +371,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Kandungan tambahan"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Layari kandungan"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Sila tunggu sehingga operasi selesai sebelum menyunting kandungan."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Layari atau muat naik {contentType} untuk bermula"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Tambahkan kandungan tambahan di atas pek mod ini"
@@ -403,9 +385,6 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Gagal memuat kandungan"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Sedang memuat kandungan..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Tiada kandungan dijumpai."
@@ -433,9 +412,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Paling lama dahulu"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Isih mengikut {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Kemas kini semua"
@@ -1240,9 +1216,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Gagal memuat kandungan pek mod"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Gagal memuat versi"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Gagal mengalih keluar kandungan"
@@ -4749,4 +4722,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

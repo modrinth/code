@@ -25,14 +25,10 @@
 			<Pagination :page="currentPage" :count="pageCount" @switch-page="switchPage" />
 		</div>
 
-		<EmptyState
-			v-if="isLoading"
-			type="no-search-result"
-			heading="Loading global detail traces..."
-		/>
+		<EmptyState v-if="isLoading" :icon="HourglassIcon" heading="Loading global detail traces..." />
 		<EmptyState
 			v-else-if="loadError"
-			type="no-search-result"
+			:icon="ServerCrashIcon"
 			heading="Failed to load global detail traces"
 		/>
 		<div v-else-if="traces.length > 0" class="mt-4 flex flex-col gap-3">
@@ -104,12 +100,12 @@
 				</div>
 				<EmptyState
 					v-else
-					type="no-search-result"
+					:icon="FootprintsIcon"
 					heading="No local traces currently match this key"
 				/>
 			</article>
 		</div>
-		<EmptyState v-else type="no-search-result" heading="No global detail traces found" />
+		<EmptyState v-else :icon="ScanSearchIcon" heading="No global detail traces found" />
 
 		<div v-if="!isLoading && !loadError && total > 0" class="mt-4 flex justify-end">
 			<Pagination :page="currentPage" :count="pageCount" @switch-page="switchPage" />
@@ -119,7 +115,16 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { HashIcon, ListIcon, SearchIcon, TrashIcon } from '@modrinth/assets'
+import {
+	FootprintsIcon,
+	HashIcon,
+	HourglassIcon,
+	ListIcon,
+	ScanSearchIcon,
+	SearchIcon,
+	ServerCrashIcon,
+	TrashIcon,
+} from '@modrinth/assets'
 import {
 	Badge,
 	Button,

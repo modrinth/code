@@ -680,18 +680,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Diesen Inhalt auf deinem Server installieren."
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Deaktiviert"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Aktiviert"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Aktualisierungen"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Warnungen"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Sicherung wird erstellt..."
   },
@@ -809,14 +797,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Zusätzliche Inhalte"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Inhalte durchsuchen"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Bitte warte, bis der Vorgang abgeschlossen ist, bevor du Inhalte bearbeitest."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Durchsuche oder lade {contentType} hoch, um loszulegen"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Füge zusätzliche Inhalte zu diesem Modpack hinzu"
@@ -838,9 +820,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Inhalte werden geladen..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Keine Inhalte gefunden."
@@ -877,9 +856,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Älteste zuerst"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortieren nach {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Alle aktualisieren"
@@ -2146,9 +2122,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Modpackinhalte konnten nicht geladen werden"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Versionen konnten nicht geladen werden"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Entfernen von Inhalten fehlgeschlagen"
@@ -8652,4 +8625,3 @@
     "defaultMessage": "Typ"
   }
 }
-

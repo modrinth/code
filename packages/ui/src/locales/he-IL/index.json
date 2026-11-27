@@ -317,12 +317,6 @@
   "content.enabled-for.server": {
     "defaultMessage": "שרת"
   },
-  "content.filter.updates": {
-    "defaultMessage": "עדכונים"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "אזהרות"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "יוצר גיבוי..."
   },
@@ -346,9 +340,6 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "טעינת התוכן נכשלה"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "טוען תוכן..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "לא נמצא תוכן."

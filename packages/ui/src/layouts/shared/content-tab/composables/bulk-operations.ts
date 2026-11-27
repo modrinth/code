@@ -8,6 +8,7 @@ export function useBulkOperation() {
 	const bulkProgress = ref(0)
 	const bulkTotal = ref(0)
 	const bulkOperation = ref<BulkOperationType | null>(null)
+	const bulkWaiting = ref(false)
 
 	async function runBulk<T>(
 		operation: BulkOperationType,
@@ -66,5 +67,7 @@ export function useBulkOperation() {
 		})
 	}
 
-	return { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, runBulk }
+	return { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, bulkWaiting, runBulk }
 }
+
+export type BulkOperationState = ReturnType<typeof useBulkOperation>

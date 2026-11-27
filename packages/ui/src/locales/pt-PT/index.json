@@ -455,14 +455,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Conteúdo adicional"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Navegar conteúdo"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Aguarde essa operação ser finalizada antes de editar o conteúdo."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Navegue ou envie {contentType} para começar"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Adicione mais conteúdo a este modpack"
@@ -475,9 +469,6 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Falha ao carregar conteúdo"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Carregando conteúdo"
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Nenhum conteúdo encontrado"
@@ -505,9 +496,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Mais antigos primeiro"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Ordenar por {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Atualizar tudo"
@@ -2955,4 +2943,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

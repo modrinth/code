@@ -41,15 +41,13 @@
 						@scroll="checkDeletingScrollState"
 					>
 						<div v-for="item in visibleItems" :key="item.id" :class="modalContentCardClasses">
-							<ContentCardItem
+							<ContentItemSummary
 								:project="item.project"
 								:project-type="item.projectType"
 								:project-link="item.projectLink"
 								:version="item.version"
 								:version-link="item.versionLink"
 								:owner="item.owner"
-								hide-actions
-								inline
 							/>
 						</div>
 					</div>
@@ -97,15 +95,13 @@
 							:key="dependent.item.id"
 							:class="modalContentCardClasses"
 						>
-							<ContentCardItem
+							<ContentItemSummary
 								:project="dependent.item.project"
 								:project-type="dependent.item.projectType"
 								:project-link="dependent.item.projectLink"
 								:version="dependent.item.version"
 								:version-link="dependent.item.versionLink"
 								:owner="dependent.item.owner"
-								hide-actions
-								inline
 							>
 								<template #title-badges>
 									<span class="flex min-w-0 flex-wrap items-center gap-1">
@@ -120,7 +116,7 @@
 										</span>
 									</span>
 								</template>
-							</ContentCardItem>
+							</ContentItemSummary>
 						</div>
 					</div>
 					<Transition
@@ -202,7 +198,7 @@ import { useScrollIndicator } from '#ui/composables/scroll-indicator'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import type { ContentCardTableItem } from '../../types'
-import ContentCardItem from '../ContentCardItem.vue'
+import ContentItemSummary from '../content-item-summary.vue'
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
 export interface ContentDependencyWarningDependent {

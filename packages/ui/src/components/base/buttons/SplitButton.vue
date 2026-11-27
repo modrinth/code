@@ -69,6 +69,7 @@ const forwardedSlots = computed(() => Object.keys(slots).filter((name) => name !
 
 		<TeleportOverflowMenu
 			:label="props.menuLabel"
+			:tooltip="props.disabled || props.menuDisabled ? undefined : props.menuLabel"
 			:options="props.options"
 			:type="props.type"
 			:color="props.color"

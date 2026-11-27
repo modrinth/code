@@ -497,18 +497,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} actualizat"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Dezactivat"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Activat"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Actualizări"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Avertismente"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Se creează o copie de rezervă..."
   },
@@ -616,9 +604,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Cele vechi mai întâi"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortează cu {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Actualizează tot"
@@ -991,9 +976,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Nu s-a putut încărca conținutul pachetului de moduri"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Nu s-a putut încarcă versiunile"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Nu s-a putut înlătura conținutul"

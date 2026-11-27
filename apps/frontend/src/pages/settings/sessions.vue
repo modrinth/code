@@ -25,7 +25,7 @@
 		</template>
 		<EmptyState
 			v-else-if="displaySessions.length === 0"
-			type="empty"
+			:icon="MonitorSmartphoneIcon"
 			:heading="formatMessage(messages.emptyStateHeading)"
 			:description="formatMessage(messages.emptyStateDescription)"
 		/>

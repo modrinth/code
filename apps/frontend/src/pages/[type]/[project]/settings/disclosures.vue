@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ClipboardListIcon } from '@modrinth/assets'
 import {
 	Button,
 	commonMessages,
@@ -128,7 +129,7 @@ const { isPending, isError, refetch } = disclosuresQuery
 		</div>
 		<EmptyState
 			v-else-if="!canEditDisclosures"
-			type="no-documents"
+			:icon="ClipboardListIcon"
 			:heading="formatMessage(messages.uploadVersionFirstHeading)"
 			:description="formatMessage(commonMessages.uploadVersionsEmptyStateDescription)"
 		/>

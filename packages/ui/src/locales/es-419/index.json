@@ -593,18 +593,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Instalar este contenido en tu servidor"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Desactivado"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Activado"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Actualizaciones"
-  },
-  "content.filter.warnings": {
-    "defaultMessage": "Advertencias"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Creando respaldo..."
   },
@@ -722,14 +710,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Contenido adicional"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Explorar contenido"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Por favor, espera a que la operación termine antes de editar el contenido."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Explora o carga {contentType} para empezar"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Añade contenido adicional encima de este modpack"
@@ -751,9 +733,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtro"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Cargando contenido..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "No se encontró contenido."
@@ -790,9 +769,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Más antiguo primero"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Ordenar por {mode}"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Actualizar todo"
@@ -1966,9 +1942,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Error al cargar el contenido del modpack"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Error al cargar las versiones"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Error al eliminar el contenido"
@@ -7383,4 +7356,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

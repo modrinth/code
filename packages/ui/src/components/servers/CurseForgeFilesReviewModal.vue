@@ -20,15 +20,13 @@
 				</Admonition>
 			</div>
 			<div class="max-h-[50vh] overflow-y-auto border-0 border-t border-solid border-surface-5">
-				<ContentCardTable
+				<ContentTable
 					v-model:selected-ids="selectedIds"
-					:items="tableItems"
+					:sections="[{ id: 'files', items: tableItems }]"
+					:columns="{ selection: true, enabledFor: true }"
 					:virtualized="false"
-					show-selection
-					show-enabled-for-column
-					hide-delete
 					flat
-					@update:enabled-for="onEnabledForChange"
+					@enabled-for="onEnabledForChange"
 				/>
 			</div>
 		</div>
@@ -66,7 +64,7 @@ import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { addonToggleKey } from '#ui/composables/server-content-toggle-state'
-import ContentCardTable from '#ui/layouts/shared/content-tab/components/ContentCardTable.vue'
+import ContentTable from '#ui/layouts/shared/content-tab/components/content-table/index.vue'
 import type { ContentCardTableItem, ContentSide } from '#ui/layouts/shared/content-tab/types'
 import {
 	injectModrinthClient,

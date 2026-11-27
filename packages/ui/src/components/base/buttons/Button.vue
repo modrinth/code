@@ -10,6 +10,7 @@ const props = withDefaults(defineProps<ButtonProps>(), {
 	nativeType: 'button',
 	disabled: false,
 	loading: false,
+	animateWidth: false,
 })
 
 const frame = ref<InstanceType<typeof ButtonFrame> | null>(null)
@@ -27,6 +28,7 @@ defineExpose({ element })
 		:size="props.size"
 		:interaction="props.interaction"
 		:native-type="props.nativeType"
+		:animate-width="props.animateWidth"
 		:disabled="props.disabled || props.loading"
 		:aria-busy="props.loading || undefined"
 	>
