@@ -402,7 +402,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 			...(isServerType.value ? createServerPageParams() : createPageParams()),
 		}
 
-		router.replace({ path: route.path, query: params })
+		router.push({ path: route.path, query: params })
 	}
 
 	async function setPage(newPageNumber: number) {
