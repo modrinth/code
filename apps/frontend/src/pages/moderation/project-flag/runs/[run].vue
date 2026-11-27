@@ -111,6 +111,7 @@
 				</template>
 			</ProjectFlagRunResults>
 		</ProjectFlagRunActions>
+		<ProjectFlagRuleEditor back-label="Run results" />
 	</div>
 </template>
 
@@ -128,6 +129,7 @@ import {
 import { Avatar, Button, injectModrinthClient, TagItem, TeleportOverflowMenu } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
+import ProjectFlagRuleEditor from '~/components/ui/moderation/project-flag/rules/rule-editor/overlay.vue'
 import ProjectFlagRunActions from '~/components/ui/moderation/project-flag/run-actions.vue'
 import { flagCountTooltip, formatDate } from '~/components/ui/moderation/project-flag/run-format'
 import ProjectFlagRunResults from '~/components/ui/moderation/project-flag/run-results/index.vue'

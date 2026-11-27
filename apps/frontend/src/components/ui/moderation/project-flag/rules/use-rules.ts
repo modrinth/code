@@ -1,7 +1,12 @@
-import type { ProjectFlagRule, ProjectFlagRuleParams } from '@modrinth/api-client'
+import type { CreateProjectFlagRuleRequest, ProjectFlagRule } from '@modrinth/api-client'
 import { injectModrinthClient } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed } from 'vue'
+
+import {
+	projectFlagProjectContextQueryKey,
+	projectFlagRuleQueryOptions,
+} from '~/composables/queries/project-flag'
 
 const FETCH_PAGE_SIZE = 100
 const queryKey = ['moderation', 'project-flag', 'rules'] as const
@@ -33,7 +38,8 @@ export function useRules(active: () => boolean, onDeleted: () => void) {
 		reset: resetDelete,
 	} = useMutation({
 		mutationFn: (id: string) => api.delete(id),
-		onSuccess: async () => {
+		onSuccess: async (_, id) => {
+			queryClient.removeQueries({ queryKey: projectFlagRuleQueryOptions(client, id).queryKey })
 			onDeleted()
 			await queryClient.invalidateQueries({ queryKey })
 		},
@@ -54,41 +60,25 @@ export function useRules(active: () => boolean, onDeleted: () => void) {
 	}
 }
 
-export function useSaveRule(
-	ruleId: () => string | undefined,
-	onSaved: (rule: ProjectFlagRule) => void,
-) {
-	const { labrinth } = injectModrinthClient()
-	const api = labrinth.project_flags_internal
+export function useSaveRule() {
+	const client = injectModrinthClient()
+	const api = client.labrinth.project_flags_internal
 	const queryClient = useQueryClient()
-	const mutation = useMutation({
-		mutationFn: ({
-			id,
-			body,
-		}: {
-			id: string | undefined
-			body: { name: string; params: ProjectFlagRuleParams }
-		}) => (id === undefined ? api.create(body) : api.update(id, body)),
+	return useMutation({
+		mutationFn: ({ id, body }: { id: string | undefined; body: CreateProjectFlagRuleRequest }) =>
+			id === undefined ? api.create(body) : api.update(id, body),
 		onSuccess: async (rule, { id }) => {
-			const created = id === undefined
 			await queryClient.cancelQueries({ queryKey })
-			if (created) {
-				queryClient.setQueryData<ProjectFlagRule[]>(queryKey, (previous = []) => [
-					rule,
-					...previous.filter((entry) => entry.id !== rule.id),
-				])
-			} else {
-				queryClient.setQueriesData<ProjectFlagRule[]>({ queryKey }, (previous) =>
-					previous?.map((entry) => (entry.id === rule.id ? rule : entry)),
-				)
-			}
-			onSaved(rule)
-			await queryClient.invalidateQueries({ queryKey })
+			queryClient.setQueryData<ProjectFlagRule[]>(queryKey, (previous) =>
+				id === undefined
+					? previous && [rule, ...previous.filter((entry) => entry.id !== rule.id)]
+					: previous?.map((entry) => (entry.id === rule.id ? rule : entry)),
+			)
+			queryClient.setQueryData(projectFlagRuleQueryOptions(client, rule.id).queryKey, rule)
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey }),
+				queryClient.resetQueries({ queryKey: projectFlagProjectContextQueryKey }),
+			])
 		},
 	})
-	return {
-		...mutation,
-		mutate: (body: { name: string; params: ProjectFlagRuleParams }) =>
-			mutation.mutate({ id: ruleId(), body }),
-	}
 }

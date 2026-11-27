@@ -6,6 +6,7 @@
 					v-model="search"
 					:icon="SearchIcon"
 					type="search"
+					input-class="[&::-webkit-search-cancel-button]:hidden"
 					aria-label="Search flag rule runs"
 					placeholder="Search runs by ID, user, or status…"
 					autocomplete="off"

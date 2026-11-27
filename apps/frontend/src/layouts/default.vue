@@ -413,6 +413,14 @@
 							to: '/moderation/technical-review/rules',
 							tone: 'orange',
 						},
+						{
+							id: 'flag-rules',
+							label: 'Flag rules',
+							icon: TagCategoryFlagIcon,
+							type: 'link',
+							to: '/moderation/project-flag',
+							tone: 'orange',
+						},
 						{ type: 'divider' },
 						{
 							id: 'file-lookup',
@@ -847,6 +855,7 @@ import {
 	ServerStackIcon,
 	SettingsIcon,
 	SunIcon,
+	TagCategoryFlagIcon,
 	ToggleRightIcon,
 	TransferIcon,
 	UserIcon,

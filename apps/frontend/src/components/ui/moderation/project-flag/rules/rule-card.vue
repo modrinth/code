@@ -1,20 +1,21 @@
 <template>
 	<article
-		ref="card"
-		class="flex min-w-0 cursor-pointer flex-col gap-1 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4 outline-none transition-[filter] hover:brightness-125"
-		tabindex="-1"
+		class="flex min-w-0 flex-col gap-1 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4 outline-none"
+		:class="{ 'cursor-pointer transition-[filter] hover:brightness-125': !editDisabled }"
 		@click="openEditor"
 	>
 		<header class="flex min-w-0 items-start justify-between gap-3">
 			<h2 class="m-0 min-w-0 break-words text-lg font-bold text-contrast">
-				<button
-					type="button"
-					class="cursor-pointer rounded-md border-0 bg-transparent p-0 text-left [color:inherit] [font:inherit] focus-visible:outline-brand"
+				<NuxtLink
+					v-if="!editDisabled"
+					:to="editorLocation"
+					class="cursor-pointer rounded-md border-0 bg-transparent p-0 text-left no-underline [color:inherit] [font:inherit] hover:underline focus-visible:outline-brand"
 					:aria-label="`Edit rule ${rule.name}`"
-					@click.stop="openEditor"
+					@click.stop
 				>
 					{{ rule.name }}
-				</button>
+				</NuxtLink>
+				<span v-else>{{ rule.name }}</span>
 			</h2>
 			<div class="shrink-0" @click.stop>
 				<TeleportOverflowMenu
@@ -63,14 +64,18 @@ import type { ProjectFlagRule } from '@modrinth/api-client'
 import { MoreHorizontalIcon, TrashIcon } from '@modrinth/assets'
 import '@modrinth/assets/styles/ace.css'
 import { type ButtonMenuOption, TeleportOverflowMenu } from '@modrinth/ui'
-import { computed, onMounted, shallowRef, useTemplateRef } from 'vue'
+import { computed, onMounted, shallowRef } from 'vue'
 
 import type { tokenizeRhai } from './ace-rhai'
 import RuleMetadata from './rule-metadata.vue'
 
-const props = defineProps<{ rule: ProjectFlagRule; deleteDisabled?: boolean }>()
-const emit = defineEmits<{ edit: [event: MouseEvent]; requestDelete: [] }>()
-const card = useTemplateRef<HTMLElement>('card')
+const props = defineProps<{ rule: ProjectFlagRule; editDisabled?: boolean; deleteDisabled?: boolean }>()
+const emit = defineEmits<{ requestDelete: [] }>()
+const route = useRoute()
+const editorLocation = computed(() => ({
+	query: { ...route.query, rule: props.rule.id },
+	hash: route.hash,
+}))
 const ruleOptions: ButtonMenuOption[] = [
 	{ label: 'Delete rule', icon: TrashIcon, tone: 'red', action: () => emit('requestDelete') },
 ]
@@ -92,8 +97,7 @@ onMounted(async () => {
 	}
 })
 
-function openEditor(event: MouseEvent) {
-	card.value?.focus({ preventScroll: true })
-	emit('edit', event)
+function openEditor() {
+	if (!props.editDisabled) return navigateTo(editorLocation.value)
 }
 </script>

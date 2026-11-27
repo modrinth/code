@@ -2,21 +2,20 @@
 	<div class="flex flex-col" :class="active ? 'gap-6' : 'gap-4'">
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<slot name="tabs" />
-			<Button
+			<ButtonLink
 				v-if="active"
 				type="colored"
 				color="brand"
 				:disabled="isDeleting"
-				@click="openEditor(undefined, $event)"
+				:to="{ query: { ...$route.query, rule: 'new' }, hash: $route.hash }"
 			>
 				<PlusIcon />
 				Create rule
-			</Button>
+			</ButtonLink>
 		</div>
 
 		<slot />
-		<ProjectFlagRuleEditorModal ref="editor" />
-		<div ref="ruleList" v-show="active" class="flex min-w-0 flex-col gap-6">
+		<div v-show="active" class="flex min-w-0 flex-col gap-6">
 			<div
 				v-if="isPending"
 				role="status"
@@ -38,8 +37,8 @@
 					:key="rule.id"
 					:id="`rule-${rule.id}`"
 					:rule="rule"
+					:edit-disabled="isDeleting"
 					:delete-disabled="isDeleting || ruleToDelete?.id === rule.id"
-					@edit="openEditor(rule, $event)"
 					@request-delete="confirmDelete(rule)"
 				>
 					<template #delete-confirmation>
@@ -79,20 +78,13 @@ import { useFlagErrorNotification } from '~/components/ui/moderation/project-fla
 
 import type { ProjectFlagRule } from '@modrinth/api-client'
 import { LoaderCircleIcon, PlusIcon } from '@modrinth/assets'
-import { Button } from '@modrinth/ui'
+import { Button, ButtonLink } from '@modrinth/ui'
 
 import ProjectFlagRuleCard from './rule-card.vue'
-import ProjectFlagRuleEditorModal from './rule-editor-modal/index.vue'
 import { useRules } from './use-rules'
 
 const props = defineProps<{ active: boolean }>()
-const editor = useTemplateRef<InstanceType<typeof ProjectFlagRuleEditorModal>>('editor')
 const route = useRoute()
-const linkedRuleId = computed(() => {
-	const id = typeof route.query.rule === 'string' ? route.query.rule : ''
-	return /^[A-Za-z0-9]+$/.test(id) ? id : undefined
-})
-const ruleList = useTemplateRef<HTMLElement>('ruleList')
 const ruleToDelete = ref<ProjectFlagRule | null>(null)
 const {
 	data,
@@ -108,36 +100,21 @@ const {
 	resetDelete,
 } = useRules(() => props.active, handleDeleted)
 
+watch(
+	() => route.query.rule,
+	(rule) => {
+		if (rule && !isDeleting.value) ruleToDelete.value = null
+	},
+)
+
 function handleDeleted() {
 	ruleToDelete.value = null
-}
-
-function openEditor(rule: ProjectFlagRule | undefined, event: MouseEvent) {
-	if (isDeleting.value) return
-	ruleToDelete.value = null
-	editor.value?.show(rule, event)
 }
 
 function confirmDelete(rule: ProjectFlagRule) {
 	resetDelete()
 	ruleToDelete.value = rule
 }
-
-const linkedRule = computed(() => rules.value.find((rule) => rule.id === linkedRuleId.value))
-const openedRuleId = ref<string>()
-watch(
-	[linkedRule, editor, ruleList, () => props.active],
-	([rule, modal, list, active]) => {
-		if (!active || !rule || !modal || !list || openedRuleId.value === rule.id) return
-		const card = list.querySelector<HTMLElement>(`#rule-${rule.id}`)
-		if (!card) return
-		card.scrollIntoView({ block: 'center' })
-		card.focus({ preventScroll: true })
-		modal.show(rule)
-		openedRuleId.value = rule.id
-	},
-	{ flush: 'post' },
-)
 
 useFlagErrorNotification(error, 'Could not load project flag rules')
 useFlagErrorNotification(deleteError, 'Could not delete the rule')

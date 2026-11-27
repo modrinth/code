@@ -22,27 +22,23 @@
 					{{ rule.name ?? 'Deleted rule' }}
 				</span>
 			</div>
-			<TagItem
-				v-if="rule.flags.length > 0"
-				class="shrink-0"
-				style="--_color: var(--color-purple)"
-			>
+			<TagItem v-if="rule.flags.length > 0" class="shrink-0" style="--_color: var(--color-purple)">
 				{{ rule.flags.length }} {{ rule.flags.length === 1 ? 'flag' : 'flags' }}
 			</TagItem>
 			<TagItem v-if="rule.error !== null" class="shrink-0" style="--_color: var(--color-red)">
 				Error
 			</TagItem>
-			<IconButton
+			<ButtonLink
 				v-if="rule.name !== null"
 				v-tooltip="'Edit rule'"
 				class="relative z-10 shrink-0"
 				type="quiet"
 				size="sm"
-				:label="`Edit rule ${rule.name}`"
-				@click="emit('edit', $event)"
+				:aria-label="`Edit rule ${rule.name}`"
+				:to="editTo"
 			>
 				<EditIcon aria-hidden="true" />
-			</IconButton>
+			</ButtonLink>
 			<DropdownIcon
 				class="pointer-events-none size-4 shrink-0 transition-[color,transform] duration-300 motion-reduce:transition-none"
 				:class="
@@ -73,16 +69,17 @@
 <script setup lang="ts">
 import type { ProjectFlagRunResult } from '@modrinth/api-client'
 import { DropdownIcon, EditIcon, TagCategoryFlagIcon } from '@modrinth/assets'
-import { Accordion, IconButton, TagItem } from '@modrinth/ui'
+import { Accordion, ButtonLink, TagItem } from '@modrinth/ui'
 import { ref, useId } from 'vue'
+import type { RouteLocationRaw } from 'vue-router'
 
 import FlagCard from './flag-card.vue'
 
 const props = defineProps<{
 	rule: ProjectFlagRunResult['rules'][string]
 	noFindings: boolean
+	editTo: RouteLocationRaw
 }>()
-const emit = defineEmits<{ edit: [event: MouseEvent] }>()
 const detailsId = useId()
 const expanded = ref(!props.noFindings)
 </script>

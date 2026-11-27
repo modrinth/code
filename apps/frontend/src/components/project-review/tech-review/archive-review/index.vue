@@ -799,11 +799,13 @@ watch(
 <style scoped>
 .archive-workspace {
 	grid-template-columns:
-		min(var(--tree-width), max(140px, calc(100% - 328px)))
+		min(var(--tree-width-drag, var(--tree-width)), max(140px, calc(100% - 328px)))
 		8px minmax(0, 1fr);
 }
 
 .archive-empty-panes {
-	grid-template-columns: minmax(0, 1fr) 8px min(var(--traces-width), max(220px, calc(100% - 208px)));
+	grid-template-columns:
+		minmax(0, 1fr) 8px
+		min(var(--traces-width-drag, var(--traces-width)), max(220px, calc(100% - 208px)));
 }
 </style>

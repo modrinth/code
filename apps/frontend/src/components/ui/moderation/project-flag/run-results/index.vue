@@ -11,7 +11,7 @@
 			color="gray"
 			wrap
 			aria-label="Project results filter"
-			class="bg-surface-2 [&>button[aria-selected=true]]:border-brand [&>button[aria-selected=true]]:bg-brand-highlight [&>button[aria-selected=true]]:text-brand"
+			class="bg-surface-2 [&_[role=tab][aria-selected=true]]:border-brand [&_[role=tab][aria-selected=true]]:bg-brand-highlight [&_[role=tab][aria-selected=true]]:text-brand"
 			@update:value="showCategory"
 		/>
 
@@ -20,6 +20,7 @@
 				v-model="search"
 				:icon="SearchIcon"
 				type="search"
+				input-class="[&::-webkit-search-cancel-button]:hidden"
 				aria-label="Search projects"
 				placeholder="Search projects by name or ID…"
 				wrapper-class="min-w-0 w-full max-w-sm"

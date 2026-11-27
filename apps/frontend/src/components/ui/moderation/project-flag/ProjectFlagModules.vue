@@ -86,24 +86,18 @@ import { Button, injectModrinthClient, Input } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 
-import ProjectFlagModuleTree from './ProjectFlagModuleTree.vue'
-import RhaiExpressionEditor from './rules/rule-editor-modal/expression-editor.vue'
+import { projectFlagModulesQueryOptions } from '~/composables/queries/project-flag'
 
-const api = injectModrinthClient().labrinth.project_flags_internal
+import ProjectFlagModuleTree from './ProjectFlagModuleTree.vue'
+import RhaiExpressionEditor from './rules/rule-editor/expression-editor.vue'
+
+const client = injectModrinthClient()
+const api = client.labrinth.project_flags_internal
 const queryClient = useQueryClient()
 type Module = Awaited<ReturnType<typeof api.getModule>>
-const queryKey = ['moderation', 'project-flag', 'modules'] as const
-const { data, isPending, error, isFetching, refetch } = useQuery({
-	queryKey,
-	queryFn: async () => {
-		const modules: Module[] = []
-		for (let offset = 0; ; offset += 200) {
-			const page = await api.listModules({ limit: 200, offset })
-			modules.push(...page)
-			if (page.length < 200) return modules
-		}
-	},
-})
+const { data, isPending, error, isFetching, refetch } = useQuery(
+	projectFlagModulesQueryOptions(client),
+)
 const names = computed(() => data.value?.map((module) => module.name) ?? [])
 const original = ref<Module | null>(null)
 const editing = ref(false)

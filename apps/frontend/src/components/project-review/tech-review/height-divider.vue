@@ -2,50 +2,76 @@
 import { useElementSize } from '@vueuse/core'
 import { computed, ref } from 'vue'
 
+import { useDividerDrag } from './use-divider-drag'
+
 const height = defineModel<number | null>({ required: true })
+const props = withDefaults(
+	defineProps<{
+		heightProperty: string
+		label?: string
+		side?: 'top' | 'bottom'
+		min?: number
+		reserve?: number
+	}>(),
+	{ label: 'Resize traces height', side: 'top', min: 0 },
+)
 const divider = ref<HTMLElement>()
 const parent = computed(() => divider.value?.parentElement)
-const pane = computed(() => divider.value?.previousElementSibling as HTMLElement | undefined)
+const pane = computed(
+	() =>
+		(props.side === 'bottom'
+			? divider.value?.nextElementSibling
+			: divider.value?.previousElementSibling) as HTMLElement | undefined,
+)
 const { height: parentHeight } = useElementSize(parent)
 const { height: paneHeight } = useElementSize(pane)
-const maximum = computed(() => Math.floor(parentHeight.value / 2))
-const drag = ref<{ pointerId: number; y: number; height: number }>()
+function maxHeight(available: number, handleSize: number) {
+	return Math.max(
+		props.min,
+		Math.floor(
+			props.reserve === undefined
+				? available / 2
+				: available - props.reserve - handleSize,
+		),
+	)
+}
+const maximum = computed(() => maxHeight(parentHeight.value, divider.value?.offsetHeight ?? 0))
+const direction = computed(() => (props.side === 'bottom' ? -1 : 1))
+const drag = useDividerDrag()
+const { dragging } = drag
 
 function update(value: number) {
-	height.value = Math.round(Math.max(0, Math.min(maximum.value, value)))
+	height.value = Math.round(Math.max(props.min, Math.min(maximum.value, value)))
 }
 
 function start(event: PointerEvent) {
 	if (event.button !== 0 || !event.isPrimary) return
-	event.preventDefault()
 	const element = event.currentTarget as HTMLElement
-	drag.value = { pointerId: event.pointerId, y: event.clientY, height: paneHeight.value }
-	element.setPointerCapture(event.pointerId)
-}
-
-function move(event: PointerEvent) {
-	if (drag.value?.pointerId !== event.pointerId) return
-	update(drag.value.height + event.clientY - drag.value.y)
-}
-
-function stop(event: PointerEvent) {
-	if (drag.value?.pointerId !== event.pointerId) return
-	drag.value = undefined
-	const element = event.currentTarget as HTMLElement
-	if (element.hasPointerCapture(event.pointerId)) element.releasePointerCapture(event.pointerId)
+	const container = element.parentElement
+	if (!container || !pane.value) return
+	drag.start(event, {
+		axis: 'y',
+		direction: direction.value,
+		size: pane.value.offsetHeight,
+		min: props.min,
+		max: maxHeight(container.clientHeight, element.offsetHeight),
+		container,
+		property: props.heightProperty,
+		commit: (size) => (height.value = size),
+	})
 }
 
 function keydown(event: KeyboardEvent) {
 	const step = event.shiftKey ? 50 : 10
 	switch (event.key) {
 		case 'ArrowUp':
-			update(paneHeight.value - step)
+			update(paneHeight.value - step * direction.value)
 			break
 		case 'ArrowDown':
-			update(paneHeight.value + step)
+			update(paneHeight.value + step * direction.value)
 			break
 		case 'Home':
-			update(0)
+			update(props.min)
 			break
 		case 'End':
 			update(maximum.value)
@@ -63,17 +89,17 @@ function keydown(event: KeyboardEvent) {
 		role="separator"
 		tabindex="0"
 		aria-orientation="horizontal"
-		aria-label="Resize traces height"
-		:aria-valuemin="0"
+		:aria-label="label"
+		:aria-valuemin="min"
 		:aria-valuemax="maximum"
 		:aria-valuenow="Math.round(paneHeight)"
 		class="height-divider relative h-4 shrink-0 cursor-row-resize touch-none select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
-		:class="{ 'is-dragging': drag }"
+		:class="{ 'is-dragging': dragging }"
 		@pointerdown="start"
-		@pointermove="move"
-		@pointerup="stop"
-		@pointercancel="stop"
-		@lostpointercapture="stop"
+		@pointermove="drag.move"
+		@pointerup="drag.stop"
+		@pointercancel="drag.stop"
+		@lostpointercapture="drag.stop"
 		@keydown="keydown"
 		@dblclick.prevent="height = null"
 	/>

@@ -767,7 +767,9 @@ async function retry() {
 
 <style scoped>
 .fallback-review-workspace {
-	grid-template-columns: minmax(0, 1fr) 8px min(var(--traces-width), max(220px, calc(100% - 208px)));
+	grid-template-columns:
+		minmax(0, 1fr) 8px
+		min(var(--traces-width-drag, var(--traces-width)), max(220px, calc(100% - 208px)));
 }
 
 @property --review-scrollbar-color {

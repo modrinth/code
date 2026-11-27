@@ -70,14 +70,6 @@ export const Searchable: Story = {
 	},
 }
 
-export const SmallSearchable: Story = {
-	args: {
-		...Searchable.args,
-		triggerSize: 'sm',
-		clearable: true,
-	},
-}
-
 export const SearchableWithMoreResults: Story = {
 	args: {
 		modelValue: 'quilt',

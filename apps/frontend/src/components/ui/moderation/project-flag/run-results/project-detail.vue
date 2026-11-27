@@ -47,49 +47,26 @@
 						:key="`${result.project.id}:${ruleId}`"
 						:rule="rule"
 						:no-findings="section.noFindings"
-						@edit="openRuleEditor(ruleId, $event)"
+						:edit-to="{
+							query: { ...$route.query, rule: ruleId, ruleProject: result.project.id },
+							hash: $route.hash,
+						}"
 					/>
 				</section>
 			</template>
 			<p v-else class="m-0 text-sm text-secondary">Select a project to see its rule results.</p>
 		</section>
-		<ProjectFlagRuleEditorModal ref="ruleEditor" />
 	</div>
 </template>
 
 <script setup lang="ts">
 import type { ProjectFlagRunResult } from '@modrinth/api-client'
-import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
-import ProjectFlagRuleEditorModal from '../rules/rule-editor-modal/index.vue'
 import FlagCard from './flag-card.vue'
 import RuleCard from './rule-card.vue'
 
 const props = defineProps<{ result?: ProjectFlagRunResult }>()
-const ruleEditor = useTemplateRef<InstanceType<typeof ProjectFlagRuleEditorModal>>('ruleEditor')
-const client = injectModrinthClient()
-const queryClient = useQueryClient()
-const { addNotification } = injectNotificationManager()
-
-async function openRuleEditor(ruleId: string, event: MouseEvent) {
-	try {
-		const rule = await queryClient.fetchQuery({
-			queryKey: ['moderation', 'project-flag', 'rule', ruleId] as const,
-			queryFn: ({ queryKey: [, , , id] }) => client.labrinth.project_flags_internal.get(id),
-			staleTime: 0,
-		})
-		ruleEditor.value?.show(rule, event)
-	} catch (error) {
-		addNotification({
-			type: 'error',
-			title: 'Could not load the rule',
-			text: error instanceof Error ? error.message : String(error),
-		})
-	}
-}
-
 const outcomeLabels = {
 	approved: 'Would approve',
 	withheld: 'Would withhold',

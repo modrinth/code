@@ -27,7 +27,6 @@
 				:spellcheck="searchSpellcheck"
 				:inputmode="searchInputmode"
 				:input-attrs="searchInputAttrs"
-				:size="inputSize"
 				:appearance="searchInputVariant"
 				wrapper-class="w-full"
 				:input-class="resolvedSearchInputClass"
@@ -236,7 +235,6 @@ import type {
 	ButtonSize,
 	ButtonType,
 } from './buttons/types'
-import type { InputSize } from './inputs/types'
 import Input from './inputs/Input.vue'
 
 export interface ComboboxOption<T> {
@@ -261,14 +259,6 @@ type ViewportRect = {
 	height: number
 	offsetTop: number
 	offsetLeft: number
-}
-
-const INPUT_SIZE_BY_TRIGGER_SIZE: Record<ButtonSize, InputSize> = {
-	xs: 'small',
-	sm: 'small',
-	md: 'standard',
-	lg: 'medium',
-	xl: 'large',
 }
 
 const DROPDOWN_VIEWPORT_MARGIN = 8
@@ -314,9 +304,8 @@ const props = withDefaults(
 		displayValue?: string
 		searchValue?: string
 		triggerClass?: string
-		/** Visual style for non-searchable button triggers. */
+		/** Shared button frame style for non-searchable combobox triggers. */
 		triggerType?: ButtonType
-		/** Size of the button or searchable input trigger. */
 		triggerSize?: ButtonSize
 		triggerInteraction?: ButtonInteraction
 		dropdownClass?: string
@@ -385,7 +374,6 @@ const emit = defineEmits<{
 	searchBlur: [query: string]
 }>()
 
-const inputSize = computed(() => INPUT_SIZE_BY_TRIGGER_SIZE[props.triggerSize])
 const slots = useSlots()
 
 const isOpen = ref(false)

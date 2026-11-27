@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<!--
 		<section
 			class="universal-card mb-4 flex flex-wrap items-center justify-between gap-3"
 			aria-label="Rules deployment"
@@ -26,26 +27,9 @@
 					}}
 				</p>
 			</div>
-			<Button :disabled="isDeploying" @click="deployModal?.show()">Deploy current staging</Button>
+			<Button disabled>Deploy rules</Button>
 		</section>
-		<NewModal ref="deployModal" header="Deploy current staging" :disable-close="isDeploying">
-			<p class="m-0 max-w-lg">
-				Deploy all saved staging rules and shared modules to live? This includes additions, edits,
-				and deletions. No test scan will run.
-			</p>
-			<template #actions>
-				<Button :disabled="isDeploying" @click="deployModal?.hide()">Cancel</Button>
-				<Button
-					type="colored"
-					color="brand"
-					:loading="isDeploying"
-					:disabled="isDeploying"
-					@click="deployStaging()"
-				>
-					Deploy
-				</Button>
-			</template>
-		</NewModal>
+		-->
 		<ProjectFlagRules :active="activeTab === 'rules'">
 			<template #tabs>
 				<Tabs
@@ -53,34 +37,24 @@
 					:value="activeTab"
 					color="gray"
 					wrap
-					class="[&>button[aria-selected=true]>svg]:text-brand [&>button[aria-selected=true]]:border-brand [&>button[aria-selected=true]]:bg-brand-highlight [&>button[aria-selected=true]]:text-brand"
+					class="[&_[role=tab][aria-selected=true]>svg]:text-brand [&_[role=tab][aria-selected=true]]:border-brand [&_[role=tab][aria-selected=true]]:bg-brand-highlight [&_[role=tab][aria-selected=true]]:text-brand"
 					@update:value="switchTab"
 				/>
 			</template>
 			<ProjectFlagRunHistory v-if="activeTab === 'runs'" />
 			<ProjectFlagModules v-else-if="activeTab === 'modules'" />
 		</ProjectFlagRules>
+		<ProjectFlagRuleEditor />
 	</div>
 </template>
 
 <script setup lang="ts">
 import { BoxIcon, HistoryIcon, TagCategoryFlagIcon } from '@modrinth/assets'
-import {
-	Button,
-	injectModrinthClient,
-	injectNotificationManager,
-	NewModal,
-	Tabs,
-	type TabsValue,
-} from '@modrinth/ui'
-
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { Tabs, type TabsValue } from '@modrinth/ui'
 
 import ProjectFlagModules from '~/components/ui/moderation/project-flag/ProjectFlagModules.vue'
-import { formatDate } from '~/components/ui/moderation/project-flag/run-format'
-import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
-import { projectFlagDeploymentQueryOptions } from '~/composables/queries/project-flag'
 import ProjectFlagRules from '~/components/ui/moderation/project-flag/rules/index.vue'
+import ProjectFlagRuleEditor from '~/components/ui/moderation/project-flag/rules/rule-editor/overlay.vue'
 import ProjectFlagRunHistory from '~/components/ui/moderation/project-flag/run-history.vue'
 
 useHead({ title: 'Project flag rules - Modrinth' })
@@ -95,40 +69,6 @@ const tabs = [
 	{ label: 'Flag rule runs', value: 'runs', icon: HistoryIcon },
 	{ label: 'Modules', value: 'modules', icon: BoxIcon },
 ]
-
-const client = injectModrinthClient()
-const queryClient = useQueryClient()
-const { addNotification } = injectNotificationManager()
-const deployModal = useTemplateRef<InstanceType<typeof NewModal>>('deployModal')
-const deploymentOptions = projectFlagDeploymentQueryOptions(client)
-const {
-	data: deployment,
-	isPending: deploymentPending,
-	error: deploymentError,
-} = useQuery(deploymentOptions)
-const {
-	mutate: deployStaging,
-	isPending: isDeploying,
-	isSuccess: deployed,
-	error: deployError,
-} = useMutation({
-	mutationFn: () => client.labrinth.project_flags_internal.deployStaging(),
-	retry: false,
-	onSuccess: async (live) => {
-		queryClient.setQueryData(deploymentOptions.queryKey, live)
-		addNotification({ type: 'success', title: 'Staging rules deployed' })
-		await queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag'] })
-	},
-})
-useFlagErrorNotification(deploymentError, 'Could not load deployment status')
-watch(
-	deployed,
-	(success) => {
-		if (success) deployModal.value?.hide()
-	},
-	{ flush: 'post' },
-)
-useFlagErrorNotification(deployError, 'Could not deploy staging')
 
 function switchTab(tab: TabsValue) {
 	return router.push({
