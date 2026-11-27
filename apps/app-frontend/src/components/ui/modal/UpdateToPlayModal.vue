@@ -10,7 +10,8 @@
 		:confirm-label="formatMessage(commonMessages.updateButton)"
 		:confirm-icon="DownloadIcon"
 		:removed-label="formatMessage(messages.removed)"
-		@confirm="handleUpdate"
+		@confirm="handleUpdate(false)"
+		@sandbox="handleUpdate(true)"
 		@cancel="handleDecline"
 	>
 		<template v-if="instance" #description>
@@ -40,6 +41,7 @@ import {
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
+import { enableInstanceSandbox } from '@/features/sandbox/enable-instance-sandbox'
 import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
 import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { wait_for_install_job } from '@/helpers/install'
@@ -261,11 +263,12 @@ async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[
 	return null
 }
 
-async function handleUpdate() {
+async function handleUpdate(sandbox: boolean) {
 	const serverProjectId = instance.value?.link?.project_id
 	if (serverProjectId) startInstallingServer(serverProjectId)
 	try {
 		if (modpackVersionId.value && instance.value) {
+			if (sandbox) await enableInstanceSandbox(instance.value.id)
 			const job = await update_managed_modrinth_version(instance.value.id, modpackVersionId.value)
 			await wait_for_install_job(appEvents, job.job_id)
 			await onUpdateComplete.value()

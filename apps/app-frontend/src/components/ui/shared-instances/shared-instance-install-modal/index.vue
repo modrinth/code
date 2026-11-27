@@ -215,7 +215,7 @@
 							type="quiet"
 							:color="offerSandbox ? undefined : 'orange'"
 							:disabled="installing"
-							@click="accept"
+							@click="accept(false)"
 						>
 							{{ formatMessage(messages.installAnyway) }}
 						</Button>
@@ -224,7 +224,7 @@
 							type="colored"
 							color="brand"
 							:disabled="installing"
-							@click="accept"
+							@click="accept(true)"
 						>
 							<ShieldCheckIcon />{{ formatMessage(messages.sandboxAndInstall) }}
 						</Button>
@@ -242,7 +242,7 @@
 						<Button type="outlined" class="!border" :disabled="installing" @click="handleCancel">
 							<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
 						</Button>
-						<Button type="colored" color="brand" :disabled="installing" @click="accept">
+						<Button type="colored" color="brand" :disabled="installing" @click="accept(false)">
 							<DownloadIcon />{{ formatMessage(messages.installButton) }}
 						</Button>
 					</template>
@@ -316,6 +316,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, ref } from 'vue'
 
 import { config } from '@/config'
+import type { InstallSandboxChoice } from '@/features/sandbox/enable-instance-sandbox'
 import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
 import { toError } from '@/helpers/errors'
 import type { SharedInstanceInstallPreview } from '@/helpers/install'
@@ -342,7 +343,7 @@ const externalFileTable = ref<HTMLElement | null>(null)
 const preview = ref<SharedInstanceInstallPreview | null>(null)
 const installing = ref(false)
 const creator = ref<SharedInstanceCreator | null>(null)
-const install = ref<() => void | Promise<void>>(() => {})
+const install = ref<(choice: InstallSandboxChoice) => void | Promise<void>>(() => {})
 const reportMode = ref(false)
 const reportOnly = ref(false)
 const isOwner = ref(false)
@@ -396,12 +397,12 @@ const creatorProfileLink = computed(() => {
 		: undefined
 })
 
-async function accept() {
+async function accept(sandbox: boolean) {
 	if (installing.value) return
 	const executeInstall = install.value
 	installing.value = true
 	try {
-		await executeInstall()
+		await executeInstall({ sandbox })
 		hide()
 	} catch (error) {
 		console.error('Failed to install shared instance:', error)
@@ -520,7 +521,7 @@ function resetReportState() {
 }
 function show(
 	previewValue: SharedInstanceInstallPreview,
-	installValue: () => void | Promise<void>,
+	installValue: (choice: InstallSandboxChoice) => void | Promise<void>,
 	creatorValue?: SharedInstanceCreator,
 	event?: MouseEvent,
 	options?: { isOwner?: boolean },

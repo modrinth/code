@@ -54,6 +54,7 @@ function applyAppearanceSettings(value: AppearanceSettings, preferredDark?: Dark
 const settingsMutation = useMutation({
 	mutationKey: appSettingsKeys.update,
 	scope: { id: 'app-settings' },
+	networkMode: 'always',
 	mutationFn: async (patch: Partial<AppearanceSettings>) => {
 		await set({ ...(await get()), ...patch })
 	},
@@ -94,20 +95,20 @@ const themeOptions = computed(() =>
 
 const preferredDarkTheme = computed(() => theme.preferredDark)
 
-function setTheme(value: ColorTheme): void {
-	settingsMutation.mutate({ theme: value })
+function setTheme(value: ColorTheme): Promise<void> {
+	return settingsMutation.mutateAsync({ theme: value })
 }
 
-function setSyncAcrossDevices(enabled: boolean): void {
-	settingsMutation.mutate({ sync_theme_across_devices: enabled })
+function setSyncAcrossDevices(enabled: boolean): Promise<void> {
+	return settingsMutation.mutateAsync({ sync_theme_across_devices: enabled })
 }
 
-function setAdvancedRendering(enabled: boolean): void {
-	settingsMutation.mutate({ advanced_rendering: enabled })
+function setAdvancedRendering(enabled: boolean): Promise<void> {
+	return settingsMutation.mutateAsync({ advanced_rendering: enabled })
 }
 
-function setNativeDecorations(enabled: boolean): void {
-	settingsMutation.mutate({ native_decorations: enabled })
+function setNativeDecorations(enabled: boolean): Promise<void> {
+	return settingsMutation.mutateAsync({ native_decorations: enabled })
 }
 
 provideAppearanceSettings({

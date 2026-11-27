@@ -10,6 +10,7 @@
 					:offer-sandbox="offerSandbox"
 					@cancel="resolveUnknownFileWarning(false)"
 					@continue="handleUnknownFileContinue"
+					@sandbox="handleUnknownFileSandbox"
 				/>
 				<ShareModalWrapper
 					ref="shareModal"
@@ -132,6 +133,7 @@ import { useManagedContentPolicy } from '@/composables/instances/use-managed-con
 import { useSyncedPackActions } from '@/composables/instances/use-synced-pack-actions'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { enableInstanceSandbox } from '@/features/sandbox/enable-instance-sandbox'
 import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version, get_version_many } from '@/helpers/cache.js'
@@ -821,6 +823,17 @@ async function handleUnknownFileContinue(dontShowAgain: boolean) {
 		} catch (error) {
 			handleError(error as Error)
 		}
+	}
+	resolveUnknownFileWarning(true)
+}
+
+async function handleUnknownFileSandbox() {
+	try {
+		await enableInstanceSandbox(instance.value.id)
+	} catch (error) {
+		handleError(error as Error)
+		resolveUnknownFileWarning(false)
+		return
 	}
 	resolveUnknownFileWarning(true)
 }

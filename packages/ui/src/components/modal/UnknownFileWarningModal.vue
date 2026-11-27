@@ -102,7 +102,7 @@
 					type="colored"
 					color="brand"
 					native-type="button"
-					@click="continueInstallation"
+					@click="sandboxInstallation"
 				>
 					<ShieldCheckIcon aria-hidden="true" />
 					{{ formatMessage(messages.sandboxAndInstall) }}
@@ -152,13 +152,18 @@ const props = withDefaults(
 const emit = defineEmits<{
 	cancel: []
 	continue: [dontShowAgain: boolean]
+	sandbox: []
 }>()
 
 const { formatMessage } = useVIntl()
 const modal = useTemplateRef('modal')
 const externalFileTableBody = ref<HTMLElement | null>(null)
 const dontShowAgain = ref(false)
-let pendingAction: { type: 'cancel' } | { type: 'continue'; dontShowAgain: boolean } | null = null
+let pendingAction:
+	| { type: 'cancel' }
+	| { type: 'sandbox' }
+	| { type: 'continue'; dontShowAgain: boolean }
+	| null = null
 const {
 	showTopFade: showTableTopFade,
 	showBottomFade: showTableBottomFade,
@@ -263,6 +268,8 @@ function handleAfterHide() {
 
 	if (action?.type === 'continue') {
 		emit('continue', action.dontShowAgain)
+	} else if (action?.type === 'sandbox') {
+		emit('sandbox')
 	} else {
 		emit('cancel')
 	}
@@ -275,6 +282,11 @@ function cancelInstallation() {
 
 function continueInstallation() {
 	pendingAction = { type: 'continue', dontShowAgain: !props.offerSandbox && dontShowAgain.value }
+	modal.value?.hide()
+}
+
+function sandboxInstallation() {
+	pendingAction = { type: 'sandbox' }
 	modal.value?.hide()
 }
 

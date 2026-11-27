@@ -116,10 +116,14 @@
 
 				<div class="flex items-center gap-2">
 					<template v-if="hasExternalFiles">
-						<Button type="quiet" :color="offerSandbox ? undefined : 'orange'" @click="handleAccept">
+						<Button
+							type="quiet"
+							:color="offerSandbox ? undefined : 'orange'"
+							@click="handleAccept(false)"
+						>
 							{{ formatMessage(messages.installAnyway) }}
 						</Button>
-						<Button v-if="offerSandbox" type="colored" color="brand" @click="handleAccept">
+						<Button v-if="offerSandbox" type="colored" color="brand" @click="handleAccept(true)">
 							<ShieldCheckIcon />
 							{{ formatMessage(messages.sandboxAndInstall) }}
 						</Button>
@@ -133,7 +137,7 @@
 							<XIcon />
 							{{ formatMessage(commonMessages.cancelButton) }}
 						</Button>
-						<Button type="colored" color="brand" @click="handleAccept">
+						<Button type="colored" color="brand" @click="handleAccept(false)">
 							<DownloadIcon />
 							{{ formatMessage(messages.installButton) }}
 						</Button>
@@ -278,12 +282,12 @@ async function fetchData(versionId: string) {
 	}
 }
 
-async function handleAccept() {
+async function handleAccept(sandbox: boolean) {
 	hide()
 	const serverProjectId = project.value?.id
 	startInstallingServer(serverProjectId)
 	try {
-		await installServerProject(serverProjectId)
+		await installServerProject(serverProjectId, { sandbox })
 		onInstallComplete.value()
 	} catch (error) {
 		console.error('Failed to install server project from InstallToPlayModal:', error)

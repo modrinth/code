@@ -72,6 +72,8 @@ pub struct MinecraftCommand {
     /// [`read_only_paths`]: Self::read_only_paths
     /// [`read_write_paths`]: Self::read_write_paths
     pub path_rules: Vec<PathRule>,
+    /// Whether the sandboxed process can access the network.
+    pub allow_network: bool,
     /// JVM arguments which do not contain sandbox-managed paths.
     ///
     /// Classpath, Java agent, native-library, and logging arguments are generated
@@ -107,6 +109,7 @@ impl Default for MinecraftCommand {
             read_only_paths: Vec::new(),
             read_write_paths: Vec::new(),
             path_rules: Vec::new(),
+            allow_network: true,
             jvm_args: Vec::new(),
             main_class: SandboxArg::default(),
             main_class_args: Vec::new(),
@@ -526,7 +529,7 @@ pub async fn setup_minecraft_command(
             .map(|s| SandboxArg::from(*s))
             .collect(),
         extra_environment,
-        allow_network: true,
+        allow_network: minecraft.allow_network,
         is_jvm: true,
         die_with_parent: true,
         stdin: minecraft.stdin,

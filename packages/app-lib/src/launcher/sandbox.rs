@@ -177,6 +177,7 @@ pub(super) struct CommandInput<'a> {
     pub jvm_args: Vec<String>,
     pub game_args: Vec<String>,
     pub granted_paths: GrantedPaths,
+    pub allow_network: bool,
 }
 
 pub(super) fn prepare_command(
@@ -253,6 +254,7 @@ pub(super) fn prepare_command(
         .read_only_paths
         .push(input.directories.libraries_dir());
     command.read_write_paths = input.granted_paths.read_write;
+    command.allow_network = input.allow_network;
     command.path_rules = vec![
         PathRule::SoftBlock(input.directories.config_dir.clone()),
         PathRule::HardBlock(input.directories.settings_dir.clone()),

@@ -59,6 +59,7 @@ export function useSettingsSource<T extends Record<string, unknown>>(options: {
 	const mutation = useMutation({
 		mutationKey: MUTATION_KEY,
 		scope: { id: MUTATION_KEY.join(':') },
+		networkMode: 'always',
 		mutationFn: async ({ instanceId, value, request }: EditVariables<T>) => {
 			if (request !== latestRequest) return
 			await edit(instanceId, options.write(value) as Partial<GameInstance>)

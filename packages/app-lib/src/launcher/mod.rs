@@ -1358,6 +1358,7 @@ pub async fn launch_minecraft(
             } else {
                 sandbox::GrantedPaths::default()
             },
+            allow_network: !sandboxed || sandbox_settings.allow_network,
         },
         &env_args,
     )?;

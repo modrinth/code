@@ -1535,7 +1535,7 @@ async function handleCommand(e) {
 				const splitPath = e.path.split(/[\\/]/)
 				const fileName = splitPath ? splitPath[splitPath.length - 1] : e.path
 				unknownPackWarningModal.value?.show(
-					() => install_create_modpack_instance(location).then(() => undefined),
+					() => install_create_modpack_instance(location),
 					fileName,
 					preview.externalFilesInModpack,
 				)

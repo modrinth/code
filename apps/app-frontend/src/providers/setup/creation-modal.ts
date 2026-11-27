@@ -84,6 +84,7 @@ export function setupCreationModal(
 		const job = await install_create_modpack_instance(location)
 		await navigateToCreatedInstance(job)
 		trackEvent('InstanceCreate', { source: 'CreationModalModpackFile' })
+		return job
 	}
 
 	async function handleCreate(config: CreationFlowContextValue) {

@@ -317,6 +317,11 @@ async function saveProfileFields(): Promise<void> {
 		savedProfile.value = { ...savedProfile.value, ...patch }
 		await refreshAuthUser()
 	} catch (error) {
+		const reverted = { ...profile.value }
+		for (const key of Object.keys(patch) as (keyof ProfileFields)[]) {
+			if (reverted[key] === patch[key]) reverted[key] = savedProfile.value[key]
+		}
+		profile.value = reverted
 		notifySaveError(error)
 	}
 }

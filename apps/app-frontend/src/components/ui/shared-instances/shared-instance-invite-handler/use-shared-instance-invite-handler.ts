@@ -10,6 +10,10 @@ import { type Ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import {
+	enableInstallJobSandbox,
+	type InstallSandboxChoice,
+} from '@/features/sandbox/enable-instance-sandbox'
 import { get_user } from '@/helpers/cache'
 import { toError } from '@/helpers/errors'
 import {
@@ -28,7 +32,7 @@ import type { AppNotification, SharedInstanceInvite } from './shared-instance-in
 type InstallModal = {
 	show(
 		preview: Awaited<ReturnType<typeof install_get_shared_instance_preview>>,
-		install: () => Promise<void>,
+		install: (choice: InstallSandboxChoice) => Promise<void>,
 		creator?: SharedInstanceCreator,
 	): void
 }
@@ -69,7 +73,7 @@ export function useSharedInstanceInviteHandler(
 		| {
 				instanceId: string
 				preview: Awaited<ReturnType<typeof install_get_shared_instance_preview>>
-				install: () => Promise<void>
+				install: (choice: InstallSandboxChoice) => Promise<void>
 				creator?: SharedInstanceCreator
 				onGoToInstance?: () => void | Promise<void>
 		  }
@@ -104,17 +108,17 @@ export function useSharedInstanceInviteHandler(
 
 	function showInstall(
 		preview: Awaited<ReturnType<typeof install_get_shared_instance_preview>>,
-		install: () => Promise<void>,
+		install: (choice: InstallSandboxChoice) => Promise<void>,
 		creator?: SharedInstanceCreator,
 	) {
 		if (!installModal.value) throw new Error('Shared instance install modal is not available.')
 		const generation = notificationGeneration
 		installModal.value.show(
 			preview,
-			async () => {
+			async (choice) => {
 				if (generation !== notificationGeneration) return
 				try {
-					await install()
+					await install(choice)
 				} catch (error) {
 					notifySharedInstanceError(error)
 					throw error
@@ -127,7 +131,7 @@ export function useSharedInstanceInviteHandler(
 	async function showInstallOrAlreadyInstalled(
 		sharedInstanceId: string,
 		preview: Awaited<ReturnType<typeof install_get_shared_instance_preview>>,
-		install: () => Promise<void>,
+		install: (choice: InstallSandboxChoice) => Promise<void>,
 		creator?: SharedInstanceCreator,
 		onGoToInstance?: () => void | Promise<void>,
 	) {
@@ -195,9 +199,9 @@ export function useSharedInstanceInviteHandler(
 			await showInstallOrAlreadyInstalled(
 				invite.sharedInstanceId,
 				preview,
-				async () => {
+				async ({ sandbox }) => {
 					await install_accept_pending_shared_instance_invite(invite.sharedInstanceId)
-					await install_shared_instance(
+					const job = await install_shared_instance(
 						invite.sharedInstanceId,
 						invite.sharedInstanceName,
 						invite.invitedById,
@@ -206,6 +210,7 @@ export function useSharedInstanceInviteHandler(
 						invite.instanceIconUrl,
 						invite.instanceIconConfig,
 					)
+					if (sandbox) await enableInstallJobSandbox(job)
 					await markNotificationRead(notification).catch((error) => handleError(toError(error)))
 					await queryClient.invalidateQueries({ queryKey: ['instances'] })
 				},
@@ -301,9 +306,9 @@ export function useSharedInstanceInviteHandler(
 			await showInstallOrAlreadyInstalled(
 				invite.sharedInstanceId,
 				invite.preview,
-				async () => {
+				async ({ sandbox }) => {
 					await install_accept_shared_instance_invite(invite.sharedInstanceId, inviteId)
-					await install_shared_instance(
+					const job = await install_shared_instance(
 						invite.sharedInstanceId,
 						invite.preview.name,
 						invite.managerId,
@@ -312,6 +317,7 @@ export function useSharedInstanceInviteHandler(
 						invite.instanceIconUrl,
 						invite.instanceIconConfig,
 					)
+					if (sandbox) await enableInstallJobSandbox(job)
 					await queryClient.invalidateQueries({ queryKey: ['instances'] })
 				},
 				invite.inviter

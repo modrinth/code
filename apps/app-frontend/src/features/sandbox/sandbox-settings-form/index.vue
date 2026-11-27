@@ -19,10 +19,10 @@ import {
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
-import { open } from '@tauri-apps/plugin-dialog'
 import { computed, onBeforeUnmount, ref, useId } from 'vue'
 
 import type { SandboxSettings } from '@/helpers/types'
+import { pickDirectory } from '@/platform/dialogs'
 
 import DisableSandboxModal from './disable-sandbox-modal.vue'
 import { SANDBOX_HELP_URL } from './links'
@@ -160,8 +160,8 @@ function addFolder() {
 }
 
 async function browseForFolder() {
-	const path = await open({ multiple: false, directory: true })
-	if (typeof path === 'string') folderPath.value = path
+	const path = await pickDirectory(formatMessage(messages.browse))
+	if (path) folderPath.value = path
 }
 
 const copiedFolder = ref<string | null>(null)

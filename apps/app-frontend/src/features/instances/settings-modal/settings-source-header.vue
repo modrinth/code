@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EditIcon, SettingsIcon, UndoIcon } from '@modrinth/assets'
+import { EditIcon, RotateClockwiseIcon, SettingsIcon } from '@modrinth/assets'
 import { Button, defineMessages, useVIntl } from '@modrinth/ui'
 
 import {
@@ -73,7 +73,7 @@ function showDefaultSettings() {
 			</Button>
 		</div>
 		<Button v-else class="shrink-0" @click="source = 'app'">
-			<UndoIcon aria-hidden="true" />
+			<RotateClockwiseIcon aria-hidden="true" />
 			{{ formatMessage(messages.resetToDefaults) }}
 		</Button>
 	</div>

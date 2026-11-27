@@ -15,7 +15,8 @@
 		:show-report-button="!isOwner"
 		:show-external-warnings="!isOwner"
 		:external-warning-description="formatMessage(messages.externalWarningDescription)"
-		@confirm="update"
+		@confirm="update(false)"
+		@sandbox="update(true)"
 		@cancel="emit('cancel')"
 		@report="emit('report', $event)"
 	>
@@ -41,6 +42,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import { enableInstanceSandbox } from '@/features/sandbox/enable-instance-sandbox'
 import { useOfferSandbox } from '@/features/sandbox/use-offer-sandbox'
 import {
 	getSharedInstanceUnavailableReason,
@@ -90,11 +92,12 @@ const diffs = computed<ContentDiffItem[]>(
 			})) ?? [],
 )
 
-async function update() {
+async function update(sandbox: boolean) {
 	let successful = false
 	emit('accepted')
 	try {
 		if (instance.value) {
+			if (sandbox) await enableInstanceSandbox(instance.value.id)
 			const job = await install_update_shared_instance(instance.value.id)
 			await wait_for_install_job(appEvents, job.job_id)
 			await onComplete.value()

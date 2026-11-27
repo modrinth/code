@@ -21,6 +21,10 @@ import {
 	linkedServerMetadata,
 	useLinkedServerCache,
 } from '@/features/instances/linked-server/use-linked-server'
+import {
+	enableInstanceSandbox,
+	type InstallSandboxChoice,
+} from '@/features/sandbox/enable-instance-sandbox'
 import { toError } from '@/helpers/errors'
 import {
 	install_get_shared_instance_preview,
@@ -53,7 +57,10 @@ type SharedInstancePreview = Awaited<ReturnType<typeof install_get_shared_instan
 
 export type ServerPlayModals = {
 	showAccountRequired: () => Promise<boolean> | undefined
-	showInstallPreview: (preview: SharedInstancePreview, confirm: () => Promise<void>) => void
+	showInstallPreview: (
+		preview: SharedInstancePreview,
+		confirm: (choice: InstallSandboxChoice) => Promise<void>,
+	) => void
 	showUpdatePreview: () => void
 	hideAll: () => void
 }
@@ -263,7 +270,15 @@ export function useServerPlay(modals: Ref<ServerPlayModals | undefined>) {
 	}
 
 	const launchMutation = useMutation({
-		mutationFn: async ({ target, instanceId }: { target: LaunchTarget; instanceId?: string }) => {
+		mutationFn: async ({
+			target,
+			instanceId,
+			sandbox,
+		}: {
+			target: LaunchTarget
+			instanceId?: string
+			sandbox?: boolean
+		}) => {
 			await assertAccount(target)
 			const existing = instanceId ? await get(instanceId) : await findInstance(target)
 			if (
@@ -286,6 +301,7 @@ export function useServerPlay(modals: Ref<ServerPlayModals | undefined>) {
 				)
 				const installedId = installJobInstanceId(job)
 				if (!installedId) throw new Error(formatMessage(messages.notReady))
+				if (sandbox) await enableInstanceSandbox(installedId)
 				activeInstall.value = {
 					serverId: target.serverId,
 					worldId: target.worldId,
@@ -380,9 +396,9 @@ export function useServerPlay(modals: Ref<ServerPlayModals | undefined>) {
 			const preview = await install_get_shared_instance_preview(sharedInstanceId, target.name)
 			await assertAccount(target)
 			if (target.icon) preview.iconUrl = target.icon
-			modals.value?.showInstallPreview(preview, async () => {
+			modals.value?.showInstallPreview(preview, async ({ sandbox }) => {
 				if (launchMutation.isPending.value) return
-				await launchMutation.mutateAsync({ target }).catch(() => {})
+				await launchMutation.mutateAsync({ target, sandbox }).catch(() => {})
 			})
 		},
 		onError: (error) => handleError(toError(error)),

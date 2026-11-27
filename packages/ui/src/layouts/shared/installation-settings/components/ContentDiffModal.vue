@@ -104,7 +104,7 @@
 							type="colored"
 							color="brand"
 							:disabled="buttonsDisabled || confirmDisabled"
-							@click="handleConfirm"
+							@click="handleSandbox"
 						>
 							<ShieldCheckIcon />
 							{{ formatMessage(messages.sandboxAndInstall) }}
@@ -190,6 +190,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
 	confirm: []
+	sandbox: []
 	cancel: []
 	report: [event?: MouseEvent]
 }>()
@@ -231,6 +232,13 @@ function handleConfirm() {
 	closingFromAction.value = true
 	hide()
 	emit('confirm')
+	closingFromAction.value = false
+}
+
+function handleSandbox() {
+	closingFromAction.value = true
+	hide()
+	emit('sandbox')
 	closingFromAction.value = false
 }
 
