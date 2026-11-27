@@ -104,6 +104,7 @@ pub fn get_jvm_arguments(
     memory: MemorySettings,
     custom_args: Vec<String>,
     java_arch: &str,
+    java_major_version: u32,
     quick_play_type: &QuickPlayType,
     quick_play_version: QuickPlayVersion,
 ) -> crate::Result<Vec<String>> {
@@ -140,6 +141,14 @@ pub fn get_jvm_arguments(
         ]);
     }
 
+    if java_major_version >= MIN_JAVA_FOR_BASE64_INTRINSICS_FLAG
+        && !parsed_arguments
+            .iter()
+            .any(|arg| arg == DISABLE_BASE64_INTRINSICS)
+    {
+        parsed_arguments.push(DISABLE_BASE64_INTRINSICS.to_string());
+    }
+
     for argument in custom_args {
         if argument.is_empty() {
             continue;
@@ -155,6 +164,10 @@ pub fn get_jvm_arguments(
 
     Ok(parsed_arguments)
 }
+
+// CVE-2026-114938
+const DISABLE_BASE64_INTRINSICS: &str = "-XX:-UseBASE64Intrinsics";
+const MIN_JAVA_FOR_BASE64_INTRINSICS_FLAG: u32 = 17;
 
 fn parse_jvm_argument(
     mut argument: String,

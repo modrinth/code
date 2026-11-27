@@ -53,7 +53,7 @@ use std::os::windows::io::{AsRawHandle, OwnedHandle};
 use std::path::Path;
 use std::{ffi::OsStr, os::windows::ffi::OsStrExt};
 
-use eyre::Result;
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use windows::{

@@ -548,14 +548,23 @@
   "app-marketing.download.download-appimage": {
     "message": "Télécharger l'AppImage"
   },
+  "app-marketing.download.download-appimage-arm64": {
+    "message": "Télécharger l'AppImage (ARM64)"
+  },
   "app-marketing.download.download-beta": {
     "message": "Télécharger la bêta"
   },
   "app-marketing.download.download-deb": {
     "message": "Télécharger le DEB"
   },
+  "app-marketing.download.download-deb-arm64": {
+    "message": "Télécharger le DEB (ARM64)"
+  },
   "app-marketing.download.download-rpm": {
     "message": "Télécharger le RPM"
+  },
+  "app-marketing.download.download-rpm-arm64": {
+    "message": "Télécharger le RPM (ARM64)"
   },
   "app-marketing.download.flathub": {
     "message": "Disponible sur Flathub"
@@ -812,6 +821,12 @@
   "auth.create-account.username.placeholder": {
     "message": "Entrez un pseudo"
   },
+  "auth.oauth.opening.description": {
+    "message": "Complétez votre inscription sur {provider}"
+  },
+  "auth.oauth.opening.title": {
+    "message": "Ouverture de {provider}..."
+  },
   "auth.reauthenticate.2fa.description": {
     "message": "Entrez le code à 6 chiffres de votre application d'authentification, ou l'un de vos codes de récupération."
   },
@@ -880,6 +895,9 @@
   },
   "auth.sign-in.choose-existing-account": {
     "message": "Utiliser un compte existant"
+  },
+  "auth.sign-in.code-failed": {
+    "message": "Ce lien de connexion est invalide ou a expiré. Veuillez réessayer."
   },
   "auth.sign-in.continue-with-email": {
     "message": "Continuer avec un E-mail"
@@ -1607,6 +1625,12 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
     "message": "Équivalent en dollars américains"
   },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-body": {
+    "message": "En raison de restrictions de conformité, nous ne pouvons pas envoyer d'argent dans la région : {region}."
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-header": {
+    "message": "Les retraits ne sont pas pris en charge pour cette région"
+  },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Entité commerciale"
   },
@@ -2221,6 +2245,9 @@
   },
   "discover.install.error.unsupported-content-type": {
     "message": "Ce type de contenu ne peut pas être installé sur un serveur depuis Découvrir."
+  },
+  "discover.install.heading.reset-modpack": {
+    "message": "Sélection du contenu à installer après la réinitialisation"
   },
   "discover.seo.description": {
     "message": "Recherchez et explorez des milliers de {projectType} Minecraft sur Modrinth avec des résultats instantanés et précis. Nos filtres vous aident à trouver rapidement les meilleurs {projectType}."
@@ -2987,6 +3014,9 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Passer à Modrinth+"
   },
+  "layout.nav.use-signed-out": {
+    "message": "Utiliser la déconnexion"
+  },
   "layout.publish.email-verification-required.description": {
     "message": "Vous devez vérifier votre adresse e-mail avant de publier sur Modrinth."
   },
@@ -3239,11 +3269,23 @@
   "moderation.settings.floating-panel-section": {
     "message": "Tableau de bord flottant"
   },
+  "moderation.settings.highlight-preview": {
+    "message": "Vérifier l'aperçu de la surbrillance"
+  },
+  "moderation.settings.highlight-preview.incorrect-formatting": {
+    "message": "Formatage incorrect"
+  },
+  "moderation.settings.highlight-preview.missing-information": {
+    "message": "Information manquante"
+  },
   "moderation.settings.highlight-preview.non-english": {
     "message": "Autre que l’anglais"
   },
   "moderation.settings.highlights-section": {
     "message": "Points forts"
+  },
+  "moderation.settings.issue-toggle-preview": {
+    "message": "Aperçu des problèmes"
   },
   "moderation.settings.issue-toggles-section": {
     "message": "Permuter les anomalies"
@@ -3257,8 +3299,17 @@
   "moderation.settings.on": {
     "message": "Oui"
   },
+  "moderation.settings.reset": {
+    "message": "Remettre aux paramètres par défaut"
+  },
   "moderation.settings.search": {
     "message": "Paramètres de recherche…"
+  },
+  "moderation.settings.theme-border": {
+    "message": "Thème orange (25% d'opacité)"
+  },
+  "moderation.settings.theme-default": {
+    "message": "Thème orange"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} par lot"
@@ -3683,6 +3734,9 @@
   "project-moderation-nags.warning": {
     "message": "Avertissement"
   },
+  "project-review.disclosures.select-ai-uses": {
+    "message": "Sélectionner les utilisations d'IA"
+  },
   "project-type.collection.plural": {
     "message": "Collections"
   },
@@ -3761,6 +3815,9 @@
   "project.actions.edit-project": {
     "message": "Modifier le projet"
   },
+  "project.actions.open-in-modview": {
+    "message": "Modview"
+  },
   "project.actions.project-page": {
     "message": "Page du projet"
   },
@@ -3802,6 +3859,12 @@
   },
   "project.description.title": {
     "message": "Description"
+  },
+  "project.disclosures.lock-status.cannot-disable": {
+    "message": "Impossible de désactiver cette option"
+  },
+  "project.disclosures.lock-status.change": {
+    "message": "Modifier le statut de verrouillage"
   },
   "project.disclosures.retry": {
     "message": "Réessayer"
@@ -5759,6 +5822,12 @@
   "settings.pats.modal.edit.title": {
     "message": "Modifier le jeton d'accès personnel"
   },
+  "settings.pats.modal.revoke.action": {
+    "message": "Révoquer ce jeton"
+  },
+  "settings.pats.token.access-token": {
+    "message": "Jeton d'accès"
+  },
   "settings.pats.token.action.edit": {
     "message": "Modifier le jeton"
   },
@@ -5782,6 +5851,12 @@
   },
   "settings.sessions.current-session": {
     "message": "Session actuelle"
+  },
+  "settings.sessions.empty-state.heading": {
+    "message": "Aucun session active"
+  },
+  "settings.sessions.ip": {
+    "message": "Adresse IP : {ip}"
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Dernier accès {ago}"

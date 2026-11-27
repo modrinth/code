@@ -2900,11 +2900,20 @@
   "moderation.keybinds.transfer.download": {
     "message": "Ladda ner JSON"
   },
+  "moderation.keybinds.transfer.file": {
+    "message": "Välj JSON-fil"
+  },
+  "moderation.keybinds.transfer.file-error": {
+    "message": "Kunde inte läsa filen. Välj en JSON-fil mindre än 64 KB."
+  },
   "moderation.moderate": {
     "message": "Moderera"
   },
   "moderation.page.external-projects": {
     "message": "Externa projekt"
+  },
+  "moderation.page.global-detail-traces": {
+    "message": "Globala spår"
   },
   "moderation.page.projects": {
     "message": "Projekt"
@@ -2930,14 +2939,26 @@
   "moderation.settings.highlight-preview.non-english": {
     "message": "Inte engelska"
   },
+  "moderation.settings.highlights-section": {
+    "message": "Höjdpunkter"
+  },
   "moderation.settings.off": {
     "message": "Av"
   },
   "moderation.settings.on": {
     "message": "På"
   },
+  "moderation.settings.reset": {
+    "message": "Återställ till standard"
+  },
   "moderation.settings.search": {
     "message": "Sök inställningar…"
+  },
+  "moderation.settings.theme-border": {
+    "message": "Tema orange (25% genomskinlighet)"
+  },
+  "moderation.settings.theme-default": {
+    "message": "Tema orange"
   },
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Kunde inte rensa alla grupper: {error}"
@@ -3362,6 +3383,9 @@
   "project.disclosures.loading": {
     "message": "Läser in upplysningar…"
   },
+  "project.disclosures.lock-status.unlocked": {
+    "message": "Olåst"
+  },
   "project.disclosures.retry": {
     "message": "Försök igen"
   },
@@ -3562,6 +3586,9 @@
   },
   "project.notification.icon-updated.title": {
     "message": "Projektikon uppdaterad"
+  },
+  "project.notification.review-save-failed.description": {
+    "message": "Du kan inte spara redigeringar till ditt projekt vilket resulterar i att valideringen misslyckas."
   },
   "project.notification.updated.message": {
     "message": "Ditt projekt har uppdaterats."
@@ -3803,6 +3830,9 @@
   "project.settings.license.optional-url": {
     "message": "Licens-URL (valfritt)"
   },
+  "project.settings.license.select": {
+    "message": "Licens"
+  },
   "project.settings.license.select-placeholder": {
     "message": "Sök licenser..."
   },
@@ -3883,6 +3913,9 @@
   },
   "project.settings.links.wiki": {
     "message": "Wikisida"
+  },
+  "project.settings.monetization.title": {
+    "message": "Intäkter"
   },
   "project.settings.permissions.attention-needed.title": {
     "message": "Okänt externt innehåll"
@@ -4417,6 +4450,9 @@
   },
   "servers.purchase.step.plan.per-month-billing": {
     "message": "/ månad{interval, select, monthly {} other {, fakturerad {interval, select, quarterly {kvartalsvis} yearly {årligen} other {{interval}}}}}"
+  },
+  "servers.sharing-update.notification.view-update": {
+    "message": "Visa uppdatering"
   },
   "settings.account.button.complete-setup": {
     "message": "Slutför inställning"
@@ -5024,6 +5060,9 @@
   "settings.pats.modal.edit.title": {
     "message": "Ändra personlig åtkomstnyckel"
   },
+  "settings.pats.token.access-token": {
+    "message": "Åtkomst-token"
+  },
   "settings.pats.token.action.edit": {
     "message": "Redigera token"
   },
@@ -5041,6 +5080,9 @@
   },
   "settings.pats.token.never-used": {
     "message": "Aldrig använd"
+  },
+  "settings.pats.token.no-permissions": {
+    "message": "Inga behörigheter"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Återkalla session"
@@ -5119,6 +5161,9 @@
   },
   "thread-issues.target.edit-url": {
     "message": "Ändra URL"
+  },
+  "thread.message.delete": {
+    "message": "Radera"
   },
   "thread.message.moderator": {
     "message": "Moderator"

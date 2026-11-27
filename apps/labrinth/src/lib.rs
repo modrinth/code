@@ -1,5 +1,6 @@
 #![recursion_limit = "256"]
 
+use anyhow::anyhow;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -25,6 +26,7 @@ use crate::util::anrok;
 use crate::util::archon::ArchonClient;
 use crate::util::http::HttpClient;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
+use crate::util::temporal::TemporalClient;
 use crate::util::tiltify::TiltifyClient;
 use sync::friends::{FRIENDS_CHANNEL_NAME, handle_pubsub};
 use url::Url;
@@ -44,6 +46,7 @@ pub mod search;
 pub mod sync;
 pub mod util;
 pub mod validate;
+pub mod workflow;
 
 #[cfg(feature = "test")]
 pub mod test;
@@ -77,6 +80,7 @@ pub struct LabrinthConfig {
     pub http_client: web::Data<HttpClient>,
     pub tiltify_client: web::Data<TiltifyClient>,
     pub kafka_client: web::Data<util::kafka::KafkaClientState>,
+    pub temporal_client: web::Data<TemporalClient>,
     pub webauthn: web::Data<Webauthn>,
 }
 
@@ -94,6 +98,7 @@ pub fn app_setup(
     email_queue: EmailQueue,
     gotenberg_client: GotenbergClient,
     kafka_client: web::Data<util::kafka::KafkaClientState>,
+    temporal_client: web::Data<TemporalClient>,
     enable_background_tasks: bool,
 ) -> LabrinthConfig {
     info!("Starting labrinth on {}", &ENV.BIND_ADDR);
@@ -248,6 +253,9 @@ pub fn app_setup(
             ro_pool.clone(),
             redis_pool.clone(),
             file_host.clone().into_inner(),
+            crate::env::Config::load()
+                .expect("failed to load project flag configuration")
+                .project_flags,
         )
         .expect("failed to create project flag engine"),
     );
@@ -273,6 +281,7 @@ pub fn app_setup(
         http_client,
         tiltify_client,
         kafka_client,
+        temporal_client,
         archon_client: web::Data::new(
             ArchonClient::from_env()
                 .expect("ARCHON_URL and PYRO_API_KEY must be set"),
@@ -295,16 +304,16 @@ pub fn app_data_config(
     labrinth_config: LabrinthConfig,
 ) {
     cfg.app_data(web::FormConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Request(eyre::eyre!("{err}")).into()
+        routes::ApiError::Request(anyhow!("{err}")).into()
     }))
     .app_data(web::PathConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Request(eyre::eyre!("{err}")).into()
+        routes::ApiError::Request(anyhow!("{err}")).into()
     }))
     .app_data(web::QueryConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Request(eyre::eyre!("{err}")).into()
+        routes::ApiError::Request(anyhow!("{err}")).into()
     }))
     .app_data(web::JsonConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Request(eyre::eyre!("{err}")).into()
+        routes::ApiError::Request(anyhow!("{err}")).into()
     }))
     .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
     .app_data(web::Data::new(labrinth_config.pool.clone()))
@@ -329,6 +338,7 @@ pub fn app_data_config(
     .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
     .app_data(labrinth_config.rate_limiter.clone())
     .app_data(labrinth_config.kafka_client.clone())
+    .app_data(labrinth_config.temporal_client.clone())
     .app_data(labrinth_config.search_state.clone())
     .app_data(labrinth_config.webauthn.clone());
 }

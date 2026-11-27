@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                COALESCE((SELECT jsonb_agg(to_jsonb(rules) ORDER BY rules.id) FROM project_flag_rules AS rules), '[]'::jsonb) AS \"rules!\",\n                COALESCE((SELECT jsonb_object_agg(name, script) FROM project_flag_modules), '{}'::jsonb) AS \"modules!\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "rules!",
+        "type_info": "Jsonb",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "modules!",
+        "type_info": "Jsonb",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "1ef347d27c2ec386546e45a1f020b1a74fc6cd17132ff2e1e7b19c8769a12a9f"
+}

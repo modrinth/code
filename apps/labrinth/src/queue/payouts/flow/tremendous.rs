@@ -1,6 +1,6 @@
 use crate::util::error::ApiContext as _;
+use anyhow::anyhow;
 use chrono::Utc;
-use eyre::eyre;
 use modrinth_util::decimal::Decimal2dp;
 use reqwest::Method;
 use rust_decimal::{Decimal, RoundingStrategy, dec};
@@ -43,19 +43,19 @@ pub(super) async fn create(
     let forex: TremendousForexResponse = queue
         .make_tremendous_request(Method::GET, "forex", None::<()>)
         .await
-        .wrap_internal_err("failed to fetch Tremendous forex data")?;
+        .internal_context("failed to fetch Tremendous forex data")?;
     let usd_to_currency_for = |currency_code: &str| {
         forex
             .forex
             .get(currency_code)
             .copied()
-            .wrap_internal_err_with(|| {
-                eyre!("no Tremendous forex rate for '{currency_code}'")
+            .internal_context_with(|| {
+                anyhow!("no Tremendous forex rate for '{currency_code}'")
             })
     };
 
-    let category = method.category.as_ref().wrap_internal_err_with(|| {
-        eyre!("method '{}' should have a category", method.id)
+    let category = method.category.as_ref().internal_context_with(|| {
+        anyhow!("method '{}' should have a category", method.id)
     })?;
 
     let delivery_email = details.delivery_email;
@@ -66,7 +66,7 @@ pub(super) async fn create(
             let currency = details.currency.unwrap_or(TremendousCurrency::Usd);
             let currency_code = currency.to_string();
             let usd_to_currency = usd_to_currency_for(&currency_code)
-                .wrap_api_err("executing `usd_to_currency_for`")?;
+                .api_context("executing `usd_to_currency_for`")?;
 
             let fee = PayoutMethodFee {
                 // If a user withdraws $10:
@@ -85,7 +85,7 @@ pub(super) async fn create(
             };
 
             let gross_usd =
-                Decimal2dp::new(amount).wrap_request_err("invalid amount")?;
+                Decimal2dp::new(amount).request_context("invalid amount")?;
 
             let total_fee_usd = Decimal2dp::rounded(
                 fee.compute_fee(amount),
@@ -130,7 +130,7 @@ pub(super) async fn create(
                     TremendousCurrency::Usd.to_string()
                 };
             let usd_to_currency = usd_to_currency_for(&currency_code)
-                .wrap_api_err("executing `usd_to_currency_for`")?;
+                .api_context("executing `usd_to_currency_for`")?;
             let currency_to_usd = dec!(1) / usd_to_currency;
 
             // no fees
@@ -193,8 +193,8 @@ pub(super) async fn execute(
         pub order: Order,
     }
 
-    let user_email = get_verified_email(user)
-        .wrap_api_err("fetching verified user email")?;
+    let user_email =
+        get_verified_email(user).api_context("fetching verified user email")?;
 
     let order_req = json!({
         "payment": {
@@ -222,7 +222,7 @@ pub(super) async fn execute(
     let order_res: TremendousResponse = queue
         .make_tremendous_request(Method::POST, "orders", Some(order_req))
         .await
-        .wrap_internal_err("failed to make Tremendous order request")?;
+        .internal_context("failed to make Tremendous order request")?;
 
     let platform_id = order_res
         .order
@@ -244,12 +244,12 @@ pub(super) async fn execute(
     }
     .insert(&mut transaction)
     .await
-    .wrap_internal_err("failed to insert payout")?;
+    .internal_context("failed to insert payout")?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("failed to commit transaction")?;
+        .internal_context("failed to commit transaction")?;
 
     Ok(())
 }

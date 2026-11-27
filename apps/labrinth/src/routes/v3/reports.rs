@@ -23,6 +23,7 @@ use crate::util::http::HTTP_CLIENT;
 use crate::util::img;
 use crate::util::routes::read_typed_from_payload;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
+use anyhow::anyhow;
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::Utc;
@@ -77,7 +78,7 @@ pub async fn report_create(
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     let current_user = get_user_from_headers(
         &req,
@@ -87,23 +88,23 @@ pub async fn report_create(
         Scopes::REPORT_CREATE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
 
     let new_report: CreateReport = read_typed_from_payload(&mut body)
         .await
-        .wrap_api_err("reading request payload")?;
+        .api_context("reading request payload")?;
 
     let id = crate::database::models::generate_report_id(&mut transaction)
         .await
-        .wrap_internal_err("generating report ID")?;
+        .internal_context("generating report ID")?;
     let report_type = crate::database::models::categories::ReportType::get_id(
         &new_report.report_type,
         &mut transaction,
     )
     .await
-    .wrap_internal_err("generating report ID")?
-    .wrap_request_err_with(|| {
+    .internal_context("generating report ID")?
+    .request_context_with(|| {
         format!("invalid report type: `{}`", new_report.report_type)
     })?;
 
@@ -126,7 +127,7 @@ pub async fn report_create(
         ItemType::Project => {
             let project_id = ProjectId(
                 parse_base62(new_report.item_id.as_str())
-                    .wrap_request_err("parsing reported project ID")?,
+                    .request_context("parsing reported project ID")?,
             );
 
             let result = sqlx::query!(
@@ -135,10 +136,10 @@ pub async fn report_create(
             )
             .fetch_one(&mut transaction)
             .await
-            .wrap_internal_err("querying database for `report_create`")?;
+            .internal_context("querying database for `report_create`")?;
 
             if !result.exists.unwrap_or(false) {
-                return Err(ApiError::Request(eyre::eyre!(format!(
+                return Err(ApiError::Request(anyhow!(format!(
                     "Project could not be found: {}",
                     new_report.item_id
                 ))));
@@ -149,7 +150,7 @@ pub async fn report_create(
         ItemType::Version => {
             let version_id = VersionId(
                 parse_base62(new_report.item_id.as_str())
-                    .wrap_request_err("parsing reported version ID")?,
+                    .request_context("parsing reported version ID")?,
             );
 
             let result = sqlx::query!(
@@ -158,10 +159,10 @@ pub async fn report_create(
             )
             .fetch_one(&mut transaction)
             .await
-            .wrap_internal_err("querying database for `report_create`")?;
+            .internal_context("querying database for `report_create`")?;
 
             if !result.exists.unwrap_or(false) {
-                return Err(ApiError::Request(eyre::eyre!(format!(
+                return Err(ApiError::Request(anyhow!(format!(
                     "Version could not be found: {}",
                     new_report.item_id
                 ))));
@@ -172,7 +173,7 @@ pub async fn report_create(
         ItemType::User => {
             let user_id = UserId(
                 parse_base62(new_report.item_id.as_str())
-                    .wrap_request_err("parsing reported user ID")?,
+                    .request_context("parsing reported user ID")?,
             );
 
             let result = sqlx::query!(
@@ -181,10 +182,10 @@ pub async fn report_create(
             )
             .fetch_one(&mut transaction)
             .await
-            .wrap_internal_err("querying database for `report_create`")?;
+            .internal_context("querying database for `report_create`")?;
 
             if !result.exists.unwrap_or(false) {
-                return Err(ApiError::Request(eyre::eyre!(format!(
+                return Err(ApiError::Request(anyhow!(format!(
                     "User could not be found: {}",
                     new_report.item_id
                 ))));
@@ -195,7 +196,7 @@ pub async fn report_create(
         ItemType::Organization => {
             let organization_id = OrganizationId(
                 parse_base62(new_report.item_id.as_str())
-                    .wrap_request_err("parsing reported organization ID")?,
+                    .request_context("parsing reported organization ID")?,
             );
 
             let result = sqlx::query!(
@@ -204,10 +205,10 @@ pub async fn report_create(
             )
             .fetch_one(&mut transaction)
             .await
-            .wrap_internal_err("querying database for `report_create`")?;
+            .internal_context("querying database for `report_create`")?;
 
             if !result.exists.unwrap_or(false) {
-                return Err(ApiError::Request(eyre::eyre!(
+                return Err(ApiError::Request(anyhow!(
                     "Organization could not be found: {}",
                     new_report.item_id
                 )));
@@ -220,16 +221,16 @@ pub async fn report_create(
             let (instance_part, version_part) = new_report
                 .item_id
                 .split_once('/')
-                .wrap_request_err_with(|| "shared instance reports must format the item ID as `instance_id/version_id`"
+                .request_context_with(|| "shared instance reports must format the item ID as `instance_id/version_id`"
                             .to_string())?;
 
             let shared_instance_id = SharedInstanceId(
                 parse_base62(instance_part)
-                    .wrap_request_err("parsing reported shared instance ID")?
+                    .request_context("parsing reported shared instance ID")?
                     as i64,
             );
             let shared_instance_version_id: i32 =
-                version_part.parse().wrap_request_err(format!(
+                version_part.parse().request_context(format!(
                     "shared instance version is not a number: `{version_part}`"
                 ))?;
 
@@ -244,12 +245,12 @@ pub async fn report_create(
                 .bearer_auth(&ENV.SHARED_INSTANCES_KEY)
                 .send()
                 .await
-                .wrap_internal_err(
+                .internal_context(
                     "failed to reach the shared instance service (instance lookup)",
                 )?;
 
             if !instance_response.status().is_success() {
-                return Err(ApiError::Request(eyre::eyre!(format!(
+                return Err(ApiError::Request(anyhow!(format!(
                     "Shared instance could not be found: {instance_part}"
                 ))));
             }
@@ -259,10 +260,10 @@ pub async fn report_create(
                 .bearer_auth(&ENV.SHARED_INSTANCES_KEY)
                 .send()
                 .await
-                .wrap_internal_err("failed to reach the shared instance service (version lookup)")?;
+                .internal_context("failed to reach the shared instance service (version lookup)")?;
 
             if !version_response.status().is_success() {
-                return Err(ApiError::Request(eyre::eyre!(format!(
+                return Err(ApiError::Request(anyhow!(format!(
                     "Shared instance version could not be found: {instance_part}/{version_part}"
                 ))));
             }
@@ -271,7 +272,7 @@ pub async fn report_create(
             report.shared_instance_version_id = Some(shared_instance_version_id)
         }
         ItemType::Unknown => {
-            return Err(ApiError::Request(eyre::eyre!(format!(
+            return Err(ApiError::Request(anyhow!(format!(
                 "Invalid report item type: {}",
                 new_report.item_type.as_str()
             ))));
@@ -281,19 +282,19 @@ pub async fn report_create(
     report
         .insert(&mut transaction)
         .await
-        .wrap_internal_err("inserting database records for `report_create`")?;
+        .internal_context("inserting database records for `report_create`")?;
 
     for image_id in new_report.uploaded_images {
         if let Some(db_image) =
             image_item::DBImage::get(image_id.into(), &mut transaction, &redis)
                 .await
-                .wrap_internal_err("fetching image from database")?
+                .internal_context("fetching image from database")?
         {
             let image: Image = db_image.into();
             if !matches!(image.context, ImageContext::Report { .. })
                 || image.context.inner_id().is_some()
             {
-                return Err(ApiError::Request(eyre::eyre!(format!(
+                return Err(ApiError::Request(anyhow!(format!(
                     "Image {image_id} is not unused and in the 'report' context"
                 ))));
             }
@@ -309,13 +310,13 @@ pub async fn report_create(
             )
             .execute(&mut transaction)
             .await
-            .wrap_internal_err("querying database for `report_create`")?;
+            .internal_context("querying database for `report_create`")?;
 
             image_item::DBImage::clear_cache(image.id.into(), &redis)
                 .await
-                .wrap_internal_err("clearing cached data from Redis")?;
+                .internal_context("clearing cached data from Redis")?;
         } else {
-            return Err(ApiError::Request(eyre::eyre!(format!(
+            return Err(ApiError::Request(anyhow!(format!(
                 "Image {image_id} could not be found"
             ))));
         }
@@ -329,7 +330,7 @@ pub async fn report_create(
     }
     .insert(&mut transaction)
     .await
-    .wrap_internal_err("inserting database records for `report_create`")?;
+    .internal_context("inserting database records for `report_create`")?;
 
     // Notify the reporter that the report has been submitted
     NotificationBuilder {
@@ -339,12 +340,12 @@ pub async fn report_create(
     }
     .insert(current_user.id.into(), &mut transaction, &redis)
     .await
-    .wrap_internal_err("inserting database records for `report_create`")?;
+    .internal_context("inserting database records for `report_create`")?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     Ok(HttpResponse::Ok().json(Report {
         id: id.into(),
@@ -415,7 +416,7 @@ pub async fn reports(
         Scopes::REPORT_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     use futures::stream::TryStreamExt;
 
@@ -424,7 +425,7 @@ pub async fn reports(
         .as_deref()
         .map(parse_base62)
         .transpose()
-        .wrap_request_err("parsing `item_id`")?
+        .request_context("parsing `item_id`")?
         .map(|id| id as i64);
 
     let report_ids = if scopes.contains(Scopes::MODERATION_READ)
@@ -450,7 +451,7 @@ pub async fn reports(
         .map_ok(|m| crate::database::models::ids::DBReportId(m.id))
         .try_collect::<Vec<crate::database::models::ids::DBReportId>>()
         .await
-        .wrap_internal_err("fetching report IDs from database")?
+        .internal_context("fetching report IDs from database")?
     } else {
         sqlx::query!(
             r#"
@@ -473,7 +474,7 @@ pub async fn reports(
         .map_ok(|m| crate::database::models::ids::DBReportId(m.id))
         .try_collect::<Vec<crate::database::models::ids::DBReportId>>()
         .await
-        .wrap_internal_err("querying database for `reports`")?
+        .internal_context("querying database for `reports`")?
     };
 
     let query_reports =
@@ -482,7 +483,7 @@ pub async fn reports(
             &**pool,
         )
         .await
-        .wrap_internal_err("fetching reports from database")?;
+        .internal_context("fetching reports from database")?;
 
     let mut reports: Vec<Report> = Vec::new();
 
@@ -523,7 +524,7 @@ pub async fn reports_get(
 ) -> Result<HttpResponse, ApiError> {
     let report_ids: Vec<crate::database::models::ids::DBReportId> =
         serde_json::from_str::<Vec<crate::models::ids::ReportId>>(&ids.ids)
-            .wrap_request_err("deserializing JSON data")?
+            .request_context("deserializing JSON data")?
             .into_iter()
             .map(|x| x.into())
             .collect();
@@ -534,7 +535,7 @@ pub async fn reports_get(
             &**pool,
         )
         .await
-        .wrap_internal_err("fetching reports from database")?;
+        .internal_context("fetching reports from database")?;
 
     let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
@@ -544,7 +545,7 @@ pub async fn reports_get(
         Scopes::REPORT_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let all_reports = reports_data
         .into_iter()
@@ -585,25 +586,25 @@ pub async fn report_get(
         Scopes::REPORT_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
     let id = info.into_inner().0.into();
 
     let report =
         crate::database::models::report_item::DBReport::get(id, &**pool)
             .await
-            .wrap_internal_err("fetching report from database")?;
+            .internal_context("fetching report from database")?;
 
     if let Some(report) = report {
         if !scopes.contains(Scopes::MODERATION_READ)
             && report.reporter != user.id.into()
         {
-            return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+            return Err(ApiError::NotFound(anyhow!("resource not found")));
         }
 
         let report: Report = report.into();
         Ok(HttpResponse::Ok().json(report))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -643,25 +644,25 @@ pub async fn report_edit(
         Scopes::REPORT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
     let id = info.into_inner().0.into();
 
     let report =
         crate::database::models::report_item::DBReport::get(id, &**pool)
             .await
-            .wrap_internal_err("fetching report from database")?;
+            .internal_context("fetching report from database")?;
 
     if let Some(report) = report {
         if !scopes.contains(Scopes::MODERATION_WRITE)
             && report.reporter != user.id.into()
         {
-            return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+            return Err(ApiError::NotFound(anyhow!("resource not found")));
         }
 
         let mut transaction = pool
             .begin()
             .await
-            .wrap_internal_err("starting database transaction")?;
+            .internal_context("starting database transaction")?;
 
         if let Some(edit_body) = &edit_report.body {
             sqlx::query!(
@@ -675,12 +676,12 @@ pub async fn report_edit(
             )
             .execute(&mut transaction)
             .await
-            .wrap_internal_err("updating edit body in database")?;
+            .internal_context("updating edit body in database")?;
         }
 
         if let Some(edit_closed) = edit_report.closed {
             if !scopes.contains(Scopes::MODERATION_WRITE) {
-                return Err(ApiError::Request(eyre::eyre!(
+                return Err(ApiError::Request(anyhow!(
                     "You cannot reopen a report!",
                 )));
             }
@@ -697,9 +698,7 @@ pub async fn report_edit(
             }
             .insert(&mut transaction)
             .await
-            .wrap_internal_err(
-                "inserting database records for `report_edit`",
-            )?;
+            .internal_context("inserting database records for `report_edit`")?;
 
             NotificationBuilder {
                 body: NotificationBody::ReportStatusUpdated {
@@ -708,9 +707,7 @@ pub async fn report_edit(
             }
             .insert(report.reporter, &mut transaction, &redis)
             .await
-            .wrap_internal_err(
-                "inserting database records for `report_edit`",
-            )?;
+            .internal_context("inserting database records for `report_edit`")?;
 
             sqlx::query!(
                 "
@@ -723,7 +720,7 @@ pub async fn report_edit(
             )
             .execute(&mut transaction)
             .await
-            .wrap_internal_err("updating database records for `report_edit`")?;
+            .internal_context("updating database records for `report_edit`")?;
         }
 
         // delete any images no longer in the body
@@ -741,16 +738,16 @@ pub async fn report_edit(
             &redis,
         )
         .await
-        .wrap_api_err("deleting unused images")?;
+        .api_context("deleting unused images")?;
 
         transaction
             .commit()
             .await
-            .wrap_internal_err("committing database transaction")?;
+            .internal_context("committing database transaction")?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -781,12 +778,12 @@ pub async fn report_delete(
         Scopes::REPORT_DELETE | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     let id = info.into_inner().0;
     let context = ImageContext::Report {
@@ -797,11 +794,11 @@ pub async fn report_delete(
         &mut transaction,
     )
     .await
-    .wrap_internal_err("fetching images from database")?;
+    .internal_context("fetching images from database")?;
     for image in uploaded_images {
         image_item::DBImage::remove(image.id, &mut transaction, &redis)
             .await
-            .wrap_internal_err("deleting image from database")?;
+            .internal_context("deleting image from database")?;
     }
 
     let result = crate::database::models::report_item::DBReport::remove_full(
@@ -809,15 +806,15 @@ pub async fn report_delete(
         &mut transaction,
     )
     .await
-    .wrap_internal_err("deleting report from database")?;
+    .internal_context("deleting report from database")?;
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }

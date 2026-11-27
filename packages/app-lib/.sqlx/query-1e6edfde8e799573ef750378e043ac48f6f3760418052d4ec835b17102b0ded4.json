@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT OR REPLACE INTO cache (id, data_type, alias, data, expires)\n                SELECT\n                    json_extract(value, '$.id') AS id,\n                    json_extract(value, '$.data_type') AS data_type,\n                    json_extract(value, '$.alias') AS alias,\n                    json_extract(value, '$.data') AS data,\n                    json_extract(value, '$.expires') AS expires\n                FROM\n                    json_each($1)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "1e6edfde8e799573ef750378e043ac48f6f3760418052d4ec835b17102b0ded4"
+}

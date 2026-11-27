@@ -1,13 +1,23 @@
+pub mod module;
 pub mod project;
 pub mod rule;
 pub mod run_response;
 mod schema_example;
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig<'_>) {
-    cfg.service(rule::list_rules)
+    cfg.service(module::list_modules)
+        .service(module::get_module)
+        .service(module::create_module)
+        .service(module::update_module)
+        .service(module::delete_module)
+        .service(rule::get_deployment)
+        .service(rule::deploy_staging)
+        .service(rule::deploy_run)
+        .service(rule::list_rules)
         .service(rule::get_rule_schema)
         .service(rule::list_runs)
         .service(rule::get_run_activity)
+        .service(rule::get_run)
         .service(rule::list_run_results)
         .service(rule::start_run)
         .service(rule::delete_run)
@@ -16,5 +26,6 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig<'_>) {
         .service(rule::update_rule)
         .service(rule::delete_rule)
         .service(rule::eval_rule)
-        .service(project::get_project_flags);
+        .service(project::get_project_flags)
+        .service(project::get_project_context);
 }

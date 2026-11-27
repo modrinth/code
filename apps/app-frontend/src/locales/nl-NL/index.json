@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "Gekopieerd"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "Details kopiëren"
-  },
   "app.action-bar.install.dismiss": {
     "message": "Sluiten"
   },
@@ -2909,9 +2906,6 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Back-ups van de app-database"
   },
-  "app.settings.resource-management.app-directory.description": {
-    "message": "Hier slaat de Modrinth-app instanties en andere bestanden op. Wijzigingen worden pas van kracht nadat de app opnieuw is opgestart."
-  },
   "app.settings.resource-management.app-directory.title": {
     "message": "App-folder"
   },
@@ -4040,20 +4034,8 @@
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "Voer Java-argumenten in…"
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "Aangepaste omgevingsvariabelen"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "Haakjes"
-  },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Aangepaste Java-argumenten"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Aangepaste Java-installatie"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "Aangepaste geheugentoewijzing"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "//pad/naar/java"

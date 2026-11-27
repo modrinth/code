@@ -4,7 +4,7 @@ use std::{
     path::PathBuf,
 };
 
-use eyre::{Result, WrapErr, ensure};
+use anyhow::{Result, Context, ensure};
 use modrinth_sandbox::{SandboxArg, SandboxCommand, SandboxEnv, SandboxStdio};
 use tracing::info;
 
@@ -31,7 +31,7 @@ async fn main() -> Result<()> {
 
     let env = SandboxEnv::new()
         .await
-        .wrap_err("creating sandbox environment")?;
+        .context("creating sandbox environment")?;
     info!("using environment {env:?}");
 
     let mut command = SandboxCommand::default();
@@ -52,7 +52,7 @@ async fn main() -> Result<()> {
     let mut child = env
         .spawn(command)
         .await
-        .wrap_err("spawning process in sandbox")?;
+        .context("spawning process in sandbox")?;
 
     let stdout = forward_pipe(
         child.stdout.take().expect("we set `stdout` to `Pipe`"),
@@ -66,16 +66,16 @@ async fn main() -> Result<()> {
     let status = child
         .wait()
         .await
-        .wrap_err("waiting for process in sandbox")?;
+        .context("waiting for process in sandbox")?;
 
     stdout
         .await
-        .wrap_err("joining stdout reader task")?
-        .wrap_err("forwarding sandboxed process stdout")?;
+        .context("joining stdout reader task")?
+        .context("forwarding sandboxed process stdout")?;
     stderr
         .await
-        .wrap_err("joining stderr reader task")?
-        .wrap_err("forwarding sandboxed process stderr")?;
+        .context("joining stderr reader task")?
+        .context("forwarding sandboxed process stderr")?;
 
     ensure!(status.success(), "sandboxed process exited with {status}");
 

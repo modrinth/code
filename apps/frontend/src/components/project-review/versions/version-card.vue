@@ -237,6 +237,24 @@
 												class="min-w-0 rounded-lg bg-surface-1 px-3 py-2"
 											>
 												<div class="flex min-w-0 flex-wrap items-center gap-3">
+													<Tooltip class="flex shrink-0">
+														<template #popper>
+															<ProjectStatusBadge
+																:status="context.project?.status ?? 'unknown'"
+																:style="{
+																	color: `var(--color-${getProjectStatusColor(context.project?.status ?? 'Unknown')})`,
+																}"
+															/>
+														</template>
+														<component
+															:is="getProjectStatusIcon(context.project?.status ?? 'Unknown')"
+															class="size-4 shrink-0"
+															:style="{
+																color: `var(--color-${getProjectStatusColor(context.project?.status ?? 'Unknown')})`,
+															}"
+															aria-hidden="true"
+														/>
+													</Tooltip>
 													<AutoLink
 														:to="dependencyHref(context)"
 														class="flex min-w-0 flex-1 items-center gap-3 text-contrast hover:underline"
@@ -327,13 +345,17 @@ import {
 	type ButtonMenuOption,
 	CopyCode,
 	type DependencyContext,
+	getProjectStatusColor,
+	getProjectStatusIcon,
 	injectModrinthClient,
 	injectTags,
 	Input,
 	ProjectPageDescription,
+	ProjectStatusBadge,
 	TagItem,
 	TagTagItem,
 	TeleportOverflowMenu,
+	Tooltip,
 	VersionChannelIndicator,
 } from '@modrinth/ui'
 import EnvironmentTags from '@modrinth/ui/src/components/project/EnvironmentTags.vue'

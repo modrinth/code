@@ -23,8 +23,8 @@ use crate::util::guards::external_notification_key_guard;
 use actix_web::http::StatusCode;
 use actix_web::web;
 use actix_web::{HttpRequest, HttpResponse, delete, post};
+use anyhow::anyhow;
 use ariadne::ids::UserId;
-use eyre::eyre;
 use lettre::message::Mailbox;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
@@ -156,20 +156,20 @@ async fn create_impl(
     let mut txn = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     if !DBUser::exists_many(&user_ids, &mut txn)
         .await
-        .wrap_internal_err("fetching users from database")?
+        .internal_context("fetching users from database")?
     {
-        return Err(ApiError::Request(eyre::eyre!(
+        return Err(ApiError::Request(anyhow!(
             "One of the specified users do not exist.".to_owned(),
         )));
     }
 
     // Skip users who already have an identical notification
     let body_value = serde_json::value::to_value(&body)
-        .wrap_request_err("serializing external notification body")?;
+        .request_context("serializing external notification body")?;
     let already_notified = sqlx::query!(
         "
         SELECT DISTINCT user_id
@@ -181,7 +181,7 @@ async fn create_impl(
     )
     .fetch_all(&mut txn)
     .await
-    .wrap_internal_err("fetching already notified from database")?
+    .internal_context("fetching already notified from database")?
     .into_iter()
     .map(|row| DBUserId(row.user_id))
     .collect::<std::collections::HashSet<_>>();
@@ -198,7 +198,7 @@ async fn create_impl(
         notification_builder
             .insert_many(notification_user_ids, &mut txn, &redis)
             .await
-            .wrap_internal_err("inserting notification IDs into database")?
+            .internal_context("inserting notification IDs into database")?
     } else {
         notification_builder
             .insert_many_without_delivery(
@@ -207,17 +207,17 @@ async fn create_impl(
                 &redis,
             )
             .await
-            .wrap_internal_err("inserting database records for `create_impl`")?
+            .internal_context("inserting database records for `create_impl`")?
     };
 
     let notifications =
         get_site_exposed_notifications(&notification_ids, &mut txn)
             .await
-            .wrap_api_err("fetching site exposed notifications")?;
+            .api_context("fetching site exposed notifications")?;
 
     txn.commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     broadcast_notifications(&redis, notifications).await;
 
@@ -225,12 +225,12 @@ async fn create_impl(
         let mut email_txn = pool
             .begin()
             .await
-            .wrap_internal_err("starting database transaction")?;
+            .internal_context("starting database transaction")?;
 
         let mut failed = HashMap::new();
         let users = DBUser::get_many_ids(&user_ids, &mut email_txn, &redis)
             .await
-            .wrap_internal_err("fetching users from database")?
+            .internal_context("fetching users from database")?
             .into_iter()
             .map(|user| (user.id, user))
             .collect::<HashMap<_, _>>();
@@ -272,7 +272,7 @@ async fn create_impl(
         email_txn
             .commit()
             .await
-            .wrap_internal_err("committing database transaction")?;
+            .internal_context("committing database transaction")?;
 
         let status = if failed
             .values()
@@ -311,13 +311,13 @@ pub async fn remove(
         notification_filter.into_inner();
 
     if user_ids.is_empty() {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "at least one user must be provided to remove notifications from"
         )));
     }
 
     if body.is_empty() {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "at least one `body` field must be provided to match notifications"
         )));
     }
@@ -332,17 +332,17 @@ pub async fn remove(
     let mut txn = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     DBNotification::remove_many_matching_body(
         &filters, &user_ids, &mut txn, &redis,
     )
     .await
-    .wrap_internal_err("deleting notifications from database")?;
+    .internal_context("deleting notifications from database")?;
 
     txn.commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     Ok(HttpResponse::NoContent().finish())
 }
@@ -376,10 +376,10 @@ pub async fn send_custom_email(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !user.scopes.contains(Scopes::ADMIN_WRITE) {
-        return Err(ApiError::Auth(eyre::eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "You do not have permission to send custom emails!",
         )));
     }
@@ -399,7 +399,7 @@ pub async fn send_custom_email(
     let mut txn = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     NotificationBuilder {
         body: NotificationBody::Custom {
@@ -410,11 +410,11 @@ pub async fn send_custom_email(
     }
     .insert_many(users, &mut txn, &redis)
     .await
-    .wrap_internal_err("inserting database records for `send_custom_email`")?;
+    .internal_context("inserting database records for `send_custom_email`")?;
 
     txn.commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     Ok(HttpResponse::Accepted().finish())
 }
@@ -436,14 +436,14 @@ async fn get_site_exposed_notifications(
     )
     .fetch_all(&mut *txn)
     .await
-    .wrap_internal_err("fetching exposed IDs from database")?
+    .internal_context("fetching exposed IDs from database")?
     .into_iter()
     .map(DBNotificationId)
     .collect::<Vec<_>>();
 
     Ok(DBNotification::get_many(&exposed_ids, txn)
         .await
-        .wrap_internal_err("fetching notifications from database")?
+        .internal_context("fetching notifications from database")?
         .into_iter()
         .map(Notification::from)
         .collect())

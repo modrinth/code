@@ -2,7 +2,7 @@
 
 use std::str::FromStr;
 
-use eyre::{Result, WrapErr, eyre};
+use anyhow::{Context, Result, anyhow};
 #[cfg(feature = "sentry")]
 use tracing::Level;
 use tracing::level_filters::LevelFilter;
@@ -65,7 +65,7 @@ pub fn init_with_config(compact: bool) -> Result<()> {
     let output_format = match env_var(OUTPUT_FORMAT_ENV_VAR) {
         Ok(format) => format
             .parse::<OutputFormat>()
-            .map_err(|_| eyre!("invalid output format '{format}'"))?,
+            .map_err(|_| anyhow!("invalid output format '{format}'"))?,
         Err(_) => OutputFormat::Human,
     };
 
@@ -116,16 +116,16 @@ pub fn init_with_config(compact: bool) -> Result<()> {
 
     registry
         .try_init()
-        .wrap_err("failed to initialize tracing registry")?;
+        .context("failed to initialize tracing registry")?;
 
     Ok(())
 }
 
 fn env_var(key: &str) -> Result<String> {
     let value = dotenvy::var(key)
-        .wrap_err_with(|| eyre!("missing environment variable `{key}`"))?;
+        .with_context(|| anyhow!("missing environment variable `{key}`"))?;
     if value.is_empty() {
-        Err(eyre!("environment variable `{key}` is empty"))
+        Err(anyhow!("environment variable `{key}` is empty"))
     } else {
         Ok(value)
     }

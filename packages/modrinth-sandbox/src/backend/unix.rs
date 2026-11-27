@@ -12,7 +12,7 @@ use std::{
 };
 
 use async_trait::async_trait;
-use eyre::{Context, Result};
+use anyhow::{Context, Result};
 use futures::FutureExt;
 
 use crate::{
@@ -127,7 +127,7 @@ pub fn spawn(
         stderr_write,
         &pass_fds,
     )
-    .wrap_err("preparing posix_spawn configuration")?;
+    .context("preparing posix_spawn configuration")?;
 
     // Read before forking so that the child doesn't need to allocate
     #[cfg(target_os = "linux")]
@@ -180,7 +180,7 @@ pub fn spawn(
     if double_fork {
         let mut status = 0 as libc::c_int;
         cvt_r(|| unsafe { libc::waitpid(child_pid, &raw mut status, 0) })?;
-        eyre::ensure!(
+        anyhow::ensure!(
             libc::WIFEXITED(status) && libc::WEXITSTATUS(status) == 0,
             "double fork failed in intermediate child"
         );
@@ -227,45 +227,45 @@ fn exec(
     pass_fds: &[OwnedFd],
     die_with_parent: bool,
     kernel_fd_limit: libc::rlim_t,
-) -> eyre::Result<()> {
+) -> anyhow::Result<()> {
     // `pass_fds` are unmarked again below
     mark_inherited_fds_cloexec(kernel_fd_limit);
 
     if let Some(mut fd) = stdin {
         if fd > 0 && fd <= libc::STDERR_FILENO {
             fd = cvt_r(|| unsafe { libc::dup(fd) })
-                .wrap_err("duplicating stdin fd")?;
+                .context("duplicating stdin fd")?;
         }
         cvt_r(|| unsafe { libc::dup2(fd, libc::STDIN_FILENO) })
-            .wrap_err("setting stdin fd")?;
+            .context("setting stdin fd")?;
     }
     if let Some(mut fd) = stdout {
         if fd > 0 && fd <= libc::STDERR_FILENO {
             fd = cvt_r(|| unsafe { libc::dup(fd) })
-                .wrap_err("duplicating stdout fd")?;
+                .context("duplicating stdout fd")?;
         }
         cvt_r(|| unsafe { libc::dup2(fd, libc::STDOUT_FILENO) })
-            .wrap_err("setting stdout fd")?;
+            .context("setting stdout fd")?;
     }
     if let Some(mut fd) = stderr {
         if fd > 0 && fd <= libc::STDERR_FILENO {
             fd = cvt_r(|| unsafe { libc::dup(fd) })
-                .wrap_err("duplicating stderr fd")?;
+                .context("duplicating stderr fd")?;
         }
         cvt_r(|| unsafe { libc::dup2(fd, libc::STDERR_FILENO) })
-            .wrap_err("setting stderr fd")?;
+            .context("setting stderr fd")?;
     }
 
     // Set working directory
     if let Some(workdir) = workdir {
         cvt_r(|| unsafe { libc::chdir(workdir) })
-            .wrap_err("setting working directory")?;
+            .context("setting working directory")?;
     }
 
     // Unset "close on exec" flag so fds are kept after the exec
     for fd in pass_fds {
         cvt_r(|| unsafe { libc::ioctl(fd.as_raw_fd(), libc::FIONCLEX) })
-            .wrap_err("unsetting close on exec")?;
+            .context("unsetting close on exec")?;
     }
 
     // Set PR_SET_PDEATHSIG to SIGKILL
@@ -274,7 +274,7 @@ fn exec(
         cvt_r(|| unsafe {
             libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL, 0, 0, 0)
         })
-        .wrap_err("setting PR_SET_PDEATHSIG")?;
+        .context("setting PR_SET_PDEATHSIG")?;
     }
 
     cvt(unsafe { libc::execve(program, argv, env) })?;
@@ -413,10 +413,10 @@ fn exec(
     spawn_config: &macos_posix_spawn::PosixSpawnConfig,
     sandbox_profile: CString,
     sandbox_params: RawStringVec,
-) -> eyre::Result<()> {
+) -> anyhow::Result<()> {
     if let Some(workdir) = workdir {
         cvt_r(|| unsafe { libc::chdir(workdir) })
-            .wrap_err("setting working directory")?;
+            .context("setting working directory")?;
     }
 
     let mut error_buf = std::ptr::null_mut();
@@ -435,13 +435,13 @@ fn exec(
         let error = unsafe { std::ffi::CStr::from_ptr(error_buf) };
         let error = error.to_string_lossy().to_string();
         unsafe { sandbox_free_error(error_buf) };
-        return Err(eyre::eyre!(error).wrap_err("setting up sandbox"));
+        return Err(anyhow::anyhow!(error).context("setting up sandbox"));
     }
 
-    eyre::ensure!(status_code == 0, "sandbox setup failed");
+    anyhow::ensure!(status_code == 0, "sandbox setup failed");
 
-    Err(eyre::eyre!(spawn_config.exec(program, argv, env))
-        .wrap_err("executing program"))
+    Err(anyhow::anyhow!(spawn_config.exec(program, argv, env))
+        .context("executing program"))
 }
 
 #[cfg(target_os = "macos")]
@@ -654,7 +654,7 @@ impl SandboxChildOp for UnixChild {
                 cvt_r(|| unsafe {
                     libc::waitpid(wait_for_pid, &raw mut status, 0)
                 })?;
-                eyre::Ok(status)
+                anyhow::Ok(status)
             })
         });
         let result = task.await;
@@ -733,7 +733,7 @@ impl std::fmt::Debug for UnixSandboxExitStatus {
     }
 }
 
-pub fn open_dev_null() -> eyre::Result<libc::c_int> {
+pub fn open_dev_null() -> anyhow::Result<libc::c_int> {
     Ok(unsafe { cvt(libc::open(c"/dev/null".as_ptr(), libc::O_RDWR))? })
 }
 

@@ -1,0 +1,65 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH old AS (\n              SELECT id, visibility, in_review, review_outcome\n              FROM mods\n              WHERE id = $2\n            ),\n            updated AS (\n              UPDATE mods\n              SET review_outcome = $1, in_review = FALSE\n              FROM threads t\n              WHERE\n                mods.id = $2\n                AND t.mod_id = mods.id\n              RETURNING mods.id, t.id AS thread_id\n            )\n            SELECT\n              updated.thread_id AS \"thread_id: DBThreadId\",\n              old.visibility AS \"old_visibility!\",\n              old.in_review AS \"old_in_review!\",\n              old.review_outcome AS \"old_review_outcome!\"\n            FROM updated\n            INNER JOIN old ON old.id = updated.id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "thread_id: DBThreadId",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "threads",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "old_visibility!",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "visibility"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "old_in_review!",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "in_review"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "old_review_outcome!",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "review_outcome"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "efd46cf24f6d768c7ae99f4ce2f9ad87466f34bd5071788dc21b11ae65984b4f"
+}

@@ -5,7 +5,7 @@ use std::{
     sync::Arc,
 };
 
-use eyre::{Context, ContextCompat, Result};
+use anyhow::{Context, Result};
 use libc::size_t;
 
 use crate::{
@@ -56,7 +56,7 @@ impl From<Option<SandboxExitStatus>> for ModrinthSandboxExitStatus {
 
 unsafe fn write_output<T>(out: *mut T, value: T, name: &str) -> Result<()> {
     let out = NonNull::new(out)
-        .wrap_err_with(|| format!("`{name}` must not be null"))?;
+        .with_context(|| format!("`{name}` must not be null"))?;
 
     // SAFETY: The caller guarantees that `out` points to valid, properly
     // aligned storage for one `T` and does not alias an active reference.
@@ -82,7 +82,7 @@ pub unsafe extern "C" fn modrinth_sandbox_child_id(
         // SAFETY: The function's safety contract requires `child` to point to
         // a live child for the duration of this call.
         let child =
-            unsafe { child.as_ref() }.wrap_err("`child` must not be null")?;
+            unsafe { child.as_ref() }.context("`child` must not be null")?;
         let id = child.inner.id().unwrap_or_default();
 
         // SAFETY: The function's safety contract requires `out_id` to point to
@@ -110,11 +110,11 @@ pub unsafe extern "C" fn modrinth_sandbox_child_try_wait(
         // SAFETY: The function's safety contract guarantees exclusive access
         // to a live child for the duration of this call.
         let child =
-            unsafe { child.as_mut() }.wrap_err("`child` must not be null")?;
+            unsafe { child.as_mut() }.context("`child` must not be null")?;
         let status = child
             .inner
             .try_wait()
-            .wrap_err("checking sandboxed child status")?;
+            .context("checking sandboxed child status")?;
 
         // SAFETY: The function's safety contract requires `out_status` to
         // point to valid, writable status storage.
@@ -139,11 +139,11 @@ pub unsafe extern "C" fn modrinth_sandbox_child_wait(
         // SAFETY: The function's safety contract guarantees exclusive access
         // to a live child for the duration of this call.
         let child =
-            unsafe { child.as_mut() }.wrap_err("`child` must not be null")?;
+            unsafe { child.as_mut() }.context("`child` must not be null")?;
         let rt = Arc::clone(&child.rt);
         let status = rt
             .block_on(child.inner.wait())
-            .wrap_err("waiting for sandboxed child")?;
+            .context("waiting for sandboxed child")?;
 
         // SAFETY: The function's safety contract requires `out_status` to
         // point to valid, writable status storage.
@@ -166,10 +166,10 @@ pub unsafe extern "C" fn modrinth_sandbox_child_kill(
         // SAFETY: The function's safety contract guarantees exclusive access
         // to a live child for the duration of this call.
         let child =
-            unsafe { child.as_mut() }.wrap_err("`child` must not be null")?;
+            unsafe { child.as_mut() }.context("`child` must not be null")?;
         let rt = Arc::clone(&child.rt);
         rt.block_on(child.inner.kill())
-            .wrap_err("killing sandboxed child")
+            .context("killing sandboxed child")
     })
 }
 
@@ -196,7 +196,7 @@ pub unsafe extern "C" fn modrinth_sandbox_child_take_stdin(
         try_return_optional(out_stdin, || {
             // SAFETY: The function's safety contract guarantees exclusive
             // access to a live child for the duration of this call.
-            let child = child.as_mut().wrap_err("`child` must not be null")?;
+            let child = child.as_mut().context("`child` must not be null")?;
             Ok(child
                 .inner
                 .stdin
@@ -229,7 +229,7 @@ pub unsafe extern "C" fn modrinth_sandbox_child_take_stdout(
         try_return_optional(out_stdout, || {
             // SAFETY: The function's safety contract guarantees exclusive
             // access to a live child for the duration of this call.
-            let child = child.as_mut().wrap_err("`child` must not be null")?;
+            let child = child.as_mut().context("`child` must not be null")?;
             Ok(child
                 .inner
                 .stdout
@@ -262,7 +262,7 @@ pub unsafe extern "C" fn modrinth_sandbox_child_take_stderr(
         try_return_optional(out_stderr, || {
             // SAFETY: The function's safety contract guarantees exclusive
             // access to a live child for the duration of this call.
-            let child = child.as_mut().wrap_err("`child` must not be null")?;
+            let child = child.as_mut().context("`child` must not be null")?;
             Ok(child
                 .inner
                 .stderr
@@ -295,11 +295,11 @@ pub unsafe extern "C" fn modrinth_sandbox_pipe_reader_read(
         // SAFETY: The function's safety contract guarantees exclusive access
         // to a live reader for the duration of this call.
         let reader =
-            unsafe { reader.as_mut() }.wrap_err("`reader` must not be null")?;
+            unsafe { reader.as_mut() }.context("`reader` must not be null")?;
         let buffer = if buffer_len == 0 {
             &mut []
         } else {
-            let buffer = NonNull::new(buffer).wrap_err(
+            let buffer = NonNull::new(buffer).context(
                 "`buffer` must not be null when `buffer_len` is nonzero",
             )?;
             // SAFETY: The function's safety contract guarantees that `buffer`
@@ -309,7 +309,7 @@ pub unsafe extern "C" fn modrinth_sandbox_pipe_reader_read(
         let read = reader
             .inner
             .read(buffer)
-            .wrap_err("reading child output pipe")?;
+            .context("reading child output pipe")?;
 
         // SAFETY: The function's safety contract requires `out_read` to point
         // to valid, writable storage for one `size_t`.
@@ -339,11 +339,11 @@ pub unsafe extern "C" fn modrinth_sandbox_pipe_writer_write(
         // SAFETY: The function's safety contract guarantees exclusive access
         // to a live writer for the duration of this call.
         let writer =
-            unsafe { writer.as_mut() }.wrap_err("`writer` must not be null")?;
+            unsafe { writer.as_mut() }.context("`writer` must not be null")?;
         let buffer = if buffer_len == 0 {
             &[]
         } else {
-            let buffer = NonNull::new(buffer.cast_mut()).wrap_err(
+            let buffer = NonNull::new(buffer.cast_mut()).context(
                 "`buffer` must not be null when `buffer_len` is nonzero",
             )?;
             // SAFETY: The function's safety contract guarantees that `buffer`
@@ -353,7 +353,7 @@ pub unsafe extern "C" fn modrinth_sandbox_pipe_writer_write(
         let written = writer
             .inner
             .write(buffer)
-            .wrap_err("writing child input pipe")?;
+            .context("writing child input pipe")?;
 
         // SAFETY: The function's safety contract requires `out_written` to
         // point to valid, writable storage for one `size_t`.
@@ -376,8 +376,8 @@ pub unsafe extern "C" fn modrinth_sandbox_pipe_writer_flush(
         // SAFETY: The function's safety contract guarantees exclusive access
         // to a live writer for the duration of this call.
         let writer =
-            unsafe { writer.as_mut() }.wrap_err("`writer` must not be null")?;
-        writer.inner.flush().wrap_err("flushing child input pipe")
+            unsafe { writer.as_mut() }.context("`writer` must not be null")?;
+        writer.inner.flush().context("flushing child input pipe")
     })
 }
 

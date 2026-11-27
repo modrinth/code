@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT visibility, in_review, review_outcome, slug\n        FROM mods\n        WHERE id = $1\n        FOR UPDATE\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "visibility",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "visibility"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "in_review",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "in_review"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "review_outcome",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "review_outcome"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "slug",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "slug"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "e2e1ca468494236b6d96e3a5ab8cec0235d7c0cdc5dee362081d7818630d4ca5"
+}

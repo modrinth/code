@@ -1,0 +1,41 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO project_flag_modules (name, script) VALUES ($1, $2) RETURNING name, script",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "name",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "project_flag_modules",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "script",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "project_flag_modules",
+            "name": "script"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "45f4dfdb56893cf73f140fd6028e3b4c25b4b4d148932dca3d5825c697589e7c"
+}

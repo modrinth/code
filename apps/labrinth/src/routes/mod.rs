@@ -12,6 +12,7 @@ use crate::util::error::{ApiContext, Context};
 use actix_files::Files;
 use actix_web::http::{StatusCode, header};
 use actix_web::{FromRequest, HttpRequest, HttpResponse, web};
+use anyhow::anyhow;
 use ariadne::ids::base62_impl::parse_base62;
 use futures::FutureExt;
 use std::collections::{HashMap, HashSet};
@@ -60,7 +61,7 @@ pub async fn resolve_refs(
     let mut redis = redis
         .connect()
         .await
-        .wrap_internal_err("connecting to Redis for project redirects")?;
+        .internal_context("connecting to Redis for project redirects")?;
     let keys = project_refs
         .iter()
         .map(|project_ref| {
@@ -70,7 +71,7 @@ pub async fn resolve_refs(
     let cached_targets = redis
         .get_many_deserialized::<Option<i64>>(&keys)
         .await
-        .wrap_internal_err("reading cached project redirects")?;
+        .internal_context("reading cached project redirects")?;
 
     let missing_refs = project_refs
         .iter()
@@ -112,7 +113,7 @@ pub async fn resolve_refs(
         )
         .fetch_all(pool)
         .await
-        .wrap_internal_err("looking up project redirects")?
+        .internal_context("looking up project redirects")?
         .into_iter()
         .map(|redirect| (redirect.project_ref, redirect.target_project_id))
         .collect::<HashMap<_, _>>()
@@ -133,7 +134,7 @@ pub async fn resolve_refs(
                     Some(PROJECT_REDIRECT_CACHE_TTL_SECONDS),
                 )
                 .await
-                .wrap_internal_err("caching project redirect")?;
+                .internal_context("caching project redirect")?;
             target_project_id
         };
         resolved.push(target_project_id.map(ProjectId::from));
@@ -174,7 +175,7 @@ pub async fn clear_project_redirect_cache(
     let mut redis = redis
         .connect()
         .await
-        .wrap_internal_err("connecting to Redis to clear project redirects")?;
+        .internal_context("connecting to Redis to clear project redirects")?;
     let keys = project_refs
         .iter()
         .map(|project_ref| {
@@ -184,7 +185,7 @@ pub async fn clear_project_redirect_cache(
     redis
         .delete_many(&keys)
         .await
-        .wrap_internal_err("clearing cached project redirects")?;
+        .internal_context("clearing cached project redirects")?;
 
     Ok(())
 }
@@ -223,7 +224,7 @@ async fn resolve_visible_refs_for_user(
         .collect::<Vec<_>>();
     let projects = DBProject::get_many(&target_refs, pool, redis)
         .await
-        .wrap_internal_err("fetching project redirect targets")?;
+        .internal_context("fetching project redirect targets")?;
     let visible_ids = filter_visible_project_ids(
         projects.iter().map(|project| &project.inner).collect(),
         user,
@@ -231,7 +232,7 @@ async fn resolve_visible_refs_for_user(
         false,
     )
     .await
-    .wrap_api_err("checking project redirect visibility")?
+    .api_context("checking project redirect visibility")?
     .into_iter()
     .map(ProjectId::from)
     .collect::<HashSet<_>>();
@@ -276,7 +277,7 @@ pub async fn redirect_query_refs(
         })
         .collect::<Vec<_>>();
     let canonical_refs = serde_json::to_string(&canonical_refs)
-        .wrap_internal_err("serializing redirected project references")?;
+        .internal_context("serializing redirected project references")?;
     let mut query = url::form_urlencoded::Serializer::new(String::new());
     for (name, value) in
         url::form_urlencoded::parse(req.query_string().as_bytes())
@@ -362,7 +363,7 @@ pub async fn redirect_ref(
         web::Path::<Vec<String>>::extract(req)
             .await
             .map_err(|err| {
-                ApiError::Request(eyre::eyre!(
+                ApiError::Request(anyhow!(
                     "decoding project redirect path: {err}"
                 ))
             })?;
@@ -556,55 +557,55 @@ pub fn public_config(cfg: &mut web::ServiceConfig) {
 pub enum ApiError {
     /// Error occurred on the server side, which the caller has no fault in.
     #[error(transparent)]
-    Internal(eyre::Report),
+    Internal(anyhow::Error),
     /// Caller made an invalid or malformed request.
     #[error(transparent)]
-    Request(eyre::Report),
+    Request(anyhow::Error),
     /// Caller attempted a request which they are not allowed to make.
     #[error(transparent)]
-    Auth(eyre::Report),
+    Auth(anyhow::Error),
     /// The requested resource does not exist.
     #[error(transparent)]
-    NotFound(eyre::Report),
+    NotFound(anyhow::Error),
     /// The request conflicts with the current state of the resource.
     #[error(transparent)]
-    Conflict(eyre::Report),
+    Conflict(anyhow::Error),
     /// A service dependency failed to complete the request.
     #[error(transparent)]
-    FailedDependency(eyre::Report),
+    FailedDependency(anyhow::Error),
     /// The request requires a precondition.
     #[error(transparent)]
-    PreconditionRequired(eyre::Report),
+    PreconditionRequired(anyhow::Error),
     /// A request precondition was not met.
     #[error(transparent)]
-    PreconditionFailed(eyre::Report),
+    PreconditionFailed(anyhow::Error),
     /// The caller exceeded a request rate limit.
     #[error(transparent)]
-    RateLimit(eyre::Report),
+    RateLimit(anyhow::Error),
 }
 
 impl ApiError {
     /// Adds context to the contained report while preserving the HTTP status.
-    pub(crate) fn wrap_err<D>(self, msg: D) -> Self
+    pub(crate) fn context<D>(self, msg: D) -> Self
     where
         D: Send + Sync + std::fmt::Debug + std::fmt::Display + 'static,
     {
         match self {
-            Self::Internal(report) => Self::Internal(report.wrap_err(msg)),
-            Self::Request(report) => Self::Request(report.wrap_err(msg)),
-            Self::Auth(report) => Self::Auth(report.wrap_err(msg)),
-            Self::NotFound(report) => Self::NotFound(report.wrap_err(msg)),
-            Self::Conflict(report) => Self::Conflict(report.wrap_err(msg)),
+            Self::Internal(report) => Self::Internal(report.context(msg)),
+            Self::Request(report) => Self::Request(report.context(msg)),
+            Self::Auth(report) => Self::Auth(report.context(msg)),
+            Self::NotFound(report) => Self::NotFound(report.context(msg)),
+            Self::Conflict(report) => Self::Conflict(report.context(msg)),
             Self::FailedDependency(report) => {
-                Self::FailedDependency(report.wrap_err(msg))
+                Self::FailedDependency(report.context(msg))
             }
             Self::PreconditionRequired(report) => {
-                Self::PreconditionRequired(report.wrap_err(msg))
+                Self::PreconditionRequired(report.context(msg))
             }
             Self::PreconditionFailed(report) => {
-                Self::PreconditionFailed(report.wrap_err(msg))
+                Self::PreconditionFailed(report.context(msg))
             }
-            Self::RateLimit(report) => Self::RateLimit(report.wrap_err(msg)),
+            Self::RateLimit(report) => Self::RateLimit(report.context(msg)),
         }
     }
 
@@ -705,12 +706,13 @@ mod tests {
     use crate::auth::AuthenticationError;
     use actix_web::ResponseError;
     use actix_web::http::StatusCode;
+    use anyhow::anyhow;
 
     #[test]
     fn api_error_reports_locked_account_as_forbidden() {
         let error = ApiError::Auth(
-            eyre::Report::new(AuthenticationError::AccountLocked)
-                .wrap_err("authenticating API request"),
+            anyhow::Error::new(AuthenticationError::AccountLocked)
+                .context("authenticating API request"),
         );
 
         assert_eq!(error.status_code(), StatusCode::FORBIDDEN);
@@ -724,9 +726,9 @@ mod tests {
         let result: Result<(), AuthenticationError> =
             Err(AuthenticationError::PrivilegedTokenExpired);
         let error = result
-            .wrap_api_err("checking privileged token age")
+            .api_context("checking privileged token age")
             .unwrap_err()
-            .wrap_err("performing sensitive action");
+            .context("performing sensitive action");
 
         assert_eq!(error.status_code(), StatusCode::UNAUTHORIZED);
         assert_eq!(error.error_response().status(), StatusCode::UNAUTHORIZED);
@@ -741,9 +743,9 @@ mod tests {
     #[test]
     fn api_error_serializes_source_chain_as_details() {
         let error = ApiError::Request(
-            eyre::eyre!("root cause")
-                .wrap_err("intermediate context")
-                .wrap_err("request failed"),
+            anyhow!("root cause")
+                .context("intermediate context")
+                .context("request failed"),
         );
 
         let response = error.as_api_error();

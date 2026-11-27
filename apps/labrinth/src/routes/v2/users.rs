@@ -56,7 +56,7 @@ pub async fn user_auth_get(
     let response = v3::users::user_auth_get(req, pool, redis, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)
-        .wrap_api_err("flattening v2 not-found response")?;
+        .api_context("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<User>(response).await {
@@ -100,7 +100,7 @@ pub async fn users_get(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<User>>(response).await {
@@ -141,7 +141,7 @@ pub async fn user_get(
     let response = v3::users::user_get(req, info, pool, redis, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)
-        .wrap_api_err("flattening v2 not-found response")?;
+        .api_context("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<User>(response).await {
@@ -187,7 +187,7 @@ pub async fn projects_list(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
 
     // Convert to V2 projects
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
@@ -195,9 +195,7 @@ pub async fn projects_list(
             let legacy_projects =
                 LegacyProject::from_many(project, &pool, &redis)
                     .await
-                    .wrap_internal_err(
-                        "executing `LegacyProject::from_many`",
-                    )?;
+                    .internal_context("executing `LegacyProject::from_many`")?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -459,7 +457,7 @@ pub async fn user_follows(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
 
     // Convert to V2 projects
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
@@ -467,9 +465,7 @@ pub async fn user_follows(
             let legacy_projects =
                 LegacyProject::from_many(project, &pool, &redis)
                     .await
-                    .wrap_internal_err(
-                        "executing `LegacyProject::from_many`",
-                    )?;
+                    .internal_context("executing `LegacyProject::from_many`")?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -510,7 +506,7 @@ pub async fn user_notifications(
         v3::users::user_notifications(req, info, pool, redis, session_queue)
             .await
             .or_else(v2_reroute::flatten_404_error)
-            .wrap_api_err("flattening v2 not-found response")?;
+            .api_context("flattening v2 not-found response")?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Notification>>(response).await {
         Ok(notifications) => {

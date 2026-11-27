@@ -67,6 +67,7 @@ import { LauncherMetaManifestV0Module } from './launcher-meta/v0'
 import { MclogsInsightsV1Module } from './mclogs/insights/v1'
 import { MclogsLogsV1Module } from './mclogs/logs/v1'
 import { PaperVersionsV3Module } from './paper/v3'
+import { PastePastesV0Module } from './paste/pastes/v0'
 import { PurpurVersionsV2Module } from './purpur/v2'
 import { SharedInstancesInstancesV1Module } from './shared-instances/instances/v1'
 import { SharedInstancesInvitesV1Module } from './shared-instances/invites/v1'
@@ -153,6 +154,7 @@ export const MODULE_REGISTRY = {
 	labrinth_versions_v2: LabrinthVersionsV2Module,
 	labrinth_versions_v3: LabrinthVersionsV3Module,
 	paper_versions_v3: PaperVersionsV3Module,
+	paste_pastes_v0: PastePastesV0Module,
 	purpur_versions_v2: PurpurVersionsV2Module,
 	sharedinstances_invites_v1: SharedInstancesInvitesV1Module,
 	sharedinstances_instances_v1: SharedInstancesInstancesV1Module,

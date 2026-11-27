@@ -1,6 +1,6 @@
 use std::path::{Component, Path, PathBuf};
 
-use eyre::{Result, bail, eyre};
+use anyhow::{Result, bail, anyhow};
 
 /// Types which Windows or a common runtime executes, installs or imports when
 /// they are opened.
@@ -300,7 +300,7 @@ impl PathRules {
     ) -> Result<PathPermission> {
         let resolved = resolve_existing(path)
             .map(normalize_path)
-            .ok_or_else(|| eyre!("unable to resolve path {path:?}"))?;
+            .ok_or_else(|| anyhow!("unable to resolve path {path:?}"))?;
 
         let given = normalize_path(path.to_path_buf());
 

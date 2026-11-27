@@ -1,6 +1,6 @@
 use std::{ffi::OsString, ptr::NonNull};
 
-use eyre::ContextCompat;
+use anyhow::Context;
 
 use super::{op::try_do, str::ModrinthSandboxStringSlice};
 
@@ -25,7 +25,7 @@ pub unsafe extern "C" fn modrinth_sandbox_helper_run_default(
 ) -> bool {
     try_do(|| {
         let out_handled = NonNull::new(out_handled)
-            .wrap_err("`out_handled` must not be null")?;
+            .context("`out_handled` must not be null")?;
 
         // SAFETY: The caller guarantees valid, writable storage for one bool.
         unsafe { out_handled.write(false) };
@@ -61,7 +61,7 @@ pub unsafe extern "C" fn modrinth_sandbox_helper_run_with_args(
 ) -> bool {
     try_do(|| {
         let out_handled = NonNull::new(out_handled)
-            .wrap_err("`out_handled` must not be null")?;
+            .context("`out_handled` must not be null")?;
 
         // SAFETY: The caller guarantees valid, writable storage for one bool.
         unsafe { out_handled.write(false) };

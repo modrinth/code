@@ -4,7 +4,7 @@ use std::{
     sync::Mutex,
 };
 
-use eyre::ContextCompat;
+use anyhow::Context;
 use libc::size_t;
 
 static LAST_ERROR: Mutex<Option<String>> = Mutex::new(None);
@@ -49,7 +49,7 @@ pub unsafe extern "C" fn modrinth_sandbox_get_last_error(
 ///
 /// If `f` returns [`Err`], this returns `false` and sets the last error to
 /// the error message.
-pub fn try_do(f: impl FnOnce() -> eyre::Result<()>) -> bool {
+pub fn try_do(f: impl FnOnce() -> anyhow::Result<()>) -> bool {
     *LAST_ERROR.lock().expect("should never be poisoned") = None;
     match f() {
         Ok(()) => true,
@@ -70,11 +70,11 @@ pub fn try_do(f: impl FnOnce() -> eyre::Result<()>) -> bool {
 /// leaked by overwriting it.
 pub unsafe fn try_return<R>(
     out: *mut *mut R,
-    f: impl FnOnce() -> eyre::Result<R>,
+    f: impl FnOnce() -> anyhow::Result<R>,
 ) -> bool {
     try_do(move || {
         let out = NonNull::new(out)
-            .wrap_err("out parameter value must not be null")?;
+            .context("out parameter value must not be null")?;
 
         // SAFETY: The caller guarantees that `out` points to valid, writable
         // storage for one pointer. Writing null establishes the failure state
@@ -108,11 +108,11 @@ pub unsafe fn try_return<R>(
 /// leaked by overwriting it.
 pub unsafe fn try_return_optional<R>(
     out: *mut *mut R,
-    f: impl FnOnce() -> eyre::Result<Option<R>>,
+    f: impl FnOnce() -> anyhow::Result<Option<R>>,
 ) -> bool {
     try_do(move || {
         let out = NonNull::new(out)
-            .wrap_err("out parameter value must not be null")?;
+            .context("out parameter value must not be null")?;
 
         // SAFETY: The caller guarantees that `out` points to valid, writable
         // storage for one pointer. Writing null represents both the initial

@@ -12,6 +12,12 @@ use std::path::PathBuf;
 
 pub type InstallModpackPreview = CreatePackInstance;
 
+#[derive(Serialize, Clone, Debug)]
+pub struct InstallJobSupportDetails {
+    pub details: String,
+    pub finished_modified: Option<i64>,
+}
+
 /// Everything about a job except its request, which is stored separately
 /// because it can be several megabytes and is only needed to run the job.
 #[derive(Serialize, Deserialize, Clone, Debug)]

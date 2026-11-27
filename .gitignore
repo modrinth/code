@@ -70,6 +70,11 @@ generated
 !apps/app-frontend/src/generated/app-events/postcard/package.json
 .env
 
+# Nix development environment
+/.devenv/
+/.direnv/
+/result
+
 # app testing dir
 app-playground-data/*
 

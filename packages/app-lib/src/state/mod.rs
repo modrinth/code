@@ -228,6 +228,14 @@ impl State {
                 tracing::error!("Error migrating legacy instance icons: {e}");
             }
 
+            tokio::spawn(async move {
+                if let Err(error) =
+                    crate::launcher::refresh_installed_version_info(state).await
+                {
+                    tracing::error!("Failed to refresh version info: {error}");
+                }
+            });
+
             let res = tokio::try_join!(
                 state.presence.discord_rpc.clear_to_default(
                     true,

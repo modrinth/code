@@ -1,4 +1,4 @@
-use eyre::{Context, Result, bail};
+use anyhow::{Context, Result, bail};
 
 use crate::ffi::{
     op::{free, try_return},
@@ -68,50 +68,50 @@ pub unsafe extern "C" fn modrinth_sandbox_prepare_command(
             let executable = command_view
                 .executable
                 .try_to_owned()
-                .wrap_err("converting `executable`")?;
+                .context("converting `executable`")?;
             let args = command_view
                 .args
                 .try_to_owned()
-                .wrap_err("converting `args`")?;
+                .context("converting `args`")?;
             let ensure_dirs_exist = command_view
                 .ensure_dirs_exist
                 .try_to_owned()
-                .wrap_err("converting `ensure_dirs_exist`")?;
+                .context("converting `ensure_dirs_exist`")?;
             let read_only_paths = command_view
                 .read_only_paths
                 .try_to_owned()
-                .wrap_err("converting `read_only_paths`")?;
+                .context("converting `read_only_paths`")?;
             let read_write_paths = command_view
                 .read_write_paths
                 .try_to_owned()
-                .wrap_err("converting `read_write_paths`")?;
+                .context("converting `read_write_paths`")?;
             let working_directory = command_view
                 .working_directory
                 .try_to_owned()
-                .wrap_err("converting `working_directory`")?;
+                .context("converting `working_directory`")?;
             let passthrough_environment = command_view
                 .passthrough_environment
                 .try_to_owned()
-                .wrap_err("converting `passthrough_environment`")?;
+                .context("converting `passthrough_environment`")?;
             let extra_environment = command_view
                 .extra_environment
                 .try_to_owned()
-                .wrap_err("converting `extra_environment`")?;
+                .context("converting `extra_environment`")?;
             let app_container_name = command_view
                 .app_container_name
                 .try_to_owned()
-                .wrap_err("converting `app_container_name`")?;
+                .context("converting `app_container_name`")?;
             let app_container_description = command_view
                 .app_container_description
                 .try_to_owned()
-                .wrap_err("converting `app_container_description`")?;
+                .context("converting `app_container_description`")?;
 
             let stdin = stdio(command_view.child_stdin)
-                .wrap_err("converting `child_stdin`")?;
+                .context("converting `child_stdin`")?;
             let stdout = stdio(command_view.child_stdout)
-                .wrap_err("converting `child_stdout`")?;
+                .context("converting `child_stdout`")?;
             let stderr = stdio(command_view.child_stderr)
-                .wrap_err("converting `child_stderr`")?;
+                .context("converting `child_stderr`")?;
 
             let command = crate::SandboxCommand {
                 executable: executable.as_ref().into(),

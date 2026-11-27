@@ -7,7 +7,7 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-use eyre::{Context, OptionExt, Result, ensure};
+use anyhow::{Context, Result, ensure};
 use rand::Rng;
 use sha1::{Digest, Sha1};
 
@@ -288,7 +288,7 @@ pub async fn setup_minecraft_command(
     minecraft: MinecraftCommand,
 ) -> Result<SandboxCommand> {
     let Ok(instance_path) = minecraft.instance_path.canonicalize() else {
-        return Err(eyre::eyre!("Instance path could not be canonicalized"));
+        return Err(anyhow::anyhow!("Instance path could not be canonicalized"));
     };
 
     let java_path = {
@@ -392,7 +392,7 @@ pub async fn setup_minecraft_command(
             include_bytes!(concat!(env!("OUT_DIR"), "/SandboxAgent.jar"));
 
         let launcher_files_dir =
-            minecraft.launcher_files_dir.clone().ok_or_eyre(
+            minecraft.launcher_files_dir.clone().context(
                 "launcher_files_dir must be set to use the sandbox API",
             )?;
         let sandbox_agent_path = tokio::task::spawn_blocking(move || {
@@ -554,7 +554,7 @@ pub fn create_launcher_jar(
     let path = dir.join(format!("{prefix}{}.jar", hex::encode(hash_bytes)));
 
     fs::create_dir_all(dir)
-        .wrap_err_with(|| format!("creating {}", dir.display()))?;
+        .with_context(|| format!("creating {}", dir.display()))?;
 
     if let Err(err) = remove_old_launcher_jars(dir, &prefix, &path) {
         tracing::warn!("failed to remove old jars from {dir:?}: {err}");
@@ -634,7 +634,7 @@ fn remove_old_launcher_jars(
     Ok(())
 }
 
-fn check_sha1_hash(path: &Path, expected_hash: &[u8]) -> eyre::Result<bool> {
+fn check_sha1_hash(path: &Path, expected_hash: &[u8]) -> anyhow::Result<bool> {
     let contents = match fs::read(path) {
         Err(err) if err.kind() == ErrorKind::NotFound => {
             return Ok(false);

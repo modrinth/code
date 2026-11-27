@@ -1,11 +1,11 @@
 <script setup>
 import {
 	CheckIcon,
-	CopyIcon,
 	DropdownIcon,
 	FolderOpenIcon,
 	HammerIcon,
 	LogInIcon,
+	TextSearchIcon,
 	UpdatedIcon,
 	WrenchIcon,
 	XIcon,
@@ -15,7 +15,6 @@ import {
 	ButtonLink,
 	Collapsible,
 	defineMessages,
-	IconButton,
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
@@ -29,11 +28,22 @@ import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { install_existing_instance } from '@/helpers/install'
 import { cancel_directory_change } from '@/helpers/settings.ts'
 import { showAppDbBackupsFolder } from '@/helpers/utils.js'
+import { openExternalUrl } from '@/platform/external-links'
+import { useCopyAsPaste } from '@/shared/composables/use-copy-as-paste'
 
 const { handleError } = injectNotificationManager()
+const copyAsPaste = useCopyAsPaste()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	inspectDebugInfo: {
+		id: 'app.error.inspect-debug-info',
+		defaultMessage: 'Inspect debug info',
+	},
+	copiedDebugInfo: {
+		id: 'app.error.copied-debug-info',
+		defaultMessage: 'Copied',
+	},
 	openBackupsFolder: {
 		id: 'app.error.state-init.open-backups-folder',
 		defaultMessage: 'Open backups folder',
@@ -159,9 +169,16 @@ const hasDebugInfo = computed(
 const debugInfo = computed(() => error.value.message ?? error.value ?? 'No error message.')
 
 const copied = ref(false)
+const copying = ref(false)
 
-async function copyToClipboard(text) {
-	await navigator.clipboard.writeText(text)
+async function inspectDebugInfo(text) {
+	copying.value = true
+	try {
+		const url = await copyAsPaste(text)
+		if (url) await openExternalUrl(url)
+	} finally {
+		copying.value = false
+	}
 	copied.value = true
 	setTimeout(() => {
 		copied.value = false
@@ -316,9 +333,7 @@ async function copyToClipboard(text) {
 							/>
 						</button>
 						<Collapsible :collapsed="errorCollapsed">
-							<div
-								class="p-3 bg-surface-2 rounded-2xl text-xs grid grid-cols-[1fr_auto] max-w-full items-start"
-							>
+							<div class="p-3 bg-surface-2 rounded-2xl text-xs flex flex-col gap-3 max-w-full">
 								<div
 									class="m-0 p-0 rounded-none bg-transparent text-sm font-mono break-words overflow-auto"
 								>
@@ -328,15 +343,17 @@ async function copyToClipboard(text) {
 										{{ formatMessage(messages.openBackupsFolder) }}
 									</button>
 								</div>
-								<IconButton
-									v-tooltip="'Copy debug info'"
-									:label="'Copy debug info'"
-									:disabled="copied"
-									@click="copyToClipboard(debugInfo)"
+								<Button
+									type="outlined"
+									size="xs"
+									class="w-fit"
+									:disabled="copied || copying"
+									@click="inspectDebugInfo(debugInfo)"
 								>
-									<template v-if="copied"> <CheckIcon class="text-green" /> </template>
-									<template v-else> <CopyIcon /> </template>
-								</IconButton>
+									<CheckIcon v-if="copied" />
+									<TextSearchIcon v-else />
+									{{ formatMessage(copied ? messages.copiedDebugInfo : messages.inspectDebugInfo) }}
+								</Button>
 							</div>
 						</Collapsible>
 					</div>

@@ -7,7 +7,7 @@ type TextField = 'name' | 'slug' | 'summary' | 'description'
 const limits: Record<TextField, { min: number; max: number }> = {
 	name: { min: 3, max: 64 },
 	slug: { min: 3, max: 64 },
-	summary: { min: 3, max: 256 },
+	summary: { min: 0, max: 256 },
 	description: { min: 0, max: 65536 },
 }
 

@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "Copiado"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "Copiar detalhes"
-  },
   "app.action-bar.install.dismiss": {
     "message": "Dispensar"
   },
@@ -1189,9 +1186,6 @@
   },
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Cópias de segurança da base de dados das aplicações"
-  },
-  "app.settings.resource-management.app-directory.description": {
-    "message": "Local onde a aplicação Modrinth armazena instâncias e outros ficheiros. As alterações entram em vigor após o reinício da aplicação."
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Diretório de aplicações"

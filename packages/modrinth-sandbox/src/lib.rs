@@ -17,7 +17,7 @@ use std::{
 };
 
 use derive_more::Debug;
-use eyre::Result;
+use anyhow::Result;
 
 pub use backend::SandboxExitStatus;
 pub use path_access::{PathPermission, PathRule};
@@ -378,7 +378,7 @@ impl SandboxHandle {
         &self,
         path: &Path,
         permission: PathPermission,
-    ) -> eyre::Result<ExposedPath> {
+    ) -> anyhow::Result<ExposedPath> {
         self.imp.expose_path(path, permission)
     }
 

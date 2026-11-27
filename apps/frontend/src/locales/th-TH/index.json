@@ -359,6 +359,9 @@
   "analytics.stat.revenue": {
     "message": "รายได้"
   },
+  "analytics.threshold.project-versions-above": {
+    "message": ""
+  },
   "app-marketing.download.description": {
     "message": "แอปเดสก์ท็อปของเราพร้อมใช้งานบนทุกแพลตฟอร์ม เลือกเวอร์ชันที่คุณต้องการได้เลย"
   },

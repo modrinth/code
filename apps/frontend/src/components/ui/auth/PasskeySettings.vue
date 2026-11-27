@@ -70,12 +70,7 @@
 							<IconButton
 								v-tooltip="formatMessage(messages.deletePasskeyButton)"
 								:label="formatMessage(messages.deletePasskeyButton)"
-								@click="
-									() => {
-										passkeyToRemove = passkey
-										removePasskeyModal?.show()
-									}
-								"
+								@click="confirmRemovePasskey(passkey)"
 							>
 								<TrashIcon />
 							</IconButton>
@@ -218,7 +213,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
+import { ensurePrivileged, isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
 import { createPasskeyCredential } from '~/helpers/passkey.ts'
 
 const { labrinth } = injectModrinthClient()
@@ -416,6 +411,12 @@ async function renamePasskey() {
 		notifyError(err)
 	}
 	stopLoading()
+}
+
+async function confirmRemovePasskey(passkey: Labrinth.Auth.v2.Passkey) {
+	if (!(await ensurePrivileged())) return
+	passkeyToRemove.value = passkey
+	removePasskeyModal.value?.show()
 }
 
 async function removePasskey() {

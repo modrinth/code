@@ -120,6 +120,26 @@
 				</div>
 			</div>
 			<div class="flex items-center gap-1">
+				<template v-if="settings.get(moderationSettings.General.ShowProjectReviewTimer)">
+					<span class="text-xs font-medium">
+						<span> Reviewing for </span>
+						<span
+							class="tabular-nums"
+							:class="
+								getClassForWarning(
+									secondsSinceLastUpdate,
+									settings.get(moderationSettings.General.ProjectReviewTimerWarning),
+								)
+							"
+						>
+							{{ secondsSinceLastUpdate < 0 ? '-' : ''
+							}}{{ (Math.abs(secondsSinceLastUpdate) / 60).toFixed(0).padStart(2, '0') }}:{{
+								(Math.abs(secondsSinceLastUpdate) % 60).toFixed(0).padStart(2, '0')
+							}}
+						</span>
+					</span>
+					<span class="mx-1.5 h-5 w-px bg-divider" aria-hidden="true" />
+				</template>
 				<Tooltip :delay="750">
 					<template #popper>
 						<div class="flex items-center gap-2">
@@ -217,6 +237,7 @@ import {
 	type TabbedModalTab,
 	Tooltip,
 } from '@modrinth/ui'
+import { useNow } from '@vueuse/core'
 import { computed, ref } from 'vue'
 
 import ModerationAppearance from '~/components/ui/moderation/settings/ModerationAppearance.vue'
@@ -333,6 +354,17 @@ const queueColumns = computed(() => {
 		},
 	]
 })
+const now = useNow({ interval: 1000 })
+const secondsSinceLastUpdate = computed(() =>
+	Math.ceil((now.value.getTime() - queue.currentQueue.lastUpdated.getTime()) / 1000),
+)
+
+function getClassForWarning(seconds: number, cutoff: number) {
+	if (cutoff <= 0) return 'text-primary'
+	if (seconds > cutoff) return 'text-red'
+	if (seconds > cutoff / 2) return 'text-orange'
+	return 'text-primary'
+}
 
 function runPanelAction(action: () => void, hide: () => void) {
 	action()

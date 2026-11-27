@@ -15,10 +15,13 @@ on:
 env:
   pnpm_config_color: always
 
+permissions: {}
+
 jobs:
   metadata:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: namespace-profile-tiny-arm64
+    permissions: {}
     outputs:
       branch-alias: ${{ steps.meta.outputs.branch_alias }}
     steps:
@@ -29,8 +32,14 @@ jobs:
   deploy:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
     needs: metadata
-    uses: ./.github/workflows/frontend-deploy.yml
-    secrets: inherit
+    uses: $/.github/workflows/frontend-deploy.yml
+    permissions:
+      contents: read
+      deployments: write
+      pull-requests: write
+    secrets:
+      CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+      CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-deploy
       cancel-in-progress: true
@@ -58,6 +67,7 @@ jobs:
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
+          package-manager-cache: false
 
       - name: Enable Corepack
         run: corepack enable

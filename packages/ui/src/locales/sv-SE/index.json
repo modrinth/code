@@ -2,6 +2,15 @@
   "action.no-permission": {
     "defaultMessage": "Du har inte behörighet."
   },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "defaultMessage": "Granskar..."
+  },
+  "app.instance.share.members.empty": {
+    "defaultMessage": "Inga användare har anslutit än"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "defaultMessage": "Ingen användare matchade dina filter."
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Kunde inte ladda in serverinställningar"
   },
@@ -20,8 +29,14 @@
   "badge.release": {
     "defaultMessage": "Utgåva"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Lägg till betalningsmetod"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Avbryt"
+  },
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "Ändra"
   },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Du är på väg att återprenumerera till <server-name>{serverName}</server-name>. Din prenumeration kommer återaktiveras och din server kommer fortsätta köra utan avbrott."
@@ -35,8 +50,23 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Kunde inte att ladda in prenumerationsdetaljer."
   },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Anpassad"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Stor"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Medium"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Liten"
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Återprenumerera"
+  },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Skatt"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Tillämpa sparade preferenser"
@@ -109,6 +139,9 @@
   },
   "button.close": {
     "defaultMessage": "Stäng"
+  },
+  "button.confirm": {
+    "defaultMessage": "Bekräfta"
   },
   "button.continue": {
     "defaultMessage": "Fortsätt"
@@ -353,6 +386,21 @@
   "content.confirm-disable.header": {
     "defaultMessage": "Inaktivera {itemType}"
   },
+  "content.confirm-environment.disable-player-title": {
+    "defaultMessage": "Inaktivera för spelare?"
+  },
+  "content.confirm-environment.disable-server-title": {
+    "defaultMessage": "Inaktivera för din server?"
+  },
+  "content.confirm-environment.player-title": {
+    "defaultMessage": "Aktivera för spelare?"
+  },
+  "content.confirm-environment.server-title": {
+    "defaultMessage": "Aktivera för din server?"
+  },
+  "content.confirm-environment.singleplayer-body": {
+    "defaultMessage": "{project} är menat för enspelarläge. Aktiverar du det på din server kan det orsaka problem eller förhindra din server från att starta."
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Nedgradering} other {Uppdatering}} kan orsaka kompatibilitetsproblem. Moddar eller innehåll du själv lagt till kommer behållas, men är kanske inte kompatibel med den nya versionen."
   },
@@ -422,6 +470,12 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} tillagd"
   },
+  "content.diff-modal.config-file-count": {
+    "defaultMessage": "{count, plural, one {# konfigurations fil} other {# konfigurations filer}}"
+  },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Konfigurera filer"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Lade till (beroende)"
   },
@@ -454,6 +508,9 @@
   },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Installera ändå"
+  },
+  "content.diff-modal.instance-folder": {
+    "defaultMessage": "Instans-mapp"
   },
   "content.diff-modal.loader-updated": {
     "defaultMessage": "Loader"
@@ -490,6 +547,27 @@
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} uppdaterade"
+  },
+  "content.enabled-for.label": {
+    "defaultMessage": "Aktivera för"
+  },
+  "content.enabled-for.player": {
+    "defaultMessage": "Spelare"
+  },
+  "content.enabled-for.please-wait": {
+    "defaultMessage": "Vänligen vänta"
+  },
+  "content.enabled-for.server": {
+    "defaultMessage": "Server"
+  },
+  "content.enabled-for.server-and-player": {
+    "defaultMessage": "Server och spelare"
+  },
+  "content.enabled-for.server-only-filter": {
+    "defaultMessage": "Endast server"
+  },
+  "content.enabled-for.server-tooltip": {
+    "defaultMessage": "Installera innehållet på din server."
   },
   "content.filter.disabled": {
     "defaultMessage": "Inaktiverat"
@@ -598,6 +676,9 @@
   },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Klientinnehåll endast"
+  },
+  "content.metadata-filter.warning.compatibility-unknown": {
+    "defaultMessage": "Okänd kompatibilitet"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Varningar"
@@ -742,6 +823,18 @@
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Initiera server"
+  },
+  "creation-flow.curseforge.change-button": {
+    "defaultMessage": "Ändra"
+  },
+  "creation-flow.curseforge.lookup-failed": {
+    "defaultMessage": "Vi kunde inte nå CurseForge. Vänligen försök igen."
+  },
+  "creation-flow.curseforge.minecraft-version": {
+    "defaultMessage": "Minecraft {version}"
+  },
+  "creation-flow.curseforge.remove-file": {
+    "defaultMessage": "Ta bort {filename}"
   },
   "creation-flow.modal.custom-setup.build-number.label": {
     "defaultMessage": "Byggnummer"
@@ -979,6 +1072,9 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Välj världstyp"
+  },
+  "creation-flow.modal.uploading.mrpack-file-label": {
+    "defaultMessage": ".mrpack-fil"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Skapa instans"
@@ -1457,6 +1553,9 @@
   "files.layout.error-title": {
     "defaultMessage": "Kunde inte ladda filerna"
   },
+  "files.layout.extraction-started-title": {
+    "defaultMessage": "Extrahering påbörjad"
+  },
   "files.layout.selected-count": {
     "defaultMessage": "{count} markerade"
   },
@@ -1799,6 +1898,9 @@
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Kunde inte radera innehållet"
   },
+  "hosting.content.failed-to-toggle": {
+    "defaultMessage": "Kunde inte aktivera eller inaktivera {name}"
+  },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Kunde inte avlänka modpaketet"
   },
@@ -1843,6 +1945,12 @@
   },
   "hosting.save-banner.saved": {
     "defaultMessage": "Sparad"
+  },
+  "hosting.settings.update-channel.alpha": {
+    "defaultMessage": "Alfa"
+  },
+  "hosting.settings.update-channel.beta": {
+    "defaultMessage": "Beta"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Ökar upp till {cpus} CPU:er"
@@ -2045,6 +2153,12 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Sök efter spelversion..."
   },
+  "installation-settings.shared-instance.unpublish-button": {
+    "defaultMessage": "Avpublisera delad instans"
+  },
+  "installation-settings.shared-instance.unpublishing-button": {
+    "defaultMessage": "Avpubliserar..."
+  },
   "installation-settings.type.instance": {
     "defaultMessage": "instans"
   },
@@ -2092,6 +2206,156 @@
   },
   "instance.confirm-repair.server-label": {
     "defaultMessage": "server"
+  },
+  "instance.icon-editor.background": {
+    "defaultMessage": "Bakgrund"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "Blå"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "Mörkgrå"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "Mörkgrön"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "Grå"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "Grön"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "Indigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "Lavendel"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "Ljusgrå"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "Lime"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "Orange"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "Rosa"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "Lila"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "Röd"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "Gul"
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "Senaste"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "Spara ikon"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "Slumpmässig"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "Symbol"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "Ryggsäck"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "Blåhaj"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "Bokhylla"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "Tårta"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "Kista"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "defaultMessage": "Motor"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "defaultMessage": "Ugn"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "defaultMessage": "Glob"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "Lyckta"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "defaultMessage": "Pannkakor"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "defaultMessage": "Svärd"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "TNT"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "defaultMessage": "Zombie"
+  },
+  "instance.settings.sharing.active-invites.actions": {
+    "defaultMessage": "Åtgärder"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "defaultMessage": "Inbjudningslänk"
+  },
+  "instance.settings.sharing.active-invites.empty": {
+    "defaultMessage": "Det finns inga aktiva inbjudningar."
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "defaultMessage": "Återkalla inbjudning"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "defaultMessage": "Återkalla inbjudning {code}"
+  },
+  "instance.settings.sharing.active-invites.title": {
+    "defaultMessage": "Aktiva inbjudningar"
+  },
+  "instance.settings.sharing.active-invites.uses": {
+    "defaultMessage": "Användningar"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-header": {
+    "defaultMessage": "Den här åtgärden kan inte ångras"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "defaultMessage": "Återkalla inbjudning"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "defaultMessage": "Återkalla inbjudning"
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "defaultMessage": "Tillagd"
+  },
+  "instance.shared-instance.publish-review.changes-tab": {
+    "defaultMessage": "Ändringar"
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "defaultMessage": "Filer"
+  },
+  "instance.shared-instance.publish-review.loading-files": {
+    "defaultMessage": "Läser in filer…"
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "defaultMessage": "Borttagen"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Äventyrsläge"
@@ -2765,6 +3029,15 @@
   "modal.open-in-app.why-use": {
     "defaultMessage": "Varför använda Modrinth App"
   },
+  "modal.tabbed.collapse": {
+    "defaultMessage": "Fäll ihop"
+  },
+  "modal.tabbed.collapse-sidebar": {
+    "defaultMessage": "Fäll ihop sidofält"
+  },
+  "modal.tabbed.expand-sidebar": {
+    "defaultMessage": "Utöka sidofält"
+  },
   "notification.error.title": {
     "defaultMessage": "Ett fel inträffade"
   },
@@ -3143,11 +3416,35 @@
   "profile.reset-2fa.title": {
     "defaultMessage": "Återställ tvåfaktorsautentisering för {username}"
   },
+  "profile.restrict-user.deselect-all-button": {
+    "defaultMessage": "Avmarkera alla"
+  },
+  "profile.restrict-user.private-reason-placeholder": {
+    "defaultMessage": "Valfritt"
+  },
+  "profile.restrict-user.reason-label": {
+    "defaultMessage": "Anledning (visas till användaren)"
+  },
+  "profile.restrict-user.reason-placeholder": {
+    "defaultMessage": "Valfritt"
+  },
+  "profile.restrict-user.remove-button": {
+    "defaultMessage": "Ta bort restriktioner"
+  },
   "profile.restrict-user.remove-error-title": {
     "defaultMessage": "Kunde inte ta bort restriktioner"
   },
+  "profile.restrict-user.remove-success-description": {
+    "defaultMessage": "{username}s restriktioner har hävts."
+  },
   "profile.restrict-user.remove-success-title": {
     "defaultMessage": "Restriktioner borttagna"
+  },
+  "profile.restrict-user.reset-button": {
+    "defaultMessage": "Återställ"
+  },
+  "profile.restrict-user.restrictions-label": {
+    "defaultMessage": "Restriktioner"
   },
   "profile.restrict-user.save-button": {
     "defaultMessage": "Spara restriktioner"
@@ -3160,6 +3457,9 @@
   },
   "profile.restrict-user.save-success-title": {
     "defaultMessage": "Restriktioner sparade"
+  },
+  "profile.restrict-user.select-all-button": {
+    "defaultMessage": "Markera alla"
   },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "{username} kommer att loggas ut från alla enheter och måste logga in igen. Personliga åtkomsttokens påverkas inte."
@@ -4256,11 +4556,23 @@
   "search.photosensitivity-warning-modal.title": {
     "defaultMessage": "Resultat är inte garanterade att vara säkra"
   },
+  "search.server-environment.player-and-server": {
+    "defaultMessage": "Spelare och server"
+  },
+  "search.server-environment.player-only": {
+    "defaultMessage": "Endast spelare"
+  },
+  "search.server-environment.title": {
+    "defaultMessage": "Miljö"
+  },
   "search.server_content_type.modpack": {
     "defaultMessage": "Moddat"
   },
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
+  },
+  "server.settings.sharing.retry": {
+    "defaultMessage": "Försök igen"
   },
   "servers.access-page.activity-log-filter.action-group.backups": {
     "defaultMessage": "Säkerhetskopior"
@@ -4589,6 +4901,18 @@
   "servers.audit-log.event.addon-enabled": {
     "defaultMessage": "Aktiverade innehåll <content></content>"
   },
+  "servers.audit-log.event.addon-player-disabled": {
+    "defaultMessage": "Inaktiverade <files></files> för spelare"
+  },
+  "servers.audit-log.event.addon-player-enabled": {
+    "defaultMessage": "Aktiverade <files></files> för spelare"
+  },
+  "servers.audit-log.event.addon-server-disabled": {
+    "defaultMessage": "Inaktiverade <files></files> på servern"
+  },
+  "servers.audit-log.event.addon-server-enabled": {
+    "defaultMessage": "Aktivera <files></files> på servern"
+  },
   "servers.audit-log.event.addon-updated": {
     "defaultMessage": "Uppdaterade innehåll <content></content>"
   },
@@ -4805,6 +5129,12 @@
   "servers.backups.admonition.fallback-name": {
     "defaultMessage": "Din säkerhetskopia"
   },
+  "servers.backups.admonition.migration-failed.title": {
+    "defaultMessage": "Serveruppdatering misslyckades"
+  },
+  "servers.backups.admonition.migration-queued.title": {
+    "defaultMessage": "Serveruppdatering köad"
+  },
   "servers.backups.admonition.restore-cancelled.description": {
     "defaultMessage": "Återställning från {backupName} avbröts."
   },
@@ -4856,6 +5186,39 @@
   "servers.backups.delete.error": {
     "defaultMessage": "Kunde inte radera {count, plural, one {säkerhetskopia} other {# säkerhetskopior}}"
   },
+  "servers.backups.deleted.column.created": {
+    "defaultMessage": "Skapad"
+  },
+  "servers.backups.deleted.column.name": {
+    "defaultMessage": "Namn"
+  },
+  "servers.backups.deleted.column.reason": {
+    "defaultMessage": "Anledning"
+  },
+  "servers.backups.deleted.filter.add": {
+    "defaultMessage": "Lägg till filter"
+  },
+  "servers.backups.deleted.filter.clear": {
+    "defaultMessage": "Rensa filter"
+  },
+  "servers.backups.deleted.filter.reason": {
+    "defaultMessage": "Anledning"
+  },
+  "servers.backups.deleted.filter.type": {
+    "defaultMessage": "Typ"
+  },
+  "servers.backups.deleted.filter.type.auto": {
+    "defaultMessage": "Automatisk"
+  },
+  "servers.backups.deleted.filter.type.manual": {
+    "defaultMessage": "Manuell"
+  },
+  "servers.backups.deleted.reason.deleted": {
+    "defaultMessage": "Manuellt raderad"
+  },
+  "servers.backups.deleted.title": {
+    "defaultMessage": "Raderade säkerhetskopior"
+  },
   "servers.backups.empty.description": {
     "defaultMessage": "Skapa din första säkerhetskopia"
   },
@@ -4898,6 +5261,9 @@
   "servers.backups.history.search-placeholder": {
     "defaultMessage": "{count, plural, one {# säkerhetskopia} other {# säkerhetskopior}}..."
   },
+  "servers.backups.history.title": {
+    "defaultMessage": "Historik över säkerhetskopior"
+  },
   "servers.backups.interval.days": {
     "defaultMessage": "{days, plural, one {# dag} other {# dagar}}"
   },
@@ -4928,6 +5294,15 @@
   "servers.backups.rotation-modal.header": {
     "defaultMessage": "Ta bort automatiska säkerhetskopior?"
   },
+  "servers.backups.slots.auto.duration-hours-minutes": {
+    "defaultMessage": "{hours} h {minutes} min"
+  },
+  "servers.backups.slots.auto.duration-minutes": {
+    "defaultMessage": "{minutes} min"
+  },
+  "servers.backups.slots.auto.next-in": {
+    "defaultMessage": "Nästa om {time}"
+  },
   "servers.backups.slots.auto.next-soon": {
     "defaultMessage": "Nästa säkerhetskopiering startar snart"
   },
@@ -4954,6 +5329,9 @@
   },
   "servers.download.unavailable.title": {
     "defaultMessage": "Nedladdning otillgänglig"
+  },
+  "servers.files.config-push.later": {
+    "defaultMessage": "Senare"
   },
   "servers.files.server-locked": {
     "defaultMessage": "Den här servern är låst och dess filer är skrivskyddade."
@@ -5065,6 +5443,21 @@
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Förbereder din server"
+  },
+  "servers.lift-suspension.duration.custom": {
+    "defaultMessage": "Anpassad"
+  },
+  "servers.lift-suspension.duration.days": {
+    "defaultMessage": "{count, plural, one {# dag} other {# dagar}}"
+  },
+  "servers.lift-suspension.duration.hours": {
+    "defaultMessage": "{count, plural, one {# timme} other {# timmar}}"
+  },
+  "servers.lift-suspension.duration.minutes": {
+    "defaultMessage": "{count, plural, one {# minut} other {# minuter}}"
+  },
+  "servers.lift-suspension.minutes": {
+    "defaultMessage": "Minuter"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Har du redan en server?"
@@ -5336,6 +5729,72 @@
   "servers.notice.undismissable": {
     "defaultMessage": "Kan ej avvisas"
   },
+  "servers.play-migration.backup.name": {
+    "defaultMessage": "Innan du ominstallerar serverinnehåll"
+  },
+  "servers.play-migration.backup.title": {
+    "defaultMessage": "Säkerhetskopiera din server"
+  },
+  "servers.play-migration.confirm": {
+    "defaultMessage": "Säkerhetskopiera och installera om"
+  },
+  "servers.play-migration.mrpack.file-label": {
+    "defaultMessage": ".mrpack-fil"
+  },
+  "servers.play.card.address.copied": {
+    "defaultMessage": "Serveradress kopierad"
+  },
+  "servers.play.card.address.copy": {
+    "defaultMessage": "Kopiera serveradress"
+  },
+  "servers.play.card.app.invite-button": {
+    "defaultMessage": "Bjud in spelare"
+  },
+  "servers.play.card.app.play-button": {
+    "defaultMessage": "Spela server"
+  },
+  "servers.play.card.app.title": {
+    "defaultMessage": "Spela med Modrinth App"
+  },
+  "servers.play.card.launcher.download-button": {
+    "defaultMessage": "Ladda ner modpaket"
+  },
+  "servers.play.invite-header": {
+    "defaultMessage": "Bjud in spelare till {name}"
+  },
+  "servers.play.players.actions": {
+    "defaultMessage": "Åtgärder"
+  },
+  "servers.play.players.all": {
+    "defaultMessage": "Alla"
+  },
+  "servers.play.players.avatar-alt": {
+    "defaultMessage": "{username}s avatar"
+  },
+  "servers.play.players.never": {
+    "defaultMessage": "Aldrig"
+  },
+  "servers.play.players.revoke-access": {
+    "defaultMessage": "Återkalla åtkomst"
+  },
+  "servers.play.players.revoke-access-for": {
+    "defaultMessage": "Återkalla åtkomst för {username}"
+  },
+  "servers.play.players.search-users": {
+    "defaultMessage": "Sök {count} användare..."
+  },
+  "servers.play.players.title": {
+    "defaultMessage": "Inbjudna spelare"
+  },
+  "servers.play.players.username": {
+    "defaultMessage": "Användarnamn"
+  },
+  "servers.play.remove-player": {
+    "defaultMessage": "Ta bort spelare"
+  },
+  "servers.play.retry": {
+    "defaultMessage": "Försök igen"
+  },
   "servers.purchase.notification.success.text": {
     "defaultMessage": "Ditt Modrinth Hosting-köp slutfördes."
   },
@@ -5402,17 +5861,44 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Granska"
   },
+  "servers.region.australia": {
+    "defaultMessage": "Austalien (Sydney)"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Tyskland (Limburg)"
+  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Hur mycket RAM vill du att din server ska ha?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
+  "servers.region.north-america-central": {
+    "defaultMessage": "Förenta Staterna (Dallas)"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "Förenta Staterna (Virginia)"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "Förenta Staterna (San Jose)"
+  },
+  "servers.region.ping.latency": {
+    "defaultMessage": "{ping} ms"
+  },
+  "servers.region.ping.testing": {
+    "defaultMessage": "Testar anslutning..."
+  },
   "servers.region.prompt": {
     "defaultMessage": "Vart vill du att din server ska vara placerad?"
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Är området inte med i listan? <link>Berätta vart du vill se Modrinth Hosting härnäst!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Singapore"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "Storbritannien (Coventry)"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "Tillagd {time}"
@@ -5471,6 +5957,12 @@
   "servers.settings.backups.interval.title": {
     "defaultMessage": "Säkerhetskopieringsintervall"
   },
+  "servers.setup.onboarding.invite.copied": {
+    "defaultMessage": "Länk kopierad"
+  },
+  "servers.setup.onboarding.invite.retry": {
+    "defaultMessage": "Försök igen"
+  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Ställ in server"
   },
@@ -5512,6 +6004,30 @@
   },
   "servers.setup.uploading-modpack.header": {
     "defaultMessage": "Laddar upp modpaket"
+  },
+  "servers.sharing-update.badge": {
+    "defaultMessage": "Ny uppdatering"
+  },
+  "servers.sharing-update.continue": {
+    "defaultMessage": "Fortsätt"
+  },
+  "servers.sharing-update.mute": {
+    "defaultMessage": "Tysta video"
+  },
+  "servers.sharing-update.pause": {
+    "defaultMessage": "Pausa video"
+  },
+  "servers.sharing-update.resume": {
+    "defaultMessage": "Fortsätt"
+  },
+  "servers.sharing-update.skip": {
+    "defaultMessage": "Hoppa över"
+  },
+  "servers.sharing-update.watch": {
+    "defaultMessage": "Titta"
+  },
+  "servers.suspend.modal.reason-label": {
+    "defaultMessage": "Anledning"
   },
   "settings.account.title": {
     "defaultMessage": "Konto och säkerhet"
@@ -5704,9 +6220,6 @@
   },
   "settings.social.blocked-users.restriction.friend-requests": {
     "defaultMessage": "Skicka vänförfrågan till dig"
-  },
-  "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Bjuda in dig till att hantera en Modrinth Hosting-server."
   },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "Bjuda in dig till en delad instans"
@@ -6500,11 +7013,26 @@
   "update-all-modal.view-changelog": {
     "defaultMessage": "Visa ändringslogg för {project}"
   },
+  "user-restrictions.group.collections": {
+    "defaultMessage": "Samlingar"
+  },
   "user-restrictions.group.create-projects": {
     "defaultMessage": "Skapa projekt"
   },
+  "user-restrictions.group.organizations": {
+    "defaultMessage": "Organisationer"
+  },
+  "user-restrictions.group.profile": {
+    "defaultMessage": "Profil"
+  },
+  "user-restrictions.group.versions": {
+    "defaultMessage": "Versioner"
+  },
   "user-restrictions.scope.collection-create": {
     "defaultMessage": "Skapa samlingar"
+  },
+  "user-restrictions.scope.collection-delete": {
+    "defaultMessage": "Radera samlingar"
   },
   "user-restrictions.scope.collection-write": {
     "defaultMessage": "Ändra samlingar"
@@ -6512,8 +7040,14 @@
   "user-restrictions.scope.organization-create": {
     "defaultMessage": "Skapa organisationer"
   },
+  "user-restrictions.scope.organization-delete": {
+    "defaultMessage": "Radera organisationer"
+  },
   "user-restrictions.scope.project-create": {
     "defaultMessage": "Skapa nya projekt"
+  },
+  "user-restrictions.scope.project-delete": {
+    "defaultMessage": "Radera projekt"
   },
   "user-restrictions.scope.version-create": {
     "defaultMessage": "Ladda upp nya versioner"

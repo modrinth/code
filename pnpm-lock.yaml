@@ -850,15 +850,6 @@ importers:
       '@tanstack/vue-query':
         specifier: 5.101.4
         version: 5.101.4(vue@3.5.43(typescript@5.9.3))
-      '@tresjs/cientos':
-        specifier: ^4.3.0
-        version: 4.3.1(@tresjs/core@4.3.6(three@0.172.0)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3)))(@types/three@0.172.0)(react@19.2.8)(three@0.172.0)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3))
-      '@tresjs/core':
-        specifier: ^4.3.4
-        version: 4.3.6(three@0.172.0)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3))
-      '@tresjs/post-processing':
-        specifier: ^2.4.0
-        version: 2.4.0(@tresjs/core@4.3.6(three@0.172.0)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3)))(three@0.172.0)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3))
       '@types/dompurify':
         specifier: ^3.0.5
         version: 3.2.0
@@ -934,9 +925,6 @@ importers:
       overlayscrollbars:
         specifier: ^2.15.1
         version: 2.15.1
-      postprocessing:
-        specifier: ^6.37.6
-        version: 6.38.2(three@0.172.0)
       qrcode.vue:
         specifier: ^3.4.1
         version: 3.8.0(vue@3.5.43(typescript@5.9.3))
@@ -1083,9 +1071,6 @@ packages:
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
-
-  '@alvarosabu/utils@3.2.0':
-    resolution: {integrity: sha512-aoGWRfaQjOo9TUwrBA6W0zwTHktgrXy69GIFNILT4gHsqscw6+X8P6uoSlZVQFr887SPm8x3aDin5EBVq8y4pw==}
 
   '@apidevtools/swagger-methods@3.0.2':
     resolution: {integrity: sha512-QAkD5kK2b1WfjDS/UQn/qQkbwF31uqRjPTrsCs5ZG9BQGAkjwvqGFjjPqAuzac/IYzpPtRzjCP1WrTuAIjMrXg==}
@@ -4321,26 +4306,6 @@ packages:
     peerDependencies:
       '@testing-library/dom': '>=7.21.4'
 
-  '@tresjs/cientos@4.3.1':
-    resolution: {integrity: sha512-3qp6lEtMrFdhxDuASP1Sz/hEi8+xcEpM6Vd6uDJysCh4uRAzyJLlBSbPoR7gVjN12wrhwJIF1AfYEFz/Vhz5ZQ==}
-    peerDependencies:
-      '@tresjs/core': '>=4.2.1'
-      three: '>=0.133'
-      vue: '>=3.3'
-
-  '@tresjs/core@4.3.6':
-    resolution: {integrity: sha512-CCk4+jwbiTl7Hj3REZqweglUQQdA3cF29TqJ4dEWunaBPyfsAGLTlJExK5lGIS10ptJkr8DqPvHQT41iTIb0Yg==}
-    peerDependencies:
-      three: '>=0.133'
-      vue: '>=3.4'
-
-  '@tresjs/post-processing@2.4.0':
-    resolution: {integrity: sha512-4l18DTLkn0Y/abyn+FD/gSJ6/SC01oXn+/qPgUxMgxZ8zGaw4PZbOi4yorhbSbOTp0gO4D1X7lNOvNUokqJwFw==}
-    peerDependencies:
-      '@tresjs/core': '>=4.0'
-      three: '>=0.169'
-      vue: '>=3.4'
-
   '@trysound/sax@0.2.0':
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
     engines: {node: '>=10.13.0'}
@@ -4400,9 +4365,6 @@ packages:
     resolution: {integrity: sha512-Fgg31wv9QbLDA0SpTOXO3MaxySc4DKGLi8sna4/Utjo4r3ZRPdCt4UQee8BWr+Q5z21yifghREPJGYaEOEIACg==}
     deprecated: This is a stub types definition. dompurify provides its own type definitions, so you do not need this installed.
 
-  '@types/draco3d@1.4.10':
-    resolution: {integrity: sha512-AX22jp8Y7wwaBgAixaSvkoG4M/+PlAcm3Qs4OW8yT9DM4xUpWKeFhLueTAyZF39pviAdcDdeJoACapiAceqNcw==}
-
   '@types/estree-jsx@1.0.5':
     resolution: {integrity: sha512-52CcUVNFyfb1A2ALocQw/Dd1BQFNmSdkuC3BkZ6iqhdMfQz7JWOFRuJFloOzjk+6WijU56m9oKXFAXc7o3Towg==}
 
@@ -4461,9 +4423,6 @@ packages:
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
 
-  '@types/offscreencanvas@2019.7.3':
-    resolution: {integrity: sha512-ieXiYmgSRXUDeOntE1InxjWyvEelZGP63M+cGuquuRLuIKKT1osnkXjxev9B7d1nXSug5vpunx+gNlbVxMlC9A==}
-
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
 
@@ -4496,9 +4455,6 @@ packages:
 
   '@types/web-bluetooth@0.0.20':
     resolution: {integrity: sha512-g9gZnnXVq7gM7v3tJCWV/qw7w+KeOlSHAhgF9RytFyifW6AF61hdT2ucrYhPq9hLs5JIryeupHV3qGk95dH9ow==}
-
-  '@types/web-bluetooth@0.0.21':
-    resolution: {integrity: sha512-oIQLCGWtcFZy2JW77j9k8nHzAOpqMHLQejDA48XXMWH6tjCQHz5RCFz1bzsmROyL6PUm+LLnUiI4BCn221inxA==}
 
   '@types/webxr@0.5.24':
     resolution: {integrity: sha512-h8fgEd/DpoS9CBrjEQXR+dIDraopAEfu4wYVNY2tEPwk60stPWhvZMf4Foo5FakuQ7HFZoa8WceaWFervK2Ovg==}
@@ -5026,26 +4982,17 @@ packages:
   '@vueuse/core@11.3.0':
     resolution: {integrity: sha512-7OC4Rl1f9G8IT6rUfi9JrKiXy4bfmHhZ5x2Ceojy0jnd3mHNEvV4JaRygH362ror6/NZ+Nl+n13LPzGiPN8cKA==}
 
-  '@vueuse/core@12.8.2':
-    resolution: {integrity: sha512-HbvCmZdzAu3VGi/pWYm5Ut+Kd9mn1ZHnn4L5G8kOQTPs/IwIAmJoBrmYk2ckLArgMXZj0AW3n5CAejLUO+PhdQ==}
-
   '@vueuse/core@9.13.0':
     resolution: {integrity: sha512-pujnclbeHWxxPRqXWmdkKV5OX4Wk4YeK7wusHqRwU0Q7EFusHoqNA/aPhB6KCh9hEqJkLAJo7bb0Lh9b+OIVzw==}
 
   '@vueuse/metadata@11.3.0':
     resolution: {integrity: sha512-pwDnDspTqtTo2HwfLw4Rp6yywuuBdYnPYDq+mO38ZYKGebCUQC/nVj/PXSiK9HX5otxLz8Fn7ECPbjiRz2CC3g==}
 
-  '@vueuse/metadata@12.8.2':
-    resolution: {integrity: sha512-rAyLGEuoBJ/Il5AmFHiziCPdQzRt88VxR+Y/A/QhJ1EWtWqPBBAxTAFaSkviwEuOEZNtW8pvkPgoCZQ+HxqW1A==}
-
   '@vueuse/metadata@9.13.0':
     resolution: {integrity: sha512-gdU7TKNAUVlXXLbaF+ZCfte8BjRJQWPCa2J55+7/h+yDtzw3vOoGQDRXzI6pyKyo6bXFT5/QoPE4hAknExjRLQ==}
 
   '@vueuse/shared@11.3.0':
     resolution: {integrity: sha512-P8gSSWQeucH5821ek2mn/ciCk+MS/zoRKqdQIM3bHq6p7GXDAJLmnRRKmF5F65sAVJIfzQlwR3aDzwCn10s8hA==}
-
-  '@vueuse/shared@12.8.2':
-    resolution: {integrity: sha512-dznP38YzxZoNloI0qpEfpkms8knDtaoQ6Y/sfS0L7Yki4zh40LFHEhur0odJC6xTHG5dxWVPiUWBXn+wCG2s5w==}
 
   '@vueuse/shared@9.13.0':
     resolution: {integrity: sha512-UrnhU+Cnufu4S6JLCPZnkWh0WwZGUp72ktOF2DFptMlOs3TOdVv8xJN53zhHGARmVOsz5KqOls09+J1NR6sBKw==}
@@ -5442,11 +5389,6 @@ packages:
   camelcase@8.0.0:
     resolution: {integrity: sha512-8WB3Jcas3swSvjIeA2yvCJ+Miyz5l1ZmB6HFb9R1317dt9LCQoswg/BGrmAmkWVEszSrrg4RwmO46qIm2OEnSA==}
     engines: {node: '>=16'}
-
-  camera-controls@2.10.1:
-    resolution: {integrity: sha512-KnaKdcvkBJ1Irbrzl8XD6WtZltkRjp869Jx8c0ujs9K+9WD+1D7ryBsCiVqJYUqt6i/HR5FxT7RLASieUD+Q5w==}
-    peerDependencies:
-      three: '>=0.126.1'
 
   caniuse-api@3.0.0:
     resolution: {integrity: sha512-bsTwuIg/BZZK/vreVTYYbSWoe2F+71P7K5QGEX+pT250DZbfU1MQ5prOKpPR+LL6uWKK3KMwMCAS74QB3Um1uw==}
@@ -5986,9 +5928,6 @@ packages:
     resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
     engines: {node: '>=12'}
 
-  draco3d@1.5.7:
-    resolution: {integrity: sha512-m6WCKt/erDXcw+70IJXnG7M3awwQPAsZvJGX5zY7beBqpELw6RDGkYVU0W43AFxye4pDZ5i2Lbyc/NNGqwjUVQ==}
-
   dset@3.1.4:
     resolution: {integrity: sha512-2QF/g9/zTaPDc3BjNcVTGoBbXBgYfMTTceLaYcFJ/W9kggFUkhxD/hMEeuLKbugyef9SqAx8cpgwlIP/jinUTA==}
     engines: {node: '>=4'}
@@ -6432,9 +6371,6 @@ packages:
       picomatch:
         optional: true
 
-  fflate@0.6.10:
-    resolution: {integrity: sha512-IQrh3lEPM93wVCEczc9SaAOvkmcoQn/G8Bo1e8ZPlY3X3bnAxWaBdvTdvM1hP62iZp0BXWDy4vTAy4fF0+Dlpg==}
-
   fflate@0.8.2:
     resolution: {integrity: sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==}
 
@@ -6630,15 +6566,6 @@ packages:
   globby@16.2.4:
     resolution: {integrity: sha512-c8B/VNLmxRcmqqenRA9t+9IyOjf9+V6lTxPaUJLqOCONdQkWZ0ETYgX0qbtJqPsgCNusT9MZ5Jeidw8Eb9tn2g==}
     engines: {node: '>=20'}
-
-  glsl-token-functions@1.0.1:
-    resolution: {integrity: sha512-EigGhp1g+aUVeUNY7H1o5tL/bnwIB3/FcRREPr2E7Du+/UDXN24hDkaZ3e4aWHDjHr9lJ6YHXMISkwhUYg9UOg==}
-
-  glsl-token-string@1.0.1:
-    resolution: {integrity: sha512-1mtQ47Uxd47wrovl+T6RshKGkRRCYWhnELmkEcUAPALWGTFe2XZpH3r45XAwL2B6v+l0KNsCnoaZCSnhzKEksg==}
-
-  glsl-tokenizer@2.1.5:
-    resolution: {integrity: sha512-XSZEJ/i4dmz3Pmbnpsy3cKh7cotvFlBiZnDOwnj/05EwNp2XrhQ4XKJxT7/pDt4kp4YcpRSKz8eTV7S+mwV6MA==}
 
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
@@ -7020,9 +6947,6 @@ packages:
   is-wsl@3.1.0:
     resolution: {integrity: sha512-UcVfVfaK4Sc4m7X3dUSoHoozQGBEFeDC+zVo06t98xe8CzHSZZBekNXH+tu0NalHolcJ/QAGqS46Hef7QXBIMw==}
     engines: {node: '>=16'}
-
-  isarray@0.0.1:
-    resolution: {integrity: sha512-D2S+3GLxWH+uhrNEcoh/fnmYeP8E8/zHl644d/jdA0g2uyXvy3sb0qxotE+ne0LtccHknQzWwZEzhak7oJ0COQ==}
 
   isarray@1.0.0:
     resolution: {integrity: sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==}
@@ -8393,14 +8317,6 @@ packages:
     resolution: {integrity: sha512-OW/rX8O/jXnm82Ey1k44pObPtdblfiuWnrd8X7GJ7emImCOstunGbXUpp7HdBrFQX6rJzn3sPT397Wp5aCwCHg==}
     engines: {node: ^10 || ^12 || >=14}
 
-  postprocessing@6.38.2:
-    resolution: {integrity: sha512-7DwuT7Tkst41ZjSj287g7C9c5/D3Xx5rMgBosg0dadbUPoZD2HNzkadKPol1d2PJAoI9f+Jeh1/v9YfLzpFGVw==}
-    peerDependencies:
-      three: '>= 0.157.0 < 0.183.0'
-
-  potpack@1.0.2:
-    resolution: {integrity: sha512-choctRBIV9EMT9WGAZHn3V7t0Z2pMQyl0EZE6pFc/6ml3ssw7Dlf/oAOvFwjm1HVsqfQN8GfeFyJ+d8tRzqueQ==}
-
   powershell-utils@0.2.1:
     resolution: {integrity: sha512-C+y9x90UElAddDZmV4qOx9W53B61PO7cIqWz2dQsWlwswuq4mr8NEwytdGKboYbQlGZ3awrkTeNvcZiZNHnQ8A==}
     engines: {node: '>=20'}
@@ -8631,9 +8547,6 @@ packages:
   read-pkg@5.2.0:
     resolution: {integrity: sha512-Ug69mNOpfvKDAc2Q8DRpMjjzdtrnv9HcSMX+4VsZxD1aZ6ZzrIE7rlzXBtWTyhULSMKg076AW6WR5iZpD0JiOg==}
     engines: {node: '>=8'}
-
-  readable-stream@1.0.34:
-    resolution: {integrity: sha512-ok1qVCJuRkNmvebYikljxJA/UEsKwLl2nI1OmaqAu4/UE+h0wKCHok4XkL/gvi39OacXvw59RJUOFUkDib2rHg==}
 
   readable-stream@2.3.8:
     resolution: {integrity: sha512-8p0AUk4XODgIewSi0l8Epjs+EVnWiK7NoDIEGU0HhE7+ZyY8D1IMY7odu5lRrFXGg71L15KG8QrPmum45RTtdA==}
@@ -9115,15 +9028,6 @@ packages:
       '@astrojs/starlight': '>=0.30.0'
       astro: '>=5.1.5'
 
-  stats-gl@2.4.2:
-    resolution: {integrity: sha512-g5O9B0hm9CvnM36+v7SFl39T7hmAlv541tU81ME8YeSb3i1CIP5/QdDeSB3A0la0bKNHpxpwxOVRo2wFTYEosQ==}
-    peerDependencies:
-      '@types/three': '*'
-      three: '*'
-
-  stats.js@0.17.0:
-    resolution: {integrity: sha512-hNKz8phvYLPEcRkeG1rsGmV5ChMjKDAWU7/OJJdDErPBNChQXxCo3WZurGpnWc6gZhAzEPFad1aVgyOANH1sMw==}
-
   statuses@2.0.2:
     resolution: {integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==}
     engines: {node: '>= 0.8'}
@@ -9168,9 +9072,6 @@ packages:
   string-width@8.3.0:
     resolution: {integrity: sha512-ZbmZM0JCihQN91dWnxoipT2KOEyHqEyfRXUyjuRhW8b/xnqPDoq4gWEVApTVa9db2wN8mmoikgFBbjh71+cGeQ==}
     engines: {node: '>=20'}
-
-  string_decoder@0.10.31:
-    resolution: {integrity: sha512-ev2QzSzWPYmy9GuqfIVildA4OdcGLeFZQrq5ys6RtiuF+RQQiZWr8TZNyAcuVXyQRYfEO+MsoB/1BuQVhOJuoQ==}
 
   string_decoder@1.1.1:
     resolution: {integrity: sha512-n/ShnvDi6FHbbVfviro+WojiFzv+s8MPMHBczVePfUpDJLwoLT0ht1l4YwBCbi8pJAveEEdnkHyPyTP/mzRfwg==}
@@ -9331,28 +9232,8 @@ packages:
   thenify@3.3.1:
     resolution: {integrity: sha512-RVZSIV5IG10Hk3enotrhvz0T9em6cyHBLkH/YAZuKqd8hRkKhSfCGIcP2KUY0EPxndzANBmNllzWPwak+bheSw==}
 
-  three-custom-shader-material@5.4.0:
-    resolution: {integrity: sha512-Yn1lFlKOk3Vul3npEGAmbbFUZ5S2+yjPgM2XqJEZEYRSUUH2vk+WVYrtTB6Bcq15wa7hLUXAKoctAvbRmBmbYA==}
-    peerDependencies:
-      '@react-three/fiber': '>=8.0'
-      react: '>=18.0'
-      three: '>=0.154'
-    peerDependenciesMeta:
-      '@react-three/fiber':
-        optional: true
-      react:
-        optional: true
-
-  three-stdlib@2.36.1:
-    resolution: {integrity: sha512-XyGQrFmNQ5O/IoKm556ftwKsBg11TIb301MB5dWNicziQBEs2g3gtOYIf7pFiLa0zI2gUwhtCjv9fmjnxKZ1Cg==}
-    peerDependencies:
-      three: '>=0.128.0'
-
   three@0.172.0:
     resolution: {integrity: sha512-6HMgMlzU97MsV7D/tY8Va38b83kz8YJX+BefKjspMNAv0Vx6dxMogHOrnRl/sbMIs3BPUKijPqDqJ/+UwJbIow==}
-
-  through2@0.6.5:
-    resolution: {integrity: sha512-RkK/CCESdTKQZHdmKICijdKKsCRVHs5KsLZ6pACAmF/1GPUQhonHSXWNERctxEp7RmvjdNbZTL5z9V7nSCXKcg==}
 
   tiny-inflate@1.0.3:
     resolution: {integrity: sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==}
@@ -10518,10 +10399,6 @@ packages:
     engines: {node: '>= 0.10.0'}
     hasBin: true
 
-  xtend@4.0.2:
-    resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
-    engines: {node: '>=0.4'}
-
   xxhash-wasm@1.1.0:
     resolution: {integrity: sha512-147y/6YNh+tlp6nd/2pWq38i9h6mz/EuQ6njIrmW8D1BS5nCqs0P6DG+m6zTGnNz5I+uhZ0SHxBs9BsPrwcKDA==}
 
@@ -10617,8 +10494,6 @@ snapshots:
   '@adobe/css-tools@4.4.4': {}
 
   '@alloc/quick-lru@5.2.0': {}
-
-  '@alvarosabu/utils@3.2.0': {}
 
   '@apidevtools/swagger-methods@3.0.2': {}
 
@@ -13717,43 +13592,6 @@ snapshots:
     dependencies:
       '@testing-library/dom': 10.4.1
 
-  '@tresjs/cientos@4.3.1(@tresjs/core@4.3.6(three@0.172.0)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3)))(@types/three@0.172.0)(react@19.2.8)(three@0.172.0)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3))':
-    dependencies:
-      '@tresjs/core': 4.3.6(three@0.172.0)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3))
-      '@vueuse/core': 12.8.2(typescript@5.9.3)
-      camera-controls: 2.10.1(three@0.172.0)
-      stats-gl: 2.4.2(@types/three@0.172.0)(three@0.172.0)
-      stats.js: 0.17.0
-      three: 0.172.0
-      three-custom-shader-material: 5.4.0(react@19.2.8)(three@0.172.0)
-      three-stdlib: 2.36.1(three@0.172.0)
-      vue: 3.5.43(typescript@5.9.3)
-    transitivePeerDependencies:
-      - '@react-three/fiber'
-      - '@types/three'
-      - react
-      - typescript
-
-  '@tresjs/core@4.3.6(three@0.172.0)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3))':
-    dependencies:
-      '@alvarosabu/utils': 3.2.0
-      '@vue/devtools-api': 6.6.4
-      '@vueuse/core': 12.8.2(typescript@5.9.3)
-      three: 0.172.0
-      vue: 3.5.43(typescript@5.9.3)
-    transitivePeerDependencies:
-      - typescript
-
-  '@tresjs/post-processing@2.4.0(@tresjs/core@4.3.6(three@0.172.0)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3)))(three@0.172.0)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3))':
-    dependencies:
-      '@tresjs/core': 4.3.6(three@0.172.0)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3))
-      '@vueuse/core': 12.8.2(typescript@5.9.3)
-      postprocessing: 6.38.2(three@0.172.0)
-      three: 0.172.0
-      vue: 3.5.43(typescript@5.9.3)
-    transitivePeerDependencies:
-      - typescript
-
   '@trysound/sax@0.2.0': {}
 
   '@turbo/darwin-64@2.11.5':
@@ -13799,8 +13637,6 @@ snapshots:
   '@types/dompurify@3.2.0':
     dependencies:
       dompurify: 3.3.1
-
-  '@types/draco3d@1.4.10': {}
 
   '@types/estree-jsx@1.0.5':
     dependencies:
@@ -13855,8 +13691,6 @@ snapshots:
 
   '@types/normalize-package-data@2.4.4': {}
 
-  '@types/offscreencanvas@2019.7.3': {}
-
   '@types/resolve@1.20.2': {}
 
   '@types/rss@0.0.32': {}
@@ -13888,8 +13722,6 @@ snapshots:
   '@types/web-bluetooth@0.0.16': {}
 
   '@types/web-bluetooth@0.0.20': {}
-
-  '@types/web-bluetooth@0.0.21': {}
 
   '@types/webxr@0.5.24': {}
 
@@ -14601,15 +14433,6 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
-  '@vueuse/core@12.8.2(typescript@5.9.3)':
-    dependencies:
-      '@types/web-bluetooth': 0.0.21
-      '@vueuse/metadata': 12.8.2
-      '@vueuse/shared': 12.8.2(typescript@5.9.3)
-      vue: 3.5.43(typescript@5.9.3)
-    transitivePeerDependencies:
-      - typescript
-
   '@vueuse/core@9.13.0(vue@3.5.43(typescript@5.9.3))':
     dependencies:
       '@types/web-bluetooth': 0.0.16
@@ -14622,8 +14445,6 @@ snapshots:
 
   '@vueuse/metadata@11.3.0': {}
 
-  '@vueuse/metadata@12.8.2': {}
-
   '@vueuse/metadata@9.13.0': {}
 
   '@vueuse/shared@11.3.0(vue@3.5.43(typescript@5.9.3))':
@@ -14632,12 +14453,6 @@ snapshots:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
-
-  '@vueuse/shared@12.8.2(typescript@5.9.3)':
-    dependencies:
-      vue: 3.5.43(typescript@5.9.3)
-    transitivePeerDependencies:
-      - typescript
 
   '@vueuse/shared@9.13.0(vue@3.5.43(typescript@5.9.3))':
     dependencies:
@@ -15116,10 +14931,6 @@ snapshots:
   camelcase-css@2.0.1: {}
 
   camelcase@8.0.0: {}
-
-  camera-controls@2.10.1(three@0.172.0):
-    dependencies:
-      three: 0.172.0
 
   caniuse-api@3.0.0:
     dependencies:
@@ -15605,8 +15416,6 @@ snapshots:
   dotenv@16.0.3: {}
 
   dotenv@17.4.2: {}
-
-  draco3d@1.5.7: {}
 
   dset@3.1.4: {}
 
@@ -16378,8 +16187,6 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.7
 
-  fflate@0.6.10: {}
-
   fflate@0.8.2: {}
 
   file-entry-cache@8.0.0:
@@ -16560,14 +16367,6 @@ snapshots:
       micromatch: 4.0.8
       slash: 5.1.0
       unicorn-magic: 0.4.0
-
-  glsl-token-functions@1.0.1: {}
-
-  glsl-token-string@1.0.1: {}
-
-  glsl-tokenizer@2.1.5:
-    dependencies:
-      through2: 0.6.5
 
   gopd@1.2.0: {}
 
@@ -17086,8 +16885,6 @@ snapshots:
   is-wsl@3.1.0:
     dependencies:
       is-inside-container: 1.0.0
-
-  isarray@0.0.1: {}
 
   isarray@1.0.0: {}
 
@@ -18952,12 +18749,6 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  postprocessing@6.38.2(three@0.172.0):
-    dependencies:
-      three: 0.172.0
-
-  potpack@1.0.2: {}
-
   powershell-utils@0.2.1: {}
 
   prebuild-install@7.1.3:
@@ -19163,13 +18954,6 @@ snapshots:
       normalize-package-data: 2.5.0
       parse-json: 5.2.0
       type-fest: 0.6.0
-
-  readable-stream@1.0.34:
-    dependencies:
-      core-util-is: 1.0.3
-      inherits: 2.0.4
-      isarray: 0.0.1
-      string_decoder: 0.10.31
 
   readable-stream@2.3.8(patch_hash=3045f7adf989b4e668a4a13819b7285b0de186b79bbf22408acaf2a41c6eaa86):
     dependencies:
@@ -19900,13 +19684,6 @@ snapshots:
     transitivePeerDependencies:
       - openapi-types
 
-  stats-gl@2.4.2(@types/three@0.172.0)(three@0.172.0):
-    dependencies:
-      '@types/three': 0.172.0
-      three: 0.172.0
-
-  stats.js@0.17.0: {}
-
   statuses@2.0.2: {}
 
   std-env@3.10.0: {}
@@ -19971,8 +19748,6 @@ snapshots:
     dependencies:
       get-east-asian-width: 1.7.0
       strip-ansi: 7.1.2
-
-  string_decoder@0.10.31: {}
 
   string_decoder@1.1.1:
     dependencies:
@@ -20188,32 +19963,7 @@ snapshots:
     dependencies:
       any-promise: 1.3.0
 
-  three-custom-shader-material@5.4.0(react@19.2.8)(three@0.172.0):
-    dependencies:
-      glsl-token-functions: 1.0.1
-      glsl-token-string: 1.0.1
-      glsl-tokenizer: 2.1.5
-      object-hash: 3.0.0
-      three: 0.172.0
-    optionalDependencies:
-      react: 19.2.8
-
-  three-stdlib@2.36.1(three@0.172.0):
-    dependencies:
-      '@types/draco3d': 1.4.10
-      '@types/offscreencanvas': 2019.7.3
-      '@types/webxr': 0.5.24
-      draco3d: 1.5.7
-      fflate: 0.6.10
-      potpack: 1.0.2
-      three: 0.172.0
-
   three@0.172.0: {}
-
-  through2@0.6.5:
-    dependencies:
-      readable-stream: 1.0.34
-      xtend: 4.0.2
 
   tiny-inflate@1.0.3: {}
 
@@ -21253,8 +21003,6 @@ snapshots:
     dependencies:
       commander: 2.20.3
       cssfilter: 0.0.10
-
-  xtend@4.0.2: {}
 
   xxhash-wasm@1.1.0: {}
 

@@ -458,6 +458,7 @@ import _TerminalSquareIcon from './icons/terminal-square.svg?component'
 import _TestIcon from './icons/test.svg?component'
 import _TextCursorInputIcon from './icons/text-cursor-input.svg?component'
 import _TextQuoteIcon from './icons/text-quote.svg?component'
+import _TextSearchIcon from './icons/text-search.svg?component'
 import _TimerIcon from './icons/timer.svg?component'
 import _ToggleLeftIcon from './icons/toggle-left.svg?component'
 import _ToggleRightIcon from './icons/toggle-right.svg?component'
@@ -957,6 +958,7 @@ export const TerminalSquareIcon = _TerminalSquareIcon
 export const TestIcon = _TestIcon
 export const TextCursorInputIcon = _TextCursorInputIcon
 export const TextQuoteIcon = _TextQuoteIcon
+export const TextSearchIcon = _TextSearchIcon
 export const TimerIcon = _TimerIcon
 export const ToggleLeftIcon = _ToggleLeftIcon
 export const ToggleRightIcon = _ToggleRightIcon

@@ -5,7 +5,7 @@ use crate::database::models::version_item::VersionQueryResult;
 use crate::models::exp;
 use crate::models::ids::{
     FileId, GalleryImageId, OrganizationId, ProjectId, TeamId, ThreadId,
-    VersionId,
+    ThreadIssueId, VersionId,
 };
 use crate::models::minecraft::legacy_game_version_name;
 use crate::routes::{FileHash, HashAlgorithm};
@@ -16,6 +16,77 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use url::Url;
 use validator::Validate;
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub enum ApprovalReason {
+    ByUser(UserId),
+    Auto(ApprovalProvenance),
+}
+
+/// Why a project's review outcome changed.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum ReviewOutcomeReason {
+    ByUser { reason: Option<String> },
+    Auto { provenance: ApprovalProvenance },
+}
+
+/// A project history entry, including its actor and timestamp.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectHistoryEntry {
+    pub id: i64,
+    pub project_id: ProjectId,
+    pub done_by: Option<UserId>,
+    pub occurred_at: DateTime<Utc>,
+    pub delta: ProjectDelta,
+}
+
+/// A durable record of a project's lifecycle or state change.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum ProjectDelta {
+    Created,
+    Deleted,
+    AutoApprovalCancelled,
+    AutoApprovalScheduled {
+        provenance: ApprovalProvenance,
+        scheduled_for: DateTime<Utc>,
+    },
+    ChangeVisibility {
+        from: ProjectVisibility,
+        to: ProjectVisibility,
+    },
+    ChangeInReview {
+        from: bool,
+        to: bool,
+    },
+    ChangeReviewOutcome {
+        from: ProjectReviewOutcome,
+        to: ProjectReviewOutcome,
+        reason: Option<ReviewOutcomeReason>,
+    },
+}
+
+/// Evidence captured when automatic approval is scheduled or performed.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ApprovalProvenance {
+    pub trigger: AutoApprovalCause,
+
+    pub resolved_issue_ids: Vec<ThreadIssueId>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum AutoApprovalCause {
+    Resubmission { user_id: UserId },
+    TechnicalReviewNoDetails,
+    ProjectFlags { ruleset_id: uuid::Uuid },
+    ScanCompleted { report_id: i64, scan_id: String },
+    RulesChanged { revision: i64, user_id: UserId },
+    ModeratorTechnicalReviewPass { user_id: UserId },
+    LocalVerdictsUpdated { user_id: UserId },
+    GlobalVerdictsUpdated { user_id: UserId },
+}
 
 /// A project returned from the API
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
@@ -51,10 +122,14 @@ pub struct Project {
     /// The date at which the project entered the moderation queue
     pub queued: Option<DateTime<Utc>>,
 
-    /// The status of the project
-    pub status: ProjectStatus,
-    /// The requested status of this project
-    pub requested_status: Option<ProjectStatus>,
+    /// The visibility requested by the project owner.
+    pub visibility: ProjectVisibility,
+    pub status: crate::models::v2::projects::ProjectStatus,
+    pub requested_status: Option<crate::models::v2::projects::ProjectStatus>,
+    /// Whether the project is currently queued for review.
+    pub in_review: bool,
+    /// The latest moderation outcome, which caps public visibility.
+    pub review_outcome: ProjectReviewOutcome,
 
     /// DEPRECATED: moved to threads system
     /// The rejection data of the project
@@ -213,8 +288,19 @@ impl From<ProjectQueryResult> for Project {
             updated: m.updated,
             approved: m.approved,
             queued: m.queued,
-            status: m.status,
-            requested_status: m.requested_status,
+            status: crate::models::v2::projects::ProjectStatus::from_state(
+                m.visibility,
+                m.in_review,
+                m.review_outcome,
+            ),
+            requested_status: Some(
+                crate::models::v2::projects::ProjectStatus::from_visibility(
+                    m.visibility,
+                ),
+            ),
+            visibility: m.visibility,
+            in_review: m.in_review,
+            review_outcome: m.review_outcome,
             moderator_message: if let Some(message) = m.moderation_message {
                 Some(ModeratorMessage {
                     message,
@@ -283,6 +369,25 @@ impl From<ProjectQueryResult> for Project {
 }
 
 impl Project {
+    pub fn effective_visibility(&self) -> ProjectVisibility {
+        crate::database::models::DBProject::calculate_effective_visibility(
+            self.visibility,
+            self.review_outcome,
+        )
+    }
+
+    pub fn is_hidden(&self) -> bool {
+        self.effective_visibility() == ProjectVisibility::Private
+    }
+
+    pub fn is_searchable(&self) -> bool {
+        self.effective_visibility() == ProjectVisibility::Public
+    }
+
+    pub fn is_approved(&self) -> bool {
+        self.review_outcome == ProjectReviewOutcome::Approved
+    }
+
     // Matches the from QueryProject, but with a ResultSearchProject
     // pub fn from_search(m: ResultSearchProject) -> Option<Self> {
     //     let project_id = ProjectId(parse_base62(&m.project_id).ok()?);
@@ -311,10 +416,9 @@ impl Project {
     //         .and_then(|dq| DateTime::parse_from_rfc3339(&dq).ok())
     //         .map(|d| d.into());
     //
-    //     let status = ProjectStatus::from_string(&m.status);
-    //     let requested_status = m
-    //         .requested_status
-    //         .map(|mrs| ProjectStatus::from_string(&mrs));
+    //     let visibility = ProjectVisibility::from_string(&m.visibility);
+    //     let in_review = m.in_review;
+    //     let review_outcome = ProjectReviewOutcome::from_string(&m.review_outcome);
     //
     //     let license_url = m.license_url;
     //     let icon_url = m.icon_url;
@@ -392,8 +496,9 @@ impl Project {
     //         updated,
     //         approved,
     //         queued,
-    //         status,
-    //         requested_status,
+    //         visibility,
+    //         in_review,
+    //         review_outcome,
     //         moderator_message: None, // Deprecated
     //         license: License {
     //             id: m.license.clone(),
@@ -493,15 +598,231 @@ impl From<LinkUrl> for Link {
     }
 }
 
-/// A status decides the visibility of a project in search, URLs, and the whole site itself.
-/// Approved - Project is displayed on search, and accessible by URL
-/// Rejected - Project is not displayed on search, and not accessible by URL (Temporary state, project can reapply)
-/// Draft - Project is not displayed on search, and not accessible by URL
-/// Unlisted - Project is not displayed on search, but accessible by URL
-/// Withheld - Same as unlisted, but set by a moderator. Cannot be switched to another type without moderator approval
-/// Processing - Project is not displayed on search, and not accessible by URL (Temporary state, project under review)
-/// Scheduled - Project is scheduled to be released in the future
-/// Private - Project is approved, but is not viewable to the public
+#[cfg(test)]
+mod project_state_tests {
+    use super::{
+        ApprovalProvenance, AutoApprovalCause, LegacyProjectStatus,
+        ProjectDelta, ProjectReviewOutcome, ProjectVisibility,
+        ReviewOutcomeReason,
+    };
+
+    #[test]
+    fn in_review_history_uses_kind_discriminator() {
+        let delta = serde_json::to_value(ProjectDelta::ChangeInReview {
+            from: false,
+            to: true,
+        })
+        .unwrap();
+        assert_eq!(
+            delta,
+            serde_json::json!({
+                "kind": "change_in_review",
+                "from": false,
+                "to": true,
+            })
+        );
+    }
+
+    #[test]
+    fn project_history_deltas_round_trip() {
+        let provenance = ApprovalProvenance {
+            trigger: AutoApprovalCause::TechnicalReviewNoDetails,
+
+            resolved_issue_ids: Vec::new(),
+        };
+        for delta in [
+            ProjectDelta::Created,
+            ProjectDelta::Deleted,
+            ProjectDelta::AutoApprovalCancelled,
+            ProjectDelta::AutoApprovalScheduled {
+                provenance: provenance.clone(),
+                scheduled_for: "2026-11-24T12:00:00Z".parse().unwrap(),
+            },
+            ProjectDelta::ChangeInReview {
+                from: false,
+                to: true,
+            },
+            ProjectDelta::ChangeInReview {
+                from: true,
+                to: false,
+            },
+            ProjectDelta::ChangeVisibility {
+                from: ProjectVisibility::Public,
+                to: ProjectVisibility::Private,
+            },
+            ProjectDelta::ChangeReviewOutcome {
+                from: ProjectReviewOutcome::NeverReviewed,
+                to: ProjectReviewOutcome::Approved,
+                reason: Some(ReviewOutcomeReason::Auto {
+                    provenance: provenance.clone(),
+                }),
+            },
+            ProjectDelta::ChangeReviewOutcome {
+                from: ProjectReviewOutcome::Approved,
+                to: ProjectReviewOutcome::Withheld,
+                reason: Some(ReviewOutcomeReason::ByUser {
+                    reason: Some("Please fix the project description".into()),
+                }),
+            },
+        ] {
+            let value = serde_json::to_value(delta).unwrap();
+            let decoded: ProjectDelta =
+                serde_json::from_value(value.clone()).unwrap();
+            assert_eq!(serde_json::to_value(decoded).unwrap(), value);
+        }
+        let delta = serde_json::to_value(ProjectDelta::ChangeReviewOutcome {
+            from: ProjectReviewOutcome::NeverReviewed,
+            to: ProjectReviewOutcome::Approved,
+            reason: Some(ReviewOutcomeReason::Auto {
+                provenance: provenance.clone(),
+            }),
+        })
+        .unwrap();
+        let message = serde_json::to_value(
+            crate::models::threads::MessageBody::AutoApproval {
+                old_status: LegacyProjectStatus::Processing,
+                new_status: LegacyProjectStatus::Approved,
+                provenance: Some(provenance),
+            },
+        )
+        .unwrap();
+        assert_eq!(delta["reason"]["type"], "auto");
+        assert_eq!(
+            delta["reason"]["provenance"]["trigger"]["kind"],
+            "technical_review_no_details"
+        );
+        assert!(
+            delta["reason"]["provenance"]
+                .get("previous_status")
+                .is_none()
+        );
+        assert_eq!(delta["reason"]["provenance"], message["provenance"]);
+    }
+
+    #[test]
+    fn visibility_round_trips_and_ordering() {
+        let values = [
+            ProjectVisibility::Private,
+            ProjectVisibility::Unlisted,
+            ProjectVisibility::Public,
+        ];
+        assert!(values[0] < values[1] && values[1] < values[2]);
+        for value in values {
+            assert_eq!(ProjectVisibility::from_string(value.as_str()), value);
+            let json = serde_json::to_string(&value).unwrap();
+            assert_eq!(json, format!("\"{}\"", value.as_str()));
+            assert_eq!(
+                serde_json::from_str::<ProjectVisibility>(&json).unwrap(),
+                value
+            );
+        }
+        assert_eq!(
+            ProjectVisibility::from_string("unknown"),
+            ProjectVisibility::Private
+        );
+    }
+
+    #[test]
+    fn review_outcome_round_trips_and_effective_visibility_matrix() {
+        use ProjectReviewOutcome::{
+            Approved, NeverReviewed, Rejected, Withheld,
+        };
+        use ProjectVisibility::{Private, Public, Unlisted};
+        for (outcome, expected) in [
+            (NeverReviewed, [Private, Private, Private]),
+            (Approved, [Private, Unlisted, Public]),
+            (Rejected, [Private, Private, Private]),
+            (Withheld, [Private, Unlisted, Unlisted]),
+        ] {
+            assert_eq!(
+                ProjectReviewOutcome::from_string(outcome.as_str()),
+                outcome
+            );
+            let json = serde_json::to_string(&outcome).unwrap();
+            assert_eq!(json, format!("\"{}\"", outcome.as_str()));
+            assert_eq!(
+                serde_json::from_str::<ProjectReviewOutcome>(&json).unwrap(),
+                outcome
+            );
+            for (visibility, effective) in
+                [Private, Unlisted, Public].into_iter().zip(expected)
+            {
+                assert_eq!(
+                    crate::database::models::DBProject::calculate_effective_visibility(
+                        visibility,
+                        outcome,
+                    ),
+                    effective,
+                );
+            }
+        }
+        assert_eq!(ProjectReviewOutcome::from_string("unknown"), NeverReviewed);
+    }
+
+    #[test]
+    fn removed_historical_states_are_unknown() {
+        for value in ["scheduled", "archived"] {
+            assert_eq!(
+                LegacyProjectStatus::from_string(value),
+                LegacyProjectStatus::Unknown
+            );
+            assert_eq!(
+                serde_json::from_value::<LegacyProjectStatus>(
+                    serde_json::json!(value)
+                )
+                .unwrap(),
+                LegacyProjectStatus::Unknown
+            );
+        }
+    }
+}
+
+/// Owner-selected visibility, ordered from least to most public.
+#[derive(
+    Serialize,
+    Deserialize,
+    Copy,
+    Clone,
+    Eq,
+    PartialEq,
+    Ord,
+    PartialOrd,
+    Hash,
+    Debug,
+    utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ProjectVisibility {
+    Private,
+    Unlisted,
+    Public,
+}
+
+impl ProjectVisibility {
+    pub fn from_string(value: &str) -> Self {
+        match value {
+            "public" => Self::Public,
+            "unlisted" => Self::Unlisted,
+            _ => Self::Private,
+        }
+    }
+
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Private => "private",
+            Self::Unlisted => "unlisted",
+            Self::Public => "public",
+        }
+    }
+}
+
+impl std::fmt::Display for ProjectVisibility {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        fmt.write_str(self.as_str())
+    }
+}
+
+/// The latest review outcome, independent of current queue membership.
 #[derive(
     Serialize,
     Deserialize,
@@ -513,144 +834,117 @@ impl From<LinkUrl> for Link {
     Debug,
     utoipa::ToSchema,
 )]
-#[serde(rename_all = "lowercase")]
-pub enum ProjectStatus {
+#[serde(rename_all = "snake_case")]
+pub enum ProjectReviewOutcome {
+    NeverReviewed,
     Approved,
-    Archived,
+    Rejected,
+    Withheld,
+}
+
+impl ProjectReviewOutcome {
+    pub fn from_string(value: &str) -> Self {
+        match value {
+            "approved" => Self::Approved,
+            "rejected" => Self::Rejected,
+            "withheld" => Self::Withheld,
+            _ => Self::NeverReviewed,
+        }
+    }
+
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::NeverReviewed => "never_reviewed",
+            Self::Approved => "approved",
+            Self::Rejected => "rejected",
+            Self::Withheld => "withheld",
+        }
+    }
+
+    pub fn max_visibility(&self) -> ProjectVisibility {
+        match self {
+            Self::Approved => ProjectVisibility::Public,
+            Self::Withheld => ProjectVisibility::Unlisted,
+            Self::NeverReviewed | Self::Rejected => ProjectVisibility::Private,
+        }
+    }
+}
+
+impl std::fmt::Display for ProjectReviewOutcome {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        fmt.write_str(self.as_str())
+    }
+}
+
+/// Historical event data only; never use this enum for current project state.
+#[derive(
+    Serialize,
+    Deserialize,
+    Copy,
+    Clone,
+    Eq,
+    PartialEq,
+    Hash,
+    Debug,
+    utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum LegacyProjectStatus {
+    Approved,
     Rejected,
     Draft,
     Unlisted,
     Processing,
     Withheld,
-    Scheduled,
     Private,
+    #[serde(other)]
     Unknown,
 }
 
-impl std::fmt::Display for ProjectStatus {
-    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(fmt, "{}", self.as_str())
+impl LegacyProjectStatus {
+    pub fn from_string(value: &str) -> Self {
+        match value {
+            "approved" => Self::Approved,
+            "rejected" => Self::Rejected,
+            "draft" => Self::Draft,
+            "unlisted" => Self::Unlisted,
+            "processing" => Self::Processing,
+            "withheld" => Self::Withheld,
+            "private" => Self::Private,
+            _ => Self::Unknown,
+        }
+    }
+
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Approved => "approved",
+            Self::Rejected => "rejected",
+            Self::Draft => "draft",
+            Self::Unlisted => "unlisted",
+            Self::Processing => "processing",
+            Self::Withheld => "withheld",
+            Self::Private => "private",
+            Self::Unknown => "unknown",
+        }
+    }
+
+    pub fn as_friendly_str(&self) -> &'static str {
+        match self {
+            Self::Approved => "Listed",
+            Self::Rejected => "Rejected",
+            Self::Draft => "Draft",
+            Self::Unlisted => "Unlisted",
+            Self::Processing => "Under review",
+            Self::Withheld => "Withheld",
+            Self::Private => "Private",
+            Self::Unknown => "Unknown",
+        }
     }
 }
 
-impl ProjectStatus {
-    pub fn from_string(string: &str) -> ProjectStatus {
-        match string {
-            "processing" => ProjectStatus::Processing,
-            "rejected" => ProjectStatus::Rejected,
-            "approved" => ProjectStatus::Approved,
-            "draft" => ProjectStatus::Draft,
-            "unlisted" => ProjectStatus::Unlisted,
-            "archived" => ProjectStatus::Archived,
-            "withheld" => ProjectStatus::Withheld,
-            "private" => ProjectStatus::Private,
-            _ => ProjectStatus::Unknown,
-        }
-    }
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            ProjectStatus::Approved => "approved",
-            ProjectStatus::Rejected => "rejected",
-            ProjectStatus::Draft => "draft",
-            ProjectStatus::Unlisted => "unlisted",
-            ProjectStatus::Processing => "processing",
-            ProjectStatus::Unknown => "unknown",
-            ProjectStatus::Archived => "archived",
-            ProjectStatus::Withheld => "withheld",
-            ProjectStatus::Scheduled => "scheduled",
-            ProjectStatus::Private => "private",
-        }
-    }
-    pub fn as_friendly_str(&self) -> &'static str {
-        match self {
-            ProjectStatus::Approved => "Listed",
-            ProjectStatus::Rejected => "Rejected",
-            ProjectStatus::Draft => "Draft",
-            ProjectStatus::Unlisted => "Unlisted",
-            ProjectStatus::Processing => "Under review",
-            ProjectStatus::Unknown => "Unknown",
-            ProjectStatus::Archived => "Archived",
-            ProjectStatus::Withheld => "Withheld",
-            ProjectStatus::Scheduled => "Scheduled",
-            ProjectStatus::Private => "Private",
-        }
-    }
-
-    pub fn iterator() -> impl Iterator<Item = ProjectStatus> {
-        [
-            ProjectStatus::Approved,
-            ProjectStatus::Archived,
-            ProjectStatus::Rejected,
-            ProjectStatus::Draft,
-            ProjectStatus::Unlisted,
-            ProjectStatus::Processing,
-            ProjectStatus::Withheld,
-            ProjectStatus::Scheduled,
-            ProjectStatus::Private,
-            ProjectStatus::Unknown,
-        ]
-        .iter()
-        .copied()
-    }
-
-    // Project pages + info cannot be viewed
-    pub fn is_hidden(&self) -> bool {
-        match self {
-            ProjectStatus::Rejected => true,
-            ProjectStatus::Draft => true,
-            ProjectStatus::Processing => true,
-            ProjectStatus::Unknown => true,
-            ProjectStatus::Scheduled => true,
-            ProjectStatus::Private => true,
-
-            ProjectStatus::Approved => false,
-            ProjectStatus::Unlisted => false,
-            ProjectStatus::Archived => false,
-            ProjectStatus::Withheld => false,
-        }
-    }
-
-    // Project can be displayed in search
-    // IMPORTANT: if this is changed, make sure to:
-    // - update the `mods_searchable_ids_gist`
-    //   index in the DB to keep random project queries fast (see the
-    //   `20250609134334_spatial-random-project-index.sql` migration).
-    // - update the `is_visible_organization` function in
-    //   `apps/labrinth/src/auth/checks.rs`, which duplicates this logic
-    //   in a SQL query for efficiency.
-    pub fn is_searchable(&self) -> bool {
-        matches!(self, ProjectStatus::Approved | ProjectStatus::Archived)
-    }
-
-    // Project is "Approved" by moderators
-    pub fn is_approved(&self) -> bool {
-        matches!(
-            self,
-            ProjectStatus::Approved
-                | ProjectStatus::Archived
-                | ProjectStatus::Unlisted
-                | ProjectStatus::Private
-        )
-    }
-
-    // Project status can be requested after moderator approval
-    pub fn can_be_requested(&self) -> bool {
-        match self {
-            ProjectStatus::Approved => true,
-            ProjectStatus::Unlisted => true,
-            ProjectStatus::Private => true,
-
-            // `draft` used to be requestable for some reason, now considered a bug.
-            ProjectStatus::Draft => false,
-            // `archived` is represented by a disclosure, not a status, so it
-            // can no longer be requested or set as a status.
-            ProjectStatus::Archived => false,
-            ProjectStatus::Rejected => false,
-            ProjectStatus::Processing => false,
-            ProjectStatus::Unknown => false,
-            ProjectStatus::Withheld => false,
-            ProjectStatus::Scheduled => false,
-        }
+impl std::fmt::Display for LegacyProjectStatus {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        fmt.write_str(self.as_str())
     }
 }
 

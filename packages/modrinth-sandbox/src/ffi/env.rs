@@ -1,6 +1,6 @@
 use std::{ptr::NonNull, sync::Arc};
 
-use eyre::{Context, ContextCompat};
+use anyhow::{Context};
 
 use crate::{
     SandboxEnv,
@@ -32,7 +32,7 @@ pub unsafe extern "C" fn modrinth_sandbox_create_env(
         try_return(out_env, || {
             let rt = tokio::runtime::Builder::new_current_thread()
                 .build()
-                .wrap_err("creating tokio runtime")?;
+                .context("creating tokio runtime")?;
             let env = rt.block_on(SandboxEnv::new())?;
             Ok(ModrinthSandboxEnv {
                 env,
@@ -62,7 +62,7 @@ pub unsafe extern "C" fn modrinth_sandbox_create_noop_env(
             let rt = tokio::runtime::Builder::new_current_thread()
                 .enable_all()
                 .build()
-                .wrap_err("creating tokio runtime")?;
+                .context("creating tokio runtime")?;
             Ok(ModrinthSandboxEnv {
                 env: SandboxEnv::noop(),
                 rt: Arc::new(rt),
@@ -114,15 +114,15 @@ pub unsafe extern "C" fn modrinth_sandbox_spawn(
     let spawn = move || {
         // SAFETY: The caller guarantees that `env` points to a live environment
         // which remains valid for the duration of this call.
-        let env = unsafe { env.as_ref() }.wrap_err("`env` must not be null")?;
+        let env = unsafe { env.as_ref() }.context("`env` must not be null")?;
 
         // SAFETY: The caller guarantees that `command` points to valid,
         // writable storage containing a command handle.
         let command_slot = unsafe { command.as_mut() }
-            .wrap_err("`command` must not be null")?;
+            .context("`command` must not be null")?;
         let command = std::mem::replace(command_slot, std::ptr::null_mut());
         let command =
-            NonNull::new(command).wrap_err("`*command` must not be null")?;
+            NonNull::new(command).context("`*command` must not be null")?;
 
         // SAFETY: The command pointer was returned by `try_return` during
         // command preparation. Its ownership was removed from the caller by
@@ -133,7 +133,7 @@ pub unsafe extern "C" fn modrinth_sandbox_spawn(
         let child = env
             .rt
             .block_on(env.env.spawn(command))
-            .wrap_err("spawning sandboxed child")?;
+            .context("spawning sandboxed child")?;
         Ok(ModrinthSandboxChild {
             inner: child,
             rt: Arc::clone(&env.rt),

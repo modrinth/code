@@ -1,4 +1,4 @@
-use eyre::Result;
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use validator::Validate;
@@ -102,7 +102,7 @@ macro_rules! define_project_components {
                                     context,
                                 )
                                 .map(Some)
-                                .wrap_err(concat!("failed to populate `", stringify!($ty), "`"))?
+                                .context(concat!("failed to populate `", stringify!($ty), "`"))?
                             }
                             None => None,
                         },
@@ -231,7 +231,7 @@ pub async fn fetch_query_context(
         )
         .fetch_all(db)
         .await
-        .wrap_err("failed to fetch partial versions")?
+        .context("failed to fetch partial versions")?
         .into_iter()
         .map(|row| {
             (

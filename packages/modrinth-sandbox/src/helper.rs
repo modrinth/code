@@ -11,7 +11,7 @@
 
 use std::ffi::{OsStr, OsString};
 
-use eyre::Result;
+use anyhow::Result;
 
 use crate::backend;
 

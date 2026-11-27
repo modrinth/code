@@ -1,8 +1,8 @@
 use std::path::PathBuf;
 
 #[cfg(any(target_os = "linux", target_os = "windows"))]
-use eyre::Context;
-use eyre::eyre;
+use anyhow::Context;
+use anyhow::anyhow;
 
 pub struct OpenFileDialogFilter {
     #[cfg_attr(target_os = "macos", allow(unused))]
@@ -30,7 +30,7 @@ pub struct OpenFileDialogArgs {
 
 pub async fn open_file_dialog(
     args: OpenFileDialogArgs,
-) -> eyre::Result<Vec<PathBuf>> {
+) -> anyhow::Result<Vec<PathBuf>> {
     #[cfg(target_os = "macos")]
     {
         open_file_dialog_macos(args).await
@@ -50,7 +50,7 @@ pub async fn open_file_dialog(
     )))]
     {
         drop(args);
-        Err(eyre::eyre!("unsupported platform for file dialog"))
+        Err(anyhow::anyhow!("unsupported platform for file dialog"))
     }
 }
 
@@ -78,13 +78,13 @@ fn split_default_location(
 #[cfg(target_os = "macos")]
 pub async fn open_file_dialog_macos(
     args: OpenFileDialogArgs,
-) -> eyre::Result<Vec<PathBuf>> {
+) -> anyhow::Result<Vec<PathBuf>> {
     let (result_sender, result_receiver) =
-        tokio::sync::oneshot::channel::<eyre::Result<Vec<PathBuf>>>();
+        tokio::sync::oneshot::channel::<anyhow::Result<Vec<PathBuf>>>();
 
     dispatch2::run_on_main(move |mtm| {
         if !objc2_app_kit::NSApplication::sharedApplication(mtm).isRunning() {
-            _ = result_sender.send(Err(eyre!(
+            _ = result_sender.send(Err(anyhow!(
                 "cannot open file dialog in headless environment"
             )));
             return;
@@ -96,7 +96,7 @@ pub async fn open_file_dialog_macos(
             let Ok(panel) = objc2_app_kit::NSOpenPanel::new(mtm)
                 .downcast::<objc2_app_kit::NSSavePanel>()
             else {
-                _ = result_sender.send(Err(eyre!(
+                _ = result_sender.send(Err(anyhow!(
                     "couldn't cast NSOpenPanel to NSSavePanel"
                 )));
                 return;
@@ -175,13 +175,13 @@ pub async fn open_file_dialog_macos(
             let mut paths = Vec::new();
             for url in urls {
                 if !url.isFileURL() {
-                    _ = result_sender.send(Err(eyre!(
+                    _ = result_sender.send(Err(anyhow!(
                         "panel returned a url which was not a file:// url"
                     )));
                     return;
                 }
                 let Some(path) = url.to_file_path() else {
-                    _ = result_sender.send(Err(eyre!(
+                    _ = result_sender.send(Err(anyhow!(
                         "failed to convert url into file path"
                     )));
                     return;
@@ -197,7 +197,7 @@ pub async fn open_file_dialog_macos(
     });
 
     result_receiver.await
-        .map_err(|_| eyre!("channel closed unexpectedly while waiting for file dialog result"))
+        .map_err(|_| anyhow!("channel closed unexpectedly while waiting for file dialog result"))
         .flatten()
 }
 
@@ -244,7 +244,7 @@ fn set_panel_filters(
 #[cfg(target_os = "linux")]
 pub async fn open_file_dialog_linux(
     args: OpenFileDialogArgs,
-) -> eyre::Result<Vec<PathBuf>> {
+) -> anyhow::Result<Vec<PathBuf>> {
     use ashpd::desktop::{ResponseError, file_chooser::SelectedFiles};
 
     let filters = linux_file_filters(&args.filters);
@@ -261,7 +261,7 @@ pub async fn open_file_dialog_linux(
             .modal(true)
             .current_name(file_name.as_deref())
             .current_folder::<&std::path::Path>(folder.as_deref())
-            .wrap_err("setting default folder")?
+            .context("setting default folder")?
             .filters(filters)
             .send()
             .await
@@ -273,12 +273,12 @@ pub async fn open_file_dialog_linux(
             .multiple(args.multiple)
             .directory(args.directory)
             .current_folder::<&std::path::Path>(folder.as_deref())
-            .wrap_err("setting default folder")?
+            .context("setting default folder")?
             .filters(if args.directory { Vec::new() } else { filters })
             .send()
             .await
     }
-    .wrap_err("sending FileChooser portal request")?;
+    .context("sending FileChooser portal request")?;
 
     let selected = match request.response() {
         Ok(selected) => selected,
@@ -287,7 +287,7 @@ pub async fn open_file_dialog_linux(
         }
         Err(err) => {
             return Err(
-                eyre!(err).wrap_err("FileChooser portal request failed")
+                anyhow!(err).context("FileChooser portal request failed")
             );
         }
     };
@@ -295,13 +295,13 @@ pub async fn open_file_dialog_linux(
     let mut paths = Vec::with_capacity(selected.uris().len());
     for uri in selected.uris() {
         if uri.scheme() != "file" {
-            return Err(eyre!(
+            return Err(anyhow!(
                 "portal returned a url which was not a file:// url"
             ));
         }
         let path = uri
             .to_file_path()
-            .map_err(|_| eyre!("failed to convert url into file path"))?;
+            .map_err(|_| anyhow!("failed to convert url into file path"))?;
         paths.push(path);
     }
 
@@ -378,19 +378,19 @@ fn case_insensitive_extension_glob(extension: &str) -> String {
 #[cfg(target_os = "windows")]
 pub async fn open_file_dialog_windows(
     args: OpenFileDialogArgs,
-) -> eyre::Result<Vec<PathBuf>> {
+) -> anyhow::Result<Vec<PathBuf>> {
     let (result_sender, result_receiver) =
-        tokio::sync::oneshot::channel::<eyre::Result<Vec<PathBuf>>>();
+        tokio::sync::oneshot::channel::<anyhow::Result<Vec<PathBuf>>>();
 
     std::thread::Builder::new()
         .name("Modrinth Sandbox File Dialog".to_string())
         .spawn(move || {
             _ = result_sender.send(show_windows_file_dialog(&args));
         })
-        .wrap_err("spawning file dialog thread")?;
+        .context("spawning file dialog thread")?;
 
     result_receiver.await.map_err(|_| {
-        eyre!(
+        anyhow!(
             "channel closed unexpectedly while waiting for file dialog result"
         )
     })?
@@ -399,7 +399,7 @@ pub async fn open_file_dialog_windows(
 #[cfg(target_os = "windows")]
 fn show_windows_file_dialog(
     args: &OpenFileDialogArgs,
-) -> eyre::Result<Vec<PathBuf>> {
+) -> anyhow::Result<Vec<PathBuf>> {
     use windows::{
         Win32::{
             Foundation::ERROR_CANCELLED,
@@ -559,8 +559,8 @@ fn show_windows_file_dialog(
 #[cfg(target_os = "windows")]
 fn com_error(
     context: &'static str,
-) -> impl FnOnce(windows::core::Error) -> eyre::Report {
-    move |err| eyre!("{err}").wrap_err(context)
+) -> impl FnOnce(windows::core::Error) -> anyhow::Error {
+    move |err| anyhow!("{err}").context(context)
 }
 
 #[cfg(target_os = "windows")]
@@ -571,7 +571,7 @@ fn is_valid_windows_extension(extension: &str) -> bool {
 #[cfg(target_os = "windows")]
 fn windows_shell_item_path(
     item: &windows::Win32::UI::Shell::IShellItem,
-) -> eyre::Result<PathBuf> {
+) -> anyhow::Result<PathBuf> {
     use std::os::windows::ffi::OsStringExt;
     use windows::Win32::{
         System::Com::CoTaskMemFree, UI::Shell::SIGDN_FILESYSPATH,

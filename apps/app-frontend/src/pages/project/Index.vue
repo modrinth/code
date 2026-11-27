@@ -1,6 +1,13 @@
 <template>
 	<div v-if="data">
 		<Teleport to="#sidebar-teleport-target">
+			<GameAwardsNomineeCard
+				v-if="gameAwardsNominee"
+				v-bind="gameAwardsNominee"
+				:dismissed="gameAwardsDismissed"
+				class="!mb-0 border-x-0 border-t-0 !rounded-none pr-6"
+				@dismiss="dismissGameAwardsVotingDetails"
+			/>
 			<ProjectSidebarCompatibility
 				v-if="!isServerProject"
 				:project="data"
@@ -264,6 +271,8 @@ import {
 	ContextMenu,
 	CreationFlowModal,
 	defineMessages,
+	GameAwardsNomineeCard,
+	getGameAwardsNominee,
 	getTargetInstallPreferences,
 	IconButton,
 	injectNotificationManager,
@@ -383,6 +392,17 @@ const { installingServerProjects, playServerProject, showAddServerToInstanceModa
 	injectServerInstall()
 const installing = ref(false)
 const data = shallowRef(null)
+
+const GAME_AWARDS_VOTING_DETAILS_DISMISSED_KEY = 'game-awards-voting-details-dismissed'
+const gameAwardsDismissed = ref(
+	localStorage.getItem(GAME_AWARDS_VOTING_DETAILS_DISMISSED_KEY) === 'true',
+)
+const gameAwardsNominee = computed(() => getGameAwardsNominee(data.value))
+
+function dismissGameAwardsVotingDetails() {
+	gameAwardsDismissed.value = true
+	localStorage.setItem(GAME_AWARDS_VOTING_DETAILS_DISMISSED_KEY, 'true')
+}
 
 function getProjectBreadcrumbSummary(projectId) {
 	const identifier = Array.isArray(projectId) ? projectId[0] : projectId

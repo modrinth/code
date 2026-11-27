@@ -32,6 +32,9 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "טעינת פרטי המנוי נכשלה."
   },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "מס"
+  },
   "browse.no-results": {
     "defaultMessage": "לא נמצאו תוצאות עבור החיפוש!"
   },
@@ -290,6 +293,9 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "אזהרת מחיקה"
   },
+  "content.confirm-environment.distant-horizons-server-body": {
+    "defaultMessage": "Distant Horizons עלול להגדיל משמעותית את ניצול המעבד בשרת שלך ולגרום להאטה. מומלץ להשאיר אותו פועל בצד השחקן בלבד."
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} נוספו"
   },
@@ -302,11 +308,32 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "עודכן"
   },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "גרסת משחק"
+  },
+  "content.enabled-for.player": {
+    "defaultMessage": "שחקן"
+  },
+  "content.enabled-for.server": {
+    "defaultMessage": "שרת"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "עדכונים"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "אזהרות"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "יוצר גיבוי..."
   },
   "content.inline-backup.create-backup": {
     "defaultMessage": "צור גיבוי"
+  },
+  "content.managed-card.server-suffix": {
+    "defaultMessage": "שרת"
+  },
+  "content.metadata-filter.warning.client-only": {
+    "defaultMessage": "תוכן צד-לקוח בלבד"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "תוכן נוסף"
@@ -331,6 +358,15 @@
   },
   "content.page-layout.share.label": {
     "defaultMessage": "שתף"
+  },
+  "creation-flow.modal.final-config.generator-settings.flat": {
+    "defaultMessage": "שטוח"
+  },
+  "creation-flow.modal.final-config.world-name.label": {
+    "defaultMessage": "שם עולם"
+  },
+  "creation-flow.modal.final-config.world-type.label": {
+    "defaultMessage": "סוג עולם"
   },
   "creation-flow.modal.import-instance.action.add": {
     "defaultMessage": "הוספה"
@@ -466,6 +502,9 @@
   },
   "input.view.list": {
     "defaultMessage": "תצוגת שורות"
+  },
+  "installation-settings.type.server": {
+    "defaultMessage": "שרת"
   },
   "installation-settings.unlink.description": {
     "defaultMessage": "ניתוק קבוע של הקישור יבטל את הפרויקט {type} הזה מפרויקט {projectType}, מה שיאפשר לך לשנות את הטוען ואת גרסת ה-Minecraft, אך לא תקבל עדכונים עתידיים."
@@ -1226,6 +1265,15 @@
   "project.server.language.zu": {
     "defaultMessage": "זולו"
   },
+  "project.server.region.asia": {
+    "defaultMessage": "אסיה"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "אוסטרליה"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "אמריקה הדרומית"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "אנליטיקה"
   },
@@ -1429,6 +1477,24 @@
   },
   "servers.access-table.unknown-joined-date": {
     "defaultMessage": "—"
+  },
+  "servers.backups.deleted.reason.suspension": {
+    "defaultMessage": "השעיה"
+  },
+  "servers.backups.history.auto-badge": {
+    "defaultMessage": "אוטומטי"
+  },
+  "servers.backups.interval.weekly": {
+    "defaultMessage": "שבועי"
+  },
+  "servers.backups.item.auto": {
+    "defaultMessage": "אוטומטי"
+  },
+  "servers.backups.slots.auto.duration-minutes": {
+    "defaultMessage": "{minutes} דקות"
+  },
+  "servers.backups.slots.auto.off": {
+    "defaultMessage": "כבוי"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "סגור"
@@ -1681,6 +1747,45 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
+  },
+  "time-frame-picker.option.all-time": {
+    "defaultMessage": "כל הזמן"
+  },
+  "time-frame-picker.option.last-14-days": {
+    "defaultMessage": "14 הימים האחרונים"
+  },
+  "time-frame-picker.option.last-180-days": {
+    "defaultMessage": "180 הימים האחרונים"
+  },
+  "time-frame-picker.option.last-30-days": {
+    "defaultMessage": "30 הימים האחרונים"
+  },
+  "time-frame-picker.option.last-7-days": {
+    "defaultMessage": "7 הימים האחרונים"
+  },
+  "time-frame-picker.option.last-90-days": {
+    "defaultMessage": "90 הימים האחרונים"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "היום"
+  },
+  "time-frame-picker.option.year-to-date": {
+    "defaultMessage": "מתחילת השנה"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "אתמול"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "ימים"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "שעות"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "חודשים"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "שבועות"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "יש לך שינויים שלא נשמרו."

@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT what AS \"what!: sqlx::types::Json<ProjectFlag>\"\n        FROM project_flags\n        WHERE project_id = $1 AND (active OR (what->>'retain_when_resolved')::bool = TRUE)\n        ORDER BY what->>'key', id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "what!: sqlx::types::Json<ProjectFlag>",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_flags",
+            "name": "what"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "e175c82ae303c79e18136717eaf403aa500e59353dd4dff842de2fc37fa1e7d7"
+}

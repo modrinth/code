@@ -32,6 +32,9 @@ use uuid::Uuid;
 /// Relative to the instance directory.
 const LAUNCHER_LOG_PATH: [&str; 2] = ["logs", "launcher_log.txt"];
 const LOG_BUFFER_CAPACITY: usize = 50_000;
+const LAUNCH_HANDSHAKE_TIMEOUT: Duration = Duration::from_secs(120);
+const OUTPUT_DRAIN_TIMEOUT: Duration = Duration::from_secs(5);
+const LAUNCH_FAILURE_OUTPUT_LINES: usize = 10;
 
 struct LogRingBuffer {
     lines: VecDeque<String>,
@@ -332,7 +335,7 @@ impl ProcessManager {
         };
         let metadata = process.metadata.clone();
 
-        {
+        let stdout_reader = {
             let log_file = log_file.clone();
             let instance_id = metadata.instance_id.clone();
             let instance_path = metadata.instance_path.clone();
@@ -347,10 +350,10 @@ impl ProcessManager {
                     &pool,
                 )
                 .await;
-            });
-        }
+            })
+        };
 
-        {
+        let stderr_reader = {
             let log_file = log_file.clone();
             let instance_id = metadata.instance_id.clone();
             let instance_path = metadata.instance_path.clone();
@@ -365,8 +368,8 @@ impl ProcessManager {
                     &pool,
                 )
                 .await;
-            });
-        }
+            })
+        };
 
         let persisted_process = child_pid.map(|pid| {
             (i64::from(pid), process.metadata.start_time.timestamp())
@@ -414,7 +417,7 @@ impl ProcessManager {
             child_poll.set_missed_tick_behavior(
                 tokio::time::MissedTickBehavior::Skip,
             );
-            let timeout = tokio::time::sleep(Duration::from_secs(30));
+            let timeout = tokio::time::sleep(LAUNCH_HANDSHAKE_TIMEOUT);
             tokio::pin!(timeout);
             let initialization =
                 post_process_init(&process.metadata, &process.rpc_server);
@@ -447,10 +450,47 @@ impl ProcessManager {
             }
         };
         if let Err(error) = post_process_result {
-            tracing::error!("Failed to run post-process init: {error}");
+            tracing::error!("Failed to launch Minecraft: {error:#}");
             clear_persisted_process(&state.pool, persisted_process).await;
-            let _ = process.child.kill().await;
-            return Err(error);
+            let exit_status = match process.child.try_wait() {
+                Ok(Some(status)) => Some(status),
+                _ => {
+                    let _ = process.child.kill().await;
+                    process.child.wait().await.ok()
+                }
+            };
+            let mut readers = [stdout_reader, stderr_reader];
+            let _ = tokio::time::timeout(
+                OUTPUT_DRAIN_TIMEOUT,
+                futures::future::join_all(readers.iter_mut()),
+            )
+            .await;
+            for reader in &readers {
+                reader.abort();
+            }
+            if let Some(status) = exit_status
+                && let Err(e) = Process::append_to_log_file(
+                    log_file.as_deref(),
+                    &format!("\n# Process exited with status: {status}\n"),
+                )
+            {
+                tracing::warn!("Failed to write exit status to log file: {e}");
+            }
+
+            let output = get_log_buffer(instance_id);
+            let output_tail = output
+                .iter()
+                .skip(output.len().saturating_sub(LAUNCH_FAILURE_OUTPUT_LINES))
+                .map(String::as_str)
+                .collect::<Vec<_>>()
+                .join("\n");
+            if output_tail.is_empty() {
+                return Err(error);
+            }
+            return Err(ErrorKind::LauncherError(format!(
+                "{error}. Last output:\n{output_tail}"
+            ))
+            .into());
         }
         info!(%rpc_address, "Minecraft launcher RPC initialization completed");
 

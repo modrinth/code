@@ -97,6 +97,23 @@
 					<span>{{ formatUpdateChannelDescription(updateChannel) }}</span>
 				</div>
 
+				<div class="flex items-center justify-between gap-2">
+					<label for="auto-restart-on-crash" class="flex flex-col gap-1">
+						<span class="text-lg font-semibold text-contrast">
+							{{ formatMessage(messages.autoRestartOnCrashTitle) }}
+						</span>
+						<span>{{ formatMessage(messages.autoRestartOnCrashDescription) }}</span>
+					</label>
+					<div v-tooltip="canUsePowerActions ? undefined : permissionDeniedMessage">
+						<Toggle
+							id="auto-restart-on-crash"
+							v-model="autoRestartOnCrash"
+							class="flex-none"
+							:disabled="!canUsePowerActions"
+						/>
+					</div>
+				</div>
+
 				<!-- preferences -->
 				<div
 					v-for="(prefConfig, key) in preferences"
@@ -190,7 +207,8 @@ const { server: data, serverId, worldId, serverFull, busyReasons } = injectModri
 const { isApp } = injectServerSettings()
 const { featureFlags } = injectPageContext()
 const queryClient = useQueryClient()
-const { canUseAdvancedSettings, canSetup, permissionDeniedMessage } = useServerPermissions()
+const { canUseAdvancedSettings, canSetup, canUsePowerActions, permissionDeniedMessage } =
+	useServerPermissions()
 const advancedActionTooltip = computed(() =>
 	canUseAdvancedSettings.value ? undefined : permissionDeniedMessage.value,
 )
@@ -261,6 +279,13 @@ watch(worldUpdateChannel, (channel) => {
 	updateChannel.value = channel
 })
 
+const serverAutoRestartOnCrash = computed(() => serverFull.value?.auto_restart_on_crash ?? false)
+const autoRestartOnCrash = ref(serverAutoRestartOnCrash.value)
+
+watch(serverAutoRestartOnCrash, (enabled) => {
+	autoRestartOnCrash.value = enabled
+})
+
 function formatUpdateChannelLabel(channel: UpdateChannel) {
 	switch (channel) {
 		case 'release':
@@ -320,6 +345,14 @@ const messages = defineMessages({
 	selectUpdateChannelAriaLabel: {
 		id: 'hosting.settings.update-channel.select',
 		defaultMessage: 'Select update channel',
+	},
+	autoRestartOnCrashTitle: {
+		id: 'hosting.settings.auto-restart-on-crash.title',
+		defaultMessage: 'Restart on crash',
+	},
+	autoRestartOnCrashDescription: {
+		id: 'hosting.settings.auto-restart-on-crash.description',
+		defaultMessage: 'Automatically restart your server when it crashes after starting.',
 	},
 	environmentChangesTitle: {
 		id: 'hosting.settings.warn-environment-changes.title',
@@ -487,9 +520,15 @@ const hasPreferenceChanges = computed(() =>
 	preferenceKeys.some((key) => newUserPreferences.value[key] !== userPreferences.value[key]),
 )
 const hasUpdateChannelChanges = computed(() => updateChannel.value !== worldUpdateChannel.value)
+const hasAutoRestartOnCrashChanges = computed(
+	() => autoRestartOnCrash.value !== serverAutoRestartOnCrash.value,
+)
 const hasUnsavedChanges = computed(
 	() =>
-		hasServerSettingsChanges.value || hasPreferenceChanges.value || hasUpdateChannelChanges.value,
+		hasServerSettingsChanges.value ||
+		hasPreferenceChanges.value ||
+		hasUpdateChannelChanges.value ||
+		hasAutoRestartOnCrashChanges.value,
 )
 
 const saveGeneral = async () => {
@@ -497,6 +536,7 @@ const saveGeneral = async () => {
 	if (!isValidServerName.value || !isValidSubdomain.value) return
 	if (hasServerSettingsChanges.value && !canUseAdvancedSettings.value) return
 	if (hasUpdateChannelChanges.value && !canSetup.value) return
+	if (hasAutoRestartOnCrashChanges.value && !canUsePowerActions.value) return
 
 	try {
 		isUpdating.value = true
@@ -541,6 +581,13 @@ const saveGeneral = async () => {
 			])
 		}
 
+		if (hasAutoRestartOnCrashChanges.value) {
+			await client.archon.servers_v1.patchServer(serverId, {
+				auto_restart_on_crash: autoRestartOnCrash.value,
+			})
+			await queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] })
+		}
+
 		// Save preferences to localStorage
 		for (const key of preferenceKeys) userPreferences.value[key] = newUserPreferences.value[key]
 
@@ -570,5 +617,6 @@ const resetGeneral = () => {
 	subdomainTouched.value = false
 	newUserPreferences.value = { ...userPreferences.value }
 	updateChannel.value = worldUpdateChannel.value
+	autoRestartOnCrash.value = serverAutoRestartOnCrash.value
 }
 </script>

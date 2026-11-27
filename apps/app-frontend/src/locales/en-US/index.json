@@ -17,11 +17,11 @@
   "app.action-bar.install.copied-details": {
     "message": "Copied"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "Copy details"
-  },
   "app.action-bar.install.dismiss": {
     "message": "Dismiss"
+  },
+  "app.action-bar.install.inspect-details": {
+    "message": "Inspect details"
   },
   "app.action-bar.install.open-instance": {
     "message": "Open instance"
@@ -412,6 +412,12 @@
   },
   "app.download-manager.title": {
     "message": "Download manager"
+  },
+  "app.error.copied-debug-info": {
+    "message": "Copied"
+  },
+  "app.error.inspect-debug-info": {
+    "message": "Inspect debug info"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Open backups folder"
@@ -2961,10 +2967,10 @@
     "message": "Telemetry"
   },
   "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "Show the Copy details action while an install is queued or running. It is always available for failed or interrupted installs."
+    "message": "Show the Inspect details action while an install is queued or running. It is always available for failed or interrupted installs."
   },
   "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Always show copy details"
+    "message": "Always show inspect details"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "The app may load more slowly until the cache is rebuilt."

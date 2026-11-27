@@ -1,7 +1,7 @@
 use crate::models::ids::{
     ImageId, ProjectId, ReportId, ThreadId, ThreadMessageId,
 };
-use crate::models::projects::ProjectStatus;
+use crate::models::projects::LegacyProjectStatus;
 use crate::models::users::User;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
@@ -38,8 +38,8 @@ pub enum LegacyMessageBody {
         associated_images: Vec<ImageId>,
     },
     StatusChange {
-        new_status: ProjectStatus,
-        old_status: ProjectStatus,
+        new_status: LegacyProjectStatus,
+        old_status: LegacyProjectStatus,
     },
     ThreadClosure,
     ThreadReopen,
@@ -96,6 +96,7 @@ impl From<crate::models::v3::threads::MessageBody> for LegacyMessageBody {
             | crate::models::v3::threads::MessageBody::AutoApproval {
                 new_status,
                 old_status,
+                ..
             } => LegacyMessageBody::StatusChange {
                 new_status,
                 old_status,

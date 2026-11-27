@@ -9,7 +9,7 @@ use std::{
 };
 
 use async_trait::async_trait;
-use eyre::{Result, WrapErr, eyre};
+use anyhow::{Result, Context, anyhow};
 use windows::{
     Win32::{
         Foundation::{
@@ -81,11 +81,11 @@ pub(crate) fn spawn(
     null_device: HANDLE,
     mut attributes: Vec<ProcThreadAttribute>,
 ) -> Result<(Pipes, WindowsChild)> {
-    let program = resolve_path(&program).wrap_err("resolving program path")?;
+    let program = resolve_path(&program).context("resolving program path")?;
     let working_directory = working_directory
         .map(|path| resolve_path(&path))
         .transpose()
-        .wrap_err("resolving working directory path")?;
+        .context("resolving working directory path")?;
     let application_name = program
         .as_os_str()
         .encode_wide()
@@ -111,10 +111,10 @@ pub(crate) fn spawn(
         if k.as_os_str().as_encoded_bytes().contains(&b'\0')
             || v.as_os_str().as_encoded_bytes().contains(&b'\0')
         {
-            return Err(eyre!("environment variable contained null byte"));
+            return Err(anyhow!("environment variable contained null byte"));
         }
         if k.as_os_str().as_encoded_bytes().contains(&b'=') {
-            return Err(eyre!(
+            return Err(anyhow!(
                 "environment variable key contained equals sign"
             ));
         }
@@ -341,7 +341,7 @@ pub(crate) fn spawn(
     };
 
     if pi.hProcess.is_invalid() {
-        return Err(eyre!("CreateProcessW returned invalid process handle"));
+        return Err(anyhow!("CreateProcessW returned invalid process handle"));
     }
 
     drop(handles_to_close);
@@ -400,7 +400,7 @@ impl SandboxChildOp for WindowsChild {
                 0,
             );
             if wait == windows::Win32::Foundation::WAIT_FAILED {
-                return Err(eyre!("wait failed"));
+                return Err(anyhow!("wait failed"));
             } else if wait == windows::Win32::Foundation::WAIT_TIMEOUT {
                 return Ok(None);
             }
@@ -431,7 +431,7 @@ impl SandboxChildOp for WindowsChild {
                 windows::Win32::System::Threading::INFINITE,
             );
             if wait == windows::Win32::Foundation::WAIT_FAILED {
-                return Err(eyre!("wait failed"));
+                return Err(anyhow!("wait failed"));
             }
 
             let mut code = 0;
@@ -442,7 +442,7 @@ impl SandboxChildOp for WindowsChild {
             Ok(code)
         })
         .await
-        .wrap_err("joining process wait task")??;
+        .context("joining process wait task")??;
 
         let exit_status = SandboxExitStatus {
             imp: WindowsSandboxExitStatus(code),
@@ -484,7 +484,7 @@ impl WindowsChild {
                 windows::Win32::System::Threading::INFINITE,
             );
             if wait == windows::Win32::Foundation::WAIT_FAILED {
-                return Err(eyre!("wait failed"));
+                return Err(anyhow!("wait failed"));
             }
 
             let mut code = 0;
@@ -592,7 +592,7 @@ pub fn create_job_object() -> Result<HANDLE> {
     let job_handle =
         unsafe { CreateJobObjectW(None, windows::core::PCWSTR::default())? };
     if job_handle.is_invalid() {
-        return Err(eyre!("CreateJobObjectW returned invalid handle"));
+        return Err(anyhow!("CreateJobObjectW returned invalid handle"));
     }
     let mut info = JOBOBJECT_EXTENDED_LIMIT_INFORMATION::default();
     info.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
@@ -625,7 +625,7 @@ pub fn open_null_device() -> Result<HANDLE> {
         )?
     };
     if handle.is_invalid() {
-        return Err(eyre!("CreateFileW returned invalid handle"));
+        return Err(anyhow!("CreateFileW returned invalid handle"));
     }
     Ok(handle)
 }
@@ -649,7 +649,7 @@ fn duplicate_handle(handle: HANDLE, inheritable: bool) -> Result<HANDLE> {
         )?;
     }
     if duplicated.is_invalid() {
-        return Err(eyre!("DuplicateHandle returned invalid handle"));
+        return Err(anyhow!("DuplicateHandle returned invalid handle"));
     }
     Ok(duplicated)
 }
@@ -659,6 +659,6 @@ pub fn to_owned_handle(handle: HANDLE) -> Result<OwnedHandle> {
     if let Ok(handle) = OwnedHandle::try_from(handle) {
         Ok(handle)
     } else {
-        Err(eyre!("cannot convert invalid handle to owned handle"))
+        Err(anyhow!("cannot convert invalid handle to owned handle"))
     }
 }

@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "Скопійовано"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "Скопіювати деталі"
-  },
   "app.action-bar.install.dismiss": {
     "message": "Відхилити"
   },
@@ -333,7 +330,7 @@
     "message": "Готуємо файли…"
   },
   "app.download-manager.active": {
-    "message": "Активно"
+    "message": "Активні"
   },
   "app.download-manager.attention": {
     "message": "Потребує уваги"
@@ -354,7 +351,7 @@
     "message": "Очистити всі завершені завдання"
   },
   "app.download-manager.complete": {
-    "message": "Завершено"
+    "message": "Завершені"
   },
   "app.download-manager.duplicated-instance": {
     "message": "Дубльований примірник"
@@ -486,13 +483,13 @@
     "message": "Бічна панель"
   },
   "app.features-settings.sync-across-devices.description": {
-    "message": "Використовуватиме ці особливості всюди, де ви ввійшли. Вимкніть це, щоб зберегти окремі налаштування на цьому пристрої."
+    "message": "Використовуватиме ці налаштування у всіх авторизованих пристроях. Вимкніть, щоб зберегти окремі налаштування на цьому пристрої."
   },
   "app.features-settings.sync-across-devices.signed-out-tooltip": {
     "message": "Увійдіть в обліковий запис Modrint, щоб синхронізувати налаштування."
   },
   "app.features-settings.sync-across-devices.title": {
-    "message": "Синхронізувати особливості між пристроями"
+    "message": "Синхронізувати налаштування між пристроями"
   },
   "app.file-download.canceling": {
     "message": "Скасування завантаження…"
@@ -771,7 +768,7 @@
     "message": "Назад до примірника"
   },
   "app.instance.server.offline.description": {
-    "message": "Цей сервер зараз не в мережі. Ви можете запустити Minecraft, але не зможете підʼєднатися до серверів."
+    "message": "Цей сервер не в мережі. Ви можете запустити Minecraft, але не зможете підʼєднатися до нього."
   },
   "app.instance.server.offline.launch-anyway": {
     "message": "Усе одно запустити"
@@ -858,7 +855,7 @@
     "message": "Увійти"
   },
   "app.instance.share.unable-to-connect.description": {
-    "message": "Сервіс спільних примірників зараз недоступний. Спробуйте пізніше"
+    "message": "Сервіс спільних примірників у цю мить недоступний. Спробуйте пізніше"
   },
   "app.instance.share.unable-to-connect.heading": {
     "message": "Не вдалося підʼєднатися"
@@ -972,7 +969,7 @@
     "message": "Видалити тут"
   },
   "app.instance.worlds.remove-server-modal.synced-description": {
-    "message": "Його можна видалити з цього конкретного примірника або з усіх синхронізованих примірників. Видалення лише з цього увімкне перевизначення, і цей примірник більше не отримуватиме змін із сервера."
+    "message": "Його можна видалити з цього примірника або з усіх синхронізованих примірників. Видалення лише з цього примірника ввімкне перевизначення, і він більше не отримуватиме змін від сервера."
   },
   "app.instance.worlds.remove-server-modal.synced-header": {
     "message": "Цей сервер синхронізовано"
@@ -1016,14 +1013,44 @@
   "app.java-selector.browse": {
     "message": "Огляд"
   },
+  "app.java-selector.copy-failed-title": {
+    "message": "Не вдалося скопіювати шлях"
+  },
+  "app.java-selector.copy-path": {
+    "message": "Скопіювати шлях"
+  },
   "app.java-selector.detect": {
     "message": "Виявити"
+  },
+  "app.java-selector.edit-path": {
+    "message": "Редагувати шлях"
+  },
+  "app.java-selector.install-java": {
+    "message": "Установити Java {version}"
   },
   "app.java-selector.installing": {
     "message": "Установлюємо..."
   },
+  "app.java-selector.invalid": {
+    "message": "Недійсна"
+  },
+  "app.java-selector.more-options": {
+    "message": "Інші варіанти Java"
+  },
+  "app.java-selector.not-set": {
+    "message": "Java не обрано"
+  },
+  "app.java-selector.path-copied-text": {
+    "message": "Шлях до Java скопійовано до буфера обміну."
+  },
+  "app.java-selector.path-copied-title": {
+    "message": "Шлях скопійовано"
+  },
   "app.java-selector.path.placeholder": {
     "message": "/шлях/до/java"
+  },
+  "app.java-selector.valid": {
+    "message": "Дійсна"
   },
   "app.library.actions.label": {
     "message": "Дії з бібліотекою"
@@ -1195,6 +1222,9 @@
   },
   "app.library.group.unknown": {
     "message": "Невідома група"
+  },
+  "app.library.instance-hidden.text": {
+    "message": "Ви можете показати його, вибравши «Налаштування» > «Поведінка»."
   },
   "app.library.instance-hidden.title": {
     "message": "Приховано з бібліотеки"
@@ -1455,7 +1485,7 @@
     "message": "Цей спільний примірник містить файли, які не опубліковані на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
   },
   "app.modal.install-to-play.unavailable-description": {
-    "message": "Версія збірки, яку використовує цей сервер, наразі не може завантажитися. Вона може бути неопублікована або під розглядом. Спробуйте пізніше або звʼяжіться з власником сервера."
+    "message": "Версію збірки, яку використовує цей сервер, у цей час не можна завантажити. Вона може бути неопублікована або під розглядом. Спробуйте пізніше або звʼяжіться з власником сервера."
   },
   "app.modal.install-to-play.unavailable-header": {
     "message": "Збірка цього сервера недоступна"
@@ -1638,7 +1668,7 @@
     "message": "Копіювати зображення"
   },
   "app.screenshots.delete-description": {
-    "message": "Видалити \"{name}\" остаточно? Цю дію неможливо скасувати."
+    "message": "Остаточно видалити «{name}»? Цю дію неможливо скасувати."
   },
   "app.screenshots.delete-success": {
     "message": "Знімок видалено"
@@ -1917,7 +1947,7 @@
     "message": "Мова"
   },
   "app.settings.game-options.category.music-and-sound.description": {
-    "message": "Налаштування гучності й звуку"
+    "message": "Налаштування гучности й звуку"
   },
   "app.settings.game-options.category.music-and-sound.label": {
     "message": "Музика та звуки"
@@ -2061,10 +2091,10 @@
     "message": "Коли згорнуто"
   },
   "app.settings.game-options.choice.while-afk": {
-    "message": "За бездіяльності"
+    "message": "За бездіяльности"
   },
   "app.settings.game-options.compatibility.none": {
-    "message": "Деякі з ваших примірників не можуть використовувати цей параметр"
+    "message": "Деякі ваші примірники не можуть використовувати це налаштування"
   },
   "app.settings.game-options.compatibility.reason.launcher-controlled": {
     "message": "Цей параметр керується налаштуваннями запуску Modrinth."
@@ -2451,7 +2481,7 @@
     "message": "Контрастний контур блоків"
   },
   "app.settings.game-options.setting.high-contrast.description": {
-    "message": "Підвищення контрастності елементів інтерфейсу."
+    "message": "Підвищує контраст елементів інтерфейсу."
   },
   "app.settings.game-options.setting.high-contrast.label": {
     "message": "Висока контрастність"
@@ -2718,7 +2748,7 @@
     "message": "Частота музики"
   },
   "app.settings.game-options.setting.music-toast.description": {
-    "message": "Визначає, де з'являтиметься підказка з назвою й виконавцем чи виконавицею пісні."
+    "message": "Укажіть, чи показувати назву музики в меню паузи та спливному вікні."
   },
   "app.settings.game-options.setting.music-toast.label": {
     "message": "Сповіщення музики"
@@ -2805,7 +2835,7 @@
     "message": "Показувати присутність"
   },
   "app.settings.game-options.setting.simulation-distance.description": {
-    "message": "Як далеко сутності оновлюються, а блоки й рідини тікають."
+    "message": "Протягом якої відстані сутності, блоки й рідини оновлюються."
   },
   "app.settings.game-options.setting.simulation-distance.label": {
     "message": "Дистанція симуляції"
@@ -2892,7 +2922,7 @@
     "message": "Спочатку виберіть значення."
   },
   "app.settings.game-options.validation.no-compatible-instances": {
-    "message": "Деякі з ваших примірників не можуть використовувати цей параметр"
+    "message": "Деякі ваші примірники не можуть використовувати це налаштування"
   },
   "app.settings.java-installations.location.title": {
     "message": "Розташування Java {version, number}"
@@ -2910,7 +2940,7 @@
     "message": "Discord Rich Presence"
   },
   "app.settings.privacy.telemetry.description": {
-    "message": "Modrinth збирає анонімізовану аналітику та дані про використання для покращення зручності та адаптації сервісу. Вимкнувши цю опцію, ви відмовляєтеся від збору, і ваші дані більше не збиратимуться."
+    "message": "Modrinth збирає анонімні дані про використання, щоб покращити зручність сервісу та адаптувати його під вас. Якщо вимкнете цю опцію, то відмовитеся від цього, і ваші дані більше не збиратимуться."
   },
   "app.settings.privacy.telemetry.title": {
     "message": "Телеметрія"
@@ -2939,8 +2969,83 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Резервні копії бази даних застосунку"
   },
+  "app.settings.resource-management.app-directory.cancel-move": {
+    "message": "Скасувати перенесення"
+  },
+  "app.settings.resource-management.app-directory.change": {
+    "message": "Змінити директорію"
+  },
+  "app.settings.resource-management.app-directory.change-to-default": {
+    "message": "Змінити на усталене"
+  },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Де Modrinth App зберігає примірники й інші файли. Зміни набудуть чинності після перезапуску застосунку."
+    "message": "Де Modrinth App зберігає примірники та інші файли."
+  },
+  "app.settings.resource-management.app-directory.modal.admonition-body": {
+    "message": "Ви не зможете користуватися Modrinth App, поки ми переносимо ваші дані. Це може зайняти багато часу."
+  },
+  "app.settings.resource-management.app-directory.modal.admonition-header": {
+    "message": "Усі ваші файли буде перенесено"
+  },
+  "app.settings.resource-management.app-directory.modal.choose": {
+    "message": "Оберіть теку"
+  },
+  "app.settings.resource-management.app-directory.modal.current": {
+    "message": "Поточна"
+  },
+  "app.settings.resource-management.app-directory.modal.drive-root": {
+    "message": "Вибирайте теку, а не корінь диску, щоб ваші файли не засмічували його."
+  },
+  "app.settings.resource-management.app-directory.modal.header": {
+    "message": "Зміна директорії застосунку"
+  },
+  "app.settings.resource-management.app-directory.modal.instances-running": {
+    "message": "Закрийте всі запущені примірники, перш ніж змінювати директорію застосунку."
+  },
+  "app.settings.resource-management.app-directory.modal.more-options": {
+    "message": "Інші варіанти перенесення"
+  },
+  "app.settings.resource-management.app-directory.modal.move-and-restart": {
+    "message": "Перенести й перезапустити"
+  },
+  "app.settings.resource-management.app-directory.modal.move-later": {
+    "message": "Перенести під час наступного запуску"
+  },
+  "app.settings.resource-management.app-directory.modal.nested": {
+    "message": "Нова тека не може перебувати всередині поточної чи містити її."
+  },
+  "app.settings.resource-management.app-directory.modal.new": {
+    "message": "Нова"
+  },
+  "app.settings.resource-management.app-directory.modal.picker-title": {
+    "message": "Вибір нової директорії застосунку"
+  },
+  "app.settings.resource-management.app-directory.more-change-options": {
+    "message": "Інші варіанти директорії"
+  },
+  "app.settings.resource-management.app-directory.move-now": {
+    "message": "Перенести й перезапустити вже"
+  },
+  "app.settings.resource-management.app-directory.open-folder": {
+    "message": "Відкрити теку"
+  },
+  "app.settings.resource-management.app-directory.open-in-explorer": {
+    "message": "Відкрити в Провіднику"
+  },
+  "app.settings.resource-management.app-directory.open-in-finder": {
+    "message": "Відкрити в Finder"
+  },
+  "app.settings.resource-management.app-directory.path-copied-text": {
+    "message": "Шлях директорії застосунку скопійовано до буфера обміну."
+  },
+  "app.settings.resource-management.app-directory.path-copied-title": {
+    "message": "Шлях скопійовано"
+  },
+  "app.settings.resource-management.app-directory.path-copy-failed-title": {
+    "message": "Не вдалося скопіювати шлях"
+  },
+  "app.settings.resource-management.app-directory.pending": {
+    "message": "Вашу директорію застосунку буде перенесено до {path}, коли Modrinth App запуститься."
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Каталог застосунку"
@@ -3018,13 +3123,13 @@
     "message": "Система"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
-    "message": "Виберіть із якого примірника копіювати вашу історію команд. Її буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."
+    "message": "Виберіть примірник, з якого потрібно скопіювати історію команд. Вона буде використана лише під час першої синхронізації, опісля її можна редагувати з будь-якого примірника."
   },
   "app.settings.synced-options.choose-sync-source.command-history-title": {
     "message": "Виберіть джерело історії команд"
   },
   "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
-    "message": "Виберіть із якого примірника копіювати ваші збережені ПШД режиму творчости. Їх буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."
+    "message": "Виберіть примірник, з якого потрібно скопіювати панелі швидкого доступу режиму творчости. Вони будуть використані лише під час першої синхронізації, опісля їх можна редагувати з будь-якого примірника."
   },
   "app.settings.synced-options.choose-sync-source.creative-hotbars-title": {
     "message": "Виберіть джерело ПШД режиму творчости"
@@ -3033,19 +3138,19 @@
     "message": "Виберіть джерело пакетів даних"
   },
   "app.settings.synced-options.choose-sync-source.game-settings-description": {
-    "message": "Виберіть із якого примірника копіювати ваші налаштування. Їх буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."
+    "message": "Виберіть примірник, з якого потрібно скопіювати налаштування гри. Вони будуть використані лише під час першої синхронізації, опісля їх можна редагувати з будь-якого примірника."
   },
   "app.settings.synced-options.choose-sync-source.game-settings-title": {
     "message": "Виберіть джерело налаштувань гри"
   },
   "app.settings.synced-options.choose-sync-source.ineligible": {
-    "message": "Ви не можете вибрати цей екземпляр як джерело синхронізації"
+    "message": "Цей примірник не може бути джерелом синхронізації"
   },
   "app.settings.synced-options.choose-sync-source.load-error": {
     "message": "Не вдалося завантажити джерела синхронізації. Спробуйте ще раз."
   },
   "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
-    "message": "Виберіть із якого примірника копіювати ваші сервери мережевої гри. Їх буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."
+    "message": "Виберіть примірник, з якого потрібно скопіювати сервери. Вони будуть використані лише під час першої синхронізації, опісля їх можна редагувати з будь-якого примірника."
   },
   "app.settings.synced-options.choose-sync-source.multiplayer-servers-title": {
     "message": "Виберіть джерело серверів мережевої гри"
@@ -3108,7 +3213,7 @@
     "message": "Ці налаштування змінилися десь ще"
   },
   "app.settings.synced-options.game-settings.custom-empty": {
-    "message": "Додані модами налаштування з'являться тут після того, як Modrinth знайде їх в одному з ваших примірників."
+    "message": "Додані модами налаштування будуть тут, коли Modrinth знайде їх в одному з ваших примірників."
   },
   "app.settings.synced-options.game-settings.description": {
     "message": "Використовувати однакові налаштування гри у всіх примірниках."
@@ -3132,7 +3237,7 @@
     "message": "Завантаження налаштувань..."
   },
   "app.settings.synced-options.game-settings.no-options-to-edit": {
-    "message": "Наразі немає параметрів для зміни"
+    "message": "Поки що немає параметрів для зміни"
   },
   "app.settings.synced-options.game-settings.not-being-synced": {
     "message": "Не синхронізується"
@@ -3494,6 +3599,9 @@
   "app.skins.toggle-ears-features-on": {
     "message": "Увімкнути"
   },
+  "app.splash.moving-app-directory": {
+    "message": "Переносимо директорію застосунку…"
+  },
   "app.survey.body": {
     "message": "Не бажаєте відповісти на кілька запитань про ваш досвід користування Modrinth App?"
   },
@@ -3510,10 +3618,10 @@
     "message": "Привіт, користувачу Modrinth!"
   },
   "app.sync-instances-update.choose-source.data-packs": {
-    "message": "Виберіть із якого примірника копіювати ваші пакети даних. Їх буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."
+    "message": "Виберіть примірник, з якого потрібно скопіювати пакети даних. Вони будуть використані лише під час першої синхронізації, опісля їх можна редагувати з будь-якого примірника."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
-    "message": "Виберіть із якого примірника копіювати ваші пакети ресурсів. Їх буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."
+    "message": "Виберіть примірник, з якого потрібно скопіювати пакети ресурсів. Вони будуть використані лише під час першої синхронізації, опісля їх можна редагувати з будь-якого примірника."
   },
   "app.synced-content.change.disable-description": {
     "message": "Вимкне його між усіма синхронізованими примірниками, або ж тільки в цьому. Якщо вимкнути лише тут, для цього примірника увімкнуться перевизначення."
@@ -3567,7 +3675,7 @@
     "message": "{count, plural, one {Цей пакет ресурсів синхронізований} other {Ці пакети ресурсів синхронізовані}}"
   },
   "app.synced-content.desync.description": {
-    "message": "Цей примірник зберігатиме свою копію. Ви хочете залишити цей уміст синхронізованим в інших примірниках чи хочете видалити його з них?"
+    "message": "Цей примірник збереже власну копію. Синхронізувати цей уміст в інших примірниках, чи видалити його в них?"
   },
   "app.synced-content.desync.keep": {
     "message": "Залишити"
@@ -3594,7 +3702,7 @@
     "message": "Синхронізовані пакети ресурсів"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} завантажено. Перезапустіть, щоб оновити зараз, або це відбудеться автоматично після закриття застосунку."
+    "message": "Завантажено Modrinth App версії {version}. Перезапустіть, щоб оновити, або ж застосунок зробить це самостійно, щойно ви його згорнете."
   },
   "app.update-popup.body.linux": {
     "message": "Modrinth App v{version} вже доступно. Скористайтеся менеджером пакетів, щоб отримати найновіші функції та виправлення!"
@@ -3788,6 +3896,60 @@
   "hosting.play.world-changed": {
     "message": "Цей світ уже не активний або не є спільним. Відкрийте панель сервера та натисніть «Грати на сервері» знову."
   },
+  "installation-settings.advanced.title": {
+    "message": "Розширені"
+  },
+  "installation-settings.relink-shared-instance.button": {
+    "message": "Знову приєднати спільний примірник"
+  },
+  "installation-settings.relink-shared-instance.description": {
+    "message": "Знову приєднує цей примірник до спільного примірника за допомогою запрошення або ідентифікатора."
+  },
+  "installation-settings.relink-shared-instance.modal.already-linked": {
+    "message": "Ваш примірник «{name}» уже приєднаний до цього спільного примірника."
+  },
+  "installation-settings.relink-shared-instance.modal.blocked-header": {
+    "message": "Цей примірник неможливо відʼєднати"
+  },
+  "installation-settings.relink-shared-instance.modal.confirm-body": {
+    "message": "Цей примірник знову стане вихідним для спільного примірника. Учасники отримуватимуть оновлення, коли ви їх публікуватимете."
+  },
+  "installation-settings.relink-shared-instance.modal.description": {
+    "message": "Приєднує цей примірник до вашого спільного примірника."
+  },
+  "installation-settings.relink-shared-instance.modal.find-button": {
+    "message": "Знайти спільний примірник"
+  },
+  "installation-settings.relink-shared-instance.modal.header": {
+    "message": "Знову приєднати спільний примірник"
+  },
+  "installation-settings.relink-shared-instance.modal.input-label": {
+    "message": "Запрошення або ідентифікатор спільного примірника"
+  },
+  "installation-settings.relink-shared-instance.modal.input-placeholder": {
+    "message": "https://modrinth.com/share/…"
+  },
+  "installation-settings.relink-shared-instance.modal.mismatch-body": {
+    "message": "Цей примірник використовує {localLoader} {localGameVersion}, але спільний примірник використовує {loader} {gameVersion}. Наступне оновлення змінить версію спільного примірника на версію цього."
+  },
+  "installation-settings.relink-shared-instance.modal.mismatch-header": {
+    "message": "Інша версія гри чи завантажувача"
+  },
+  "installation-settings.relink-shared-instance.modal.not-owner": {
+    "message": "Лише власник може знову приєднати спільний примірник. Щоб отримувати оновлення, перевстановіть його у вашій бібліотеці."
+  },
+  "installation-settings.relink-shared-instance.modal.relink-button": {
+    "message": "Знову приєднати"
+  },
+  "installation-settings.relink-shared-instance.modal.server-managed": {
+    "message": "Цей спільний примірник керується сервером, тому його не можна відʼєднати."
+  },
+  "installation-settings.relink-shared-instance.modal.version-summary": {
+    "message": "{loader} {gameVersion} · Версія {version}"
+  },
+  "installation-settings.relink-shared-instance.title": {
+    "message": "Перевʼязування спільного примірника"
+  },
   "installation-settings.shared-instance.linked-title": {
     "message": "Пов'язаний спільний примірник"
   },
@@ -3810,7 +3972,7 @@
     "message": "Відвʼязування спільного примірника"
   },
   "installation-settings.unlink-shared-instance.modal.header": {
-    "message": "Відв'язати спільний примірник"
+    "message": "Відвʼязування спільного примірника"
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Це видалить спільний примірник із серверів Modrinth. Користувачі Modrinth App припинять отримувати оновлення, але ваш локальний примірник і його вміст залишаться на цьому пристрої."
@@ -3910,6 +4072,15 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Пакет ресурсів"
+  },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "Керувати усталеними налаштуваннями"
+  },
+  "instance.settings.reset-setting-to-default": {
+    "message": "Скинути {setting} до усталеного"
+  },
+  "instance.settings.reset-to-default": {
+    "message": "Скинути до усталеного"
   },
   "instance.settings.sidebar.label.game": {
     "message": "Гра"
@@ -4037,6 +4208,9 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Оберіть випуск оновлення"
   },
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "Ваш примірник використовуватиме усталені параметри запуску, якщо ви їх не перевизначите тут."
+  },
   "instance.settings.tabs.hooks.label": {
     "message": "Параметри запуску"
   },
@@ -4097,6 +4271,9 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Налаштування інсталяції недоступні, поки цей примірник заблокований."
   },
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "Ваш примірник використовуватиме усталені налаштування Java й памʼяті, якщо ви їх не перевизначите тут."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Уведіть змінні середовища..."
   },
@@ -4104,25 +4281,28 @@
     "message": "Уведіть аргументи Java..."
   },
   "instance.settings.tabs.java.environment-variables": {
-    "message": "Власні змінні середовища"
+    "message": "Змінні середовища"
   },
   "instance.settings.tabs.java.hooks": {
     "message": "Параметри"
   },
   "instance.settings.tabs.java.java-arguments": {
-    "message": "Власні аргументи Java"
+    "message": "Аргументи Java"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "Власна інсталяція Java"
+    "message": "Інсталяція Java"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "Власний розподіл пам'яті"
+    "message": "Виділення памʼяті"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/шлях/до/java"
   },
   "instance.settings.tabs.java.label": {
     "message": "Java й памʼять"
+  },
+  "instance.settings.tabs.java.recommended-java-version": {
+    "message": "Для версії Minecraft цього примірника радимо Java {version}."
   },
   "instance.settings.tabs.sharing": {
     "message": "Спільний доступ"
@@ -4187,6 +4367,9 @@
   "instance.settings.tabs.syncing": {
     "message": "Синхронізація"
   },
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "Ваш примірник використовуватиме усталені налаштування вікна, якщо ви їх не перевизначите тут."
+  },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Повний екран"
   },
@@ -4213,6 +4396,9 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Уведіть ширину…"
+  },
+  "instance.settings.using-defaults": {
+    "message": "Використовуються усталені"
   },
   "instance.shared-instance.error.title": {
     "message": "Щось пішло не так"
@@ -4353,7 +4539,7 @@
     "message": "Переглянути примірник"
   },
   "instance.worlds.world_in_use": {
-    "message": "Світ наразі використовується"
+    "message": "У цьому світі грають"
   },
   "minecraft-account.add-account": {
     "message": "Додати обліковий запис"

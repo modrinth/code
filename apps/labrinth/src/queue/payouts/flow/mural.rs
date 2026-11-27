@@ -1,6 +1,6 @@
+use anyhow::anyhow;
 use ariadne::ids::UserId;
 use chrono::Utc;
-use eyre::eyre;
 use modrinth_util::decimal::Decimal2dp;
 use muralpay::FiatAndRailCode;
 use rust_decimal::{Decimal, RoundingStrategy, dec};
@@ -76,13 +76,13 @@ pub(super) async fn create(
     details: MuralPayDetails,
 ) -> Result<PayoutFlow, ApiError> {
     if is_blocked_region(details.recipient_info.physical_address()) {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "withdrawals are not supported for this region"
         )));
     }
 
     let gross_usd =
-        Decimal2dp::new(amount).wrap_request_err("invalid amount")?;
+        Decimal2dp::new(amount).request_context("invalid amount")?;
     let platform_fee_usd = Decimal2dp::rounded(
         PLATFORM_FEE.compute_fee(gross_usd),
         RoundingStrategy::AwayFromZero,
@@ -91,7 +91,7 @@ pub(super) async fn create(
     let mural = queue.muralpay.load();
     let mural = mural
         .as_ref()
-        .wrap_internal_err("required Mural client is not available")?;
+        .internal_context("required Mural client is not available")?;
 
     let method_fee_usd;
     let forex_usd_to_currency;
@@ -119,11 +119,11 @@ pub(super) async fn create(
                     fiat_and_rail_code,
                 }])
                 .await
-                .wrap_internal_err("failed to request fees")?;
+                .internal_context("failed to request fees")?;
             let fee = fees
                 .into_iter()
                 .next()
-                .wrap_internal_err("no fees returned")?;
+                .internal_context("no fees returned")?;
 
             match fee {
                 muralpay::TokenPayoutFee::Success {
@@ -139,7 +139,7 @@ pub(super) async fn create(
                     min_amount_usd = min_usd_fiat(fiat_and_rail_code);
                 }
                 muralpay::TokenPayoutFee::Error { message, .. } => {
-                    return Err(ApiError::Internal(eyre!(
+                    return Err(ApiError::Internal(anyhow!(
                         "failed to compute fee: {message}"
                     )));
                 }
@@ -182,15 +182,15 @@ pub(super) async fn execute(
         recipient_info,
     }: MuralFlow,
 ) -> Result<(), ApiError> {
-    let user_email = get_verified_email(user)
-        .wrap_api_err("fetching verified user email")?;
+    let user_email =
+        get_verified_email(user).api_context("fetching verified user email")?;
     let sent_to_method_usd = net_usd + method_fee_usd;
     let total_fee_usd = method_fee_usd + platform_fee_usd;
 
     let mural = queue.muralpay.load();
     let mural = mural
         .as_ref()
-        .wrap_internal_err("required Mural client is not available")?;
+        .internal_context("required Mural client is not available")?;
 
     let payment_statement_doc = queue
         .create_mural_payment_statement_doc(
@@ -201,7 +201,7 @@ pub(super) async fn execute(
             gotenberg,
         )
         .await
-        .wrap_api_err("creating Mural payment statement document")?;
+        .api_context("creating Mural payment statement document")?;
 
     let user_id = UserId::from(user.id);
     let method_id = match &payout_details {
@@ -265,11 +265,11 @@ pub(super) async fn execute(
     let payout_request = match payout_request {
         Ok(payout_request) => payout_request,
         Err(muralpay::MuralError::Api(err)) => {
-            return Err(ApiError::Request(eyre::eyre!(Box::new(err))));
+            return Err(ApiError::Request(anyhow!(Box::new(err))));
         }
         Err(err) => {
             return Err(ApiError::Internal(
-                eyre!(err).wrap_err("failed to create payout request"),
+                anyhow!(err).context("failed to create payout request"),
             ));
         }
     };
@@ -307,7 +307,7 @@ pub(super) async fn execute(
             .client
             .execute_payout_request(payout_request.id)
             .await
-            .wrap_internal_err("failed to execute payout request")?;
+            .internal_context("failed to execute payout request")?;
         Ok::<_, ApiError>(())
     })
     .await;
@@ -334,12 +334,12 @@ pub(super) async fn execute(
     payout
         .insert(&mut transaction)
         .await
-        .wrap_internal_err("failed to insert payout")?;
+        .internal_context("failed to insert payout")?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("failed to commit transaction")?;
+        .internal_context("failed to commit transaction")?;
 
     Ok(())
 }

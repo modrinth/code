@@ -1,7 +1,7 @@
 use crate::database::models::{DBProductId, DBProductPriceId, product_item};
 use crate::models::billing::{Price, ProductMetadata};
+use anyhow::{Context, Result};
 use dashmap::DashMap;
-use eyre::{Result, WrapErr};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -60,7 +60,7 @@ impl DBProduct {
     ) -> Result<Option<DBProduct>> {
         Ok(Self::get_many(&[id], exec)
             .await
-            .wrap_err("fetching product")?
+            .context("fetching product")?
             .into_iter()
             .next())
     }
@@ -76,12 +76,12 @@ impl DBProduct {
         )
         .fetch_optional(exec)
         .await
-        .wrap_err("fetching product by price")?;
+        .context("fetching product by price")?;
 
         maybe_row
             .map(TryInto::try_into)
             .transpose()
-            .wrap_err("deserializing product metadata")
+            .context("deserializing product metadata")
     }
 
     pub async fn get_by_type<'a, E>(exec: E, r#type: &str) -> Result<Vec<Self>>
@@ -94,13 +94,13 @@ impl DBProduct {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching products by type")?;
+        .context("fetching products by type")?;
 
         maybe_row
             .into_iter()
             .map(TryInto::try_into)
             .collect::<std::result::Result<Vec<_>, _>>()
-            .wrap_err("deserializing product metadata")
+            .context("deserializing product metadata")
     }
 
     pub async fn get_many(
@@ -115,13 +115,13 @@ impl DBProduct {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching products")?;
+        .context("fetching products")?;
 
         results
             .into_iter()
             .map(TryInto::try_into)
             .collect::<std::result::Result<Vec<_>, _>>()
-            .wrap_err("deserializing product metadata")
+            .context("deserializing product metadata")
     }
 
     pub async fn get_all(
@@ -131,13 +131,13 @@ impl DBProduct {
         let results = select_products_with_predicate!("WHERE 1 = $1", one)
             .fetch_all(exec)
             .await
-            .wrap_err("fetching all products")?;
+            .context("fetching all products")?;
 
         results
             .into_iter()
             .map(TryInto::try_into)
             .collect::<std::result::Result<Vec<_>, _>>()
-            .wrap_err("deserializing product metadata")
+            .context("deserializing product metadata")
     }
 }
 
@@ -164,13 +164,13 @@ impl QueryProductWithPrices {
             let mut redis = redis
                 .connect()
                 .await
-                .wrap_err("connecting to Redis for purchasable products")?;
+                .context("connecting to Redis for purchasable products")?;
             let key = redis.key().metadata(PRODUCTS_NAMESPACE, "all");
 
             let res: Option<Vec<QueryProductWithPrices>> = redis
                 .get_deserialized(&key)
                 .await
-                .wrap_err("fetching purchasable products from cache")?;
+                .context("fetching purchasable products from cache")?;
 
             if let Some(res) = res {
                 return Ok(res);
@@ -179,14 +179,14 @@ impl QueryProductWithPrices {
 
         let all_products = product_item::DBProduct::get_all(exec)
             .await
-            .wrap_err("fetching all products")?;
+            .context("fetching all products")?;
         let prices =
             product_item::DBProductPrice::get_all_public_products_prices(
                 &all_products.iter().map(|x| x.id).collect::<Vec<_>>(),
                 exec,
             )
             .await
-            .wrap_err("fetching public product prices")?;
+            .context("fetching public product prices")?;
 
         let products = all_products
             .into_iter()
@@ -214,13 +214,13 @@ impl QueryProductWithPrices {
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to Redis to cache purchasable products")?;
+            .context("connecting to Redis to cache purchasable products")?;
         let key = redis.key().metadata(PRODUCTS_NAMESPACE, "all");
 
         redis
             .set_serialized(&key, &products, None)
             .await
-            .wrap_err("caching purchasable products")?;
+            .context("caching purchasable products")?;
 
         Ok(products)
     }
@@ -234,13 +234,13 @@ impl QueryProductWithPrices {
     {
         let all_products = DBProduct::get_by_type(exec, r#type)
             .await
-            .wrap_err("fetching products by type")?;
+            .context("fetching products by type")?;
         let prices = DBProductPrice::get_all_products_prices(
             &all_products.iter().map(|x| x.id).collect::<Vec<_>>(),
             exec,
         )
         .await
-        .wrap_err("fetching product prices")?;
+        .context("fetching product prices")?;
 
         let products = all_products
             .into_iter()
@@ -324,7 +324,7 @@ impl DBProductPrice {
     ) -> Result<Option<DBProductPrice>> {
         Ok(Self::get_many(&[id], exec)
             .await
-            .wrap_err("fetching product price")?
+            .context("fetching product price")?
             .into_iter()
             .next())
     }
@@ -341,13 +341,13 @@ impl DBProductPrice {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching product prices")?;
+        .context("fetching product prices")?;
 
         results
             .into_iter()
             .map(TryInto::try_into)
             .collect::<std::result::Result<Vec<_>, _>>()
-            .wrap_err("deserializing product prices")
+            .context("deserializing product prices")
     }
 
     pub async fn get_all_product_prices(
@@ -356,7 +356,7 @@ impl DBProductPrice {
     ) -> Result<Vec<DBProductPrice>> {
         let res = Self::get_all_products_prices(&[product_id], exec)
             .await
-            .wrap_err("fetching product prices")?;
+            .context("fetching product prices")?;
 
         Ok(res.remove(&product_id).map(|x| x.1).unwrap_or_default())
     }
@@ -367,7 +367,7 @@ impl DBProductPrice {
     ) -> Result<Vec<DBProductPrice>> {
         let res = Self::get_all_public_products_prices(&[product_id], exec)
             .await
-            .wrap_err("fetching public product prices")?;
+            .context("fetching public product prices")?;
 
         Ok(res.remove(&product_id).map(|x| x.1).unwrap_or_default())
     }
@@ -384,7 +384,7 @@ impl DBProductPrice {
             exec,
         )
         .await
-        .wrap_err("fetching public product prices")
+        .context("fetching public product prices")
     }
 
     pub async fn get_all_products_prices(
@@ -393,7 +393,7 @@ impl DBProductPrice {
     ) -> Result<DashMap<DBProductId, Vec<DBProductPrice>>> {
         Self::get_all_products_prices_with_visibility(product_ids, None, exec)
             .await
-            .wrap_err("fetching product prices")
+            .context("fetching product prices")
     }
 
     async fn get_all_products_prices_with_visibility(
@@ -425,7 +425,7 @@ impl DBProductPrice {
             .fetch(exec)
             .try_fold(DashMap::new(), predicate)
             .await
-            .wrap_err("fetching product prices")?,
+            .context("fetching product prices")?,
 
             Some(public) => select_prices_with_predicate!(
                 "WHERE product_id = ANY($1::bigint[]) AND public = $2",
@@ -435,7 +435,7 @@ impl DBProductPrice {
             .fetch(exec)
             .try_fold(DashMap::new(), predicate)
             .await
-            .wrap_err("fetching public product prices")?,
+            .context("fetching public product prices")?,
         };
 
         Ok(prices)

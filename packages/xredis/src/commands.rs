@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use redis::aio::ConnectionLike;
 use redis::{FromRedisValue, ToRedisArgs};
 
@@ -29,7 +29,7 @@ where
         .arg(expiry)
         .query_async::<()>(connection)
         .await
-        .wrap_err("writing to Redis")?;
+        .context("writing to Redis")?;
     Ok(())
 }
 
@@ -50,7 +50,7 @@ where
         key,
         settings
             .encode_value(&data)
-            .wrap_err("serializing Redis value")?,
+            .context("serializing Redis value")?,
         expiry.unwrap_or(settings.default_expiry),
     )
     .await
@@ -65,7 +65,7 @@ where
         .arg(key)
         .query_async(connection)
         .await
-        .wrap_err("fetching from Redis")
+        .context("fetching from Redis")
 }
 
 /// Issues ordinary `MGET` commands in bounded chunks. Cluster routing and
@@ -127,7 +127,7 @@ where
             .arg(chunk)
             .query_async::<Vec<Option<T>>>(connection)
             .await
-            .wrap_err("fetching multiple values from Redis")?;
+            .context("fetching multiple values from Redis")?;
         values.extend(part);
     }
     Ok(values)
@@ -148,13 +148,12 @@ where
         let value = connection
             .route_command(command, primary_mget_routing(chunk))
             .await
-            .wrap_err("fetching multiple values from primary Redis nodes")?;
-        let value = value
-            .extract_error()
-            .wrap_err("extracting Redis response")?;
+            .context("fetching multiple values from primary Redis nodes")?;
+        let value =
+            value.extract_error().context("extracting Redis response")?;
         let part = redis::from_redis_value::<Vec<Option<T>>>(value)
             .map_err(redis::RedisError::from)
-            .wrap_err("decoding Redis response")?;
+            .context("decoding Redis response")?;
         values.extend(part);
     }
     Ok(values)
@@ -174,7 +173,7 @@ where
         .arg(key)
         .query_async(connection)
         .await
-        .wrap_err("fetching serialized value from Redis")?;
+        .context("fetching serialized value from Redis")?;
     Ok(value.and_then(|value| settings.decode_value(&value)))
 }
 
@@ -190,7 +189,7 @@ where
 {
     Ok(get_many(connection, keys)
         .await
-        .wrap_err("fetching serialized values from Redis")?
+        .context("fetching serialized values from Redis")?
         .into_iter()
         .map(|value| value.and_then(|value| settings.decode_value(&value)))
         .collect())
@@ -205,7 +204,7 @@ where
         .arg(key)
         .query_async::<()>(connection)
         .await
-        .wrap_err("deleting from Redis")?;
+        .context("deleting from Redis")?;
     Ok(())
 }
 
@@ -219,7 +218,7 @@ where
             .arg(keys)
             .query_async::<()>(connection)
             .await
-            .wrap_err("deleting multiple values from Redis")?;
+            .context("deleting multiple values from Redis")?;
     }
     Ok(())
 }
@@ -235,7 +234,7 @@ where
         .arg(value)
         .query_async::<()>(connection)
         .await
-        .wrap_err("pushing to Redis list")?;
+        .context("pushing to Redis list")?;
     Ok(())
 }
 
@@ -248,5 +247,5 @@ where
         .arg(key)
         .query_async(connection)
         .await
-        .wrap_err("incrementing Redis value")
+        .context("incrementing Redis value")
 }

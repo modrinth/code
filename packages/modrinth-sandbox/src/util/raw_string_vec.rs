@@ -15,7 +15,7 @@ impl RawStringVec {
         self.0.push(string.into_raw());
     }
 
-    pub fn push_os(&mut self, string: OsString) -> eyre::Result<()> {
+    pub fn push_os(&mut self, string: OsString) -> anyhow::Result<()> {
         self.push_c(CString::new(string.into_vec())?);
         Ok(())
     }

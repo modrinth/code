@@ -21,7 +21,7 @@ use thiserror::Error;
 #[derive(Error, Debug)]
 pub enum AuthenticationError {
     #[error(transparent)]
-    Internal(#[from] eyre::Report),
+    Internal(#[from] anyhow::Error),
     #[error("An unknown database error occurred: {0}")]
     Sqlx(#[from] sqlx::Error),
     #[error("Error while parsing JSON: {0}")]

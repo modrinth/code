@@ -10,7 +10,7 @@ use std::{
 
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
-use eyre::{Context, Result};
+use anyhow::{Context, Result};
 
 use crate::{
     ExposedPath, SandboxCommand,
@@ -59,8 +59,8 @@ pub async fn create_env(
         if tokio::fs::try_exists(FLATPAK_INFO_PATH)
             .await
             .map_err(|err| {
-                eyre::eyre!(err)
-                    .wrap_err("checking if `{FLATPAK_INFO_PATH}` exists")
+                anyhow::anyhow!(err)
+                    .context("checking if `{FLATPAK_INFO_PATH}` exists")
             })?
         {
             linux::flatpak::Flatpak::init(make_helper).await
@@ -84,7 +84,7 @@ impl SandboxCommand {
     /// Fails if any of the paths are hard blocked, or contain a blocked path.
     pub(crate) fn take_paths(
         &mut self,
-    ) -> eyre::Result<(ReadWritePathSet, PathRules)> {
+    ) -> anyhow::Result<(ReadWritePathSet, PathRules)> {
         let mut read_only_paths = std::mem::take(&mut self.read_only_paths);
         let mut requested_write_paths =
             std::mem::take(&mut self.read_write_paths);
@@ -242,7 +242,7 @@ pub trait SandboxHandleOp {
         &self,
         path: &Path,
         permission: PathPermission,
-    ) -> eyre::Result<ExposedPath>;
+    ) -> anyhow::Result<ExposedPath>;
     fn is_path_readable(&self, path: &Path) -> bool;
     fn is_path_writeable(&self, path: &Path) -> bool;
     fn is_path_blocked(&self, path: &Path) -> bool;

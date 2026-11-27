@@ -33,10 +33,14 @@ concurrency:
 env:
   INTERNAL: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
 
+permissions: {}
+
 jobs:
   build:
     name: Build Labrinth
     runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'namespace-profile-modrinth-labrinth' || 'namespace-profile-untrusted-large-amd64' }}
+    permissions:
+      contents: read
     env:
       SQLX_OFFLINE: 'true'
       GIT_HASH: ${{ github.sha }}
@@ -47,6 +51,8 @@ jobs:
       - name: Check out code
         if: env.INTERNAL != 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Check out code (Namespace)
         if: env.INTERNAL == 'true'
@@ -78,7 +84,7 @@ jobs:
         run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
 
       - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake protobuf-compiler libprotobuf-dev
 
       - name: Build labrinth
         run: cargo build --profile release-labrinth --package labrinth
@@ -102,6 +108,9 @@ jobs:
     needs: [build]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     uses: SparkUniverse/workflows/.github/workflows/docker-build.yaml@main
+    permissions:
+      contents: read
+      packages: write
     with:
       image-name: labrinth
       dockerfile-path: apps/labrinth/Dockerfile
@@ -111,6 +120,8 @@ jobs:
     needs: [docker-build]
     if: ${{ github.ref == 'refs/heads/prod' }}
     uses: SparkUniverse/workflows/.github/workflows/argo-update.yaml@main
+    permissions:
+      contents: read
     secrets:
       ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}
     with:
@@ -122,6 +133,8 @@ jobs:
     needs: [docker-build]
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
     uses: SparkUniverse/workflows/.github/workflows/argo-update.yaml@main
+    permissions:
+      contents: read
     secrets:
       ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}
     with:

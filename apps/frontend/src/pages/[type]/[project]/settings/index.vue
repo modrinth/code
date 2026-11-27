@@ -317,7 +317,7 @@
 						type="colored"
 						color="red"
 						:disabled="!hasDeletePermission"
-						@click="$refs.modal_confirm.show()"
+						@click="confirmDeleteProject"
 					>
 						<TrashIcon aria-hidden="true" />
 						{{ formatMessage(messages.deleteProjectButton) }}
@@ -382,7 +382,7 @@ import {
 	useProjectSlugSuggestions,
 	useSlugSuggestionVisibility,
 } from '~/composables/project-slug-suggestions'
-import { isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
+import { ensurePrivileged, isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
@@ -774,6 +774,14 @@ const deleteBanner = async () => {
 			type: 'error',
 		})
 	}
+}
+
+const modal_confirm = ref(null)
+
+const confirmDeleteProject = async () => {
+	const requiresPrivileged = tags.value.approvedStatuses.includes(project.value.status)
+	if (!(await ensurePrivileged(requiresPrivileged))) return
+	modal_confirm.value?.show()
 }
 
 const deleteProject = async () => {

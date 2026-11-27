@@ -6,10 +6,11 @@ use crate::models::payouts::{
 use crate::routes::ApiError;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
+use anyhow::Result;
+use anyhow::anyhow;
 use arc_swap::ArcSwapOption;
 use base64::Engine;
 use chrono::{DateTime, Duration, Utc};
-use eyre::Result;
 use modrinth_util::decimal::Decimal2dp;
 use muralpay::FiatAndRailCode;
 use reqwest::Method;
@@ -187,14 +188,14 @@ impl PayoutsQueue {
             .form(&form)
             .send()
             .await
-            .map_err(|err| eyre::eyre!(err))
-            .wrap_failed_dependency_err(
+            .map_err(|err| anyhow!(err))
+            .failed_dependency_context(
                 "error while authenticating with PayPal".to_string(),
             )?
             .json()
             .await
-            .map_err(|err| eyre::eyre!(err))
-            .wrap_failed_dependency_err(
+            .map_err(|err| anyhow!(err))
+            .failed_dependency_context(
                 "error while authenticating with PayPal (deser error)"
                     .to_string(),
             )?;
@@ -224,8 +225,8 @@ impl PayoutsQueue {
                 drop(read);
                 self.refresh_token()
                     .await
-                    .map_err(|err| eyre::eyre!(err))
-                    .wrap_failed_dependency_err(
+                    .map_err(|err| anyhow!(err))
+                    .failed_dependency_context(
                         "error while authenticating with PayPal".to_string(),
                     )?
             } else {
@@ -235,8 +236,8 @@ impl PayoutsQueue {
             drop(read);
             self.refresh_token()
                 .await
-                .map_err(|err| eyre::eyre!(err))
-                .wrap_failed_dependency_err(
+                .map_err(|err| anyhow!(err))
+                .failed_dependency_context(
                     "error while authenticating with PayPal".to_string(),
                 )?
         };
@@ -270,8 +271,8 @@ impl PayoutsQueue {
         let resp = request
             .send()
             .await
-            .map_err(|err| eyre::eyre!(err))
-            .wrap_failed_dependency_err(
+            .map_err(|err| anyhow!(err))
+            .failed_dependency_context(
                 "could not communicate with PayPal".to_string(),
             )?;
 
@@ -280,8 +281,8 @@ impl PayoutsQueue {
         let value = resp
             .json::<Value>()
             .await
-            .map_err(|err| eyre::eyre!(err))
-            .wrap_failed_dependency_err(
+            .map_err(|err| anyhow!(err))
+            .failed_dependency_context(
                 "could not retrieve PayPal response body".to_string(),
             )?;
 
@@ -304,7 +305,7 @@ impl PayoutsQueue {
                 if error.name == "INSUFFICIENT_FUNDS" {
                     error.message = "We're currently transferring funds to our PayPal account. Please try again in a couple days.".to_string();
                 }
-                return Err(ApiError::FailedDependency(eyre::eyre!(format!(
+                return Err(ApiError::FailedDependency(anyhow!(format!(
                     "error name: {}, message: {}",
                     error.name, error.message
                 ))));
@@ -313,19 +314,18 @@ impl PayoutsQueue {
             if let Ok(error) =
                 serde_json::from_value::<PayPalIdentityError>(value)
             {
-                return Err(ApiError::FailedDependency(eyre::eyre!(format!(
+                return Err(ApiError::FailedDependency(anyhow!(format!(
                     "error name: {}, message: {}",
                     error.error, error.error_description
                 ))));
             }
 
-            return Err(ApiError::FailedDependency(eyre::eyre!(
+            return Err(ApiError::FailedDependency(anyhow!(
                 "could not retrieve PayPal error body",
             )));
         }
 
-        serde_json::from_value(value)
-            .wrap_request_err("deserializing JSON data")
+        serde_json::from_value(value).request_context("deserializing JSON data")
     }
 
     pub async fn make_tremendous_request<T: Serialize, X: DeserializeOwned>(
@@ -349,8 +349,8 @@ impl PayoutsQueue {
         let resp = request
             .send()
             .await
-            .map_err(|err| eyre::eyre!(err))
-            .wrap_failed_dependency_err(
+            .map_err(|err| anyhow!(err))
+            .failed_dependency_context(
                 "could not communicate with Tremendous".to_string(),
             )?;
 
@@ -359,8 +359,8 @@ impl PayoutsQueue {
         let value = resp
             .json::<Value>()
             .await
-            .map_err(|err| eyre::eyre!(err))
-            .wrap_failed_dependency_err(
+            .map_err(|err| anyhow!(err))
+            .failed_dependency_context(
                 "could not retrieve Tremendous response body".to_string(),
             )?;
 
@@ -376,25 +376,24 @@ impl PayoutsQueue {
 
                 let err =
                     serde_json::from_value::<TremendousError>(array.clone())
-                        .map_err(|err| eyre::eyre!(err))
-                        .wrap_failed_dependency_err(
+                        .map_err(|err| anyhow!(err))
+                        .failed_dependency_context(
                             "could not retrieve Tremendous error json body"
                                 .to_string(),
                         )?;
 
-                return Err(ApiError::FailedDependency(eyre::eyre!(format!(
+                return Err(ApiError::FailedDependency(anyhow!(format!(
                     "Tremendous error: {} ({:?})",
                     err.message, err.payload
                 ))));
             }
 
-            return Err(ApiError::FailedDependency(eyre::eyre!(
+            return Err(ApiError::FailedDependency(anyhow!(
                 "could not retrieve Tremendous error body",
             )));
         }
 
-        serde_json::from_value(value)
-            .wrap_request_err("deserializing JSON data")
+        serde_json::from_value(value).request_context("deserializing JSON data")
     }
 
     pub async fn get_payout_methods(
@@ -462,7 +461,7 @@ impl PayoutsQueue {
                 drop(read);
                 refresh_payout_methods(self)
                     .await
-                    .wrap_api_err("executing `refresh_payout_methods`")?
+                    .api_context("executing `refresh_payout_methods`")?
             } else {
                 options.clone()
             }
@@ -470,7 +469,7 @@ impl PayoutsQueue {
             drop(read);
             refresh_payout_methods(self)
                 .await
-                .wrap_api_err("executing `refresh_payout_methods`")?
+                .api_context("executing `refresh_payout_methods`")?
         };
 
         Ok(options.options)
@@ -550,7 +549,7 @@ async fn get_tremendous_payout_methods(
     let forex: TremendousForexResponse = queue
         .make_tremendous_request(Method::GET, "forex", None::<()>)
         .await
-        .wrap_err("failed to fetch Tremendous forex data")?;
+        .context("failed to fetch Tremendous forex data")?;
 
     let response = queue
         .make_tremendous_request::<(), TremendousResponse>(
@@ -559,7 +558,7 @@ async fn get_tremendous_payout_methods(
             None,
         )
         .await
-        .wrap_err("failed to fetch Tremendous products data")?;
+        .context("failed to fetch Tremendous products data")?;
 
     let mut methods = Vec::new();
 

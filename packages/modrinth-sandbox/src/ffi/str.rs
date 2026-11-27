@@ -1,6 +1,6 @@
 use std::{ffi::c_char, ptr::NonNull, slice, str};
 
-use eyre::{Context, ContextCompat, Result, ensure};
+use anyhow::{Context, Result, ensure};
 use libc::size_t;
 
 /// A borrowed UTF-8 string. `len` counts bytes; no trailing NUL is required.
@@ -45,7 +45,7 @@ impl ModrinthSandboxString {
     /// reading `len` bytes for the duration of this call.
     pub unsafe fn try_to_owned(self) -> Result<Box<str>> {
         let ptr = NonNull::new(self.ptr.cast_mut())
-            .wrap_err("expected a non-null string")?;
+            .context("expected a non-null string")?;
 
         // SAFETY: The caller guarantees that `ptr` is valid for reading
         // `len` bytes. The pointer was checked for null above, and `u8` has
@@ -54,7 +54,7 @@ impl ModrinthSandboxString {
             slice::from_raw_parts(ptr.as_ptr().cast::<u8>(), self.len)
         };
 
-        let value = str::from_utf8(bytes).wrap_err("string is not UTF-8")?;
+        let value = str::from_utf8(bytes).context("string is not UTF-8")?;
         Ok(value.into())
     }
 }
@@ -109,7 +109,7 @@ impl ModrinthSandboxStringSlice {
         }
 
         let ptr = NonNull::new(self.ptr.cast_mut())
-            .wrap_err("expected a non-null string slice")?;
+            .context("expected a non-null string slice")?;
 
         // SAFETY: The caller guarantees that `ptr` is properly aligned and
         // valid for reading `len` string descriptors. The zero-length case was
@@ -120,7 +120,7 @@ impl ModrinthSandboxStringSlice {
             // SAFETY: The caller guarantees that every string descriptor in
             // the slice upholds `ModrinthSandboxString`'s safety contract.
             let string = unsafe { item.try_to_owned() }
-                .wrap_err_with(|| format!("reading string at index {index}"))?;
+                .with_context(|| format!("reading string at index {index}"))?;
             strings.push(string);
         }
 
@@ -154,7 +154,7 @@ impl ModrinthSandboxStringPairsSlice {
             }
             .try_to_owned()
         }
-        .wrap_err("reading string pair keys")?;
+        .context("reading string pair keys")?;
 
         // SAFETY: The caller guarantees that the value slice and each of its
         // string descriptors uphold their respective safety contracts.
@@ -165,7 +165,7 @@ impl ModrinthSandboxStringPairsSlice {
             }
             .try_to_owned()
         }
-        .wrap_err("reading string pair values")?;
+        .context("reading string pair values")?;
 
         Ok(keys
             .into_iter()

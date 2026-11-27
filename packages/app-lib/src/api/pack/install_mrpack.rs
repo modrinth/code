@@ -454,6 +454,17 @@ fn external_override_relative_path(path: &str) -> Option<&str> {
     .then_some(relative_path)
 }
 
+fn is_supported_override_path(path: &str) -> bool {
+    SafeRelativeUtf8UnixPathBuf::try_from(path.to_string()).is_ok()
+        && path
+            .strip_prefix("overrides/")
+            .or_else(|| path.strip_prefix("client-overrides/"))
+            .is_some_and(|relative_path| {
+                crate::state::content_store::validate_relative(relative_path)
+                    .is_ok()
+            })
+}
+
 fn extract_zip_entry(
     mut reader: impl Read,
     path: &Path,
@@ -1040,7 +1051,17 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
                     .strip_prefix("overrides/")
                     .or_else(|| filename.strip_prefix("client-overrides/"))
                     .is_some_and(|path| MODPACK_SERVER_PATHS.contains(&path));
-            (is_override && !shadowed_sync_override && !ignored_servers)
+            let unsupported_path =
+                is_override && !is_supported_override_path(filename);
+            if unsupported_path {
+                tracing::warn!(
+                    "Skipping modpack override with an unsupported path: {filename}"
+                );
+            }
+            (is_override
+                && !shadowed_sync_override
+                && !ignored_servers
+                && !unsupported_path)
                 .then(|| (index, file.clone()))
         })
         .collect::<Vec<_>>();
@@ -1457,6 +1478,7 @@ pub async fn remove_all_related_files(
         (filename.starts_with("overrides/")
             || filename.starts_with("client-overrides/"))
             && !filename.ends_with('/')
+            && is_supported_override_path(filename)
     });
 
     for file in override_file_entries {
@@ -1622,5 +1644,27 @@ mod zip_reader_tests {
                 .is_err()
         );
         assert_eq!(std::fs::read(&destination).unwrap(), b"previous contents");
+    }
+
+    #[test]
+    fn rejects_override_paths_that_cannot_be_installed() {
+        for path in [
+            "overrides/config/example.toml",
+            "client-overrides/options.txt",
+            "overrides/.cache/resourcefullib/README.txt",
+        ] {
+            assert!(is_supported_override_path(path), "{path}");
+        }
+        for path in [
+            "overrides/CON.txt",
+            "client-overrides/config/aux.json",
+            "overrides/config/trailing.",
+            "overrides/config/trailing ",
+            "overrides/config/a:b.txt",
+            "overrides/config\\example.toml",
+            "overrides/../escape.txt",
+        ] {
+            assert!(!is_supported_override_path(path), "{path}");
+        }
     }
 }

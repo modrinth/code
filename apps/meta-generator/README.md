@@ -34,6 +34,12 @@ cargo run -p meta-generator -- import
 cargo run -p meta-generator -- export
 ```
 
+Both commands apply pending database migrations first. To only apply migrations and exit:
+
+```sh
+cargo run -p meta-generator -- migrate
+```
+
 Without upstream flags, all upstreams are selected. Put flags before the command to select specific upstreams:
 
 ```sh

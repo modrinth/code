@@ -1,4 +1,4 @@
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 
 pub struct MinecraftMetaDb(pub toasty::Db);
 
@@ -12,7 +12,7 @@ impl MinecraftMetaDb {
             .models(toasty::models!(minecraft_meta_model::*))
             .connect(database_url.as_str())
             .await
-            .wrap_err("connecting to Minecraft metadata database")?;
+            .context("connecting to Minecraft metadata database")?;
         Ok(Self(db))
     }
 }

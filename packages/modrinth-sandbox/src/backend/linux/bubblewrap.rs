@@ -9,7 +9,7 @@ use std::{
 
 use async_trait::async_trait;
 use derive_more::Debug;
-use eyre::{OptionExt, Result, WrapErr, bail, eyre};
+use anyhow::{Context, Result, Context, bail, anyhow};
 use libseccomp::{
     ScmpAction, ScmpArgCompare, ScmpCompareOp, ScmpFilterContext, ScmpSyscall,
 };
@@ -47,11 +47,11 @@ impl Backend for Bubblewrap {
 async fn init() -> Result<BubblewrapEnv> {
     let bwrap = find_command("bwrap")
         .await
-        .wrap_err("searching for `bwrap` executable")?;
+        .context("searching for `bwrap` executable")?;
     let xdg_dbus_proxy = find_command("xdg-dbus-proxy")
         .await
-        .wrap_err("searching for `xdg-dbus-proxy` executable")?;
-    let dev_null = unix::open_dev_null().wrap_err("opening /dev/null")?;
+        .context("searching for `xdg-dbus-proxy` executable")?;
+    let dev_null = unix::open_dev_null().context("opening /dev/null")?;
     Ok(BubblewrapEnv {
         bwrap,
         xdg_dbus_proxy,
@@ -354,14 +354,14 @@ fn spawn(
     let mut builder = BubblewrapCommandBuilder::default();
 
     let Some(directories) = directories::BaseDirs::new() else {
-        return Err(eyre!("unable to determine base directories"));
+        return Err(anyhow!("unable to determine base directories"));
     };
 
     let mut environment = command.take_environment();
 
     let xdg_runtime_dir = directories
         .runtime_dir()
-        .ok_or_eyre("XDG_RUNTIME_DIR is not set")?;
+        .context("XDG_RUNTIME_DIR is not set")?;
 
     let file_sharing_mountpoint = xdg_runtime_dir
         .join(format!("modrinth-file-sharing-{}", Uuid::now_v7()));
@@ -558,7 +558,7 @@ fn spawn(
 
     for path in &command.ensure_dirs_exist {
         std::fs::create_dir_all(path)
-            .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
+            .with_context(|| anyhow!("creating directory {path:?}"))?;
     }
 
     // Bind custom paths
@@ -583,7 +583,7 @@ fn spawn(
         }
 
         if attempt == 100 {
-            return Err(eyre!(
+            return Err(anyhow!(
                 "Unable to find unique instance-id for .flatpak-info"
             ));
         } else {
@@ -677,7 +677,7 @@ instance-id={instance_id}
         false,
         command.die_with_parent,
     )
-    .wrap_err("spawning child")?;
+    .context("spawning child")?;
 
     let mut child = crate::SandboxChild {
         stdin: pipes.stdin,
@@ -769,7 +769,7 @@ impl SandboxHandleOp for BubblewrapSandboxHandle {
         &self,
         path: &Path,
         permission: PathPermission,
-    ) -> eyre::Result<ExposedPath> {
+    ) -> anyhow::Result<ExposedPath> {
         let is_accessible = |path: &Path, permission| match permission {
             PathPermission::ReadOnly => self.is_path_readable(path),
             PathPermission::ReadWrite => self.is_path_writeable(path),
@@ -828,16 +828,16 @@ fn start_dbus_proxy(
 
     let flatpak_info_fd1 =
         WritableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info1")
-            .wrap_err("creating flatpak-info memory file 1")?;
+            .context("creating flatpak-info memory file 1")?;
     let flatpak_info_fd1 = flatpak_info_fd1
         .write(flatpak_info)
-        .wrap_err("writing to flatpak-info memory file 1")?;
+        .context("writing to flatpak-info memory file 1")?;
     let flatpak_info_fd2 =
         WritableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info2")
-            .wrap_err("creating flatpak-info memory file 2")?;
+            .context("creating flatpak-info memory file 2")?;
     let flatpak_info_fd2 = flatpak_info_fd2
         .write(flatpak_info)
-        .wrap_err("writing to flatpak-info memory file 2")?;
+        .context("writing to flatpak-info memory file 2")?;
 
     arguments.push("--file".into());
     arguments.push(format!("{}", flatpak_info_fd1.as_raw_fd()).into());
@@ -1233,7 +1233,7 @@ fn create_seccomp_filter() -> Result<std::os::fd::OwnedFd> {
 
     let Ok(mut filter) = ScmpFilterContext::new(ScmpAction::Errno(libc::EPERM))
     else {
-        return Err(eyre!("unable to init seccomp filter context"));
+        return Err(anyhow!("unable to init seccomp filter context"));
     };
 
     for syscall in ALLOWED_SYSCALLS {

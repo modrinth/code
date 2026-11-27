@@ -275,6 +275,7 @@ import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import { useUserCountry } from '@/composables/country.ts'
+import { ensurePrivileged } from '@/composables/reauth.ts'
 import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal.vue'
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
 
@@ -297,6 +298,7 @@ const hoveredSeg = ref<string | null>(null)
 
 const withdrawModal = ref<InstanceType<typeof CreatorWithdrawModal>>()
 async function openWithdrawModal() {
+	if (!(await ensurePrivileged())) return
 	withdrawModal.value?.show?.()
 }
 

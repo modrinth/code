@@ -303,7 +303,7 @@ async fn fetch_dependent_on_version_filter(
     )
     .fetch_all(pool)
     .await
-    .wrap_internal_err("failed to fetch dependent project versions")?;
+    .internal_context("failed to fetch dependent project versions")?;
 
     Ok(versions
         .into_iter()
@@ -344,7 +344,7 @@ async fn fetch_dependent_version_projects(
     )
     .fetch_all(cx.pool)
     .await
-    .wrap_internal_err("failed to fetch dependent version projects")?;
+    .internal_context("failed to fetch dependent version projects")?;
 
     Ok(versions
         .into_iter()
@@ -361,7 +361,7 @@ pub(crate) async fn fetch(
     let dependent_on_version_filter =
         fetch_dependent_on_version_filter(metrics, cx.pool)
             .await
-            .wrap_api_err("fetching dependent on version filter")?;
+            .api_context("fetching dependent on version filter")?;
     if !metrics.filter_by.dependent_project_id.is_empty()
         && dependent_on_version_filter.is_empty()
     {
@@ -438,13 +438,13 @@ pub(crate) async fn fetch(
     };
     let mut cursor = query
         .fetch::<DownloadRow>()
-        .wrap_internal_err("fetching project-download pagination cursor")?;
+        .internal_context("fetching project-download pagination cursor")?;
     let mut rows = Vec::new();
 
     while let Some(row) = cursor
         .next()
         .await
-        .wrap_internal_err("fetching project downloads")?
+        .internal_context("fetching project downloads")?
     {
         rows.push(row);
     }
@@ -452,7 +452,7 @@ pub(crate) async fn fetch(
     let dependent_version_projects =
         fetch_dependent_version_projects(&rows, cx)
             .await
-            .wrap_api_err("fetching dependent version projects")?;
+            .api_context("fetching dependent version projects")?;
     let mut buckets = HashMap::<DownloadBucket, u64>::new();
 
     for row in rows {
@@ -579,7 +579,7 @@ pub(crate) async fn fetch(
                 }),
             }),
         )
-        .wrap_api_err("executing `ProjectMetrics::Downloads`")?;
+        .api_context("executing `ProjectMetrics::Downloads`")?;
     }
 
     Ok(())

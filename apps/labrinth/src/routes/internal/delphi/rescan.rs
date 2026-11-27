@@ -1,4 +1,4 @@
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use tracing::info;
 
 use crate::{
@@ -16,7 +16,7 @@ pub async fn enqueue_tech_review_files_for_new_delphi_version(
         sqlx::query_scalar!("SELECT MAX(delphi_version) FROM delphi_reports")
             .fetch_one(pool)
             .await
-            .wrap_err("fetching latest stored Delphi version")?;
+            .context("fetching latest stored Delphi version")?;
 
     if stored_delphi_version == Some(delphi_version) {
         info!(
@@ -37,12 +37,12 @@ pub async fn enqueue_tech_review_files_for_new_delphi_version(
     )
     .fetch_all(pool)
     .await
-    .wrap_err("fetching technical review files for Delphi rescan")?;
+    .context("fetching technical review files for Delphi rescan")?;
 
     for file_id in &file_ids {
         delphi_scan::publish_file_scan(kafka_client, *file_id, false, false)
             .await
-            .wrap_err_with(|| {
+            .with_context(|| {
                 format!("enqueueing file `{file_id:?}` for Delphi rescan")
             })?;
     }

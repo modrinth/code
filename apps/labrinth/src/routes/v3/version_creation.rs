@@ -29,13 +29,14 @@ use crate::search::SearchState;
 use crate::util::MinecraftMeta;
 use crate::util::kafka::KafkaClientState;
 use crate::util::routes::read_from_field;
+use crate::util::temporal::TemporalClient;
 use crate::util::validate::validation_errors_to_string;
 use crate::validate::{ValidationResult, validate_file};
 use actix_multipart::{Field, Multipart};
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, post, web};
+use anyhow::Context as _;
 use chrono::Utc;
-use eyre::WrapErr as _;
 use futures::stream::StreamExt;
 use hex::ToHex;
 use itertools::Itertools;
@@ -139,6 +140,7 @@ pub async fn version_create_route(
     session_queue: Data<AuthQueue>,
     kafka_client: web::Data<KafkaClientState>,
     search_state: Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, CreateError> {
     version_create(
         minecraft_meta.clone(),
@@ -150,6 +152,7 @@ pub async fn version_create_route(
         session_queue,
         kafka_client,
         search_state,
+        &temporal,
     )
     .await
 }
@@ -164,6 +167,7 @@ pub async fn version_create(
     session_queue: Data<AuthQueue>,
     kafka_client: web::Data<KafkaClientState>,
     search_state: Data<SearchState>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -219,16 +223,22 @@ pub async fn version_create(
         }
     };
 
-    prepared.commit(transaction, &redis).await?;
-    crate::queue::delphi_scan::publish_new_files(
-        &kafka_client,
-        &delphi_scan_files,
-    )
-    .await;
-    search_state
-        .queue
-        .push_version_changes(project_id.into(), [VersionId::from(version_id)])
-        .await;
+    prepared
+        .commit_with_post_commit(transaction, &redis, temporal, async {
+            crate::queue::delphi_scan::publish_new_files(
+                &kafka_client,
+                &delphi_scan_files,
+            )
+            .await;
+            search_state
+                .queue
+                .push_version_changes(
+                    project_id.into(),
+                    [VersionId::from(version_id)],
+                )
+                .await;
+        })
+        .await?;
     Ok(response)
 }
 
@@ -663,6 +673,7 @@ pub async fn upload_file_to_version_route(
     session_queue: web::Data<AuthQueue>,
     kafka_client: web::Data<KafkaClientState>,
     search_state: Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, CreateError> {
     upload_file_to_version(
         minecraft_meta.clone(),
@@ -675,6 +686,7 @@ pub async fn upload_file_to_version_route(
         session_queue,
         kafka_client,
         search_state,
+        &temporal,
     )
     .await
 }
@@ -690,6 +702,7 @@ pub async fn upload_file_to_version(
     session_queue: web::Data<AuthQueue>,
     kafka_client: web::Data<KafkaClientState>,
     search_state: Data<SearchState>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -749,16 +762,19 @@ pub async fn upload_file_to_version(
         }
     };
 
-    prepared.commit(transaction, &redis).await?;
-    crate::queue::delphi_scan::publish_new_files(
-        &kafka_client,
-        &delphi_scan_files,
-    )
-    .await;
-    search_state
-        .queue
-        .push_version_changes(project_id.into(), [version_id])
-        .await;
+    prepared
+        .commit_with_post_commit(transaction, &redis, temporal, async {
+            crate::queue::delphi_scan::publish_new_files(
+                &kafka_client,
+                &delphi_scan_files,
+            )
+            .await;
+            search_state
+                .queue
+                .push_version_changes(project_id.into(), [version_id])
+                .await;
+        })
+        .await?;
     Ok(response)
 }
 
@@ -1223,16 +1239,16 @@ pub async fn validate_minecraft_component(
     minecraft_meta: web::Data<MinecraftMeta>,
     component: &exp::minecraft::ModVersion,
     loaders: &[models::loader_item::Loader],
-) -> eyre::Result<()> {
-    eyre::ensure!(
+) -> anyhow::Result<()> {
+    anyhow::ensure!(
         !loaders.is_empty(),
         "Minecraft fields do not apply to the supplied loaders"
     );
-    eyre::ensure!(
+    anyhow::ensure!(
         !component.game_versions.is_empty(),
         "at least one Minecraft game version is required"
     );
-    eyre::ensure!(
+    anyhow::ensure!(
         component.mrpack_loaders.is_empty()
             || loaders.iter().any(|loader| loader.loader == "mrpack"),
         "`mrpack_loaders` requires the `mrpack` loader"
@@ -1240,7 +1256,7 @@ pub async fn validate_minecraft_component(
     minecraft_meta
         .validate_minecraft_versions(&component.game_versions)
         .await
-        .wrap_err("validating minecraft game versions")
+        .context("validating minecraft game versions")
 }
 
 pub async fn create_minecraft_component(
@@ -1250,7 +1266,7 @@ pub async fn create_minecraft_component(
     loaders: &[models::loader_item::Loader],
 ) -> Result<Option<exp::minecraft::ModVersion>, CreateError> {
     let build = async {
-        eyre::ensure!(
+        anyhow::ensure!(
             typed.is_none() || fields.is_empty(),
             "cannot combine typed and flattened Minecraft fields"
         );
@@ -1258,7 +1274,7 @@ pub async fn create_minecraft_component(
         if !applies && typed.is_none() && fields.is_empty() {
             return Ok(None);
         }
-        eyre::ensure!(
+        anyhow::ensure!(
             !fields.contains_key("mrpack_loaders")
                 || loaders.iter().any(|loader| loader.loader == "mrpack"),
             "`mrpack_loaders` requires the `mrpack` loader"
@@ -1274,7 +1290,7 @@ pub async fn create_minecraft_component(
             loaders,
         )
         .await?;
-        eyre::Ok(Some(component))
+        anyhow::Ok(Some(component))
     }
     .await;
     build.map_err(|error| CreateError::InvalidInput(error.to_string()))

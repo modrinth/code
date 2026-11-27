@@ -16,7 +16,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use eyre::{ContextCompat, Result, eyre};
+use anyhow::{Context, Result, anyhow};
 use tokio::fs;
 
 pub async fn find_command(
@@ -26,7 +26,7 @@ pub async fn find_command(
 }
 
 async fn find_command_(command: &OsStr) -> Result<PathBuf> {
-    let path = env::var_os("PATH").wrap_err("missing `PATH`")?;
+    let path = env::var_os("PATH").context("missing `PATH`")?;
     for mut path in env::split_paths(&path) {
         if !path.is_absolute() {
             continue;
@@ -37,7 +37,7 @@ async fn find_command_(command: &OsStr) -> Result<PathBuf> {
         }
     }
 
-    Err(eyre!("command not found in `PATH`"))
+    Err(anyhow!("command not found in `PATH`"))
 }
 
 pub struct WritableMemoryFile {
@@ -45,7 +45,7 @@ pub struct WritableMemoryFile {
 }
 
 impl WritableMemoryFile {
-    pub fn open(name: &CStr) -> eyre::Result<Self> {
+    pub fn open(name: &CStr) -> anyhow::Result<Self> {
         let fd = unsafe {
             OwnedFd::from_raw_fd(cvt(libc::memfd_create(
                 name.as_ptr(),
@@ -58,13 +58,13 @@ impl WritableMemoryFile {
     pub fn write_filter(
         mut self,
         filter: libseccomp::ScmpFilterContext,
-    ) -> eyre::Result<OwnedFd> {
+    ) -> anyhow::Result<OwnedFd> {
         filter.export_bpf(&self.fd)?;
         self.reset_and_seal()?;
         Ok(self.fd)
     }
 
-    pub fn write(mut self, data: &CStr) -> eyre::Result<OwnedFd> {
+    pub fn write(mut self, data: &CStr) -> anyhow::Result<OwnedFd> {
         unsafe {
             let fd = self.fd.as_raw_fd();
             cvt(libc::write(
@@ -77,7 +77,7 @@ impl WritableMemoryFile {
         Ok(self.fd)
     }
 
-    fn reset_and_seal(&mut self) -> eyre::Result<()> {
+    fn reset_and_seal(&mut self) -> anyhow::Result<()> {
         unsafe {
             let fd = self.fd.as_raw_fd();
             libc::lseek(fd, 0, libc::SEEK_SET);
@@ -94,7 +94,7 @@ impl WritableMemoryFile {
     }
 }
 
-pub fn open_pipe() -> eyre::Result<(OwnedFd, OwnedFd)> {
+pub fn open_pipe() -> anyhow::Result<(OwnedFd, OwnedFd)> {
     let mut fds = [0, 0];
     unsafe {
         cvt(libc::pipe2(&raw mut fds as *mut _, libc::O_CLOEXEC))?;
@@ -120,7 +120,7 @@ pub async fn ensure_valid_command(
 
 async fn ensure_exposable_path(path: &Path) -> Result<()> {
     let check = |path: &Path| {
-        eyre::ensure!(
+        anyhow::ensure!(
             !path.starts_with("/tmp"),
             "cannot expose {}: Flatpak's private /tmp cannot be exposed through the host portal; use a persistent or cache directory instead",
             path.display()

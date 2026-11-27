@@ -14,7 +14,7 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-use eyre::{Context, bail, eyre};
+use anyhow::{Context, bail, anyhow};
 use indexmap::IndexMap;
 use parking_lot::Mutex;
 use rand::RngExt;
@@ -25,7 +25,7 @@ use crate::path_access::PathPermission;
 const TTL: Duration = Duration::ZERO;
 const O_DEFAULT: OFlags = OFlags::NOFOLLOW.union(OFlags::CLOEXEC);
 
-pub fn mount(mountpoint: PathBuf) -> eyre::Result<FileSharing> {
+pub fn mount(mountpoint: PathBuf) -> anyhow::Result<FileSharing> {
     if fuser::INodeNo::ROOT.0 != 1 {
         bail!("expected root inode to have value 1");
     }
@@ -95,7 +95,7 @@ impl FileSharing {
         &self,
         path: PathBuf,
         permission: PathPermission,
-    ) -> eyre::Result<PathBuf> {
+    ) -> anyhow::Result<PathBuf> {
         let mutable = permission == PathPermission::ReadWrite;
         let mut fs = self.filesystem.0.lock();
         if let Some(shutdown_reason) = fs.abort.get_abort_message() {
@@ -120,7 +120,7 @@ impl FileSharing {
                 let io_error =
                     std::io::Error::from_raw_os_error(errno.raw_os_error());
                 return Err(
-                    eyre!("unable to open parent directory").wrap_err(io_error)
+                    anyhow!("unable to open parent directory").context(io_error)
                 );
             }
         };
@@ -131,7 +131,7 @@ impl FileSharing {
                 let io_error =
                     std::io::Error::from_raw_os_error(errno.raw_os_error());
                 return Err(
-                    eyre!("unable to stat parent directory").wrap_err(io_error)
+                    anyhow!("unable to stat parent directory").context(io_error)
                 );
             }
         };
@@ -147,7 +147,7 @@ impl FileSharing {
                 } else {
                     let io_error =
                         std::io::Error::from_raw_os_error(errno.raw_os_error());
-                    return Err(eyre!("unable to stat file").wrap_err(io_error));
+                    return Err(anyhow!("unable to stat file").context(io_error));
                 }
             }
         };

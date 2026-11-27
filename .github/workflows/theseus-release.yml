@@ -1,12 +1,14 @@
 name: Modrinth App release
 on:
-  workflow_run:
+  workflow_run: # zizmor: ignore[dangerous-triggers]
     workflows: ['Modrinth App build']
     types: [completed]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
+
+permissions: {}
 
 jobs:
   release:
@@ -16,6 +18,9 @@ jobs:
       github.event.workflow_run.event == 'push' &&
       startsWith(github.event.workflow_run.head_branch, 'v')
     runs-on: namespace-profile-medium-amd64
+    permissions:
+      contents: write
+      actions: read
     env:
       VERSION_TAG: ${{ github.event.workflow_run.head_branch }}
       LINUX_X64_BUNDLE_ARTIFACT_NAME: App bundle (x86_64-unknown-linux-gnu)

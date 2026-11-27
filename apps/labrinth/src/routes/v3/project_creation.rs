@@ -7,7 +7,7 @@ use crate::database::PgPool;
 use crate::database::PgTransaction;
 use crate::database::models::loader_item::Loader;
 use crate::database::models::thread_item::ThreadBuilder;
-use crate::database::models::{self, DBUser, image_item};
+use crate::database::models::{self, DBProject, DBUser, image_item};
 use crate::file_hosting::{FileHost, FileHostPublicity, FileHostingError};
 use crate::models::error::ApiError;
 use crate::models::exp;
@@ -16,8 +16,9 @@ use crate::models::images::{Image, ImageContext};
 use crate::models::link_platform::LinkPlatform;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    License, Link, MonetizationStatus, Project, ProjectStatus,
-    SideTypesMigrationReviewStatus, VersionStatus,
+    License, Link, MonetizationStatus, Project, ProjectDelta,
+    ProjectReviewOutcome, ProjectVisibility, SideTypesMigrationReviewStatus,
+    VersionStatus,
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
@@ -26,15 +27,18 @@ use crate::queue::session::AuthQueue;
 use crate::routes::internal::globals::GLOBALS;
 use crate::search::SearchState;
 use crate::util::MinecraftMeta;
+use crate::util::error::Context;
 use crate::util::guards::admin_key_guard;
 use crate::util::img::upload_image_optimized;
 use crate::util::kafka::KafkaClientState;
 use crate::util::routes::read_from_field;
+use crate::util::temporal::TemporalClient;
 use crate::util::validate::validation_errors_to_string;
 use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
 use actix_web::web::{self, Data};
 use actix_web::{HttpRequest, HttpResponse, post};
+use anyhow::anyhow;
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
@@ -61,7 +65,7 @@ pub enum CreateError {
     #[error(transparent)]
     Request(crate::routes::ApiError),
     #[error(transparent)]
-    InternalError(#[from] eyre::Report),
+    InternalError(#[from] anyhow::Error),
     #[error("An unknown database error occurred")]
     SqlxDatabaseError(#[from] sqlx::Error),
     #[error("Error while parsing multipart payload: {0}")]
@@ -123,7 +127,7 @@ impl From<crate::routes::ApiError> for CreateError {
                 Self::InvalidInput(format!("{err:#}"))
               }
             }
-            err => Self::InternalError(eyre::eyre!("{err:#}")),
+            err => Self::InternalError(anyhow!("{err:#}")),
         }
     }
 }
@@ -206,8 +210,8 @@ pub fn default_project_type() -> String {
     "mod".to_string()
 }
 
-fn default_requested_status() -> ProjectStatus {
-    ProjectStatus::Approved
+fn default_visibility() -> ProjectVisibility {
+    ProjectVisibility::Public
 }
 
 #[derive(Serialize, Deserialize, Validate, Clone)]
@@ -226,7 +230,7 @@ pub struct ProjectCreateData {
     #[serde(alias = "mod_slug")]
     /// The slug of a project, used for vanity URLs
     pub slug: String,
-    #[validate(length(min = 3, max = 255))]
+    #[validate(length(max = 255))]
     #[serde(alias = "mod_description")]
     /// A short description of the project.
     pub summary: String,
@@ -261,9 +265,9 @@ pub struct ProjectCreateData {
     #[validate(nested, length(max = 64))]
     /// The multipart names of the gallery items to upload
     pub gallery_items: Option<Vec<NewGalleryItem>>,
-    #[serde(default = "default_requested_status")]
-    /// The status of the mod to be set once it is approved
-    pub requested_status: ProjectStatus,
+    #[serde(default = "default_visibility")]
+    pub visibility: ProjectVisibility,
+    pub requested_status: Option<crate::models::v2::projects::ProjectStatus>,
 
     // Associations to uploaded images in body/description
     #[validate(length(max = 10))]
@@ -325,6 +329,7 @@ pub async fn project_create(
     session_queue: Data<AuthQueue>,
     kafka_client: Data<KafkaClientState>,
     search_state: Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, CreateError> {
     project_create_internal(
         minecraft_meta.clone(),
@@ -336,6 +341,7 @@ pub async fn project_create(
         session_queue,
         kafka_client,
         search_state,
+        &temporal,
     )
     .await
 }
@@ -350,6 +356,7 @@ pub async fn project_create_internal(
     session_queue: Data<AuthQueue>,
     kafka_client: Data<KafkaClientState>,
     search_state: Data<SearchState>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -404,13 +411,16 @@ pub async fn project_create_internal(
         }
     };
 
-    prepared.commit(transaction, &redis).await?;
-    crate::queue::delphi_scan::publish_new_files(
-        &kafka_client,
-        &delphi_scan_files,
-    )
-    .await;
-    search_state.queue.push_project_change(project_id).await;
+    prepared
+        .commit_with_post_commit(transaction, &redis, temporal, async {
+            crate::queue::delphi_scan::publish_new_files(
+                &kafka_client,
+                &delphi_scan_files,
+            )
+            .await;
+            search_state.queue.push_project_change(project_id).await;
+        })
+        .await?;
     Ok(response)
 }
 
@@ -438,6 +448,7 @@ pub async fn project_create_with_id(
     kafka_client: Data<KafkaClientState>,
     search_state: Data<SearchState>,
     path: web::Path<(ProjectId,)>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -491,13 +502,16 @@ pub async fn project_create_with_id(
         }
     };
 
-    prepared.commit(transaction, &redis).await?;
-    crate::queue::delphi_scan::publish_new_files(
-        &kafka_client,
-        &delphi_scan_files,
-    )
-    .await;
-    search_state.queue.push_project_change(project_id).await;
+    prepared
+        .commit_with_post_commit(transaction, &redis, &temporal, async {
+            crate::queue::delphi_scan::publish_new_files(
+                &kafka_client,
+                &delphi_scan_files,
+            )
+            .await;
+            search_state.queue.push_project_change(project_id).await;
+        })
+        .await?;
     Ok(response)
 }
 
@@ -963,7 +977,17 @@ async fn project_create_inner(
 
         let team_id = team.insert(&mut *transaction).await?;
 
-        let status = ProjectStatus::Draft;
+        let visibility = project_create_data
+            .requested_status
+            .map(|status| {
+                status.visibility().ok_or_else(|| {
+                    CreateError::InvalidInput(
+                        "invalid requested project status".to_string(),
+                    )
+                })
+            })
+            .transpose()?
+            .unwrap_or(project_create_data.visibility);
 
         let license_id = spdx::Expression::parse(
             &project_create_data.license_id,
@@ -1004,8 +1028,9 @@ async fn project_create_inner(
             categories,
             additional_categories,
             initial_versions: versions,
-            status,
-            requested_status: Some(project_create_data.requested_status),
+            visibility,
+            in_review: false,
+            review_outcome: ProjectReviewOutcome::NeverReviewed,
             license: license_id.to_string(),
             slug: Some(project_create_data.slug),
             link_urls,
@@ -1033,6 +1058,14 @@ async fn project_create_inner(
         let id = project_builder_actual
             .insert(&mut *transaction, redis, file_host, delphi_scan_files)
             .await?;
+        DBProject::record_history(
+            id,
+            Some(current_user.user.id.into()),
+            ProjectDelta::Created,
+            &mut *transaction,
+        )
+        .await
+        .internal_context("failed to record project creation history")?;
         DBUser::clear_project_cache(&[current_user.user.id.into()], redis)
             .await?;
 
@@ -1117,8 +1150,15 @@ async fn project_create_inner(
             updated: now,
             approved: None,
             queued: None,
-            status,
-            requested_status: project_builder.requested_status,
+            status: crate::models::v2::projects::ProjectStatus::Draft,
+            requested_status: Some(
+                crate::models::v2::projects::ProjectStatus::from_visibility(
+                    visibility,
+                ),
+            ),
+            visibility,
+            in_review: false,
+            review_outcome: ProjectReviewOutcome::NeverReviewed,
             moderator_message: None,
             license: License {
                 id: project_create_data.license_id.clone(),

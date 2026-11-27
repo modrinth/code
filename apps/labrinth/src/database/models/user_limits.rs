@@ -1,5 +1,5 @@
 use crate::database::PgPool;
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
@@ -19,7 +19,7 @@ pub async fn get_user_requests_per_minute(
     let mut redis = redis
         .connect()
         .await
-        .wrap_err("connecting to redis for cached user rate limit")?;
+        .context("connecting to redis for cached user rate limit")?;
     let key = redis
         .key()
         .entity(USER_REQUESTS_PER_MINUTE_NAMESPACE, user_id.0);
@@ -27,7 +27,7 @@ pub async fn get_user_requests_per_minute(
     let cached: Option<Option<u32>> = redis
         .get_deserialized(&key)
         .await
-        .wrap_err("fetching cached user rate limit")?;
+        .context("fetching cached user rate limit")?;
     if let Some(requests_per_minute) = cached {
         return Ok(requests_per_minute);
     }
@@ -38,7 +38,7 @@ pub async fn get_user_requests_per_minute(
     )
     .fetch_optional(pool)
     .await
-    .wrap_err("fetching user rate limit")?
+    .context("fetching user rate limit")?
     .flatten()
     .map(|requests_per_minute| requests_per_minute as u32);
 
@@ -49,7 +49,7 @@ pub async fn get_user_requests_per_minute(
             Some(USER_REQUESTS_PER_MINUTE_EXPIRY),
         )
         .await
-        .wrap_err("caching user rate limit")?;
+        .context("caching user rate limit")?;
 
     Ok(requests_per_minute)
 }

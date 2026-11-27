@@ -8,7 +8,7 @@ pub mod decimal;
 pub use error::*;
 pub use modrinth_log as log;
 
-use eyre::{Result, eyre};
+use anyhow::{Result, anyhow};
 
 /// Fetches an environment variable, possibly loading it using [`dotenvy`].
 ///
@@ -19,9 +19,9 @@ use eyre::{Result, eyre};
 #[track_caller]
 pub fn env_var(key: &str) -> Result<String> {
     let value = dotenvy::var(key)
-        .wrap_err_with(|| eyre!("missing environment variable `{key}`"))?;
+        .with_context(|| anyhow!("missing environment variable `{key}`"))?;
     if value.is_empty() {
-        Err(eyre!("environment variable `{key}` is empty"))
+        Err(anyhow!("environment variable `{key}` is empty"))
     } else {
         Ok(value)
     }

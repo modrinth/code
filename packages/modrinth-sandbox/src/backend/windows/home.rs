@@ -5,7 +5,7 @@ use std::{
     path::{Component, Path, PathBuf},
 };
 
-use eyre::{Result, WrapErr, ensure};
+use anyhow::{Result, Context, ensure};
 use uuid::Uuid;
 use windows::Win32::{
     Foundation::{GENERIC_WRITE, HANDLE},
@@ -64,7 +64,7 @@ pub fn link_into_sandbox_home(
             && err.kind() != ErrorKind::AlreadyExists
         {
             return Err(err)
-                .wrap_err_with(|| format!("creating {directory:?}"));
+                .with_context(|| format!("creating {directory:?}"));
         }
     }
 
@@ -77,7 +77,7 @@ pub fn link_into_sandbox_home(
             let mut backup_name = name.to_owned();
             backup_name.push(format!("-backup-{}", Uuid::now_v7()));
             fs::rename(&link, link.with_file_name(backup_name))
-                .wrap_err_with(|| format!("backing up {link:?}"))?;
+                .with_context(|| format!("backing up {link:?}"))?;
         }
     }
 
@@ -93,7 +93,7 @@ fn remove_link(path: &Path) -> Result<()> {
         .is_ok_and(|metadata| metadata.is_symlink())
     {
         fs::remove_dir(path)
-            .wrap_err_with(|| format!("removing link {path:?}"))?;
+            .with_context(|| format!("removing link {path:?}"))?;
     }
     Ok(())
 }
@@ -150,14 +150,14 @@ fn create_junction(link: &Path, target: &Path) -> Result<()> {
     buffer.extend(0_u16.to_le_bytes());
     buffer.extend(data.into_iter().flat_map(u16::to_le_bytes));
 
-    fs::create_dir(link).wrap_err_with(|| format!("creating {link:?}"))?;
+    fs::create_dir(link).with_context(|| format!("creating {link:?}"))?;
     let directory = OpenOptions::new()
         .access_mode(GENERIC_WRITE.0)
         .custom_flags(
             (FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT).0,
         )
         .open(link)
-        .wrap_err_with(|| format!("opening {link:?}"))?;
+        .with_context(|| format!("opening {link:?}"))?;
 
     let mut returned = 0;
     unsafe {
@@ -172,5 +172,5 @@ fn create_junction(link: &Path, target: &Path) -> Result<()> {
             None,
         )
     }
-    .wrap_err_with(|| format!("linking {link:?} to {target:?}"))
+    .with_context(|| format!("linking {link:?} to {target:?}"))
 }

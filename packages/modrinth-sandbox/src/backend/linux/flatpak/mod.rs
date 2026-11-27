@@ -10,7 +10,7 @@ use std::{
 
 use async_trait::async_trait;
 use derive_more::Debug;
-use eyre::{Context, OptionExt, Result, bail, ensure, eyre};
+use anyhow::{Context, Result, bail, ensure, anyhow};
 use futures::{StreamExt, TryStreamExt, stream::FuturesUnordered};
 use libc::SIGKILL;
 use tokio::{fs, sync::oneshot};
@@ -50,11 +50,11 @@ impl Backend for Flatpak {
 async fn init() -> Result<FlatpakEnv> {
     let session_bus = zbus::Connection::session()
         .await
-        .wrap_err("connecting to session bus")?;
+        .context("connecting to session bus")?;
     let flatpak_portal = dbus::FlatpakPortalProxy::new(&session_bus)
         .await
         .context("connecting to Flatpak portal")?;
-    let dev_null = unix::open_dev_null().wrap_err("opening /dev/null")?;
+    let dev_null = unix::open_dev_null().context("opening /dev/null")?;
     Ok(FlatpakEnv {
         flatpak_portal,
         dev_null,
@@ -88,12 +88,12 @@ async fn spawn(
         .into_iter()
         .map(|(key, val)| {
             let key = key.into_os_string().into_string().map_err(|key| {
-                eyre!("environment variable {key:?} has non-UTF-8 key")
+                anyhow!("environment variable {key:?} has non-UTF-8 key")
             })?;
             let val = val.into_os_string().into_string().map_err(|_| {
-                eyre!("environment variable value for key {key:?} has non-UTF-8 value")
+                anyhow!("environment variable value for key {key:?} has non-UTF-8 value")
             })?;
-            eyre::Ok((key, val))
+            anyhow::Ok((key, val))
         })
         .collect::<Result<BTreeMap<_, _>>>()?;
 
@@ -128,14 +128,14 @@ async fn spawn(
                 .map(OwnedFd::from)
                 .map(Fd::Owned)
                 .map(|fd| (fd, None))
-                .wrap_err("creating /dev/null fd")?,
+                .context("creating /dev/null fd")?,
             SandboxStdio::Inherit => {
                 let fd = Fd::Borrowed(inherited.as_fd());
                 (fd, None)
             }
             SandboxStdio::Pipe => {
                 let (read, write) =
-                    std::io::pipe().wrap_err("creating child stdin pipe")?;
+                    std::io::pipe().context("creating child stdin pipe")?;
                 (OwnedFd::from(read).into(), Some(write))
             }
         };
@@ -151,14 +151,14 @@ async fn spawn(
                 .map(OwnedFd::from)
                 .map(Fd::Owned)
                 .map(|fd| (fd, None))
-                .wrap_err("creating /dev/null fd")?,
+                .context("creating /dev/null fd")?,
             SandboxStdio::Inherit => {
                 let fd = Fd::Borrowed(inherited.as_fd());
                 (fd, None)
             }
             SandboxStdio::Pipe => {
                 let (read, write) =
-                    std::io::pipe().wrap_err("creating child stdout pipe")?;
+                    std::io::pipe().context("creating child stdout pipe")?;
                 (OwnedFd::from(write).into(), Some(read))
             }
         };
@@ -174,14 +174,14 @@ async fn spawn(
                 .map(OwnedFd::from)
                 .map(Fd::Owned)
                 .map(|fd| (fd, None))
-                .wrap_err("creating /dev/null fd")?,
+                .context("creating /dev/null fd")?,
             SandboxStdio::Inherit => {
                 let fd = Fd::Borrowed(inherited.as_fd());
                 (fd, None)
             }
             SandboxStdio::Pipe => {
                 let (read, write) =
-                    std::io::pipe().wrap_err("creating child stderr pipe")?;
+                    std::io::pipe().context("creating child stderr pipe")?;
                 (OwnedFd::from(write).into(), Some(read))
             }
         };
@@ -201,7 +201,7 @@ async fn spawn(
     for path in &command.ensure_dirs_exist {
         fs::create_dir_all(path)
             .await
-            .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
+            .with_context(|| anyhow!("creating directory {path:?}"))?;
     }
 
     let sandbox_expose_fd = path_set
@@ -215,14 +215,14 @@ async fn spawn(
             if let Err(err) = &file_result
                 && err.kind() == ErrorKind::NotFound
             {
-                return eyre::Ok(None);
+                return anyhow::Ok(None);
             }
             let file = file_result
-                .wrap_err_with(|| eyre!("opening file {path:?} for writing"))?;
+                .with_context(|| anyhow!("opening file {path:?} for writing"))?;
             let file = file.into_std().await;
             let fd = OwnedFd::from(file);
             let fd = zbus::OwnedFd::from(fd);
-            eyre::Ok(Some(fd))
+            anyhow::Ok(Some(fd))
         })
         .collect::<FuturesUnordered<_>>()
         .filter_map(|i| async move { i.transpose() })
@@ -240,14 +240,14 @@ async fn spawn(
             if let Err(err) = &file_result
                 && err.kind() == ErrorKind::NotFound
             {
-                return eyre::Ok(None);
+                return anyhow::Ok(None);
             }
             let file = file_result
-                .wrap_err_with(|| eyre!("opening file {path:?} for reading"))?;
+                .with_context(|| anyhow!("opening file {path:?} for reading"))?;
             let file = file.into_std().await;
             let fd = OwnedFd::from(file);
             let fd = zbus::OwnedFd::from(fd);
-            eyre::Ok(Some(fd))
+            anyhow::Ok(Some(fd))
         })
         .collect::<FuturesUnordered<_>>()
         .filter_map(|i| async move { i.transpose() })
@@ -293,7 +293,7 @@ async fn spawn(
         .flatpak_portal
         .spawn(&cwd_path, &argv, &fds, &envs, flags, &options)
         .await
-        .wrap_err("spawning child process through Flatpak portal")?;
+        .context("spawning child process through Flatpak portal")?;
 
     // ...because otherwise we can have a race condition here.
     // if we spawn the process, and it exits very quickly, then flatpak
@@ -373,29 +373,29 @@ async fn start_dbus_proxy(
 ) -> Result<(DbusProxy, zbus::OwnedFd, String)> {
     let xdg_dbus_proxy = find_command("xdg-dbus-proxy")
         .await
-        .wrap_err("searching for `xdg-dbus-proxy` executable")?;
+        .context("searching for `xdg-dbus-proxy` executable")?;
     let dev_null = env.dev_null;
 
     crate::backend::run_on_spawn_thread(move || {
         let directories = directories::BaseDirs::new()
-            .ok_or_eyre("unable to determine base directories")?;
+            .context("unable to determine base directories")?;
 
         // Flatpak can only expose the socket at the same path as on the host, so it
         // can't be in $XDG_RUNTIME_DIR or /tmp, since the launcher has its own versions
         // of those
         let cache_dir = directories.cache_dir();
         std::fs::create_dir_all(cache_dir)
-            .wrap_err("creating cache directory")?;
+            .context("creating cache directory")?;
         let cache_dir = cache_dir
             .canonicalize()
-            .wrap_err("resolving cache directory")?;
+            .context("resolving cache directory")?;
 
         let socket_path =
             cache_dir.join(format!("bus-{:016x}", rand::random::<u64>()));
         let address = socket_path
             .to_str()
             .map(|path| format!("unix:path={path}"))
-            .ok_or_eyre("socket path isn't valid UTF-8")?;
+            .context("socket path isn't valid UTF-8")?;
 
         let dbus_proxy = DbusProxy::start(
             xdg_dbus_proxy,
@@ -410,10 +410,10 @@ async fn start_dbus_proxy(
             .read(true)
             .custom_flags(libc::O_PATH | libc::O_NOFOLLOW)
             .open(dbus_proxy.socket_path())
-            .wrap_err("opening dbus proxy socket")?;
+            .context("opening dbus proxy socket")?;
         let socket_fd = zbus::OwnedFd::from(OwnedFd::from(socket));
 
-        eyre::Ok((dbus_proxy, socket_fd, address))
+        anyhow::Ok((dbus_proxy, socket_fd, address))
     })
     .await?
 }
@@ -432,7 +432,7 @@ fn open_dev_null() -> Result<std::fs::File> {
         .read(true)
         .write(true)
         .open("/dev/null")
-        .wrap_err("opening /dev/null")
+        .context("opening /dev/null")
 }
 
 /// Flatpak does not support granting additional filesystem access after spawn.
@@ -491,7 +491,7 @@ impl SandboxChildOp for FlatpakChild {
         let rx_exited = self
             .rx_exited
             .as_mut()
-            .ok_or_eyre("missing exit status receiver")?;
+            .context("missing exit status receiver")?;
         match rx_exited.try_recv() {
             Ok(exit_status) => {
                 self.rx_exited = None;
@@ -513,9 +513,9 @@ impl SandboxChildOp for FlatpakChild {
         let exit_status = self
             .rx_exited
             .as_mut()
-            .ok_or_eyre("missing exit status receiver")?
+            .context("missing exit status receiver")?
             .await
-            .wrap_err("channel closed")?;
+            .context("channel closed")?;
         self.rx_exited = None;
         self.exit_status = Some(exit_status);
         Ok(exit_status)
@@ -525,6 +525,6 @@ impl SandboxChildOp for FlatpakChild {
         self.flatpak_portal
             .spawn_signal(self.flatpak_pid, SIGKILL as u32, true)
             .await
-            .wrap_err("sending SIGKILL to child process")
+            .context("sending SIGKILL to child process")
     }
 }

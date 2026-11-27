@@ -63,6 +63,25 @@ async function openReauth(): Promise<void> {
 	}
 }
 
+/**
+ * Reauthenticate before a privileged flow collects input.
+ * A missing session age counts as not privileged, so save does not discover that after the form is filled.
+ * Returns false when reauthentication is cancelled.
+ */
+export async function ensurePrivileged(required = true): Promise<boolean> {
+	try {
+		if (required && isSessionYoung(useAuthState().value.token) !== true) {
+			await requestReauth()
+		}
+		return true
+	} catch (error) {
+		if (isReauthCancelled(error)) {
+			return false
+		}
+		throw error
+	}
+}
+
 export async function runPrivileged(action: () => Promise<void>, precheck = true): Promise<void> {
 	if (precheck && isSessionYoung(useAuthState().value.token) === false) {
 		await requestReauth()

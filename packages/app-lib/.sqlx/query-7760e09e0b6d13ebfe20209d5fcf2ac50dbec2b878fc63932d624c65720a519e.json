@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT access_token, refresh_token FROM minecraft_users",
+  "describe": {
+    "columns": [
+      {
+        "name": "access_token",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "minecraft_users",
+            "name": "access_token"
+          }
+        }
+      },
+      {
+        "name": "refresh_token",
+        "ordinal": 1,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "minecraft_users",
+            "name": "refresh_token"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "7760e09e0b6d13ebfe20209d5fcf2ac50dbec2b878fc63932d624c65720a519e"
+}

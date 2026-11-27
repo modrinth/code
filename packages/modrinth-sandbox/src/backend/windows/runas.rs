@@ -1,6 +1,6 @@
 use std::os::windows::ffi::OsStrExt;
 
-use eyre::{Result, eyre};
+use anyhow::{Result, anyhow};
 use windows::Win32::UI::Shell::SHELLEXECUTEINFOW;
 
 use crate::{SandboxArg, helper::MakeHelper};
@@ -39,7 +39,7 @@ pub fn spawn(
     }
 
     if sei.hProcess.is_invalid() {
-        return Err(eyre!(
+        return Err(anyhow!(
             "ShellExecuteExW returned invalid process handle. Operation completed via DDE?"
         ));
     }

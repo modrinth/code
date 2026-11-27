@@ -1,0 +1,32 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                        WITH schedules AS (\n                            SELECT * FROM UNNEST(ARRAY[1,2,3,4,5,6]::bigint[],\n                                ARRAY['2026-01-01','2026-02-01','2025-01-01','2025-01-01','2025-01-01','2025-01-01']::timestamptz[])\n                                AS s(id, scheduled_for)\n                        ), projects(id, in_review, project_types, submission, flag) AS (\n                            VALUES (1::bigint, true, ARRAY['mod'], 'new', 'test'),\n                                (2, true, ARRAY['mod'], 'new', 'test'),\n                                (3, false, ARRAY['mod'], 'new', 'test'),\n                                (4, true, ARRAY['modpack'], 'new', 'test'),\n                                (5, true, ARRAY['mod'], 'resubmission', 'test'),\n                                (6, true, ARRAY['mod'], 'new', 'other')\n                        ), filtered AS (\n                            SELECT p.id, s.scheduled_for FROM projects p JOIN schedules s USING (id)\n                            WHERE p.in_review AND p.project_types && ARRAY['mod']\n                                AND p.submission = 'new' AND p.flag = 'test'\n                        ), total AS (\n                            SELECT count(*) AS count FROM filtered\n                        ), page AS (\n                            SELECT * FROM filtered\n                            ORDER BY CASE WHEN $1 THEN scheduled_for END DESC,\n                                CASE WHEN NOT $1 THEN scheduled_for END ASC, id ASC\n                            LIMIT $2 OFFSET $3\n                        )\n                        SELECT total.count AS \"total!\", page.id AS \"id?\"\n                        FROM total LEFT JOIN page ON true\n                        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "id?",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bool",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null,
+      true
+    ]
+  },
+  "hash": "0fd2b5e94d51179bcd911be795cdf3005a1b9aadd13ccc3558db6991b0cff0ea"
+}

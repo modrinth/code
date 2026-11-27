@@ -548,14 +548,23 @@
   "app-marketing.download.download-appimage": {
     "message": "Baixar AppImage"
   },
+  "app-marketing.download.download-appimage-arm64": {
+    "message": "Baixar AppImage (ARM64)"
+  },
   "app-marketing.download.download-beta": {
     "message": "Baixar beta"
   },
   "app-marketing.download.download-deb": {
     "message": "Baixar DEB"
   },
+  "app-marketing.download.download-deb-arm64": {
+    "message": "Baixar DEB (ARM64)"
+  },
   "app-marketing.download.download-rpm": {
     "message": "Baixar RPM"
+  },
+  "app-marketing.download.download-rpm-arm64": {
+    "message": "Baixar RPM (ARM64)"
   },
   "app-marketing.download.flathub": {
     "message": "Obtenha-o no Flathub"
@@ -812,6 +821,12 @@
   "auth.create-account.username.placeholder": {
     "message": "Inserir nome de usuário"
   },
+  "auth.oauth.opening.description": {
+    "message": "Conclua seu login em {provider}"
+  },
+  "auth.oauth.opening.title": {
+    "message": "Abrindo {provider}..."
+  },
   "auth.reauthenticate.2fa.description": {
     "message": "Insira o código de 6 dígitos do seu aplicativo de autenticação ou um dos códigos de backup."
   },
@@ -883,6 +898,9 @@
   },
   "auth.sign-in.choose-existing-account": {
     "message": "Use uma conta existente"
+  },
+  "auth.sign-in.code-failed": {
+    "message": "Este link de login é inválido ou expirou. Tente novamente."
   },
   "auth.sign-in.continue-with-email": {
     "message": "Continuar com e-mail"
@@ -2999,6 +3017,9 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Assinar o Modrinth+"
   },
+  "layout.nav.use-signed-out": {
+    "message": "Usar encerrar sessão"
+  },
   "layout.publish.email-verification-required.description": {
     "message": "Você precisa verificar seu e-mail antes de publicar no Modrinth."
   },
@@ -3141,7 +3162,7 @@
     "message": "outro vínculo para esta ação"
   },
   "moderation.keybinds.technical": {
-    "message": "Páginas de revisão técnica"
+    "message": "Páginas de análise técnica"
   },
   "moderation.keybinds.title": {
     "message": "Atalhos"
@@ -3813,7 +3834,7 @@
     "message": "Editar projeto"
   },
   "project.actions.open-in-modview": {
-    "message": "Abrir na visualização de moderador"
+    "message": "Visão de moderador"
   },
   "project.actions.project-page": {
     "message": "Página do projeto"
@@ -6244,6 +6265,12 @@
   },
   "thread.message.tech-review-exited": {
     "message": "O projeto saiu da fila de revisão técnica, pois todas as pendências foram resolvidas."
+  },
+  "thread.message.tech-review-failed": {
+    "message": "revisão técnica concluída e projeto marcado como reprovado com {safe} seguro e {unsafe,  plural, one {# insegurança} other {# inseguranças}} revisados."
+  },
+  "thread.message.tech-review-passed": {
+    "message": "análise técnica completa e projeto marcado como passou com {safe, plural, one {# problema seguro} other {# problemas seguros}} revisado."
   },
   "thread.message.thread-closed": {
     "message": "fechou o tópico."

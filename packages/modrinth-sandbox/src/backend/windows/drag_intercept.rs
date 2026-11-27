@@ -17,7 +17,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use eyre::{Result, WrapErr, ensure, eyre};
+use anyhow::{Result, Context, ensure, anyhow};
 use tracing::{debug, error, warn};
 use windows::{
     Win32::{
@@ -164,11 +164,11 @@ impl DragInterceptHandle {
                 .run_message_loop();
                 debug!(process_id, "drag intercept thread stopped");
             })
-            .wrap_err("spawning drag intercept thread")?;
+            .context("spawning drag intercept thread")?;
 
         let thread_id = ready_receiver
             .recv()
-            .wrap_err("drag intercept thread exited during setup")??;
+            .context("drag intercept thread exited during setup")??;
         debug!(process_id, "drag intercept thread started");
 
         Ok(Self { thread_id, thread })
@@ -364,7 +364,7 @@ impl DragTracking {
     ) -> Result<()> {
         let mut cursor = POINT::default();
         unsafe { GetCursorPos(&raw mut cursor) }
-            .wrap_err("getting cursor position")?;
+            .context("getting cursor position")?;
         let monitor =
             unsafe { MonitorFromPoint(cursor, MONITOR_DEFAULTTONEAREST) };
         let hovered = top_level_window_at(cursor)
@@ -394,7 +394,7 @@ impl DragTracking {
 }
 
 fn setup_intercept_thread() -> Result<(OleGuard, WinEventHook)> {
-    let ole = OleGuard::initialize().wrap_err("initializing OLE")?;
+    let ole = OleGuard::initialize().context("initializing OLE")?;
 
     unsafe {
         // Use physical pixels for all coordinates
@@ -420,7 +420,7 @@ fn setup_intercept_thread() -> Result<(OleGuard, WinEventHook)> {
             WINEVENT_OUTOFCONTEXT,
         );
         if hook.is_invalid() {
-            return Err(eyre!("unable to install drag image event hook"));
+            return Err(anyhow!("unable to install drag image event hook"));
         }
         Ok((ole, WinEventHook(hook)))
     }
@@ -507,7 +507,7 @@ impl DragOverlay {
                 if err.code()
                     != HRESULT::from_win32(ERROR_CLASS_ALREADY_EXISTS.0)
                 {
-                    return Err(err).wrap_err("registering overlay class");
+                    return Err(err).context("registering overlay class");
                 }
             }
 
@@ -528,7 +528,7 @@ impl DragOverlay {
                 Some(instance),
                 None,
             )
-            .wrap_err("creating overlay window")?;
+            .context("creating overlay window")?;
             let dragged_over = Arc::<AtomicBool>::default();
             let overlay = Self {
                 window,
@@ -537,7 +537,7 @@ impl DragOverlay {
             };
 
             set_overlay_opacity(window, OVERLAY_HIDDEN_OPACITY)
-                .wrap_err("setting overlay opacity")?;
+                .context("setting overlay opacity")?;
 
             let target: IDropTarget = DropTarget {
                 overlay_window: window,
@@ -547,7 +547,7 @@ impl DragOverlay {
             }
             .into();
             RegisterDragDrop(window, &target)
-                .wrap_err("registering overlay as a drop target")?;
+                .context("registering overlay as a drop target")?;
 
             _ = ShowWindow(window, SW_SHOWNOACTIVATE);
 
@@ -906,7 +906,7 @@ fn post_drop_message(
         "window no longer belongs to the sandboxed process"
     );
 
-    let drop = create_drop_data(files, point).wrap_err("creating drop data")?;
+    let drop = create_drop_data(files, point).context("creating drop data")?;
     // The receiver frees the data if this succeeds
     if let Err(err) = unsafe {
         PostMessageW(
@@ -917,7 +917,7 @@ fn post_drop_message(
         )
     } {
         unsafe { _ = GlobalFree(Some(drop)) };
-        return Err(err).wrap_err("posting drop message");
+        return Err(err).context("posting drop message");
     }
     Ok(())
 }
@@ -965,11 +965,11 @@ fn ensure_process_medium_integrity(process_id: u32) -> Result<()> {
     let token = unsafe {
         let process = Owned::new(
             OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, process_id)
-                .wrap_err("opening process")?,
+                .context("opening process")?,
         );
         let mut token = HANDLE::default();
         OpenProcessToken(*process, TOKEN_QUERY, &raw mut token)
-            .wrap_err("opening process token")?;
+            .context("opening process token")?;
         Owned::new(token)
     };
     ensure_token_medium_integrity(*token)
@@ -977,7 +977,7 @@ fn ensure_process_medium_integrity(process_id: u32) -> Result<()> {
 
 fn ensure_com_caller_medium_integrity() -> Result<()> {
     let token = unsafe {
-        CoImpersonateClient().wrap_err("impersonating COM caller")?;
+        CoImpersonateClient().context("impersonating COM caller")?;
         let mut token = HANDLE::default();
         let opened = OpenThreadToken(
             GetCurrentThread(),
@@ -986,9 +986,9 @@ fn ensure_com_caller_medium_integrity() -> Result<()> {
             &raw mut token,
         );
         let reverted = CoRevertToSelf();
-        opened.wrap_err("opening token of COM caller")?;
+        opened.context("opening token of COM caller")?;
         let token = Owned::new(token);
-        reverted.wrap_err("reverting impersonation of COM caller")?;
+        reverted.context("reverting impersonation of COM caller")?;
         token
     };
     ensure_token_medium_integrity(*token)
@@ -1025,7 +1025,7 @@ fn get_token_integrity_level(token: HANDLE) -> Result<u32> {
             size_of::<LabelBuffer>() as u32,
             &raw mut returned,
         )
-        .wrap_err("querying token integrity level")?;
+        .context("querying token integrity level")?;
 
         let sid = buffer.label.Label.Sid;
         let count = *GetSidSubAuthorityCount(sid);

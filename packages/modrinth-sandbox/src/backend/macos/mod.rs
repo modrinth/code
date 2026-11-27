@@ -7,7 +7,7 @@ use std::{
 
 use async_trait::async_trait;
 use derive_more::Debug;
-use eyre::{Context, OptionExt, Result};
+use anyhow::{Context, Result};
 
 use crate::{
     ExposedPath, SandboxCommand, SandboxExitStatus,
@@ -31,7 +31,7 @@ impl Backend for Macos {
         _make_helper: crate::helper::MakeHelper,
     ) -> Result<Box<dyn SandboxEnv>> {
         let dev_null =
-            super::unix::open_dev_null().wrap_err("opening /dev/null")?;
+            super::unix::open_dev_null().context("opening /dev/null")?;
         Ok(Box::new(MacosEnv { dev_null }))
     }
 }
@@ -63,13 +63,13 @@ fn spawn(
     let temp_root = confstr(libc::_CS_DARWIN_USER_TEMP_DIR)
         .map(OsString::from_vec)
         .map(PathBuf::from)
-        .ok_or_eyre("macOS user temporary directory is unavailable")?
+        .context("macOS user temporary directory is unavailable")?
         .canonicalize()
-        .wrap_err("resolving macOS user temporary directory")?;
+        .context("resolving macOS user temporary directory")?;
     let temp_dir = tempfile::Builder::new()
         .prefix("modrinth-sandbox-")
         .tempdir_in(&temp_root)
-        .wrap_err("creating sandbox temporary directory")?;
+        .context("creating sandbox temporary directory")?;
 
     let temp_path = temp_dir.path().to_path_buf();
     command.read_write_paths.push(temp_path.clone());
@@ -85,7 +85,7 @@ fn spawn(
 
     let environment = command.take_environment();
     let home =
-        std::env::var_os("HOME").ok_or_eyre("`HOME` not set in environment")?;
+        std::env::var_os("HOME").context("`HOME` not set in environment")?;
     let mut sandbox_profile = SandboxProfile::new(home);
 
     if command.allow_network {
@@ -101,9 +101,9 @@ fn spawn(
         let cache_root = confstr(libc::_CS_DARWIN_USER_CACHE_DIR)
             .map(OsString::from_vec)
             .map(PathBuf::from)
-            .ok_or_eyre("macOS user cache directory is unavailable")?
+            .context("macOS user cache directory is unavailable")?
             .canonicalize()
-            .wrap_err("resolving macOS user cache directory")?;
+            .context("resolving macOS user cache directory")?;
         sandbox_profile.push("(allow file-write* file-read* file-map-executable process-exec (subpath ");
         sandbox_profile.push_path(
             cache_root.join("net.java.openjdk.java").into_os_string(),
@@ -113,7 +113,7 @@ fn spawn(
 
     for path in &command.ensure_dirs_exist {
         std::fs::create_dir_all(path)
-            .wrap_err_with(|| format!("creating directory {path:?}"))?;
+            .with_context(|| format!("creating directory {path:?}"))?;
     }
 
     let (path_set, path_rules) = command.take_paths()?;
@@ -142,7 +142,7 @@ fn spawn(
         sandbox_profile,
         sandbox_params,
     )
-    .wrap_err("spawning child")?;
+    .context("spawning child")?;
 
     let mut child = crate::SandboxChild {
         stdin: pipes.stdin,
@@ -202,8 +202,8 @@ impl SandboxHandleOp for MacosSandboxHandle {
         &self,
         _path: &Path,
         _permission: PathPermission,
-    ) -> eyre::Result<ExposedPath> {
-        Err(eyre::eyre!("unsupported"))
+    ) -> anyhow::Result<ExposedPath> {
+        Err(anyhow::anyhow!("unsupported"))
     }
 
     fn is_path_readable(&self, path: &Path) -> bool {
@@ -286,14 +286,14 @@ impl SandboxProfile {
 
     fn finish(self) -> Result<(CString, RawStringVec)> {
         let profile = CString::new(self.profile.into_encoded_bytes())
-            .wrap_err("converting sandbox profile to C-string")?;
+            .context("converting sandbox profile to C-string")?;
 
         let mut params = RawStringVec::with_capacity(self.params.len() * 2);
         for (name, value) in self.params {
             params.push_os(name)?;
             params
                 .push_os(value)
-                .wrap_err("sandbox path contained a null byte")?;
+                .context("sandbox path contained a null byte")?;
         }
 
         Ok((profile, params))

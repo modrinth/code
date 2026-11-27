@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "Zkopírováno"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "Kopírovat detaily"
-  },
   "app.action-bar.install.dismiss": {
     "message": "Zavřít"
   },
@@ -2920,9 +2917,6 @@
   },
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Zálohy databáze aplikace"
-  },
-  "app.settings.resource-management.app-directory.description": {
-    "message": "Kde Modrinth App ukládá instance a další soubory. Změny se projeví po restartu aplikace."
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Složka aplikace"

@@ -824,9 +824,19 @@ mod tests {
     use crate::models::exp;
     use crate::models::ids::{ProjectId, TeamId, ThreadId};
     use crate::models::projects::{
-        GalleryItem, License, Link, MonetizationStatus, ProjectStatus,
-        SideTypesMigrationReviewStatus,
+        GalleryItem, License, Link, MonetizationStatus, ProjectReviewOutcome,
+        ProjectVisibility, SideTypesMigrationReviewStatus,
     };
+
+    #[test]
+    fn project_response_includes_legacy_and_canonical_state() {
+        let value = serde_json::to_value(project()).unwrap();
+        assert_eq!(value["status"], "draft");
+        assert_eq!(value["requested_status"], "approved");
+        assert_eq!(value["visibility"], "public");
+        assert_eq!(value["in_review"], false);
+        assert_eq!(value["review_outcome"], "never_reviewed");
+    }
 
     fn project() -> Project {
         let now = Utc::now();
@@ -844,8 +854,13 @@ mod tests {
             updated: now,
             approved: None,
             queued: None,
-            status: ProjectStatus::Draft,
-            requested_status: None,
+            status: crate::models::v2::projects::ProjectStatus::Draft,
+            requested_status: Some(
+                crate::models::v2::projects::ProjectStatus::Approved,
+            ),
+            visibility: ProjectVisibility::Public,
+            in_review: false,
+            review_outcome: ProjectReviewOutcome::NeverReviewed,
             moderator_message: None,
             license: License {
                 id: "MIT".to_string(),

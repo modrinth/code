@@ -1,11 +1,11 @@
 use std::path::{Path, PathBuf};
 
-use eyre::{Context, Result, eyre};
+use anyhow::{Context, Result, anyhow};
 
 pub fn resolve_path(path: &Path) -> Result<PathBuf> {
     let path = path
         .canonicalize()
-        .wrap_err_with(|| eyre!("executable file {path:?} doesn't exist"))?;
+        .with_context(|| anyhow!("executable file {path:?} doesn't exist"))?;
 
     debug_assert!(path.is_absolute());
 

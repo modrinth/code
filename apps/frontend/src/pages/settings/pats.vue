@@ -318,7 +318,7 @@ import {
 	toggleScope,
 	useScopes,
 } from '~/composables/auth/scopes.ts'
-import { isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
+import { ensurePrivileged, isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -548,7 +548,8 @@ const scopeCategories = computed(() => {
 	return categories.filter((c) => c.scopes.length > 0)
 })
 
-function openCreatePat() {
+async function openCreatePat() {
+	if (!(await ensurePrivileged())) return
 	name.value = null
 	scopesVal.value = BigInt(0)
 	expires.value = null
@@ -556,7 +557,8 @@ function openCreatePat() {
 	patModal.value.show()
 }
 
-function openEditPat(pat) {
+async function openEditPat(pat) {
+	if (!(await ensurePrivileged())) return
 	editPatId.value = pat.id
 	name.value = pat.name
 	scopesVal.value = BigInt(pat.scopes)
@@ -564,7 +566,8 @@ function openEditPat(pat) {
 	patModal.value.show()
 }
 
-function confirmRemovePat(id) {
+async function confirmRemovePat(id) {
+	if (!(await ensurePrivileged())) return
 	deletePatIndex.value = id
 	modal_confirm.value.show()
 }

@@ -5,7 +5,7 @@ use std::{
 };
 
 use async_trait::async_trait;
-use eyre::{Context, Result, eyre};
+use anyhow::{Context, Result, anyhow};
 
 use crate::{
     SandboxCommand, SandboxExitStatus, SandboxStdio,
@@ -43,7 +43,7 @@ async fn spawn(mut command: SandboxCommand) -> Result<crate::SandboxChild> {
     for directory in &command.ensure_dirs_exist {
         tokio::fs::create_dir_all(directory)
             .await
-            .wrap_err_with(|| eyre!("creating directory {directory:?}"))?;
+            .with_context(|| anyhow!("creating directory {directory:?}"))?;
     }
 
     let environment = command.take_environment();
@@ -63,7 +63,7 @@ async fn spawn(mut command: SandboxCommand) -> Result<crate::SandboxChild> {
     let (stdout, stdout_reader) = output_stdio(command.stdout)?;
     let (stderr, stderr_reader) = output_stdio(command.stderr)?;
     builder.stdin(stdin).stdout(stdout).stderr(stderr);
-    let child = builder.spawn().wrap_err("spawning unsandboxed process")?;
+    let child = builder.spawn().context("spawning unsandboxed process")?;
     // Command retains the child-side pipe handles after spawning.
     drop(builder);
 
@@ -89,7 +89,7 @@ fn input_stdio(mode: SandboxStdio) -> Result<(Stdio, Option<PipeWriter>)> {
         SandboxStdio::Inherit => Ok((Stdio::inherit(), None)),
         SandboxStdio::Pipe => {
             let (reader, writer) =
-                std::io::pipe().wrap_err("creating unsandboxed stdin pipe")?;
+                std::io::pipe().context("creating unsandboxed stdin pipe")?;
             Ok((reader.into(), Some(writer)))
         }
     }
@@ -101,7 +101,7 @@ fn output_stdio(mode: SandboxStdio) -> Result<(Stdio, Option<PipeReader>)> {
         SandboxStdio::Inherit => Ok((Stdio::inherit(), None)),
         SandboxStdio::Pipe => {
             let (reader, writer) =
-                std::io::pipe().wrap_err("creating unsandboxed output pipe")?;
+                std::io::pipe().context("creating unsandboxed output pipe")?;
             Ok((writer.into(), Some(reader)))
         }
     }
@@ -122,7 +122,7 @@ impl SandboxChildOp for StdChild {
         self.child
             .try_wait()
             .map(|status| status.map(sandbox_exit_status))
-            .wrap_err("checking unsandboxed child status")
+            .context("checking unsandboxed child status")
     }
 
     async fn wait(&mut self) -> Result<SandboxExitStatus> {
@@ -130,7 +130,7 @@ impl SandboxChildOp for StdChild {
             .wait()
             .await
             .map(sandbox_exit_status)
-            .wrap_err("waiting for unsandboxed child")
+            .context("waiting for unsandboxed child")
     }
 
     async fn kill(&mut self) -> Result<()> {
@@ -140,7 +140,7 @@ impl SandboxChildOp for StdChild {
         self.child
             .kill()
             .await
-            .wrap_err("killing unsandboxed child")
+            .context("killing unsandboxed child")
     }
 }
 
@@ -174,7 +174,7 @@ impl SandboxHandleOp for NoopSandboxHandle {
         &self,
         _path: &Path,
         _permission: PathPermission,
-    ) -> eyre::Result<ExposedPath> {
+    ) -> anyhow::Result<ExposedPath> {
         Ok(ExposedPath::Direct)
     }
 

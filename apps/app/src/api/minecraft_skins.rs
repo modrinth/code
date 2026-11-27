@@ -2,8 +2,11 @@ use crate::api::Result;
 
 use std::path::Path;
 use theseus::minecraft_skins::{
-    self, Bytes, Cape, MinecraftSkinVariant, Skin, UrlOrBlob,
+    self, Bytes, Cape, MinecraftSkinVariant, Skin, SkinEars, UrlOrBlob,
 };
+use url::Url;
+
+use super::utils::tauri_convert_file_src;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("minecraft-skins")
@@ -20,6 +23,9 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             flush_pending_skin_change_for_profile,
             normalize_skin_texture,
             get_dragged_skin_data,
+            render_skin_preview,
+            render_skin_head,
+            get_skin_ears,
         ])
         .build()
 }
@@ -144,4 +150,38 @@ pub async fn normalize_skin_texture(texture: UrlOrBlob) -> Result<Bytes> {
 pub async fn get_dragged_skin_data(path: String) -> Result<Bytes> {
     let path = Path::new(&path);
     Ok(minecraft_skins::get_dragged_skin_data(path).await?)
+}
+
+/// `invoke('plugin:minecraft-skins|render_skin_preview', skin, cape_texture)`
+///
+/// See also: [minecraft_skins::render_skin_preview]
+#[tauri::command]
+pub async fn render_skin_preview(
+    skin: Skin,
+    cape_texture: Option<Url>,
+) -> Result<String> {
+    let path =
+        minecraft_skins::render_skin_preview(&skin, cape_texture.as_ref())
+            .await?;
+    Ok(tauri_convert_file_src(&path)?.to_string())
+}
+
+/// `invoke('plugin:minecraft-skins|render_skin_head', skin)`
+///
+/// See also: [minecraft_skins::render_skin_head]
+#[tauri::command]
+pub async fn render_skin_head(skin: Skin) -> Result<String> {
+    let path = minecraft_skins::render_skin_head(&skin).await?;
+    Ok(tauri_convert_file_src(&path)?.to_string())
+}
+
+/// `invoke('plugin:minecraft-skins|get_skin_ears', texture, slim)`
+///
+/// See also: [minecraft_skins::get_skin_ears]
+#[tauri::command]
+pub async fn get_skin_ears(
+    texture: UrlOrBlob,
+    slim: bool,
+) -> Result<Option<SkinEars>> {
+    Ok(minecraft_skins::get_skin_ears(&texture, slim).await?)
 }

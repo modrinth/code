@@ -75,7 +75,7 @@ use windows::{
 
 use async_trait::async_trait;
 use derive_more::Debug;
-use eyre::{Context, Result, bail, ensure, eyre};
+use anyhow::{Context, Result, bail, ensure, anyhow};
 use parking_lot::Mutex;
 use uuid::Uuid;
 
@@ -105,9 +105,9 @@ impl Backend for AppContainer {
         Ok(Box::new(AppContainerEnv {
             make_helper,
             job_handle: super::create_job_object()
-                .wrap_err("error creating job object")?,
+                .context("error creating job object")?,
             null_device: super::open_null_device()
-                .wrap_err("error opening null device")?,
+                .context("error opening null device")?,
         }))
     }
 }
@@ -151,7 +151,7 @@ fn spawn(
     let app_container_sid_string =
         app_container_sid_to_string(&app_container_sid)?;
     let acl_ledger = AppliedAclLedger::open(&app_container_sid_string)
-        .wrap_err("opening AppContainer ACL ledger")?;
+        .context("opening AppContainer ACL ledger")?;
     let app_container_folder =
         get_app_container_folder(&app_container_sid_string)?;
     let local_state = app_container_folder.join("LocalState");
@@ -159,7 +159,7 @@ fn spawn(
     let temp_state = app_container_folder.join("TempState");
     let sandbox_home = local_state.join("Home");
     for path in [&local_state, &roaming_state, &temp_state, &sandbox_home] {
-        std::fs::create_dir_all(path).wrap_err_with(|| {
+        std::fs::create_dir_all(path).with_context(|| {
             format!("creating AppContainer storage directory {path:?}")
         })?;
     }
@@ -286,7 +286,7 @@ fn spawn(
 
     for path in &command.ensure_dirs_exist {
         std::fs::create_dir_all(path)
-            .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
+            .with_context(|| anyhow!("creating directory {path:?}"))?;
     }
 
     if let Some(real_home) = &real_home
@@ -334,19 +334,19 @@ fn spawn(
     for path in path_set.iter_read_only() {
         instance_grants.extend(
             Grant::from_path(path, PermissionType::Read)
-                .wrap_err_with(|| eyre!("creating read grant for {path:?}"))?,
+                .with_context(|| anyhow!("creating read grant for {path:?}"))?,
         );
     }
     for path in path_set.iter_read_write() {
         instance_grants.extend(
             Grant::from_path(path, PermissionType::Write)
-                .wrap_err_with(|| eyre!("creating write grant for {path:?}"))?,
+                .with_context(|| anyhow!("creating write grant for {path:?}"))?,
         );
     }
     for path in parents {
         instance_grants.extend(
-            Grant::from_path(&path, PermissionType::Traverse).wrap_err_with(
-                || eyre!("creating traverse grant for {path:?}"),
+            Grant::from_path(&path, PermissionType::Traverse).with_context(
+                || anyhow!("creating traverse grant for {path:?}"),
             )?,
         );
     }
@@ -360,10 +360,10 @@ fn spawn(
 
     let locked_acl_ledger = acl_ledger
         .lock()
-        .wrap_err("locking AppContainer ACL ledger")?;
+        .context("locking AppContainer ACL ledger")?;
     let mut prepared = locked_acl_ledger
         .prepare(instance_grants)
-        .wrap_err("preparing AppContainer ACL instance")?;
+        .context("preparing AppContainer ACL instance")?;
     let mut parents_to_elevate = Vec::new();
     let mut read_paths_to_elevate = Vec::new();
     let mut write_paths_to_elevate = Vec::new();
@@ -431,7 +431,7 @@ fn spawn(
                     PermissionType::Write => write_paths_to_elevate.push(path),
                 }
             } else {
-                return Err(err).wrap_err_with(|| {
+                return Err(err).with_context(|| {
                     format!("granting sandbox access to {path:?}")
                 });
             }
@@ -448,7 +448,7 @@ fn spawn(
                 need_set_network_isolation_elevated = true;
             } else {
                 return Err(err)
-                    .wrap_err("configuring AppContainer network isolation");
+                    .context("configuring AppContainer network isolation");
             }
         }
     }
@@ -473,12 +473,12 @@ fn spawn(
 
         info!(?arguments, "spawning elevated helper command");
         let mut elevated = super::runas::spawn(env.make_helper, arguments)
-            .wrap_err("spawning elevated helper command")?;
+            .context("spawning elevated helper command")?;
         let elevated_status = elevated
             .blocking_wait()
-            .wrap_err("running elevated helper")?;
+            .context("running elevated helper")?;
         info!("elevated helper command finished: {elevated_status}");
-        eyre::ensure!(
+        anyhow::ensure!(
             elevated_status.success(),
             "elevated helper failed with {elevated_status}"
         );
@@ -486,7 +486,7 @@ fn spawn(
 
     prepared
         .finalize_pruning(&not_revoked)
-        .wrap_err("finalizing AppContainer ACL pruning")?;
+        .context("finalizing AppContainer ACL pruning")?;
 
     let (pipes, child) = super::spawn(
         command.executable.clone().into(),
@@ -500,14 +500,14 @@ fn spawn(
         env.null_device.clone(),
         attribute_list,
     )
-    .wrap_err("spawning child")?;
+    .context("spawning child")?;
     let process_identity = child
         .process_identity()
-        .wrap_err("reading spawned child process identity")?;
+        .context("reading spawned child process identity")?;
     let acl_instance_id = prepared.id();
     prepared
         .activate(process_identity)
-        .wrap_err("activating AppContainer ACL instance")?;
+        .context("activating AppContainer ACL instance")?;
     drop(prepared);
 
     let handle = WindowsSandboxHandle {
@@ -603,7 +603,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
         &self,
         path: &Path,
         permission: PathPermission,
-    ) -> eyre::Result<ExposedPath> {
+    ) -> anyhow::Result<ExposedPath> {
         let is_accessible = |path: &Path, permission| match permission {
             PathPermission::ReadOnly => self.is_path_readable(path),
             PathPermission::ReadWrite => self.is_path_writeable(path),
@@ -625,7 +625,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
                 Ok(_) => {}
                 Err(err) if err.kind() == ErrorKind::AlreadyExists => {}
                 Err(err) => {
-                    return Err(err).wrap_err_with(|| {
+                    return Err(err).with_context(|| {
                         format!("creating empty file {path:?}")
                     });
                 }
@@ -635,7 +635,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
         let original_path = path;
         let path = path
             .canonicalize()
-            .wrap_err_with(|| format!("canonicalizing path {path:?}"))?;
+            .with_context(|| format!("canonicalizing path {path:?}"))?;
 
         let simplified = strip_verbatim_prefix(&path);
         let exposed = if paths_equal(
@@ -662,7 +662,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
 
         let mut grants =
             vec![Grant::from_path(&path, permission.into())?.ok_or_else(
-                || eyre!("unable to canonicalize path: {path:?}"),
+                || anyhow!("unable to canonicalize path: {path:?}"),
             )?];
         let mut parent = path.parent();
         while let Some(parent_path) = parent {
@@ -674,7 +674,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
         }
 
         let acl_ledger = AppliedAclLedger::open(&self.app_container_sid)
-            .wrap_err("opening AppContainer ACL ledger")?;
+            .context("opening AppContainer ACL ledger")?;
         let sid = self
             .app_container_sid
             .encode_wide()
@@ -700,7 +700,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
                 self.acl_instance_id,
                 grants,
                 |grant| {
-                    apply_grant(&app_container_sid, grant).wrap_err_with(|| {
+                    apply_grant(&app_container_sid, grant).with_context(|| {
                         format!(
                             "granting dynamic sandbox {:?} access to {:?}",
                             grant.permission, grant.path
@@ -709,7 +709,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
                 },
                 |grant| revoke_grant(&app_container_sid, grant),
             )
-            .wrap_err("adding dynamic AppContainer ACL grants")?;
+            .context("adding dynamic AppContainer ACL grants")?;
 
         let mut path_set = self.path_set.lock();
         match permission {
@@ -784,7 +784,7 @@ fn app_container_sid_to_string(app_container_sid: &PSID) -> Result<OsString> {
     let mut string_sid = PWSTR::default();
     unsafe { ConvertSidToStringSidW(*app_container_sid, &mut string_sid)? };
     if string_sid.is_null() {
-        return Err(eyre!("ConvertSidToStringSidW returned a null SID"));
+        return Err(anyhow!("ConvertSidToStringSidW returned a null SID"));
     }
     scopeguard::defer! {
         unsafe {
@@ -805,7 +805,7 @@ fn get_app_container_folder(app_container_sid: &OsStr) -> Result<PathBuf> {
     let folder =
         unsafe { GetAppContainerFolderPath(PCWSTR(string_sid.as_ptr()))? };
     if folder.is_null() {
-        return Err(eyre!("GetAppContainerFolderPath returned a null path"));
+        return Err(anyhow!("GetAppContainerFolderPath returned a null path"));
     }
     scopeguard::defer! {
         unsafe { CoTaskMemFree(Some(folder.0.cast())) };
@@ -908,7 +908,7 @@ fn try_set_network_isolation(app_container: &PSID) -> Result<()> {
     Ok(())
 }
 
-pub(super) fn is_access_denied(err: &eyre::Report) -> bool {
+pub(super) fn is_access_denied(err: &anyhow::Error) -> bool {
     err.downcast_ref::<std::io::Error>().is_some_and(|err| {
         err.kind() == ErrorKind::PermissionDenied
             || err.raw_os_error().unwrap_or(0)
@@ -1538,7 +1538,7 @@ fn acl_eq(first: *const ACL, second: *const ACL) -> Result<bool> {
 
 pub fn run_helper(
     args: impl IntoIterator<Item = OsString>,
-) -> eyre::Result<bool> {
+) -> anyhow::Result<bool> {
     let mut args = args.into_iter();
     let (
         Some(app_container_name),

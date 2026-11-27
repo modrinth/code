@@ -29,12 +29,14 @@ import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get_ads_debug_state } from '@/helpers/ads.js'
 import { purge_cache_types } from '@/helpers/cache.js'
 import { appSettingsKeys, get, set } from '@/helpers/settings.ts'
-import { copyToClipboard, showAppDbBackupsFolder } from '@/helpers/utils.js'
+import { showAppDbBackupsFolder } from '@/helpers/utils.js'
+import { useCopyAsPaste } from '@/shared/composables/use-copy-as-paste'
 
 const { addNotification, handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const { adConsentAvailable } = injectPageContext()
 const appSettings = useAppSettings()
+const copyAsPaste = useCopyAsPaste()
 const queryClient = useQueryClient()
 const clearCacheConfirmModal = ref<InstanceType<typeof ConfirmModalWrapper> | null>(null)
 const copyingAdDetails = ref(false)
@@ -134,12 +136,12 @@ const messages = defineMessages({
 	},
 	alwaysShowCopyDetailsTitle: {
 		id: 'app.settings.resource-management.always-show-copy-details.title',
-		defaultMessage: 'Always show copy details',
+		defaultMessage: 'Always show inspect details',
 	},
 	alwaysShowCopyDetailsDescription: {
 		id: 'app.settings.resource-management.always-show-copy-details.description',
 		defaultMessage:
-			'Show the Copy details action while an install is queued or running. It is always available for failed or interrupted installs.',
+			'Show the Inspect details action while an install is queued or running. It is always available for failed or interrupted installs.',
 	},
 })
 
@@ -207,7 +209,7 @@ async function handleCopyAdDetails() {
 		}
 
 		const { current_ad: currentAd, ...info } = adReport
-		await copyToClipboard(
+		await copyAsPaste(
 			`CURRENT_AD: ${currentAd ?? 'unknown'}\n\nINFO:\n${JSON.stringify(info, null, 2)}`,
 		)
 

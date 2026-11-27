@@ -6,8 +6,8 @@ use crate::database::PgTransaction;
 use crate::models::thread_issues::{
     ThreadIssueContext, ThreadIssueFacet, ThreadIssueTarget, ThreadIssueVerdict,
 };
+use anyhow::{Context, Result, anyhow};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr, eyre};
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
 
@@ -63,7 +63,7 @@ impl DBThreadIssue {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching thread issues")?;
+        .context("fetching thread issues")?;
 
         let mut issues = Vec::<Self>::new();
         for row in rows {
@@ -110,14 +110,16 @@ impl DBThreadIssue {
         transaction: &mut PgTransaction<'_>,
     ) -> Result<Vec<DBThreadIssueId>> {
         if issues.iter().any(|issue| issue.facets.is_empty()) {
-            return Err(eyre!("thread issues must contain at least one facet"));
+            return Err(anyhow!(
+                "thread issues must contain at least one facet"
+            ));
         }
 
         let mut ids = Vec::with_capacity(issues.len());
         for issue in issues {
             let id = generate_thread_issue_id(&mut *transaction)
                 .await
-                .wrap_err("generating thread issue ID")?;
+                .context("generating thread issue ID")?;
 
             sqlx::query!(
                 r#"
@@ -136,21 +138,21 @@ impl DBThreadIssue {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("inserting thread issue")?;
+            .context("inserting thread issue")?;
 
             let facet_ids = generate_many_thread_issue_facet_ids(
                 issue.facets.len(),
                 &mut *transaction,
             )
             .await
-            .wrap_err("generating thread issue facet IDs")?;
+            .context("generating thread issue facet IDs")?;
             let facet_ids = facet_ids.iter().map(|id| id.0).collect::<Vec<_>>();
             let whats = issue
                 .facets
                 .into_iter()
                 .map(serde_json::to_value)
                 .collect::<std::result::Result<Vec<_>, _>>()
-                .wrap_err("serializing thread issue facets")?;
+                .context("serializing thread issue facets")?;
             let verdicts = facet_ids
                 .iter()
                 .map(|_| ThreadIssueVerdict::Open.as_str().to_string())
@@ -178,7 +180,7 @@ impl DBThreadIssue {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("inserting thread issue facets")?;
+            .context("inserting thread issue facets")?;
 
             ids.push(id);
         }
@@ -207,7 +209,7 @@ impl DBThreadIssue {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("updating thread issue facet")?;
+        .context("updating thread issue facet")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -231,7 +233,7 @@ impl DBThreadIssue {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("verifying thread issue facets")?;
+        .context("verifying thread issue facets")?;
 
         Ok(())
     }
@@ -246,7 +248,7 @@ impl DBThreadIssue {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("deleting thread issue")?;
+        .context("deleting thread issue")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -279,9 +281,7 @@ impl DBThreadIssue {
         )
         .fetch_all(&mut *transaction)
         .await
-        .wrap_err(
-            "locking project thread issues for verdict synchronization",
-        )?;
+        .context("locking project thread issues for verdict synchronization")?;
 
         let mut changed_ids = Vec::new();
         let mut changed_verdicts = Vec::new();
@@ -350,7 +350,7 @@ impl DBThreadIssue {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("updating project thread issue facet verdicts")?;
+            .context("updating project thread issue facet verdicts")?;
         }
 
         for issue in &mut issues {
@@ -370,7 +370,7 @@ fn parse_verdict(
         "open" => Ok(ThreadIssueVerdict::Open),
         "addressed" => Ok(ThreadIssueVerdict::Addressed),
         "resolved" => Ok(ThreadIssueVerdict::Resolved),
-        verdict => Err(eyre!(
+        verdict => Err(anyhow!(
             "thread issue `{issue_id}` facet `{facet_id}` has invalid verdict `{verdict}`"
         )),
     }

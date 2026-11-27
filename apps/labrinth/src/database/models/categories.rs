@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use futures::TryStreamExt;
 use xredis::RedisPool;
 
@@ -48,7 +48,7 @@ impl Category {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching category ids")?;
+        .context("fetching category ids")?;
 
         let mut map = HashMap::new();
         for r in result {
@@ -76,7 +76,7 @@ impl Category {
         )
         .fetch_optional(exec)
         .await
-        .wrap_err("fetching category id")?;
+        .context("fetching category id")?;
 
         Ok(result.map(|r| CategoryId(r.id)))
     }
@@ -92,13 +92,13 @@ impl Category {
             let mut redis = redis
                 .connect()
                 .await
-                .wrap_err("connecting to redis for cached categories")?;
+                .context("connecting to redis for cached categories")?;
             let key = redis.key().metadata(TAGS_NAMESPACE, "category");
 
             let res: Option<Vec<Category>> = redis
                 .get_deserialized(&key)
                 .await
-                .wrap_err("fetching cached categories")?;
+                .context("fetching cached categories")?;
 
             if let Some(res) = res {
                 return Ok(res);
@@ -123,18 +123,18 @@ impl Category {
         })
         .try_collect::<Vec<Category>>()
         .await
-        .wrap_err("fetching categories")?;
+        .context("fetching categories")?;
 
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to cache categories")?;
+            .context("connecting to redis to cache categories")?;
         let key = redis.key().metadata(TAGS_NAMESPACE, "category");
 
         redis
             .set_serialized(&key, &result, None)
             .await
-            .wrap_err("caching categories")?;
+            .context("caching categories")?;
 
         Ok(result)
     }
@@ -157,7 +157,7 @@ impl ReportType {
         )
         .fetch_optional(exec)
         .await
-        .wrap_err("fetching report type id")?;
+        .context("fetching report type id")?;
 
         Ok(result.map(|r| ReportTypeId(r.id)))
     }
@@ -170,14 +170,14 @@ impl ReportType {
             let mut redis = redis
                 .connect()
                 .await
-                .wrap_err("connecting to redis for cached report types")?;
+                .context("connecting to redis for cached report types")?;
             let key = redis.key().metadata(TAGS_NAMESPACE, "report_type");
 
             let res: Option<Vec<String>> =
                 redis
                     .get_deserialized(&key)
                     .await
-                    .wrap_err("fetching cached report types")?;
+                    .context("fetching cached report types")?;
 
             if let Some(res) = res {
                 return Ok(res);
@@ -193,18 +193,18 @@ impl ReportType {
         .map_ok(|c| c.name)
         .try_collect::<Vec<String>>()
         .await
-        .wrap_err("fetching report types")?;
+        .context("fetching report types")?;
 
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to cache report types")?;
+            .context("connecting to redis to cache report types")?;
         let key = redis.key().metadata(TAGS_NAMESPACE, "report_type");
 
         redis
             .set_serialized(&key, &result, None)
             .await
-            .wrap_err("caching report types")?;
+            .context("caching report types")?;
 
         Ok(result)
     }
@@ -227,7 +227,7 @@ impl ProjectType {
         )
         .fetch_optional(exec)
         .await
-        .wrap_err("fetching project type id")?;
+        .context("fetching project type id")?;
 
         Ok(result.map(|r| ProjectTypeId(r.id)))
     }
@@ -240,14 +240,14 @@ impl ProjectType {
             let mut redis = redis
                 .connect()
                 .await
-                .wrap_err("connecting to redis for cached project types")?;
+                .context("connecting to redis for cached project types")?;
             let key = redis.key().metadata(TAGS_NAMESPACE, "project_type");
 
             let res: Option<Vec<String>> =
                 redis
                     .get_deserialized(&key)
                     .await
-                    .wrap_err("fetching cached project types")?;
+                    .context("fetching cached project types")?;
 
             if let Some(res) = res {
                 return Ok(res);
@@ -263,18 +263,18 @@ impl ProjectType {
         .map_ok(|c| c.name)
         .try_collect::<Vec<String>>()
         .await
-        .wrap_err("fetching project types")?;
+        .context("fetching project types")?;
 
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to cache project types")?;
+            .context("connecting to redis to cache project types")?;
         let key = redis.key().metadata(TAGS_NAMESPACE, "project_type");
 
         redis
             .set_serialized(&key, &result, None)
             .await
-            .wrap_err("caching project types")?;
+            .context("caching project types")?;
 
         Ok(result)
     }

@@ -11,7 +11,7 @@ crate-type = ["rlib", "cdylib", "staticlib"]
 tempfile = { workspace = true }
 tracing = { workspace = true }
 tokio = { workspace = true, features = ["fs", "io-util", "macros", "net", "process", "rt", "sync"] }
-eyre = { workspace = true }
+anyhow = { workspace = true }
 async-trait = { workspace = true }
 bitflags = { workspace = true, features = ["serde"] }
 derive_more = { workspace = true, features = ["debug"] }

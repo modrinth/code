@@ -1,0 +1,20 @@
+[package]
+name = "modrinth-skin-rendering"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "CPU rendering of Minecraft player skins"
+repository.workspace = true
+
+[dependencies]
+glam = { workspace = true }
+gltf = { workspace = true }
+png = { workspace = true }
+serde = { workspace = true, features = ["derive"], optional = true }
+thiserror = { workspace = true }
+
+[features]
+serde = ["dep:serde"]
+
+[lints]
+workspace = true

@@ -385,14 +385,14 @@ pub async fn project_version_reads_scopes() {
                 .as_array()
                 .unwrap()
                 .iter()
-                .any(|x| x["status"] == "processing")
+                .any(|x| x["status"] == "processing" || x["in_review"] == true)
         );
         assert!(
             success
                 .as_array()
                 .unwrap()
                 .iter()
-                .any(|x| x["status"] == "processing")
+                .any(|x| x["status"] == "processing" || x["in_review"] == true)
         );
 
         // Project metadata reading

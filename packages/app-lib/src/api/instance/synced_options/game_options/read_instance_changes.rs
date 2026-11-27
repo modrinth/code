@@ -7,7 +7,7 @@ use super::fullscreen::update_app_fullscreen_setting;
 use super::launch_overrides::currently_launcher_owned_keys;
 use super::options_file::{GameOptionsDocument, validate_raw_key_value};
 use crate::state::{
-    CanonicalValue, GameOptionKind, InstanceMetadata, State,
+    CanonicalValue, GameOptionKind, InstanceMetadata, State, StoredOption,
     load_game_option_preferences, load_game_options_sync_state,
     load_shared_game_options,
 };
@@ -18,11 +18,69 @@ pub(super) fn custom_setting_id(key: &str) -> String {
     format!("external:{key}")
 }
 
+#[derive(Clone, Copy)]
+pub(super) enum InstanceEdits<'a> {
+    Live(Option<&'a GameOptionsDocument>),
+    Offline(&'a GameOptionsDocument),
+}
+
+impl<'a> InstanceEdits<'a> {
+    fn last_synced(self) -> Option<&'a GameOptionsDocument> {
+        match self {
+            Self::Live(last_synced) => last_synced,
+            Self::Offline(last_synced) => Some(last_synced),
+        }
+    }
+}
+
+fn decode_instance_value(
+    definition: Option<&SupportedSetting>,
+    stored: &StoredOption,
+    key: &str,
+    raw: &str,
+    game_version: &str,
+) -> Option<CanonicalValue> {
+    if let Some(definition) = definition {
+        decode_value_for_version(definition, key, raw, game_version)
+    } else if matches!(stored.kind, GameOptionKind::External)
+        && validate_raw_key_value(key, raw).is_ok()
+    {
+        Some(CanonicalValue::ExternalRaw(raw.to_string()))
+    } else {
+        None
+    }
+}
+
+fn shared_value_unchanged_since(
+    last_synced: &GameOptionsDocument,
+    definition: Option<&SupportedSetting>,
+    stored: &StoredOption,
+    game_version: &str,
+) -> bool {
+    let key = match definition {
+        Some(definition) => {
+            observed_physical_key(definition, last_synced, game_version)
+        }
+        None => stored.raw_key.clone(),
+    };
+    let synced = key.and_then(|key| {
+        let raw = last_synced.value(&key)?;
+        decode_instance_value(definition, stored, &key, raw, game_version)
+    });
+    synced.is_some_and(|synced| {
+        stored
+            .value
+            .as_ref()
+            .is_some_and(|current| canonical_values_equal(current, &synced))
+    })
+}
+
 /// Imports every enabled setting present in `options.txt`. The caller skips file
 /// hashes produced by app writes.
 pub(super) async fn read_instance_changes_into_shared_settings(
     metadata: &InstanceMetadata,
     document: &GameOptionsDocument,
+    edits: InstanceEdits<'_>,
     state: &State,
 ) -> crate::Result<bool> {
     let values = load_shared_game_options(&state.pool).await?;
@@ -75,22 +133,29 @@ pub(super) async fn read_instance_changes_into_shared_settings(
         let Some(current_raw) = document.value(&current_key) else {
             continue;
         };
-        let candidate = if let Some(definition) = definition {
-            decode_value_for_version(
+        if edits
+            .last_synced()
+            .is_some_and(|base| base.value(&current_key) == Some(current_raw))
+        {
+            continue;
+        }
+        if let InstanceEdits::Offline(base) = edits
+            && !shared_value_unchanged_since(
+                base,
                 definition,
-                &current_key,
-                current_raw,
+                stored,
                 &metadata.applied_content_set.game_version,
             )
-        } else if matches!(stored.kind, GameOptionKind::External) {
-            if validate_raw_key_value(&current_key, current_raw).is_err() {
-                continue;
-            }
-            Some(CanonicalValue::ExternalRaw(current_raw.to_string()))
-        } else {
-            None
-        };
-        let Some(candidate) = candidate else {
+        {
+            continue;
+        }
+        let Some(candidate) = decode_instance_value(
+            definition,
+            stored,
+            &current_key,
+            current_raw,
+            &metadata.applied_content_set.game_version,
+        ) else {
             continue;
         };
         if stored

@@ -1,5 +1,5 @@
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
@@ -54,7 +54,7 @@ impl DBOAuthClientAuthorization {
         )
         .fetch_optional(exec)
         .await
-        .wrap_err("fetching oauth client authorization")?;
+        .context("fetching oauth client authorization")?;
 
         Ok(value.map(|r| r.into()))
     }
@@ -74,7 +74,7 @@ impl DBOAuthClientAuthorization {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching oauth client authorizations for user")?;
+        .context("fetching oauth client authorizations for user")?;
 
         Ok(results.into_iter().map(|r| r.into()).collect_vec())
     }
@@ -104,7 +104,7 @@ impl DBOAuthClientAuthorization {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("upserting oauth client authorization")?;
+        .context("upserting oauth client authorization")?;
 
         Ok(())
     }
@@ -124,7 +124,7 @@ impl DBOAuthClientAuthorization {
         )
         .execute(exec)
         .await
-        .wrap_err("removing oauth client authorization")?;
+        .context("removing oauth client authorization")?;
 
         Ok(())
     }

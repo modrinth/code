@@ -20,6 +20,7 @@
 						<IssuePicker ref="issuePicker" @selected="activeReviewTab = 'issues'" />
 					</div>
 				</div>
+				<ProjectFlags v-if="projectId" :project-id="projectId" />
 				<IssueList v-show="activeReviewTab === 'issues'" />
 				<IssueList v-show="activeReviewTab === 're-review'" re-review />
 				<MessageThread v-show="activeReviewTab === 'thread'" ref="messageThread" />
@@ -156,6 +157,7 @@ import ProjectReviewLayout from './layout/index.client.vue'
 import { type ProjectReviewTab, projectReviewTabs } from './layout/types'
 import MessageThread from './message-thread/index.vue'
 import Permissions from './permissions/index.vue'
+import ProjectFlags from './project-flags.vue'
 import ProjectInfo from './project-info/index.vue'
 import ProjectWideChecks from './project-wide-checks.vue'
 import QueueBar from './queue-bar.vue'

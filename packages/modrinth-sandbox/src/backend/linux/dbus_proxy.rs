@@ -4,7 +4,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use eyre::{Result, WrapErr, eyre};
+use anyhow::{Result, Context, anyhow};
 
 use crate::{SandboxStdio, backend::unix, util::SandboxArg};
 
@@ -28,7 +28,7 @@ impl DbusProxy {
         let (keep_alive_read_fd, keep_alive_write_fd) = super::open_pipe()?;
 
         let session_bus_address = std::env::var_os(DBUS_ADDRESS_ENV)
-            .ok_or_else(|| eyre!("reading `{DBUS_ADDRESS_ENV}`"))?;
+            .ok_or_else(|| anyhow!("reading `{DBUS_ADDRESS_ENV}`"))?;
 
         arguments.push(session_bus_address.into());
         arguments.push(socket_path.clone().into());
@@ -57,7 +57,7 @@ impl DbusProxy {
             true,
             false,
         )
-        .wrap_err("spawning dbus proxy child")?;
+        .context("spawning dbus proxy child")?;
 
         // Wait for proxy to start by reading from fd
         let mut buf = 0 as libc::c_char;
@@ -69,7 +69,7 @@ impl DbusProxy {
                 1,
             ) != 1
             {
-                return Err(eyre!("syncing with xdg-dbus-proxy"));
+                return Err(anyhow!("syncing with xdg-dbus-proxy"));
             }
             tracing::info!(
                 "xdg-dbus-proxy took {:.1?} to start",

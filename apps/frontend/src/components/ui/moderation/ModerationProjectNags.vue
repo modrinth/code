@@ -154,6 +154,7 @@ interface Props {
 	validationNags?: Labrinth.Projects.v3.ProjectNag[]
 	validationLoading?: boolean
 	validationAvailable?: boolean
+	canBypassValidation?: boolean
 	submitProject: () => Promise<boolean>
 	currentMember?: Labrinth.Projects.v3.TeamMember | null
 	collapsed?: boolean
@@ -223,6 +224,7 @@ const props = withDefaults(defineProps<Props>(), {
 	validationNags: () => [],
 	validationLoading: false,
 	validationAvailable: true,
+	canBypassValidation: false,
 })
 
 const emit = defineEmits<{
@@ -364,9 +366,10 @@ const nagContext = computed<NagContext>(() => ({
 
 const canSubmitForReview = computed(() => {
 	return (
-		!props.validationLoading &&
-		props.validationAvailable &&
-		!props.validationNags.some((nag) => nag.severity === 'required')
+		props.canBypassValidation ||
+		(!props.validationLoading &&
+			props.validationAvailable &&
+			!props.validationNags.some((nag) => nag.severity === 'required'))
 	)
 })
 

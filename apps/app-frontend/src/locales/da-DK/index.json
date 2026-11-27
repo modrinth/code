@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "Kopieret"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "Kopier detaljer"
-  },
   "app.action-bar.install.dismiss": {
     "message": "Annuller"
   },

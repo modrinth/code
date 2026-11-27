@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "已複製"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "複製詳細資訊"
-  },
   "app.action-bar.install.dismiss": {
     "message": "忽略"
   },
@@ -1010,14 +1007,44 @@
   "app.java-selector.browse": {
     "message": "瀏覽"
   },
+  "app.java-selector.copy-failed-title": {
+    "message": "無法複製路徑"
+  },
+  "app.java-selector.copy-path": {
+    "message": "複製路徑"
+  },
   "app.java-selector.detect": {
     "message": "偵測"
+  },
+  "app.java-selector.edit-path": {
+    "message": "編輯路徑"
+  },
+  "app.java-selector.install-java": {
+    "message": "安裝 Java {version}"
   },
   "app.java-selector.installing": {
     "message": "正在安裝..."
   },
+  "app.java-selector.invalid": {
+    "message": "無效"
+  },
+  "app.java-selector.more-options": {
+    "message": "更多 Java 選項"
+  },
+  "app.java-selector.not-set": {
+    "message": "未選擇任何 Java"
+  },
+  "app.java-selector.path-copied-text": {
+    "message": "Java 路徑已複製到剪貼簿。"
+  },
+  "app.java-selector.path-copied-title": {
+    "message": "路徑已複製"
+  },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
+  },
+  "app.java-selector.valid": {
+    "message": "有效"
   },
   "app.library.actions.label": {
     "message": "遊戲庫動作"
@@ -2915,8 +2942,71 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "應用程式資料庫備份"
   },
+  "app.settings.resource-management.app-directory.cancel-move": {
+    "message": "取消移動"
+  },
+  "app.settings.resource-management.app-directory.change": {
+    "message": "變更應用程式資料夾"
+  },
+  "app.settings.resource-management.app-directory.change-to-default": {
+    "message": "重設為預設值"
+  },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Modrinth App 儲存實例及其他檔案的位置。變更將於重新啟動應用程式後生效。"
+    "message": "Modrinth App 儲存實例及其他檔案的位置。"
+  },
+  "app.settings.resource-management.app-directory.modal.admonition-header": {
+    "message": "你的所有檔案將被移動"
+  },
+  "app.settings.resource-management.app-directory.modal.choose": {
+    "message": "選擇資料夾"
+  },
+  "app.settings.resource-management.app-directory.modal.current": {
+    "message": "目前"
+  },
+  "app.settings.resource-management.app-directory.modal.header": {
+    "message": "變更應用程式資料夾"
+  },
+  "app.settings.resource-management.app-directory.modal.more-options": {
+    "message": "更多移動選項"
+  },
+  "app.settings.resource-management.app-directory.modal.move-and-restart": {
+    "message": "移動並重新啟動"
+  },
+  "app.settings.resource-management.app-directory.modal.move-later": {
+    "message": "在下次啟動時移動"
+  },
+  "app.settings.resource-management.app-directory.modal.nested": {
+    "message": "新的資料夾不能位於目前的應用程式資料夾內，也不能包含該資料夾。"
+  },
+  "app.settings.resource-management.app-directory.modal.new": {
+    "message": "新的"
+  },
+  "app.settings.resource-management.app-directory.modal.picker-title": {
+    "message": "選擇新的應用程式資料夾"
+  },
+  "app.settings.resource-management.app-directory.more-change-options": {
+    "message": "更多資料夾選項"
+  },
+  "app.settings.resource-management.app-directory.move-now": {
+    "message": "立即移動並重新啟動"
+  },
+  "app.settings.resource-management.app-directory.open-folder": {
+    "message": "開啟資料夾"
+  },
+  "app.settings.resource-management.app-directory.open-in-explorer": {
+    "message": "在檔案總管中顯示"
+  },
+  "app.settings.resource-management.app-directory.open-in-finder": {
+    "message": "在 Finder 中開啟"
+  },
+  "app.settings.resource-management.app-directory.path-copied-text": {
+    "message": "應用程式資料夾路徑已複製到剪貼簿。"
+  },
+  "app.settings.resource-management.app-directory.path-copied-title": {
+    "message": "路徑已複製"
+  },
+  "app.settings.resource-management.app-directory.path-copy-failed-title": {
+    "message": "無法複製路徑"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "應用程式資料夾"
@@ -3470,6 +3560,9 @@
   "app.skins.toggle-ears-features-on": {
     "message": "開啟"
   },
+  "app.splash.moving-app-directory": {
+    "message": "正在移動應用程式資料夾..."
+  },
   "app.survey.body": {
     "message": "你方便回答幾個關於 Modrinth App 使用體驗的問題嗎？"
   },
@@ -3899,6 +3992,15 @@
   "instance.server-modal.resource-pack": {
     "message": "資源包"
   },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "管理預設設定"
+  },
+  "instance.settings.reset-setting-to-default": {
+    "message": "將「{setting}」重設為預設值"
+  },
+  "instance.settings.reset-to-default": {
+    "message": "重設為預設值"
+  },
   "instance.settings.sidebar.label.game": {
     "message": "遊戲"
   },
@@ -4022,6 +4124,9 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "選擇更新通道"
   },
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "你的實例會使用預設的啟動掛勾，除非你在這裡覆寫這些設定。"
+  },
   "instance.settings.tabs.hooks.label": {
     "message": "啟動掛勾"
   },
@@ -4082,6 +4187,9 @@
   "instance.settings.tabs.installation.locked": {
     "message": "實例被鎖定時無法使用安裝設定選項。"
   },
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "你的實例會使用預設的 Java 和記憶體設定，除非你在這裡覆寫這些設定。"
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "輸入環境變數..."
   },
@@ -4089,25 +4197,28 @@
     "message": "輸入 Java 參數..."
   },
   "instance.settings.tabs.java.environment-variables": {
-    "message": "自訂環境變數"
+    "message": "環境變數"
   },
   "instance.settings.tabs.java.hooks": {
     "message": "掛勾"
   },
   "instance.settings.tabs.java.java-arguments": {
-    "message": "自訂 Java 參數"
+    "message": "Java 參數"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "自訂 Java 安裝"
+    "message": "Java 安裝"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "自訂記憶體配置"
+    "message": "記憶體配置"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
   },
   "instance.settings.tabs.java.label": {
     "message": "Java 和記憶體"
+  },
+  "instance.settings.tabs.java.recommended-java-version": {
+    "message": "這個實例的 Minecraft 版本建議使用 Java {version}。"
   },
   "instance.settings.tabs.sharing": {
     "message": "共用"
@@ -4172,6 +4283,9 @@
   "instance.settings.tabs.syncing": {
     "message": "同步"
   },
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "你的實例會使用預設的視窗設定，除非你在這裡覆寫這些設定。"
+  },
   "instance.settings.tabs.window.fullscreen": {
     "message": "全螢幕"
   },
@@ -4198,6 +4312,9 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "輸入寬度..."
+  },
+  "instance.settings.using-defaults": {
+    "message": "使用預設值"
   },
   "instance.shared-instance.error.title": {
     "message": "出了點狀況"

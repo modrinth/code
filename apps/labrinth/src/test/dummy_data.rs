@@ -25,7 +25,7 @@ use super::{
 
 use super::{database::USER_USER_ID, get_json_val_str};
 
-pub const DUMMY_DATA_UPDATE: i64 = 13;
+pub const DUMMY_DATA_UPDATE: i64 = 14;
 
 pub const DUMMY_CATEGORIES: &[&str] = &[
     "combat",
@@ -438,8 +438,7 @@ pub async fn add_project_beta(api: &ApiV3) -> (Project, Version) {
         { "op": "add", "path": "/summary", "value": "A dummy project for testing with." },
         { "op": "add", "path": "/description", "value": "This project is not yet approved, but it contains enough descriptive information to satisfy project review validation requirements while remaining available for testing private project behavior." },
         { "op": "add", "path": "/initial_versions/0/status", "value": "unlisted" },
-        { "op": "add", "path": "/status", "value": "private" },
-        { "op": "add", "path": "/requested_status", "value": "private" },
+        { "op": "add", "path": "/visibility", "value": "private" },
     ]))
     .unwrap();
 
@@ -452,7 +451,7 @@ pub async fn add_project_beta(api: &ApiV3) -> (Project, Version) {
     assert_status!(&resp, StatusCode::OK);
 
     let resp = api
-        .edit_project("beta", json!({ "status": "processing" }), ADMIN_USER_PAT)
+        .edit_project("beta", json!({ "in_review": true }), ADMIN_USER_PAT)
         .await;
     assert_status!(&resp, StatusCode::NO_CONTENT);
 

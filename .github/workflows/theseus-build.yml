@@ -48,6 +48,8 @@ env:
   TURBO_TELEMETRY_DISABLED: 1
   pnpm_config_color: always
 
+permissions: {}
+
 jobs:
   build:
     name: Build (${{ matrix.artifact-target-name }})
@@ -73,6 +75,8 @@ jobs:
             artifact-target-name: aarch64-unknown-linux-gnu
 
     runs-on: ${{ matrix.platform }}
+    permissions:
+      contents: read
 
     steps:
       - name: Check out code
@@ -93,12 +97,13 @@ jobs:
         uses: rui314/setup-mold@339e96b4ff1f3bd865856ba4cbbe8818a7acb038 # v1 / Mold 3.0.0
 
       - name: Setup sccache
-        uses: mozilla-actions/sccache-action@fc920bf0ec8de6ee65d409111f7ec508035751ba # v0.0.11
+        uses: mozilla-actions/sccache-action@fc920bf0ec8de6ee65d409111f7ec508035751ba # v0.0.11 # zizmor: ignore[cache-poisoning]
 
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
+          package-manager-cache: false
 
       - name: Enable Corepack
         run: corepack enable
@@ -157,7 +162,7 @@ jobs:
       - name: Set application version and environment
         shell: bash
         run: |
-          APP_VERSION="${{ inputs.app-version-override }}"
+          APP_VERSION="${INPUTS_APP_VERSION_OVERRIDE}"
           if [ -z "$APP_VERSION" ]; then
             APP_VERSION="$(git describe --tags --always | sed -E 's/-([0-9]+)-(g[0-9a-fA-F]+)$/-canary+\1.\2/')"
           fi
@@ -169,6 +174,8 @@ jobs:
           dasel put -f apps/app-frontend/package.json -t string -v "${APP_VERSION#v}" 'version'
 
           cp "packages/app-lib/.env.${BUILD_ENVIRONMENT}" packages/app-lib/.env
+        env:
+          INPUTS_APP_VERSION_OVERRIDE: ${{ inputs.app-version-override }}
 
       - name: Install dependencies
         run: pnpm install
@@ -268,6 +275,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           sparse-checkout: .github/scripts
+          persist-credentials: false
 
       - name: Send Slack notification
         run: node .github/scripts/notify-app-build.mjs
