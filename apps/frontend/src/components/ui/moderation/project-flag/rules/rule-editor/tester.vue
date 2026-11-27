@@ -247,6 +247,21 @@
 							</IconButton>
 						</li>
 					</ul>
+					<div
+						v-if="draftProjectIds.length"
+						class="min-w-0 rounded-xl border border-solid border-surface-5 bg-surface-3 p-2"
+					>
+						<div class="flex items-center justify-between gap-2">
+							<span class="text-sm text-secondary">Project IDs</span>
+							<CopyCode type="button" :text="draftProjectIdsText" display-text="Copy IDs" />
+						</div>
+						<pre
+							class="m-0 mt-2 max-h-24 overflow-auto whitespace-pre-wrap break-words font-mono text-xs"
+							tabindex="0"
+							aria-label="Project IDs"
+							v-text="draftProjectIdsText"
+						/>
+					</div>
 				</div>
 				<div class="flex flex-col gap-2">
 					<label :for="importInputId" class="text-sm text-secondary">
@@ -307,6 +322,7 @@ import {
 	Button,
 	Combobox,
 	type ComboboxOption,
+	CopyCode,
 	IconButton,
 	Input,
 	injectModrinthClient,
@@ -412,6 +428,7 @@ const importErrorId = `${listFormId}-error`
 const editingListName = ref('')
 const draftListName = ref('')
 const draftProjectIds = ref<string[]>([])
+const draftProjectIdsText = computed(() => draftProjectIds.value.join(', '))
 const listError = ref('')
 const importInput = ref('')
 const importError = ref('')
