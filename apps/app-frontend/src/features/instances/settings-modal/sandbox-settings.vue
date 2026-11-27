@@ -19,9 +19,9 @@ const { formatMessage } = useVIntl()
 const { instance } = injectInstanceSettings()
 
 const messages = defineMessages({
-	settingsSource: {
-		id: 'instance.settings.tabs.sandbox.settings-source',
-		defaultMessage: 'Sandboxing settings source',
+	settingsHeading: {
+		id: 'instance.settings.tabs.sandbox.settings-heading',
+		defaultMessage: 'Sandboxing settings',
 	},
 })
 
@@ -65,7 +65,7 @@ function applyPatch(patch: Partial<SandboxSettings>) {
 		<SettingsSourceHeader
 			v-model="source"
 			tab="sandbox"
-			:title="formatMessage(messages.settingsSource)"
+			:title="formatMessage(messages.settingsHeading)"
 		/>
 		<SandboxSettingsForm
 			v-if="effective"

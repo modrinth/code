@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ExternalIcon } from '@modrinth/assets'
-import { defineMessages, IntlFormatted, SegmentedControl, useVIntl } from '@modrinth/ui'
+import { EditIcon, SettingsIcon, UndoIcon } from '@modrinth/assets'
+import { Button, defineMessages, useVIntl } from '@modrinth/ui'
+
 import {
 	injectSettingsActions,
 	type InstanceDefaultsTab,
@@ -18,8 +19,8 @@ const { openInstanceDefaults } = injectSettingsActions()
 
 const messages = defineMessages({
 	usingDefaults: {
-		id: 'instance.settings.source.using-defaults',
-		defaultMessage: 'Using defaults from <link>app settings</link>',
+		id: 'instance.settings.source.using-app-defaults',
+		defaultMessage: 'Using the defaults from your app settings.',
 	},
 	usingCustom: {
 		id: 'instance.settings.source.using-custom',
@@ -29,22 +30,15 @@ const messages = defineMessages({
 		id: 'instance.settings.source.app-settings',
 		defaultMessage: 'App settings',
 	},
-	custom: {
-		id: 'instance.settings.source.custom',
-		defaultMessage: 'Custom',
+	customize: {
+		id: 'instance.settings.source.customize',
+		defaultMessage: 'Customize',
+	},
+	resetToDefaults: {
+		id: 'instance.settings.source.reset-to-defaults',
+		defaultMessage: 'Reset to app defaults',
 	},
 })
-
-const sources: SettingsSource[] = ['app', 'custom']
-const neutralSources: SettingsSource[] = ['app']
-
-function formatSource(value: unknown): string {
-	return formatMessage(value === 'app' ? messages.appSettings : messages.custom)
-}
-
-function setSource(value: unknown) {
-	if (value === 'app' || value === 'custom') source.value = value
-}
 
 function showDefaultSettings() {
 	const openSettings = () => openInstanceDefaults(props.tab)
@@ -65,29 +59,22 @@ function showDefaultSettings() {
 				{{ title }}
 			</h2>
 			<p class="m-0 text-secondary">
-				<IntlFormatted v-if="source === 'app'" :message-id="messages.usingDefaults">
-					<template #link="{ children }">
-						<button
-							type="button"
-							class="inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 align-bottom text-[length:inherit] font-medium text-blue hover:underline"
-							@click="showDefaultSettings"
-						>
-							<component :is="() => children" />
-							<ExternalIcon class="size-4" aria-hidden="true" />
-						</button>
-					</template>
-				</IntlFormatted>
-				<template v-else>{{ formatMessage(messages.usingCustom) }}</template>
+				{{ formatMessage(source === 'app' ? messages.usingDefaults : messages.usingCustom) }}
 			</p>
 		</div>
-		<SegmentedControl
-			:model-value="source"
-			class="shrink-0"
-			:items="sources"
-			:format-label="formatSource"
-			:neutral-items="neutralSources"
-			v-bind="{ ariaLabel: title }"
-			@update:model-value="setSource"
-		/>
+		<div v-if="source === 'app'" class="flex shrink-0 items-center gap-2">
+			<Button @click="showDefaultSettings">
+				<SettingsIcon aria-hidden="true" />
+				{{ formatMessage(messages.appSettings) }}
+			</Button>
+			<Button type="colored" color="brand" @click="source = 'custom'">
+				<EditIcon aria-hidden="true" />
+				{{ formatMessage(messages.customize) }}
+			</Button>
+		</div>
+		<Button v-else class="shrink-0" @click="source = 'app'">
+			<UndoIcon aria-hidden="true" />
+			{{ formatMessage(messages.resetToDefaults) }}
+		</Button>
 	</div>
 </template>

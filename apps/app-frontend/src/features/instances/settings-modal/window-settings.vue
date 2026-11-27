@@ -54,9 +54,9 @@ function setDimension(index: 0 | 1, value: number) {
 }
 
 const messages = defineMessages({
-	settingsSource: {
-		id: 'instance.settings.tabs.window.settings-source',
-		defaultMessage: 'Window settings source',
+	settingsHeading: {
+		id: 'instance.settings.tabs.window.settings-heading',
+		defaultMessage: 'Window settings',
 	},
 	fullscreen: {
 		id: 'instance.settings.tabs.window.fullscreen',
@@ -98,7 +98,7 @@ const messages = defineMessages({
 		<SettingsSourceHeader
 			v-model="source"
 			tab="window"
-			:title="formatMessage(messages.settingsSource)"
+			:title="formatMessage(messages.settingsHeading)"
 		/>
 
 		<div

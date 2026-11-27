@@ -100,25 +100,23 @@ defineExpose({ show })
 				<span class="font-semibold leading-6 text-contrast">
 					{{ formatMessage(messages.risksTitle) }}
 				</span>
-				<div
+				<Checkbox
 					v-for="(risk, index) in risks"
 					:key="index"
-					class="flex w-full items-start gap-3 rounded-[18px] border border-solid border-surface-5 bg-surface-4 p-3"
+					v-model="acknowledged[index]"
+					:description="formatMessage(risk.title)"
+					color="white"
+					class="w-full !items-start rounded-[18px] border !border-solid border-surface-5 !bg-surface-4 !p-3"
 				>
-					<Checkbox
-						v-model="acknowledged[index]"
-						:description="formatMessage(risk.title)"
-						color="white"
-					/>
-					<div class="flex min-w-0 flex-1 flex-col gap-1">
+					<span class="flex min-w-0 flex-1 flex-col gap-1">
 						<span class="font-semibold leading-6 text-contrast">
 							{{ formatMessage(risk.title) }}
 						</span>
 						<span class="text-sm leading-5 text-primary">
 							{{ formatMessage(risk.description) }}
 						</span>
-					</div>
-				</div>
+					</span>
+				</Checkbox>
 			</div>
 			<p class="m-0 leading-6">
 				<IntlFormatted :message-id="messages.help">

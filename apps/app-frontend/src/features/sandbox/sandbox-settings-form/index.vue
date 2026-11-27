@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { ExternalIcon, FolderSearchIcon, PlusIcon, XIcon } from '@modrinth/assets'
+import {
+	CheckIcon,
+	ClipboardCopyIcon,
+	ExternalIcon,
+	FolderSearchIcon,
+	PlusIcon,
+	TrashIcon,
+} from '@modrinth/assets'
 import {
 	Admonition,
 	Button,
@@ -13,7 +20,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
-import { computed, ref, useId } from 'vue'
+import { computed, onBeforeUnmount, ref, useId } from 'vue'
 
 import type { SandboxSettings } from '@/helpers/types'
 
@@ -156,12 +163,26 @@ async function browseForFolder() {
 	const path = await open({ multiple: false, directory: true })
 	if (typeof path === 'string') folderPath.value = path
 }
+
+const copiedFolder = ref<string | null>(null)
+let copiedResetTimeout: ReturnType<typeof setTimeout> | undefined
+
+async function copyFolder(folder: string) {
+	await navigator.clipboard.writeText(folder)
+	copiedFolder.value = folder
+	clearTimeout(copiedResetTimeout)
+	copiedResetTimeout = setTimeout(() => {
+		copiedFolder.value = null
+	}, 1500)
+}
+
+onBeforeUnmount(() => clearTimeout(copiedResetTimeout))
 </script>
 
 <template>
 	<div class="flex flex-col gap-6">
 		<div class="flex flex-col gap-4">
-			<Admonition type="info">
+			<Admonition type="info" class="transition-opacity" :class="{ 'opacity-60': disabled }">
 				<p class="m-0 leading-6">
 					<IntlFormatted :message-id="messages.info">
 						<template #link="{ children }">
@@ -272,19 +293,34 @@ async function browseForFolder() {
 						<div
 							v-for="(folder, index) in settings.extra_paths"
 							:key="folder"
-							class="flex items-center"
+							class="flex items-center gap-2"
 						>
-							<Input
-								:model-value="folder"
-								readonly
-								class="min-w-0 flex-1"
-								size="medium"
-								:aria-label="formatMessage(messages.folderPlaceholder)"
-							/>
+							<Button
+								size="lg"
+								class="min-w-0 flex-1 !justify-between text-left"
+								@click="copyFolder(folder)"
+							>
+								<span class="min-w-0 truncate text-base font-semibold text-primary">
+									{{ folder }}
+								</span>
+								<CheckIcon
+									v-if="copiedFolder === folder"
+									class="size-5 shrink-0"
+									aria-hidden="true"
+								/>
+								<ClipboardCopyIcon
+									v-else
+									class="size-5 shrink-0 text-secondary"
+									aria-hidden="true"
+								/>
+							</Button>
 							<IconButton
 								:label="formatMessage(commonMessages.removeButton)"
 								type="quiet"
+								color="red"
+								interaction="filled"
 								size="lg"
+								class="!text-primary"
 								@click="
 									update(
 										'extra_paths',
@@ -292,7 +328,7 @@ async function browseForFolder() {
 									)
 								"
 							>
-								<XIcon />
+								<TrashIcon />
 							</IconButton>
 						</div>
 					</div>

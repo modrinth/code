@@ -4193,14 +4193,17 @@
   "instance.settings.source.app-settings": {
     "message": "App settings"
   },
-  "instance.settings.source.custom": {
-    "message": "Custom"
+  "instance.settings.source.customize": {
+    "message": "Customize"
+  },
+  "instance.settings.source.reset-to-defaults": {
+    "message": "Reset to app defaults"
+  },
+  "instance.settings.source.using-app-defaults": {
+    "message": "Using the defaults from your app settings."
   },
   "instance.settings.source.using-custom": {
     "message": "Using custom settings for this instance"
-  },
-  "instance.settings.source.using-defaults": {
-    "message": "Using defaults from <link>app settings</link>"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Turn off this override to edit synced data."
@@ -4343,8 +4346,8 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Enter pre-launch command..."
   },
-  "instance.settings.tabs.hooks.settings-source": {
-    "message": "Launch hooks settings source"
+  "instance.settings.tabs.hooks.settings-heading": {
+    "message": "Launch hooks settings"
   },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Hooks run in the working directory of the instance, with the following variables:"
@@ -4415,14 +4418,14 @@
   "instance.settings.tabs.java.recommended-java-version": {
     "message": "Java {version} is recommended for the Minecraft version of this instance."
   },
-  "instance.settings.tabs.java.settings-source": {
-    "message": "Java and memory settings source"
+  "instance.settings.tabs.java.settings-heading": {
+    "message": "Java and memory settings"
   },
   "instance.settings.tabs.sandbox": {
     "message": "Sandboxing"
   },
-  "instance.settings.tabs.sandbox.settings-source": {
-    "message": "Sandboxing settings source"
+  "instance.settings.tabs.sandbox.settings-heading": {
+    "message": "Sandboxing settings"
   },
   "instance.settings.tabs.sharing": {
     "message": "Sharing"
@@ -4505,8 +4508,8 @@
   "instance.settings.tabs.window.label": {
     "message": "Window"
   },
-  "instance.settings.tabs.window.settings-source": {
-    "message": "Window settings source"
+  "instance.settings.tabs.window.settings-heading": {
+    "message": "Window settings"
   },
   "instance.settings.tabs.window.width": {
     "message": "Width"

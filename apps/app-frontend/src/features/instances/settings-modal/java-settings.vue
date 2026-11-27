@@ -69,9 +69,9 @@ const source = useSettingsSource(draft, () => ({
 }))
 
 const messages = defineMessages({
-	settingsSource: {
-		id: 'instance.settings.tabs.java.settings-source',
-		defaultMessage: 'Java and memory settings source',
+	settingsHeading: {
+		id: 'instance.settings.tabs.java.settings-heading',
+		defaultMessage: 'Java and memory settings',
 	},
 	javaInstallation: {
 		id: 'instance.settings.tabs.java.java-installation',
@@ -117,7 +117,7 @@ const messages = defineMessages({
 		<SettingsSourceHeader
 			v-model="source"
 			tab="java"
-			:title="formatMessage(messages.settingsSource)"
+			:title="formatMessage(messages.settingsHeading)"
 		/>
 
 		<div

@@ -46,9 +46,9 @@ const defaultHooks = computed<Record<HookKey, string>>(() => ({
 const source = useSettingsSource(hooks, () => defaultHooks.value)
 
 const messages = defineMessages({
-	settingsSource: {
-		id: 'instance.settings.tabs.hooks.settings-source',
-		defaultMessage: 'Launch hooks settings source',
+	settingsHeading: {
+		id: 'instance.settings.tabs.hooks.settings-heading',
+		defaultMessage: 'Launch hooks settings',
 	},
 	hookVariablesDescription: {
 		id: 'instance.settings.tabs.hooks.variables.description',
@@ -123,7 +123,7 @@ const messages = defineMessages({
 		<SettingsSourceHeader
 			v-model="source"
 			tab="hooks"
-			:title="formatMessage(messages.settingsSource)"
+			:title="formatMessage(messages.settingsHeading)"
 		/>
 
 		<div
