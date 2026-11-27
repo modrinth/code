@@ -7,6 +7,7 @@ import { createApp } from 'vue'
 
 import App from '@/App.vue'
 import { overlayScrollbarsDirective } from '@/directives/overlayScrollbars'
+import { blockControlCharacterInput } from '@/helpers/control-character-input'
 import { setupErrorReporting } from '@/helpers/error-reporting'
 import { debugStartup, traceStartupStep } from '@/helpers/startup-debug'
 import i18nPlugin from '@/plugins/i18n'
@@ -14,6 +15,7 @@ import i18nDebugPlugin from '@/plugins/i18n-debug'
 import router from '@/routes'
 
 debugStartup('Frontend entry module evaluated')
+blockControlCharacterInput()
 const app = createApp(App)
 setupErrorReporting(app, router)
 
