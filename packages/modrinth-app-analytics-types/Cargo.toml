@@ -1,0 +1,16 @@
+[package]
+name = "modrinth-app-analytics-types"
+edition.workspace = true
+
+[dependencies]
+chrono = { workspace = true, features = ["serde"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true, features = ["raw_value"] }
+serde_path_to_error = { workspace = true }
+smol_str = { workspace = true, features = ["serde"] }
+strum = { workspace = true, features = ["derive"] }
+thiserror = { workspace = true }
+uuid = { workspace = true, features = ["serde", "v7"] }
+
+[lints]
+workspace = true

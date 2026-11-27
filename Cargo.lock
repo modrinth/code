@@ -8442,6 +8442,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "modrinth-app-analytics-sdk"
+version = "0.0.0"
+dependencies = [
+ "arc-swap",
+ "chrono",
+ "modrinth-app-analytics-types",
+ "parking_lot",
+ "reqwest 0.13.5",
+ "smol_str",
+ "tokio",
+ "tracing",
+ "uuid 1.28.0",
+]
+
+[[package]]
+name = "modrinth-app-analytics-types"
+version = "0.0.0"
+dependencies = [
+ "chrono",
+ "serde",
+ "serde_json",
+ "serde_path_to_error",
+ "smol_str",
+ "strum 0.28.0",
+ "thiserror 2.0.21",
+ "uuid 1.28.0",
+]
+
+[[package]]
 name = "modrinth-content-management"
 version = "0.0.0"
 dependencies = [

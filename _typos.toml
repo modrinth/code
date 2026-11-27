@@ -9,6 +9,8 @@ extend-exclude = [
   # contains payment card IDs like `IY1VMST1MOXS` which are flagged
   "apps/labrinth/src/queue/payouts/mod.rs",
   "apps/app-frontend/src/features/settings/syncing/game-settings-modal/languages.ts",
+  # ISO 3166-1 alpha-2 country codes like `BA` and `FO`
+  "packages/modrinth-app-analytics-types/src/iso3166_1_alpha_2.rs",
   # vendored
   "packages/toasty",
 ]
