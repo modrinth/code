@@ -14,11 +14,7 @@
 			</span>
 		</Card>
 	</div>
-	<ImageViewerEditor
-		ref="galleryViewer"
-		:items="galleryViewerItems"
-		editor="disabled"
-	>
+	<ImageViewerEditor ref="galleryViewer" :items="galleryViewerItems" editor="disabled">
 		<template #actions="{ item }">
 			<Button
 				type="quiet"
