@@ -11,20 +11,18 @@
 		@mouseenter="handleMouseEnter"
 		@pointerdown="handlePointerDown"
 	>
-		<div class="pointer-events-none flex min-w-0 flex-[2.5_1_0%] items-center gap-3 truncate">
+		<div class="pointer-events-none flex min-w-0 flex-[2.5_1_0%] items-center gap-4">
 			<Checkbox
-				class="pointer-events-auto"
+				class="pointer-events-auto shrink-0"
 				:model-value="selected"
 				@click.stop
 				@update:model-value="emit('toggle-select')"
 			/>
-			<div class="pointer-events-none flex size-5 items-center justify-center">
+			<div class="pointer-events-none flex min-w-0 items-center gap-3">
 				<component
 					:is="iconComponent"
-					class="size-5 group-hover:text-contrast group-focus:text-contrast"
+					class="size-5 shrink-0 group-hover:text-contrast group-focus:text-contrast"
 				/>
-			</div>
-			<div class="pointer-events-none flex flex-col truncate">
 				<span
 					class="pointer-events-none truncate group-hover:text-contrast group-focus:text-contrast"
 				>
@@ -178,7 +176,7 @@ const formatBytes = useFormatBytes()
 const containerClasses = computed(() => {
 	const dropTarget = isDropTarget.value
 	return [
-		'group m-0 flex w-full select-none items-center justify-between gap-4 overflow-hidden border-0 border-t border-solid border-surface-4 pl-3 pr-4 py-3 focus:!outline-none',
+		'group m-0 flex w-full select-none items-center justify-between gap-4 overflow-hidden border-0 border-t border-solid border-surface-4 px-3 py-3 focus:!outline-none',
 		dropTarget
 			? '!bg-brand-highlight'
 			: props.selected

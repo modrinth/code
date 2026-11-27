@@ -809,12 +809,6 @@
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "Bagikan ke mclo.gs"
   },
-  "files.navbar.upload-file": {
-    "defaultMessage": "Unggah berkas"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": "Unggah dari berkas .zip"
-  },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Unggah dari URL .zip"
   },

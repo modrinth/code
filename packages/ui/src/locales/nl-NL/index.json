@@ -1550,9 +1550,6 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "Broodkruimelnavigatie"
   },
-  "files.navbar.create-new": {
-    "defaultMessage": "Nieuw aanmaken..."
-  },
   "files.navbar.file-navigation": {
     "defaultMessage": "Bestandsnavigatie"
   },
@@ -1573,12 +1570,6 @@
   },
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "Delen op mclo.gs"
-  },
-  "files.navbar.upload-file": {
-    "defaultMessage": "Bestand uploaden"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": "Uploaden vanuit een .zip-bestand"
   },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Uploaden via een .zip-URL"

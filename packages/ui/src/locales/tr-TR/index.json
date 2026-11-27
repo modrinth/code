@@ -1601,9 +1601,6 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "Yol işareti gezintisi"
   },
-  "files.navbar.create-new": {
-    "defaultMessage": "Yeni oluştur..."
-  },
   "files.navbar.file-navigation": {
     "defaultMessage": "Dosya gezintisi"
   },
@@ -1624,12 +1621,6 @@
   },
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "mclo.gs'de paylaş"
-  },
-  "files.navbar.upload-file": {
-    "defaultMessage": "Dosya yükle"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": "Upload from .zip file"
   },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": ".zip URL'sinden yükle"

@@ -47,3 +47,12 @@ export const WithoutDescription: Story = {
 		heading: 'No transactions',
 	},
 }
+
+export const WithoutPattern: Story = {
+	args: {
+		icon: BoxIcon,
+		heading: 'This folder is empty',
+		description: 'There are no files or folders.',
+		hidePattern: true,
+	},
+}

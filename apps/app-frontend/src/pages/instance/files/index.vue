@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EditingFile, FileItem, UploadState } from '@modrinth/ui'
+import type { FileItem, UploadState } from '@modrinth/ui'
 import {
 	commonMessages,
 	defineMessages,
@@ -8,9 +8,10 @@ import {
 	provideFileManager,
 	ReadyTransition,
 	useDebugLogger,
+	useFileRouteState,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
 import { computed, ref, watch } from 'vue'
 
@@ -57,8 +58,8 @@ const items = ref<FileItem[]>([])
 const firstPaintPending = ref(true)
 const loading = ref(true)
 const error = ref<Error | null>(null)
-const currentPath = ref('')
-const editingFile = ref<EditingFile | null>(null)
+const routeState = useFileRouteState()
+const currentPath = computed(() => routeState.currentPath.value.replace(/^\/+/, ''))
 
 debug('setup: start, instance.id =', instanceId.value)
 
@@ -82,6 +83,8 @@ async function writeBytes(path: string, bytes: Uint8Array, createOnly = false) {
 		createOnly,
 	})
 }
+
+const queryClient = useQueryClient()
 
 const directoryQuery = useQuery(
 	computed(() => ({
@@ -116,21 +119,7 @@ firstPaintPending.value = false
 
 async function refresh() {
 	debug('refresh: called, currentPath =', currentPath.value, 'instanceRoot =', instanceRoot.value)
-	await directoryQuery.refetch()
-}
-
-function navigateTo(path: string) {
-	debug('navigateTo:', path)
-	currentPath.value = path.startsWith('/') ? path.slice(1) : path
-	refresh()
-}
-
-function startEditing(file: EditingFile) {
-	editingFile.value = file
-}
-
-function stopEditing() {
-	editingFile.value = null
+	await queryClient.invalidateQueries({ queryKey: instanceKeys.allFiles(instanceId.value) })
 }
 
 async function handleCreateItem(name: string, type: 'file' | 'directory') {
@@ -298,7 +287,6 @@ useAppEvent('instance', async (event) => {
 watch(instanceId, async () => {
 	debug('watch instance.id: changed to', instanceId.value)
 	firstPaintPending.value = true
-	currentPath.value = ''
 	await instanceRootQuery.refetch()
 	await refresh()
 })
@@ -310,10 +298,10 @@ provideFileManager({
 	loading,
 	error,
 	currentPath,
-	navigateTo,
-	editingFile,
-	startEditing,
-	stopEditing,
+	navigateTo: routeState.navigateTo,
+	editingFile: routeState.editingFile,
+	startEditing: routeState.startEditing,
+	stopEditing: routeState.stopEditing,
 	createItem: handleCreateItem,
 	renameItem: handleRenameItem,
 	moveItem: handleMoveItem,

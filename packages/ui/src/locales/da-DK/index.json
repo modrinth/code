@@ -500,12 +500,6 @@
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "Del til mclo.gs"
   },
-  "files.navbar.upload-file": {
-    "defaultMessage": "Upload fil"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": "Upload fra .zip fil"
-  },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Upload fra .zip URL"
   },

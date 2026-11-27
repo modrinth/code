@@ -1520,9 +1520,6 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "Länkstigsnavigering"
   },
-  "files.navbar.create-new": {
-    "defaultMessage": "Skapa ny..."
-  },
   "files.navbar.file-navigation": {
     "defaultMessage": "Filnavigering"
   },
@@ -1543,12 +1540,6 @@
   },
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "Dela till mclo.gs"
-  },
-  "files.navbar.upload-file": {
-    "defaultMessage": "Ladda upp fil"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": "Ladda upp .zip-fil"
   },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Uppladdad från .zip-URL"

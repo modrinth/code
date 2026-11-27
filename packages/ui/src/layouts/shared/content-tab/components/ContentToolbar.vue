@@ -85,7 +85,7 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 
 <template>
 	<div class="flex flex-col gap-4">
-		<div class="flex items-center justify-between gap-2">
+		<div class="flex min-h-[42px] items-center justify-between gap-2">
 			<ContentTypeTabs v-if="types.length > 1" v-model="type" :types="types" />
 			<SplitButton
 				v-tooltip="addTooltip"

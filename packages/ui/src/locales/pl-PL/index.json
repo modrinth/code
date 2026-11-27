@@ -1742,9 +1742,6 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "Nawigacja do stron nadrzędnych"
   },
-  "files.navbar.create-new": {
-    "defaultMessage": "Utwórz nowy..."
-  },
   "files.navbar.file-navigation": {
     "defaultMessage": "Nawigacja plików"
   },
@@ -1765,12 +1762,6 @@
   },
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "Prześlij do mclo.gs"
-  },
-  "files.navbar.upload-file": {
-    "defaultMessage": "Prześlij plik"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": "Prześlij z pliku .zip"
   },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Prześlij z adresu URL .zip"

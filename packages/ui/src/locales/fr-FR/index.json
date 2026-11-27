@@ -1592,9 +1592,6 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "Navigation par fil d'Ariane"
   },
-  "files.navbar.create-new": {
-    "defaultMessage": "Créer nouveau..."
-  },
   "files.navbar.file-navigation": {
     "defaultMessage": "Navigation dans les fichiers"
   },
@@ -1615,12 +1612,6 @@
   },
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "Partager vers mclo.gs"
-  },
-  "files.navbar.upload-file": {
-    "defaultMessage": "Importer un fichier"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": "Importer depuis un fichier .zip"
   },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Importer depuis une URL .zip"

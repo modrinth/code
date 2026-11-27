@@ -1490,9 +1490,6 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "Điều hướng bằng đường dẫn"
   },
-  "files.navbar.create-new": {
-    "defaultMessage": "Tạo mới..."
-  },
   "files.navbar.file-navigation": {
     "defaultMessage": "Điều hướng tệp"
   },
@@ -1513,12 +1510,6 @@
   },
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "Chia sẻ lên mclo.gs"
-  },
-  "files.navbar.upload-file": {
-    "defaultMessage": "Tải tệp lên"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": "Tải lên từ tệp .zip"
   },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Tải lên từ URL tệp .zip"

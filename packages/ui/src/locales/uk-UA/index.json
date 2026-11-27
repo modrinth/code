@@ -1706,9 +1706,6 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "Навігаційна стежка"
   },
-  "files.navbar.create-new": {
-    "defaultMessage": "Створити…"
-  },
   "files.navbar.file-navigation": {
     "defaultMessage": "Навігація серед файлів"
   },
@@ -1729,12 +1726,6 @@
   },
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "Поширити в mclo.gs"
-  },
-  "files.navbar.upload-file": {
-    "defaultMessage": "Вивантажити файл"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": "Вивантажити з файлу .zip"
   },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Вивантажити з посилання на .zip"

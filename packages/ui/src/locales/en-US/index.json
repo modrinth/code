@@ -1853,9 +1853,6 @@
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "Breadcrumb navigation"
   },
-  "files.navbar.create-new": {
-    "defaultMessage": "Create new..."
-  },
   "files.navbar.file-navigation": {
     "defaultMessage": "File navigation"
   },
@@ -1865,11 +1862,17 @@
   "files.navbar.home": {
     "defaultMessage": "Home"
   },
+  "files.navbar.more-create-options": {
+    "defaultMessage": "More ways to add files"
+  },
   "files.navbar.new-file": {
     "defaultMessage": "New file"
   },
   "files.navbar.new-folder": {
     "defaultMessage": "New folder"
+  },
+  "files.navbar.refreshing": {
+    "defaultMessage": "Refreshing..."
   },
   "files.navbar.search-files": {
     "defaultMessage": "Search files"
@@ -1877,11 +1880,8 @@
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "Share to mclo.gs"
   },
-  "files.navbar.upload-file": {
-    "defaultMessage": "Upload file"
-  },
-  "files.navbar.upload-from-zip": {
-    "defaultMessage": "Upload from .zip file"
+  "files.navbar.upload-files": {
+    "defaultMessage": "Upload files"
   },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Upload from .zip URL"

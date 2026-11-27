@@ -1,22 +1,17 @@
 <template>
-	<div class="flex h-full w-full items-center justify-center gap-6 p-20">
-		<FileIcon class="size-28" />
-		<div class="flex flex-col gap-2">
-			<h3 class="m-0 text-2xl font-bold text-red">{{ title }}</h3>
-			<p class="m-0 text-sm text-secondary">
-				{{ message }}
-			</p>
-			<div class="flex gap-2">
-				<Button size="sm" @click="$emit('refetch')">
-					<RefreshCwIcon class="h-5 w-5" />
-					{{ formatMessage(messages.tryAgain) }}
-				</Button>
-				<Button size="sm" @click="$emit('home')">
-					<HomeIcon class="h-5 w-5" />
+	<div>
+		<EmptyState :icon="FileIcon" :heading="title" :description="message" hide-pattern>
+			<template #actions>
+				<Button type="outlined" size="lg" @click="$emit('home')">
+					<HomeIcon />
 					{{ formatMessage(messages.goToHome) }}
 				</Button>
-			</div>
-		</div>
+				<Button type="colored" color="brand" size="lg" @click="$emit('refetch')">
+					<RefreshCwIcon />
+					{{ formatMessage(messages.tryAgain) }}
+				</Button>
+			</template>
+		</EmptyState>
 	</div>
 </template>
 
@@ -24,6 +19,7 @@
 import { FileIcon, HomeIcon, RefreshCwIcon } from '@modrinth/assets'
 
 import { Button } from '#ui/components/base/buttons'
+import EmptyState from '#ui/components/base/EmptyState.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 const { formatMessage } = useVIntl()
