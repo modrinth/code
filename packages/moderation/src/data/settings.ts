@@ -48,9 +48,9 @@ const settings = {
 		ShowCreatorStatsOnPublicPages: setting.asToggle({
 			type: 'toggle',
 			id: 'show-creator-stats-on-public-pages',
-			title: 'Show creator moderation stats on public pages',
+			title: 'Show user moderation stats on public pages',
 			description:
-				'Show project status counts and account restrictions on project and profile pages for staff.',
+				'Show project status counts and account restrictions on project, profile, organization, and collection pages for staff.',
 			default: false,
 		}),
 		SortDisclosuresByActiveFirst: setting.asToggle({

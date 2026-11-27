@@ -1,7 +1,22 @@
 import type { AbstractModrinthClient } from '@modrinth/api-client'
+import { moderationSettings } from '@modrinth/moderation'
 import { getRemovedScopes, injectModrinthClient, useVIntl } from '@modrinth/ui'
+import { isStaff } from '@modrinth/utils'
 import { useQueries, useQuery } from '@tanstack/vue-query'
 import { computed, type Ref } from 'vue'
+
+import { useAuthState } from './auth'
+import { useModerationSettings } from './moderation'
+
+export function useShowCreatorStatsOnPublicPages() {
+	const auth = useAuthState()
+	const settings = useModerationSettings()
+	return computed(
+		() =>
+			isStaff(auth.value.user) &&
+			settings.value.get(moderationSettings.General.ShowCreatorStatsOnPublicPages),
+	)
+}
 
 export const creatorProjectStatsQueryOptions = {
 	memberAccount: (id: string, client: AbstractModrinthClient) => ({
@@ -40,20 +55,22 @@ export function useCreatorProjectStats(
 	userIds: Ref<string[]>,
 	organizationId: Ref<string>,
 	enabled: Ref<boolean> = computed(() => true),
+	active: Ref<boolean> = enabled,
 ) {
 	const client = injectModrinthClient()
 	const { formatMessage } = useVIntl()
 	const memberIds = computed(() => (enabled.value ? [...new Set(userIds.value)].toSorted() : []))
+	const fetchEnabled = computed(() => enabled.value && active.value)
 	const organizationProjects = useQuery(
 		computed(() => ({
 			...creatorProjectStatsQueryOptions.organizationProjects(organizationId.value, client),
-			enabled: enabled.value && !!organizationId.value,
+			enabled: fetchEnabled.value && !!organizationId.value,
 		})),
 	)
 	const organizationFlaggedProjects = useQuery(
 		computed(() => ({
 			...creatorProjectStatsQueryOptions.organizationFlaggedProjects(organizationId.value, client),
-			enabled: enabled.value && !!organizationId.value,
+			enabled: fetchEnabled.value && !!organizationId.value,
 		})),
 	)
 	const organizationStats = computed(() => [
@@ -68,14 +85,14 @@ export function useCreatorProjectStats(
 	const memberFlaggedProjects = useQuery(
 		computed(() => ({
 			...creatorProjectStatsQueryOptions.memberFlaggedProjects(memberIds.value, client),
-			enabled: enabled.value && memberIds.value.length > 0,
+			enabled: fetchEnabled.value && memberIds.value.length > 0,
 		})),
 	)
 	const memberProjects = useQueries({
 		queries: computed(() =>
 			memberIds.value.map((userId) => ({
 				...creatorProjectStatsQueryOptions.memberProjects(userId, client),
-				enabled: enabled.value,
+				enabled: fetchEnabled.value,
 			})),
 		),
 	})
@@ -83,7 +100,7 @@ export function useCreatorProjectStats(
 		queries: computed(() =>
 			memberIds.value.map((id) => ({
 				...creatorProjectStatsQueryOptions.memberAccount(id, client),
-				enabled: enabled.value,
+				enabled: fetchEnabled.value,
 			})),
 		),
 	})
@@ -91,7 +108,7 @@ export function useCreatorProjectStats(
 		queries: computed(() =>
 			memberIds.value.map((id) => ({
 				...creatorProjectStatsQueryOptions.memberBlacklist(id, client),
-				enabled: enabled.value,
+				enabled: fetchEnabled.value,
 			})),
 		),
 	})
