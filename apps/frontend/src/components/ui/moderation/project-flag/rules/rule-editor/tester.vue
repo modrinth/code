@@ -325,7 +325,8 @@ import { projectFlagProjectContextQueryKey } from '~/composables/queries/project
 const projectIdPattern = /^[A-Za-z0-9]{1,11}$/
 const base62Digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 const defaultListName = 'Default'
-const projectRequestBatchSize = 100
+const projectDetailsBatchSize = 100
+const ruleEvaluationBatchSize = 20
 const props = defineProps<{
 	initialProjectId?: string
 	params: ProjectFlagRuleParams
@@ -415,9 +416,9 @@ const listError = ref('')
 const importInput = ref('')
 const importError = ref('')
 
-function* projectBatches(ids: string[]) {
-	for (let offset = 0; offset < ids.length; offset += projectRequestBatchSize) {
-		yield ids.slice(offset, offset + projectRequestBatchSize)
+function* projectBatches(ids: string[], batchSize: number) {
+	for (let offset = 0; offset < ids.length; offset += batchSize) {
+		yield ids.slice(offset, offset + batchSize)
 	}
 }
 
@@ -426,7 +427,7 @@ function projectDetailsOptions(ids: string[]) {
 		queryKey: ['moderation', 'project-flag', 'test-projects', ids] as const,
 		queryFn: async ({ signal }) => {
 			const projects: Labrinth.Projects.v2.Project[] = []
-			for (const batch of projectBatches(ids)) {
+			for (const batch of projectBatches(ids, projectDetailsBatchSize)) {
 				signal.throwIfAborted()
 				projects.push(...(await client.labrinth.projects_v2.getMultiple(batch)))
 			}
@@ -574,7 +575,7 @@ const {
 		const start = performance.now()
 		const results: ProjectFlagEvaluationResult[] = []
 		const requestErrors = new Map<string, string>()
-		for (const batch of projectBatches(request.project_ids)) {
+		for (const batch of projectBatches(request.project_ids, ruleEvaluationBatchSize)) {
 			try {
 				const evaluated = await client.labrinth.project_flags_internal.evalRule({
 					...request,

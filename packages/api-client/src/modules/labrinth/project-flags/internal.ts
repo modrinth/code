@@ -228,6 +228,7 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 				version: 'internal',
 				method: 'POST',
 				body: data,
+				timeout: 60_000,
 				retry: false,
 			},
 		)
