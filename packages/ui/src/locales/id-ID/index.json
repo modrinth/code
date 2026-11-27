@@ -407,21 +407,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Cari {count, number} {contentType}..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Nama berkas"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Bagikan"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Tautan Markdown"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Tautan proyek"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Nama proyek"
-  },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Terbaru dahulu"
   },

@@ -761,12 +761,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} Projekte wurden hinzugefügt"
   },
-  "app.instance.mods.share-text": {
-    "message": "Schau dir die Projekte an, die ich in meinem Modpack verwende!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Modpackinhalte teilen"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Erfolgreich hochgeladen"
   },

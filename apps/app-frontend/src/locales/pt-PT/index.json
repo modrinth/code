@@ -683,12 +683,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} foram adicionados projetos"
   },
-  "app.instance.mods.share-text": {
-    "message": "Dá uma vista de olhos nos projetos que estou a usar no meu modpack!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Partilhar conteúdo do modpack"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Carregado com sucesso"
   },

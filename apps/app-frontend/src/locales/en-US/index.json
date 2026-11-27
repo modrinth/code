@@ -770,12 +770,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} projects were added"
   },
-  "app.instance.mods.share-text": {
-    "message": "Check out the projects I'm using in my modpack!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Sharing modpack content"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Successfully uploaded"
   },
@@ -3920,9 +3914,6 @@
   "hosting.play.world-changed": {
     "message": "This world is no longer active or has not been shared. Open the server panel and press Play server again."
   },
-  "installation-settings.advanced.title": {
-    "message": "Advanced"
-  },
   "installation-settings.relink-shared-instance.button": {
     "message": "Relink shared instance"
   },
@@ -4390,6 +4381,51 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Syncing"
+  },
+  "instance.settings.tabs.troubleshooting": {
+    "message": "Troubleshooting"
+  },
+  "instance.settings.tabs.troubleshooting.content-list.copy": {
+    "message": "Copy content list"
+  },
+  "instance.settings.tabs.troubleshooting.content-list.description": {
+    "message": "Copy a link listing everything installed in this instance, handy when asking for help."
+  },
+  "instance.settings.tabs.troubleshooting.content-list.file-names": {
+    "message": "File names"
+  },
+  "instance.settings.tabs.troubleshooting.content-list.link-copied.title": {
+    "message": "Content list link copied"
+  },
+  "instance.settings.tabs.troubleshooting.content-list.markdown-links": {
+    "message": "Markdown links"
+  },
+  "instance.settings.tabs.troubleshooting.content-list.more-options": {
+    "message": "More list formats"
+  },
+  "instance.settings.tabs.troubleshooting.content-list.project-links": {
+    "message": "Project links"
+  },
+  "instance.settings.tabs.troubleshooting.content-list.project-names": {
+    "message": "Project names"
+  },
+  "instance.settings.tabs.troubleshooting.content-list.text-copied.text": {
+    "message": "Couldn't create a link, so the list was copied as text instead."
+  },
+  "instance.settings.tabs.troubleshooting.content-list.text-copied.title": {
+    "message": "Content list copied"
+  },
+  "instance.settings.tabs.troubleshooting.content-list.title": {
+    "message": "Content list"
+  },
+  "instance.settings.tabs.troubleshooting.debug-info.description": {
+    "message": "Export this instance's logs and diagnostic data to a ZIP file to share."
+  },
+  "instance.settings.tabs.troubleshooting.debug-info.export": {
+    "message": "Export debug info"
+  },
+  "instance.settings.tabs.troubleshooting.debug-info.title": {
+    "message": "Debug info"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "Your instance uses the default window settings unless you override them here."

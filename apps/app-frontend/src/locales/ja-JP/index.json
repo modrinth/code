@@ -761,12 +761,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count}件のプロジェクトが追加されました"
   },
-  "app.instance.mods.share-text": {
-    "message": "私のModパックで使われているプロジェクトをチェック！"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Modパックのコンテンツを共有"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "アップロードに成功しました"
   },

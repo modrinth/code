@@ -827,21 +827,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "搜索到 {count, number}个{contentType}…"
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "文件名"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "分享"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Markdown 链接"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "项目链接"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "项目名称"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "名称（英文首字母A-Z）"
   },

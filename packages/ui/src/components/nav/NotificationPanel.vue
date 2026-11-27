@@ -161,7 +161,7 @@ async function handleButtonClick(item: WebNotification, button: WebNotificationB
 }
 
 function createNotifText(notif: WebNotification): string {
-	return [notif.title, notif.text, notif.errorCode].filter(Boolean).join('\n')
+	return notif.copyText ?? [notif.title, notif.text, notif.errorCode].filter(Boolean).join('\n')
 }
 
 function getCopyKey(notif: WebNotification): string {

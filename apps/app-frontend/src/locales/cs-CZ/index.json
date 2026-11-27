@@ -758,12 +758,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} projektů bylo přidáno"
   },
-  "app.instance.mods.share-text": {
-    "message": "Podívejte se na projekty, které používám ve svém modpacku!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Sdílení obsahu modpacku"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Úspěšně nahráno"
   },

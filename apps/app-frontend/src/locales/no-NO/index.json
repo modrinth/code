@@ -527,9 +527,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} prosjekter ble lagt til"
   },
-  "app.instance.mods.share-text": {
-    "message": "Sjekk ut prosjektene jeg bruker i min modpakke!"
-  },
   "app.modal.install-to-play.header": {
     "message": "Installer for å spille"
   },

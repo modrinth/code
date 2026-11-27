@@ -1,20 +1,8 @@
 <script setup lang="ts">
-import {
-	BoxIcon,
-	CodeIcon,
-	CompassIcon,
-	DownloadIcon,
-	DropdownIcon,
-	FileIcon,
-	FolderOpenIcon,
-	LinkIcon,
-	ShareIcon,
-	TextCursorInputIcon,
-	TrashIcon,
-} from '@modrinth/assets'
+import { BoxIcon, CompassIcon, DownloadIcon, FolderOpenIcon, TrashIcon } from '@modrinth/assets'
 import { computed, ref, watch } from 'vue'
 
-import { Button, type ButtonMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import { Button } from '#ui/components/base/buttons'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { getProjectTypeIcon } from '#ui/utils/auto-icons'
@@ -102,26 +90,6 @@ const messages = defineMessages({
 	browseContent: {
 		id: 'content.page-layout.empty.browse-content',
 		defaultMessage: 'Browse content',
-	},
-	shareProjectNames: {
-		id: 'content.page-layout.share.project-names',
-		defaultMessage: 'Project names',
-	},
-	shareFileNames: {
-		id: 'content.page-layout.share.file-names',
-		defaultMessage: 'File names',
-	},
-	shareProjectLinks: {
-		id: 'content.page-layout.share.project-links',
-		defaultMessage: 'Project links',
-	},
-	shareMarkdownLinks: {
-		id: 'content.page-layout.share.markdown-links',
-		defaultMessage: 'Markdown links',
-	},
-	share: {
-		id: 'content.page-layout.share.label',
-		defaultMessage: 'Share',
 	},
 })
 
@@ -299,33 +267,6 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 	retain(id)
 	await ctx.setEnabledFor(item, side, enabled)
 }
-
-const shareOptions = computed<ButtonMenuOption[]>(() => {
-	const share = ctx.share
-	if (!share) return []
-	return [
-		{
-			id: 'share-names',
-			label: formatMessage(messages.shareProjectNames),
-			action: () => share(selectedItems.value, 'names'),
-		},
-		{
-			id: 'share-file-names',
-			label: formatMessage(messages.shareFileNames),
-			action: () => share(selectedItems.value, 'file-names'),
-		},
-		{
-			id: 'share-urls',
-			label: formatMessage(messages.shareProjectLinks),
-			action: () => share(selectedItems.value, 'urls'),
-		},
-		{
-			id: 'share-markdown',
-			label: formatMessage(messages.shareMarkdownLinks),
-			action: () => share(selectedItems.value, 'markdown'),
-		},
-	]
-})
 </script>
 
 <template>
@@ -514,35 +455,6 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 					<DownloadIcon />
 					<span class="bar-label">{{ formatMessage(commonMessages.updateButton) }}</span>
 				</Button>
-
-				<TeleportOverflowMenu
-					v-if="ctx.share"
-					type="quiet"
-					:label="formatMessage(messages.share)"
-					:tooltip="formatMessage(messages.share)"
-					:options="shareOptions"
-					class="!w-auto !px-2.5 !rounded-xl"
-				>
-					<ShareIcon />
-					<span class="bar-label">{{ formatMessage(messages.share) }}</span>
-					<DropdownIcon />
-					<template #share-names>
-						<TextCursorInputIcon />
-						{{ formatMessage(messages.shareProjectNames) }}
-					</template>
-					<template #share-file-names>
-						<FileIcon />
-						{{ formatMessage(messages.shareFileNames) }}
-					</template>
-					<template #share-urls>
-						<LinkIcon />
-						{{ formatMessage(messages.shareProjectLinks) }}
-					</template>
-					<template #share-markdown>
-						<CodeIcon />
-						{{ formatMessage(messages.shareMarkdownLinks) }}
-					</template>
-				</TeleportOverflowMenu>
 			</template>
 
 			<template #actions-end>

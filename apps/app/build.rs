@@ -230,6 +230,7 @@ fn main() {
                         "instance_get_dependencies_as_content_items",
                         "instance_get_linked_modpack_info",
                         "instance_get_linked_modpack_content",
+                        "instance_get_content_list",
                         "instance_get_optimal_jre_key",
                         "instance_get_recommended_java_version",
                         "instance_get_full_path",

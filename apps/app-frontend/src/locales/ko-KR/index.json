@@ -761,12 +761,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "프로젝트 {count}개 추가됨"
   },
-  "app.instance.mods.share-text": {
-    "message": "제 모드팩에 사용 중인 프로젝트를 확인해 보세요!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "모드팩 콘텐츠 공유"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "업로드 성공"
   },

@@ -455,12 +455,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} projekata je dodato"
   },
-  "app.instance.mods.share-text": {
-    "message": "Pogledaj ove projekte koje ja koristim u svom modpacku!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Deljenje sadržaja modpacka"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Uspešno otpremljeno"
   },

@@ -737,12 +737,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} projekt került hozzáadásra"
   },
-  "app.instance.mods.share-text": {
-    "message": "Nézd meg, milyen projekteket használok a modcsomagomban!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Modcsomag-tartalmak megosztása"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Sikeresen feltöltve"
   },

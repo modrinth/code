@@ -320,12 +320,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} proyekto ang nadagdag"
   },
-  "app.instance.mods.share-text": {
-    "message": "Tingnan ang mga proyektong ginagamit ko sa aking modpack!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Binabahagi ang kontento ng modpack"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Matagumpay na na-upload"
   },

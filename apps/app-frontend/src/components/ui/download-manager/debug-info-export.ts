@@ -10,9 +10,16 @@ export interface DebugInfoExportProgress {
 	totalBytes: number | null
 }
 
+export interface DebugInfoExportInstance {
+	id: string
+	name: string
+	iconPath: string | null
+}
+
 export interface DebugInfoExportTask extends DebugInfoExportProgress {
 	id: string
-	filename: string
+	path: string
+	instance: DebugInfoExportInstance | null
 	status: 'running' | 'succeeded' | 'failed' | 'canceled'
 	started: boolean
 	canceling: boolean
@@ -23,31 +30,51 @@ export interface DebugInfoExportTask extends DebugInfoExportProgress {
 }
 
 export const debugInfoExports = ref(new Map<string, DebugInfoExportTask>())
-const selectingDestination = ref(false)
-export const exportingDebugInfo = computed(
-	() =>
-		selectingDestination.value ||
-		[...debugInfoExports.value.values()].some((task) => task.status === 'running'),
-)
+const selectingDestination = ref(new Set<string | null>())
 
-export async function exportDebugInfo(title: string) {
-	if (exportingDebugInfo.value) return
-	selectingDestination.value = true
+export function isExportingDebugInfo(instanceId: string | null = null) {
+	return (
+		selectingDestination.value.has(instanceId) ||
+		[...debugInfoExports.value.values()].some(
+			(task) => task.status === 'running' && (task.instance?.id ?? null) === instanceId,
+		)
+	)
+}
+
+export const exportingDebugInfo = computed(() => isExportingDebugInfo())
+
+function defaultFileName(instance: DebugInfoExportInstance | null) {
+	const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+	const name = instance?.name
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '')
+	return `modrinth-debug-${name ? `${name}-` : ''}${timestamp}.zip`
+}
+
+export async function exportDebugInfo(
+	title: string,
+	instance: DebugInfoExportInstance | null = null,
+) {
+	const instanceId = instance?.id ?? null
+	if (isExportingDebugInfo(instanceId)) return
+	selectingDestination.value.add(instanceId)
 	let path: string | null
 	try {
 		path = await save({
 			title,
-			defaultPath: `modrinth-debug-${new Date().toISOString().replace(/[:.]/g, '-')}.zip`,
+			defaultPath: defaultFileName(instance),
 			filters: [{ name: 'ZIP', extensions: ['zip'] }],
 		})
 	} finally {
-		selectingDestination.value = false
+		selectingDestination.value.delete(instanceId)
 	}
 	if (!path) return
 
 	const task = reactive<DebugInfoExportTask>({
 		id: crypto.randomUUID(),
-		filename: path.split(/[/\\]/).pop() ?? path,
+		path,
+		instance,
 		status: 'running',
 		stage: 'preparing',
 		processedBytes: 0,
@@ -84,6 +111,7 @@ export async function exportDebugInfo(title: string) {
 		const saved = await invoke<boolean>('plugin:utils|export_debug_info', {
 			id: task.id,
 			path,
+			instanceId,
 			onProgress,
 		})
 		task.status = saved ? 'succeeded' : 'canceled'

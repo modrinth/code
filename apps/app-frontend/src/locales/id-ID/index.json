@@ -431,12 +431,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} proyek telah ditambahkan"
   },
-  "app.instance.mods.share-text": {
-    "message": "Lihat proyek-proyek yang saya pakai di paket mod saya!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Membagi konten paket mod"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Berhasil diunggah"
   },

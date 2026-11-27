@@ -74,8 +74,8 @@
 			</div>
 		</div>
 		<EmptyState
-			:icon="ReceiptTextIcon"
 			v-else
+			:icon="ReceiptTextIcon"
 			:heading="formatMessage(messages.noTransactions)"
 			:description="formatMessage(messages.noTransactionsDesc)"
 		/>

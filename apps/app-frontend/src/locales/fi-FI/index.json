@@ -734,12 +734,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} projektia lisättiin"
   },
-  "app.instance.mods.share-text": {
-    "message": "Katso mitä projekteja käytän modipaketissani!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Jaetaan modipaketin sisältö"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Ladattu onnistuneesti"
   },

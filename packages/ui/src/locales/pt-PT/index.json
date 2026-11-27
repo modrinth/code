@@ -476,21 +476,6 @@
   "content.page-layout.please-wait": {
     "defaultMessage": "Aguarde"
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Nomes dos ficheiros"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Partilhar"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Links Markdown"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Links dos projetos"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Nomes dos projetos"
-  },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Mais recentes primeiro"
   },

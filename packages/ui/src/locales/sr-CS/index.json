@@ -641,21 +641,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Traži {count, number} {contentType}..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Imena datoteka"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Deli"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Markdown linkovi"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Linkovi projekata"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Imena projekata"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "Ime (A-Z)"
   },

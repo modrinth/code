@@ -761,12 +761,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} projetos foram adicionados"
   },
-  "app.instance.mods.share-text": {
-    "message": "Dê uma olhada nos projetos que estou usando no meu pacote de mods!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Compartilhando conteúdo do pacote de mods"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Adicionado com sucesso"
   },

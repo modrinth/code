@@ -46,6 +46,7 @@ defineEmits<{
 	togglePause: [id: string]
 	dismiss: [id: string]
 	copyDetails: [id: string]
+	reveal: [id: string]
 	open: []
 }>()
 
@@ -86,9 +87,16 @@ const cancelLabel = computed(() =>
 	),
 )
 const instanceLink = computed(() =>
-	props.job.status === 'succeeded' && props.job.instanceId
+	props.job.status === 'succeeded' && props.job.instanceId && !props.job.revealPath
 		? `/instance/${encodeURIComponent(props.job.instanceId)}`
 		: undefined,
+)
+const rowLabel = computed(() =>
+	instanceLink.value
+		? `${formatMessage(messages.openInstance)}: ${props.job.title}`
+		: props.job.revealPath
+			? `${formatMessage(commonMessages.openInFolderButton)}: ${props.job.title}`
+			: undefined,
 )
 </script>
 
@@ -100,13 +108,13 @@ const instanceLink = computed(() =>
 	>
 		<div class="flex items-center justify-between gap-2">
 			<component
-				:is="instanceLink ? RouterLink : 'div'"
+				:is="instanceLink ? RouterLink : job.revealPath ? 'button' : 'div'"
 				:to="instanceLink"
-				:aria-label="
-					instanceLink ? `${formatMessage(messages.openInstance)}: ${job.title}` : undefined
-				"
-				class="flex min-w-0 flex-1 items-center gap-2 rounded-lg text-inherit no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-				@click="instanceLink && $emit('open')"
+				:type="!instanceLink && job.revealPath ? 'button' : undefined"
+				:aria-label="rowLabel"
+				class="flex min-w-0 flex-1 items-center gap-2 rounded-lg border-none bg-transparent p-0 text-left text-inherit no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+				:class="{ 'cursor-pointer': !instanceLink && job.revealPath }"
+				@click="instanceLink ? $emit('open') : job.revealPath && $emit('reveal', job.id)"
 			>
 				<Avatar
 					v-if="displayIcon"

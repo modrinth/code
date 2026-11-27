@@ -590,6 +590,9 @@ pub(crate) async fn dependencies_to_content_items(
                     .and_then(|version| version.files.first())
                     .map(|file| file.size as u64)
                     .unwrap_or(0),
+                hash: version
+                    .and_then(|version| version.files.first())
+                    .and_then(|file| file.hashes.get("sha1").cloned()),
                 enabled: true,
                 locked: false,
                 project_type,
@@ -1030,6 +1033,7 @@ async fn content_files_to_content_items(
                 file_path: path.clone(),
                 id: file.hash.clone(),
                 size: file.size,
+                hash: Some(file.hash.clone()),
                 enabled: file.enabled,
                 locked: file.locked,
                 project_type: file.project_type,

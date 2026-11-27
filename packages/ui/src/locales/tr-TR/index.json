@@ -755,21 +755,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "{count, number} türündeki içerikleri arayın..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Dosya adları"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Paylaş"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Markdown bağlantıları"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Proje bağlantıları"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Proje isimleri"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "İsim (A-Z)"
   },

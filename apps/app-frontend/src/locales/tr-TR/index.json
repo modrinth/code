@@ -761,12 +761,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} projeler eklendi"
   },
-  "app.instance.mods.share-text": {
-    "message": "Modpaketimde kullandığım projelere göz at!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Mod paketi içeriğini paylaşıyorsunuz"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Başarıyla yüklendi"
   },

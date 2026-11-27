@@ -701,21 +701,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Sök {count, number} {contentType}..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Filnamn"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Dela"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Markdown-länkar"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Projektlänkar"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Projektnamn"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "Namn (A–Z)"
   },

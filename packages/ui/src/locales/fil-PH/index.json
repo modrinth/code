@@ -218,15 +218,6 @@
   "content.page-layout.please-wait": {
     "defaultMessage": "Mangyaring maghintay"
   },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Ibahagi"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Mga markdown link"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Mga link ng proyekto"
-  },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Pinakabago ang mauuna"
   },
@@ -2658,4 +2649,3 @@
     "defaultMessage": "Uri"
   }
 }
-

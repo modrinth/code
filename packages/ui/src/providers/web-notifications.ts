@@ -26,6 +26,7 @@ export interface WebNotification {
 	buttons?: WebNotificationButton[]
 	dismissible?: boolean
 	copyable?: boolean
+	copyText?: string
 }
 
 export type NotificationPanelLocation = 'left' | 'right'

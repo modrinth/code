@@ -749,12 +749,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} projekt lades till"
   },
-  "app.instance.mods.share-text": {
-    "message": "Kolla in projekten jag använder i mitt modpaket!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Delar innehåll från modpaket"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Uppladdning lyckades"
   },

@@ -824,21 +824,6 @@
   "content.page-layout.please-wait": {
     "defaultMessage": "Зачекайте"
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Назви файлів"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Поділитися"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Посилання з Markdown"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Посилання на проєкти"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Назви проєктів"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "Назва (А-Я)"
   },

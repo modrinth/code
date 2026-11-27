@@ -650,21 +650,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "フォルダ内の{contentType}を検索..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "ファイル名"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "共有"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "マークダウンリンク"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "プロジェクトリンク"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "プロジェクト名"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "名前（A~Z）"
   },

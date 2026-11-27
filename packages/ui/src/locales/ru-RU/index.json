@@ -797,21 +797,6 @@
   "content.page-layout.please-wait": {
     "defaultMessage": "Подождите"
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Названия файлов"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Поделиться"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Markdown‑ссылки"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Ссылки на проекты"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Названия проектов"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "Название (А–Я)"
   },
