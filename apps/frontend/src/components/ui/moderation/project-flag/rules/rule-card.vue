@@ -1,6 +1,8 @@
 <template>
 	<article
 		class="flex min-w-0 flex-col rounded-2xl border border-solid border-surface-4 bg-surface-3"
+		:class="{ 'cursor-pointer transition-[filter] hover:brightness-125': !editDisabled }"
+		@click="openEditor"
 	>
 		<header class="flex min-w-0 items-center gap-3 p-4 pb-1">
 			<h2 class="m-0 mr-auto min-w-0 break-words text-lg font-bold text-contrast">
@@ -139,6 +141,20 @@ const patterns = computed(() => Object.entries(props.rule.params.scan_files_for)
 const questions = computed(() => Object.entries(props.rule.params.decision_questions ?? {}))
 const tokenize = shallowRef<typeof tokenizeRhai>()
 const preview = computed(() => tokenize.value?.(props.rule.params.expression))
+
+function openEditor(event: MouseEvent) {
+	const target = event.target as Element | null
+	const card = event.currentTarget as HTMLElement
+	if (
+		props.editDisabled ||
+		event.defaultPrevented ||
+		target?.closest?.('a, button, [role="button"]') ||
+		card.ownerDocument.getSelection()?.isCollapsed === false
+	) {
+		return
+	}
+	return navigateTo(editorLocation.value)
+}
 
 onMounted(async () => {
 	try {
