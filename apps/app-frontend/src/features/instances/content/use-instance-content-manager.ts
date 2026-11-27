@@ -37,6 +37,7 @@ import { openExternalUrl } from '@/platform/external-links'
 import { injectContentInstall } from '@/providers/content-install'
 
 import { findDependentItems, normalizeContentItem } from './content-items'
+import { useInstanceContentGroups } from './groups/use-instance-content-groups'
 import { contentMutationKey, useContentMutations } from './use-content-mutations'
 import { useContentOperations } from './use-content-operations'
 import { useContentUpdater } from './use-content-updater'
@@ -390,6 +391,7 @@ export function useInstanceContentManager() {
 			owner: contentOwnerLink,
 		},
 		menu,
+		groups: useInstanceContentGroups(() => instance.value.id),
 		persistKey: instance.value.id,
 		searchQueryParam: 'q',
 		showSharedContentFilter,

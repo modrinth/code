@@ -168,6 +168,12 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 			case 'world.content.file.side.lock.updated':
 				handleWorldContentFileSideUpdate(serverId, event)
 				break
+			case 'world.content.groups.update':
+				queryClient.setQueryData<Archon.Content.v1.WorldContentGroup[]>(
+					serverKeys.contentGroups(serverId, event.world_id),
+					event.groups,
+				)
+				break
 		}
 	}
 
@@ -538,6 +544,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 			version: item.version,
 			owner: item.owner,
 			icon_url: item.icon_url,
+			group_id: item.group_id === undefined ? (current?.group_id ?? null) : item.group_id,
 		}
 	}
 

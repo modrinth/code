@@ -1,0 +1,112 @@
+import type { Ref } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
+
+import type { ContentCardTableItem } from '../../types'
+
+type Point = { x: number; y: number }
+
+export const ROW_GATHER_DURATION = 350
+
+export interface RowDragGatherItem {
+	row: ContentCardTableItem
+	rect: { left: number; top: number; width: number; height: number }
+}
+
+export function useRowDragGather(
+	rows: Ref<ContentCardTableItem[]>,
+	root: Ref<HTMLElement | null>,
+	preview: Ref<HTMLElement | null>,
+) {
+	const items = ref<RowDragGatherItem[]>([])
+	const target = ref<Point>({ x: 0, y: 0 })
+	const isGathering = ref(false)
+	let anchorOffset: Point = { x: 0, y: 0 }
+	let lastPointer: Point = { x: 0, y: 0 }
+	let cleanupTimer: number | undefined
+	let alignFrame: { id: number; window: Window } | undefined
+
+	function clearCleanupTimer() {
+		if (cleanupTimer === undefined) return
+		clearTimeout(cleanupTimer)
+		cleanupTimer = undefined
+	}
+
+	function cancelAlignFrame() {
+		if (alignFrame === undefined) return
+		alignFrame.window.cancelAnimationFrame(alignFrame.id)
+		alignFrame = undefined
+	}
+
+	function clear() {
+		clearCleanupTimer()
+		cancelAlignFrame()
+		items.value = []
+		anchorOffset = { x: 0, y: 0 }
+		isGathering.value = false
+	}
+
+	function updateTarget(pointer: Point) {
+		lastPointer = pointer
+		target.value = {
+			x: pointer.x + anchorOffset.x + (preview.value?.offsetWidth ?? 0) / 2,
+			y: pointer.y + anchorOffset.y + (preview.value?.offsetHeight ?? 0) / 2,
+		}
+	}
+
+	function rowElement(rowId: string) {
+		const ownerDocument = root.value?.ownerDocument ?? document
+		return Array.from(ownerDocument.querySelectorAll<HTMLElement>('[data-content-card-item]')).find(
+			(element) => element.dataset.contentCardItem === rowId,
+		)
+	}
+
+	function start(rowIds: string[], pointer: Point) {
+		clear()
+		const ownerWindow = root.value?.ownerDocument.defaultView ?? window
+		const reduceMotion = ownerWindow.matchMedia('(prefers-reduced-motion: reduce)').matches
+		if (rowIds.length < 2 || reduceMotion) return
+
+		const source = rowElement(rowIds[0])?.getBoundingClientRect()
+		anchorOffset = source
+			? { x: source.left - pointer.x, y: source.top - pointer.y }
+			: { x: 0, y: 0 }
+
+		const rowsById = new Map(rows.value.map((row) => [row.id, row]))
+		items.value = rowIds.slice(1).flatMap((rowId) => {
+			const row = rowsById.get(rowId)
+			const element = rowElement(rowId)
+			if (!row || !element || element.getClientRects().length === 0) return []
+			const rect = element.getBoundingClientRect()
+			return [
+				{ row, rect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height } },
+			]
+		})
+		updateTarget(pointer)
+		isGathering.value = items.value.length > 0
+		if (isGathering.value) {
+			alignFrame = {
+				id: ownerWindow.requestAnimationFrame(() => {
+					alignFrame = undefined
+					updateTarget(lastPointer)
+				}),
+				window: ownerWindow,
+			}
+		}
+	}
+
+	function finish() {
+		isGathering.value = false
+		clearCleanupTimer()
+		cleanupTimer = window.setTimeout(() => {
+			items.value = []
+			cleanupTimer = undefined
+		}, 400)
+	}
+
+	onBeforeUnmount(() => {
+		clearCleanupTimer()
+		cancelAlignFrame()
+	})
+
+	return { items, target, isGathering, start, updateTarget, clear, finish }
+}

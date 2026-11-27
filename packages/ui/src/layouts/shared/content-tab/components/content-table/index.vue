@@ -1,4 +1,12 @@
 <script setup lang="ts">
+import {
+	DragDropProvider,
+	type DragEndEvent,
+	type DragMoveEvent,
+	type DragOverEvent,
+	DragOverlay,
+	type DragStartEvent,
+} from '@dnd-kit/vue'
 import { InfoIcon } from '@modrinth/assets'
 import { computed, ref, watch } from 'vue'
 
@@ -9,9 +17,20 @@ import { commonMessages } from '#ui/utils/common-messages'
 
 import type { ContentCardTableItem, ContentSide } from '../../types'
 import ContentEnabledFor from '../ContentEnabledFor.vue'
+import DragGather from './drag-gather.vue'
+import DragPreview from './drag-preview.vue'
+import DragRow from './drag-row.vue'
 import TableHeader from './header.vue'
 import TableRow from './row.vue'
+import SectionEmpty from './section-empty.vue'
+import SectionHeader from './section-header.vue'
 import type { ContentTableColumns, ContentTableSection } from './types'
+import {
+	SECTION_EMPTY_HEIGHT,
+	SECTION_HEADER_HEIGHT,
+	useGroupedEntries,
+} from './use-grouped-entries'
+import { useRowDragGather } from './use-row-drag-gather'
 import { useContentTableLayout } from './use-table-layout'
 
 const props = withDefaults(
@@ -22,6 +41,8 @@ const props = withDefaults(
 		virtualized?: boolean
 		hideHeader?: boolean
 		flat?: boolean
+		draggable?: boolean
+		dragDisabled?: boolean
 		extraActionWidths?: (row: ContentCardTableItem) => number[]
 	}>(),
 	{
@@ -30,6 +51,8 @@ const props = withDefaults(
 		virtualized: true,
 		hideHeader: false,
 		flat: false,
+		draggable: false,
+		dragDisabled: false,
 		extraActionWidths: () => [],
 	},
 )
@@ -43,6 +66,8 @@ const emit = defineEmits<{
 	update: [id: string]
 	switchVersion: [id: string]
 	prefetch: [id: string]
+	setSectionCollapsed: [sectionId: string, collapsed: boolean]
+	moveRows: [rowIds: string[], sectionId: string]
 }>()
 
 const { formatMessage } = useVIntl()
@@ -71,14 +96,7 @@ const { isStuck } = useStickyObserver(
 
 const rows = computed(() => props.sections.flatMap((section) => section.items))
 const grouped = computed(() => props.sections.some((section) => !!section.label))
-const sectionOffsets = computed(() => {
-	let offset = 0
-	return props.sections.map((section) => {
-		const start = offset
-		offset += section.items.length
-		return start
-	})
-})
+const canDrag = computed(() => grouped.value && props.draggable)
 
 const showSelection = computed(() => !!props.columns.selection)
 const showVersion = computed(() => props.columns.version !== false)
@@ -104,17 +122,38 @@ const { listContainer, totalHeight, visibleRange, visibleTop, visibleItems, scro
 		enabled: computed(() => props.virtualized && !grouped.value),
 	})
 
+const groupedEntries = useGroupedEntries({
+	sections: computed(() => props.sections),
+	rowHeight,
+	enabled: computed(() => props.virtualized && grouped.value),
+})
+const groupedListContainer = groupedEntries.listContainer
+const lastGroupedEntryKey = computed(() => {
+	const sections = props.sections
+	const last = sections[sections.length - 1]
+	if (!last) return null
+	if (last.collapsed) return `header:${last.id}`
+	if (last.items.length === 0) return last.emptyLabel ? `empty:${last.id}` : `header:${last.id}`
+	return `row:${last.items[last.items.length - 1].id}`
+})
+
+const orderedRows = computed(() => (grouped.value ? groupedEntries.rows.value : rows.value))
+
 watch(
 	[
-		() =>
-			props.highlightedItemId
-				? rows.value.findIndex((row) => row.id === props.highlightedItemId)
-				: -1,
-		listContainer,
+		() => props.highlightedItemId,
+		() => (grouped.value ? groupedListContainer.value : listContainer.value),
 	],
-	([index, container], _, onCleanup) => {
-		if (index < 0 || !container) return
-		const frame = requestAnimationFrame(() => scrollToIndex(index))
+	([id, container], _, onCleanup) => {
+		if (!id || !container) return
+		const frame = requestAnimationFrame(() => {
+			if (grouped.value) {
+				groupedEntries.scrollToRow(id)
+			} else {
+				const index = rows.value.findIndex((row) => row.id === id)
+				if (index >= 0) scrollToIndex(index)
+			}
+		})
 		onCleanup(() => cancelAnimationFrame(frame))
 	},
 	{ flush: 'post' },
@@ -144,7 +183,7 @@ function toggleRowSelection(id: string, selected: boolean, index: number, event?
 	if (selected && event?.shiftKey && lastSelectedIndex.value !== null) {
 		const start = Math.min(lastSelectedIndex.value, index)
 		const end = Math.max(lastSelectedIndex.value, index)
-		const rangeIds = rows.value
+		const rangeIds = orderedRows.value
 			.slice(start, end + 1)
 			.filter((row) => !row.disabled)
 			.map((row) => row.id)
@@ -157,15 +196,98 @@ function toggleRowSelection(id: string, selected: boolean, index: number, event?
 	lastSelectedIndex.value = index
 }
 
-function rowClass(row: ContentCardTableItem, index: number) {
-	const selected = selectedIds.value.includes(row.id)
+watch(grouped, () => {
+	lastSelectedIndex.value = null
+})
+
+const sectionIdByRowId = computed(() => {
+	const map = new Map<string, string>()
+	for (const section of props.sections) {
+		for (const row of section.items) map.set(row.id, section.id)
+	}
+	return map
+})
+const rowsById = computed(() => new Map(rows.value.map((row) => [row.id, row])))
+
+const activeDragIds = ref<string[]>([])
+const activeDragIdSet = computed(() => new Set(activeDragIds.value))
+const activeDropSectionId = ref<string | null>(null)
+const activeDragRow = computed(() =>
+	activeDragIds.value.length > 0 ? rowsById.value.get(activeDragIds.value[0]) : undefined,
+)
+const dragPreviewRef = ref<HTMLElement | null>(null)
+const gather = useRowDragGather(rows, tableRef, dragPreviewRef)
+const overlayTarget = computed(() => tableRef.value?.ownerDocument.body ?? 'body')
+
+function canDropOnSection(sectionId: string | null) {
+	if (!sectionId || activeDragIds.value.length === 0) return false
+	const section = props.sections.find((candidate) => candidate.id === sectionId)
+	if (!section || section.droppable === false) return false
+	return activeDragIds.value.some((id) => sectionIdByRowId.value.get(id) !== sectionId)
+}
+
+const dropSectionId = computed(() =>
+	canDropOnSection(activeDropSectionId.value) ? activeDropSectionId.value : null,
+)
+
+function handleDragStart(event: DragStartEvent) {
+	const rowId = (event.operation.source?.data as { rowId?: string } | undefined)?.rowId
+	if (!rowId) return
+	const selected = new Set(selectedIds.value)
+	activeDragIds.value = selected.has(rowId)
+		? [
+				rowId,
+				...orderedRows.value
+					.filter((row) => row.id !== rowId && selected.has(row.id))
+					.map((row) => row.id),
+				...selectedIds.value.filter(
+					(id) => id !== rowId && !orderedRows.value.some((row) => row.id === id),
+				),
+			]
+		: [rowId]
+	gather.start(activeDragIds.value, event.operation.position.current)
+}
+
+function handleDragMove(event: DragMoveEvent) {
+	if (gather.items.value.length === 0) return
+	gather.updateTarget(event.to ?? event.operation.position.current)
+}
+
+function handleDragOver(event: DragOverEvent) {
+	const target = event.operation.target?.data as { sectionId?: string } | undefined
+	activeDropSectionId.value = target?.sectionId ?? null
+}
+
+function handleDragEnd(event: DragEndEvent) {
+	const target = event.operation.target?.data as { sectionId?: string } | undefined
+	const sectionId = target?.sectionId ?? null
+	if (!event.canceled && sectionId && canDropOnSection(sectionId)) {
+		emit('moveRows', [...activeDragIds.value], sectionId)
+	}
+	gather.clear()
+	activeDragIds.value = []
+	activeDropSectionId.value = null
+}
+
+function toggleSection(section: ContentTableSection) {
+	emit('setSectionCollapsed', section.id, !section.collapsed)
+}
+
+function rowBackground(row: ContentCardTableItem, index: number, sectionId?: string) {
+	if (sectionId && dropSectionId.value === sectionId) return 'bg-surface-3'
+	if (selectedIds.value.includes(row.id)) return 'bg-surface-2.5'
+	return index % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2'
+}
+
+function rowClass(row: ContentCardTableItem, index: number, isLast: boolean, sectionId?: string) {
 	return [
-		selected ? 'bg-surface-2.5' : index % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2',
-		'border-0 border-t border-solid border-surface-4',
+		rowBackground(row, index, sectionId),
+		'border-0 border-t border-solid border-surface-4 transition-[background-color,opacity,filter] duration-150 hover:brightness-[1.15]',
 		props.highlightedItemId && row.id === props.highlightedItemId
 			? 'outline outline-2 -outline-offset-2 outline-brand'
 			: '',
-		index === rows.value.length - 1 && !props.flat ? 'rounded-b-[20px]' : '',
+		activeDragIdSet.value.has(row.id) ? 'opacity-50' : '',
+		isLast && !props.flat ? 'rounded-b-[20px]' : '',
 	]
 }
 </script>
@@ -208,13 +330,14 @@ function rowClass(row: ContentCardTableItem, index: number) {
 			:show-enabled-for="showEnabledFor"
 			:show-version="separateVersion"
 			:show-actions="hasActionsColumn"
+			:drag-handle="canDrag"
 			:enabled-for-label="formatMessage(messages.enabledFor)"
 			:enabled-for-description="formatMessage(messages.enabledForDescription)"
 			@toggle-all="toggleSelectAll"
 		/>
 
 		<div
-			v-if="rows.length === 0"
+			v-if="rows.length === 0 && !grouped"
 			class="flex items-center justify-center py-12"
 			:class="flat ? '' : 'rounded-b-[20px]'"
 		>
@@ -223,55 +346,126 @@ function rowClass(row: ContentCardTableItem, index: number) {
 			</slot>
 		</div>
 
-		<div
+		<DragDropProvider
 			v-else-if="grouped"
-			ref="listContainer"
-			role="rowgroup"
-			:class="flat ? '' : 'rounded-b-[20px]'"
+			@drag-start="handleDragStart"
+			@drag-move="handleDragMove"
+			@drag-over="handleDragOver"
+			@drag-end="handleDragEnd"
 		>
-			<template v-for="(section, sectionIndex) in sections" :key="section.id">
+			<div
+				ref="groupedListContainer"
+				role="rowgroup"
+				class="relative w-full"
+				:class="flat ? '' : 'rounded-b-[20px]'"
+				:style="
+					virtualized
+						? { minHeight: `${groupedEntries.totalHeight.value}px`, overflowAnchor: 'none' }
+						: undefined
+				"
+			>
 				<div
-					v-if="section.label"
-					class="flex h-11 items-center border-0 border-t border-solid border-surface-4 bg-surface-2 px-4 font-semibold text-secondary"
+					:class="{ 'absolute w-full': virtualized }"
+					:style="virtualized ? { top: `${groupedEntries.visibleTop.value}px` } : undefined"
 				>
-					{{ section.label }}
+					<template v-for="entry in groupedEntries.visibleEntries.value" :key="entry.key">
+						<SectionHeader
+							v-if="entry.kind === 'header'"
+							:section="entry.section"
+							:droppable="canDrag && entry.section.droppable !== false"
+							:drop-active="dropSectionId === entry.section.id"
+							:class="lastGroupedEntryKey === entry.key && !flat ? 'rounded-b-[20px]' : ''"
+							:style="{ height: `${SECTION_HEADER_HEIGHT}px` }"
+							@toggle="toggleSection(entry.section)"
+						>
+							<template v-if="$slots['section-header']" #default="{ toggle }">
+								<slot
+									name="section-header"
+									:section="entry.section"
+									:collapsed="!!entry.section.collapsed"
+									:toggle="toggle"
+								/>
+							</template>
+						</SectionHeader>
+						<SectionEmpty
+							v-else-if="entry.kind === 'empty'"
+							:section="entry.section"
+							:droppable="canDrag && entry.section.droppable !== false"
+							:drop-active="dropSectionId === entry.section.id"
+							:class="lastGroupedEntryKey === entry.key && !flat ? 'rounded-b-[20px]' : ''"
+							:style="{ height: `${SECTION_EMPTY_HEIGHT}px` }"
+						/>
+						<DragRow
+							v-else
+							:row-id="entry.row.id"
+							:section-id="entry.section.id"
+							:disabled="!canDrag || dragDisabled || !!entry.row.disabled"
+						>
+							<TableRow
+								:data-content-card-item="entry.row.id"
+								:row="entry.row"
+								:layout="layout"
+								:actions="actionSet"
+								:selection="showSelection"
+								:selected="selectedIds.includes(entry.row.id)"
+								:show-version="showVersion"
+								:show-enabled-for="showEnabledFor"
+								:show-actions="hasActionsColumn"
+								:drag-handle="canDrag"
+								:class="
+									rowClass(
+										entry.row,
+										entry.indexInSection,
+										lastGroupedEntryKey === entry.key,
+										entry.section.id,
+									)
+								"
+								@select="
+									(value, event) => toggleRowSelection(entry.row.id, value, entry.rowIndex, event)
+								"
+								@toggle="(value) => emit('toggle', entry.row.id, value)"
+								@enabled-for="(side, value) => emit('enabledFor', entry.row.id, side, value)"
+								@remove="(event) => emit('remove', entry.row.id, event)"
+								@update="emit('update', entry.row.id)"
+								@switch-version="emit('switchVersion', entry.row.id)"
+								@prefetch="emit('prefetch', entry.row.id)"
+							>
+								<template #title-badges>
+									<slot name="row-title-badges" :item="entry.row" />
+								</template>
+								<template #actions-before>
+									<slot name="row-actions-before" :item="entry.row" />
+								</template>
+								<template #actions-after>
+									<slot name="row-actions-after" :item="entry.row" />
+								</template>
+							</TableRow>
+						</DragRow>
+					</template>
 				</div>
-				<TableRow
-					v-for="(row, rowIndex) in section.items"
-					:key="row.id"
-					:data-content-card-item="row.id"
-					:row="row"
-					:layout="layout"
-					:actions="actionSet"
-					:selection="showSelection"
-					:selected="selectedIds.includes(row.id)"
-					:show-version="showVersion"
-					:show-enabled-for="showEnabledFor"
-					:show-actions="hasActionsColumn"
-					:class="rowClass(row, sectionOffsets[sectionIndex] + rowIndex)"
-					@select="
-						(value, event) =>
-							toggleRowSelection(row.id, value, sectionOffsets[sectionIndex] + rowIndex, event)
-					"
-					@toggle="(value) => emit('toggle', row.id, value)"
-					@enabled-for="(side, value) => emit('enabledFor', row.id, side, value)"
-					@remove="(event) => emit('remove', row.id, event)"
-					@update="emit('update', row.id)"
-					@switch-version="emit('switchVersion', row.id)"
-					@prefetch="emit('prefetch', row.id)"
-				>
-					<template #title-badges>
-						<slot name="row-title-badges" :item="row" />
-					</template>
-					<template #actions-before>
-						<slot name="row-actions-before" :item="row" />
-					</template>
-					<template #actions-after>
-						<slot name="row-actions-after" :item="row" />
-					</template>
-				</TableRow>
-			</template>
-		</div>
+			</div>
+			<Teleport :to="overlayTarget">
+				<div class="pointer-events-none fixed inset-0 z-[9999]">
+					<DragOverlay :drop-animation="null">
+						<div
+							v-if="activeDragRow"
+							ref="dragPreviewRef"
+							class="w-fit transition-transform duration-150 ease-out"
+							:class="gather.isGathering.value ? 'scale-[0.975]' : 'scale-100'"
+						>
+							<DragPreview :row="activeDragRow" :count="activeDragIds.length" />
+						</div>
+					</DragOverlay>
+				</div>
+			</Teleport>
+			<DragGather
+				v-if="gather.items.value.length > 0"
+				:items="gather.items.value"
+				:target="gather.target.value"
+				:teleport-to="overlayTarget"
+				@complete="gather.finish()"
+			/>
+		</DragDropProvider>
 
 		<div
 			v-else
@@ -297,7 +491,13 @@ function rowClass(row: ContentCardTableItem, index: number) {
 					:show-version="showVersion"
 					:show-enabled-for="showEnabledFor"
 					:show-actions="hasActionsColumn"
-					:class="rowClass(row, visibleRange.start + offset)"
+					:class="
+						rowClass(
+							row,
+							visibleRange.start + offset,
+							visibleRange.start + offset === rows.length - 1,
+						)
+					"
 					@select="
 						(value, event) => toggleRowSelection(row.id, value, visibleRange.start + offset, event)
 					"

@@ -12,6 +12,9 @@ export interface ContentTableColumns {
 export interface ContentTableSection {
 	id: string
 	label?: string
+	collapsed?: boolean
+	droppable?: boolean
+	emptyLabel?: string
 	items: ContentCardTableItem[]
 }
 

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\t\t\tINSERT INTO instance_content_group_memberships (instance_id, content_type, item_key, group_id)\n\t\t\t\t\tVALUES (?, ?, ?, ?)\n\t\t\t\t\tON CONFLICT (instance_id, content_type, item_key)\n\t\t\t\t\tDO UPDATE SET group_id = excluded.group_id\n\t\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "6bc3f2399a8142d33989b05afaf5216ef5448f762f6da161e7b9fde3d7ee14be"
+}

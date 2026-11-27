@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { BoxIcon, CompassIcon, DownloadIcon, FolderOpenIcon, TrashIcon } from '@modrinth/assets'
+import {
+	BoxIcon,
+	CompassIcon,
+	DownloadIcon,
+	FolderOpenIcon,
+	MinusIcon,
+	SquarePlusIcon,
+	TrashIcon,
+} from '@modrinth/assets'
 import { computed, ref, watch } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
@@ -9,7 +17,8 @@ import { getProjectTypeIcon } from '#ui/utils/auto-icons'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import ContentTable from './components/content-table/index.vue'
-import type { ContentTableAction } from './components/content-table/types'
+import type { ContentTableAction, ContentTableSection } from './components/content-table/types'
+import ContentGroupHeader from './components/ContentGroupHeader.vue'
 import ContentSelectionBar from './components/ContentSelectionBar.vue'
 import ContentToolbar from './components/ContentToolbar.vue'
 import DeleteFlow from './components/flows/DeleteFlow.vue'
@@ -18,10 +27,12 @@ import type { ContentFlowState } from './components/flows/types'
 import UpdateAllFlow from './components/flows/UpdateAllFlow.vue'
 import UpdateFlow from './components/flows/UpdateFlow.vue'
 import ManagedContentCard from './components/managed-content-card/index.vue'
+import ConfirmDeleteGroupModal from './components/modals/ConfirmDeleteGroupModal.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
 import {
 	useBulkOperation,
 	useChangingItems,
+	useContentGrouping,
 	useContentPrefetch,
 	useContentRows,
 	useContentSelection,
@@ -29,7 +40,8 @@ import {
 } from './composables'
 import { injectContentManager } from './providers/content-manager'
 import { getUpdateCandidates } from './queries'
-import type { ContentItem, ContentSide } from './types'
+import type { ContentCardTableItem, ContentItem, ContentSide } from './types'
+import { UNGROUPED_CONTENT_SECTION_ID } from './utils/content-groups'
 
 const props = withDefaults(
 	defineProps<{
@@ -95,6 +107,18 @@ const messages = defineMessages({
 		id: 'content.page-layout.empty.browse-content',
 		defaultMessage: 'Browse content',
 	},
+	emptyGroup: {
+		id: 'content.page-layout.groups.empty',
+		defaultMessage: 'Drag content here to add it to this group',
+	},
+	removeFromGroup: {
+		id: 'content.page-layout.groups.remove-from-group',
+		defaultMessage: 'Remove from group',
+	},
+	newGroup: {
+		id: 'content.page-layout.groups.new-group',
+		defaultMessage: 'New group',
+	},
 })
 
 const ctx = injectContentManager()
@@ -145,6 +169,68 @@ const { toRow, toDisplayRow } = useContentRows({
 })
 const rows = computed(() => visibleItems.value.map(toRow))
 
+const grouping = useContentGrouping({
+	manager: ctx.groups,
+	activeType,
+	visibleItems,
+	filtering: computed(
+		() =>
+			searchQuery.value.trim().length > 0 ||
+			Object.values(filters.value).some((values) => values.length > 0),
+	),
+	persistKey: ctx.persistKey,
+})
+const { groupBy } = grouping
+
+const tableSections = computed<ContentTableSection[]>(() => {
+	const sections = grouping.sections.value
+	if (!grouping.grouped.value || sections.length === 0) {
+		return [{ id: activeType.value, items: rows.value }]
+	}
+	const rowsById = new Map(rows.value.map((row) => [row.id, row]))
+	return sections.map((section) => ({
+		id: section.id,
+		label: section.name,
+		collapsed: grouping.isCollapsed(section.id),
+		emptyLabel: section.groupId ? formatMessage(messages.emptyGroup) : undefined,
+		items: section.items
+			.map((item) => rowsById.get(item.id))
+			.filter((row): row is ContentCardTableItem => !!row),
+	}))
+})
+
+const deleteGroupModal = ref<InstanceType<typeof ConfirmDeleteGroupModal>>()
+
+function sectionGroup(sectionId: string) {
+	return grouping.typeGroups.value.find((group) => group.id === sectionId)
+}
+
+function moveRowsToSection(rowIds: string[], sectionId: string) {
+	const items = rowIds.map(findItem).filter((item): item is ContentItem => !!item)
+	void grouping.moveItems(items, sectionId === UNGROUPED_CONTENT_SECTION_ID ? null : sectionId)
+}
+
+async function createGroupFromSelection() {
+	const group = await grouping.createGroup(selectedItems.value)
+	if (group && selectedItems.value.length > 0) clearSelection()
+}
+
+const removingFromGroup = ref(false)
+
+async function removeSelectionFromGroups() {
+	if (removingFromGroup.value) return
+	removingFromGroup.value = true
+	try {
+		if (await grouping.moveItems(selectedItems.value, null)) clearSelection()
+	} finally {
+		removingFromGroup.value = false
+	}
+}
+
+const groupedSelectedItems = computed(() =>
+	selectedItems.value.filter((item) => grouping.groupIdOf(item) !== null),
+)
+
 const flowState: ContentFlowState = {
 	selectedItems,
 	clearSelection,
@@ -188,11 +274,23 @@ const searchPlaceholder = computed(() =>
 	}),
 )
 
+const highlightedItem = computed(() => {
+	const id = props.highlightedItemId
+	return id ? ctx.items.value.find((candidate) => candidate.id === id) : undefined
+})
+
 watch(
 	() => props.highlightedItemId,
-	(id) => {
-		const item = id ? ctx.items.value.find((candidate) => candidate.id === id) : undefined
-		if (item) reveal(item)
+	() => {
+		if (highlightedItem.value) reveal(highlightedItem.value)
+	},
+	{ immediate: true },
+)
+
+watch(
+	() => (highlightedItem.value ? grouping.sectionIdOf(highlightedItem.value) : null),
+	(sectionId) => {
+		if (sectionId) grouping.setCollapsed(sectionId, false)
 	},
 	{ immediate: true },
 )
@@ -316,6 +414,7 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 						v-model:type="activeType"
 						v-model:filters="filters"
 						v-model:sort="sortMode"
+						v-model:group-by="groupBy"
 						:search-placeholder="searchPlaceholder"
 						:types="types"
 						:add-disabled="isBusy || !ctx.canAdd.value"
@@ -327,11 +426,14 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 						:busy-tooltip="busyMessage"
 						:filter-categories="metadataFilterCategories"
 						:sort-fields="sortFields"
+						:show-grouping="grouping.supported.value"
+						:new-group-disabled="grouping.creating.value || typeItems.length === 0"
 						@add="ctx.browse(activeType)"
 						@upload="ctx.upload()"
 						@update-all="updateAllFlow?.promptUpdate(typeItems)"
 						@prefetch-update-all="prefetchUpdates(typeItems)"
 						@refresh="refresh"
+						@new-group="createGroupFromSelection"
 					/>
 
 					<EmptyState
@@ -368,7 +470,9 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 					<ContentTable
 						v-else
 						v-model:selected-ids="selectedIds"
-						:sections="[{ id: activeType, items: rows }]"
+						:sections="tableSections"
+						:draggable="grouping.customGrouped.value"
+						:drag-disabled="isBulkOperating"
 						:columns="{
 							selection: true,
 							enabledFor: !!ctx.setEnabledFor,
@@ -381,7 +485,27 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 						@update="updateItem"
 						@switch-version="switchVersion"
 						@prefetch="prefetchRow"
+						@set-section-collapsed="grouping.setCollapsed"
+						@move-rows="moveRowsToSection"
 					>
+						<template #section-header="{ section, collapsed, toggle }">
+							<ContentGroupHeader
+								:name="section.label ?? ''"
+								:count="section.items.length"
+								:collapsed="collapsed"
+								:editable="!!sectionGroup(section.id)"
+								:start-editing="grouping.pendingRenameGroupId.value === section.id"
+								:max-name-length="ctx.groups?.maxNameLength"
+								:can-move-up="grouping.canMoveGroup(section.id, -1)"
+								:can-move-down="grouping.canMoveGroup(section.id, 1)"
+								:on-rename="(name: string) => grouping.renameGroup(section.id, name)"
+								@toggle="toggle"
+								@move-up="grouping.moveGroup(section.id, -1)"
+								@move-down="grouping.moveGroup(section.id, 1)"
+								@delete="(event) => deleteGroupModal?.show(section.id, section.label ?? '', event)"
+								@editing-started="grouping.completePendingRename(section.id)"
+							/>
+						</template>
 						<template #empty>
 							<span>{{ formatMessage(messages.noContentFound) }}</span>
 						</template>
@@ -447,6 +571,28 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 		>
 			<template #actions>
 				<Button
+					v-if="grouping.customGrouped.value"
+					v-tooltip="formatMessage(messages.newGroup)"
+					type="quiet"
+					:disabled="removingFromGroup"
+					:loading="grouping.creating.value"
+					@click="createGroupFromSelection"
+				>
+					<SquarePlusIcon />
+					<span class="bar-label">{{ formatMessage(messages.newGroup) }}</span>
+				</Button>
+				<Button
+					v-if="grouping.customGrouped.value && groupedSelectedItems.length > 0"
+					v-tooltip="formatMessage(messages.removeFromGroup)"
+					type="quiet"
+					:disabled="grouping.creating.value"
+					:loading="removingFromGroup"
+					@click="removeSelectionFromGroups"
+				>
+					<MinusIcon />
+					<span class="bar-label">{{ formatMessage(messages.removeFromGroup) }}</span>
+				</Button>
+				<Button
 					v-if="supportsUpdateAll && getUpdateCandidates(selectedItems).length > 0"
 					v-tooltip="busyMessage ?? formatMessage(commonMessages.updateButton)"
 					type="quiet"
@@ -493,6 +639,7 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 			:update-item="(item) => updateFlow?.openUpdate(item)"
 		/>
 		<UpdateFlow ref="updateFlow" />
+		<ConfirmDeleteGroupModal ref="deleteGroupModal" @delete="grouping.deleteGroup" />
 		<ConfirmUnlinkModal
 			v-if="ctx.managed.value?.unlink"
 			ref="confirmUnlinkModal"

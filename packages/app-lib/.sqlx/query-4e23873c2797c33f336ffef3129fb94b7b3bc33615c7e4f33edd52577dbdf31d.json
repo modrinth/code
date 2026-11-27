@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE instance_content_groups\n\t\tSET display_order = display_order + 1\n\t\tWHERE instance_id = ? AND content_type = ?\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "4e23873c2797c33f336ffef3129fb94b7b3bc33615c7e4f33edd52577dbdf31d"
+}

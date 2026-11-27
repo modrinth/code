@@ -20,6 +20,7 @@ import {
 	withInstallProgress,
 } from './content-items'
 import { useContentBusyState } from './use-content-busy-state'
+import { useContentGroups } from './use-content-groups'
 import { useContentMutations } from './use-content-mutations'
 import { useContentQueries } from './use-content-queries'
 import { useContentUpload } from './use-content-upload'
@@ -149,6 +150,7 @@ export function useServerContentManager() {
 					: undefined,
 			owner: (owner: ContentOwner) => owner.link ?? `/${owner.type}/${owner.id}`,
 		},
+		groups: useContentGroups({ serverId, queries, items }),
 		persistKey: `server:${serverId}:${worldId.value}`,
 		disableWhileMutating: false,
 	}

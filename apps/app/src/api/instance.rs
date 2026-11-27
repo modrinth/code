@@ -47,6 +47,12 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_get_linked_modpack_info,
             instance_get_linked_modpack_content,
             instance_get_content_list,
+            instance_list_content_groups,
+            instance_create_content_group,
+            instance_rename_content_group,
+            instance_delete_content_group,
+            instance_set_content_group_order,
+            instance_set_content_group_memberships,
             instance_get_optimal_jre_key,
             instance_get_recommended_java_version,
             instance_get_full_path,
@@ -758,6 +764,72 @@ pub async fn instance_save_edited_screenshot<R: Runtime>(
     let screenshot =
         theseus::instance::save_edited_screenshot(key, png_bytes, mode).await?;
     serialize_screenshot(&app_handle, screenshot)
+}
+
+#[tauri::command]
+pub async fn instance_list_content_groups(
+    instance_id: String,
+) -> Result<Vec<theseus::instance::InstanceContentGroup>> {
+    Ok(theseus::instance::list_content_groups(instance_id).await?)
+}
+
+#[tauri::command]
+pub async fn instance_create_content_group(
+    instance_id: String,
+    content_type: String,
+    name: String,
+    item_keys: Vec<String>,
+) -> Result<theseus::instance::InstanceContentGroup> {
+    Ok(theseus::instance::create_content_group(
+        instance_id,
+        content_type,
+        name,
+        item_keys,
+    )
+    .await?)
+}
+
+#[tauri::command]
+pub async fn instance_rename_content_group(
+    id: String,
+    new_name: String,
+) -> Result<()> {
+    Ok(theseus::instance::rename_content_group(id, new_name).await?)
+}
+
+#[tauri::command]
+pub async fn instance_delete_content_group(id: String) -> Result<()> {
+    Ok(theseus::instance::delete_content_group(id).await?)
+}
+
+#[tauri::command]
+pub async fn instance_set_content_group_order(
+    instance_id: String,
+    content_type: String,
+    group_ids: Vec<String>,
+) -> Result<()> {
+    Ok(theseus::instance::set_content_group_order(
+        instance_id,
+        content_type,
+        group_ids,
+    )
+    .await?)
+}
+
+#[tauri::command]
+pub async fn instance_set_content_group_memberships(
+    instance_id: String,
+    content_type: String,
+    item_keys: Vec<String>,
+    group_id: Option<String>,
+) -> Result<()> {
+    Ok(theseus::instance::set_content_group_memberships(
+        instance_id,
+        content_type,
+        item_keys,
+        group_id,
+    )
+    .await?)
 }
 
 #[tauri::command]

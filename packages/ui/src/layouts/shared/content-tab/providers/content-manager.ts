@@ -25,6 +25,24 @@ export interface ContentDependencyWarning {
 	}>
 }
 
+export interface ContentGroup {
+	id: string
+	type: ContentType
+	name: string
+	itemKeys: string[]
+}
+
+export interface ContentGroupsManager {
+	groups: Readonly<Ref<ContentGroup[]>>
+	supportsType: (type: ContentType) => boolean
+	maxNameLength: number
+	create: (type: ContentType, name: string, itemKeys: string[]) => Promise<ContentGroup | null>
+	rename: (groupId: string, name: string) => Promise<boolean>
+	remove: (groupId: string) => Promise<boolean>
+	reorder: (type: ContentType, groupIds: string[]) => Promise<boolean>
+	move: (type: ContentType, itemKeys: string[], groupId: string | null) => Promise<boolean>
+}
+
 export interface ContentManagerContext {
 	items: Readonly<Ref<ContentItem[]>>
 	loading: Readonly<Ref<boolean>>
@@ -70,6 +88,7 @@ export interface ContentManagerContext {
 		owner: (owner: ContentOwner) => ContentOwner['link']
 	}
 	menu?: (item: ContentItem) => ButtonMenuOption[]
+	groups?: ContentGroupsManager
 	persistKey?: string
 
 	searchQueryParam?: string

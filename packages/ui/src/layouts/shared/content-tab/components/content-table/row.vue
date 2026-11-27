@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { GripVerticalIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
@@ -21,6 +22,7 @@ const props = defineProps<{
 	showVersion: boolean
 	showEnabledFor: boolean
 	showActions: boolean
+	dragHandle?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -51,6 +53,27 @@ const title = computed(() => props.row.project.title.replace(/§[0-9a-fk-orx]/gi
 const isDisabled = computed(() => !!props.row.disabled || !!props.row.installing)
 const dimmed = computed(() => props.row.enabled === false && !isDisabled.value)
 
+const INTERACTIVE_SELECTOR = 'a, button, input, label, select, textarea, [role="switch"]'
+
+function isSelectionRowClick(event: MouseEvent) {
+	return (
+		(event.shiftKey || event.metaKey || event.ctrlKey) &&
+		props.selection &&
+		!isDisabled.value &&
+		!(event.target instanceof Element && event.target.closest(INTERACTIVE_SELECTOR))
+	)
+}
+
+function handleRowMousedown(event: MouseEvent) {
+	if (isSelectionRowClick(event)) event.preventDefault()
+}
+
+function handleRowClick(event: MouseEvent) {
+	if (!isSelectionRowClick(event)) return
+	event.preventDefault()
+	emit('select', !props.selected, event)
+}
+
 function linkTarget(link: unknown) {
 	return typeof link === 'string' && link.startsWith('http') ? '_blank' : undefined
 }
@@ -69,8 +92,15 @@ function splitHalves(value: string) {
 			{ 'gap-y-2 py-3': stacked },
 			{ 'opacity-50 grayscale': row.disabled && !row.installing, 'opacity-50': row.installing },
 		]"
+		@mousedown="handleRowMousedown"
+		@click="handleRowClick"
 	>
 		<div class="flex min-w-0 items-center gap-4" :class="{ 'col-span-full': stacked }">
+			<GripVerticalIcon
+				v-if="dragHandle"
+				aria-hidden="true"
+				class="size-5 shrink-0 cursor-grab text-secondary"
+			/>
 			<Checkbox
 				v-if="selection"
 				:model-value="selected"

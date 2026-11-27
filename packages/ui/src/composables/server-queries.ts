@@ -8,6 +8,8 @@ export const serverKeys = {
 	detail: (serverId: string) => ['servers', 'detail', serverId] as const,
 	detailV1: (serverId: string) => ['servers', 'v1', 'detail', serverId] as const,
 	content: (serverId: string) => ['content', 'list', 'v1', serverId] as const,
+	contentGroups: (serverId: string, worldId: string) =>
+		['content', 'groups', 'v1', serverId, worldId] as const,
 	startup: (serverId: string) => ['servers', 'startup', 'v1', serverId] as const,
 	wsState: (serverId: string) => ['servers', 'ws-state', serverId] as const,
 	shareDiff: (serverId: string, ...scope: [worldId?: string, userId?: string]) =>
