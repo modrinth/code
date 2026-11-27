@@ -6,7 +6,7 @@ import { computed, type MaybeRefOrGetter, ref, toValue } from 'vue'
 import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
 
 const CHECK_DEBOUNCE = 300
-const PROJECT_SLUG_REGEX = /^[a-z0-9._-]{3,64}$/
+const PROJECT_SLUG_REGEX = /^[a-z0-9-]{3,64}$/
 
 interface ProjectSlugSuggestionOptions {
 	title: MaybeRefOrGetter<string>
@@ -21,7 +21,7 @@ export function generateUrlSlug(value: string) {
 		.toLowerCase()
 		.replaceAll('+', '-plus')
 		.replaceAll(/[!"'`]/g, '')
-		.replaceAll(/[^a-z0-9._-]+/g, '-')
+		.replaceAll(/[^a-z0-9-]+/g, '-')
 		.replaceAll(/-+/g, '-')
 		.replaceAll(/^-+|-+$/g, '')
 }

@@ -474,7 +474,7 @@ mod tests {
 
     #[test]
     fn project_create_accepts_url_safe_base_slugs() {
-        for slug in ["valid-slug", "valid_slug", "valid.slug", "valid123"] {
+        for slug in ["valid-slug", "Valid-Slug", "valid123"] {
             assert_project_slug_validation(slug, true);
         }
     }
@@ -482,6 +482,8 @@ mod tests {
     #[test]
     fn project_create_rejects_unsafe_base_slugs() {
         for slug in [
+            "invalid_slug",
+            "invalid.slug",
             "invalid/slug",
             "../invalid",
             r#"invalid"slug"#,

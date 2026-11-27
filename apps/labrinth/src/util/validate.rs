@@ -7,7 +7,7 @@ use validator::{ValidationErrors, ValidationErrorsKind};
 use crate::models::pats::Scopes;
 
 pub static RE_URL_SAFE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r#"^[a-zA-Z0-9._-]+$"#).unwrap());
+    LazyLock::new(|| Regex::new(r#"^[a-zA-Z0-9-]+$"#).unwrap());
 
 // only used for versions
 // TODO: percent-encode version names in URLs instead of treating them as slugs
@@ -185,7 +185,7 @@ mod tests {
 
     #[test]
     fn url_safe_regex_accepts_allowed_slug_punctuation() {
-        for slug in ["valid-slug", "valid_slug", "valid.slug", "valid123"] {
+        for slug in ["valid-slug", "Valid-Slug", "valid123"] {
             assert_url_safe_slug(slug, true);
         }
     }
@@ -193,6 +193,8 @@ mod tests {
     #[test]
     fn url_safe_regex_rejects_unsafe_slug_punctuation() {
         for slug in [
+            "invalid_slug",
+            "invalid.slug",
             "invalid/slug",
             "../invalid",
             r#"invalid"slug"#,
