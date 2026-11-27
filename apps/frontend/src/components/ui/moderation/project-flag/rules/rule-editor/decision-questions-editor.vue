@@ -36,14 +36,15 @@
 				class="overflow-hidden rounded-xl border border-solid border-surface-4 bg-surface-3"
 			>
 				<Accordion
-					:open-by-default="expandedId === rowId(entry)"
+					:open-by-default="expandedQuestions.has(entry)"
 					button-class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-3 px-3 py-2 text-left text-sm font-medium text-contrast transition-[filter] hover:brightness-125 focus-visible:-outline-offset-2 focus-visible:brightness-125 motion-reduce:transition-none"
 					content-class="flex min-w-0 flex-col gap-3 px-3 pb-3 pt-1"
-					@on-open="expandedId = rowId(entry)"
-					@on-close="expandedId = undefined"
+					@on-open="expandedQuestions.add(entry)"
+					@on-close="expandedQuestions.delete(entry)"
 				>
 					<template #button="{ open }">
 						<span class="min-w-0 flex-1 truncate">{{ entry.key.trim() || 'New question' }}</span>
+						<span v-if="errors[index]" class="shrink-0 text-red">Error</span>
 						<ChevronDownIcon
 							class="size-4 shrink-0 text-secondary transition-transform duration-300 motion-reduce:transition-none"
 							:class="{ 'rotate-180': open }"
@@ -130,7 +131,7 @@ import {
 	type MultiSelectOption,
 	Textarea,
 } from '@modrinth/ui'
-import { nextTick, ref, useId, useTemplateRef } from 'vue'
+import { nextTick, reactive, useId, useTemplateRef } from 'vue'
 
 import { useUndoableDraftRemoval } from './use-undoable-draft-removal'
 
@@ -174,7 +175,7 @@ const id = useId()
 const headingId = `${id}-heading`
 const helpId = `${id}-help`
 const section = useTemplateRef<HTMLElement>('section')
-const expandedId = ref<string>()
+const expandedQuestions = reactive(new WeakSet<DecisionQuestionEntry>())
 const rowIds = new WeakMap<DecisionQuestionEntry, string>()
 let nextRowId = 0
 
@@ -193,8 +194,9 @@ async function addQuestion() {
 		question: '',
 		include_context: ['title', 'summary', 'description'],
 	})
-	expandedId.value = rowId(entries.value[entries.value.length - 1])
-	const keyId = `${expandedId.value}-key`
+	const entry = entries.value[entries.value.length - 1]
+	expandedQuestions.add(entry)
+	const keyId = `${rowId(entry)}-key`
 	await nextTick()
 	section.value?.querySelector<HTMLInputElement>(`[id="${keyId}"]`)?.focus()
 }

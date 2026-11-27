@@ -131,15 +131,14 @@
 					<p v-if="isProjectRunning(activeId)" role="status" class="m-0 text-sm text-secondary">
 						Running tests…
 					</p>
-					<p
-						v-else-if="error && requestedProjects.has(activeId)"
+					<pre
+						v-else-if="activeView === 'error' && activeError"
 						role="alert"
-						class="m-0 whitespace-pre-wrap break-words text-sm text-red"
-					>
-						{{ error.message }}
-					</p>
+						class="m-0 whitespace-pre-wrap break-words font-mono text-sm text-red"
+						v-text="activeError"
+					/>
 					<p v-else-if="!result" class="m-0 text-sm text-secondary">
-						Run all to see this project’s results.
+						{{ activeError ? 'Test failed.' : 'Run all to see this project’s results.' }}
 					</p>
 					<pre
 						v-else-if="activeView === 'raw'"
@@ -154,13 +153,7 @@
 					<p v-else-if="activeView === 'log'" class="m-0 text-sm text-secondary">
 						No print output.
 					</p>
-					<p
-						v-else-if="result.error"
-						role="alert"
-						class="m-0 whitespace-pre-wrap break-words text-sm text-red"
-					>
-						{{ result.error }}
-					</p>
+					<p v-else-if="result.error" class="m-0 text-sm text-secondary">Test failed.</p>
 					<p v-else-if="!result.flags.length" class="m-0 text-sm text-secondary">
 						No issues found.
 					</p>
@@ -188,6 +181,7 @@
 
 <script setup lang="ts">
 import type { EvalProjectFlagRuleRequest, ProjectFlagRuleParams } from '@modrinth/api-client'
+import { ModrinthServerError } from '@modrinth/api-client'
 import { PlayIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Avatar,
@@ -236,9 +230,6 @@ const activeId = computed({
 	},
 })
 const activeView = ref<TabsValue>('issues')
-watch(activeId, () => {
-	activeView.value = 'issues'
-})
 const searchInput = ref('')
 const query = refDebounced(
 	computed(() => searchInput.value.trim()),
@@ -395,9 +386,34 @@ const results = computed(
 	() => new Map(data.value?.results.map((result) => [result.project_id, result])),
 )
 const result = computed(() => (activeId.value ? results.value.get(activeId.value) : undefined))
+const requestError = computed(() => {
+	const failure = error.value
+	if (!(failure instanceof ModrinthServerError) || !failure.v1Error) return failure?.message
+
+	const { description, details } = failure.v1Error
+	if (details == null) return description
+	const causes = Array.isArray(details) ? details : [details]
+	return [
+		description,
+		...causes.map((cause) => (typeof cause === 'string' ? cause : JSON.stringify(cause, null, 2))),
+	].join('\n')
+})
+const activeError = computed(() => {
+	if (!activeId.value) return undefined
+	if (requestedProjects.value.has(activeId.value) && requestError.value) return requestError.value
+	return result.value?.error
+})
+watch([activeId, activeError], ([id, failure], [previousId]) => {
+	if (failure) {
+		activeView.value = 'error'
+	} else if (id !== previousId || activeView.value === 'error') {
+		activeView.value = 'issues'
+	}
+})
 const outputTabs = computed(() => [
 	{ value: 'issues', label: result.value ? `Issues (${result.value.flags.length})` : 'Issues' },
 	{ value: 'log', label: result.value ? `Log (${result.value.log.length})` : 'Log' },
+	...(activeError.value ? [{ value: 'error', label: 'Error' }] : []),
 	{ value: 'raw', label: 'Raw JSON' },
 ])
 

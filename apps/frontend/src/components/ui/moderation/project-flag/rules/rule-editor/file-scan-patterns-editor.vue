@@ -21,14 +21,17 @@
 				class="overflow-hidden rounded-xl border border-solid border-surface-4 bg-surface-3"
 			>
 				<Accordion
-					:open-by-default="isExpanded(entry, index)"
+					:open-by-default="expandedPatterns.has(entry)"
 					button-class="flex w-full cursor-pointer items-center gap-2 border-0 bg-surface-3 px-3 py-2 text-left text-sm font-medium text-contrast transition-[filter] hover:brightness-125 focus-visible:-outline-offset-2 focus-visible:brightness-125 motion-reduce:transition-none"
 					content-class="flex min-w-0 flex-col gap-3 px-3 pb-3 pt-1"
-					@on-open="expandedId = rowId(entry)"
-					@on-close="expandedId = null"
+					@on-open="expandedPatterns.add(entry)"
+					@on-close="expandedPatterns.delete(entry)"
 				>
 					<template #button="{ open }">
 						<span class="min-w-0 flex-1 truncate">{{ entry.name.trim() || 'New pattern' }}</span>
+						<span v-if="errors[index]?.name || errors[index]?.pattern" class="shrink-0 text-red">
+							Error
+						</span>
 						<ChevronDownIcon
 							class="size-4 shrink-0 text-secondary transition-transform duration-300 motion-reduce:transition-none"
 							:class="{ 'rotate-180': open }"
@@ -60,16 +63,17 @@
 						<label :for="`${rowId(entry)}-regex`" class="text-sm font-medium text-secondary"
 							>Regex</label
 						>
-						<Input
+						<Textarea
 							:id="`${rowId(entry)}-regex`"
-							v-model="entry.pattern"
+							:model-value="entry.pattern"
 							:disabled="disabled"
+							:rows="5"
 							:aria-describedby="errors[index]?.pattern ? `${rowId(entry)}-regex-error` : undefined"
 							placeholder="(?i)forbidden text"
 							input-class="font-mono"
 							autocomplete="off"
 							:spellcheck="false"
-							@keydown.enter.prevent
+							@update:model-value="entry.pattern = $event ?? ''"
 						/>
 						<p
 							v-if="errors[index]?.pattern"
@@ -102,8 +106,8 @@
 
 <script setup lang="ts">
 import { ChevronDownIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
-import { Accordion, Button, IconButton, Input } from '@modrinth/ui'
-import { nextTick, ref, useId, useTemplateRef } from 'vue'
+import { Accordion, Button, IconButton, Input, Textarea } from '@modrinth/ui'
+import { nextTick, reactive, useId, useTemplateRef } from 'vue'
 
 import { useUndoableDraftRemoval } from './use-undoable-draft-removal'
 
@@ -123,7 +127,7 @@ const removePattern = useUndoableDraftRemoval(
 const id = useId()
 const headingId = `${id}-heading`
 const section = useTemplateRef<HTMLElement>('section')
-const expandedId = ref<string | null>()
+const expandedPatterns = reactive(new WeakSet(patterns.value.slice(0, 1)))
 const rowIds = new WeakMap<FileScanPattern, string>()
 let nextRowId = 0
 
@@ -136,14 +140,11 @@ function rowId(entry: FileScanPattern) {
 	return row
 }
 
-function isExpanded(entry: FileScanPattern, index: number) {
-	return expandedId.value === undefined ? index === 0 : expandedId.value === rowId(entry)
-}
-
 async function addPattern() {
 	patterns.value.push({ name: '', pattern: '' })
-	expandedId.value = rowId(patterns.value[patterns.value.length - 1])
-	const nameId = `${expandedId.value}-name`
+	const entry = patterns.value[patterns.value.length - 1]
+	expandedPatterns.add(entry)
+	const nameId = `${rowId(entry)}-name`
 	await nextTick()
 	section.value?.querySelector<HTMLInputElement>(`[id="${nameId}"]`)?.focus()
 }

@@ -16,6 +16,12 @@ const queryKey = ['moderation', 'project-flag', 'rules'] as const
 const deleteRuleKey = [...queryKey, 'delete'] as const
 type RuleToDelete = Pick<ProjectFlagRule, 'id' | 'name'>
 
+export function getRuleNameError(name: string) {
+	if (!name.trim()) return 'Enter a rule name.'
+	if (Array.from(name).length > 1023) return 'The name must be at most 1,023 characters.'
+	return ''
+}
+
 export function useRules(active: () => boolean) {
 	const client = injectModrinthClient()
 	const api = client.labrinth.project_flags_internal

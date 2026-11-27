@@ -1,7 +1,7 @@
 <template>
 	<Accordion
 		v-if="entries?.length"
-		:open-by-default="openByDefault"
+		:open-by-default="openByDefault || Boolean(filteredEntries)"
 		button-class="flex w-full cursor-pointer items-start gap-1 rounded border-0 bg-transparent p-0 text-left text-inherit hover:bg-surface-3"
 		@on-open="hasOpened = true"
 	>
@@ -18,14 +18,15 @@
 				}}<span v-if="!open" class="text-secondary">…{{ closing }}{{ comma }}</span></code
 			>
 		</template>
-		<div v-if="hasOpened || openByDefault">
+		<div v-if="hasOpened || openByDefault || filteredEntries">
 			<div class="ml-1.5 border-0 border-l border-solid border-surface-4 pl-3">
 				<Field
 					v-for="([key, child], index) in entries"
 					:key="key"
 					:name="isArray ? undefined : key"
 					:value="child"
-					:open-by-default="isArray && entries.length === 1"
+					:open-by-default="Array.isArray(value) && value.length === 1"
+					:matching-branches="matchingBranches"
 					:trailing-comma="index < entries.length - 1"
 				/>
 			</div>
@@ -48,16 +49,23 @@ import { ChevronRightIcon } from '@modrinth/assets'
 import { Accordion } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import type { MatchingBranches } from './fields'
+
 const props = defineProps<{
 	name?: string
 	value: ProjectFlagValue
 	trailingComma?: boolean
 	openByDefault?: boolean
+	matchingBranches?: MatchingBranches
 }>()
 const hasOpened = ref(false)
 const isArray = computed(() => Array.isArray(props.value))
+const filteredEntries = computed(() => props.matchingBranches?.get(props.value))
 const entries = computed(() =>
-	props.value !== null && typeof props.value === 'object' ? Object.entries(props.value) : undefined,
+	filteredEntries.value ??
+	(props.value !== null && typeof props.value === 'object'
+		? Object.entries(props.value)
+		: undefined),
 )
 const opening = computed(() => (isArray.value ? '[' : '{'))
 const closing = computed(() => (isArray.value ? ']' : '}'))

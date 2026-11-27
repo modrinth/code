@@ -9,6 +9,15 @@
 		>
 			<template #title>Rule context</template>
 			<SampleProjectPicker v-model="projectId" />
+			<Input
+				v-model="fieldQuery"
+				:icon="ListFilterIcon"
+				size="small"
+				aria-label="Filter rule context fields"
+				placeholder="Filter fields…"
+				autocomplete="off"
+				clearable
+			/>
 			<p v-if="isPending" role="status" class="m-0 flex items-center gap-2 text-sm text-secondary">
 				<LoaderCircleIcon class="size-4 animate-spin" />
 				Loading fields…
@@ -17,6 +26,13 @@
 				<p class="m-0 text-sm text-red">Could not load fields.</p>
 				<Button size="sm" :disabled="isFetching" @click="refetch()">Try again</Button>
 			</div>
+			<p
+				v-else-if="fieldFilter && !visibleFields.length"
+				role="status"
+				class="m-0 text-sm text-secondary"
+			>
+				No matching fields.
+			</p>
 			<div
 				v-else-if="data"
 				role="region"
@@ -27,11 +43,12 @@
 				<code>{{ '{' }}</code>
 				<div class="min-w-max pl-3">
 					<SchemaField
-						v-for="([name, value], index) in fields"
+						v-for="([name, value], index) in visibleFields"
 						:key="name"
 						:name="name"
 						:value="value"
-						:trailing-comma="index < fields.length - 1"
+						:matching-branches="fieldFilter?.branches"
+						:trailing-comma="index < visibleFields.length - 1"
 					/>
 				</div>
 				<code>{{ '}' }}</code>
@@ -117,10 +134,10 @@ import type {
 	ProjectFlagRuleParams,
 	ProjectFlagValue,
 } from '@modrinth/api-client'
-import { ExternalIcon, LoaderCircleIcon, PackagePlusIcon } from '@modrinth/assets'
-import { Accordion, Button, IconButton, injectModrinthClient } from '@modrinth/ui'
+import { ExternalIcon, ListFilterIcon, LoaderCircleIcon, PackagePlusIcon } from '@modrinth/assets'
+import { Accordion, Button, IconButton, Input, injectModrinthClient } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import {
 	projectFlagInputSchemaQueryOptions,
@@ -129,7 +146,7 @@ import {
 
 import type { FileScanPattern } from '../file-scan-patterns-editor.vue'
 import SchemaField from './field.vue'
-import { recordValue } from './fields'
+import { createFieldSearch, recordValue } from './fields'
 import SampleProjectPicker from './sample-project-picker.vue'
 
 const props = defineProps<{
@@ -207,4 +224,11 @@ const fields = computed<[string, ProjectFlagValue][]>(() => {
 	}
 	return values.concat(Object.entries(rest))
 })
+const fieldQuery = ref('')
+const fieldSearch = computed(() => createFieldSearch(fields.value))
+const fieldFilter = computed(() => {
+	const query = fieldQuery.value.trim()
+	return query ? fieldSearch.value(query) : undefined
+})
+const visibleFields = computed(() => fieldFilter.value?.entries ?? fields.value)
 </script>

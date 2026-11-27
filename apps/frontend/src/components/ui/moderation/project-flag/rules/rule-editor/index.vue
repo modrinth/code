@@ -18,9 +18,9 @@
 						v-if="!editingName"
 						ref="nameButton"
 						type="button"
-						class="group flex max-w-full cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2 py-1 text-left font-[inherit] text-inherit hover:bg-surface-3 focus-visible:bg-surface-3"
+						class="group flex max-w-full cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2 py-1 text-left font-[inherit] text-lg transition-all hover:bg-surface-3 focus-visible:bg-surface-3"
 						:disabled="isSaving"
-						:aria-label="name ? `Edit rule name: ${name}` : 'Enter a rule name'"
+						:aria-label="`Edit rule name: ${name}`"
 						@click="editName"
 					>
 						<span class="min-w-0 truncate">{{ name || 'Untitled rule' }}</span>
@@ -46,16 +46,14 @@
 					/>
 					<span v-if="name && nameError" :id="nameErrorId" class="sr-only">{{ nameError }}</span>
 				</h1>
-				<template v-if="rule">
-					<CopyCode :text="rule.id" title="" :aria-label="`Copy rule ID ${rule.id}`" />
-					<time
-						:datetime="rule.updated_at"
-						:title="formatDate(rule.updated_at, true)"
-						class="shrink-0 text-sm text-secondary"
-					>
-						Edited {{ formatDate(rule.updated_at) }}
-					</time>
-				</template>
+				<CopyCode :text="rule.id" title="" :aria-label="`Copy rule ID ${rule.id}`" />
+				<time
+					:datetime="rule.updated_at"
+					:title="formatDate(rule.updated_at, true)"
+					class="shrink-0 text-sm text-secondary"
+				>
+					Edited {{ formatDate(rule.updated_at) }}
+				</time>
 			</div>
 			<div class="ml-auto flex shrink-0 flex-wrap items-center gap-2">
 				<Button :disabled="!hasChanges || isSaving" @click="discardRule">Discard</Button>
@@ -63,12 +61,13 @@
 					<Button
 						type="colored"
 						color="brand"
+						aria-keyshortcuts="Meta+S Control+S"
 						:loading="isSavingRule"
 						:disabled="isSaving || Boolean(saveDisabledReason)"
 						:class="{ 'pointer-events-none': saveDisabledReason }"
 						@click="saveRule"
 					>
-						{{ isSavingRule ? 'Saving…' : rule ? 'Save changes' : 'Create rule' }}
+						{{ isSavingRule ? 'Saving…' : 'Save changes' }}
 					</Button>
 				</span>
 				<IconButton
@@ -249,7 +248,7 @@ import { projectFlagModulesQueryOptions } from '~/composables/queries/project-fl
 
 import { formatDate } from '../../run-format'
 import { useFlagErrorNotification } from '../../use-flag-error-notification'
-import { useSaveRule } from '../use-rules'
+import { getRuleNameError, useSaveRule } from '../use-rules'
 import DecisionQuestionsEditor, {
 	type DecisionQuestionEntry,
 } from './decision-questions-editor.vue'
@@ -261,7 +260,7 @@ import SharedModuleEditorModal from './shared-module-editor-modal.vue'
 import ProjectFlagRuleTester from './tester.vue'
 
 const props = defineProps<{
-	initialRule?: ProjectFlagRule
+	initialRule: ProjectFlagRule
 	initialProjectId?: string
 	backLabel: string
 	rhaiEditor: RhaiEditorRuntime
@@ -269,12 +268,6 @@ const props = defineProps<{
 const emit = defineEmits<{ close: []; saved: [rule: ProjectFlagRule] }>()
 
 const MAX_TEST_PROJECTS = 100
-const DEFAULT_EXPRESSION = `print(\`\${project.name}: \${project.summary}\`);
-if project.slug == "foo" {
-	[#{ key: "illegal_slug", reason: "Project has illegal slug" }]
-} else {
-	[]
-}`
 
 const id = useId()
 const nameErrorId = `${id}-name-error`
@@ -303,7 +296,7 @@ const editorPane = useTemplateRef<HTMLElement>('editorPane')
 const tester = useTemplateRef<InstanceType<typeof ProjectFlagRuleTester>>('tester')
 const rule = shallowRef(props.initialRule)
 const name = ref('')
-const editingName = ref(!props.initialRule)
+const editingName = ref(false)
 const nameInput = useTemplateRef<InstanceType<typeof Input>>('nameInput')
 const nameButton = useTemplateRef<HTMLButtonElement>('nameButton')
 const leaveDialog = useTemplateRef<InstanceType<typeof ConfirmLeaveModal>>('leaveDialog')
@@ -351,30 +344,51 @@ const expression = ref('')
 const patterns = ref<FileScanPattern[]>([])
 const decisionQuestions = ref<DecisionQuestionEntry[]>([])
 
-function resetRule() {
+function reconcileDraftRows<T extends object>(
+	draftRows: T[],
+	savedRows: T[],
+	getKey: (row: T) => string,
+) {
+	const remaining = new Map(savedRows.map((row) => [getKey(row), row]))
+	const rows: T[] = []
+	for (const draft of draftRows) {
+		const key = getKey(draft).trim()
+		const saved = remaining.get(key)
+		if (!saved) continue
+		rows.push(Object.assign(draft, saved))
+		remaining.delete(key)
+	}
+	return rows.concat([...remaining.values()])
+}
+
+function resetRule(preserveRows = false) {
 	const saved = rule.value
-	name.value = saved?.name ?? ''
-	expression.value = saved?.params.expression ?? DEFAULT_EXPRESSION
-	patterns.value = Object.entries(saved?.params.scan_files_for ?? {}).map(([name, pattern]) => ({
-		name,
-		pattern,
-	}))
-	decisionQuestions.value = Object.entries(saved?.params.decision_questions ?? {}).map(
+	name.value = saved.name
+	expression.value = saved.params.expression
+	const savedPatterns = Object.entries(saved.params.scan_files_for ?? {}).map(
+		([name, pattern]) => ({
+			name,
+			pattern,
+		}),
+	)
+	const savedQuestions = Object.entries(saved.params.decision_questions ?? {}).map(
 		([key, { question, include_context }]) => ({
 			key,
 			question,
 			include_context: [...include_context],
 		}),
 	)
+	patterns.value = preserveRows
+		? reconcileDraftRows(patterns.value, savedPatterns, (row) => row.name)
+		: savedPatterns
+	decisionQuestions.value = preserveRows
+		? reconcileDraftRows(decisionQuestions.value, savedQuestions, (row) => row.key)
+		: savedQuestions
 }
 
 resetRule()
 
-const nameError = computed(() => {
-	if (!name.value.trim()) return 'Enter a rule name.'
-	if (Array.from(name.value).length > 1023) return 'The name must be at most 1,023 characters.'
-	return ''
-})
+const nameError = computed(() => getRuleNameError(name.value))
 const expressionError = computed(() => {
 	if (!expression.value.trim()) return 'Enter a Rhai expression.'
 	if (Array.from(expression.value).length > 65535) {
@@ -439,10 +453,10 @@ const params = computed<ProjectFlagRuleParams>(() => ({
 }))
 const hasChanges = computed(() => {
 	const original = rule.value
-	const savedPatterns = original?.params.scan_files_for ?? {}
-	const savedQuestions = original?.params.decision_questions ?? {}
+	const savedPatterns = original.params.scan_files_for ?? {}
+	const savedQuestions = original.params.decision_questions ?? {}
 	return (
-		name.value !== (original?.name ?? '') ||
+		name.value !== original.name ||
 		decisionQuestions.value.length !== Object.keys(savedQuestions).length ||
 		new Set(decisionQuestions.value.map(({ key }) => key)).size !==
 			decisionQuestions.value.length ||
@@ -455,7 +469,7 @@ const hasChanges = computed(() => {
 				include_context.some((field) => !saved.include_context.includes(field))
 			)
 		}) ||
-		expression.value !== (original?.params.expression ?? DEFAULT_EXPRESSION) ||
+		expression.value !== original.params.expression ||
 		patterns.value.length !== Object.keys(savedPatterns).length ||
 		new Set(patterns.value.map((entry) => entry.name)).size !== patterns.value.length ||
 		patterns.value.some(
@@ -487,11 +501,11 @@ async function saveRule() {
 	if (saveDisabledReason.value || isSaving.value) return
 	try {
 		const saved = await save({
-			id: rule.value?.id,
+			id: rule.value.id,
 			body: { name: name.value, params: params.value },
 		})
 		rule.value = saved
-		resetRule()
+		resetRule(true)
 		emit('saved', saved)
 	} catch {
 		// The save error is reported by the mutation notification.
@@ -534,13 +548,15 @@ onBeforeRouteLeave(allowEditorNavigation)
 onBeforeRouteUpdate((to, from) => {
 	if (
 		to.path === from.path &&
+		to.query.rule === from.query.rule &&
 		(to.query.ruleProject ?? to.query.project) === (from.query.ruleProject ?? from.query.project)
 	) {
-		if (to.query.rule === from.query.rule) return
-		if (from.query.rule === 'new' && rule.value && to.query.rule === rule.value.id) return
+		return
 	}
 	return allowEditorNavigation()
 })
+
+defineExpose({ saveRule })
 </script>
 
 <style scoped>
