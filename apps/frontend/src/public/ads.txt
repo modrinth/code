@@ -148,17 +148,18 @@ yieldmo.com,2754490424016969782,RESELLER
 
 #KueezRTB
 kueez.com,b00c846c1849c000c0e05101af7e6860, DIRECT
-appnexus.com,8826,reseller
-improvedigital.com,2106,reseller
 media.net,8cu4jtrf9,reseller
 openx.com,557564833,reseller
 pubmatic.com,162110,reseller
 rubiconproject.com,16920,reseller
 sharethrough.com,n98xdzel,reseller
+triplelift.com,14670,RESELLER, 6c33edb13117fd86
+trustedstack.com, TSIO6G4I5, RESELLER
+richaudience.com, IzJp6ykuQS, RESELLER
+adform.com,2926,RESELLER,9f5210a2f0999e32
 smartadserver.com,4288,reseller
 video.unrulymedia.com,3486482593,reseller
 yieldmo.com,3133660606033240149,reseller
-zetaglobal.com,108,reseller
 
 #Medianet
 Media.net, 8CUENMD10, DIRECT
