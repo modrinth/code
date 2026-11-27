@@ -269,7 +269,7 @@ const messages = defineMessages({
 	},
 	twoFactorCodeLabel: {
 		id: 'auth.reauthenticate.2fa.label',
-		defaultMessage: 'Two-factor authentication',
+		defaultMessage: 'Two-factor authentication. ',
 	},
 	twoFactorCodeDescription: {
 		id: 'auth.reauthenticate.2fa.description',
