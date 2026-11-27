@@ -27,7 +27,7 @@
 		</div>
 
 		<slot />
-		<div v-show="active" class="flex min-w-0 flex-col gap-6">
+		<div v-show="active" class="flex min-w-0 flex-col gap-2.5">
 			<div
 				v-if="isPending"
 				role="status"
@@ -69,7 +69,7 @@
 					<template #delete-confirmation>
 						<div
 							v-if="ruleToDelete?.id === rule.id"
-							class="flex cursor-auto flex-col gap-3 rounded-xl border border-solid border-surface-4 p-3"
+							class="mx-4 mb-4 flex cursor-auto flex-col gap-3 rounded-xl border border-solid border-surface-4 p-3"
 							role="group"
 							aria-label="Confirm rule deletion"
 							@click.stop
