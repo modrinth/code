@@ -236,6 +236,12 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Revisar retroalimentación"
   },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "La versión del modpack que seleccionaste no está disponible públicamente. Escoge una versión a la que todos los jugadores tengan acceso."
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "Selecciona una versión públicamente disponible"
+  },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "¡Has seleccionado {count, plural, one {# tag de resolución} other {# etiquetas de resolución}} ({tags}). Los paquetes de recursos normalmente sólo deberían tener la etiqueta que coincida con la resolución principal."
   },

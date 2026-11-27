@@ -4865,9 +4865,6 @@
   "scopes.userRead.label": {
     "message": "Felhasználói adatok olvasása"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Olvasd el az e-mailedet"
-  },
   "scopes.userReadEmail.label": {
     "message": "Felhasználói e-mail olvasása"
   },

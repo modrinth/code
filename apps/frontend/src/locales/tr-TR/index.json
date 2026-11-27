@@ -4715,9 +4715,6 @@
   "scopes.userRead.label": {
     "message": "Kullanıcı verisi oku"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Kendi e-postanızı okuyun"
-  },
   "scopes.userReadEmail.label": {
     "message": "Kullanıcı e-postası oku"
   },

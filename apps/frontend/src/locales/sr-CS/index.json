@@ -1694,9 +1694,6 @@
   "scopes.userRead.label": {
     "message": "Čitanje podataka korisnika"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Omogućava čitanje email adrese korisnika"
-  },
   "scopes.userReadEmail.label": {
     "message": "Čitanje email-a korisnika"
   },

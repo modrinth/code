@@ -4859,9 +4859,6 @@
   "scopes.userRead.label": {
     "message": "Đọc dữ liệu người dùng"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Xem email của bạn"
-  },
   "scopes.userReadEmail.label": {
     "message": "Xem email người dùng"
   },

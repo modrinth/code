@@ -20,6 +20,9 @@
   "app.action-bar.install.dismiss": {
     "message": "忽略"
   },
+  "app.action-bar.install.inspect-details": {
+    "message": "檢視詳細資訊"
+  },
   "app.action-bar.install.open-instance": {
     "message": "開啟實例"
   },
@@ -409,6 +412,12 @@
   },
   "app.download-manager.title": {
     "message": "下載管理器"
+  },
+  "app.error.copied-debug-info": {
+    "message": "已複製"
+  },
+  "app.error.inspect-debug-info": {
+    "message": "檢視除錯資訊"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "開啟備份資料夾"
@@ -2919,10 +2928,10 @@
     "message": "遙測"
   },
   "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "當安裝已排入佇列或正在執行時，顯示「複製詳細資訊」按鈕。這項設定僅適用於前述安裝情形，安裝失敗或中斷時一律顯示該按鈕。"
+    "message": "當安裝已排入佇列或正在執行時，顯示「檢視詳細資訊」按鈕。這項設定僅適用於前述安裝情形，安裝失敗或中斷時一律顯示該按鈕。"
   },
   "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "一律顯示「複製詳細資訊」"
+    "message": "一律顯示「檢視詳細資訊」"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "在快取完成重建前，應用程式的載入速度可能會比較慢。"

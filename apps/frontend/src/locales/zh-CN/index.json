@@ -5222,9 +5222,6 @@
   "scopes.userRead.label": {
     "message": "读取用户数据"
   },
-  "scopes.userReadEmail.description": {
-    "message": "读取你的邮箱地址"
-  },
   "scopes.userReadEmail.label": {
     "message": "读取用户邮箱地址"
   },
@@ -6265,6 +6262,9 @@
   },
   "thread.message.tech-review-exited": {
     "message": "该项目已离开技术审查队列，因为所有待处理的痕迹均已解决。"
+  },
+  "thread.message.tech-review-failed": {
+    "message": "已完成技术审查，并将项目标记为不通过，共审查了 {safe} 项安全问题与 {unsafe,plural,other {# 项不安全问题}}。"
   },
   "thread.message.tech-review-passed": {
     "message": "完成了技术审核并将项目标记为通过，并已通过{safe, plural, one {# 一个安全问题} other {# 个安全问题}}。"

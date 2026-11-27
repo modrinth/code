@@ -665,6 +665,9 @@
   "content.enabled-for.please-wait": {
     "defaultMessage": "请稍等"
   },
+  "content.enabled-for.required-here": {
+    "defaultMessage": "此内容需要在此处启用才能正常工作。"
+  },
   "content.enabled-for.server": {
     "defaultMessage": "服务器"
   },
@@ -959,8 +962,20 @@
   "creation-flow.curseforge.description": {
     "defaultMessage": "使用一个在 Modrinth 上不存在的整合包。"
   },
+  "creation-flow.curseforge.file-description": {
+    "defaultMessage": "您将需要常规的模组包文件，如果我们找不到服务器包，可以在其后添加一个服务器包。"
+  },
   "creation-flow.curseforge.file-label": {
     "defaultMessage": "CurseForge 整合包文件"
+  },
+  "creation-flow.curseforge.ftb-installer": {
+    "defaultMessage": "这个版本自带FTB服务器版安装包，我们将用它来设置服务器。"
+  },
+  "creation-flow.curseforge.invalid-link": {
+    "defaultMessage": "输入 CurseForge 麦块模组包 或 模组包版本链接。"
+  },
+  "creation-flow.curseforge.link-description": {
+    "defaultMessage": "您可以使用 modpack 或特定 modpack 版本的链接。"
   },
   "creation-flow.curseforge.link-label": {
     "defaultMessage": "CurseForge 整合包链接"
@@ -986,8 +1001,14 @@
   "creation-flow.curseforge.selected-file-label": {
     "defaultMessage": "整合包文件"
   },
+  "creation-flow.curseforge.server-pack-description": {
+    "defaultMessage": "您可以选择添加一个服务器包，使其更容易确定需要在服务器上安装什么。"
+  },
   "creation-flow.curseforge.server-pack-label": {
     "defaultMessage": "服务器包 <optional>（可选）</optional>"
+  },
+  "creation-flow.curseforge.server-pack-none": {
+    "defaultMessage": "我们找不到此项目的任何版本的服务器包。我们建议选择不同的包或手动上传服务器包。"
   },
   "creation-flow.curseforge.title": {
     "defaultMessage": "上传一个 CurseForge 整合包"
@@ -2774,11 +2795,23 @@
   "instance.shared-instance.publish-review.push-and-restart-button": {
     "defaultMessage": "推送并重启"
   },
+  "instance.shared-instance.publish-review.push-only-button": {
+    "defaultMessage": "仅更新推送"
+  },
   "instance.shared-instance.publish-review.removed-label": {
     "defaultMessage": "已移除"
   },
+  "instance.shared-instance.publish-review.restart-warning": {
+    "defaultMessage": "这些更改需要重新启动服务器才能生效。"
+  },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "defaultMessage": "{size} 超出限制。 取消选择一些文件以推送此更新。"
+  },
   "instance.shared-instance.publish-review.storage-title": {
     "defaultMessage": "存储允许量"
+  },
+  "instance.shared-instance.publish-review.storage-usage": {
+    "defaultMessage": "{used}/{limit}"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "冒险模式"
@@ -2957,6 +2990,12 @@
   "label.changes-saved": {
     "defaultMessage": "更改已保存"
   },
+  "label.client-only-dependency-on-server-warning": {
+    "defaultMessage": "此仅限客户端的模组作为依赖项安装在服务器上，可能会阻止服务器启动。"
+  },
+  "label.client-only-mod-on-server-warning": {
+    "defaultMessage": "此仅限客户端的模组已安装在服务器上，可能会阻止服务器启动。"
+  },
   "label.collections": {
     "defaultMessage": "收藏"
   },
@@ -3115,6 +3154,9 @@
   },
   "label.rename-failed": {
     "defaultMessage": "重命名失败"
+  },
+  "label.requires-client-only-dependency-warning": {
+    "defaultMessage": "这个模组需要只依赖客户端，可能会阻止服务器启动。"
   },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "我同意 <terms-link>激励计划条款</terms-link>"
@@ -3500,6 +3542,9 @@
   "notifications.invite.decline": {
     "defaultMessage": "拒绝"
   },
+  "notifications.invite.review": {
+    "defaultMessage": "再次确认"
+  },
   "notifications.server-invite.body": {
     "defaultMessage": "<actor>{actor}</actor> 邀请您管理服务器 <entity>{entity}</entity>。"
   },
@@ -3878,6 +3923,9 @@
   "profile.restrict-user.admonition-title": {
     "defaultMessage": "所选权限将被删除"
   },
+  "profile.restrict-user.deselect-all-button": {
+    "defaultMessage": "反选全部"
+  },
   "profile.restrict-user.error-description": {
     "defaultMessage": "更新此用户时发生错误。请重试。"
   },
@@ -3907,6 +3955,12 @@
   },
   "profile.restrict-user.remove-success-title": {
     "defaultMessage": "限制已移除"
+  },
+  "profile.restrict-user.reset-button": {
+    "defaultMessage": "重置"
+  },
+  "profile.restrict-user.restrictions-label": {
+    "defaultMessage": "限制"
   },
   "profile.restrict-user.save-button": {
     "defaultMessage": "保存描述"
@@ -4312,6 +4366,15 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, other {人关注}}"
+  },
+  "project.game-awards.official-nominee": {
+    "defaultMessage": "正式提名"
+  },
+  "project.game-awards.vote": {
+    "defaultMessage": "对游戏奖投票"
+  },
+  "project.game-awards.vote-now": {
+    "defaultMessage": "立即投票"
   },
   "project.license.error": {
     "defaultMessage": "获取许可证文本内容时出错。"
@@ -4943,6 +5006,9 @@
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "清除搜索"
   },
+  "search.filter.option.search.no_results": {
+    "defaultMessage": "未找到相关结果"
+  },
   "search.filter.option.search.placeholder": {
     "defaultMessage": "搜索…"
   },
@@ -5063,6 +5129,12 @@
   "search.photosensitivity-warning-modal.title": {
     "defaultMessage": "搜索结果不能保证安全"
   },
+  "search.server-environment.player-and-server": {
+    "defaultMessage": "玩家和服务器"
+  },
+  "search.server-environment.player-only": {
+    "defaultMessage": "仅限玩家"
+  },
   "search.server-environment.title": {
     "defaultMessage": "运行环境"
   },
@@ -5072,8 +5144,17 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "原版"
   },
+  "server.settings.sharing.invites-error": {
+    "defaultMessage": "未能加载有效邀请"
+  },
+  "server.settings.sharing.not-shared": {
+    "defaultMessage": "这个世界不共享。使用 Play 服务器或在 Play 页面上邀请其他玩家即发布其内容。"
+  },
   "server.settings.sharing.retry": {
     "defaultMessage": "重试"
+  },
+  "server.settings.sharing.unpublish-description": {
+    "defaultMessage": "从Modrint中删除此服务器的共享实例，并停止向玩家发送内容更新。您的服务器及其内容不会受到影响。"
   },
   "servers.access-page.activity-log-filter.action-group.backups": {
     "defaultMessage": "备份"
@@ -5113,6 +5194,9 @@
   },
   "servers.access-page.activity-log-filter.action.addon-enabled": {
     "defaultMessage": "启用内容"
+  },
+  "servers.access-page.activity-log-filter.action.addon-player-enabled": {
+    "defaultMessage": "已修改玩家内容启用"
   },
   "servers.access-page.activity-log-filter.action.addon-updated": {
     "defaultMessage": "更新内容"
@@ -5239,6 +5323,9 @@
   },
   "servers.access-page.activity-log-filter.action.user-removed": {
     "defaultMessage": "撤回访问权"
+  },
+  "servers.access-page.activity-log-filter.action.world-data-reset": {
+    "defaultMessage": "重置世界数据"
   },
   "servers.access-page.activity-log-filter.add": {
     "defaultMessage": "添加筛选"

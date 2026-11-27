@@ -374,6 +374,9 @@
   "app.download-manager.new-instance": {
     "message": "Nieuwe instantie"
   },
+  "app.download-manager.no-tasks": {
+    "message": "Geen taken"
+  },
   "app.download-manager.pause": {
     "message": "Pauzeer installatie"
   },
@@ -2882,12 +2885,6 @@
   "app.settings.privacy.telemetry.title": {
     "message": "Telemetrie"
   },
-  "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "Geef de knop 'Details kopiëren' weer terwijl een installatie in de wachtrij staat of wordt uitgevoerd. Deze actie is altijd beschikbaar voor mislukte of onderbroken installaties."
-  },
-  "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Altijd 'Details kopiëren' laten zien"
-  },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "De app kan wat trager laden totdat de cache opnieuw is opgebouwd."
   },
@@ -2905,6 +2902,9 @@
   },
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Back-ups van de app-database"
+  },
+  "app.settings.resource-management.app-directory.open-in-finder": {
+    "message": "Finder openen"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "App-folder"

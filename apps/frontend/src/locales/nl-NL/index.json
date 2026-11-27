@@ -4739,9 +4739,6 @@
   "scopes.userRead.label": {
     "message": "Lees gebruokers data"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Lees je e-mail"
-  },
   "scopes.userReadEmail.label": {
     "message": "Lees gebruiker email"
   },

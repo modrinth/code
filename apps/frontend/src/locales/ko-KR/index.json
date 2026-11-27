@@ -5192,9 +5192,6 @@
   "scopes.userRead.label": {
     "message": "사용자 데이터 읽기"
   },
-  "scopes.userReadEmail.description": {
-    "message": "이메일 읽기"
-  },
   "scopes.userReadEmail.label": {
     "message": "사용자 이메일 읽기"
   },

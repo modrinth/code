@@ -3422,9 +3422,6 @@
   "scopes.userRead.label": {
     "message": "Baca data pengguna"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Membaca e-mel anda"
-  },
   "scopes.userReadEmail.label": {
     "message": "Baca e-mel pengguna"
   },

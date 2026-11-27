@@ -47,6 +47,9 @@
   "nags.all-languages.title": {
     "defaultMessage": "正確な言語を選択してください"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "利用可能な {totalAvailableTags, plural, other {#} } 個のタグを選択しました。タグは関連するプロジェクトを見つけるのに役立ちます。関連するタグのみを選択してください。"
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "適切なタグを選択する"
   },
@@ -54,7 +57,7 @@
     "defaultMessage": "{type} に適用されるコンテンツの開示事項を入力して、ユーザーが重要な情報を認識していることを確認してください。"
   },
   "nags.check-disclosures.title": {
-    "defaultMessage": "レビューの公開"
+    "defaultMessage": "開示事項を確認する"
   },
   "nags.description-ends-with-header.description": {
     "defaultMessage": "プロジェクトの説明文は、見出しだけで、その後に本文が何も書かれていないような構成にしてはなりません。"
@@ -149,6 +152,63 @@
   "nags.link-validation.download.title": {
     "defaultMessage": "ダウンロードリンクを削除してください"
   },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "あなたの{linkField, select, issues {イシュートラッカー} source {ソースコード} wiki {wiki} discord {Discord招待} site {ウェブサイト} store {ストア} license {ライセンス} description {説明文} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {寄付先}}のリンクは既に{otherLinkField, select, issues {イシュートラッカー} source {ソースコード} wiki {wiki} discord {Discord招待} site {ウェブサイト} store {ストア} license {ライセンス} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {別}}の箇所で使われています。同じリンクを複数の箇所に載せないでください。"
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "重複したリンクを削除してください"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "あなたの{linkField}のリンクは使用できません。リンクを削除するか、{linkField}のリンクに適したものに置き換えてください。"
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "誤ったリンクを置き換える"
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "あなたの{linkField, select, issues {イシュートラッカー} source {ソースコード} wiki {wiki} discord {Discord招待} site {ウェブサイト} store {ストア} license {ライセンス} description {説明文} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {寄付先}}のリンクは許可されていないドメインを使用しています。リンクを削除するか置き換えてください。"
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "許可されていないリンクを削除する"
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "あなたの{linkField, select, issues {イシュートラッカー} source {ソースコード} wiki {wiki} discord {Discord招待} site {ウェブサイト} store {ストア} license {ライセンス} description {説明文} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {寄付先}}のリンクはIPアドレスを使用しています。URLにはドメイン名を使ってください。"
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "IPアドレスのリンクを削除する"
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "あなたの{linkField, select, issues {イシュートラッカー} source {ソースコード} wiki {wiki} discord {Discord招待} site {ウェブサイト} store {ストア} license {ライセンス} description {説明文} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {寄付先}}のリンクは無効です。完全なHTTPSのURLを入力してください。"
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "無効なリンクを修正する"
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "あなたの{linkField, select, issues {イシュートラッカー} source {ソースコード} wiki {wiki} discord {Discord招待} site {ウェブサイト} store {ストア} license {ライセンス} description {説明文} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {寄付先}}のリンクは適さない可能性があります。本来の用途に適しているか確認してください。"
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "リンクが正しいか確認する"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "あなたのソースコードのリンクはサポートされているホストプラットフォーム上のリポジトリ、あるいはセルフホスティングのGitea/Forgejoサービスである必要があります。"
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "ソースコードのリポジトリにリンクする"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "該当のリンクを見直す"
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "あなたの{linkField, select, issues {イシュートラッカー} source {ソースコード} wiki {wiki} discord {Discord招待} site {ウェブサイト} store {ストア} license {ライセンス} description {説明文} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {寄付先}}のリンクは確認できませんでした。このリンクが利用可能か確認してください。"
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "リンクが利用可能か確認する"
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "あなたの{linkField, select, issues {イシュートラッカー} source {ソースコード} wiki {wiki} discord {Discord招待} site {ウェブサイト} store {ストア} license {ライセンス} description {説明文} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {寄付先}}のリンクは{linkField, select, issues {イシュートラッカー} source {ソースコード} wiki {wiki} discord {Discord招待} site {ウェブサイト} store {ストア} license {ライセンス} description {説明文} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {寄付先}}のリンクとして正しくありません。削除するか正しいリンクに置き換えてください。"
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "間違ったリンクを修正する"
+  },
   "nags.long-headers.description": {
     "defaultMessage": "説明文にある{count, plural, other {#個のヘッダー}}{count, plural, other{}}はあまりに長すぎます。ヘッダーは簡潔で、セクションの見出しとして機能すべきであり、完全な文として使用すべきではありません。"
   },
@@ -176,8 +236,20 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "フィードバックの確認"
   },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "選択されたModパックのバージョンは公開されていません。すべてのプレイヤーが利用可能なバージョンを選択してください。"
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "公開されているModパックのバージョンを選択する"
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "正しい解像度を選択"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Modパックに外部コンテンツを配布する許可があることを証明する資料を提出済みか確認してください。"
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "コンテンツのアクセス許可を確認"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "サーバーがサポートするバージョンのModパックを選択するか、または独自のModパックをアップロードしてください。"
@@ -190,6 +262,12 @@
   },
   "nags.select-country.title": {
     "defaultMessage": "地域を選択"
+  },
+  "nags.select-environment.description": {
+    "defaultMessage": "プロジェクトを実行できる環境を指定してください。"
+  },
+  "nags.select-environment.title": {
+    "defaultMessage": "環境を選択してください"
   },
   "nags.select-language.description": {
     "defaultMessage": "サーバーが対応している言語をリストアップしてください。"
@@ -220,6 +298,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "リンクの設定を表示"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "アクセス許可の設定を開く"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "タグの設定を表示"

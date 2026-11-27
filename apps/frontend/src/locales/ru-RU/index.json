@@ -3011,6 +3011,9 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Перейти на Modrinth+"
   },
+  "layout.nav.use-signed-out": {
+    "message": "Без входа"
+  },
   "layout.publish.email-verification-required.description": {
     "message": "Для публикации на Modrinth подтвердите почту."
   },
@@ -5303,6 +5306,9 @@
   "servers.sharing-update.notification.view-update": {
     "message": "Подробнее"
   },
+  "servers.sharing-update.web-description": {
+    "message": "Теперь вы можете поделиться сервером с друзьями. После принятия в Modrinth App будет создана управляемая им сборка."
+  },
   "settings.account.button.complete-setup": {
     "message": "Завершить настройку"
   },
@@ -6216,16 +6222,16 @@
     "message": "Modrinth"
   },
   "thread.message.tech-review-completed": {
-    "message": "завершил технический обзор и пометил проект как <status>.</status>"
+    "message": "завершает техпроверку и меняет статус на <status>.</status>"
   },
   "thread.message.tech-review-entered": {
     "message": "Проект в очереди на техпроверку."
   },
   "thread.message.tech-review-exit-file-deleted": {
-    "message": "Проект покинул очередь технических проверок, так как все файлы в ожидании проверки были удалены пользователем."
+    "message": "Проект покинул очередь на техпроверку: все файлы в ожидании проверки удалены пользователем."
   },
   "thread.message.tech-review-exited": {
-    "message": "Проект покинул очередь технического рассмотрения, так как были решены все оставшиеся следы."
+    "message": "Проект покинул очередь на техпроверку: все нерешённые вопросы решены."
   },
   "thread.message.thread-closed": {
     "message": "закрывает ветку."

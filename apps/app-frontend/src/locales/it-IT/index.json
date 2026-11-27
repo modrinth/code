@@ -20,6 +20,9 @@
   "app.action-bar.install.dismiss": {
     "message": "Ignora"
   },
+  "app.action-bar.install.inspect-details": {
+    "message": "Ispeziona info"
+  },
   "app.action-bar.install.open-instance": {
     "message": "Apri istanza"
   },
@@ -409,6 +412,12 @@
   },
   "app.download-manager.title": {
     "message": "Gestore di download"
+  },
+  "app.error.copied-debug-info": {
+    "message": "Copiati"
+  },
+  "app.error.inspect-debug-info": {
+    "message": "Ispeziona info di debug"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Apri la cartella dei backup"
@@ -2955,10 +2964,10 @@
     "message": "Telemetria"
   },
   "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "Mostra il pulsante Copia info mentre un'installazione è in coda o in esecuzione. Verrà sempre mostrato in caso di errore o di interruzione."
+    "message": "Mostra il pulsante Ispeziona info mentre un'installazione è in coda o in esecuzione. Verrà sempre mostrato in caso di errore o di interruzione."
   },
   "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Mostra sempre Copia info"
+    "message": "Mostra sempre Ispeziona info"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "L'app potrebbe caricarsi più lentamente finché la cache non sarà ripristinata."
@@ -2979,7 +2988,7 @@
     "message": "Backup del database dell'app"
   },
   "app.settings.resource-management.app-directory.cancel-move": {
-    "message": "Annulla spostamento"
+    "message": "Annulla"
   },
   "app.settings.resource-management.app-directory.change": {
     "message": "Cambia cartella"
@@ -2994,7 +3003,7 @@
     "message": "Non potrai usare l'app durante il processo. Potrebbe richiedere alcuni minuti."
   },
   "app.settings.resource-management.app-directory.modal.admonition-header": {
-    "message": "Tutti i file saranno spostati"
+    "message": "Tutti i file verranno spostati"
   },
   "app.settings.resource-management.app-directory.modal.choose": {
     "message": "Scegli una cartella"

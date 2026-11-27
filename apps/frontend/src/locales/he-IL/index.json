@@ -2156,9 +2156,6 @@
   "scopes.userRead.label": {
     "message": "קרא נתוני משתמש"
   },
-  "scopes.userReadEmail.description": {
-    "message": "קרא את הדוא\"ל שלך"
-  },
   "scopes.userReadEmail.label": {
     "message": "צפייה בכתובת האימייל של המשתמש"
   },

@@ -896,6 +896,9 @@
   "auth.sign-in.choose-existing-account": {
     "message": "Użyj istniejącego konta"
   },
+  "auth.sign-in.code-failed": {
+    "message": "Ten link do logowania jest nieprawidłowy lub wygasł. Spróbuj ponownie."
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Kontynuuj przez e-mail"
   },
@@ -3105,13 +3108,19 @@
     "message": "Konfliktuje z: {actions}"
   },
   "moderation.keybinds.decisions": {
-    "message": "Przejrzyj wyniki weryfikacji i kolejkę"
+    "message": "Przeglądanie wyników i kolejki"
   },
   "moderation.keybinds.global": {
-    "message": "Przełącz hosty i skopiuj adresy URL"
+    "message": "Przełączanie hostów i kopiowanie linków"
+  },
+  "moderation.keybinds.items": {
+    "message": "Przejrzyj przedmioty i kontrole"
   },
   "moderation.keybinds.listen": {
     "message": "Wciśnij klawisz..."
+  },
+  "moderation.keybinds.navigation": {
+    "message": "Przejrzyj nawigację i panele"
   },
   "moderation.keybinds.no-results": {
     "message": "Żaden skrót klawiszowy nie pasuje do twojego wyszukiwania."
@@ -3126,7 +3135,7 @@
     "message": "Kopiowanie z publicznej strony projektu"
   },
   "moderation.keybinds.recording": {
-    "message": "{setting}: Nasłuchiwanie klawisza. Wciśnij Escape, aby wyczyścić ten klawisz."
+    "message": "{setting}: oczekiwanie na wciśnięcie klawiszy. Wciśnij Escape, aby wyczyścić te przypisanie."
   },
   "moderation.keybinds.reset-default": {
     "message": "Przywróć do domyślnych"
@@ -3144,7 +3153,10 @@
     "message": "Wyszukaj skróty klawiszowe..."
   },
   "moderation.keybinds.self-conflict": {
-    "message": "inne skróty klawiszowe dla tej akcji"
+    "message": "innym skrótem klawiszowym dla tej akcji"
+  },
+  "moderation.keybinds.technical": {
+    "message": "Strony przeglądu technicznego"
   },
   "moderation.keybinds.title": {
     "message": "Skróty klawiszowe"
@@ -3179,6 +3191,18 @@
   "moderation.keybinds.transfer.import": {
     "message": "Importuj skróty klawiszowe"
   },
+  "moderation.keybinds.transfer.import-help": {
+    "message": "Wklej JSON ze skrótami klawiszowymi lub wybierz plik JSON. Zastosowanie kompletnie wymieni aktywne przypisania klawiszy; pominięte skróty klawiszowe zostaną przywrócone do ustawień domyślnych."
+  },
+  "moderation.keybinds.transfer.invalid": {
+    "message": "Nieprawidłowe skróty klawiszowe. Użyj eksportu skrótów klawiszowych wersji 1 ze znanymi identyfikatorami akcji, tablicami definicji kluczy i modyfikatorami boolowskimi."
+  },
+  "moderation.keybinds.transfer.json": {
+    "message": "JSON skrótów klawiszowych"
+  },
+  "moderation.keybinds.transfer.too-large": {
+    "message": "Te skróty wykraczają poza miejsce dostępne w Twoich zapisanych ustawieniach moderacji. Usuń kilka niestandardowych powiązań i spróbuj ponownie."
+  },
   "moderation.moderate": {
     "message": "Moderuj"
   },
@@ -3198,13 +3222,52 @@
     "message": "Zgłoszenia"
   },
   "moderation.project-review.approvedCount": {
-    "message": "{count} zaakceptowane"
+    "message": "Zatwierdzone: {count}"
   },
   "moderation.project-review.archivedCount": {
-    "message": "{count} "
+    "message": "Zarchiwizowane: {count}"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "Wersje robocze: {count}"
+  },
+  "moderation.project-review.privateCount": {
+    "message": "Prywatne: {count}"
+  },
+  "moderation.project-review.processingCount": {
+    "message": "W trakcie przeglądu: {count}"
+  },
+  "moderation.project-review.rejectedCount": {
+    "message": "Odrzucone: {count}"
+  },
+  "moderation.project-review.scheduledCount": {
+    "message": "Zaplanowane: {count}"
+  },
+  "moderation.project-review.techReviewFailedCount": {
+    "message": "Nie przeszło przeglądu technicznego: {count}"
+  },
+  "moderation.project-review.unknownCount": {
+    "message": "O nieznanym stanie: {count}"
+  },
+  "moderation.project-review.unlistedCount": {
+    "message": "Ustawione na niewymienione: {count}"
+  },
+  "moderation.project-review.withheldCount": {
+    "message": "Wstrzymane: {count}"
   },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
+  },
+  "moderation.settings.default-value-styled": {
+    "message": "Domyślne: <value></value>"
+  },
+  "moderation.settings.floating-panel-preview": {
+    "message": "Podgląd panelu"
+  },
+  "moderation.settings.floating-panel-section": {
+    "message": "Panel przeglądu"
+  },
+  "moderation.settings.highlight-preview": {
+    "message": "Podgląd podświetlenia przeglądu"
   },
   "moderation.settings.highlight-preview.incorrect-formatting": {
     "message": "Niepoprawne formatowanie"
@@ -3217,6 +3280,12 @@
   },
   "moderation.settings.highlights-section": {
     "message": "Wyróżnienia"
+  },
+  "moderation.settings.issue-toggle-preview": {
+    "message": "Podgląd przełączników problemów"
+  },
+  "moderation.settings.issue-toggles-section": {
+    "message": "Przełączniki problemów"
   },
   "moderation.settings.no-results": {
     "message": "Żadne ustawienia nie pasują do twojego wyszukiwania."
@@ -3235,6 +3304,9 @@
   },
   "moderation.settings.search": {
     "message": "Szukaj ustawień..."
+  },
+  "moderation.settings.theme-border": {
+    "message": "Kolor pomarańczowy motywu (25% przezroczystości)"
   },
   "moderation.settings.theme-default": {
     "message": "Kolor pomarańczowy motywu"
@@ -3806,6 +3878,9 @@
   "project.disclosures.lock-status.cannot-disable": {
     "message": "Nie można wyłączyć"
   },
+  "project.disclosures.lock-status.change": {
+    "message": "Zmień status blokady"
+  },
   "project.disclosures.lock-status.fully-locked": {
     "message": "W pełni zablokowany"
   },
@@ -4040,6 +4115,9 @@
   "project.moderation.error.unauthorized": {
     "message": "Brak autoryzacji"
   },
+  "project.moderation.project-changed": {
+    "message": "Wybrany projekt został zmieniony. Przejrzyj go ponownie."
+  },
   "project.moderation.thread.approved-warning": {
     "message": "Ten wątek nie jest aktywnie monitorowany, ale może być sprawdzany w celu znalezienia informacji o Twoim projekcie."
   },
@@ -4093,6 +4171,9 @@
   },
   "project.notification.updated.title": {
     "message": "Projekt zaktualizowany"
+  },
+  "project.review.approved": {
+    "message": "Twój projekt został zatwierdzony{status, select, unlisted { jako niewymieniony} private { jako prywatny} other {}}."
   },
   "project.settings.back-to-all-projects": {
     "message": "Powrót do wszystkich projektów"
@@ -4379,6 +4460,9 @@
   "project.settings.license.custom": {
     "message": "Niestandardowa"
   },
+  "project.settings.license.custom-name-invalid": {
+    "message": "Nazwy licencji niestandardowych mogą zawierać tylko litery, cyfry, kropki i myślniki."
+  },
   "project.settings.license.custom-name-required": {
     "message": "Podaj nazwę niestandardowej licencji."
   },
@@ -4544,6 +4628,9 @@
   "project.settings.permissions.attention-needed.title": {
     "message": "Nieznana zewnętrzna zawartość"
   },
+  "project.settings.permissions.awaiting-review-count": {
+    "message": "{count, plural, =0 {Brak oczekujących na recenzję} one {# oczekujące na recenzję} few {# oczekujące na recenzję} other {# oczekujących na recenzję}}"
+  },
   "project.settings.permissions.bad-proof.description": {
     "message": "Zespół moderatorów Modrinth odrzucił podane informacje o zezwoleniach dla niektórej zawartości. Podaj poprawne dowody lub usuń podaną niżej zawartość."
   },
@@ -4607,6 +4694,9 @@
   "project.settings.permissions.not-allowed.description": {
     "message": "Niektóra zewnętrzna zawartość na może być dystrybuowana przez Modrinth i musi być usunięta, ponieważ jest niezgodna z naszymi Zasadami dotyczącymi treści."
   },
+  "project.settings.permissions.open-image-in-new-tab": {
+    "message": "Otwórz obraz w nowej karcie"
+  },
   "project.settings.permissions.pending-approval-count": {
     "message": "{count, plural, =0 {Żadna atrybucja nie potrzebuje sprawdzenia} one {# atrybucja potrzebuje sprawdzenia} few{# atrybucje potrzebują sprawdzenia} other {# atrybucji potrzebuje sprawdzenia}}"
   },
@@ -4624,6 +4714,9 @@
   },
   "project.settings.permissions.sort.status": {
     "message": "Status"
+  },
+  "project.settings.permissions.user-action-count": {
+    "message": "{count} wymaga działania użytkownika"
   },
   "project.settings.server.bedrock-address-label": {
     "message": "Adres Bedrock"
@@ -4832,17 +4925,29 @@
   "report.not-for.dmca.description": {
     "message": "Zobacz naszą <policy-link>Politykę dotyczącą praw autorskich</policy-link>."
   },
+  "report.note.ai-images.1b": {
+    "message": "Jeszcze nie akceptujemy zgłoszeń o użyciu obrazków wygenerowanych przez AI, ponieważ dalej aktualizujemy nasze narzędzia moderacji, by lepiej odpowiadać na zgłoszenia."
+  },
+  "report.note.check-back-later.b": {
+    "message": "Mamy nadzieję, że wkrótce będziemy mogli je przyjmować! Dziękujemy za cierpliwość i chęci pomagania Modrinth!"
+  },
   "report.note.copyright.1": {
     "message": "Należy pamiętać, że *nie* przesyłasz wniosku o usunięcie treści na podstawie ustawy DMCA, ale zgłoszenie dotyczące ponownie przesłanej treści."
   },
   "report.note.copyright.2": {
     "message": "Jeśli zamierzałeś złożyć wniosek o usunięcie treści na podstawie ustawy DMCA (co stanowi działanie prawne), zapoznaj się z naszą <copyright-policy-link>Polityką dotyczącą praw autorskich</copyright-policy-link>."
   },
+  "report.note.fully-ai-generated.1b": {
+    "message": "Jeszcze nie akceptujemy zgłoszeń o projektach w pełni wygenerowanych przez AI, ponieważ dalej aktualizujemy nasze narzędzia moderacji, by lepiej odpowiadać na zgłoszenia."
+  },
   "report.note.malicious.1": {
     "message": "Zgłoszenia szkodliwych lub zwodniczych treści muszą zawierać znaczny dowód, na przykład fragmenty kodu źródłowego."
   },
   "report.note.malicious.2": {
     "message": "Podsumowania z Microsoft Defender, VirusTotal lub narzędzi AI wykrywających złośliwe oprogramowanie nie są uważane jako wystarczający dowód i nie będą akceptowane."
+  },
+  "report.note.missing-disclosure.1b": {
+    "message": "Jeszcze nie akceptujemy zgłoszeń o brakujących ujawnieniach, ponieważ dalej aktualizujemy nasze narzędzia moderacji, by lepiej odpowiadać na zgłoszenia."
   },
   "report.please-report": {
     "message": "Proszę zgłosić:"
@@ -5108,9 +5213,6 @@
   "scopes.userRead.label": {
     "message": "Odczytywanie danych użytkownika"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Odczytywanie twoich wiadomości e-mail"
-  },
   "scopes.userReadEmail.label": {
     "message": "Odczytywanie wiadomości e-mail"
   },
@@ -5204,14 +5306,23 @@
   "servers.purchase.step.plan.per-month-billing": {
     "message": "/ miesiąc{interval, select, monthly {} other {, rozliczono {interval, select, quarterly {kwartał} yearly {corocznie} other {{interval}}}}}"
   },
+  "servers.sharing-update.notification.description": {
+    "message": "Zaproś znajomych, aby mogli korzystać z instancji zarządzanej przez Twój serwer."
+  },
   "servers.sharing-update.notification.dismiss": {
     "message": "Odrzuć"
+  },
+  "servers.sharing-update.notification.purchase-description": {
+    "message": "Zdobądź serwer i zaproś do niego znajomych, by mogli grać w instancję zarządzaną automatycznie przez serwer."
   },
   "servers.sharing-update.notification.title": {
     "message": "Udostępniaj serwery znajomym"
   },
   "servers.sharing-update.notification.view-update": {
     "message": "Pokaż aktualizację"
+  },
+  "servers.sharing-update.web-description": {
+    "message": "Możesz teraz bezpośrednio udostępnić swój serwer znajomym. Gdy zaakceptują zaproszenie w Modrinth App, automatycznie otrzymają instancję zarządzaną przez Twój serwer."
   },
   "settings.account.button.complete-setup": {
     "message": "Zakończ ustawianie"
@@ -5435,8 +5546,20 @@
   "settings.account.security.two-factor.title": {
     "message": "Weryfikacja dwuetapowa"
   },
+  "settings.account.standing.good": {
+    "message": "Twoje konto nie jest w żaden sposób ograniczone."
+  },
   "settings.account.standing.reason-label": {
     "message": "Powód:"
+  },
+  "settings.account.standing.restricted.description": {
+    "message": "Moderator usunął uprawnienia z Twojego konta:"
+  },
+  "settings.account.standing.restricted.header": {
+    "message": "Twoje konto zostało ograniczone"
+  },
+  "settings.account.standing.title": {
+    "message": "Stan konta"
   },
   "settings.account.two-factor.backup.intro": {
     "message": "Pobierz i zapisz te kody zapasowe w bezpiecznym miejscu. Możesz użyć tych kodów, jeśli zgubisz swoje urządzenie! Chroń te kody tak, jak swoje hasło."
@@ -5510,6 +5633,9 @@
   "settings.applications.description.intro": {
     "message": "Aplikacje pozwalają uwierzytelniać użytkowników Modrinth w Twoich produktach. Więcej informacji można znaleźć w <docs-link>dokumentacji API Modrinth</docs-link>."
   },
+  "settings.applications.empty-state.description": {
+    "message": "Aplikacje, które utworzysz, pojawią się tutaj."
+  },
   "settings.applications.empty-state.heading": {
     "message": "Brak aplikacji"
   },
@@ -5548,6 +5674,9 @@
   },
   "settings.applications.modal.header": {
     "message": "Informacje o aplikacje"
+  },
+  "settings.applications.no-scopes": {
+    "message": "Brak zakresów"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Ikona twej aplikacji została zaktualizowana."
@@ -5810,6 +5939,12 @@
   "settings.pats.description": {
     "message": "Klucze dostępu osobistego zezwalają na dostęp do API Modrinth. Mogą być dowolnie tworzone bądź unieważniane. Więcej informacji zawarte jest w <doc-link>dokumentacji API Modrinth</doc-link>."
   },
+  "settings.pats.empty-state.description": {
+    "message": "Klucze, które utworzysz, pojawią się tutaj."
+  },
+  "settings.pats.empty-state.heading": {
+    "message": "Brak kluczy dostępu osobistego"
+  },
   "settings.pats.modal.create.action": {
     "message": "Utwórz klucz dostępu osobistego"
   },
@@ -5828,11 +5963,26 @@
   "settings.pats.modal.edit.title": {
     "message": "Edytuj klucz dostępu osobistego"
   },
+  "settings.pats.modal.revoke.action": {
+    "message": "Unieważnij klucz"
+  },
+  "settings.pats.modal.revoke.description": {
+    "message": "Ten klucz zostanie natychmiastowo unieważnioni i wszystko, co z niego korzysta, przestanie działać. Tej akcji nie można cofnąć."
+  },
+  "settings.pats.modal.revoke.title": {
+    "message": "Czy na pewno chcesz unieważnić ten klucz?"
+  },
+  "settings.pats.token.access-token": {
+    "message": "Klucz dostępu"
+  },
   "settings.pats.token.action.edit": {
     "message": "Edytuj klucz"
   },
   "settings.pats.token.action.revoke": {
     "message": "Unieważnij token"
+  },
+  "settings.pats.token.disclaimer": {
+    "message": "Zapisz gdzieś ten klucz. Możesz go zobaczyć tylko raz. Gdy opuścisz tę stronę, już nigdy go nie zobaczysz."
   },
   "settings.pats.token.expired-ago": {
     "message": "Wygasł {ago}"
@@ -5857,6 +6007,12 @@
   },
   "settings.sessions.current-session": {
     "message": "Aktualna sesja"
+  },
+  "settings.sessions.description.1": {
+    "message": "Poniżej wymienione są wszystkie urządzenia zalogowane na Twoje konto Modrinth. Możesz wylogować się z każdego indywidualnie, unieważniając ich sesję. Jeżeli widzisz tu wpis, którego nie rozpoznajesz, natychmiast wyloguj to urządzenie i zmień hasło swojego konta Modrinth."
+  },
+  "settings.sessions.description.2": {
+    "message": "Wymienione lokalizacje mogą być niedokładne, ponieważ opierają się na adresie IP. VPNy i niektórzy dostawcy usług internetowych mogą ukrywać rzeczywistą lokalizację."
   },
   "settings.sessions.empty-state.description": {
     "message": "Urządzenia zalogowane na Twoje konto pojawią się tutaj."
@@ -6008,8 +6164,17 @@
   "thread.issue-history.private-note": {
     "message": "Widoczne tylko dla moderatorów"
   },
+  "thread.message.auto-approval": {
+    "message": ": rozwiązano wszystkie problemy, a status projektu został automatycznie ustawiony na <status>zatwierdzony</status>."
+  },
   "thread.message.delete": {
     "message": "Usuń"
+  },
+  "thread.message.deleted-message": {
+    "message": ": przesłano wiadomość, która została usunięta."
+  },
+  "thread.message.legacy-project-message": {
+    "message": "Ten projekt został opublikowany w Modrinth, zanim dodano wątki moderacyjne i może nie mieć historii moderacji."
   },
   "thread.message.moderator": {
     "message": "Moderator"
@@ -6035,20 +6200,50 @@
   "thread.message.reporter": {
     "message": "Zgłaszający"
   },
+  "thread.message.reverted-to-draft": {
+    "message": ": przywrócono projekt do stanu <status>.</status>"
+  },
+  "thread.message.review": {
+    "message": ": przejrzano projekt i ustawiono jego status na <status>status</status>."
+  },
+  "thread.message.review-with-issues": {
+    "message": ": przejrzano projekt i ustawiono jego status na <status>status</status> z {count, plural, one {# problemem} other {# problemami}}."
+  },
   "thread.message.sent-image": {
-    "message": "wyślij obraz."
+    "message": ": przesłano obraz."
   },
   "thread.message.sent-message": {
-    "message": "wyślij wiadomość."
+    "message": ": przesłano wiadomość."
+  },
+  "thread.message.status-changed": {
+    "message": ": zmieniono status projektu z <old-status>status</old-status> na <status>.</status>"
+  },
+  "thread.message.submitted-for-review": {
+    "message": ": przesłano projekt do przeglądu."
   },
   "thread.message.system": {
     "message": "Modrinth"
   },
+  "thread.message.tech-review-completed": {
+    "message": ": ukończono przegląd techniczny i oznaczono projekt wynikiem <status>.</status>"
+  },
+  "thread.message.tech-review-entered": {
+    "message": "Projekt został dodany do kolejki przeglądu technicznego."
+  },
+  "thread.message.tech-review-exit-file-deleted": {
+    "message": "Projekt został usunięty z kolejki przeglądu technicznego, ponieważ wszystkie pliki oczekujące na przegląd zostały usunięte przez użytkownika."
+  },
+  "thread.message.tech-review-exited": {
+    "message": "Projekt został usunięty z kolejki przeglądu technicznego, ponieważ wszystkie problemy zostały rozwiązane."
+  },
+  "thread.message.tech-review-passed": {
+    "message": ": ukończono przegląd techniczny i oznaczono projekt jako gotowy po przeglądnięciu {safe, plural, one {# bezpiecznego problemu} other {# bezpiecznych problemów}}."
+  },
   "thread.message.thread-closed": {
-    "message": "zamknięto wątek."
+    "message": ": zamknięto wątek."
   },
   "thread.message.thread-reopened": {
-    "message": "ponownie otwarto wątek."
+    "message": ": ponownie otwarto wątek."
   },
   "ui.latest-news-row.latest-news": {
     "message": "Najnowsze aktualności z Modrinth"

@@ -2735,12 +2735,6 @@
   "app.settings.privacy.telemetry.title": {
     "message": "بيانات قياس الاستخدام"
   },
-  "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "إظهار إجراء \"نسخ التفاصيل\" أثناء إدراج التثبيت في قائمة الانتظار أو تشغيله. يكون متاحاً دائماً للتثبيتات الفاشلة أو المقاطعة."
-  },
-  "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "إظهار تفاصيل النسخة دائماً"
-  },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "قد يتم تحميل التطبيق بشكل أبطأ حتى يتم إعادة بناء التخزين المؤقت."
   },

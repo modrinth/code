@@ -1958,9 +1958,6 @@
   "scopes.userRead.label": {
     "message": "Citește datele utilizatorului"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Citește adresa de email"
-  },
   "scopes.userReadEmail.label": {
     "message": "Citește adresa de email a utilizatorului"
   },

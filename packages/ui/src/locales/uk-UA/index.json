@@ -66,7 +66,7 @@
     "defaultMessage": "Не вдалося змінити спосіб оплати."
   },
   "billing.resubscribe-modal.error.text": {
-    "defaultMessage": "Неможливо поновити передплату, не вдалося завантажити її деталі."
+    "defaultMessage": "Неможливо поновити передплату: не вдалося завантажити її деталі."
   },
   "billing.resubscribe-modal.error.title": {
     "defaultMessage": "Помилка"
@@ -126,7 +126,7 @@
     "defaultMessage": "Не знайдено результатів за вашим запитом!"
   },
   "browse.offline": {
-    "defaultMessage": "Ви не в мережі. Підʼєднайтеся до інтернету, щоб дослідити Modrinth!"
+    "defaultMessage": "Ви поза мережею. Підʼєднайтеся до інтернету, щоб дослідити Modrinth!"
   },
   "browse.search.placeholder": {
     "defaultMessage": "Шукати {projectType}…"
@@ -825,7 +825,7 @@
     "defaultMessage": "Не вдалося завантажити вміст"
   },
   "content.page-layout.failed-to-load-changelog": {
-    "defaultMessage": "Не вдалося завантажити журнал змін"
+    "defaultMessage": "Не вдалося завантажити список змін"
   },
   "content.page-layout.failed-to-load-updates": {
     "defaultMessage": "Не вдалося завантажити доступні оновлення"
@@ -2961,13 +2961,13 @@
     "defaultMessage": "Усе одно встановити"
   },
   "instances.updater-modal.loading-changelog": {
-    "defaultMessage": "Завантаження журналу змін…"
+    "defaultMessage": "Завантаження списку змін…"
   },
   "instances.updater-modal.loading-versions": {
     "defaultMessage": "Завантаження версій…"
   },
   "instances.updater-modal.no-changelog": {
-    "defaultMessage": "Для цієї версії не надано журнал змін."
+    "defaultMessage": "Для цієї версії не надано списку змін."
   },
   "instances.updater-modal.no-versions": {
     "defaultMessage": "Версій не знайдено"
@@ -2988,7 +2988,7 @@
     "defaultMessage": "Оновити до {version}"
   },
   "instances.updater-modal.warning-app": {
-    "defaultMessage": "Оновлення може зламати ваш примірник. Спочатку ознайомтесь із журналом змін у версії та створіть резервну копію."
+    "defaultMessage": "Оновлення може зламати ваш примірник. Спочатку ознайомтеся зі списком змін версії та створіть резервну копію."
   },
   "instances.updater-modal.warning-web": {
     "defaultMessage": "Оновлення може зламати ваш світ. Спочатку ознайомтесь із журналом змін у версії та створіть резервну копію."
@@ -3051,7 +3051,7 @@
     "defaultMessage": "Деталі"
   },
   "label.discover-content": {
-    "defaultMessage": "Огляд вмісту"
+    "defaultMessage": "Шукати вміст"
   },
   "label.done": {
     "defaultMessage": "Готово"
@@ -4275,7 +4275,7 @@
     "defaultMessage": "Обов’язковий вміст"
   },
   "project.about.server.title": {
-    "defaultMessage": "Подробиці сервера"
+    "defaultMessage": "Деталі сервера"
   },
   "project.about.tags.title": {
     "defaultMessage": "Позначки"
@@ -4393,6 +4393,33 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {відстежує} few {відстежують} other {відстежують}}"
+  },
+  "project.game-awards.body": {
+    "defaultMessage": "{projectName} — один із пʼяти номінантів. Йому потрібний Ваш голос!"
+  },
+  "project.game-awards.category.best-user-creation": {
+    "defaultMessage": "Найкращий твір"
+  },
+  "project.game-awards.days-left": {
+    "defaultMessage": "{days, plural, one {Залишився # день} few {Залишилося # дні} many {Залишилося # днів} other {Залишилося # дня}}"
+  },
+  "project.game-awards.event-name": {
+    "defaultMessage": "The Game Awards {year}"
+  },
+  "project.game-awards.hide-voting-details": {
+    "defaultMessage": "Приховати деталі голосування"
+  },
+  "project.game-awards.nominee-for": {
+    "defaultMessage": "Номінант на «{category}»"
+  },
+  "project.game-awards.official-nominee": {
+    "defaultMessage": "Офіційний номінант"
+  },
+  "project.game-awards.vote": {
+    "defaultMessage": "Голосуйте на The Game Awards"
+  },
+  "project.game-awards.vote-now": {
+    "defaultMessage": "Голосуйте вже"
   },
   "project.license.error": {
     "defaultMessage": "Не вдалося отримати текст ліцензії."
@@ -5024,6 +5051,9 @@
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Очистити пошук"
   },
+  "search.filter.option.search.no_results": {
+    "defaultMessage": "Результатів не знайдено"
+  },
   "search.filter.option.search.placeholder": {
     "defaultMessage": "Пошук…"
   },
@@ -5409,7 +5439,7 @@
     "defaultMessage": "Запрошення надіслано"
   },
   "servers.access-page.notification.load-failed.text": {
-    "defaultMessage": "Перезапустіть сторінку, тоді спробуйте ще раз."
+    "defaultMessage": "Оновіть сторінку, тоді спробуйте ще раз."
   },
   "servers.access-page.notification.load-failed.title": {
     "defaultMessage": "Доступ не завантажено"
@@ -6525,7 +6555,7 @@
     "defaultMessage": "У нас можуть виникнути тимчасові проблеми з нашими серверами."
   },
   "servers.manage.error.details": {
-    "defaultMessage": "Подробиці помилки:"
+    "defaultMessage": "Деталі помилки:"
   },
   "servers.manage.error.queue-notice": {
     "defaultMessage": "Якщо ви недавно придбали сервер Modrinth Hosting, то він у черзі та з’явиться тут, щойно буде готовий. <warning>Не намагайтеся придбати новий сервер.</warning>"
@@ -7794,7 +7824,7 @@
     "defaultMessage": "Власний уміст"
   },
   "tag.category.decoration": {
-    "defaultMessage": "Оздоблення"
+    "defaultMessage": "Оздоба"
   },
   "tag.category.dungeons": {
     "defaultMessage": "Підземелля"
@@ -7908,7 +7938,7 @@
     "defaultMessage": "Мережа"
   },
   "tag.category.offline-mode": {
-    "defaultMessage": "Режим «не в мережі»"
+    "defaultMessage": "Режим «поза мережею»"
   },
   "tag.category.oneblock": {
     "defaultMessage": "One Block"
@@ -8280,13 +8310,13 @@
     "defaultMessage": "Нерозпізнані файли"
   },
   "update-all-modal.changelog-for": {
-    "defaultMessage": "Журнал змін для {project}"
+    "defaultMessage": "Список змін для {project}"
   },
   "update-all-modal.changelog-loaded": {
-    "defaultMessage": "Журнал змін завантажено."
+    "defaultMessage": "Список змін завантажено."
   },
   "update-all-modal.close-changelog": {
-    "defaultMessage": "Закрити журнал змін"
+    "defaultMessage": "Закрити список змін"
   },
   "update-all-modal.current-version": {
     "defaultMessage": "Поточна версія"
@@ -8301,13 +8331,13 @@
     "defaultMessage": "Завантаження оновлень…"
   },
   "update-all-modal.loading-changelog": {
-    "defaultMessage": "Завантаження журналів змін…"
+    "defaultMessage": "Завантаження списку змін…"
   },
   "update-all-modal.new-version": {
     "defaultMessage": "Нова версія"
   },
   "update-all-modal.no-changelog": {
-    "defaultMessage": "Журнал змін не надано для цієї версії."
+    "defaultMessage": "Список змін не надано для цієї версії."
   },
   "update-all-modal.no-compatible-updates": {
     "defaultMessage": "Немає доступних сумісних оновлень."
@@ -8343,7 +8373,7 @@
     "defaultMessage": "Переглянути"
   },
   "update-all-modal.view-changelog": {
-    "defaultMessage": "Переглянути журнал змін для {project}"
+    "defaultMessage": "Переглянути список змін для {project}"
   },
   "update-all-modal.warning": {
     "defaultMessage": "Ми не можемо гарантувати, що оновлення будуть безпечними для ваших світів. Ознайомтеся зі списком змін і подумайте про створення резервної копії."
@@ -8577,7 +8607,7 @@
     "defaultMessage": "Відомі несумісності"
   },
   "version.section.no-changes": {
-    "defaultMessage": "Журналу змін не надано."
+    "defaultMessage": "Списку змін не надано."
   },
   "version.section.no-modpack-mod-loader": {
     "defaultMessage": "Без завантажувача"

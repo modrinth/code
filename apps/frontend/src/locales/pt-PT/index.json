@@ -3317,9 +3317,6 @@
   "scopes.userRead.label": {
     "message": "Ler dados de utilizador"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Ler o teu e-mail"
-  },
   "scopes.userReadEmail.label": {
     "message": "Ler e-mail do utilizador"
   },

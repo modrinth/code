@@ -1166,12 +1166,6 @@
   "app.settings.privacy.telemetry.title": {
     "message": "Telemetria"
   },
-  "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "Mostrar a ação «Copiar detalhes» enquanto uma instalação estiver na fila ou em execução. Esta ação está sempre disponível para instalações que tenham falhado ou sido interrompidas."
-  },
-  "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Mostrar sempre os detalhes da cópia"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Limpe os dados da cache e faça o download novamente a partir do Modrinth. A aplicação poderá demorar mais tempo a carregar até que a cache seja reconstruída."
   },

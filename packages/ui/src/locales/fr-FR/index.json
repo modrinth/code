@@ -11,6 +11,15 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "defaultMessage": "Vos modifications n'ont pas encore été partagées"
   },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "defaultMessage": "Publier la mise à jour"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "defaultMessage": "Publication..."
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "defaultMessage": "Révision..."
+  },
   "app.instance.share.members.empty": {
     "defaultMessage": "Aucun utilisateur n'a rejoint pour le moment"
   },
@@ -386,6 +395,9 @@
   "content.card.frozen": {
     "defaultMessage": "Ce projet est verrouillé sur sa version actuelle jusqu'à son dégel."
   },
+  "content.card.override-file": {
+    "defaultMessage": "Écraser les fichiers"
+  },
   "content.card.select-project": {
     "defaultMessage": "Sélectionner {project}"
   },
@@ -394,6 +406,9 @@
   },
   "content.card.synced": {
     "defaultMessage": "Synchronisé entre les instances"
+  },
+  "content.card.uploaded-file": {
+    "defaultMessage": "Fichier téléversé"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Êtes vous sûr·e de vouloir télécharger la dernière mise à jour compatible de {count, plural, one {# projet} other {# projets}} ? Il est recommandé de mettre à jour le contenu un par un."
@@ -425,17 +440,35 @@
   "content.confirm-disable.header": {
     "defaultMessage": "Désactiver {itemType}"
   },
+  "content.confirm-environment.admonition-title": {
+    "defaultMessage": "Ce contenu peut être incompatible"
+  },
+  "content.confirm-environment.disable-player-body": {
+    "defaultMessage": "{project} est requis sur le client des joueurs. Le désactiver pourrait empêcher les joueurs d'utiliser ce contenu correctement."
+  },
   "content.confirm-environment.disable-player-title": {
     "defaultMessage": "Désactiver pour les joueurs ?"
+  },
+  "content.confirm-environment.disable-server-body": {
+    "defaultMessage": "{project} est requis sur le serveur. Le désactiver pourrait empêcher votre serveur de fonctionner correctement."
   },
   "content.confirm-environment.disable-server-title": {
     "defaultMessage": "Désactiver pour votre serveur ?"
   },
+  "content.confirm-environment.distant-horizons-server-body": {
+    "defaultMessage": "Distant peut considérablement augmenter l'utilisation du CPU sur votre serveur et causer du lag. Il est recommandé de seulement le seulement le garder activé du côté des joueurs."
+  },
   "content.confirm-environment.performance-admonition-title": {
     "defaultMessage": "Avertissement de performance"
   },
+  "content.confirm-environment.player-body": {
+    "defaultMessage": "{project} n'est pas supposé s'exécuter sur le client des joueurs. L'activer pourrait causer des erreurs ou empêcher le jeu de démarrer."
+  },
   "content.confirm-environment.player-title": {
     "defaultMessage": "Activer pour les joueurs ?"
+  },
+  "content.confirm-environment.required-admonition-title": {
+    "defaultMessage": "Ce contenu est nécessaire ici"
   },
   "content.confirm-environment.server-title": {
     "defaultMessage": "Activer pour votre serveur ?"
@@ -590,8 +623,14 @@
   "content.enabled-for.label": {
     "defaultMessage": "Activé pour"
   },
+  "content.enabled-for.not-supported-here": {
+    "defaultMessage": "Ce contenu n'est pas conçu pour être activé ici."
+  },
   "content.enabled-for.player": {
     "defaultMessage": "Joueur"
+  },
+  "content.enabled-for.player-only-filter": {
+    "defaultMessage": "Joueur seulement"
   },
   "content.enabled-for.please-wait": {
     "defaultMessage": "Veuillez patienter"
@@ -721,6 +760,9 @@
   },
   "content.metadata-filter.warning.compatibility-unknown": {
     "defaultMessage": "Compatibilité inconnue"
+  },
+  "content.metadata-filter.warning.server-only": {
+    "defaultMessage": "Contenu serveur seulement"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Avertissements"
@@ -866,11 +908,32 @@
   "creation-flow.button.setup-server": {
     "defaultMessage": "Mettre le serveur en place"
   },
+  "creation-flow.curseforge.change-button": {
+    "defaultMessage": "Changer"
+  },
+  "creation-flow.curseforge.file-label": {
+    "defaultMessage": "fichier Modpack CurseForge"
+  },
+  "creation-flow.curseforge.link-label": {
+    "defaultMessage": "lien du modpack CurseForge"
+  },
   "creation-flow.curseforge.minecraft-version": {
     "defaultMessage": "Minecraft {version}"
   },
+  "creation-flow.curseforge.or-upload": {
+    "defaultMessage": "Ou téléversez vous-même"
+  },
+  "creation-flow.curseforge.processing-file": {
+    "defaultMessage": "Traitement..."
+  },
   "creation-flow.curseforge.remove-file": {
     "defaultMessage": "Retirer {filename}"
+  },
+  "creation-flow.curseforge.selected-file-label": {
+    "defaultMessage": "fichier Modpack"
+  },
+  "creation-flow.curseforge.title": {
+    "defaultMessage": "Télécharger un modpack CurseForge"
   },
   "creation-flow.modal.custom-setup.build-number.label": {
     "defaultMessage": "Numéro du build"
@@ -2255,6 +2318,9 @@
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Vous devrez réinitialiser votre serveur pour changer de loader."
   },
+  "installation-settings.reinstall-modpack.title": {
+    "defaultMessage": "Réinstaller le modpack"
+  },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Réinstallation du modpack"
   },
@@ -2279,6 +2345,15 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Recherchez une version du jeu..."
   },
+  "installation-settings.shared-instance.title": {
+    "defaultMessage": "Dépublier l'instance"
+  },
+  "installation-settings.shared-instance.unpublish-button": {
+    "defaultMessage": "Dépublier l'instance partagée"
+  },
+  "installation-settings.shared-instance.unpublishing-button": {
+    "defaultMessage": "Dépublication..."
+  },
   "installation-settings.type.instance": {
     "defaultMessage": "instance"
   },
@@ -2296,6 +2371,12 @@
   },
   "installation-settings.unlink.description": {
     "defaultMessage": "Désassocier de façon permanente déconnectera ce {type} du {projectType} projet, vous autorisant à changer le chargeur et la version de Minecraft, mais vous ne pourrez pas recevoir de futures mises à jour."
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
+    "defaultMessage": "Dépublication de l'instance partagée"
+  },
+  "installation-settings.unpublish-shared-instance.modal.header": {
+    "defaultMessage": "Dépublier l'instance partagée"
   },
   "installation-settings.verifying": {
     "defaultMessage": "Vérification en cours..."
@@ -3539,6 +3620,9 @@
   "profile.force-password-reset.error-description": {
     "defaultMessage": "Une erreur s'est produite lors de la réinitialisation du mot de passe, veuillez réessayer."
   },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "Échec de la réinitialisation du mot de passe"
+  },
   "profile.force-password-reset.success-title": {
     "defaultMessage": "Mot de passe réinitialisé"
   },
@@ -3614,8 +3698,14 @@
   "profile.restrict-user.header": {
     "defaultMessage": "Restreindre {username}"
   },
+  "profile.restrict-user.private-reason-label": {
+    "defaultMessage": "Note privée (réservée au personnel)"
+  },
   "profile.restrict-user.private-reason-placeholder": {
     "defaultMessage": "Optionnel"
+  },
+  "profile.restrict-user.reason-label": {
+    "defaultMessage": "Raison (affiché à l'utilisateur)"
   },
   "profile.restrict-user.reason-placeholder": {
     "defaultMessage": "Optionnel"
@@ -3625,6 +3715,9 @@
   },
   "profile.restrict-user.restrictions-label": {
     "defaultMessage": "Restrictions"
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "Session révoquée"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Une erreur s'est produite pendant le déblocage de cet utilisateur. Veuillez réessayer."
@@ -3982,6 +4075,33 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {abonné} other {abonnés}}"
+  },
+  "project.game-awards.body": {
+    "defaultMessage": "{projectName} est l'un des cinq candidats. Il lui faut votre vote, à présent !"
+  },
+  "project.game-awards.category.best-user-creation": {
+    "defaultMessage": "Meilleure création de l'utilisateur"
+  },
+  "project.game-awards.days-left": {
+    "defaultMessage": "{days, plural, one {# jour restant} other {# jours restants}}"
+  },
+  "project.game-awards.event-name": {
+    "defaultMessage": "Les Game Awards {year}"
+  },
+  "project.game-awards.hide-voting-details": {
+    "defaultMessage": "Masquer les détails du vote"
+  },
+  "project.game-awards.nominee-for": {
+    "defaultMessage": "Candidat pour {category}"
+  },
+  "project.game-awards.official-nominee": {
+    "defaultMessage": "Candidat officiel"
+  },
+  "project.game-awards.vote": {
+    "defaultMessage": "Votez aux Game Awards"
+  },
+  "project.game-awards.vote-now": {
+    "defaultMessage": "Voter maintenant"
   },
   "project.license.error": {
     "defaultMessage": "Le texte de la licence n'a pas pu être récupéré."
@@ -4609,6 +4729,9 @@
   },
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Effacer la recherche"
+  },
+  "search.filter.option.search.no_results": {
+    "defaultMessage": "Aucun résultat trouvé"
   },
   "search.filter.option.search.placeholder": {
     "defaultMessage": "Rechercher..."

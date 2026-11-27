@@ -2603,9 +2603,6 @@
   "scopes.userRead.label": {
     "message": "Pagbasa ng datos ng tagagamit"
   },
-  "scopes.userReadEmail.description": {
-    "message": "Pagbasa ng iyong email"
-  },
   "scopes.userReadEmail.label": {
     "message": "Pagbasa ng email ng tagagamit"
   },

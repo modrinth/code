@@ -2193,10 +2193,10 @@
     "message": "残高不足"
   },
   "dashboard.withdraw.error.invalid-address.text": {
-    "message": "提供された住所を確認できませんでした。住所の詳細を再確認してください。"
+    "message": "提供されたアドレスを検証できませんでした。アドレスの詳細を確認してください。"
   },
   "dashboard.withdraw.error.invalid-address.title": {
-    "message": "住所の確認に失敗しました"
+    "message": "アドレスの検証に失敗しました"
   },
   "dashboard.withdraw.error.invalid-bank.text": {
     "message": "入力された銀行口座情報が無効です。情報を確認してください。"
@@ -4583,20 +4583,47 @@
   "project.settings.permissions.not-allowed.description": {
     "message": "含まれる外部コンテンツの一部は、当社のコンテンツルールに違反しているため、Modrinth に配布できず、削除する必要があります。"
   },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "最近編集された"
+  },
   "project.settings.permissions.sort.rejected": {
     "message": "却下"
   },
   "project.settings.permissions.sort.status": {
     "message": "ステータス"
   },
+  "project.settings.server.bedrock-address-label": {
+    "message": "統合版のアドレス"
+  },
+  "project.settings.server.cannot-save-title": {
+    "message": "保存できません"
+  },
+  "project.settings.server.details-heading": {
+    "message": "サーバーの詳細"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "アドレスを入力"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "Javaのアドレス"
+  },
   "project.settings.server.languages-label": {
     "message": "言語設定"
+  },
+  "project.settings.server.latency-label": {
+    "message": "レイテンシ: {latency}ms"
+  },
+  "project.settings.server.optional-label": {
+    "message": "任意"
   },
   "project.settings.server.region-label": {
     "message": "地域"
   },
   "project.settings.server.select-region-placeholder": {
     "message": "地域を選択"
+  },
+  "project.settings.server.server-online": {
+    "message": "サーバーはオンラインです！"
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "関連するタグを選択してください。タグの残りのタグの前に表示されます。"
@@ -4978,9 +5005,6 @@
   },
   "scopes.userRead.label": {
     "message": "ユーザーデータを読み込む"
-  },
-  "scopes.userReadEmail.description": {
-    "message": "メールを読み込む"
   },
   "scopes.userReadEmail.label": {
     "message": "ユーザーのメールを読み込む"

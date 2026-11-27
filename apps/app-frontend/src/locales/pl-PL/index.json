@@ -20,6 +20,9 @@
   "app.action-bar.install.dismiss": {
     "message": "Odrzuć"
   },
+  "app.action-bar.install.inspect-details": {
+    "message": "Sprawdź szczegóły"
+  },
   "app.action-bar.install.open-instance": {
     "message": "Otwórz instancję"
   },
@@ -409,6 +412,12 @@
   },
   "app.download-manager.title": {
     "message": "Menedżer pobierania"
+  },
+  "app.error.copied-debug-info": {
+    "message": "Skopiowano"
+  },
+  "app.error.inspect-debug-info": {
+    "message": "Sprawdź informacje debugowania"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Otwórz folder kopii zapasowych"
@@ -1398,10 +1407,10 @@
     "message": "{count, plural, one {To usuwa udostępnioną instancję z serwerów Modrinth. Osoby używające jej w aplikacji Modrinth przestaną otrzymywać aktualizacje, i będzie ona usunięta z twojej biblioteki.} few{To usuwa udostępnione instancje z serwerów Modrinth. Osoby używające ich w aplikacji Modrinth przestaną otrzymywać aktualizacje, i będą one usunięte z twojej biblioteki.} many {To usuwa udostępnione instancje z serwerów Modrinth. Osoby używające ich w aplikacji Modrinth przestaną otrzymywać aktualizacje, i będą one usunięte z twojej biblioteki.} other{To usuwa udostępnione instancje z serwerów Modrinth. Osoby używające ich w aplikacji Modrinth przestaną otrzymywać aktualizacje, i będą one usunięte z twojej biblioteki.}}"
   },
   "app.library.unpublish-shared-instance.modal.admonition-header": {
-    "message": "{count, plural, one {Cofanie publikacji udostępnionej instancji} few {Cofanie publikacji # udostępnionych instancji} many {Cofanie publikacji # udostępnionych instancji} other {Cofanie publikacji # udostępnionych instancji}}"
+    "message": "{count, plural, one {Cofanie publikacji udostępnionej instancji} other {Cofanie publikacji # udostępnionych instancji}}"
   },
   "app.library.unpublish-shared-instance.modal.header": {
-    "message": "{count, plural, one {Cofnij publikację udostępnionej instancji} few {Cofnij publikację # udoatępnionych instancjii} many {Cofnij publikację # udostępnionych instancjii} other {Cofnij publikację # udostępnionych instancji}}"
+    "message": "{count, plural, one {Cofnij publikację udostępnionej instancji} other {Cofnij publikację # udostępnionych instancji}}"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "Dodatkowy kontekst"
@@ -1812,13 +1821,13 @@
     "message": "Najstarsze"
   },
   "app.server-sharing-update.notification.description": {
-    "message": "Zaproś znajomych, aby zagrać z instancją zarządzaną przez twój serwer."
+    "message": "Zaproś znajomych, aby mogli korzystać z instancji zarządzanej przez Twój serwer."
   },
   "app.server-sharing-update.notification.dismiss": {
     "message": "Odrzuć"
   },
   "app.server-sharing-update.notification.purchase-description": {
-    "message": "Zdobądź serwer i zaproś do niego znajomych z instancją zarządzaną przez niego."
+    "message": "Zdobądź serwer i zaproś do niego znajomych, by mogli grać w instancję zarządzaną automatycznie przez serwer."
   },
   "app.server-sharing-update.notification.view-update": {
     "message": "Zobacz nowości"
@@ -2943,10 +2952,10 @@
     "message": "Telemetria"
   },
   "app.settings.resource-management.always-show-copy-details.description": {
-    "message": "Pokaż szczegóły kopiowania, gdy instalacja jest w kolejce lub uruchomiona. Jest zawsze dostępna dla nieudanych lub przerwanych instalacji."
+    "message": "Pokaż szczegóły inspekcji, gdy instalacja jest w kolejce lub uruchomiona. Jest zawsze dostępna dla nieudanych lub przerwanych instalacji."
   },
   "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "Zawsze pokazuj szczegóły kopii"
+    "message": "Zawsze pokazuj szczegóły inspekcji"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Aplikacja może ładować się wolniej, dopóki pamięć podręczna nie zostanie odbudowana."
@@ -2989,6 +2998,9 @@
   },
   "app.settings.resource-management.app-directory.modal.current": {
     "message": "Aktualny"
+  },
+  "app.settings.resource-management.app-directory.modal.drive-root": {
+    "message": "Wybierz folder zamiast górnej części dysku, żeby Twoje pliki się nie pomieszały z innymi plikami."
   },
   "app.settings.resource-management.app-directory.modal.header": {
     "message": "Zmień katalog aplikacji"
@@ -3881,23 +3893,68 @@
   "hosting.play.not-ready": {
     "message": "Ta instancja nie jest dostępna do uruchomienia. Sprawdź jej status w twojej bibliotece."
   },
+  "hosting.play.update-description": {
+    "message": "Zaktualizuj tę instancję do najnowszej wersji udostępnionej przez serwer przed dołączeniem."
+  },
   "hosting.play.update-to-play": {
     "message": "Zaktualizuj, by grać"
+  },
+  "hosting.play.world-changed": {
+    "message": "Ten świat już nie jest aktywny lub nie został udostępniony. Otwórz panel serwera i naciśnij Graj na serwerze ponownie."
   },
   "installation-settings.advanced.title": {
     "message": "Zaawansowane"
   },
   "installation-settings.relink-shared-instance.button": {
-    "message": "Podłącz ponownie wspólną instancję"
+    "message": "Połącz ponownie udostępnioną instancję"
+  },
+  "installation-settings.relink-shared-instance.description": {
+    "message": "Połącz tę instancję ponownie do udostępnionej instancji, od której została ona odłączona, używając linku z zaproszeniem lub identyfikatora."
+  },
+  "installation-settings.relink-shared-instance.modal.already-linked": {
+    "message": "Twoja instancja \"{name}\" jest już połączona z tą udostępnioną instancją."
+  },
+  "installation-settings.relink-shared-instance.modal.blocked-header": {
+    "message": "Tej instancji nie można ponownie połączyć"
+  },
+  "installation-settings.relink-shared-instance.modal.confirm-body": {
+    "message": "Ta instancja ponownie stanie się źródłem udostępnionej instancji. Członkowie będą otrzymywać zmiany, gdy publikujesz aktualizacje."
+  },
+  "installation-settings.relink-shared-instance.modal.description": {
+    "message": "Połącz ponownie tę instancję z udostępnioną instancją, której jesteś właścicielem."
+  },
+  "installation-settings.relink-shared-instance.modal.find-button": {
+    "message": "Znajdź udostępnioną instancję"
+  },
+  "installation-settings.relink-shared-instance.modal.header": {
+    "message": "Połącz ponownie udostępnioną instancję"
+  },
+  "installation-settings.relink-shared-instance.modal.input-label": {
+    "message": "Link do zaproszenia lub ID udostępnionej instancji"
   },
   "installation-settings.relink-shared-instance.modal.input-placeholder": {
     "message": "https://modrinth.com/share/..."
   },
+  "installation-settings.relink-shared-instance.modal.mismatch-body": {
+    "message": "Ta instancja używa {localLoader} {localGameVersion}, ale udostępniona instancja używa {loader} {gameVersion}. Następne opublikowanie zmian ustawi udostępnioną instancję na wersję z tej instancji."
+  },
   "installation-settings.relink-shared-instance.modal.mismatch-header": {
     "message": "Inna wersja gry lub loadera"
   },
+  "installation-settings.relink-shared-instance.modal.not-owner": {
+    "message": "Tylko właściciel może ponownie połączyć udostępnioną instancję. Aby otrzymywać jej aktualizacje jako członek, zainstaluj ją ponownie z biblioteki."
+  },
   "installation-settings.relink-shared-instance.modal.relink-button": {
-    "message": "Podłącz ponownie"
+    "message": "Połącz ponownie"
+  },
+  "installation-settings.relink-shared-instance.modal.server-managed": {
+    "message": "Ta udostępniona instancja jest zarządzana przez serwer, więc nie może być ponownie połączona."
+  },
+  "installation-settings.relink-shared-instance.modal.version-summary": {
+    "message": "{loader} {gameVersion} · Wersja {version}"
+  },
+  "installation-settings.relink-shared-instance.title": {
+    "message": "Połącz ponownie udostępnioną instancję"
   },
   "installation-settings.shared-instance.linked-title": {
     "message": "Powiązana udostępniona instancja"
@@ -4025,6 +4082,12 @@
   "instance.settings.defaults.open-app-settings": {
     "message": "Zarządzaj domyślnymi ustawieniami"
   },
+  "instance.settings.reset-setting-to-default": {
+    "message": "Przywróć do domyślnych: {setting}"
+  },
+  "instance.settings.reset-to-default": {
+    "message": "Przywróć do domyślnych"
+  },
   "instance.settings.sidebar.label.game": {
     "message": "Gra"
   },
@@ -4093,6 +4156,9 @@
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
     "message": "Nie można duplikować podczas instalowania."
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.locked": {
+    "message": "Zablokowane instancje nie mogą być duplikowane."
   },
   "instance.settings.tabs.general.duplicate-instance": {
     "message": "Duplikuj instancję"
@@ -4358,6 +4424,12 @@
   "instance.shared-instance.network-error.title": {
     "message": "Błąd sieci"
   },
+  "instance.shared-instance.owner-behind.text": {
+    "message": "Nowa wersja została przesłana od innej instalacji Modrinth App. Zainstaluj ją, i spróbuj ponownie."
+  },
+  "instance.shared-instance.owner-behind.title": {
+    "message": "Nie udało się przesłać aktualizacji"
+  },
   "instance.shared-instance.owner-tooltip": {
     "message": "Zawartość tej instancji jest udostępniana dla innych użytkowników."
   },
@@ -4366,6 +4438,12 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Twój dostęp do udostępnionej instancji został odwołany. Instancja jest nadal dostępna, ale nie jest już połączona i nie będzie otrzymywać aktualizacji."
+  },
+  "instance.shared-instance.unavailable.locked-owner-text": {
+    "message": "Udostępniona instancja została zablokowana przez Zespół Moderacji Treści. Nie możesz już przesyłać aktualizacji lub ponownie udostępniać tej instancji."
+  },
+  "instance.shared-instance.unavailable.locked-owner-title": {
+    "message": "Zablokowano udostępnianie instancji"
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Ta udostępniona instancja została zablokowana przez zespół moderacyjny Modrinth. Nie będzie otrzymywać dalszych aktualizacji z instancji źródłowej."
@@ -4378,6 +4456,9 @@
   },
   "instance.shared-instance.unavailable.not-found-text": {
     "message": "Nie udało się znaleźć tej udostępnionej instancji. Twoja zainstalowana zawartość nadal znajduje się na tym urządzeniu."
+  },
+  "instance.shared-instance.unavailable.not-found-title": {
+    "message": "Udostępniona instancja niedostępna"
   },
   "instance.shared-instance.unavailable.text": {
     "message": "Twoja lokalna instancja jest nadal dostępna, ale nie jest już połączona i nie będzie otrzymywać aktualizacji."
