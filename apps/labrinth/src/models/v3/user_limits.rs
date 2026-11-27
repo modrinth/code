@@ -119,13 +119,25 @@ impl UserLimits {
         user: &UserWithScopes,
         pool: &PgPool,
     ) -> Result<Self, sqlx::Error> {
-        let user_id = DBUserId::from(user.user.id);
-        let db_limits =
-            DBUserLimits::get(DBUserId::from(user.user.id), pool).await?;
+        Self::get_for_collections_owned_by(
+            DBUserId::from(user.user.id),
+            user,
+            pool,
+        )
+        .await
+    }
+
+    /// actor with ADMIN_WRITE is not limited, including when the collection is created on another account.
+    pub async fn get_for_collections_owned_by(
+        owner_id: DBUserId,
+        actor: &UserWithScopes,
+        pool: &PgPool,
+    ) -> Result<Self, sqlx::Error> {
+        let db_limits = DBUserLimits::get(owner_id, pool).await?;
         let current = sqlx::query_scalar!(
             "SELECT COUNT(*) FROM collections
             WHERE user_id = $1",
-            user_id as DBUserId,
+            owner_id as DBUserId,
         )
         .fetch_one(pool)
         .await?
@@ -135,7 +147,7 @@ impl UserLimits {
             current,
             max: db_limits.collections,
         }
-        .adjust_for_user(user))
+        .adjust_for_user(actor))
     }
 
     pub async fn get_for_versions_per_project(

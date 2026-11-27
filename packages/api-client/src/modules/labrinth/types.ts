@@ -2721,6 +2721,14 @@ export namespace Labrinth {
 			projects: string[]
 		}
 
+		export type CreateCollectionRequest = {
+			name: string
+			description?: string | null
+			projects?: string[]
+			// allows staff to create collections for other users
+			user_id?: string
+		}
+
 		export type EditCollectionRequest = {
 			name?: string
 			description?: string | null
