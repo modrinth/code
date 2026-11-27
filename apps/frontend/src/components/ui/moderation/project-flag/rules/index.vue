@@ -1,11 +1,24 @@
 <template>
-	<div class="flex flex-col" :class="active ? 'gap-6' : 'gap-4'">
+	<div class="flex flex-col gap-4">
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<slot name="tabs" />
+		</div>
+		<div v-if="active" class="flex flex-wrap items-center gap-2">
+			<Input
+				v-model="search"
+				:icon="SearchIcon"
+				type="search"
+				input-class="[&::-webkit-search-cancel-button]:hidden"
+				aria-label="Search flag rules"
+				placeholder="Search rules by name or ID…"
+				autocomplete="off"
+				wrapper-class="min-w-0 grow basis-full sm:max-w-md sm:basis-48"
+				clearable
+			/>
 			<ButtonLink
-				v-if="active"
 				type="colored"
 				color="brand"
+				class="ml-auto max-w-full shrink-0"
 				:to="{ query: { ...$route.query, rule: 'new' }, hash: $route.hash }"
 			>
 				<PlusIcon />
@@ -38,8 +51,15 @@
 					<h2 class="m-0 text-lg font-bold text-contrast">No project flag rules</h2>
 					<p class="m-0 text-secondary">Create a rule to get started.</p>
 				</div>
+				<p
+					v-else-if="filteredRules.length === 0"
+					role="status"
+					class="universal-card m-0 flex h-[102px] items-center justify-center text-center text-secondary"
+				>
+					No rules match your search.
+				</p>
 				<ProjectFlagRuleCard
-					v-for="rule in rules"
+					v-for="rule in filteredRules"
 					:key="rule.id"
 					:id="`rule-${rule.id}`"
 					:rule="rule"
@@ -74,8 +94,9 @@
 import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
 
 import type { ProjectFlagRule } from '@modrinth/api-client'
-import { LoaderCircleIcon, PlusIcon } from '@modrinth/assets'
-import { Button, ButtonLink } from '@modrinth/ui'
+import { LoaderCircleIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
+import { Button, ButtonLink, Input } from '@modrinth/ui'
+import Fuse from 'fuse.js'
 
 import ProjectFlagRuleCard from './rule-card.vue'
 import { useRules } from './use-rules'
@@ -86,6 +107,14 @@ const ruleToDelete = ref<ProjectFlagRule | null>(null)
 const { data, isPending, isError, error, isFetching, refetch, rules, deleteRule } = useRules(
 	() => props.active,
 )
+const search = ref<string>()
+const ruleSearch = computed(
+	() => new Fuse(rules.value, { keys: ['name', 'id'], threshold: 0.3, ignoreLocation: true }),
+)
+const filteredRules = computed(() => {
+	const term = search.value?.trim()
+	return term ? ruleSearch.value.search(term).map(({ item }) => item) : rules.value
+})
 
 watch(
 	() => route.query.rule,

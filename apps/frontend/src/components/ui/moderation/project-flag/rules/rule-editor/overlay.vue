@@ -2,16 +2,21 @@
 	<NewModal
 		ref="createModal"
 		header="Create rule"
+		width="100%"
 		max-width="28rem"
-		:on-after-show="() => ruleNameInput?.focus()"
+		:initial-focus="() => createForm?.querySelector('input') ?? null"
 		:disable-close="isCreatingRule && selection === 'new'"
 		:on-hide="onCreateModalHide"
 	>
-		<form :id="createFormId" class="flex flex-col gap-2" @submit.prevent="createRule">
+		<form
+			:id="createFormId"
+			ref="createForm"
+			class="flex flex-col gap-2 pb-2"
+			@submit.prevent="createRule"
+		>
 			<label :for="ruleNameId" class="text-sm font-medium text-contrast">Rule name</label>
 			<Input
 				:id="ruleNameId"
-				ref="ruleNameInput"
 				v-model="ruleName"
 				placeholder="Enter a rule name"
 				autocomplete="off"
@@ -96,7 +101,7 @@ const router = useRouter()
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 const ruleEditor = useTemplateRef<InstanceType<typeof RuleEditor>>('ruleEditor')
 const createModal = useTemplateRef<InstanceType<typeof NewModal>>('createModal')
-const ruleNameInput = useTemplateRef<InstanceType<typeof Input>>('ruleNameInput')
+const createForm = useTemplateRef<HTMLFormElement>('createForm')
 const createFormId = useId()
 const ruleNameId = `${createFormId}-name`
 const ruleNameErrorId = `${ruleNameId}-error`
