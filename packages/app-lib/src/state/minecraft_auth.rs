@@ -7,6 +7,9 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use heck::ToTitleCase;
+use modrinth_app_analytics_sdk::types::enums::{
+    MinecraftAuthErrorCode, MinecraftAuthStep as AnalyticsAuthStep,
+};
 use p256::ecdsa::signature::Signer;
 use p256::ecdsa::{Signature, SigningKey, VerifyingKey};
 use p256::elliptic_curve::Generate;
@@ -92,28 +95,104 @@ struct XboxErrorResponse {
     xerr: u64,
 }
 
+impl From<MinecraftAuthStep> for AnalyticsAuthStep {
+    fn from(step: MinecraftAuthStep) -> Self {
+        match step {
+            MinecraftAuthStep::GetDeviceToken => Self::GetDeviceToken,
+            MinecraftAuthStep::SisuAuthenticate => Self::SisuAuthenticate,
+            MinecraftAuthStep::GetOAuthToken => Self::GetOAuthToken,
+            MinecraftAuthStep::RefreshOAuthToken => Self::RefreshOAuthToken,
+            MinecraftAuthStep::SisuAuthorize => Self::SisuAuthorize,
+            MinecraftAuthStep::XstsAuthorize => Self::XstsAuthorize,
+            MinecraftAuthStep::MinecraftToken => Self::MinecraftToken,
+            MinecraftAuthStep::MinecraftEntitlements => {
+                Self::MinecraftEntitlements
+            }
+            MinecraftAuthStep::MinecraftProfile => Self::MinecraftProfile,
+        }
+    }
+}
+
 impl MinecraftAuthenticationError {
     pub(crate) fn code(&self) -> &'static str {
+        match self.error_code() {
+            MinecraftAuthErrorCode::TokenExpired => {
+                "minecraft_auth_token_expired"
+            }
+            MinecraftAuthErrorCode::ClockOutOfSync => {
+                "minecraft_auth_clock_out_of_sync"
+            }
+            MinecraftAuthErrorCode::RateLimited => {
+                "minecraft_auth_rate_limited"
+            }
+            MinecraftAuthErrorCode::ServiceUnavailable => {
+                "minecraft_auth_service_unavailable"
+            }
+            MinecraftAuthErrorCode::ConnectionRefused => {
+                "minecraft_auth_connection_refused"
+            }
+            MinecraftAuthErrorCode::Network => "minecraft_auth_network",
+            MinecraftAuthErrorCode::AgeVerification => {
+                "minecraft_auth_age_verification"
+            }
+            MinecraftAuthErrorCode::Banned => "minecraft_auth_banned",
+            MinecraftAuthErrorCode::Restricted => "minecraft_auth_restricted",
+            MinecraftAuthErrorCode::NoXboxProfile => {
+                "minecraft_auth_no_xbox_profile"
+            }
+            MinecraftAuthErrorCode::TermsNotAccepted => {
+                "minecraft_auth_terms_not_accepted"
+            }
+            MinecraftAuthErrorCode::RegionUnavailable => {
+                "minecraft_auth_region_unavailable"
+            }
+            MinecraftAuthErrorCode::AdultVerification => {
+                "minecraft_auth_adult_verification"
+            }
+            MinecraftAuthErrorCode::Underage => "minecraft_auth_underage",
+            MinecraftAuthErrorCode::XstsRejected(_) => {
+                "minecraft_auth_xsts_rejected"
+            }
+            MinecraftAuthErrorCode::OtherKnown(_)
+            | MinecraftAuthErrorCode::OtherUnknown => "minecraft_auth_error",
+        }
+    }
+
+    pub(crate) fn related_authentication_flow_step(
+        &self,
+    ) -> Option<MinecraftAuthStep> {
+        match self {
+            Self::SerializeBody { step, .. }
+            | Self::DeserializeResponse { step, .. }
+            | Self::Request { step, .. } => Some(*step),
+            Self::ReadingPublicKey
+            | Self::PEMSerialize(_)
+            | Self::NoSessionId
+            | Self::NoUserHash => None,
+        }
+    }
+
+    pub(crate) fn error_code(&self) -> MinecraftAuthErrorCode {
         match self {
             Self::DeserializeResponse {
                 step: MinecraftAuthStep::RefreshOAuthToken,
                 ..
-            } => "minecraft_auth_token_expired",
+            } => MinecraftAuthErrorCode::TokenExpired,
             Self::DeserializeResponse {
                 step: MinecraftAuthStep::SisuAuthenticate,
                 ..
-            } => "minecraft_auth_clock_out_of_sync",
+            } => MinecraftAuthErrorCode::ClockOutOfSync,
             Self::DeserializeResponse {
                 step: MinecraftAuthStep::MinecraftToken,
                 status_code: StatusCode::TOO_MANY_REQUESTS,
                 ..
-            } => "minecraft_auth_rate_limited",
+            } => MinecraftAuthErrorCode::RateLimited,
             Self::DeserializeResponse {
                 step: MinecraftAuthStep::MinecraftToken,
                 status_code,
                 ..
             } if status_code.is_server_error() => {
-                "minecraft_auth_service_unavailable"
+                MinecraftAuthErrorCode::ServiceUnavailable
             }
             Self::Request { source, .. } if source.is_request() => {
                 let connection_refused = iter::successors(
@@ -127,32 +206,35 @@ impl MinecraftAuthenticationError {
                 });
 
                 if connection_refused {
-                    "minecraft_auth_connection_refused"
+                    MinecraftAuthErrorCode::ConnectionRefused
                 } else {
-                    "minecraft_auth_network"
+                    MinecraftAuthErrorCode::Network
                 }
             }
             Self::DeserializeResponse { step, raw, .. } => {
                 match serde_json::from_str::<XboxErrorResponse>(raw)
                     .map(|response| response.xerr)
                 {
-                    Ok(2148916222) => "minecraft_auth_age_verification",
-                    Ok(2148916227) => "minecraft_auth_banned",
-                    Ok(2148916229) => "minecraft_auth_restricted",
-                    Ok(2148916233) => "minecraft_auth_no_xbox_profile",
-                    Ok(2148916234) => "minecraft_auth_terms_not_accepted",
-                    Ok(2148916235) => "minecraft_auth_region_unavailable",
+                    Ok(2148916222) => MinecraftAuthErrorCode::AgeVerification,
+                    Ok(2148916227) => MinecraftAuthErrorCode::Banned,
+                    Ok(2148916229) => MinecraftAuthErrorCode::Restricted,
+                    Ok(2148916233) => MinecraftAuthErrorCode::NoXboxProfile,
+                    Ok(2148916234) => MinecraftAuthErrorCode::TermsNotAccepted,
+                    Ok(2148916235) => MinecraftAuthErrorCode::RegionUnavailable,
                     Ok(2148916236 | 2148916237) => {
-                        "minecraft_auth_adult_verification"
+                        MinecraftAuthErrorCode::AdultVerification
                     }
-                    Ok(2148916238) => "minecraft_auth_underage",
-                    _ if matches!(step, MinecraftAuthStep::XstsAuthorize) => {
-                        "minecraft_auth_xsts_rejected"
+                    Ok(2148916238) => MinecraftAuthErrorCode::Underage,
+                    result
+                        if matches!(step, MinecraftAuthStep::XstsAuthorize) =>
+                    {
+                        MinecraftAuthErrorCode::XstsRejected(result.ok())
                     }
-                    _ => "minecraft_auth_error",
+                    Ok(num) => MinecraftAuthErrorCode::OtherKnown(num),
+                    _ => MinecraftAuthErrorCode::OtherUnknown,
                 }
             }
-            _ => "minecraft_auth_error",
+            _ => MinecraftAuthErrorCode::OtherUnknown,
         }
     }
 

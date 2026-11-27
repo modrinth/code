@@ -1,5 +1,7 @@
+use crate::analytics::InstanceInfo;
 use crate::state::ModLoader;
 use chrono::{DateTime, Utc};
+use modrinth_app_analytics_sdk::types::enums::AppLoader;
 use serde::{Deserialize, Serialize};
 
 use super::unknown_value;
@@ -93,4 +95,29 @@ pub struct ContentSet {
     pub loader_version: Option<String>,
     pub created: DateTime<Utc>,
     pub modified: DateTime<Utc>,
+}
+
+impl ContentSet {
+    /// Describes this content set's loader and game version for an instance
+    /// analytics event.
+    #[must_use]
+    pub fn to_analytics_instance_info(&self) -> InstanceInfo {
+        let loader = match self.loader {
+            ModLoader::Vanilla => AppLoader::Vanilla,
+            ModLoader::Forge => AppLoader::Forge,
+            ModLoader::Fabric => AppLoader::Fabric,
+            ModLoader::Quilt => AppLoader::Quilt,
+            ModLoader::NeoForge => AppLoader::NeoForge,
+        };
+
+        InstanceInfo {
+            loader,
+            loader_version: self
+                .loader_version
+                .as_deref()
+                .filter(|_| loader != AppLoader::Vanilla)
+                .map(Into::into),
+            game_version: self.game_version.as_str().into(),
+        }
+    }
 }

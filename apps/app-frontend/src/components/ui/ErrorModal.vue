@@ -23,7 +23,6 @@ import { computed, ref } from 'vue'
 import { ChatIcon } from '@/assets/icons'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { handleSevereError } from '@/composables/use-error.js'
-import { trackEvent } from '@/helpers/analytics'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { install_existing_instance } from '@/helpers/install'
 import { cancel_directory_change } from '@/helpers/settings.ts'
@@ -120,7 +119,6 @@ async function loginMinecraft() {
 			await set_default_user(loggedIn.profile.id).catch(handleError)
 		}
 
-		await trackEvent('AccountLogIn', { source: 'ErrorModal' })
 		loadingMinecraft.value = false
 		errorModal.value.hide()
 	} catch (err) {

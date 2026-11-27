@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                UPDATE app_analytics\n                SET installation_id = $1\n                WHERE id = 0\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "a460e760aa9ec218698cd3d95584692ad331c7519234974a8cb23ddbd511e2cb"
+}

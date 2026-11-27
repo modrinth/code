@@ -3,7 +3,6 @@ name = "modrinth-app-analytics-sdk"
 edition.workspace = true
 
 [dependencies]
-arc-swap = { workspace = true }
 chrono = { workspace = true }
 modrinth-app-analytics-types = { workspace = true }
 parking_lot = { workspace = true }

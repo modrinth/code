@@ -3,11 +3,13 @@ use crate::api::oauth_utils;
 use crate::api::oauth_utils::auth_code_reply::AuthReplySession;
 use crate::api::oauth_utils::auth_seal::AuthSeal;
 use anyhow::Context;
+use std::time::Instant;
 use tauri::Manager;
 use tauri::Runtime;
 use tauri::plugin::TauriPlugin;
 use tauri_plugin_opener::OpenerExt;
 use theseus::ErrorKind;
+use theseus::analytics::{self, AppEventType, ModrinthSignInFailureReason};
 use theseus::prelude::*;
 use url::Url;
 
@@ -33,26 +35,97 @@ pub async fn modrinth_login<R: Runtime>(
     flow: mr_auth::ModrinthAuthFlow,
     add_account: Option<bool>,
 ) -> Result<ModrinthCredentials> {
+    let started_at = Instant::now();
+    let result = sign_in(&app, flow, add_account.unwrap_or(false)).await;
+    let duration_ms = analytics::elapsed_ms(started_at);
+
+    match result {
+        Ok(credentials) => {
+            analytics::add_event(
+                "Generic",
+                AppEventType::ModrinthSignIn { duration_ms },
+            );
+            Ok(credentials)
+        }
+        Err((reason, error)) => {
+            analytics::add_event(
+                "Generic",
+                AppEventType::ModrinthSignInFailed {
+                    reason,
+                    duration_ms,
+                },
+            );
+            Err(error.into())
+        }
+    }
+}
+
+async fn sign_in<R: Runtime>(
+    app: &tauri::AppHandle<R>,
+    flow: mr_auth::ModrinthAuthFlow,
+    add_account: bool,
+) -> std::result::Result<
+    ModrinthCredentials,
+    (ModrinthSignInFailureReason, theseus::Error),
+> {
     let seal = AuthSeal::generate();
     let mut reply = AuthReplySession::start(seal.nonce().to_string());
-    let auth_code_recv_socket = reply.socket_addr().await?;
+    let auth_code_recv_socket = reply.socket_addr().await.map_err(|error| {
+        (ModrinthSignInFailureReason::ReplyListenerFailed, error)
+    })?;
+    let begin_url = mr_auth::authenticate_begin_flow(flow)
+        .await
+        .map_err(|error| (ModrinthSignInFailureReason::Other, error))?;
+    let public_key = seal
+        .public_key()
+        .map_err(|error| (ModrinthSignInFailureReason::Other, error))?;
     let auth_request_uri = auth_request_url(
-        mr_auth::authenticate_begin_flow(flow).await?,
+        begin_url,
         &auth_code_recv_socket,
-        &seal.public_key()?,
+        &public_key,
         seal.nonce(),
-        add_account.unwrap_or(false),
-    )?;
+        add_account,
+    )
+    .map_err(|error| (ModrinthSignInFailureReason::Other, error))?;
 
     app.opener()
         .open_url(auth_request_uri, None::<&str>)
-        .context("failed to open auth request URI")?;
+        .context("failed to open auth request URI")
+        .map_err(|error| {
+            (ModrinthSignInFailureReason::BrowserOpenFailed, error)
+        })?;
 
-    let Some(auth_code) = reply.wait().await? else {
-        return Err(ErrorKind::LoginCanceled.into());
+    let auth_code = match reply.wait().await {
+        Ok(Some(auth_code)) => auth_code,
+        Ok(None) => {
+            return Err((
+                ModrinthSignInFailureReason::Cancelled,
+                ErrorKind::LoginCanceled.into(),
+            ));
+        }
+        Err(error) => {
+            return Err((
+                ModrinthSignInFailureReason::ReplyListenerFailed,
+                error,
+            ));
+        }
     };
-    let session_token = seal.open(&auth_code)?;
-    let credentials = mr_auth::authenticate_finish_flow(&session_token).await?;
+    let session_token = seal
+        .open(&auth_code)
+        .map_err(|error| (ModrinthSignInFailureReason::InvalidReply, error))?;
+
+    #[rustfmt::skip] // rustfmt makes this look weird
+    let credentials = mr_auth::authenticate_finish_flow(&session_token)
+        .await
+        .map_err(|error| {
+            let reason = match theseus::error_code(&error) {
+                "network_error" | "api_error" | "parse_error" => {
+                    ModrinthSignInFailureReason::FetchUserFailed
+                }
+                _ => ModrinthSignInFailureReason::Other,
+            };
+            (reason, error)
+        })?;
 
     if let Some(main_window) = app.get_window("main") {
         main_window.set_focus().ok();
@@ -82,8 +155,15 @@ pub async fn set_active(user_id: String) -> Result<()> {
 }
 
 #[tauri::command]
-pub async fn remove_account(user_id: String) -> Result<()> {
-    Ok(theseus::mr_auth::remove_user(&user_id).await?)
+pub async fn remove_account(
+    user_id: String,
+    initial_session_validation_failed: Option<bool>,
+) -> Result<()> {
+    Ok(theseus::mr_auth::remove_user(
+        &user_id,
+        initial_session_validation_failed.unwrap_or(false),
+    )
+    .await?)
 }
 
 #[tauri::command]
@@ -97,7 +177,7 @@ fn auth_request_url(
     public_key: &str,
     nonce: &str,
     add_account: bool,
-) -> Result<String> {
+) -> theseus::Result<String> {
     let mut url =
         Url::parse(begin_url).context("failed to build auth request URI")?;
     {

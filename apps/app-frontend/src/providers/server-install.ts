@@ -4,7 +4,6 @@ import { type Ref, ref } from 'vue'
 import type { Router } from 'vue-router'
 
 import { handleSevereError } from '@/composables/use-error.js'
-import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version } from '@/helpers/cache.js'
 import {
 	install_create_instance,
@@ -163,11 +162,6 @@ export function createServerInstall(opts: {
 								action: async () => {
 									try {
 										await joinServer(project.id, serverAddress)
-										trackEvent('InstanceStart', {
-											loader: project.loader,
-											game_version: project.game_version,
-											source: 'ServerProject',
-										})
 									} catch (err) {
 										handleSevereError(err, { instanceId: project.id })
 									}
@@ -199,11 +193,6 @@ export function createServerInstall(opts: {
 								action: async () => {
 									try {
 										if (serverAddress) await start_join_server(instance.id, serverAddress)
-										trackEvent('InstanceStart', {
-											loader: instance.loader,
-											game_version: instance.game_version,
-											source: 'ServerProject',
-										})
 									} catch (err) {
 										handleSevereError(err, { instanceId: instance.id })
 									}
@@ -349,11 +338,6 @@ export function createServerInstall(opts: {
 		// Join server
 		try {
 			await joinServer(instance.id, serverAddress)
-			trackEvent('InstanceStart', {
-				loader: instance.loader,
-				game_version: instance.game_version,
-				source: 'ServerProject',
-			})
 		} catch (err) {
 			handleSevereError(err, { instanceId: instance.id })
 		}

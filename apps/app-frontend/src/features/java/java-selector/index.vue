@@ -100,7 +100,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
 import { jreQueryOptions } from '@/features/java/queries'
-import { trackEvent } from '@/helpers/analytics'
 import { autoInstallJava } from '@/platform/app-lib/jre/commands'
 import type { JavaVersion } from '@/platform/app-lib/jre/types'
 import { pickFile } from '@/platform/dialogs'
@@ -265,7 +264,6 @@ async function browse() {
 	const selected = await pickFile()
 	if (!selected) return
 
-	trackEvent('JavaManualSelect', { version: props.version?.toString() ?? '' })
 	await selectPath(selected)
 }
 

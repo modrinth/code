@@ -4,7 +4,10 @@ use anyhow::Context;
 use reqwest::StatusCode;
 
 use crate::State;
-use crate::state::{Credentials, MinecraftLoginFlow};
+use crate::analytics::{self, AppEventType, MicrosoftSignInFailureReason};
+use crate::state::{
+    Credentials, MinecraftAuthenticationError, MinecraftLoginFlow,
+};
 use crate::util::fetch::INSECURE_REQWEST_CLIENT;
 
 #[tracing::instrument]
@@ -79,6 +82,15 @@ pub async fn remove_user(uuid: uuid::Uuid) -> crate::Result<()> {
     if let Some((uuid, user)) = users.remove(&uuid) {
         Credentials::remove(uuid, &state.pool).await?;
 
+        analytics::add_event(
+            "Generic",
+            AppEventType::MicrosoftSignOut {
+                num_accounts_left: u32::try_from(users.len())
+                    .unwrap_or(u32::MAX),
+                was_active_account: user.active,
+            },
+        );
+
         if user.active
             && let Some((_, mut user)) = users.into_iter().next()
         {
@@ -96,4 +108,27 @@ pub async fn users() -> crate::Result<Vec<Credentials>> {
     let state = State::get().await?;
     let users = Credentials::get_all(&state.pool).await?;
     Ok(users.into_iter().map(|x| x.1).collect())
+}
+
+/// Classifies why signing in to a Microsoft account failed with `error`.
+#[must_use]
+pub fn sign_in_failure_reason(
+    error: &crate::Error,
+) -> MicrosoftSignInFailureReason {
+    if crate::error_kinds(error)
+        .any(|kind| matches!(kind, crate::ErrorKind::NoMinecraftProfile))
+    {
+        return MicrosoftSignInFailureReason::NoMinecraftProfile;
+    }
+
+    match error
+        .chain()
+        .find_map(|cause| cause.downcast_ref::<MinecraftAuthenticationError>())
+    {
+        Some(error) => MicrosoftSignInFailureReason::Auth {
+            code: error.error_code(),
+            step: error.related_authentication_flow_step().map(Into::into),
+        },
+        None => MicrosoftSignInFailureReason::Other,
+    }
 }

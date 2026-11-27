@@ -1,7 +1,6 @@
 import { onScopeDispose, type Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { trackEvent } from '@/helpers/analytics'
 import { debugStartup } from '@/helpers/startup-debug'
 
 import { useAppLoadingState } from './use-app-loading-state'
@@ -64,11 +63,6 @@ export function useRouteLoading({ stateInitialized, stateFailed }: RouteLoadingO
 	const removeAfterEach = router.afterEach((to, from, failure) => {
 		debugStartup('Route navigation settled', { to: to.path, failed: !!failure })
 		updateHistoryNavigationState()
-		trackEvent('PageView', {
-			path: to.path,
-			fromPath: from.path,
-			failed: !!failure,
-		})
 		const timer = setTimeout(() => {
 			releaseTimers.delete(timer)
 			debugStartup('Route loading release check', {

@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT installation_id\n        FROM app_analytics\n        WHERE id = 0\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "installation_id",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "app_analytics",
+            "name": "installation_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "7e85ed015fe0d758c63a2fe6074c90bafc9a7debcfaf3f497915c04b4f147930"
+}

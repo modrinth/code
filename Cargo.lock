@@ -8445,7 +8445,6 @@ dependencies = [
 name = "modrinth-app-analytics-sdk"
 version = "0.0.0"
 dependencies = [
- "arc-swap",
  "chrono",
  "modrinth-app-analytics-types",
  "parking_lot",
@@ -14447,6 +14446,7 @@ dependencies = [
  "json5",
  "libc",
  "minecraft-meta-manifest",
+ "modrinth-app-analytics-sdk",
  "modrinth-content-management",
  "modrinth-skin-rendering",
  "notify",

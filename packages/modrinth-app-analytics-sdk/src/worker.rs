@@ -40,9 +40,7 @@ pub(crate) async fn bg(a: Arc<AnalyticsInner>, mut drain_rx: DrainReceiver) {
 
             match a.send_batch(batch).await {
                 Ok(()) => backoff = BACKOFF_DEFAULT,
-                Err(events) => {
-                    a.queue.requeue(events);
-
+                Err(()) => {
                     tokio::select! {
                         () = sleep(backoff) => {}
                         reply = drain_rx.recv() => {
@@ -70,8 +68,7 @@ async fn drain(
             break true;
         }
 
-        if let Err(events) = a.send_batch(batch).await {
-            a.queue.requeue(events);
+        if a.send_batch(batch).await.is_err() {
             break false;
         }
     };

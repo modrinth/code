@@ -64,7 +64,6 @@ import { ref } from 'vue'
 import steveImage from '@/assets/steve-look-up-left.webp'
 import { handleSevereError } from '@/composables/use-error.js'
 import { injectMinecraftAccounts } from '@/features/minecraft-accounts/context'
-import { trackEvent } from '@/helpers/analytics'
 import { login as loginFlow, set_default_user } from '@/helpers/auth.js'
 
 const { formatMessage } = useVIntl()
@@ -118,7 +117,6 @@ async function signIn() {
 
 		await set_default_user(loggedIn.profile.id)
 		await minecraftAccounts.value?.refreshValues()
-		await trackEvent('AccountLogIn', { source: 'MinecraftRequiredModal' })
 		modal.value?.hide()
 	} catch (error) {
 		handleSevereError(error)

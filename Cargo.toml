@@ -152,6 +152,7 @@ lz4_flex = { version = "0.14.0", default-features = false, features = [
 ] }
 minecraft-meta-manifest = { path = "packages/minecraft-meta-manifest" }
 minecraft-meta-model = { path = "packages/minecraft-meta-model" }
+modrinth-app-analytics-sdk = { path = "packages/modrinth-app-analytics-sdk" }
 modrinth-app-analytics-types = { path = "packages/modrinth-app-analytics-types" }
 modrinth-content-management = { path = "packages/modrinth-content-management" }
 modrinth-log = { path = "packages/modrinth-log" }

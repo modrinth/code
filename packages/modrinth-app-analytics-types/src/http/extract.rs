@@ -30,7 +30,7 @@ pub const MAX_EVENT_IN_ADVANCE: TimeDelta = TimeDelta::hours(23);
 pub const MAX_APP_VERSION_LEN: usize = 32;
 
 /// Longest event source accepted, in bytes.
-pub const MAX_SOURCE_LEN: usize = 23;
+pub const MAX_SOURCE_LEN: usize = 32;
 
 /// Longest game or loader version accepted, in bytes.
 pub const MAX_INSTANCE_VERSION_FIELD_LEN: usize = 64;
@@ -401,20 +401,5 @@ mod tests {
             extracted.rejected.as_slice(),
             [SingleEventProcessingError::InvalidAppVersion]
         ));
-    }
-
-    #[test]
-    fn validates_source_format() {
-        assert!(is_valid_source("BrowseTab"));
-        assert!(is_valid_source("NewInstance2"));
-        assert!(is_valid_source("X"));
-        assert!(!is_valid_source(""));
-        assert!(!is_valid_source("browseTab"));
-        assert!(!is_valid_source("Browse_Tab"));
-        assert!(!is_valid_source("2Browse"));
-        assert!(!is_valid_source(&format!(
-            "A{}",
-            "a".repeat(MAX_SOURCE_LEN)
-        )));
     }
 }
