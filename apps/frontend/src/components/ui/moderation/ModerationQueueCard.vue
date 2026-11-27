@@ -60,37 +60,27 @@
 							</span>
 						</div>
 					</div>
-					<div v-if="queueEntry.ownership?.kind === 'user'">
+					<div v-if="queueEntry.ownership" ref="ownerRow" class="flex flex-wrap items-center gap-2">
 						<NuxtLink
-							:to="`/user/${queueEntry.ownership.id}`"
+							:to="`/${queueEntry.ownership.kind}/${queueEntry.ownership.id}`"
 							target="_blank"
-							class="flex w-fit min-w-40 items-center gap-1 text-sm font-medium text-secondary hover:underline"
+							class="flex w-fit items-center gap-1 text-sm font-medium text-secondary hover:underline"
 						>
 							<Avatar
 								:src="queueEntry.ownership.icon_url"
 								size="1.5rem"
-								circle
+								:circle="queueEntry.ownership.kind === 'user'"
 								class="border border-surface-5 bg-surface-4 !shadow-none"
 							/>
 							{{ queueEntry.ownership.name }}
 						</NuxtLink>
-					</div>
-					<div
-						v-else-if="queueEntry.ownership?.kind === 'organization'"
-						class="flex items-center gap-1"
-					>
-						<Avatar
-							:src="queueEntry.ownership.icon_url"
-							size="1.5rem"
-							class="border border-surface-5 bg-surface-4 !shadow-none"
+						<CreatorStatusStats
+							v-if="ownerStatsRequested"
+							:id="queueEntry.ownership.id"
+							:kind="queueEntry.ownership.kind"
+							:active="ownerRowVisible"
+							class="!mt-0"
 						/>
-						<NuxtLink
-							:to="`/organization/${queueEntry.ownership.id}`"
-							target="_blank"
-							class="text-sm font-medium text-secondary hover:underline"
-						>
-							{{ queueEntry.ownership.name }}
-						</NuxtLink>
 					</div>
 				</div>
 			</div>
@@ -161,9 +151,11 @@ import {
 	useRelativeTime,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
+import { useIntersectionObserver } from '@vueuse/core'
 import dayjs from 'dayjs'
-import { computed } from 'vue'
+import { computed, ref, shallowRef, useTemplateRef } from 'vue'
 
+import CreatorStatusStats from '~/components/CreatorStatusStats.vue'
 import type { ModerationProject } from '~/helpers/moderation'
 
 const formatRelativeTime = useRelativeTime()
@@ -187,6 +179,17 @@ const props = defineProps<{
 const emit = defineEmits<{
 	startFromProject: [projectId: string]
 }>()
+
+const ownerRow = useTemplateRef<HTMLDivElement>('ownerRow')
+const ownerStatsRequested = ref(false)
+const visibleOwnerRow = shallowRef<Element | null>(null)
+const ownerRowVisible = computed(() => !!ownerRow.value && ownerRow.value === visibleOwnerRow.value)
+useIntersectionObserver(ownerRow, (entries) => {
+	const entry = entries.at(-1)
+	if (!entry || entry.target !== ownerRow.value) return
+	visibleOwnerRow.value = entry.isIntersecting ? entry.target : null
+	if (entry.isIntersecting) ownerStatsRequested.value = true
+})
 
 function getDaysQueued(date: Date): number {
 	const now = new Date()

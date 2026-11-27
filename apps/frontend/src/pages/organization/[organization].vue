@@ -78,32 +78,39 @@
 
 				<SidebarCard title="Members">
 					<div class="flex flex-col gap-3 font-semibold">
-						<nuxt-link
-							v-for="member in acceptedMembers"
-							:key="`member-${member?.user?.id}`"
-							class="group flex w-fit items-center gap-2 leading-[1.2] text-primary"
-							:to="`/user/${member?.user?.username}`"
-						>
-							<Avatar
-								:src="member.user.avatar_url"
-								:alt="member.user.username"
-								size="32px"
-								circle
+						<div v-for="member in acceptedMembers" :key="member.user.id">
+							<nuxt-link
+								class="group flex w-fit items-center gap-2 leading-[1.2] text-primary"
+								:to="`/user/${member.user.username}`"
+							>
+								<Avatar
+									:src="member.user.avatar_url"
+									:alt="member.user.username"
+									size="32px"
+									circle
+								/>
+								<div class="flex flex-col">
+									<span class="flex w-full flex-nowrap items-center gap-1 group-hover:underline">
+										<span class="min-w-0 overflow-hidden truncate">{{ member.user.username }}</span>
+										<CrownIcon
+											v-if="member.is_owner"
+											v-tooltip="'Organization owner'"
+											class="text-brand-orange"
+										/>
+									</span>
+									<span class="text-sm font-normal text-secondary">
+										{{ member?.role ? member.role : 'Member' }}
+									</span>
+								</div>
+							</nuxt-link>
+							<ProjectStatusStats
+								v-if="
+									showCreatorStats && memberStats[member.user.id]?.some((stat) => stat.count > 0)
+								"
+								:stats="memberStats[member.user.id] ?? []"
+								class="ml-10"
 							/>
-							<div class="flex flex-col">
-								<span class="flex w-full flex-nowrap items-center gap-1 group-hover:underline">
-									<span class="min-w-0 overflow-hidden truncate">{{ member.user.username }}</span>
-									<CrownIcon
-										v-if="member.is_owner"
-										v-tooltip="'Organization owner'"
-										class="text-brand-orange"
-									/>
-								</span>
-								<span class="text-sm font-normal text-secondary">
-									{{ member?.role ? member.role : 'Member' }}
-								</span>
-							</div>
-						</nuxt-link>
+						</div>
 					</div>
 				</SidebarCard>
 			</div>
@@ -182,10 +189,15 @@ import type { Organization, ProjectType } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
+import ProjectStatusStats from '~/components/ProjectStatusStats.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavStack from '~/components/ui/NavStack.vue'
 import OrganizationPageHeader from '~/components/ui/OrganizationPageHeader.vue'
+import {
+	useCreatorProjectStats,
+	useShowCreatorStatsOnPublicPages,
+} from '~/composables/creator-project-stats'
 import { warmProjectCheckCaches } from '~/composables/queries/project'
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 import {
@@ -306,6 +318,13 @@ const acceptedMembers = computed(() => {
 
 	return owner ? [owner, ...rest] : rest
 })
+
+const showCreatorStats = useShowCreatorStatsOnPublicPages()
+const { memberStats } = useCreatorProjectStats(
+	computed(() => acceptedMembers.value.map((member) => member.user.id)),
+	ref(''),
+	computed(() => showCreatorStats.value && !routeHasSettings.value),
+)
 
 const isInvited = computed(() => {
 	return currentMember.value?.accepted === false
