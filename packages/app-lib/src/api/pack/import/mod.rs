@@ -257,13 +257,24 @@ pub fn get_default_launcher_path(
             return find_multimc_path();
         }
         ImportLauncherType::PrismLauncher => {
-            Some(dirs::data_dir()?.join("PrismLauncher"))
+            let native = host_data_dir()?.join("PrismLauncher");
+            if native.exists() {
+                return Some(native);
+            }
+            Some(
+                dirs::home_dir()?
+                    .join(".var")
+                    .join("app")
+                    .join("org.prismlauncher.PrismLauncher")
+                    .join("data")
+                    .join("PrismLauncher"),
+            )
         }
         ImportLauncherType::ATLauncher => {
-            Some(dirs::data_dir()?.join("ATLauncher"))
+            Some(host_data_dir()?.join("ATLauncher"))
         }
         ImportLauncherType::GDLauncher => {
-            Some(dirs::data_dir()?.join("gdlauncher_next"))
+            Some(host_data_dir()?.join("gdlauncher_next"))
         }
         ImportLauncherType::Curseforge => {
             let home = dirs::home_dir()?;
@@ -279,13 +290,23 @@ pub fn get_default_launcher_path(
     if path.exists() { Some(path) } else { None }
 }
 
+fn host_data_dir() -> Option<PathBuf> {
+    if std::env::var_os("FLATPAK_ID").is_none() {
+        return dirs::data_dir();
+    }
+    std::env::var_os("HOST_XDG_DATA_HOME")
+        .filter(|dir| !dir.is_empty())
+        .map(PathBuf::from)
+        .or_else(|| Some(dirs::home_dir()?.join(".local").join("share")))
+}
+
 /// Searches common locations for a MultiMC installation.
 /// MultiMC stores data in its own application directory (not a standard data dir)
 fn find_multimc_path() -> Option<PathBuf> {
     let mut candidates: Vec<PathBuf> = Vec::new();
 
     // Linux/macOS: ~/.local/share/multimc is the typical location
-    if let Some(data_dir) = dirs::data_dir() {
+    if let Some(data_dir) = host_data_dir() {
         candidates.push(data_dir.join("multimc"));
         candidates.push(data_dir.join("MultiMC"));
     }
