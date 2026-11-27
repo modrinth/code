@@ -2507,6 +2507,9 @@
   "app.settings.game-options.setting.hostile-volume.label": {
     "message": "Hostile creatures"
   },
+  "app.settings.game-options.setting.improved-fog.label": {
+    "message": "Improved fog"
+  },
   "app.settings.game-options.setting.improved-transparency.label": {
     "message": "Improved transparency"
   },
@@ -2681,6 +2684,9 @@
   "app.settings.game-options.setting.key-quick-actions.label": {
     "message": "Quick actions"
   },
+  "app.settings.game-options.setting.key-repeat-recipe-or-trade.label": {
+    "message": "Repeat recipe/trade"
+  },
   "app.settings.game-options.setting.key-right.label": {
     "message": "Strafe right"
   },
@@ -2803,6 +2809,9 @@
   },
   "app.settings.game-options.setting.players-volume.label": {
     "message": "Players"
+  },
+  "app.settings.game-options.setting.prefer-dxgi-present.label": {
+    "message": "Prefer DXGI present"
   },
   "app.settings.game-options.setting.prioritize-chunk-updates.label": {
     "message": "Prioritize chunk updates"

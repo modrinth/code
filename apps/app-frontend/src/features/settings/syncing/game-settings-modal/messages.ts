@@ -399,6 +399,10 @@ const catalogSettingMessages = defineMessages({
 		id: 'app.settings.game-options.setting.graphics-backend.label',
 		defaultMessage: 'Graphics backend',
 	},
+	preferDxgiPresentLabel: {
+		id: 'app.settings.game-options.setting.prefer-dxgi-present.label',
+		defaultMessage: 'Prefer DXGI present',
+	},
 	cloudRangeLabel: {
 		id: 'app.settings.game-options.setting.cloud-range.label',
 		defaultMessage: 'Cloud distance',
@@ -438,6 +442,10 @@ const catalogSettingMessages = defineMessages({
 	cutoutLeavesLabel: {
 		id: 'app.settings.game-options.setting.cutout-leaves.label',
 		defaultMessage: 'Cutout leaves',
+	},
+	improvedFogLabel: {
+		id: 'app.settings.game-options.setting.improved-fog.label',
+		defaultMessage: 'Improved fog',
 	},
 	improvedTransparencyLabel: {
 		id: 'app.settings.game-options.setting.improved-transparency.label',
@@ -709,6 +717,10 @@ const catalogKeyMessages = defineMessages({
 	socialInteractionsLabel: {
 		id: 'app.settings.game-options.setting.key-social-interactions.label',
 		defaultMessage: 'Social interactions',
+	},
+	repeatRecipeOrTradeLabel: {
+		id: 'app.settings.game-options.setting.key-repeat-recipe-or-trade.label',
+		defaultMessage: 'Repeat recipe/trade',
 	},
 	quickActionsLabel: {
 		id: 'app.settings.game-options.setting.key-quick-actions.label',
@@ -1154,6 +1166,7 @@ const knownSettings: Record<string, { label: MessageDescriptor; description?: Me
 		entity_distance: { label: catalogSettingMessages.entityDistanceLabel },
 		debug_gui_scale: { label: catalogSettingMessages.debugGuiScaleLabel },
 		graphics_backend: { label: catalogSettingMessages.graphicsBackendLabel },
+		prefer_dxgi_present: { label: catalogSettingMessages.preferDxgiPresentLabel },
 		cloud_range: { label: catalogSettingMessages.cloudRangeLabel },
 		exclusive_fullscreen: { label: catalogSettingMessages.exclusiveFullscreenLabel },
 		mac_fullscreen_menu: { label: catalogSettingMessages.macFullscreenMenuLabel },
@@ -1166,6 +1179,7 @@ const knownSettings: Record<string, { label: MessageDescriptor; description?: Me
 		reduced_debug_info: { label: catalogSettingMessages.reducedDebugInfoLabel },
 		chunk_fade_time: { label: catalogSettingMessages.chunkFadeTimeLabel },
 		cutout_leaves: { label: catalogSettingMessages.cutoutLeavesLabel },
+		improved_fog: { label: catalogSettingMessages.improvedFogLabel },
 		improved_transparency: { label: catalogSettingMessages.improvedTransparencyLabel },
 		texture_filtering: { label: catalogSettingMessages.textureFilteringLabel },
 		anisotropy: { label: catalogSettingMessages.anisotropyLabel },
@@ -1233,6 +1247,7 @@ const knownSettings: Record<string, { label: MessageDescriptor; description?: Me
 		'key.save_toolbar': { label: catalogKeyMessages.saveToolbarLabel },
 		'key.load_toolbar': { label: catalogKeyMessages.loadToolbarLabel },
 		'key.social_interactions': { label: catalogKeyMessages.socialInteractionsLabel },
+		'key.repeat_recipe_or_trade': { label: catalogKeyMessages.repeatRecipeOrTradeLabel },
 		'key.quick_actions': { label: catalogKeyMessages.quickActionsLabel },
 		'key.spectator_hotbar': { label: catalogKeyMessages.spectatorHotbarLabel },
 		'key.friends': { label: catalogKeyMessages.friendsLabel },
