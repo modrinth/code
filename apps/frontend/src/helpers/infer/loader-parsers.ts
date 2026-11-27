@@ -149,10 +149,10 @@ export function createLoaderParsers(
 			const manifestFile = zip.file('META-INF/MANIFEST.MF')
 			if (manifestFile !== null) {
 				const manifestText = await manifestFile.async('text')
-				if (manifestText.match(/^Legacy-Fabric-Intermediary-Version: (.*)$/)) {
+				if (manifestText.match(/^Legacy-Fabric-Intermediary-Version: (.*)$/m)) {
 					loaders.push('legacy-fabric')
 				}
-				if (manifestText.match(/^Calamus-Generation: (.*)$/)) {
+				if (manifestText.match(/^Calamus-Generation: (.*)$/m)) {
 					loaders.push('ornithe')
 				}
 			}
@@ -228,7 +228,7 @@ export function createLoaderParsers(
 			const manifestFile = zip.file('META-INF/MANIFEST.MF')
 			if (manifestFile !== null) {
 				const manifestText = await manifestFile.async('text')
-				if (manifestText.match(/^Calamus-Generation: (.*)$/)) {
+				if (manifestText.match(/^Calamus-Generation: (.*)$/m)) {
 					loaders.push('ornithe')
 				}
 			}
