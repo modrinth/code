@@ -1727,9 +1727,6 @@
   "app.screenshots.preview.instance-and-date": {
     "message": "{instance} · {date}"
   },
-  "app.screenshots.search": {
-    "message": "Suchen"
-  },
   "app.screenshots.select": {
     "message": "{name} auswählen"
   },
@@ -1766,17 +1763,8 @@
   "app.screenshots.show-in-folder": {
     "message": "In Ordner anzeigen"
   },
-  "app.screenshots.sort-by": {
-    "message": "Sortieren nach"
-  },
   "app.screenshots.sort.name": {
     "message": "Name"
-  },
-  "app.screenshots.sort.newest": {
-    "message": "Neueste"
-  },
-  "app.screenshots.sort.oldest": {
-    "message": "Älteste"
   },
   "app.server-sharing-update.notification.description": {
     "message": "Lade Freunde ein, mit einer Instanz zu spielen, die von deinem Server verwaltet wird."

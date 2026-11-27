@@ -1727,9 +1727,6 @@
   "app.screenshots.preview.instance-and-date": {
     "message": "{instance} · {date}"
   },
-  "app.screenshots.search": {
-    "message": "검색"
-  },
   "app.screenshots.select": {
     "message": "{name} 선택"
   },
@@ -1766,17 +1763,8 @@
   "app.screenshots.show-in-folder": {
     "message": "폴더에서 보기"
   },
-  "app.screenshots.sort-by": {
-    "message": "정렬 기준"
-  },
   "app.screenshots.sort.name": {
     "message": "이름"
-  },
-  "app.screenshots.sort.newest": {
-    "message": "최신"
-  },
-  "app.screenshots.sort.oldest": {
-    "message": "오래됨"
   },
   "app.server-sharing-update.notification.description": {
     "message": "서버로 관리되는 인스턴스에서 함께 플레이할 친구를 초대하세요."

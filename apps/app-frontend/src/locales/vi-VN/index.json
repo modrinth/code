@@ -1526,9 +1526,6 @@
   "app.screenshots.preview.instance-and-date": {
     "message": "{instance} · {date}"
   },
-  "app.screenshots.search": {
-    "message": "Tìm kiếm"
-  },
   "app.screenshots.select": {
     "message": "Chọn {name}"
   },
@@ -1565,17 +1562,8 @@
   "app.screenshots.show-in-folder": {
     "message": "Hiển thị trong thư mục"
   },
-  "app.screenshots.sort-by": {
-    "message": "Sắp xếp theo"
-  },
   "app.screenshots.sort.name": {
     "message": "Tên"
-  },
-  "app.screenshots.sort.newest": {
-    "message": "Mới nhất"
-  },
-  "app.screenshots.sort.oldest": {
-    "message": "Cũ nhất"
   },
   "app.settings.app-version": {
     "message": "Ứng dụng Modrinth {version}"

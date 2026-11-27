@@ -1727,9 +1727,6 @@
   "app.screenshots.preview.instance-and-date": {
     "message": "{instance} · {date}"
   },
-  "app.screenshots.search": {
-    "message": "検索"
-  },
   "app.screenshots.select": {
     "message": "{name}を選択"
   },
@@ -1766,17 +1763,8 @@
   "app.screenshots.show-in-folder": {
     "message": "フォルダーで表示"
   },
-  "app.screenshots.sort-by": {
-    "message": "並び替え"
-  },
   "app.screenshots.sort.name": {
     "message": "名前順"
-  },
-  "app.screenshots.sort.newest": {
-    "message": "新しい順"
-  },
-  "app.screenshots.sort.oldest": {
-    "message": "古い順"
   },
   "app.server-sharing-update.notification.description": {
     "message": "サーバーによって管理されるインスタンスでプレイするフレンドを招待します。"

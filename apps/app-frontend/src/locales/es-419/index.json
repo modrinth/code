@@ -1697,9 +1697,6 @@
   "app.screenshots.preview.instance-and-date": {
     "message": "{instance} · {date}"
   },
-  "app.screenshots.search": {
-    "message": "Buscar"
-  },
   "app.screenshots.select": {
     "message": "Seleccionar {name}"
   },
@@ -1736,17 +1733,8 @@
   "app.screenshots.show-in-folder": {
     "message": "Mostrar en carpeta"
   },
-  "app.screenshots.sort-by": {
-    "message": "Ordenar por"
-  },
   "app.screenshots.sort.name": {
     "message": "Nombre"
-  },
-  "app.screenshots.sort.newest": {
-    "message": "Más recientes"
-  },
-  "app.screenshots.sort.oldest": {
-    "message": "Más antiguos"
   },
   "app.server-sharing-update.notification.description": {
     "message": "Invita a tus amigos a jugar con una instancia administrada por tu servidor."
