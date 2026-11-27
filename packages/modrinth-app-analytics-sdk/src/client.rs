@@ -192,11 +192,15 @@ pub(crate) struct AnalyticsInner {
 impl AnalyticsInner {
     /// Send a batch of events, if analytics haven't been opted-out of.
     ///
+    /// When the send fails, the events are put back in the queue to be
+    /// retried, unless the installation ID changed or analytics were opted
+    /// out of while sending.
+    ///
     /// `events` must be at most [`MAX_EVENTS_PER_BATCH`] events.
     pub(crate) async fn send_batch(
         &self,
         events: Vec<AppEvent>,
-    ) -> Result<(), Vec<AppEvent>> {
+    ) -> Result<(), ()> {
         assert!(
             events.len() <= MAX_EVENTS_PER_BATCH,
             "events len must be at most {MAX_EVENTS_PER_BATCH}"
@@ -238,7 +242,11 @@ impl AnalyticsInner {
                     error = format!("{e:#}"),
                     "Failed to send a batch of events for analytics"
                 );
-                Err(batch.events)
+                let backend = self.backend.lock();
+                if backend.installation_id() == Some(installation_id) {
+                    self.queue.requeue(batch.events);
+                }
+                Err(())
             }
         }
     }

@@ -7,8 +7,8 @@ use url::Url;
 use uuid::Uuid;
 
 /// Endpoint the app sends batches of analytics events to.
-//const PUSH_URL: &str = concat!(env!("MODRINTH_API_BASE_URL"), "analytics/app-events");
-const PUSH_URL: &str = "http://localhost:8003/app-events";
+const PUSH_URL: &str =
+    concat!(env!("MODRINTH_API_BASE_URL"), "analytics/app-events");
 
 /// Starts the analytics client, opted out when `telemetry` is disabled.
 ///

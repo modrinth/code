@@ -846,7 +846,7 @@ export function createContentInstall(opts: {
 		projectId: string,
 		versionId?: string | null,
 		instanceId?: string | null,
-		source: string = 'unknown',
+		_source: string = 'unknown',
 		callback: ContentInstallCallback = () => {},
 		createInstanceCallback: (instanceId: string) => void = () => {},
 		hints?: { preferredLoader?: string; preferredGameVersion?: string; showProjectInfo?: boolean },

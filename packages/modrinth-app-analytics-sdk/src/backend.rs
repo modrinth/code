@@ -24,6 +24,17 @@ impl AnalyticsBackend {
         }
     }
 
+    /// Returns the installation ID events are sent under, or `None` when
+    /// opted out.
+    pub(crate) fn installation_id(&self) -> Option<Uuid> {
+        match self {
+            AnalyticsBackend::OptedOut => None,
+            AnalyticsBackend::Enabled {
+                installation_id, ..
+            } => Some(*installation_id),
+        }
+    }
+
     pub(crate) fn is_enabled(&self) -> bool {
         matches!(self, AnalyticsBackend::Enabled { .. })
     }

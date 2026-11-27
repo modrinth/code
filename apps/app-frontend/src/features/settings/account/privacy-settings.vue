@@ -11,7 +11,8 @@ import {
 import { ref, watch } from 'vue'
 
 import { open_ads_consent_preferences } from '@/helpers/ads.js'
-import { get, reset_analytics_installation_id, set } from '@/helpers/settings.ts'
+import { get, set } from '@/helpers/settings.ts'
+import { resetAnalyticsInstallationId } from '@/platform/app-lib/settings/commands'
 
 const { formatMessage } = useVIntl()
 const { addNotification, handleError } = injectNotificationManager()
@@ -82,7 +83,7 @@ const resettingInstallationId = ref(false)
 async function resetInstallationId() {
 	resettingInstallationId.value = true
 	try {
-		await reset_analytics_installation_id()
+		await resetAnalyticsInstallationId()
 		addNotification({
 			type: 'success',
 			title: formatMessage(messages.resetInstallationIdSuccessTitle),
