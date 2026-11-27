@@ -352,17 +352,8 @@ const processesQuery = useQuery(
 )
 const playing = computed(() => (processesQuery.data.value?.length ?? 0) > 0)
 
-async function ensureCriticalContent(targetInstanceId: string) {
-	await queryClient.ensureQueryData(
-		instanceContentQueryOptions(targetInstanceId, (error) => handleError(toError(error))),
-	)
-}
-
 async function ensureCriticalInstanceData(targetInstanceId: string) {
-	await Promise.all([
-		queryClient.ensureQueryData(instanceDetailQueryOptions(targetInstanceId)),
-		ensureCriticalContent(targetInstanceId),
-	])
+	await queryClient.ensureQueryData(instanceDetailQueryOptions(targetInstanceId))
 }
 
 function isUnmanagedInstanceError(error: unknown) {
