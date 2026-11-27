@@ -535,15 +535,19 @@ async function handleZipSelection(target: string) {
 
 // Extract
 async function handleExtractItem(item: { name: string; type: string; path: string }) {
-	if (isBusy.value || !ctx.extractFile) return
+	if (isBusy.value || !ctx.extractFile || !uploadConflictModal.value) return
+	const modal = uploadConflictModal.value
+	const token = modal.startCheck(item.path)
 	try {
 		const dry = await ctx.extractFile(item.path, true, true)
+		if (!modal.isCheckPending(token)) return
+		if (dry && dry.conflicting_files.length > 0) {
+			modal.showConflicts(dry.conflicting_files)
+			return
+		}
+		modal.hide()
 		if (dry) {
-			if (dry.conflicting_files.length === 0) {
-				handleExtractConfirm(item.path)
-			} else {
-				uploadConflictModal.value?.show(item.path, dry.conflicting_files)
-			}
+			handleExtractConfirm(item.path)
 		} else {
 			addNotification({
 				title: formatMessage(messages.dryRunFailedTitle),
@@ -552,6 +556,8 @@ async function handleExtractItem(item: { name: string; type: string; path: strin
 			})
 		}
 	} catch (error) {
+		if (!modal.isCheckPending(token)) return
+		modal.hide()
 		addNotification({
 			title: formatMessage(commonMessages.extractFailedLabel),
 			text: error instanceof Error ? error.message : '',

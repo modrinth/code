@@ -1595,6 +1595,9 @@
   "file-button.file-too-large.title": {
     "defaultMessage": "File too large"
   },
+  "files.conflict-modal.checking-conflicts": {
+    "defaultMessage": "Checking for conflicting files…"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Extract summary"
   },
@@ -1870,6 +1873,9 @@
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpack from URL"
+  },
+  "files.operations.starting-extraction": {
+    "defaultMessage": "Starting extraction…"
   },
   "files.rename-modal.header": {
     "defaultMessage": "Rename {name}"

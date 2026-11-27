@@ -1,6 +1,16 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.header)" :closable="true" no-padding>
-		<div class="max-w-[500px]">
+	<NewModal
+		ref="modal"
+		:header="formatMessage(messages.header)"
+		:closable="true"
+		no-padding
+		:on-hide="handleHide"
+	>
+		<div v-if="checking" class="flex w-[500px] max-w-full items-center gap-2 p-4 text-secondary">
+			<SpinnerIcon class="animate-spin" />
+			{{ formatMessage(messages.checkingConflicts) }}
+		</div>
+		<div v-else class="max-w-[500px]">
 			<div class="flex flex-col gap-4 p-4">
 				<Admonition type="warning" :header="formatMessage(messages.warningHeader)">
 					<span>
@@ -60,7 +70,7 @@
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="brand" @click="handleProceed">
+				<Button type="colored" color="brand" :disabled="checking" @click="handleProceed">
 					<CheckIcon />
 					{{ formatMessage(messages.overwriteButton) }}
 				</Button>
@@ -70,8 +80,8 @@
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, MinusIcon, XIcon } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { CheckIcon, MinusIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { computed, onBeforeUnmount, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import { Button } from '#ui/components/base/buttons'
@@ -113,6 +123,10 @@ const messages = defineMessages({
 		id: 'files.conflict-modal.overwrite-button',
 		defaultMessage: 'Overwrite',
 	},
+	checkingConflicts: {
+		id: 'files.conflict-modal.checking-conflicts',
+		defaultMessage: 'Checking for conflicting files…',
+	},
 })
 
 const path = ref('')
@@ -126,20 +140,65 @@ const modal = ref<InstanceType<typeof NewModal>>()
 
 const hasMany = computed(() => files.value.length > 100)
 
-const show = (zipPath: string, conflictingFiles: string[]) => {
-	path.value = zipPath
-	files.value = conflictingFiles
+const LOADING_DELAY_MS = 1000
+
+const checking = ref(false)
+const shown = ref(false)
+let checkToken = 0
+let pendingToken: number | null = null
+let loadingTimer: ReturnType<typeof setTimeout> | undefined
+
+const open = () => {
+	clearTimeout(loadingTimer)
+	if (shown.value) return
+	shown.value = true
 	modal.value?.show()
 }
 
-const hide = () => {
-	modal.value?.hide()
+/**
+ * Starts a conflict check, showing the modal in a loading state if it takes longer than a second.
+ * Returns a token for `isCheckPending`, which goes stale if the modal is closed or another check starts.
+ */
+const startCheck = (zipPath: string): number => {
+	path.value = zipPath
+	files.value = []
+	checking.value = true
+	clearTimeout(loadingTimer)
+	loadingTimer = setTimeout(open, LOADING_DELAY_MS)
+	pendingToken = ++checkToken
+	return pendingToken
 }
+
+const isCheckPending = (token: number) => token === pendingToken
+
+const showConflicts = (conflictingFiles: string[]) => {
+	pendingToken = null
+	files.value = conflictingFiles
+	checking.value = false
+	open()
+}
+
+const hide = () => {
+	clearTimeout(loadingTimer)
+	if (shown.value) {
+		modal.value?.hide()
+	} else {
+		handleHide()
+	}
+}
+
+const handleHide = () => {
+	shown.value = false
+	pendingToken = null
+}
+
+onBeforeUnmount(() => clearTimeout(loadingTimer))
 
 const handleProceed = () => {
+	const proceedPath = path.value
 	hide()
-	emit('proceed', path.value)
+	emit('proceed', proceedPath)
 }
 
-defineExpose({ show })
+defineExpose({ startCheck, isCheckPending, showConflicts, hide })
 </script>
