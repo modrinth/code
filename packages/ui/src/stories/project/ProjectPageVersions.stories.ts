@@ -200,3 +200,16 @@ export const MobileWidth: Story = {
 		showEnvironmentColumn: true,
 	},
 }
+
+export const WithRefresh: Story = {
+	args: {
+		refresh: () => new Promise((resolve) => setTimeout(resolve, 1500)),
+	},
+}
+
+export const WithCreateVersion: Story = {
+	args: {
+		openModal: () => {},
+		refresh: () => new Promise((resolve) => setTimeout(resolve, 1500)),
+	},
+}

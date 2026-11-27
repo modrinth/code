@@ -2,7 +2,7 @@
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import UnknownFileWarningModal from '#ui/components/modal/UnknownFileWarningModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import ManagedContentModal from '#ui/layouts/shared/content-tab/components/managed-content-modal/index.vue'
+import ManagedContentModal from '#ui/layouts/shared/content-tab/components/ManagedContentModal.vue'
 import ConfirmEnvironmentModal from '#ui/layouts/shared/content-tab/components/modals/ConfirmEnvironmentModal.vue'
 import ContentPageLayout from '#ui/layouts/shared/content-tab/layout.vue'
 import { provideContentManager } from '#ui/layouts/shared/content-tab/providers/content-manager'

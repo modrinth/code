@@ -43,6 +43,10 @@ export function useQuickplayFilters(options: {
 	const searchQuery = ref('')
 	const selectedFilters = ref<string[]>([])
 
+	const hasAnyWorlds = computed(
+		() => serverWorlds.value.length > 0 || singleplayerWorlds.value.length > 0,
+	)
+
 	const activeWorlds = computed<World[]>(() =>
 		activeTab.value === 'servers' ? serverWorlds.value : singleplayerWorlds.value,
 	)
@@ -69,6 +73,11 @@ export function useQuickplayFilters(options: {
 		const validIds = new Set(filters.map((filter) => filter.id))
 		const cleaned = selectedFilters.value.filter((id) => validIds.has(id))
 		if (cleaned.length !== selectedFilters.value.length) selectedFilters.value = cleaned
+	})
+
+	watch(hasAnyWorlds, (hasAny) => {
+		if (!hasAny) activeTab.value = 'servers'
+		else if (serverWorlds.value.length === 0) activeTab.value = 'worlds'
 	})
 
 	watch(activeTab, () => {
@@ -118,6 +127,7 @@ export function useQuickplayFilters(options: {
 		searchQuery,
 		selectedFilters,
 		filterOptions,
+		hasAnyWorlds,
 		activeWorlds,
 		filteredWorlds,
 	}

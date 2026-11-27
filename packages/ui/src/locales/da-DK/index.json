@@ -1817,12 +1817,6 @@
   "servers.access-page.notification.invite-sent.title": {
     "defaultMessage": "Invitation sendt"
   },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Alle"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Rolle: {role}"
-  },
   "servers.access-table.column.role": {
     "defaultMessage": "Rolle"
   },

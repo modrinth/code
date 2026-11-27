@@ -1,9 +1,9 @@
 import { useQueryClient } from '@tanstack/vue-query'
 
+import { instanceKeys, instanceListQueryOptions } from '@/features/instances/queries'
 import type { InstancePayload } from '@/generated/app-events/InstancePayload'
 import { installJobInstanceId, isInstallJobFinished } from '@/helpers/install'
 import { syncedPackKeys } from '@/helpers/synced-packs'
-import { instanceKeys, instanceListQueryOptions } from '@/pages/instance/query-options'
 import type { AppEvents } from '@/providers/app-events'
 
 import { useAppEvent } from './use-app-event'

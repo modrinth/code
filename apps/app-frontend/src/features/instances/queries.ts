@@ -1,0 +1,192 @@
+import { queryOptions } from '@tanstack/vue-query'
+
+import { get_project_v3 } from '@/helpers/cache.js'
+import { install_get_shared_instance_update_preview } from '@/helpers/install'
+import {
+	get as getInstance,
+	get_linked_modpack_content,
+	list as listInstances,
+	list_instance_screenshots,
+	list_screenshot_groups,
+	list_synced_screenshots,
+} from '@/helpers/instance'
+import { loadInstanceContentData } from '@/helpers/instance-content'
+import { get_by_instance_id } from '@/helpers/process'
+import type { CacheBehaviour, GameInstance } from '@/helpers/types'
+import { getRecommendedJavaVersion } from '@/platform/app-lib/instances/commands'
+import { refreshSharedInstanceLock } from '@/platform/app-lib/shared-instances/commands'
+
+type RecommendedJavaInstance = Pick<
+	GameInstance,
+	'id' | 'game_version' | 'loader' | 'loader_version'
+>
+
+export const instanceKeys = {
+	all: ['instances'] as const,
+	list: () => [...instanceKeys.all, 'list'] as const,
+	detail: (instanceId: string) => [...instanceKeys.all, 'summary', instanceId] as const,
+	processes: (instanceId: string) => [...instanceKeys.all, 'processes', instanceId] as const,
+	content: (instanceId: string) => [...instanceKeys.all, 'content', instanceId] as const,
+	contentSync: (instanceId: string) => [...instanceKeys.all, 'content-sync', instanceId] as const,
+	contentUpdateCheck: (instanceId: string) =>
+		[...instanceKeys.all, 'content-update-check', instanceId] as const,
+	rootPath: (instanceId: string) => [...instanceKeys.detail(instanceId), 'root-path'] as const,
+	files: (instanceId: string, path: string) =>
+		[...instanceKeys.detail(instanceId), 'files', path] as const,
+	console: (instanceId: string) => [...instanceKeys.detail(instanceId), 'console'] as const,
+	logs: (instanceId: string) => [...instanceKeys.detail(instanceId), 'logs'] as const,
+	installedProjectIds: (instanceId: string, source: 'content' | 'worlds') =>
+		[...instanceKeys.detail(instanceId), 'installed-project-ids', source] as const,
+	linkedContent: (instanceId: string) => ['linkedModpackContent', instanceId] as const,
+	linkedProject: (projectId: string) => ['project', 'v3', projectId] as const,
+	sharedEligibility: (userId: string | null | undefined) =>
+		['shared-instance-eligibility', userId] as const,
+	sharedUpdatePreviews: (instanceId: string) =>
+		[...instanceKeys.detail(instanceId), 'shared-update-preview'] as const,
+	sharedUpdatePreview: (instanceId: string, userId: string | null | undefined) =>
+		[...instanceKeys.sharedUpdatePreviews(instanceId), userId] as const,
+	sharedLock: (instanceId: string) => ['sharedInstanceLock', instanceId] as const,
+	sharedMembers: (instanceId: string) => ['sharedInstanceUsers', instanceId] as const,
+	recommendedJava: (instance: RecommendedJavaInstance) =>
+		[
+			...instanceKeys.detail(instance.id),
+			'recommended-java',
+			instance.game_version,
+			instance.loader,
+			instance.loader_version ?? null,
+		] as const,
+}
+
+export const screenshotKeys = {
+	all: ['screenshots'] as const,
+	global: () => [...screenshotKeys.all, 'global'] as const,
+	instance: (instanceId: string) => [...screenshotKeys.all, 'instance', instanceId] as const,
+	groups: () => [...screenshotKeys.all, 'groups'] as const,
+}
+
+export function instanceListQueryOptions() {
+	return queryOptions({
+		queryKey: instanceKeys.list(),
+		networkMode: 'always',
+		queryFn: listInstances,
+		staleTime: 30_000,
+	})
+}
+
+export function syncedScreenshotsQueryOptions() {
+	return queryOptions({
+		queryKey: screenshotKeys.global(),
+		networkMode: 'always',
+		queryFn: list_synced_screenshots,
+		staleTime: 0,
+	})
+}
+
+export function instanceScreenshotsQueryOptions(instanceId: string) {
+	return queryOptions({
+		queryKey: screenshotKeys.instance(instanceId),
+		networkMode: 'always',
+		queryFn: () => list_instance_screenshots(instanceId),
+		staleTime: 0,
+	})
+}
+
+export function screenshotGroupsQueryOptions() {
+	return queryOptions({
+		queryKey: screenshotKeys.groups(),
+		networkMode: 'always',
+		queryFn: list_screenshot_groups,
+		staleTime: 0,
+	})
+}
+
+export function instanceRecommendedJavaQueryOptions(instance: RecommendedJavaInstance) {
+	return queryOptions({
+		queryKey: instanceKeys.recommendedJava(instance),
+		networkMode: 'always',
+		queryFn: () => getRecommendedJavaVersion(instance.id),
+		staleTime: Infinity,
+	})
+}
+
+export function instanceDetailQueryOptions(instanceId: string) {
+	return queryOptions({
+		queryKey: instanceKeys.detail(instanceId),
+		networkMode: 'always',
+		queryFn: async () => {
+			const instance = await getInstance(instanceId)
+			if (!instance) throw new Error(`Instance ${instanceId} is not managed`)
+			return instance
+		},
+		staleTime: 30_000,
+	})
+}
+
+export function instanceProcessesQueryOptions(instanceId: string) {
+	return queryOptions({
+		queryKey: instanceKeys.processes(instanceId),
+		networkMode: 'always',
+		queryFn: async () => {
+			const processes = await get_by_instance_id(instanceId)
+			return Array.isArray(processes) ? processes : []
+		},
+		staleTime: 0,
+	})
+}
+
+export function sharedInstanceUpdatePreviewQueryOptions(
+	instanceId: string,
+	userId: string | null | undefined,
+) {
+	return queryOptions({
+		queryKey: instanceKeys.sharedUpdatePreview(instanceId, userId),
+		queryFn: () => install_get_shared_instance_update_preview(instanceId),
+		retry: false,
+		staleTime: 30_000,
+		refetchOnWindowFocus: 'always',
+		refetchInterval: 60_000,
+	})
+}
+
+export function sharedInstanceLockQueryOptions(instanceId: string) {
+	return queryOptions({
+		queryKey: instanceKeys.sharedLock(instanceId),
+		queryFn: () => refreshSharedInstanceLock(instanceId),
+		retry: false,
+		staleTime: 30_000,
+		refetchOnWindowFocus: 'always',
+		refetchInterval: 60_000,
+	})
+}
+
+export function instanceLinkedProjectQueryOptions(projectId: string) {
+	return queryOptions({
+		queryKey: instanceKeys.linkedProject(projectId),
+		networkMode: 'always',
+		queryFn: () => get_project_v3(projectId, 'must_revalidate'),
+		staleTime: 30_000,
+	})
+}
+
+export function instanceContentQueryOptions(
+	instanceId: string,
+	onError?: (error: Error) => unknown,
+) {
+	return queryOptions({
+		queryKey: instanceKeys.content(instanceId),
+		networkMode: 'always',
+		queryFn: () => loadInstanceContentData(instanceId, undefined, onError),
+		staleTime: 30_000,
+	})
+}
+
+export function linkedModpackContentQueryOptions(
+	instanceId: string,
+	cacheBehaviour?: CacheBehaviour,
+) {
+	return queryOptions({
+		queryKey: instanceKeys.linkedContent(instanceId),
+		networkMode: 'always',
+		queryFn: () => get_linked_modpack_content(instanceId, cacheBehaviour),
+	})
+}

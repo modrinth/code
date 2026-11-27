@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "تجاهل"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "فتح النسخة"
-  },
   "app.action-bar.install.retry": {
     "message": "محاولة"
   },
@@ -697,9 +694,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "النسخة"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "مشروع"
   },
   "app.instance.mods.freeze-content": {
     "message": "تثبيت الإصدار"

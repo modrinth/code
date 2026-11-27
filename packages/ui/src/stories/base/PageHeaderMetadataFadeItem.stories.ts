@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
+import PageHeaderMetadataFadeItem from '../../components/base/page-header/metadata/fade-item.vue'
 import PageHeaderMetadata from '../../components/base/page-header/metadata/index.vue'
-import PageHeaderMetadataFadeItem from '../../components/base/page-header/metadata/page-header-metadata-fade-item.vue'
 import PageHeaderMetadataItem from '../../components/base/page-header/metadata/page-header-metadata-item.vue'
 
 const meta = {

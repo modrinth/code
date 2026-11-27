@@ -2,6 +2,7 @@ import { injectAuth, type SharingSettingsContext } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
+import { instanceKeys } from '@/features/instances/queries'
 import {
 	get_shared_instance_invites,
 	revoke_shared_instance_invite,
@@ -9,7 +10,6 @@ import {
 	unpublish_shared_instance,
 } from '@/helpers/instance'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
-import { instanceKeys } from '@/pages/instance/query-options'
 
 import { injectInstanceSettings } from '../instance-settings-context.ts'
 

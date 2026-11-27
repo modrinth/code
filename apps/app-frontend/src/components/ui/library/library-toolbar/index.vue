@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { PlusIcon, SearchIcon, SquarePlusIcon } from '@modrinth/assets'
 import { Button, defineMessages, Input, useVIntl } from '@modrinth/ui'
-import { computed, inject } from 'vue'
+import { computed } from 'vue'
 
 import FilterMenu from '@/components/ui/library/library-toolbar/filter-menu.vue'
 import NewGroupModal from '@/components/ui/library/library-toolbar/new-group-modal.vue'
 import SortMenu from '@/components/ui/library/library-toolbar/sort-menu.vue'
 import { useLibrary } from '@/components/ui/library/use-library'
+import { injectInstanceCreation } from '@/features/instances/instance-creation-context'
 
 const { search, selectedLibraryInstances, openNewGroupModal } = useLibrary()
-const showCreationModal = inject<() => void>('showCreationModal')
+const instanceCreation = injectInstanceCreation(null)
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	search: { id: 'app.library.search.placeholder', defaultMessage: 'Search' },
@@ -41,7 +42,7 @@ function openNewGroup() {
 				<SquarePlusIcon />
 				{{ formatMessage(messages.newGroup) }}
 			</Button>
-			<Button type="colored" color="brand" @click="showCreationModal?.()">
+			<Button type="colored" color="brand" @click="instanceCreation?.showCreationModal()">
 				<PlusIcon />
 				{{ formatMessage(messages.newInstance) }}
 			</Button>

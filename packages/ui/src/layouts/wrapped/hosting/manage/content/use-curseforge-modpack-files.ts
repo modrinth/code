@@ -42,7 +42,7 @@ export function useCurseForgeModpackFiles(options: {
 	const queryClient = useQueryClient()
 
 	function filesQueryKey(targetWorldId: string | null, projectId: number | undefined) {
-		return ['kyros', 'flameanvil', 'files', targetWorldId, projectId]
+		return ['kyros', 'flameanvil', 'files', targetWorldId, projectId] as const
 	}
 
 	async function listFiles(targetWorldId: string, projectId: number) {

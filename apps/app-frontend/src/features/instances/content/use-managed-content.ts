@@ -10,24 +10,25 @@ import {
 	injectNotificationManager,
 	type ManagedContent,
 	type ManagedContentModal,
-	type ManagedContentModalState,
 	type ManagedContentProject,
 	type ManagedContentUpdate,
 	type ManagedContentVersion,
 	summarizeManagedContent,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, onUnmounted, type Ref, ref, watch } from 'vue'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, nextTick, onScopeDispose, type Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import type { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
-import { edit, get_linked_modpack_content, getInstanceIconUrl } from '@/helpers/instance'
+import type { injectInstancePage } from '@/features/instances/instance-context'
+import { instanceKeys, linkedModpackContentQueryOptions } from '@/features/instances/queries'
+import type { injectSharedInstance } from '@/features/instances/shared-instance-context'
+import { edit, getInstanceIconUrl } from '@/helpers/instance'
 import type { InstanceContentData } from '@/helpers/instance-content'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
-import type { injectInstancePage } from '@/pages/instance/instance-context'
-import { instanceKeys } from '@/pages/instance/query-options'
-import type { injectSharedInstance } from '@/pages/instance/shared-instance-context'
+
+import { injectManagedContentModalMemory } from './managed-content-modal-memory'
 
 const messages = defineMessages({
 	modpackContentHeader: {
@@ -39,8 +40,6 @@ const messages = defineMessages({
 		defaultMessage: 'Shared content',
 	},
 })
-
-let savedModalState: { instanceId: string; state: ManagedContentModalState } | null = null
 
 export interface ManagedContentOptions {
 	instance: Ref<GameInstance>
@@ -81,6 +80,7 @@ export function useManagedContent({
 	const client = injectModrinthClient()
 	const route = useRoute()
 	const router = useRouter()
+	const savedModalState = injectManagedContentModalMemory()
 
 	const managedDisableConfirmModal = ref<InstanceType<typeof ConfirmDisableModal> | null>()
 	const pendingManagedDisableItems = ref<ContentItem[]>([])
@@ -116,18 +116,15 @@ export function useManagedContent({
 		() => linkedModpackProject.value ?? localImportedModpackProject.value,
 	)
 
-	const modpackContentQueryKey = computed(() => instanceKeys.linkedContent(instance.value.id))
-	const modpackContentQuery = useQuery({
-		queryKey: modpackContentQueryKey,
-		networkMode: 'always',
-		queryFn: () => get_linked_modpack_content(instance.value.id),
-		enabled: computed(
-			() =>
+	const modpackContentQuery = useQuery(
+		computed(() => ({
+			...linkedModpackContentQueryOptions(instance.value.id),
+			enabled:
 				!!instance.value?.id &&
 				!!instance.value?.link &&
 				instance.value.install_stage === 'installed',
-		),
-	})
+		})),
+	)
 
 	const hasSharedManagedContent = computed(() => {
 		if (instance.value.shared_instance?.role === 'owner') return false
@@ -293,11 +290,7 @@ export function useManagedContent({
 
 	function prefetchView() {
 		if (!instance.value.link || instance.value.install_stage !== 'installed') return
-		void queryClient.prefetchQuery({
-			queryKey: modpackContentQueryKey.value,
-			networkMode: 'always',
-			queryFn: () => get_linked_modpack_content(instance.value.id),
-		})
+		void queryClient.prefetchQuery(linkedModpackContentQueryOptions(instance.value.id))
 	}
 
 	function prefetchPrimaryAction() {
@@ -331,11 +324,7 @@ export function useManagedContent({
 	async function refreshManagedContentItems(cacheBehaviour?: CacheBehaviour) {
 		if (!instance.value?.id) return
 		const contentItems = await queryClient
-			.fetchQuery({
-				queryKey: modpackContentQueryKey.value,
-				networkMode: 'always',
-				queryFn: () => get_linked_modpack_content(instance.value.id, cacheBehaviour),
-			})
+			.fetchQuery(linkedModpackContentQueryOptions(instance.value.id, cacheBehaviour))
 			.catch(handleError)
 		if (contentItems) managedContentModal.value?.setItems(managedContentItems.value)
 	}
@@ -369,14 +358,32 @@ export function useManagedContent({
 		await setManagedEnabled(items, false)
 	}
 
-	async function unpairInstance() {
-		await edit(instance.value.id, { link: null as unknown as undefined })
-		queryClient.setQueryData<InstanceContentData>(
-			instanceKeys.content(instance.value.id),
-			(data) => (data ? { ...data, modpack: null } : data),
-		)
-		localImportedModpackUnlinked.value = true
-		await refetchContent()
+	const unpairMutation = useMutation({
+		networkMode: 'always',
+		mutationFn: (instanceId: string) => edit(instanceId, { link: null as unknown as undefined }),
+		onMutate: async (instanceId) => {
+			const contentKey = instanceKeys.content(instanceId)
+			await queryClient.cancelQueries({ queryKey: contentKey })
+			const previous = queryClient.getQueryData<InstanceContentData>(contentKey)
+			queryClient.setQueryData<InstanceContentData>(contentKey, (data) =>
+				data ? { ...data, modpack: null } : data,
+			)
+			const previousLocalUnlinked = localImportedModpackUnlinked.value
+			localImportedModpackUnlinked.value = true
+			return { previous, previousLocalUnlinked }
+		},
+		onError: (error, instanceId, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(instanceKeys.content(instanceId), context.previous)
+			}
+			if (context) localImportedModpackUnlinked.value = context.previousLocalUnlinked
+			handleError(error)
+		},
+		onSettled: () => refetchContent().catch(handleError),
+	})
+
+	function unpairInstance() {
+		unpairMutation.mutate(instance.value.id)
 	}
 
 	function matchesHighlightedFile(item: ContentItem) {
@@ -402,8 +409,8 @@ export function useManagedContent({
 	}
 
 	async function restoreModalState() {
-		const saved = savedModalState
-		savedModalState = null
+		const saved = savedModalState.value
+		savedModalState.value = null
 		if (saved?.instanceId !== instance.value.id) return
 		await nextTick()
 		managedContentModal.value?.restore(saved.state)
@@ -411,9 +418,9 @@ export function useManagedContent({
 
 	const removeBeforeEach = router.beforeEach(() => {
 		const state = managedContentModal.value?.getState()
-		savedModalState = state ? { instanceId: instance.value.id, state } : null
+		savedModalState.value = state ? { instanceId: instance.value.id, state } : null
 	})
-	onUnmounted(removeBeforeEach)
+	onScopeDispose(removeBeforeEach)
 
 	return {
 		managedDisableConfirmModal,

@@ -665,9 +665,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Kérlek várd meg a művelet befejezését a tartalom szerkesztése előtt."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "További tartalom hozzáadása ehhez a modcsomaghoz"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Nincs tartalom telepítve"
   },
@@ -4427,9 +4424,6 @@
   "project.versions.filter.channel": {
     "defaultMessage": "Csatorna"
   },
-  "project.versions.filter.selected-count": {
-    "defaultMessage": "{count, number} kiválasztva"
-  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Szűrő kiválasztása a következőhöz: {filter}"
   },
@@ -4942,12 +4936,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "Rang nem frissíthető"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Összes"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Rang: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "Szerkesztő"

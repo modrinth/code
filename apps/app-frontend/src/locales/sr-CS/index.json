@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Otpusti"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "Otvori instancu"
-  },
   "app.action-bar.install.retry": {
     "message": "Probaj ponovo"
   },
@@ -433,9 +430,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instanca"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "projekat"
   },
   "app.instance.mods.freeze-content": {
     "message": "Zamrzni verziju"

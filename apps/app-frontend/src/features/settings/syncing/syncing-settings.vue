@@ -11,6 +11,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, onScopeDispose, ref } from 'vue'
 
+import { instanceKeys, instanceListQueryOptions } from '@/features/instances/queries'
 import { gameSettingsKeys } from '@/helpers/game-options'
 import {
 	type GlobalSyncedOptions,
@@ -28,7 +29,6 @@ import {
 	syncedServersQueryOptions,
 } from '@/helpers/synced-options'
 import { syncedPackKeys, syncedPackQueryOptions } from '@/helpers/synced-packs'
-import { instanceKeys, instanceListQueryOptions } from '@/pages/instance/query-options'
 
 import CommandHistoryModal from './command-history-modal.vue'
 import GameSettingsModal from './game-settings-modal/index.vue'

@@ -17,6 +17,7 @@ import { computed, ref } from 'vue'
 
 import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { instanceKeys } from '@/features/instances/queries'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache'
 import {
@@ -34,7 +35,6 @@ import {
 import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 import type { Manifest } from '@/helpers/types'
-import { instanceKeys } from '@/pages/instance/query-options'
 import { injectAppEvents } from '@/providers/app-events'
 import { provideInstanceBackup } from '@/providers/instance-backup'
 

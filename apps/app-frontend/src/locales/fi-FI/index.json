@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Hylkää"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "Avaa instanssi"
-  },
   "app.action-bar.install.retry": {
     "message": "Yritä uudelleen"
   },
@@ -712,9 +709,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instanssi"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "projekti"
   },
   "app.instance.mods.freeze-content": {
     "message": "Lukitse versio"

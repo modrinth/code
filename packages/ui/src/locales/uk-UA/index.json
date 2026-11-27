@@ -794,9 +794,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Дочекайтеся завершення операції, перш ніж редагувати вміст."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Додайте додатковий уміст до цієї збірки"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Немає встановленого вмісту"
   },
@@ -4811,9 +4808,6 @@
   "project.versions.filter.channel": {
     "defaultMessage": "Канал"
   },
-  "project.versions.filter.selected-count": {
-    "defaultMessage": "{count, number} обрано"
-  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Перемкнути фільтр на {filter}"
   },
@@ -5362,12 +5356,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "Роль не оновлено"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Усе"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Роль: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "Редагувальник"

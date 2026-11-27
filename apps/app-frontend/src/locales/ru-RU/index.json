@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Закрыть"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "Открыть сборку"
-  },
   "app.action-bar.install.retry": {
     "message": "Повторить"
   },
@@ -733,9 +730,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Сборка"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "проект"
   },
   "app.instance.mods.freeze-content": {
     "message": "Заморозить версию"
@@ -3692,14 +3686,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "Меняете лаунчер?"
   },
-  "app.welcome-screen.more-options": {
-    "message": "Дополнительно"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Нажмите <shortcut>Т</shortcut> быстрого создания сборки"
-  },
-  "app.welcome-screen.skip": {
-    "message": "Пропустить"
   },
   "app.welcome-screen.title": {
     "message": "Добро пожаловать в Modrinth"

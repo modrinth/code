@@ -32,7 +32,8 @@ export function useAnimatedWidth(target: MaybeElementRef, options: UseAnimatedWi
 
 		const to = el.offsetWidth
 		settledWidth = to
-		if (!from || from === to || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		const view = el.ownerDocument.defaultView ?? window
+		if (!from || from === to || view.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 			return
 		}
 
@@ -53,12 +54,13 @@ export function useAnimatedWidth(target: MaybeElementRef, options: UseAnimatedWi
 			if (!isEnabled || !target) return
 
 			const el = target as HTMLElement
+			const view = el.ownerDocument.defaultView ?? window
 			settledWidth = el.offsetWidth
 
-			const mutationObserver = new MutationObserver(() => animateWidth(el))
+			const mutationObserver = new view.MutationObserver(() => animateWidth(el))
 			mutationObserver.observe(el, { childList: true, characterData: true, subtree: true })
 
-			const resizeObserver = new ResizeObserver(() => {
+			const resizeObserver = new view.ResizeObserver(() => {
 				if (!animation) settledWidth = el.offsetWidth
 			})
 			resizeObserver.observe(el)

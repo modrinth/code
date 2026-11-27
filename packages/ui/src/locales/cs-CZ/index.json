@@ -641,9 +641,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Před úpravou obsahu prosím počkej, až se operace dokončí."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Přidejte další obsah k tomuto modpacku"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Není nainstalován žádný obsah"
   },
@@ -3973,12 +3970,6 @@
   },
   "servers.access-page.notification.invite-sent.title": {
     "defaultMessage": "Pozvánka odeslána"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Vše"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Role: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "Editor"

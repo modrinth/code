@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { LibraryIcon, PlusIcon, StarIcon } from '@modrinth/assets'
 import { Button, ContextMenu, defineMessages, EmptyState, useVIntl } from '@modrinth/ui'
-import { computed, inject, nextTick, onDeactivated, onUnmounted, ref, toRef, watch } from 'vue'
+import { computed, nextTick, onDeactivated, onUnmounted, ref, toRef, watch } from 'vue'
 import Draggable from 'vuedraggable'
 
 import GroupInstancesModal from '@/components/ui/library/group-instances-modal.vue'
@@ -14,6 +14,7 @@ import {
 	type InstanceGroup as InstanceGroupType,
 	provideLibrary,
 } from '@/components/ui/library/use-library'
+import { injectInstanceCreation } from '@/features/instances/instance-creation-context'
 import { FAVORITES_GROUP_ID } from '@/helpers/instance-groups'
 import type { GameInstance } from '@/helpers/types'
 
@@ -48,7 +49,7 @@ const messages = defineMessages({
 	},
 })
 
-const showCreationModal = inject<() => void>('showCreationModal')
+const instanceCreation = injectInstanceCreation(null)
 
 const {
 	instanceGroups,
@@ -277,8 +278,13 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 				:description="formatMessage(messages.emptyDescription)"
 			>
 				<template #actions>
-					<Button type="colored" color="brand" size="lg" @click="showCreationModal?.()">
-						<PlusIcon class="size-5" />
+					<Button
+						type="colored"
+						color="brand"
+						size="lg"
+						@click="instanceCreation?.showCreationModal()"
+					>
+						<PlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.newInstance) }}
 					</Button>
 				</template>

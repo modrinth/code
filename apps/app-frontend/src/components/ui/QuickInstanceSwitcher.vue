@@ -23,12 +23,12 @@ import {
 	QUICK_INSTANCE_LIMIT_MAX,
 	useQuickInstanceLimit,
 } from '@/composables/use-quick-instance-limit.ts'
+import { instanceListQueryOptions } from '@/features/instances/queries'
 import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import { trackEvent } from '@/helpers/analytics'
 import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
 import { showInstanceInFolder } from '@/helpers/utils'
-import { instanceListQueryOptions } from '@/pages/instance/query-options'
 
 const ITEM_SIZE = 52
 const SYNC_DEBOUNCE_MS = 1000
@@ -38,6 +38,24 @@ const { updatePreferences } = injectUserPreferences()
 const appSettings = useAppSettings()
 const instancesQuery = useQuery(instanceListQueryOptions())
 const router = useRouter()
+
+function instancePath(instanceId) {
+	return `/instance/${encodeURIComponent(instanceId)}`
+}
+
+function isInstanceRoute(route, instanceId) {
+	const path = decodeURIComponent(route.path)
+	const base = `/instance/${instanceId}`
+	return path === base || path.startsWith(`${base}/`)
+}
+
+function isInstanceBrowseRoute(route, instanceId) {
+	return (
+		(route.path.startsWith('/browse') || route.path.startsWith('/project')) &&
+		route.query.i === instanceId
+	)
+}
+
 const instanceOptions = ref()
 const runningInstances = ref([])
 
@@ -365,7 +383,9 @@ function openContextMenu(event, instance) {
 					:key="instance.id"
 					v-tooltip.right="instance.name"
 					class="quick-instance-item relative"
-					:to="`/instance/${encodeURIComponent(instance.id)}`"
+					:to="instancePath(instance.id)"
+					:is-primary="(r) => isInstanceRoute(r, instance.id)"
+					:is-subpage="(r) => isInstanceBrowseRoute(r, instance.id)"
 					@contextmenu.prevent.stop="(event) => openContextMenu(event, instance)"
 				>
 					<Avatar

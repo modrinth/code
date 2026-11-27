@@ -53,14 +53,6 @@ export const accessMessages = defineMessages({
 		id: 'servers.access-page.activity-log-filter.action-types-search',
 		defaultMessage: 'Search actions...',
 	},
-	allRoles: {
-		id: 'servers.access-page.role-filter.all',
-		defaultMessage: 'All',
-	},
-	selectedRoleFilter: {
-		id: 'servers.access-page.role-filter.selected',
-		defaultMessage: 'Role: {role}',
-	},
 	ownerRole: {
 		id: 'servers.access-page.role.owner',
 		defaultMessage: 'Owner',

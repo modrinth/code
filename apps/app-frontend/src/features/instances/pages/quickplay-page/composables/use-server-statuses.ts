@@ -2,11 +2,11 @@ import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import { useQueries, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type MaybeRefOrGetter, toValue } from 'vue'
 
+import { injectInstancePage } from '@/features/instances/instance-context'
 import { normalizeServerAddress } from '@/features/servers/address'
 import { serverStatusQueryOptions } from '@/features/servers/queries'
 import type { ServerData } from '@/features/servers/server-pings'
 import { instanceProtocolQueryOptions } from '@/features/worlds/queries'
-import { injectInstancePage } from '@/pages/instance/instance-context'
 import type { ServerStatus, ServerWorld } from '@/platform/app-lib/worlds/types'
 
 import type { ServerAvailability } from '../types'

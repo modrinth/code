@@ -1,4 +1,4 @@
-import { open } from '@tauri-apps/plugin-dialog'
+import { open, save, type SaveDialogOptions } from '@tauri-apps/plugin-dialog'
 
 export async function pickDirectory(title: string): Promise<string | null> {
 	const directory = await open({ multiple: false, directory: true, title })
@@ -12,4 +12,8 @@ export function pickFile(): Promise<string | null> {
 export async function pickFiles(): Promise<string[]> {
 	const files = await open({ multiple: true })
 	return files ?? []
+}
+
+export function pickSaveFile(options: SaveDialogOptions): Promise<string | null> {
+	return save(options)
 }

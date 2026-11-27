@@ -53,6 +53,13 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useAppEvent } from '@/composables/use-app-event'
 import {
+	instanceListQueryOptions,
+	instanceScreenshotsQueryOptions,
+	screenshotGroupsQueryOptions,
+	screenshotKeys,
+	syncedScreenshotsQueryOptions,
+} from '@/features/instances/queries'
+import {
 	create_screenshot_group,
 	delete_screenshot_group,
 	delete_screenshots,
@@ -71,13 +78,6 @@ import {
 	set_screenshot_group_memberships,
 } from '@/helpers/instance'
 import { MAX_INSTANCE_GROUP_NAME_LENGTH } from '@/helpers/instance-groups'
-import {
-	instanceListQueryOptions,
-	instanceScreenshotsQueryOptions,
-	screenshotGroupsQueryOptions,
-	screenshotKeys,
-	syncedScreenshotsQueryOptions,
-} from '@/pages/instance/query-options'
 
 import ScreenshotDragGather from './drag-gather.vue'
 import ScreenshotDragPreview from './drag-preview.vue'

@@ -1457,9 +1457,6 @@
   "server.settings.sharing.unpublish-confirmation": {
     "defaultMessage": "פעולה זו מוחקת את המופע המשותף ומשביתה את קישורי ההזמנה שלו. שחקנים יפסיקו לקבל עדכוני תוכן משותף. השרת שלך והתוכן שלו יישארו זמינים."
   },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "הכל"
-  },
   "servers.access-table.unknown-joined-date": {
     "defaultMessage": "—"
   },

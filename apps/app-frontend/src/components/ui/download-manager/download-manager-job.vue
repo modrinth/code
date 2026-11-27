@@ -66,7 +66,14 @@ const messages = defineMessages({
 	dismiss: { id: 'app.action-bar.install.dismiss', defaultMessage: 'Dismiss' },
 	cancel: { id: 'app.download-manager.cancel', defaultMessage: 'Cancel installation' },
 	remove: { id: 'app.download-manager.remove', defaultMessage: 'Remove from history' },
-	openInstance: { id: 'app.action-bar.install.open-instance', defaultMessage: 'Open instance' },
+	openInstanceLabel: {
+		id: 'app.download-manager.open-instance-label',
+		defaultMessage: 'Open instance: {title}',
+	},
+	openInFolderLabel: {
+		id: 'app.download-manager.open-in-folder-label',
+		defaultMessage: 'Open in folder: {title}',
+	},
 	eta: {
 		id: 'app.download-manager.eta',
 		defaultMessage: 'Estimated time remaining for this download',
@@ -93,9 +100,9 @@ const instanceLink = computed(() =>
 )
 const rowLabel = computed(() =>
 	instanceLink.value
-		? `${formatMessage(messages.openInstance)}: ${props.job.title}`
+		? formatMessage(messages.openInstanceLabel, { title: props.job.title })
 		: props.job.revealPath
-			? `${formatMessage(commonMessages.openInFolderButton)}: ${props.job.title}`
+			? formatMessage(messages.openInFolderLabel, { title: props.job.title })
 			: undefined,
 )
 </script>

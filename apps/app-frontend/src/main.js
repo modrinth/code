@@ -6,6 +6,7 @@ import { getCurrentWindow } from '@tauri-apps/api/window'
 import { createApp } from 'vue'
 
 import App from '@/App.vue'
+import { setupMarkdownYoutubeEmbeds } from '@/app/runtime/markdown-youtube-embeds'
 import { overlayScrollbarsDirective } from '@/directives/overlayScrollbars'
 import { setupErrorReporting } from '@/helpers/error-reporting'
 import { debugStartup, traceStartupStep } from '@/helpers/startup-debug'
@@ -14,6 +15,7 @@ import i18nDebugPlugin from '@/plugins/i18n-debug'
 import router from '@/routes'
 
 debugStartup('Frontend entry module evaluated')
+setupMarkdownYoutubeEmbeds()
 const app = createApp(App)
 setupErrorReporting(app, router)
 

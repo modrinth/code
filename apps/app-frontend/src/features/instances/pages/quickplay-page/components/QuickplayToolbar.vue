@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CompassIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
+import { CompassIcon, PlusIcon, RefreshCwIcon } from '@modrinth/assets'
 import {
 	Button,
 	commonMessages,
@@ -7,7 +7,7 @@ import {
 	type FilterPillOption,
 	FilterPills,
 	IconButton,
-	Input,
+	ListToolbar,
 	type ToolbarTab,
 	ToolbarTabs,
 	useVIntl,
@@ -85,6 +85,8 @@ const tabs = computed<ToolbarTab<QuickplayTab>[]>(() => [
 
 const isServersTab = computed(() => activeTab.value === 'servers')
 
+const showFilterPills = computed(() => isServersTab.value && props.filterOptions.length > 0)
+
 const searchLabel = computed(() =>
 	formatMessage(isServersTab.value ? messages.searchServersLabel : messages.searchWorldsLabel),
 )
@@ -116,22 +118,14 @@ const refreshLabel = computed(() =>
 				</Button>
 			</div>
 		</div>
-		<template v-if="worldCount > 0">
-			<div class="flex items-center gap-2">
-				<Input
-					v-model="search"
-					:icon="SearchIcon"
-					type="search"
-					autocomplete="off"
-					:spellcheck="false"
-					size="medium"
-					wrapper-class="min-w-0 flex-1"
-					clearable
-					:clear-label="formatMessage(commonMessages.clearButton)"
-					:aria-label="searchLabel"
-					:placeholder="searchPlaceholder"
-				/>
-				<div class="h-6 w-px bg-surface-5" aria-hidden="true" />
+		<ListToolbar
+			v-if="worldCount > 0"
+			v-model:search="search"
+			:search-label="searchLabel"
+			:search-placeholder="searchPlaceholder"
+			:filters-shown="showFilterPills"
+		>
+			<template #actions>
 				<IconButton
 					v-tooltip="refreshLabel"
 					type="quiet"
@@ -142,16 +136,14 @@ const refreshLabel = computed(() =>
 				>
 					<RefreshCwIcon :class="{ 'animate-spin': refreshing }" aria-hidden="true" />
 				</IconButton>
-			</div>
-			<FilterPills
-				v-if="isServersTab && filterOptions.length > 0"
-				v-model="filters"
-				:options="filterOptions"
-			>
-				<template #all>
-					{{ formatMessage(commonMessages.allProjectType) }}
-				</template>
-			</FilterPills>
-		</template>
+			</template>
+			<template #filters>
+				<FilterPills v-model="filters" :options="filterOptions">
+					<template #all>
+						{{ formatMessage(commonMessages.allProjectType) }}
+					</template>
+				</FilterPills>
+			</template>
+		</ListToolbar>
 	</div>
 </template>

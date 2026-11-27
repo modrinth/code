@@ -6,8 +6,8 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import { useResultActions } from '../../composables/use-result-actions'
 import { injectBrowseManager } from '../../providers/browse-manager'
-import ProjectResult from './project-result.vue'
-import ServerResult from './server-result.vue'
+import ProjectResult from './project.vue'
+import ServerResult from './server.vue'
 
 defineProps<{
 	dense?: boolean

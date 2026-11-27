@@ -15,11 +15,10 @@ import { invoke } from '@tauri-apps/api/core'
 import { computed, ref, watch } from 'vue'
 
 import { useAppEvent } from '@/composables/use-app-event'
+import { injectInstancePage } from '@/features/instances/instance-context'
+import { instanceKeys } from '@/features/instances/queries'
 import { get_full_path } from '@/helpers/instance'
 import { highlightInFolder } from '@/helpers/utils'
-
-import { injectInstancePage } from '../instance-context'
-import { instanceKeys } from '../query-options'
 
 const instancePage = injectInstancePage()
 const instanceId = instancePage.instanceId

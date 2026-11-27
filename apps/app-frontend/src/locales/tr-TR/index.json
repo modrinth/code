@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Reddet"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "Kurulumu aç"
-  },
   "app.action-bar.install.retry": {
     "message": "Yeniden Dene"
   },
@@ -739,9 +736,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Kurulum"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "proje"
   },
   "app.instance.mods.freeze-content": {
     "message": "Sürümü dondur"

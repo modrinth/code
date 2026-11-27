@@ -794,9 +794,6 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Poczekaj, aż operacja zostanie zakończona, zanim zaczniesz edytować treści."
   },
-  "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Dodaj dodatkową zawartość do tej paczki modów"
-  },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Brak zainstalowanej zawartości"
   },
@@ -4844,9 +4841,6 @@
   "project.versions.filter.channel": {
     "defaultMessage": "Kanał"
   },
-  "project.versions.filter.selected-count": {
-    "defaultMessage": "Wybrano {count, number}"
-  },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Przełącz filtrowanie dla {filter}"
   },
@@ -5392,12 +5386,6 @@
   },
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "Nie udało się zmienić roli"
-  },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Wszystkie"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Rola: {role}"
   },
   "servers.access-page.role.editor": {
     "defaultMessage": "Edytor"

@@ -4,7 +4,7 @@ import { computed, ref, watch } from 'vue'
 
 import { switchCurseForgeModpackFile } from '#ui/components/flows/creation-flow-modal/curseforge'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import type ManagedContentModal from '#ui/layouts/shared/content-tab/components/managed-content-modal/index.vue'
+import type ManagedContentModal from '#ui/layouts/shared/content-tab/components/ManagedContentModal.vue'
 import { contentVersionQueryOptions } from '#ui/layouts/shared/content-tab/queries'
 import type {
 	ContentItem,
@@ -96,7 +96,7 @@ export function useManagedModpack({
 	)
 
 	const projectQuery = useQuery({
-		queryKey: computed(() => ['labrinth', 'project', modpackProjectId.value]),
+		queryKey: computed(() => ['labrinth', 'project', modpackProjectId.value] as const),
 		queryFn: () => client.labrinth.projects_v2.get(modpackProjectId.value!),
 		enabled: computed(() => !!modpackProjectId.value),
 	})
@@ -206,15 +206,14 @@ export function useManagedModpack({
 		}
 
 		modpackContentModal.value?.showLoading()
-		try {
-			const { data } = await modpackContentQuery.refetch()
-			if (!data) throw new Error('Failed to load modpack content')
+		const { data, error } = await modpackContentQuery.refetch()
+		if (data) {
 			showModpackContent(data.addons ?? [])
-		} catch (err) {
-			isModpackContentModalOpen.value = false
-			modpackContentModal.value?.hide()
-			notifyError(formatMessage(messages.failedToLoadModpackContent), err)
+			return
 		}
+		isModpackContentModalOpen.value = false
+		modpackContentModal.value?.hide()
+		notifyError(formatMessage(messages.failedToLoadModpackContent), error)
 	}
 
 	watch(

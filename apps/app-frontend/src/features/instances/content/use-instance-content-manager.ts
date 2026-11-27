@@ -16,7 +16,6 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -25,15 +24,16 @@ import { useManagedContentPolicy } from '@/composables/instances/use-managed-con
 import { useSyncedPackActions } from '@/composables/instances/use-synced-pack-actions'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { injectInstancePage } from '@/features/instances/instance-context'
+import { instanceContentQueryOptions, instanceKeys } from '@/features/instances/queries'
+import { injectSharedInstance } from '@/features/instances/shared-instance-context'
 import { get_version_many } from '@/helpers/cache.js'
 import { install_bulk_update_content } from '@/helpers/install'
 import { get_shared_instance_publish_preview } from '@/helpers/instance'
 import { loadInstanceContentData } from '@/helpers/instance-content'
 import type { CacheBehaviour } from '@/helpers/types'
 import { highlightModInInstance } from '@/helpers/utils.js'
-import { injectInstancePage } from '@/pages/instance/instance-context'
-import { instanceContentQueryOptions, instanceKeys } from '@/pages/instance/query-options'
-import { injectSharedInstance } from '@/pages/instance/shared-instance-context'
+import { openExternalUrl } from '@/platform/external-links'
 import { injectContentInstall } from '@/providers/content-install'
 
 import { findDependentItems, normalizeContentItem } from './content-items'
@@ -61,7 +61,7 @@ const messages = defineMessages({
 function contentOwnerLink(owner: ContentOwner): NonNullable<ContentOwner['link']> {
 	if (owner.type === 'user') return `/user/${encodeURIComponent(owner.id)}`
 	return () => {
-		void openUrl(`https://modrinth.com/organization/${owner.id}`)
+		void openExternalUrl(`https://modrinth.com/organization/${owner.id}`)
 	}
 }
 

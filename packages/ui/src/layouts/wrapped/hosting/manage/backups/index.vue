@@ -55,34 +55,24 @@
 						:clear-label="formatMessage(commonMessages.clearButton)"
 						clearable
 					/>
-					<div class="flex shrink-0 flex-col gap-2 md:flex-row">
-						<Button
-							v-if="settingsModal"
-							size="lg"
-							@click="settingsModal.openServerSettings({ tabId: 'backups' })"
-						>
-							<Settings2Icon aria-hidden="true" />
-							{{ formatMessage(commonMessages.settingsLabel) }}
-						</Button>
-						<SplitButton
-							v-tooltip="createDisabledReason"
-							type="colored"
-							color="brand"
-							size="lg"
-							class="[&>[data-button]:first-child]:flex-1"
-							:options="createMenuOptions"
-							:menu-label="formatMessage(messages.moreCreateOptions)"
-							:primary-disabled="!!createDisabledReason"
-							@click="createModal?.show()"
-						>
-							<PlusIcon aria-hidden="true" />
-							{{ formatMessage(messages.createBackup) }}
-							<template #download-files>
-								<DownloadIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.downloadFilesButton) }}
-							</template>
-						</SplitButton>
-					</div>
+					<SplitButton
+						v-tooltip="createDisabledReason"
+						type="colored"
+						color="brand"
+						size="lg"
+						class="shrink-0 [&>[data-button]:first-child]:flex-1"
+						:options="createMenuOptions"
+						:menu-label="formatMessage(messages.moreCreateOptions)"
+						:primary-disabled="!!createDisabledReason"
+						@click="createModal?.show()"
+					>
+						<PlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.createBackup) }}
+						<template #download-files>
+							<DownloadIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.downloadFilesButton) }}
+						</template>
+					</SplitButton>
 				</div>
 
 				<EmptyState
@@ -180,7 +170,6 @@ import {
 	PlusIcon,
 	SaveIcon,
 	SearchIcon,
-	Settings2Icon,
 	TrashIcon,
 } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
@@ -208,7 +197,6 @@ import {
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
-import { injectServerSettingsModal } from '#ui/providers/server-settings-modal'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import DeletedBackups from './deleted-backups.vue'
@@ -339,7 +327,6 @@ const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { server, serverId, worldId, busyReasons, isSiteAdmin } = injectModrinthServerContext()
 const hideSupportFeatures = useHideSupportFeatures()
-const settingsModal = injectServerSettingsModal(null)
 const fileDownload = injectFileDownload(null)
 const { canManageBackups, permissionDeniedMessage } = useServerPermissions()
 

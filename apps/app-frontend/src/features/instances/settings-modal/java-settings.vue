@@ -3,12 +3,12 @@ import { defineMessages, injectNotificationManager, Input, useVIntl } from '@mod
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
+import { instanceRecommendedJavaQueryOptions } from '@/features/instances/queries'
 import JavaSelector from '@/features/java/java-selector/index.vue'
 import MemorySlider from '@/features/java/memory-slider.vue'
 import { javaVersionsQueryOptions } from '@/features/java/queries'
 import { edit } from '@/helpers/instance'
 import { appSettingsQueryOptions, parseEnvVars, serializeEnvVars } from '@/helpers/settings.ts'
-import { instanceRecommendedJavaQueryOptions } from '@/pages/instance/query-options'
 
 import DefaultSettingsIntro from './default-settings-intro.vue'
 import { injectInstanceSettings } from './instance-settings-context'

@@ -2729,12 +2729,6 @@
   "servers.access-page.notification.role-update-failed.title": {
     "defaultMessage": "Rolul nu a putut fi actualizat"
   },
-  "servers.access-page.role-filter.all": {
-    "defaultMessage": "Toate"
-  },
-  "servers.access-page.role-filter.selected": {
-    "defaultMessage": "Rol: {role}"
-  },
   "servers.access-page.role.editor": {
     "defaultMessage": "Editor"
   },

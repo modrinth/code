@@ -1,6 +1,12 @@
 import type { AbstractModrinthClient, IconConfig } from '@modrinth/api-client'
 import type { AbstractPopupNotificationManager, AbstractWebNotificationManager } from '@modrinth/ui'
 
+import { provideDebugInfoExports } from '@/features/debug-info/context'
+import { createDebugInfoExports } from '@/features/debug-info/debug-info-exports'
+import {
+	createManagedContentModalMemory,
+	provideManagedContentModalMemory,
+} from '@/features/instances/content/managed-content-modal-memory'
 import { setupInstanceActionsProvider } from '@/features/instances/instance-actions/context'
 import { setupSharedInstanceActionsProvider } from '@/features/library/shared-instances/actions-context'
 
@@ -30,6 +36,8 @@ export function setupProviders(
 	const onboardingChecklist = setupOnboardingChecklistProvider(appEvents)
 	setupInstanceActionsProvider()
 	setupSharedInstanceActionsProvider()
+	provideDebugInfoExports(createDebugInfoExports())
+	provideManagedContentModalMemory(createManagedContentModalMemory())
 
 	return {
 		...setupCreationModal(notificationManager, getGeneratedIconConfig),

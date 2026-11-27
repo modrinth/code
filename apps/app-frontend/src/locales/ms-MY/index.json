@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Ketepikan"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "Buka pemasangan"
-  },
   "app.action-bar.install.retry": {
     "message": "Cuba semula"
   },
@@ -259,9 +256,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Pemasangan"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "projek"
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" telah ditambahkan"

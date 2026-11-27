@@ -87,9 +87,10 @@ function setAdvancedFiltersCollapsed(collapsed: boolean) {
 	if (ctx.preferences) ctx.preferences.advancedFiltersCollapsed.value = collapsed
 }
 
-function closeFiltersMenu() {
+function closeFiltersMenu(event: MouseEvent) {
 	if (ctx.filtersMenuOpen) ctx.filtersMenuOpen.value = false
-	window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+	const ownerWindow = (event.currentTarget as Element | null)?.ownerDocument.defaultView
+	ownerWindow?.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
 }
 
 function isShaderGameVersionNote(filterId: string) {
@@ -122,7 +123,7 @@ const filterClass = computed(() => {
 })
 const buttonClass = computed(() =>
 	props.dense
-		? 'button-animation flex flex-col gap-1 px-3 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg'
+		? 'button-animation flex flex-col gap-1 px-3 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-surface-4'
 		: 'button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none',
 )
 const contentClass = computed(() => (props.dense ? 'mt-2 mb-3' : 'mb-4 mx-3'))
@@ -141,23 +142,23 @@ const headerClass = computed(() => (props.dense ? 'text-base m-0' : 'm-0 text-lg
 		@dismiss="onPhotosensitivityWarningDismiss"
 	/>
 
-	<div v-if="ctx.filtersMenuOpen?.value" class="fixed inset-0 z-40 bg-bg" />
+	<div v-if="ctx.filtersMenuOpen?.value" class="fixed inset-0 z-40 bg-surface-1" />
 
 	<div
 		class="flex flex-col"
 		:class="{
 			'gap-3': !dense,
-			'fixed inset-0 z-50 m-4 mb-0 overflow-auto rounded-t-3xl bg-bg-raised':
+			'fixed inset-0 z-50 m-4 mb-0 overflow-auto rounded-t-3xl bg-surface-3':
 				ctx.filtersMenuOpen?.value,
 		}"
 	>
 		<div
 			v-if="ctx.filtersMenuOpen?.value"
-			class="sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-0 border-b-[1px] border-solid border-divider bg-bg-raised px-6 py-4"
+			class="sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-0 border-b-[1px] border-solid border-divider bg-surface-3 px-6 py-4"
 		>
 			<h3 class="m-0 text-lg text-contrast">{{ formatMessage(commonMessages.filtersLabel) }}</h3>
 			<IconButton :label="formatMessage(commonMessages.closeButton)" @click="closeFiltersMenu">
-				<XIcon />
+				<XIcon aria-hidden="true" />
 			</IconButton>
 		</div>
 
@@ -166,7 +167,7 @@ const headerClass = computed(() => (props.dense ? 'text-base m-0' : 'm-0 text-lg
 			:class="
 				dense
 					? 'flex flex-col gap-3 border-0 border-b-[1px] p-4 last:border-b-0 border-[--brand-gradient-border] border-solid'
-					: 'card-shadow flex flex-col gap-3 rounded-2xl bg-bg-raised border-solid border-surface-4 border p-4'
+					: 'card-shadow flex flex-col gap-3 rounded-2xl bg-surface-3 border-solid border-surface-4 border p-4'
 			"
 		>
 			<label

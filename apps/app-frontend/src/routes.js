@@ -58,7 +58,7 @@ export default new createRouter({
 		{
 			path: '/browse/:projectType',
 			name: 'Discover content',
-			component: () => import('@/platform/adapters/browse/browse-page.vue'),
+			component: () => import('@/features/browse/pages/BrowsePage.vue'),
 			meta: {
 				saveScroll: true,
 			},
@@ -132,7 +132,7 @@ export default new createRouter({
 				{
 					path: '',
 					name: 'InstanceContent',
-					component: () => import('@/pages/instance/content/index.vue'),
+					component: () => import('@/features/instances/pages/ContentPage.vue'),
 					meta: {
 						saveScroll: true,
 					},
@@ -140,7 +140,7 @@ export default new createRouter({
 				{
 					path: 'projects/:type',
 					name: 'InstanceContentFilter',
-					component: () => import('@/pages/instance/content/index.vue'),
+					component: () => import('@/features/instances/pages/ContentPage.vue'),
 					meta: {
 						saveScroll: true,
 					},

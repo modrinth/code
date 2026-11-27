@@ -2,6 +2,7 @@ import { useSessionStorage } from '@vueuse/core'
 import type { Ref } from 'vue'
 import { computed, ref, watch } from 'vue'
 
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { normalizeProjectType } from '#ui/utils/common-messages'
 
 import type { ContentItem, ContentType } from '../types'
@@ -45,6 +46,7 @@ function persisted<T>(key: string | undefined, initial: T) {
 }
 
 export function useContentViewState(options: ContentViewStateOptions) {
+	const debug = useDebugLogger('ContentTypeDefault')
 	const types = computed<ContentType[]>(() => {
 		const provided = options.types.value
 		const present = new Set(options.items.value.map(contentTypeOf))
@@ -68,12 +70,27 @@ export function useContentViewState(options: ContentViewStateOptions) {
 	)
 
 	let autoSelectedType: ContentType | null = activeType.value === defaultType ? defaultType : null
-	watch(activeType, (next) => {
+	debug('setup', {
+		defaultType,
+		activeType: activeType.value,
+		types: types.value,
+		autoSelectedType,
+		itemCount: options.items.value.length,
+	})
+	watch(activeType, (next, previous) => {
+		debug('activeType changed', { previous, next, autoSelectedType, stack: new Error().stack })
 		if (next !== autoSelectedType) autoSelectedType = null
 	})
 	watch(
 		options.items,
 		(items) => {
+			debug('items changed', {
+				autoSelectedType,
+				activeType: activeType.value,
+				typeItemCount: typeItems.value.length,
+				itemTypes: items.map((item) => `${item.project_type}->${contentTypeOf(item)}`),
+				types: types.value,
+			})
 			if (autoSelectedType === null || typeItems.value.length > 0) return
 			const populated = types.value.find((type) =>
 				items.some((item) => contentTypeOf(item) === type),

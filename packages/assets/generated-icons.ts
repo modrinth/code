@@ -25,6 +25,7 @@ import _ArrowRightToLineIcon from './icons/arrow-right-to-line.svg?component'
 import _ArrowUpIcon from './icons/arrow-up.svg?component'
 import _ArrowUpDownIcon from './icons/arrow-up-down.svg?component'
 import _ArrowUpFromLineIcon from './icons/arrow-up-from-line.svg?component'
+import _ArrowUpNarrowWideIcon from './icons/arrow-up-narrow-wide.svg?component'
 import _ArrowUpRightIcon from './icons/arrow-up-right.svg?component'
 import _ArrowUpZAIcon from './icons/arrow-up-z-a.svg?component'
 import _AsteriskIcon from './icons/asterisk.svg?component'
@@ -540,6 +541,7 @@ export const ArrowRightToLineIcon = _ArrowRightToLineIcon
 export const ArrowUpIcon = _ArrowUpIcon
 export const ArrowUpDownIcon = _ArrowUpDownIcon
 export const ArrowUpFromLineIcon = _ArrowUpFromLineIcon
+export const ArrowUpNarrowWideIcon = _ArrowUpNarrowWideIcon
 export const ArrowUpRightIcon = _ArrowUpRightIcon
 export const ArrowUpZAIcon = _ArrowUpZAIcon
 export const AsteriskIcon = _AsteriskIcon

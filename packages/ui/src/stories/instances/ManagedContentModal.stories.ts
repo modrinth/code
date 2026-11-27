@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
 import { Button } from '../../components/base/buttons'
-import ManagedContentModal from '../../layouts/shared/content-tab/components/managed-content-modal/index.vue'
+import ManagedContentModal from '../../layouts/shared/content-tab/components/ManagedContentModal.vue'
 import type { ContentItem } from '../../layouts/shared/content-tab/types'
 
 const sodiumItem: ContentItem = {

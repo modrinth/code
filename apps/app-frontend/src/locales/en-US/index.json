@@ -23,9 +23,6 @@
   "app.action-bar.install.inspect-details": {
     "message": "Inspect details"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "Open instance"
-  },
   "app.action-bar.install.retry": {
     "message": "Retry"
   },
@@ -260,6 +257,9 @@
   "app.browse.back-to-instance": {
     "message": "Back to instance"
   },
+  "app.browse.breadcrumb.hosting": {
+    "message": "Hosting"
+  },
   "app.browse.discover-project-type": {
     "message": "Discover {projectType}"
   },
@@ -382,6 +382,12 @@
   },
   "app.download-manager.no-tasks": {
     "message": "No tasks"
+  },
+  "app.download-manager.open-in-folder-label": {
+    "message": "Open in folder: {title}"
+  },
+  "app.download-manager.open-instance-label": {
+    "message": "Open instance: {title}"
   },
   "app.download-manager.pause": {
     "message": "Pause installation"
@@ -752,9 +758,6 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instance"
   },
-  "app.instance.mods.content-type-project": {
-    "message": "project"
-  },
   "app.instance.mods.freeze-content": {
     "message": "Freeze version"
   },
@@ -765,7 +768,7 @@
     "message": "\"{name}\" was added"
   },
   "app.instance.mods.projects-were-added": {
-    "message": "{count} projects were added"
+    "message": "{count, plural, one {# project was added} other {# projects were added}}"
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Successfully uploaded"
@@ -3788,14 +3791,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "Escaping another launcher?"
   },
-  "app.welcome-screen.more-options": {
-    "message": "More options"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Press <shortcut>N</shortcut> to quick create an instance"
-  },
-  "app.welcome-screen.skip": {
-    "message": "Skip"
   },
   "app.welcome-screen.title": {
     "message": "Welcome to Modrinth"

@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Відхилити"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "Відкрити примірник"
-  },
   "app.action-bar.install.retry": {
     "message": "Повторити"
   },
@@ -730,9 +727,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Примірник"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "проєкт"
   },
   "app.instance.mods.freeze-content": {
     "message": "Заморозити версію"
@@ -3734,14 +3728,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "Змінили запускач?"
   },
-  "app.welcome-screen.more-options": {
-    "message": "Додаткові опції"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Натисніть <shortcut>N</shortcut> для створення примірника"
-  },
-  "app.welcome-screen.skip": {
-    "message": "Пропустити"
   },
   "app.welcome-screen.title": {
     "message": "Вітаємо в Modrinth"

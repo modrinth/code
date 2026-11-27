@@ -71,7 +71,7 @@ import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import { useRouteLoading } from '@/app/runtime/use-route-loading'
 import { useSharedInstanceLockSync } from '@/app/runtime/use-shared-instance-lock-sync'
-import RouteScope from '@/app/shell/route-scope.vue'
+import RouteScope from '@/app/shell/RouteScope.vue'
 import AppSidebar from '@/app/shell/sidebar/index.vue'
 import AppTitleBar from '@/app/shell/title-bar/index.vue'
 import { trackExternalFileDownload } from '@/components/ui/download-manager/external-file-downloads'
@@ -99,6 +99,7 @@ import { useInstanceMetadataRefresh } from '@/composables/use-instance-metadata-
 import { useQuickInstanceLimit } from '@/composables/use-quick-instance-limit.ts'
 import { isDarkTheme, useTheme } from '@/composables/use-theme.ts'
 import { config } from '@/config'
+import { useBrowseRoutePrefetch } from '@/features/browse/use-browse-route-prefetch'
 import ServerPlayHandler from '@/features/hosting/play-handler.vue'
 import { prefetchHostingData } from '@/features/hosting/prefetch'
 import InstanceActionModals from '@/features/instances/instance-actions/instance-action-modals.vue'
@@ -106,6 +107,11 @@ import {
 	createInstanceLaunchState,
 	provideInstanceLaunchState,
 } from '@/features/instances/launch-state'
+import {
+	instanceKeys,
+	instanceListQueryOptions,
+	screenshotKeys,
+} from '@/features/instances/queries'
 import { maxMemoryQueryOptions } from '@/features/java/queries'
 import SharedInstanceLockNotice from '@/features/library/shared-instances/shared-instance-lock-notice.vue'
 import SharedInstanceModals from '@/features/library/shared-instances/shared-instance-modals.vue'
@@ -171,12 +177,6 @@ import {
 	setRestartAfterPendingUpdate,
 } from '@/helpers/utils.js'
 import i18n, { setLocale } from '@/i18n.config'
-import {
-	instanceKeys,
-	instanceListQueryOptions,
-	screenshotKeys,
-} from '@/pages/instance/query-options'
-import { useBrowseRoutePrefetch } from '@/platform/adapters/browse/use-browse-route-prefetch'
 import { createFileDownload } from '@/platform/adapters/file-download'
 import { createIconCache } from '@/platform/adapters/icon-cache'
 import { startJoinServer, startJoinSingleplayerWorld } from '@/platform/app-lib/worlds/commands'
@@ -2049,10 +2049,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				v-tooltip.right="formatMessage(messages.home)"
 				to="/"
 				:is-primary="(route) => route.path === '/'"
-				:is-subpage="
-					() =>
-						(route.path.startsWith('/browse') || route.path.startsWith('/project')) && route.query.i
-				"
 			>
 				<PlayIcon class="ml-0.5" />
 			</NavButton>

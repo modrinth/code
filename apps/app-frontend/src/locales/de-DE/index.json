@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Ausblenden"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "Instanz öffnen"
-  },
   "app.action-bar.install.retry": {
     "message": "Erneut versuchen"
   },
@@ -739,9 +736,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instanz"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "Projekt"
   },
   "app.instance.mods.freeze-content": {
     "message": "Version sperren"
@@ -3743,14 +3737,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "Einem anderen Launcher entkommen?"
   },
-  "app.welcome-screen.more-options": {
-    "message": "Weitere Optionen"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Drücke <shortcut>N</shortcut>, um schnell eine Instanz zu erstellen"
-  },
-  "app.welcome-screen.skip": {
-    "message": "Überspringen"
   },
   "app.welcome-screen.title": {
     "message": "Willkommen bei Modrinth"

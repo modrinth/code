@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import BrowseToolbar from './components/BrowseToolbar.vue'
 import BrowseResults from './components/results/index.vue'
-import SelectedProjectsFloatingBar from './components/selection/floating-bar.vue'
-import BrowseToolbar from './components/toolbar.vue'
+import SelectedProjectsFloatingBar from './components/SelectedProjectsFloatingBar.vue'
 import { injectBrowseManager } from './providers/browse-manager'
 
 defineProps<{

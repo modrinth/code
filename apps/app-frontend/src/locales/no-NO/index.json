@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Avvis"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "Åpne tilfelle"
-  },
   "app.action-bar.install.retry": {
     "message": "Prøv igjen"
   },
@@ -514,9 +511,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Tilfelle"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "prosjekt"
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" ble lagt til"

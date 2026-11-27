@@ -1,50 +1,42 @@
 <template>
-	<div class="mb-3 flex flex-col gap-3">
-		<div class="flex flex-wrap justify-between gap-2">
-			<VersionFilterControl
-				ref="versionFilters"
-				:versions="normalizedVersions"
-				:game-versions="gameVersions"
-				:base-id="`${baseId}-filter`"
-				@update:query="updateQuery"
-			/>
-
+	<VersionFilterControl
+		ref="versionFilters"
+		v-model:search="searchQuery"
+		class="mb-4"
+		:versions="normalizedVersions"
+		:game-versions="gameVersions"
+		:search-placeholder="formatMessage(messages.searchPlaceholder, { count: versions.length })"
+		:page="currentPage"
+		:page-count="pageCount"
+		@update:query="updateQuery"
+		@switch-page="switchPage"
+	>
+		<template #controls>
+			<SortMenu v-model="sortMode" :fields="sortFields" />
+		</template>
+		<template v-if="refresh || openModal" #actions>
+			<IconButton
+				v-if="refresh"
+				v-tooltip="refreshLabel"
+				type="quiet"
+				size="lg"
+				:label="refreshLabel"
+				:disabled="refreshing"
+				@click="runRefresh"
+			>
+				<RefreshCwIcon :class="{ 'animate-spin': refreshing }" aria-hidden="true" />
+			</IconButton>
 			<Button
 				v-if="openModal"
 				:type="createVersionButtonSecondary ? 'base' : 'colored'"
 				:color="createVersionButtonSecondary ? undefined : 'green'"
+				size="lg"
 				@click="openModal"
 			>
 				<PlusIcon /> Create version
 			</Button>
-
-			<Pagination
-				v-if="!openModal"
-				:page="currentPage"
-				class="mt-auto"
-				:count="Math.ceil(filteredVersions.length / pageSize)"
-				@switch-page="switchPage"
-			/>
-		</div>
-
-		<div
-			v-if="openModal && filteredVersions.length > pageSize"
-			class="flex flex-wrap items-center justify-between gap-2"
-		>
-			<span>
-				Showing {{ (currentPage - 1) * pageSize + 1 }} to
-				{{ Math.min(currentPage * pageSize, filteredVersions.length) }} of
-				{{ filteredVersions.length }}
-			</span>
-
-			<Pagination
-				:page="currentPage"
-				class="mt-auto"
-				:count="Math.ceil(filteredVersions.length / pageSize)"
-				@switch-page="switchPage"
-			/>
-		</div>
-	</div>
+		</template>
+	</VersionFilterControl>
 
 	<Table
 		v-if="versions.length > 0"
@@ -101,7 +93,7 @@
 						</div>
 					</div>
 				</AutoLink>
-				<div data-no-row-click>
+				<div data-no-row-click class="empty:hidden">
 					<slot name="version-issue" :version="version" />
 				</div>
 			</div>
@@ -426,7 +418,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="smart-clickable:allow-pointer-events">
+					<div class="smart-clickable:allow-pointer-events empty:hidden">
 						<slot name="version-issue" :version="version" />
 					</div>
 					<div v-if="showFiles" class="tag-list">
@@ -445,12 +437,7 @@
 	</div>
 
 	<div class="mt-3 flex">
-		<Pagination
-			:page="currentPage"
-			class="ml-auto"
-			:count="Math.ceil(filteredVersions.length / pageSize)"
-			@switch-page="switchPage"
-		/>
+		<Pagination :page="currentPage" class="ml-auto" :count="pageCount" @switch-page="switchPage" />
 	</div>
 </template>
 <script setup lang="ts">
@@ -461,6 +448,7 @@ import {
 	DownloadIcon,
 	getLoaderIcon,
 	PlusIcon,
+	RefreshCwIcon,
 	StarIcon,
 } from '@modrinth/assets'
 import {
@@ -481,10 +469,13 @@ import {
 	getVersionGroupsForDisplay,
 	type VersionDisplayGroup,
 } from '@modrinth/utils'
-import { computed, type Ref, ref } from 'vue'
+import { computed, type Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { Button } from '#ui/components/base/buttons'
+import { Button, IconButton } from '#ui/components/base/buttons'
+import SortMenu, { type SortField, type SortMode } from '#ui/components/base/SortMenu.vue'
+import { useContentSearch } from '#ui/layouts/shared/content-tab/composables/content-search'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import { useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
@@ -493,6 +484,45 @@ import FloatingMenu from '../floating/FloatingMenu.vue'
 import { getEnvironmentFilterValue, getEnvironmentTags } from './settings/environment/environments'
 
 const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	withheld: {
+		id: 'project.versions.version.withheld',
+		defaultMessage: 'Withheld',
+	},
+	withheldTooltip: {
+		id: 'project.versions.version.withheld.tooltip',
+		defaultMessage: 'Version withheld due to missing permissions',
+	},
+	toggleFilterTooltip: {
+		id: 'project.versions.filter.toggle-tooltip',
+		defaultMessage: 'Toggle filter for {filter}',
+	},
+	modloaderShort: {
+		id: 'project.versions.platform.modloader.short',
+		defaultMessage: 'ModLoader',
+	},
+	sortPublished: {
+		id: 'project.versions.sort.published',
+		defaultMessage: 'Date published',
+	},
+	sortDownloads: {
+		id: 'project.versions.sort.downloads',
+		defaultMessage: 'Downloads',
+	},
+	sortVersion: {
+		id: 'project.versions.sort.version',
+		defaultMessage: 'Version number',
+	},
+	searchPlaceholder: {
+		id: 'project.versions.search-placeholder',
+		defaultMessage: 'Search {count, number} versions...',
+	},
+	refreshing: {
+		id: 'project.versions.refreshing',
+		defaultMessage: 'Refreshing...',
+	},
+})
 const formatRelativeTime = useRelativeTime({ style: 'narrow' })
 const { formatCompactNumber } = useCompactNumber()
 const formatDateTime = useFormatDateTime({
@@ -542,6 +572,7 @@ const props = withDefaults(
 		versionLink?: (version: Labrinth.Versions.v3.Version) => string
 		openModal?: () => void
 		createVersionButtonSecondary?: boolean
+		refresh?: () => unknown
 	}>(),
 	{
 		baseId: undefined,
@@ -549,6 +580,7 @@ const props = withDefaults(
 		showEnvironmentColumn: false,
 		currentMember: false,
 		versionLink: undefined,
+		refresh: undefined,
 	},
 )
 
@@ -565,7 +597,7 @@ const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 		{
 			key: 'name',
 			label: 'Version',
-			cellClass: '!overflow-visible py-3 pr-4 min-w-[7rem]',
+			cellClass: '!overflow-visible py-3 pr-4 align-middle min-w-[7rem]',
 		},
 		{
 			key: 'gameVersions',
@@ -697,9 +729,15 @@ const selectedEnvironments: Ref<string[]> = computed(
 	() => versionFilters.value?.selectedEnvironments ?? [],
 )
 
+const { searchQuery, search } = useContentSearch(normalizedVersions, ['version_number', 'name'], {
+	threshold: 0.2,
+})
+const searchMatches = computed(() => new Set(search(normalizedVersions.value)))
+
 const filteredVersions = computed(() => {
 	return normalizedVersions.value.filter(
 		(version) =>
+			searchMatches.value.has(version) &&
 			hasAnySelected(version.game_versions, selectedGameVersions.value) &&
 			hasAnySelected(version.loaders, selectedPlatforms.value) &&
 			isAnySelected(version.version_type, selectedChannels.value) &&
@@ -718,8 +756,49 @@ function isAnySelected(value: string, selected: string[]) {
 	return selected.length === 0 || selected.includes(value)
 }
 
+type VersionSortField = 'version' | 'published' | 'downloads'
+
+const sortFields = computed<SortField<VersionSortField>[]>(() => [
+	{ value: 'published', label: formatMessage(messages.sortPublished), kind: 'date' },
+	{ value: 'downloads', label: formatMessage(messages.sortDownloads), kind: 'numeric' },
+	{ value: 'version', label: formatMessage(messages.sortVersion), kind: 'alphabetical' },
+])
+
+const defaultSortMode: SortMode<VersionSortField> = { field: 'published', direction: 'desc' }
+
+function parseSortMode(field: unknown, direction: unknown): SortMode<VersionSortField> {
+	const match = sortFields.value.find((candidate) => candidate.value === field)
+	if (!match) return defaultSortMode
+	const fallbackDirection = match.kind === 'alphabetical' ? 'asc' : 'desc'
+	return {
+		field: match.value,
+		direction: direction === 'asc' || direction === 'desc' ? direction : fallbackDirection,
+	}
+}
+
+const sortMode = ref<SortMode<VersionSortField>>(defaultSortMode)
+
+const versionSortComparators: Record<
+	VersionSortField,
+	(a: DisplayVersion, b: DisplayVersion) => number
+> = {
+	version: (a, b) =>
+		a.version_number.localeCompare(b.version_number, undefined, {
+			numeric: true,
+			sensitivity: 'base',
+		}),
+	published: (a, b) => Date.parse(a.date_published) - Date.parse(b.date_published),
+	downloads: (a, b) => a.downloads - b.downloads,
+}
+
+const sortedVersions = computed(() => {
+	const compare = versionSortComparators[sortMode.value.field]
+	const sign = sortMode.value.direction === 'asc' ? 1 : -1
+	return [...filteredVersions.value].sort((a, b) => sign * compare(a, b))
+})
+
 const currentVersions = computed(() =>
-	filteredVersions.value
+	sortedVersions.value
 		.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value)
 		.map((version) => ({
 			...version,
@@ -729,6 +808,22 @@ const currentVersions = computed(() =>
 const currentVersionRows = computed<VersionTableRow[]>(
 	() => currentVersions.value as VersionTableRow[],
 )
+const pageCount = computed(() => Math.ceil(filteredVersions.value.length / pageSize.value))
+
+const refreshing = ref(false)
+const refreshLabel = computed(() =>
+	formatMessage(refreshing.value ? messages.refreshing : commonMessages.refreshButton),
+)
+
+async function runRefresh() {
+	if (!props.refresh || refreshing.value) return
+	refreshing.value = true
+	try {
+		await props.refresh()
+	} finally {
+		refreshing.value = false
+	}
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -736,6 +831,26 @@ const router = useRouter()
 if (route.query.page) {
 	currentPage.value = Number(route.query.page) || 1
 }
+
+if (typeof route.query.q === 'string') {
+	searchQuery.value = route.query.q
+}
+
+sortMode.value = parseSortMode(route.query.sort, route.query.dir)
+
+watch(sortMode, (mode) => {
+	const isDefault =
+		mode.field === defaultSortMode.field && mode.direction === defaultSortMode.direction
+	updateQuery({
+		sort: isDefault ? undefined : mode.field,
+		dir: isDefault ? undefined : mode.direction,
+		page: undefined,
+	})
+})
+
+watch(searchQuery, (query) => {
+	updateQuery({ q: query.trim() ? query : undefined, page: undefined })
+})
 
 function switchPage(page: number) {
 	currentPage.value = page
@@ -774,25 +889,6 @@ function updateQuery(newQueries: Record<string, string | string[] | undefined | 
 		},
 	})
 }
-
-const messages = defineMessages({
-	withheld: {
-		id: 'project.versions.version.withheld',
-		defaultMessage: 'Withheld',
-	},
-	withheldTooltip: {
-		id: 'project.versions.version.withheld.tooltip',
-		defaultMessage: 'Version withheld due to missing permissions',
-	},
-	toggleFilterTooltip: {
-		id: 'project.versions.filter.toggle-tooltip',
-		defaultMessage: 'Toggle filter for {filter}',
-	},
-	modloaderShort: {
-		id: 'project.versions.platform.modloader.short',
-		defaultMessage: 'ModLoader',
-	},
-})
 </script>
 
 <style scoped>

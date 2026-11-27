@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "隐藏"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "打开实例"
-  },
   "app.action-bar.install.retry": {
     "message": "重试"
   },
@@ -739,9 +736,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "实例"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "项目"
   },
   "app.instance.mods.freeze-content": {
     "message": "锁定版本"
@@ -3725,14 +3719,8 @@
   "app.welcome-screen.import-prompt": {
     "message": "想从其他启动器迁移实例？"
   },
-  "app.welcome-screen.more-options": {
-    "message": "更多选项"
-  },
   "app.welcome-screen.quick-create-hint": {
     "message": "按 <shortcut>N</shortcut> 键快速创建实例"
-  },
-  "app.welcome-screen.skip": {
-    "message": "跳过"
   },
   "app.welcome-screen.title": {
     "message": "欢迎使用 Modrinth"

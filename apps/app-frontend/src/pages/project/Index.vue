@@ -127,50 +127,50 @@
 							</TeleportOverflowMenu>
 						</template>
 						<template v-else>
-							<Button
-								v-if="showSwitchVersion && onVersionsPage"
-								v-tooltip="formatMessage(messages.alreadyInstalled)"
-								size="xl"
-								native-type="button"
-								disabled
+							<Transition
+								mode="out-in"
+								enter-active-class="transition-opacity duration-200 ease-in-out motion-reduce:transition-none"
+								enter-from-class="opacity-0"
+								leave-active-class="transition-opacity duration-200 ease-in-out motion-reduce:transition-none"
+								leave-to-class="opacity-0"
 							>
-								<CheckIcon />
-								{{ formatMessage(commonMessages.installedLabel) }}
-							</Button>
-							<Button
-								v-else-if="showSwitchVersion"
-								size="xl"
-								native-type="button"
-								@click="goToVersions"
-							>
-								<SwapIcon />
-								{{ formatMessage(messages.switchVersion) }}
-							</Button>
-							<Button
-								v-else
-								v-tooltip="
-									installButtonInstalled ? formatMessage(messages.alreadyInstalled) : undefined
-								"
-								type="colored"
-								color="brand"
-								size="xl"
-								native-type="button"
-								:disabled="installButtonDisabled"
-								@click="install(null)"
-							>
-								<component :is="installButtonIcon" :class="installButtonIconClass" />
-								{{
-									installButtonInstalled
-										? formatMessage(commonMessages.installedLabel)
-										: installButtonValidating
-											? formatMessage(commonMessages.validatingLabel)
-											: installButtonLoading
-												? formatMessage(commonMessages.installingLabel)
-												: serverProjectSelected
-													? formatMessage(commonMessages.selectedLabel)
-													: formatMessage(commonMessages.installButton)
-								}}
-							</Button>
+								<Button
+									v-if="showSwitchVersion && !onVersionsPage"
+									key="switch-version"
+									size="xl"
+									native-type="button"
+									@click="openSwitchVersionModal"
+								>
+									<SwapIcon />
+									{{ formatMessage(messages.switchVersion) }}
+								</Button>
+								<Button
+									v-else-if="!showSwitchVersion"
+									key="install"
+									v-tooltip="
+										installButtonInstalled ? formatMessage(messages.alreadyInstalled) : undefined
+									"
+									type="colored"
+									color="brand"
+									size="xl"
+									native-type="button"
+									:disabled="installButtonDisabled"
+									@click="install(null)"
+								>
+									<component :is="installButtonIcon" :class="installButtonIconClass" />
+									{{
+										installButtonInstalled
+											? formatMessage(commonMessages.installedLabel)
+											: installButtonValidating
+												? formatMessage(commonMessages.validatingLabel)
+												: installButtonLoading
+													? formatMessage(commonMessages.installingLabel)
+													: serverProjectSelected
+														? formatMessage(commonMessages.selectedLabel)
+														: formatMessage(commonMessages.installButton)
+									}}
+								</Button>
+							</Transition>
 							<TeleportOverflowMenu
 								type="quiet"
 								size="xl"
@@ -205,6 +205,7 @@
 					:route="displayedProjectRoute"
 					:project="data"
 					:versions="versions"
+					:refresh-versions="refreshVersions"
 					:members="members"
 					:instance="instance"
 					:install="install"
@@ -221,6 +222,20 @@
 			<template v-else>{{ formatMessage(messages.loadError) }}</template>
 		</div>
 		<SelectedProjectsFloatingBar v-if="projectInstallTarget" :selection="serverInstall.selection" />
+		<ContentUpdaterModal
+			v-if="data && instance && showSwitchVersion"
+			ref="switchVersionModal"
+			:versions="versions"
+			:current-game-version="instance.game_version"
+			:current-loader="instance.loader"
+			:current-version-id="installedVersion ?? ''"
+			:is-app="true"
+			:project-type="data.project_type"
+			:project-icon-url="data.icon_url ?? undefined"
+			:project-name="data.title"
+			:action-loading="installing"
+			@update="(version) => install(version.id)"
+		/>
 		<ContextMenu ref="options" :label="formatMessage(messages.projectActionsLabel)">
 			<template #open_link="{ option }">
 				<GlobeIcon /> {{ option.label }} <ExternalIcon />
@@ -262,6 +277,7 @@ import {
 	BrowseInstallHeader,
 	Button,
 	commonMessages,
+	ContentUpdaterModal,
 	ContextMenu,
 	CreationFlowModal,
 	defineMessages,
@@ -294,7 +310,9 @@ import { SwapIcon } from '@/assets/icons/index.js'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import InstanceMetadataItems from '@/features/instances/instance-metadata-items.vue'
+import { useServerInstallContent } from '@/features/browse/server-install-content'
+import StickyBrowseHeader from '@/features/browse/StickyBrowseHeader.vue'
+import InstanceMetadataItems from '@/features/instances/InstanceMetadataItems.vue'
 import { getServerAddress } from '@/features/servers/address'
 import { fetchCachedServerStatus, getFreshCachedServerStatus } from '@/features/servers/queries'
 import {
@@ -315,8 +333,6 @@ import {
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_by_instance_id } from '@/helpers/process'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { useServerInstallContent } from '@/platform/adapters/browse/server-install-content'
-import StickyBrowseHeader from '@/platform/adapters/browse/sticky-browse-header.vue'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { provideBreadcrumbParent, useBreadcrumb } from '@/shared/breadcrumbs'
@@ -662,10 +678,14 @@ const projectSearchUrl = computed(
 )
 
 const showSwitchVersion = computed(() => !!instance.value && installed.value)
-const onVersionsPage = computed(() => route.name === 'Versions')
+const onVersionsPage = computed(() =>
+	['Versions', 'Version'].includes(displayedProjectRoute.value.name),
+)
 
-function goToVersions() {
-	router.push(versionsHref.value)
+const switchVersionModal = ref(null)
+
+function openSwitchVersionModal() {
+	switchVersionModal.value?.show(installedVersion.value ?? undefined, { switchMode: true })
 }
 
 const [allLoaders, allGameVersions] = await Promise.all([
@@ -867,6 +887,17 @@ watch(
 		}
 	},
 )
+
+async function refreshVersions() {
+	const requestedId = data.value?.id
+	if (!requestedId) return
+	const project = await get_project(requestedId, 'bypass').catch(handleError)
+	if (!project || data.value?.id !== requestedId) return
+	const freshVersions = await get_version_many(project.versions, 'bypass').catch(handleError)
+	if (!freshVersions || data.value?.id !== requestedId) return
+	data.value = project
+	versions.value = freshVersions.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
+}
 
 async function install(version) {
 	if (serverProjectInstallContext.value && data.value) {

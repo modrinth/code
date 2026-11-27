@@ -20,9 +20,6 @@
   "app.action-bar.install.dismiss": {
     "message": "התעלם"
   },
-  "app.action-bar.install.open-instance": {
-    "message": "הצג התקנה"
-  },
   "app.action-bar.install.retry": {
     "message": "נסה שוב"
   },
@@ -604,9 +601,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "התקנה"
-  },
-  "app.instance.mods.content-type-project": {
-    "message": "פרויקט"
   },
   "app.instance.mods.freeze-content": {
     "message": "הקפאת גרסה"
@@ -1657,9 +1651,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "גרסה {version} הותקנה בהצלחה!"
-  },
-  "app.welcome-screen.skip": {
-    "message": "דלג"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"

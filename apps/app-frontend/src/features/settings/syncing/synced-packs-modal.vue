@@ -15,6 +15,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 
 import SyncedContentModal from '@/components/ui/instance/SyncedContentModal.vue'
 import { useAppEvent } from '@/composables/use-app-event'
+import { instanceKeys } from '@/features/instances/queries'
 import {
 	isSyncedPackTypeAvailable,
 	remove_synced_pack,
@@ -23,7 +24,6 @@ import {
 	syncedPackQueryOptions,
 	type SyncedPackType,
 } from '@/helpers/synced-packs'
-import { instanceKeys } from '@/pages/instance/query-options'
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()

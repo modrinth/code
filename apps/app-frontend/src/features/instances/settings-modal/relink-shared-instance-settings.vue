@@ -5,7 +5,7 @@
 		}}</span>
 		<div>
 			<Button :disabled="!!offline || !auth.user.value" @click="relinkModal?.show($event)">
-				<LinkIcon class="size-5" />
+				<LinkIcon aria-hidden="true" />
 				{{ formatMessage(messages.relinkButton) }}
 			</Button>
 		</div>
@@ -19,7 +19,7 @@ import { LinkIcon } from '@modrinth/assets'
 import { Button, defineMessages, injectAuth, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import { injectSharedInstance } from '@/pages/instance/shared-instance-context'
+import { injectSharedInstance } from '@/features/instances/shared-instance-context'
 
 import { injectInstanceSettings } from './instance-settings-context.ts'
 import RelinkSharedInstanceModal from './relink-shared-instance/relink-shared-instance-modal.vue'

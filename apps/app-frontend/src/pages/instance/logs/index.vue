@@ -16,10 +16,9 @@ import { computed, ref, shallowRef, triggerRef, watch, watchEffect } from 'vue'
 
 import { useAppEvent } from '@/composables/use-app-event'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
+import { injectInstancePage } from '@/features/instances/instance-context'
+import { instanceKeys } from '@/features/instances/queries'
 import { delete_logs_by_filename, get_output_by_filename } from '@/helpers/logs.js'
-
-import { injectInstancePage } from '../instance-context'
-import { instanceKeys } from '../query-options'
 
 const client = injectModrinthClient()
 const { handleError } = injectNotificationManager()

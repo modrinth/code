@@ -9,31 +9,18 @@
 				size="medium"
 				clearable
 			/>
-			<div class="flex shrink-0 items-center gap-2 flex-wrap md:flex-nowrap">
-				<Combobox
-					v-model="roleFilter"
-					:options="roleFilterOptions"
-					:display-value="selectedRoleFilterLabel"
-					trigger-size="lg"
-					trigger-class="min-w-[225px]"
-				>
-					<template #prefix>
-						<FilterIcon class="size-5 text-secondary" aria-hidden="true" />
-					</template>
-				</Combobox>
-				<Button
-					v-tooltip="manageUsersActionTooltip"
-					type="colored"
-					color="brand"
-					size="lg"
-					class="w-full md:w-fit"
-					:disabled="!canManageUsers"
-					@click="grantAccessModal?.show($event)"
-				>
-					<UserPlusIcon aria-hidden="true" />
-					{{ formatMessage(messages.inviteFriends) }}
-				</Button>
-			</div>
+			<Button
+				v-tooltip="manageUsersActionTooltip"
+				type="colored"
+				color="brand"
+				size="lg"
+				class="w-full shrink-0 md:w-fit"
+				:disabled="!canManageUsers"
+				@click="grantAccessModal?.show($event)"
+			>
+				<UserPlusIcon aria-hidden="true" />
+				{{ formatMessage(messages.inviteFriends) }}
+			</Button>
 		</div>
 
 		<AccessTable
@@ -111,12 +98,11 @@
 
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { FilterIcon, SearchIcon, UserPlusIcon } from '@modrinth/assets'
+import { SearchIcon, UserPlusIcon } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
-import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
 import {
@@ -142,8 +128,6 @@ import {
 
 import { useAccessAuditLog } from './audit-log'
 import { accessMessages } from './messages'
-
-type RoleFilter = ServerAccessRole | 'all'
 
 const props = withDefaults(
 	defineProps<{
@@ -204,22 +188,6 @@ const roleOptions = computed<ServerAccessRoleOption[]>(() => [
 	},
 ])
 
-const roleFilterOptions = computed<ComboboxOption<RoleFilter>[]>(() => [
-	{ value: 'all', label: formatMessage(messages.allRoles) },
-	...roleOptions.value.map((role) => ({
-		value: role.value,
-		label: role.label,
-	})),
-])
-
-const selectedRoleFilterLabel = computed(() =>
-	formatMessage(messages.selectedRoleFilter, {
-		role:
-			roleFilterOptions.value.find((option) => option.value === roleFilter.value)?.label ??
-			formatMessage(messages.allRoles),
-	}),
-)
-
 const serverUsersQueryKey = ['servers', 'users', 'v1', serverId]
 const serverUsersQuery = useQuery({
 	queryKey: serverUsersQueryKey,
@@ -272,7 +240,6 @@ const members = computed<ServerAccessMember[]>(() =>
 )
 
 const memberSearch = ref('')
-const roleFilter = ref<RoleFilter>('all')
 const {
 	auditEntries,
 	auditLogFilterCategories,
@@ -302,7 +269,6 @@ const {
 const filteredMembers = computed(() => {
 	const normalizedSearch = memberSearch.value.trim().toLowerCase()
 	return members.value.filter((member) => {
-		if (roleFilter.value !== 'all' && member.role !== roleFilter.value) return false
 		if (!normalizedSearch) return true
 
 		const roleLabel = formatRole(member.role)

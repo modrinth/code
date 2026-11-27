@@ -9,28 +9,39 @@
 	</span>
 
 	<template v-for="preview in showPreviews ? appliedFilterPreviews : []" :key="preview.key">
-		<Button
-			v-if="preview.category.direct"
-			type="base"
-			native-type="button"
-			:size="compact ? 'sm' : 'lg'"
-			:class="effectivePreviewTriggerClass"
-			:aria-label="formatMessage(messages.clearNamedFilter, { name: preview.label })"
-			@click="clearFilterCategory(preview.key)"
-		>
-			<div
-				class="flex min-w-0 max-w-full items-center gap-2 sm:max-w-80"
-				:class="compact ? 'min-h-6' : 'min-h-8'"
+		<div v-if="preview.category.direct" class="relative inline-block w-auto min-w-0 max-w-full">
+			<ButtonFrame
+				as="div"
+				type="base"
+				:size="compact ? 'sm' : 'lg'"
+				class="w-auto max-w-full cursor-default overflow-hidden text-left"
+				:class="effectivePreviewTriggerClass"
 			>
-				<FilterIcon
-					v-if="showPreviewFilterIcon"
-					class="size-5 shrink-0 text-primary"
-					aria-hidden="true"
-				/>
-				<span class="min-w-0 flex-1 truncate font-semibold text-contrast">{{ preview.label }}</span>
-				<XIcon class="size-4 shrink-0 text-primary" />
-			</div>
-		</Button>
+				<div
+					class="flex min-w-0 max-w-full items-center gap-2 sm:max-w-80"
+					:class="compact ? 'min-h-6' : 'min-h-8'"
+				>
+					<FilterIcon
+						v-if="showPreviewFilterIcon"
+						class="size-5 shrink-0 text-primary"
+						aria-hidden="true"
+					/>
+					<span class="min-w-0 flex-1 truncate font-semibold text-contrast">
+						{{ preview.label }}
+					</span>
+					<div class="flex shrink-0 items-center gap-1.5">
+						<button
+							type="button"
+							class="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-secondary transition-colors hover:text-contrast"
+							:aria-label="formatMessage(messages.clearNamedFilter, { name: preview.label })"
+							@click.stop="clearFilterCategory(preview.key)"
+						>
+							<XIcon class="size-4 text-primary" />
+						</button>
+					</div>
+				</div>
+			</ButtonFrame>
+		</div>
 		<MultiSelect
 			v-else
 			class="min-w-0 max-w-full"
@@ -452,6 +463,7 @@ import type { Component, ComponentPublicInstance, CSSProperties } from 'vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { Button, type ButtonElementHandle, type ButtonSize } from '#ui/components/base/buttons'
+import ButtonFrame from '#ui/components/base/buttons/ButtonFrame.vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { useVirtualScroll } from '../../composables/virtual-scroll'

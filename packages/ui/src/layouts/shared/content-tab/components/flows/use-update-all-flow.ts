@@ -117,12 +117,9 @@ export function useUpdateAllFlow(
 			const preferredVersionId = item.update_version_id!
 			const versions = projectVersions.get(item.project!.id) ?? []
 			const preferredVersion =
-				queryClient.getQueryData<Labrinth.Versions.v2.Version>([
-					'labrinth',
-					'version',
-					'v2',
-					preferredVersionId,
-				]) ??
+				queryClient.getQueryData<Labrinth.Versions.v2.Version>(
+					contentVersionQueryOptions.version(preferredVersionId, client).queryKey,
+				) ??
 				recommended.get(preferredVersionId) ??
 				versions.find((version) => version.id === preferredVersionId)
 			const sorted = [

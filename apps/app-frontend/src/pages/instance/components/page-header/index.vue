@@ -199,11 +199,11 @@ import {
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import InstanceMetadataItems from '@/features/instances/instance-metadata-items.vue'
+import { instanceBrowseHeadingMessage } from '@/features/browse/use-instance-browse-target'
+import InstanceMetadataItems from '@/features/instances/InstanceMetadataItems.vue'
 import { formatPlaytime, playtimeMessages } from '@/features/instances/playtime'
 import { libraryInstanceMessages } from '@/features/library/messages'
 import type { GameInstance } from '@/helpers/types'
-import { instanceBrowseHeadingMessage } from '@/platform/adapters/browse/use-instance-browse-target'
 
 import InstanceHeaderServerMetadata from './instance-page-header-server-metadata.vue'
 

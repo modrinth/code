@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { injectInstancePage } from '@/features/instances/instance-context'
 import { showWorldInFolder } from '@/features/worlds/actions'
 import { gameVersionsQueryOptions } from '@/features/worlds/queries'
 import {
@@ -21,7 +22,6 @@ import {
 	hasWorldQuickPlaySupport,
 } from '@/features/worlds/world-utils'
 import WorldItem from '@/features/worlds/WorldItem.vue'
-import { injectInstancePage } from '@/pages/instance/instance-context'
 import type { ServerWorld, World } from '@/platform/app-lib/worlds/types'
 
 import AddServerModal from './components/AddServerModal.vue'
@@ -86,14 +86,21 @@ const readyPending = useReadyState(worldsQuery)
 const { protocolVersion, getServerData, getServerAvailability, refreshServer, refreshAllServers } =
 	useServerStatuses(serverWorlds)
 
-const { activeTab, searchQuery, selectedFilters, filterOptions, activeWorlds, filteredWorlds } =
-	useQuickplayFilters({
-		serverWorlds,
-		singleplayerWorlds,
-		getServerAvailability,
-		highlightedWorld,
-		loaded: () => worldsQuery.isSuccess.value,
-	})
+const {
+	activeTab,
+	searchQuery,
+	selectedFilters,
+	filterOptions,
+	hasAnyWorlds,
+	activeWorlds,
+	filteredWorlds,
+} = useQuickplayFilters({
+	serverWorlds,
+	singleplayerWorlds,
+	getServerAvailability,
+	highlightedWorld,
+	loaded: () => worldsQuery.isSuccess.value,
+})
 
 const { startingInstance, joinWorld, stop, isPlayingWorld } = useWorldLaunch(isManagedServerWorld)
 
@@ -180,6 +187,7 @@ function worldKey(world: World) {
 	<ReadyTransition :pending="readyPending">
 		<div class="flex flex-col gap-4">
 			<QuickplayToolbar
+				v-if="hasAnyWorlds"
 				v-model:tab="activeTab"
 				v-model:search="searchQuery"
 				v-model:filters="selectedFilters"
