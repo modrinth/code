@@ -233,16 +233,16 @@ subtle = "2.6.1"
 syn = { version = "3.0" }
 sysinfo = { version = "0.38.4", default-features = false }
 tar = "0.4.46"
-tauri = "=2.11.5"
-tauri-build = "=2.6.3"
+tauri = "=2.12.7"
+tauri-build = "=2.7.6"
 tauri-plugin-deep-link = "=2.4.3"
 tauri-plugin-dialog = "=2.4.0"
 tauri-plugin-fs = "=2.4.5"
 tauri-plugin-http = "=2.5.7"
 tauri-plugin-opener = "=2.5.0"
 tauri-plugin-os = "=2.3.1"
-tauri-plugin-single-instance = "=2.3.4"
-tauri-plugin-updater = { git = "https://github.com/modrinth/plugins-workspace", rev = "998825c75cb8d60a10de82af5675f1d7295e8eef", default-features = false, features = [
+tauri-plugin-single-instance = { git = "https://github.com/modrinth/plugins-workspace", rev = "2064b69417ac11015b060d82287c723d6bd62b6c" }
+tauri-plugin-updater = { git = "https://github.com/modrinth/plugins-workspace", rev = "2064b69417ac11015b060d82287c723d6bd62b6c", default-features = false, features = [
   "rustls-tls",
   "zip",
 ] }
@@ -341,16 +341,7 @@ wildcard_dependencies = "warn"
 [workspace.metadata]
 name = "modrinth-rust"
 
-# Pin the upstream Tao 0.36 upgrade until a Tauri release includes the Windows input deadlock fix.
-# https://github.com/tauri-apps/tauri/pull/15307
 [patch.crates-io]
-tauri = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
-tauri-build = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
-tauri-codegen = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
-tauri-macros = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
-tauri-runtime = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
-tauri-runtime-wry = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
-tauri-utils = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
 # Toasty's unused SQLite driver conflicts with SQLx's native SQLite bindings.
 toasty = { path = "packages/toasty" }
 
