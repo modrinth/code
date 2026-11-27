@@ -348,7 +348,7 @@ export const rulesReviewPanel = panel({
 			label: 'Which features require a Server-side Opt-in?',
 			id: 'rules-server-side-opt-in-features',
 			multiple: true,
-			required: false,
+			required: true,
 			options: () =>
 				optInTypes.map((type) => ({
 					value: `rules-server-side-opt-in-${type.toLowerCase()}`,

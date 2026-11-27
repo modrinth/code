@@ -97,7 +97,7 @@ function updateIssues(value: string[]) {
 		reviewMessages.resetIssueMessage(id)
 	}
 	for (const id of next) {
-		if (!current.has(id)) panels.addIssue(id)
+		if (!current.has(id)) panels.addIssue(id, { selectPanelToggle: true })
 	}
 }
 

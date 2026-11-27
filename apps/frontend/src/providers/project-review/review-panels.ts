@@ -756,10 +756,23 @@ export function createReviewPanels(
 		]
 	})
 
-	function addIssue(id: string) {
+	function addIssue(id: string, { selectPanelToggle = false } = {}) {
 		const current = project.value
 		const issue = availableIssues.value.find((issue) => issue.id === id)
 		if (!current || !issue) return
+		if (selectPanelToggle) {
+			const toggles = issue.controls.filter(({ control }) => control.type === 'toggle')
+			const entry = toggles[0]
+			if (
+				toggles.length === 1 &&
+				entry.control.type === 'toggle' &&
+				entry.control.id !== undefined &&
+				(!entry.control.issueCardDisplay || entry.control.issueCardDisplay.hidden)
+			) {
+				write(entry.binding, entry.control, true)
+				return
+			}
+		}
 		session.write(current.id, 'issue-active', id, true)
 		updateIssueOrder(current.id, id)
 	}
