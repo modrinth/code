@@ -75,6 +75,21 @@ const {
 	isPending: pending,
 } = useQuery(computed(() => projectQueryOptions.attribution(props.project.id, client)))
 
+const { data: attributionProjects, isSuccess: attributionProjectsSuccess } = useQuery(
+	computed(() => ({
+		queryKey: computed(() => [
+			'project-attribution-modrinth-projects',
+			attributionData.value?.flatMap((group) => group.files)?.map((file) => file.sha1),
+		]),
+		queryFn: () =>
+			client.labrinth.version_files_v3.getProjectsByHashes(
+				'sha1',
+				attributionData.value?.flatMap((group) => group.files)?.map((file) => file.sha1) ?? [],
+			),
+		enabled: !!attributionData.value && props.isModerator,
+	})),
+)
+
 const sortRejectedLabel = defineMessage({
 	id: 'project.settings.permissions.sort.rejected',
 	defaultMessage: 'Rejected',
@@ -692,6 +707,11 @@ function dismissInfoBanner() {
 					:collapsed="getCardCollapsed(group)"
 					:project-id="project.id"
 					:group="group"
+					:group-modrinth-projects="
+						attributionProjectsSuccess
+							? group.files?.flatMap((file) => attributionProjects?.[file.sha1] ?? [])
+							: []
+					"
 					:members="members"
 					:is-moderator="isModerator"
 					:pixelated="pixelated"
