@@ -280,7 +280,7 @@
 									action: () =>
 										auth.user ? reportVersion(version!.id) : promptAuth(signInRouteObj),
 								},
-								{ type: 'divider', shown: flags.developerMode },
+								{ type: 'divider' },
 								{
 									id: 'copy-id',
 									label: formatMessage(commonMessages.copyIdButton),

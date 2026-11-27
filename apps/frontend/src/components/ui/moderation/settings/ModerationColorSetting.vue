@@ -49,18 +49,19 @@ watch([() => theme.active, () => props.defaultColor], updateDefaultColor, { flus
 <template>
 	<div class="flex flex-wrap items-center gap-2">
 		<span ref="swatch" class="hidden" :style="{ color: defaultColor }" aria-hidden="true" />
-		<span class="text-sm text-secondary">{{ model || defaultLabel }}</span>
-		<ColorPicker v-model="pickerColor" :label="label" />
 		<IconButton
-			v-tooltip="formatMessage(messages.reset)"
-			type="quiet"
+			v-tooltip="model === resetValue ? undefined : formatMessage(messages.reset)"
+			type="outlined"
 			size="sm"
-			:circular="false"
+			class="shrink-0"
+			:class="{ invisible: model === resetValue }"
+			:aria-hidden="model === resetValue || undefined"
 			:label="formatMessage(messages.reset)"
-			:disabled="model === resetValue"
 			@click="model = resetValue"
 		>
 			<RotateCounterClockwiseIcon aria-hidden="true" />
 		</IconButton>
+		<span class="text-sm text-secondary">{{ model || defaultLabel }}</span>
+		<ColorPicker v-model="pickerColor" :label="label" />
 	</div>
 </template>

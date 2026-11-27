@@ -55,7 +55,15 @@
 		</template>
 
 		<template #actions>
-			<PageHeaderActions>
+			<div v-if="$slots['secondary-actions']" class="flex flex-col items-end gap-3">
+				<PageHeaderActions>
+					<slot name="actions" />
+				</PageHeaderActions>
+				<PageHeaderActions>
+					<slot name="secondary-actions" />
+				</PageHeaderActions>
+			</div>
+			<PageHeaderActions v-else>
 				<slot name="actions" />
 			</PageHeaderActions>
 		</template>

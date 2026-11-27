@@ -166,7 +166,7 @@
 									auth.user ? reportVersion(version.id) : promptAuth(getSignInRouteObj(route)),
 								shown: !currentMember,
 							},
-							{ type: 'divider', shown: isStaff(auth.user) },
+							{ type: 'divider' },
 							{
 								id: 'view-c2pa-info',
 								label: 'View C2PA info',
@@ -174,7 +174,7 @@
 								action: () => projectC2paScanModal.openC2paModal(createDownloadUrl(version)),
 								shown: isStaff(auth.user),
 							},
-							{ type: 'divider', shown: currentMember || flags.developerMode },
+							{ type: 'divider' },
 							{
 								id: 'copy-id',
 								label: 'Copy ID',
@@ -191,7 +191,7 @@
 								},
 								shown: flags.developerMode,
 							},
-							{ type: 'divider', shown: !!currentMember },
+							{ type: 'divider' },
 							{
 								id: 'edit-metadata',
 								label: 'Edit metadata',

@@ -188,13 +188,13 @@ const { style: floatingPanelStyle } = useFloatingReviewPanelAppearance()
 </script>
 
 <template>
-	<div :class="{ 'universal-card': !embedded }">
-		<div class="mb-2.5 flex flex-wrap items-center justify-between gap-2">
-			<h2 class="m-0 text-2xl">
-				{{ formatMessage(messages.panelAppearance) }}
-			</h2>
-			<ModerationAppearanceThemes />
-		</div>
+	<div class="mb-3 mt-6 flex flex-wrap items-center justify-between gap-2 first:mt-0">
+		<h2 class="m-0 text-2xl font-semibold">
+			{{ formatMessage(messages.panelAppearance) }}
+		</h2>
+		<ModerationAppearanceThemes />
+	</div>
+	<div :class="{ 'universal-card !m-0': !embedded }">
 		<Input
 			v-model="search"
 			type="search"
@@ -206,112 +206,146 @@ const { style: floatingPanelStyle } = useFloatingReviewPanelAppearance()
 		<p v-if="!filteredGroups.length" class="text-secondary" role="status">
 			{{ formatMessage(messages.noResults) }}
 		</p>
-		<section
-			v-for="group in filteredGroups"
-			:key="group.id"
-			:aria-labelledby="group.id === 'highlight-options' ? undefined : `${settingsId}-${group.id}`"
-			class="mt-8"
-		>
-			<h3
-				v-if="group.id !== 'highlight-options'"
-				:id="`${settingsId}-${group.id}`"
-				class="mb-6 text-xl font-semibold"
+		<div class="mt-4 flex flex-col gap-8">
+			<section
+				v-for="group in filteredGroups"
+				:key="group.id"
+				:aria-labelledby="
+					group.id === 'highlight-options' ? undefined : `${settingsId}-${group.id}`
+				"
 			>
-				{{ formatMessage(group.title) }}
-			</h3>
-			<div class="flex flex-col gap-6">
-				<div
-					v-for="setting in group.settings"
-					:key="setting.id"
-					class="flex flex-row flex-wrap items-center justify-between gap-2"
+				<h3
+					v-if="group.id !== 'highlight-options'"
+					:id="`${settingsId}-${group.id}`"
+					class="m-0 mb-4 text-xl font-semibold"
 				>
-					<div class="min-w-0 flex-1">
-						<span class="mb-2.5 block font-semibold text-contrast">{{ setting.title }}</span>
-						<span class="block text-secondary">{{ setting.description }}</span>
-						<span
-							v-if="
-								setting.id === general.ShowFloatingPanelFieldHoverHighlight.id ||
-								setting.id === general.ShowInlinePanelHoverHighlight.id
-							"
-							class="mt-2.5 block text-xs text-secondary"
-						>
-							<IntlFormatted :message-id="messages.defaultValue">
-								<template #value>
-									<span
-										class="font-medium"
-										:class="{
-											'text-green': setting.type === 'toggle' && setting.default,
-											'text-red': setting.type === 'toggle' && !setting.default,
-											'italic opacity-50': setting.default === '',
-										}"
-										>{{ defaultLabel(setting) }}</span
-									>
-								</template>
-							</IntlFormatted>
-						</span>
-					</div>
-
-					<ModerationColorSetting
-						v-if="setting.type === 'color'"
-						:label="controlLabel(group.title, setting.title)"
-						:default-label="defaultLabel(setting)"
-						:reset-value="String(resetValue(setting))"
-						default-color="var(--color-orange)"
-						:model-value="configuredSettings.get(setting)"
-						@update:model-value="(value) => configuredSettings.set(setting, value)"
-					/>
-					<div v-if="setting.type === 'number'" class="flex shrink-0 items-center gap-2">
-						<Input
-							type="number"
-							clamp
-							class="w-24"
-							:aria-label="controlLabel(group.title, setting.title)"
-							:model-value="configuredSettings.get(setting)"
-							:min="setting.min"
-							:max="setting.max"
-							:step="setting.step"
-							@update:model-value="
-								(value) =>
-									configuredSettings.set(setting, value === undefined ? undefined : Number(value))
-							"
-						>
-							<template #trailing>
-								<span class="text-secondary">{{ setting.unit }}</span>
-							</template>
-						</Input>
-						<IconButton
-							v-tooltip="formatMessage(messages.reset)"
-							type="quiet"
-							size="sm"
-							:circular="false"
-							:label="formatMessage(messages.reset)"
-							:disabled="configuredSettings.get(setting) === resetValue(setting)"
-							@click="configuredSettings.set(setting, Number(resetValue(setting)))"
-						>
-							<RotateCounterClockwiseIcon aria-hidden="true" />
-						</IconButton>
-					</div>
+					{{ formatMessage(group.title) }}
+				</h3>
+				<div class="flex flex-col gap-6">
 					<div
-						v-if="
-							setting.id === general.ReviewHighlightOpacity.id ||
-							setting.id === general.IssueToggleColor.id
-						"
-						class="mt-4 box-border flex w-full flex-col gap-2.5 rounded-xl bg-surface-2"
+						v-for="setting in group.settings"
+						:key="setting.id"
+						class="flex flex-row flex-wrap items-center justify-between gap-2"
 					>
-						<Highlight
-							active
-							:enabled="setting.id === general.ReviewHighlightOpacity.id"
-							layer="behind"
+						<div class="min-w-0 flex-1">
+							<span class="mb-1 block font-medium text-contrast">{{ setting.title }}</span>
+							<span class="block text-secondary">{{ setting.description }}</span>
+							<span
+								v-if="
+									setting.id === general.ShowFloatingPanelFieldHoverHighlight.id ||
+									setting.id === general.ShowInlinePanelHoverHighlight.id
+								"
+								class="mt-1 block text-xs text-secondary"
+							>
+								<IntlFormatted :message-id="messages.defaultValue">
+									<template #value>
+										<span
+											class="font-medium"
+											:class="{
+												'text-green': setting.type === 'toggle' && setting.default,
+												'text-red': setting.type === 'toggle' && !setting.default,
+												'italic opacity-50': setting.default === '',
+											}"
+											>{{ defaultLabel(setting) }}</span
+										>
+									</template>
+								</IntlFormatted>
+							</span>
+						</div>
+
+						<ModerationColorSetting
+							v-if="setting.type === 'color'"
+							:label="controlLabel(group.title, setting.title)"
+							:default-label="defaultLabel(setting)"
+							:reset-value="String(resetValue(setting))"
+							default-color="var(--color-orange)"
+							:model-value="configuredSettings.get(setting)"
+							@update:model-value="(value) => configuredSettings.set(setting, value)"
+						/>
+						<div v-if="setting.type === 'number'" class="flex shrink-0 items-center gap-2">
+							<IconButton
+								v-tooltip="
+									configuredSettings.get(setting) === resetValue(setting)
+										? undefined
+										: formatMessage(messages.reset)
+								"
+								type="outlined"
+								size="sm"
+								class="shrink-0"
+								:class="{
+									invisible: configuredSettings.get(setting) === resetValue(setting),
+								}"
+								:aria-hidden="configuredSettings.get(setting) === resetValue(setting) || undefined"
+								:label="formatMessage(messages.reset)"
+								@click="configuredSettings.set(setting, Number(resetValue(setting)))"
+							>
+								<RotateCounterClockwiseIcon aria-hidden="true" />
+							</IconButton>
+							<Input
+								type="number"
+								clamp
+								class="w-28 shrink-0"
+								:aria-label="controlLabel(group.title, setting.title)"
+								:model-value="configuredSettings.get(setting)"
+								:min="setting.min"
+								:max="setting.max"
+								:step="setting.step"
+								@update:model-value="
+									(value) =>
+										configuredSettings.set(setting, value === undefined ? undefined : Number(value))
+								"
+							>
+								<template #trailing>
+									<span class="text-secondary">{{ setting.unit }}</span>
+								</template>
+							</Input>
+						</div>
+						<div
+							v-if="
+								setting.id === general.ReviewHighlightOpacity.id ||
+								setting.id === general.IssueToggleColor.id
+							"
+							class="mt-4 box-border flex w-full flex-col gap-2.5 rounded-xl bg-surface-2"
 						>
-							<p class="m-0 font-semibold text-contrast">
-								{{
-									formatMessage(
-										setting.id === general.IssueToggleColor.id
-											? messages.issueTogglePreview
-											: messages.highlightPreview,
-									)
-								}}
-							</p>
+							<Highlight
+								active
+								:enabled="setting.id === general.ReviewHighlightOpacity.id"
+								layer="behind"
+							>
+								<p class="m-0 font-semibold text-contrast">
+									{{
+										formatMessage(
+											setting.id === general.IssueToggleColor.id
+												? messages.issueTogglePreview
+												: messages.highlightPreview,
+										)
+									}}
+								</p>
+								<div class="flex flex-wrap gap-1.5">
+									<ActionButton
+										v-for="issue in previewIssues[setting.id]"
+										:key="issue.label.id"
+										v-model="issue.selected"
+										:color="configuredSettings.get(general.IssueToggleColor)"
+										:label="formatMessage(issue.label)"
+									/>
+								</div>
+							</Highlight>
+						</div>
+						<div
+							v-if="setting.id === general.FloatingReviewPanelBorderWidth.id"
+							class="mt-4 box-border flex w-full flex-col gap-2 rounded-xl border-solid p-2.5 pb-3 text-sm text-primary"
+							:style="floatingPanelStyle"
+						>
+							<div class="flex items-center justify-between gap-3">
+								<p class="m-0 font-semibold text-contrast">
+									{{ formatMessage(messages.floatingPanelPreview) }}
+								</p>
+								<div class="flex items-center gap-3 text-secondary" aria-hidden="true">
+									<PinIcon class="size-4" />
+									<XIcon class="size-4" />
+								</div>
+							</div>
 							<div class="flex flex-wrap gap-1.5">
 								<ActionButton
 									v-for="issue in previewIssues[setting.id]"
@@ -321,42 +355,37 @@ const { style: floatingPanelStyle } = useFloatingReviewPanelAppearance()
 									:label="formatMessage(issue.label)"
 								/>
 							</div>
-						</Highlight>
-					</div>
-					<div
-						v-if="setting.id === general.FloatingReviewPanelBorderWidth.id"
-						class="mt-4 box-border flex w-full flex-col gap-2 rounded-xl border-solid p-2.5 pb-3 text-sm text-primary"
-						:style="floatingPanelStyle"
-					>
-						<div class="flex items-center justify-between gap-3">
-							<p class="m-0 font-semibold text-contrast">
-								{{ formatMessage(messages.floatingPanelPreview) }}
-							</p>
-							<div class="flex items-center gap-3 text-secondary" aria-hidden="true">
-								<PinIcon class="size-4" />
-								<XIcon class="size-4" />
-							</div>
 						</div>
-						<div class="flex flex-wrap gap-1.5">
-							<ActionButton
-								v-for="issue in previewIssues[setting.id]"
-								:key="issue.label.id"
-								v-model="issue.selected"
-								:color="configuredSettings.get(general.IssueToggleColor)"
-								:label="formatMessage(issue.label)"
+
+						<div v-if="setting.type === 'toggle'" class="flex shrink-0 items-center gap-2">
+							<IconButton
+								v-tooltip="
+									configuredSettings.get(setting) === resetValue(setting)
+										? undefined
+										: formatMessage(messages.reset)
+								"
+								type="outlined"
+								size="sm"
+								class="shrink-0"
+								:class="{
+									invisible: configuredSettings.get(setting) === resetValue(setting),
+								}"
+								:aria-hidden="configuredSettings.get(setting) === resetValue(setting) || undefined"
+								:label="formatMessage(messages.reset)"
+								@click="configuredSettings.set(setting, resetValue(setting))"
+							>
+								<RotateCounterClockwiseIcon aria-hidden="true" />
+							</IconButton>
+							<Toggle
+								:aria-label="controlLabel(group.title, setting.title)"
+								:model-value="configuredSettings.get(setting)"
+								class="shrink-0"
+								@update:model-value="(value) => configuredSettings.set(setting, value)"
 							/>
 						</div>
 					</div>
-
-					<Toggle
-						v-if="setting.type === 'toggle'"
-						:aria-label="controlLabel(group.title, setting.title)"
-						:model-value="configuredSettings.get(setting)"
-						class="shrink-0"
-						@update:model-value="(value) => configuredSettings.set(setting, value)"
-					/>
 				</div>
-			</div>
-		</section>
+			</section>
+		</div>
 	</div>
 </template>

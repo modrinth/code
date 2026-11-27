@@ -13,10 +13,10 @@ useSeoMeta({
 </script>
 
 <template>
-	<div class="flex flex-col gap-4">
+	<div class="flex flex-col">
 		<ModerationSettings section="public-pages" />
 		<ModerationSettings section="general" />
 		<ModerationTechReview />
-		<ModerationAppearance />
+		<ModerationAppearance class="mt-6" />
 	</div>
 </template>

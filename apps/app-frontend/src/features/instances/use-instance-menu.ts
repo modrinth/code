@@ -192,7 +192,7 @@ export function useInstanceMenu() {
 				shown: canAddContent,
 				action: () => void item.addContent(),
 			},
-			{ type: 'divider', shown: canAddContent },
+			{ type: 'divider' },
 			{
 				id: 'edit',
 				label: formatMessage(messages.viewInstance),

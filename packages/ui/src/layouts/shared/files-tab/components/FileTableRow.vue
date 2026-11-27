@@ -243,7 +243,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('extract', item),
 		},
-		{ type: 'divider', shown: canExtract.value },
+		{ type: 'divider' },
 		{
 			id: 'zip',
 			label: formatMessage(messages.createZip),
@@ -253,7 +253,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('zip', item),
 		},
-		{ type: 'divider', shown: props.type === 'directory' && !!ctx.zipFolder },
+		{ type: 'divider' },
 		{
 			id: 'rename',
 			label: formatMessage(commonMessages.renameButton),

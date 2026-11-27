@@ -429,10 +429,7 @@
 							to: '/admin/user_lookup',
 							shown: isAdmin(auth.user),
 						},
-						{
-							type: 'divider',
-							shown: isAdmin(auth.user),
-						},
+						{ type: 'divider' },
 						{
 							id: 'servers-lookup',
 							label: 'Server lookup',
@@ -464,10 +461,7 @@
 							action: (event) => $refs.modal_batch_credit.show(event),
 							shown: isAdmin(auth.user),
 						},
-						{
-							type: 'divider',
-							shown: isAdmin(auth.user),
-						},
+						{ type: 'divider' },
 						{
 							id: 'analytics-events',
 							label: 'Analytics events',

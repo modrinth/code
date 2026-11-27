@@ -13,8 +13,7 @@ const settings = {
 		WrapTechReviewCode: setting.asToggle({
 			type: 'toggle',
 			id: 'wrap-tech-review-code',
-			title: 'Wrap tech review code',
-			description: 'Wrap long lines of source code to fit the code viewer in technical review.',
+			title: 'Wrap long lines in tech review code',
 			default: false,
 		}),
 		TechReviewScrollTiming: setting.asNumber({
@@ -41,8 +40,7 @@ const settings = {
 			type: 'toggle',
 			id: 'open-tech-review-tab-by-default',
 			title: 'Open Tech Review tab by default',
-			description:
-				'Open the Tech Review tab when entering tech review mode or opening a project in tech review mode.',
+			description: 'Start in modview tech review tab when tech review mode is enabled.',
 			default: true,
 		}),
 		ShowCreatorStatsOnPublicPages: setting.asToggle({
@@ -57,7 +55,6 @@ const settings = {
 			type: 'toggle',
 			id: 'sort-disclosures-by-active-first',
 			title: 'Sort disclosures by active first',
-			description: 'Show active disclosures before inactive disclosures in project review.',
 			default: true,
 		}),
 		GalleryColumns: setting.asEnum({
@@ -174,21 +171,18 @@ const settings = {
 			type: 'color',
 			id: 'floating-review-panel-border-color',
 			title: 'Border color',
-			description: 'Border color for floating review panels.',
 			default: '',
 		}),
 		FloatingReviewPanelBackground: setting.asColor({
 			type: 'color',
 			id: 'floating-review-panel-background',
-			title: 'Background',
-			description: 'Background tint color for floating review panels.',
+			title: 'Background tint color',
 			default: '',
 		}),
 		FloatingReviewPanelBackgroundOpacity: setting.asNumber({
 			type: 'number',
 			id: 'floating-review-panel-background-opacity',
-			title: 'Opacity',
-			description: 'Background tint opacity for floating review panels.',
+			title: 'Background opacity',
 			default: 3,
 			min: 0,
 			max: 100,
@@ -199,7 +193,7 @@ const settings = {
 			type: 'number',
 			id: 'floating-review-panel-border-width',
 			title: 'Border width',
-			description: 'Border width for floating review panels. Set to 0 to hide the border.',
+			description: 'Set to 0 to hide the border.',
 			default: 1,
 			min: 0,
 			max: 8,
@@ -259,7 +253,7 @@ const settings = {
 			type: 'toggle',
 			id: 'slicer-button-in-versions',
 			title: 'Show Slicer button in versions table and page',
-			description: 'Show the Slicer button on public version lists and version pages for staff.',
+			description: 'On public version lists and version pages.',
 			default: false,
 		}),
 		AlternativeHostname: setting.asString({
@@ -269,6 +263,19 @@ const settings = {
 			description:
 				'Use this host for the "Open current page" shortcut when on production or staging. Enter a hostname or HTTP(S) URL, such as localhost:3000.',
 			default: '',
+		}),
+		ShowModerationHeaderRow: setting.asToggle({
+			type: 'toggle',
+			id: 'show-moderation-header-row',
+			title: 'Show moderation row',
+			description: 'When off, those actions move to the overflow menu.',
+			default: false,
+		}),
+		ShowCopyButtonsInModerationRow: setting.asToggle({
+			type: 'toggle',
+			id: 'show-copy-buttons-in-moderation-row',
+			title: 'Show copy buttons in moderation row',
+			default: true,
 		}),
 		EnableProjectKeybinds: setting.asToggle({
 			type: 'toggle',
@@ -288,8 +295,7 @@ const settings = {
 			type: 'toggle',
 			id: 'show-project-review-timer',
 			title: 'Show project review timer',
-			description:
-				'Show a timer in the project review queue bar indicating how long you have been reviewing the current project.',
+			description: `Shows how long you've been reviewing the current project in the queue bar.`,
 			default: false,
 		}),
 		ProjectReviewTimerWarning: setting.asNumber({

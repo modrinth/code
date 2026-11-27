@@ -76,6 +76,7 @@ export interface ButtonMenuItemBase {
 	shown?: boolean
 	disabled?: boolean
 	tooltip?: string
+	shortcut?: string
 	remainOpen?: boolean
 	tone?: 'default' | ButtonColor
 	hoverFilled?: boolean

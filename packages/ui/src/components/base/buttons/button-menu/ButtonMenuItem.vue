@@ -112,6 +112,12 @@ function handleFocus(event: FocusEvent) {
 				class="!text-secondary"
 			/>
 			<slot />
+			<kbd
+				v-if="props.option.shortcut"
+				class="ml-auto shrink-0 rounded-md border border-solid border-surface-5 bg-surface-2 px-1.5 py-0.5 font-sans text-xs font-medium leading-none text-secondary"
+			>
+				{{ props.option.shortcut }}
+			</kbd>
 		</RouterLink>
 
 		<a
@@ -141,6 +147,12 @@ function handleFocus(event: FocusEvent) {
 				class="!text-secondary"
 			/>
 			<slot />
+			<kbd
+				v-if="props.option.shortcut"
+				class="ml-auto shrink-0 rounded-md border border-solid border-surface-5 bg-surface-2 px-1.5 py-0.5 font-sans text-xs font-medium leading-none text-secondary"
+			>
+				{{ props.option.shortcut }}
+			</kbd>
 		</a>
 
 		<button
@@ -165,6 +177,12 @@ function handleFocus(event: FocusEvent) {
 				class="!text-secondary"
 			/>
 			<slot />
+			<kbd
+				v-if="props.option.shortcut"
+				class="ml-auto shrink-0 rounded-md border border-solid border-surface-5 bg-surface-2 px-1.5 py-0.5 font-sans text-xs font-medium leading-none text-secondary"
+			>
+				{{ props.option.shortcut }}
+			</kbd>
 		</button>
 
 		<button

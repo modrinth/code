@@ -919,7 +919,7 @@ const handleRightClick = (event: MouseEvent) => {
 			shown: canAddContent,
 			action: () => void browseContent(instance.value?.loader === 'vanilla' ? 'datapack' : 'mod'),
 		},
-		{ type: 'divider', shown: canAddContent },
+		{ type: 'divider' },
 		{
 			id: 'edit',
 			label: formatMessage(messages.edit),

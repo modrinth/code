@@ -116,7 +116,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => [
 			void copy(`${config.public.siteUrl}/user/${user.value.id}`)
 		},
 	},
-	{ type: 'divider', shown: isStaffViewing.value },
+	{ type: 'divider' },
 	{
 		id: 'open-info',
 		label: 'View user details',
@@ -150,7 +150,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => [
 		shown: isAdmin.value,
 		disabled: !userQuery.data.value || userQuery.isFetching.value,
 	},
-	{ type: 'divider', shown: isAdmin.value },
+	{ type: 'divider' },
 	{
 		id: 'edit-user',
 		label: 'Edit user',

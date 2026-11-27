@@ -155,7 +155,7 @@
 					>
 						<template #actions>
 							<ButtonLink
-								v-if="auth.user && currentMember"
+								v-if="showMemberEditAction"
 								v-tooltip="formatMessage(messages.editProject)"
 								type="colored"
 								color="brand"
@@ -166,7 +166,7 @@
 								<SettingsIcon />
 							</ButtonLink>
 							<ButtonLink
-								v-if="auth.user && currentMember"
+								v-if="showMemberEditAction"
 								type="colored"
 								color="brand"
 								size="xl"
@@ -179,7 +179,7 @@
 
 							<div class="hidden sm:contents">
 								<IconButton
-									v-if="!isServerProject && auth.user && currentMember"
+									v-if="!isServerProject && showMemberEditAction"
 									v-tooltip="formatMessage(commonMessages.downloadButton)"
 									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
 									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
@@ -200,7 +200,7 @@
 									{{ formatMessage(commonMessages.downloadButton) }}
 								</Button>
 								<IconButton
-									v-if="isServerProject && auth.user && currentMember"
+									v-if="isServerProject && showMemberEditAction"
 									v-tooltip="formatMessage(commonMessages.playButton)"
 									:type="projectHeaderPrimaryColor === 'brand' ? 'colored' : 'base'"
 									:color="projectHeaderPrimaryColor === 'brand' ? 'brand' : undefined"
@@ -378,6 +378,76 @@
 							>
 								<MoreVerticalIcon />
 							</TeleportOverflowMenu>
+						</template>
+						<template v-if="showProjectHeaderSecondaryActions" #secondary-actions>
+							<template v-if="showStaffHeaderActions">
+								<ButtonLink
+									v-if="!showMemberEditAction"
+									type="colored-text"
+									color="orange"
+									:to="`${projectPath}/settings`"
+								>
+									<SettingsIcon />
+									{{ formatMessage(commonMessages.editButton) }}
+								</ButtonLink>
+								<ButtonLink
+									type="colored-text"
+									color="orange"
+									target="_blank"
+									rel="noopener noreferrer"
+									:to="{
+										path: '/moderation/project-review',
+										query: { project: project.id },
+									}"
+								>
+									<ScaleIcon />
+									{{ formatMessage(messages.openInModview) }}
+								</ButtonLink>
+								<template v-if="project.actualProjectType === 'modpack'">
+									<IconButton
+										v-tooltip="formatMessage(messages.rescanModpack)"
+										type="colored-text"
+										color="orange"
+										:label="formatMessage(messages.rescanModpack)"
+										@click="scanModal?.show()"
+									>
+										<FolderSearchIcon />
+									</IconButton>
+									<IconButton
+										v-tooltip="
+											formatMessage(
+												isCheckingModpackArchives
+													? messages.checkingModpackArchives
+													: messages.checkModpackArchives,
+											)
+										"
+										type="colored-text"
+										color="orange"
+										:label="
+											formatMessage(
+												isCheckingModpackArchives
+													? messages.checkingModpackArchives
+													: messages.checkModpackArchives,
+											)
+										"
+										:disabled="isCheckingModpackArchives"
+										@click="checkModpackArchives"
+									>
+										<FileArchiveIcon />
+									</IconButton>
+								</template>
+							</template>
+							<template v-if="showHeaderCopyButtons">
+								<CopyLinkButton
+									:url="project.id"
+									:icon="CopyIcon"
+									:copy-label="formatMessage(commonMessages.copyIdButton)"
+								/>
+								<CopyLinkButton
+									:url="`${config.public.siteUrl}/project/${project.id}`"
+									:copy-label="formatMessage(commonMessages.copyPermalinkButton)"
+								/>
+							</template>
 						</template>
 					</ProjectPageHeader>
 					<ProjectMemberHeader
@@ -567,13 +637,14 @@
 <script setup>
 import {
 	ChartIcon,
-	ClipboardCopyIcon,
 	CompassIcon,
+	CopyIcon,
 	DownloadIcon,
 	FileArchiveIcon,
 	FolderSearchIcon,
 	HeartIcon,
 	LeftArrowIcon,
+	LinkIcon,
 	MoreVerticalIcon,
 	PackageSearchIcon,
 	PlayIcon,
@@ -593,6 +664,7 @@ import {
 	Button,
 	ButtonLink,
 	commonMessages,
+	CopyLinkButton,
 	defineMessages,
 	formatDependencyProjectFilterOption,
 	formatProjectTypeSentence,
@@ -1773,6 +1845,30 @@ const currentMember = computed(() => {
 	return val
 })
 
+const showMemberEditAction = computed(
+	() => !!(auth.value.user && currentMember.value && !currentMember.value.staffOnly),
+)
+const showModerationHeaderRow = computed(() =>
+	modSettings.value.get(moderationSettings.General.ShowModerationHeaderRow),
+)
+const showCopyButtonsInModerationRow = computed(() =>
+	modSettings.value.get(moderationSettings.General.ShowCopyButtonsInModerationRow),
+)
+const showStaffHeaderActions = computed(
+	() => isStaff(auth.value.user) && showModerationHeaderRow.value,
+)
+const showHeaderCopyButtons = computed(() =>
+	isStaff(auth.value.user)
+		? showStaffHeaderActions.value && showCopyButtonsInModerationRow.value
+		: true,
+)
+const showProjectHeaderSecondaryActions = computed(
+	() => showStaffHeaderActions.value || showHeaderCopyButtons.value,
+)
+const showStaffOverflowActions = computed(
+	() => isStaff(auth.value.user) && !showModerationHeaderRow.value,
+)
+
 const {
 	data: projectValidationResponse,
 	isFetching: projectValidationLoading,
@@ -1922,7 +2018,9 @@ const settingsBackDestination = computed(() => {
 })
 
 const projectHeaderPrimaryColor = computed(() =>
-	currentMember.value || route.name === 'type-project-version-version' ? 'standard' : 'brand',
+	showMemberEditAction.value || route.name === 'type-project-version-version'
+		? 'standard'
+		: 'brand',
 )
 const showProjectHeaderCreateServerAction = computed(
 	() => canCreateServerFrom.value && flags.value.showProjectPageQuickServerButton,
@@ -2015,7 +2113,6 @@ async function checkModpackArchives() {
 }
 
 const projectHeaderMoreActions = computed(() => {
-	const isStaff = !!(auth.value.user && tags.value.staffRoles.includes(auth.value.user.role))
 	const projectId = project.value?.id
 	const dependentSearchTypes = getDependentSearchTypes()
 	const dependentSearchActions = dependentSearchTypes
@@ -2066,41 +2163,46 @@ const projectHeaderMoreActions = computed(() => {
 		},
 		{ type: 'divider' },
 		{
-			id: 'open-in-modview',
+			id: 'edit',
+			label: formatMessage(commonMessages.editButton),
+			icon: SettingsIcon,
+			type: 'link',
+			to: `${projectPath.value}/settings`,
+			tone: 'orange',
+			shown: showStaffOverflowActions.value && !showMemberEditAction.value,
+		},
+		{
+			id: 'modview',
 			label: formatMessage(messages.openInModview),
 			icon: ScaleIcon,
 			type: 'link',
+			href: `/moderation/project-review?project=${projectId}`,
 			target: '_blank',
-			rel: 'noopener noreferrer',
-			to: {
-				path: '/moderation/project-review',
-				query: { project: projectId },
-			},
 			tone: 'orange',
-			shown: !!auth.value.user && isStaff,
+			shown: showStaffOverflowActions.value,
 		},
 		{
-			id: 'moderation-modpack-rescan',
+			id: 'rescan-modpack',
 			label: formatMessage(messages.rescanModpack),
 			icon: FolderSearchIcon,
-			action: () => scanModal.value?.show(),
 			tone: 'orange',
-			shown: !!auth.value.user && isStaff && project.value?.actualProjectType === 'modpack',
+			action: () => scanModal.value?.show(),
+			shown: showStaffOverflowActions.value && project.value?.actualProjectType === 'modpack',
 		},
 		{
-			id: 'moderation-modpack-check-archives',
+			id: 'check-modpack-archives',
 			label: formatMessage(
 				isCheckingModpackArchives.value
 					? messages.checkingModpackArchives
 					: messages.checkModpackArchives,
 			),
 			icon: FileArchiveIcon,
-			action: checkModpackArchives,
 			tone: 'orange',
 			disabled: isCheckingModpackArchives.value,
-			shown: !!auth.value.user && isStaff && project.value?.actualProjectType === 'modpack',
+			action: checkModpackArchives,
+			shown: showStaffOverflowActions.value && project.value?.actualProjectType === 'modpack',
 		},
-		{ type: 'divider', shown: !!auth.value.user && isStaff },
+		{ type: 'divider' },
 		{
 			id: 'report',
 			label: formatMessage(commonMessages.reportButton),
@@ -2112,13 +2214,13 @@ const projectHeaderMoreActions = computed(() => {
 		{
 			id: 'copy-id',
 			label: formatMessage(commonMessages.copyIdButton),
-			icon: ClipboardCopyIcon,
+			icon: CopyIcon,
 			action: copyId,
 		},
 		{
 			id: 'copy-permalink',
 			label: formatMessage(commonMessages.copyPermalinkButton),
-			icon: ClipboardCopyIcon,
+			icon: LinkIcon,
 			action: copyPermalink,
 		},
 	]
