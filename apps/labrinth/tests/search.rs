@@ -9,13 +9,77 @@ use common::environment::TestEnvironment;
 use common::environment::with_test_environment;
 use common::search::setup_search_projects;
 use futures::stream::StreamExt;
-use labrinth::models::projects::DependencyType;
+use labrinth::{models::projects::DependencyType, search::SearchRequest};
 use serde_json::json;
 
 use crate::common::api_common::Api;
 use crate::common::api_common::ApiProject;
 
 pub mod common;
+
+#[actix_rt::test]
+async fn normalized_titles_have_title_relevance() {
+    with_test_environment(
+        Some(10),
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let project = &test_env.dummy.project_alpha;
+            let resp = test_env
+                .api
+                .edit_project(
+                    &project.project_id,
+                    json!({
+                        "name": "wWaypoints",
+                        "summary": "A test project"
+                    }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
+
+            let resp = test_env.api.reset_search_index().await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
+
+            for (query, expected_score) in [
+                ("Waypoint", 4.0),
+                ("Waypoints", 4.0),
+                ("way", 4.0),
+                ("wWaypoints", 5.0),
+                ("wwaypoints", 5.0),
+                ("alpha", 3.0),
+                ("user", 2.0),
+                ("test", 1.0),
+            ] {
+                let results = test_env
+                    .db
+                    .search_backend
+                    .search_for_project_raw(&SearchRequest {
+                        query: Some(query.to_string()),
+                        offset: None,
+                        index: Some("relevance".to_string()),
+                        limit: None,
+                        show_metadata: true,
+                        new_filters: None,
+                        facets: None,
+                        filters: None,
+                        version: None,
+                    })
+                    .await
+                    .unwrap();
+                let hit = results
+                    .hits
+                    .iter()
+                    .find(|hit| hit.project_id == project.project_id)
+                    .unwrap_or_else(|| panic!("missing project for {query}"));
+                assert_eq!(
+                    hit.search_metadata.as_ref().unwrap()["score"].as_f64(),
+                    Some(expected_score),
+                    "unexpected relevance for {query}"
+                );
+            }
+        },
+    )
+    .await;
+}
 
 // TODO: Revisit this wit   h the new modify_json in the version maker
 // That change here should be able to simplify it vastly
