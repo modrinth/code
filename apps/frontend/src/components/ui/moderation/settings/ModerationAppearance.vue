@@ -53,6 +53,10 @@ const messages = defineMessages({
 		id: 'moderation.settings.issue-toggles-section',
 		defaultMessage: 'Issue toggles',
 	},
+	techReview: {
+		id: 'moderation.settings.tech-review-section',
+		defaultMessage: 'Tech review',
+	},
 	controlLabel: {
 		id: 'moderation.settings.control-label',
 		defaultMessage: '{section}: {setting}',
@@ -70,6 +74,10 @@ const messages = defineMessages({
 	themeBorder: {
 		id: 'moderation.settings.theme-border',
 		defaultMessage: 'Theme orange (25% opacity)',
+	},
+	themeTechReviewBoolean: {
+		id: 'moderation.settings.theme-tech-review-boolean',
+		defaultMessage: 'Theme purple',
 	},
 	reset: {
 		id: 'moderation.settings.reset',
@@ -141,6 +149,11 @@ const groups = [
 		title: messages.issueToggles,
 		settings: [general.IssueToggleColor],
 	},
+	{
+		id: 'tech-review',
+		title: messages.techReview,
+		settings: [general.TechReviewBooleanColor],
+	},
 ]
 
 const filteredGroups = computed(() => {
@@ -169,7 +182,9 @@ function defaultLabel(setting: (typeof groups)[number]['settings'][number]) {
 		return formatMessage(
 			setting.id === general.FloatingReviewPanelBorderColor.id
 				? messages.themeBorder
-				: messages.themeDefault,
+				: setting.id === general.TechReviewBooleanColor.id
+					? messages.themeTechReviewBoolean
+					: messages.themeDefault,
 		)
 	}
 	if (setting.type === 'toggle') return formatMessage(setting.default ? messages.on : messages.off)
@@ -256,7 +271,11 @@ const { style: floatingPanelStyle } = useFloatingReviewPanelAppearance()
 						:label="controlLabel(group.title, setting.title)"
 						:default-label="defaultLabel(setting)"
 						:reset-value="String(resetValue(setting))"
-						default-color="var(--color-orange)"
+						:default-color="
+							setting.id === general.TechReviewBooleanColor.id
+								? 'var(--color-purple)'
+								: 'var(--color-orange)'
+						"
 						:model-value="configuredSettings.get(setting)"
 						@update:model-value="(value) => configuredSettings.set(setting, value)"
 					/>

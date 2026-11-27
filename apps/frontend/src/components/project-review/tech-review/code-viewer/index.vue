@@ -117,8 +117,8 @@ async function openSearch() {
 	const pane = sourcePane.value
 	const selection = pane?.ownerDocument.getSelection()
 	if (selection && pane?.contains(selection.anchorNode) && pane.contains(selection.focusNode)) {
-		const text = selection.toString()
-		if (text && !text.includes('\n')) findQuery.value = text
+		const text = selection.rangeCount ? selection.getRangeAt(0).cloneRange().toString() : null
+		if (text && !text.includes('\n')) findQuery.value = text.trim()
 	}
 	matchMode.value = 'search'
 	await nextTick()

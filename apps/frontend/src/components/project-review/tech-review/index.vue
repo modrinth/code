@@ -92,10 +92,10 @@
 							<button
 								type="button"
 								class="mr-1 rounded-full bg-transparent p-0 transition-[filter] hover:brightness-125"
-								:aria-label="`Choose pending archive (${pendingReports.length} pending)`"
+								:aria-label="`Choose pending archive (${uniqueFileCount} pending)`"
 							>
 								<TagItem style="--_bg-color: var(--color-orange-bg); --_color: var(--color-orange)">
-									{{ pendingReports.length }} pending
+									{{ uniqueFileCount }} pending
 								</TagItem>
 							</button>
 							<template #popper>
@@ -551,6 +551,16 @@ provide(TECH_REVIEW_DECISIONS_KEY, decisions)
 const archiveMenu = ref<InstanceType<typeof FloatingMenu>>()
 const allArchivesMenu = ref<InstanceType<typeof FloatingMenu>>()
 provideTechReviewMenus()
+const uniqueFileCount = computed(
+	() =>
+		new Set(
+			pendingReports.value.map((report) =>
+				[...new Set(report.issues.flatMap((issue) => issue.details.map((detail) => detail.key)))]
+					.sort()
+					.join('|'),
+			),
+		).size,
+)
 const selectedFile = computed(
 	() =>
 		reports.value.find((file) => file.id === selectedFileId.value) ??

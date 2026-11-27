@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { moderationSettings } from '@modrinth/moderation'
 import { computed, getCurrentInstance } from 'vue'
 
+import { useModerationSettings } from '~/composables/moderation.ts'
+
+const settings = useModerationSettings()
 const TraceData = getCurrentInstance()!.type
 const props = defineProps<{
 	value: unknown
@@ -75,7 +79,13 @@ const text = computed(() => {
 				v-for="[key, item] in booleanEntries"
 				:key="key"
 				class="min-w-0"
-				:class="item ? 'text-purple' : 'text-primary opacity-50'"
+				:class="item ? '' : 'text-primary opacity-50'"
+				:style="{
+					color: item
+						? settings.get(moderationSettings.General.TechReviewBooleanColor) ||
+							'var(--color-purple)'
+						: undefined,
+				}"
 			>
 				<dt class="max-w-40 truncate whitespace-nowrap font-medium" :title="`${key}: ${item}`">
 					{{ key }}

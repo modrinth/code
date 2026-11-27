@@ -20,6 +20,7 @@ import { decodeStringContents } from './string-contents'
 for (const [name, definition] of Object.entries({ bash, dos, powershell })) {
 	if (!hljs.getLanguage(name)) hljs.registerLanguage(name, definition)
 }
+const languagesExcludedFromAutoDetect = ['skript', 'mcfunction']
 const languages = hljs
 	.listLanguages()
 	.map((value) => ({
@@ -138,7 +139,9 @@ async function onContextMenu(event: MouseEvent) {
 function detectLanguage(text: string) {
 	const result = hljs.highlightAuto(
 		text,
-		languages.map(({ value }) => value),
+		languages
+			.map(({ value }) => value)
+			.filter((value) => !languagesExcludedFromAutoDetect.includes(value)),
 	)
 	if (
 		result.relevance < 3 ||
