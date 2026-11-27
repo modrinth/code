@@ -78,7 +78,7 @@
 							class="relative w-full"
 							:style="{ minHeight: `${totalHeight}px`, overflowAnchor: 'none' }"
 						>
-							<div class="absolute w-full" :style="{ top: `${visibleTop}px` }">
+							<div ref="visibleRowsEl" class="absolute w-full" :style="{ top: `${visibleTop}px` }">
 								<FileTableRow
 									v-for="(item, idx) in visibleItems"
 									:key="item.path"
@@ -216,6 +216,7 @@ import {
 	SaveIcon,
 	TrashIcon,
 } from '@modrinth/assets'
+import { useElementSize } from '@vueuse/core'
 import type { Component } from 'vue'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 
@@ -361,6 +362,7 @@ const { recordOperation, onKeydown } = useFileUndoRedo(
 )
 
 // Virtual scroll
+const rowHeight = ref(61)
 const {
 	listContainer: virtualListContainer,
 	totalHeight,
@@ -368,8 +370,15 @@ const {
 	visibleTop,
 	visibleItems,
 } = useVirtualScroll(filteredItems, {
-	itemHeight: 61,
+	itemHeight: rowHeight,
 	bufferSize: 5,
+})
+
+const visibleRowsEl = ref<HTMLElement | null>(null)
+const { height: visibleRowsHeight } = useElementSize(visibleRowsEl)
+watch(visibleRowsHeight, (height) => {
+	const count = visibleItems.value.length
+	if (height > 0 && count > 0) rowHeight.value = height / count
 })
 
 // Sticky observer for the table header
