@@ -4,6 +4,8 @@ import { type Ref, ref } from 'vue'
 import type { Router } from 'vue-router'
 
 import { handleSevereError } from '@/composables/use-error.js'
+import { getServerAddress } from '@/features/servers/address'
+import { ensureManagedServerWorldExists } from '@/features/worlds/managed-server'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version } from '@/helpers/cache.js'
 import {
@@ -15,8 +17,7 @@ import {
 } from '@/helpers/install'
 import { edit, get, list } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
-import { ensureManagedServerWorldExists, getServerAddress } from '@/helpers/worlds'
-import { start_join_server } from '@/helpers/worlds.ts'
+import { startJoinServer } from '@/platform/app-lib/worlds/commands'
 import type { AppEvents } from '@/providers/app-events'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -108,7 +109,7 @@ export function createServerInstall(opts: {
 
 	async function joinServer(instanceId: string, serverAddress: string | null) {
 		if (!serverAddress) return
-		await start_join_server(instanceId, serverAddress)
+		await startJoinServer(instanceId, serverAddress)
 	}
 
 	async function findInstalledInstance(projectId: string) {
@@ -198,7 +199,7 @@ export function createServerInstall(opts: {
 								label: 'Launch game',
 								action: async () => {
 									try {
-										if (serverAddress) await start_join_server(instance.id, serverAddress)
+										if (serverAddress) await startJoinServer(instance.id, serverAddress)
 										trackEvent('InstanceStart', {
 											loader: instance.loader,
 											game_version: instance.game_version,

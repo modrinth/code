@@ -449,9 +449,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Pumili ng opsiyon"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Di-magkatugmang bersiyong {version}"
   },

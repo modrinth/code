@@ -323,9 +323,6 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Tampilkan Tab dunia di instansi"
-  },
   "app.file-download.preparing": {
     "message": "Mempersiapkan unduhan..."
   },
@@ -706,9 +703,6 @@
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
-  },
-  "app.world.server-modal.select-an-option": {
-    "message": "Pilih opsi"
   },
   "app.world.world-item.incompatible-version": {
     "message": "Versi {version} tidak cocok"

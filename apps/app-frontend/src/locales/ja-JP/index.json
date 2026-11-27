@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "サイドバーにスキンセレクターを表示する"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "インスタンスにワールドタブを表示する"
-  },
   "app.features-settings.sidebar.title": {
     "message": "サイドバー"
   },
@@ -916,9 +913,6 @@
   },
   "app.instance.tab.share": {
     "message": "共有"
-  },
-  "app.instance.tab.worlds": {
-    "message": "ワールド"
   },
   "app.instance.worlds.add-server": {
     "message": "サーバーを追加"
@@ -3764,9 +3758,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "オプションを選択"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "互換性の無いバージョン {version}"
   },
@@ -4124,9 +4115,6 @@
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "グローバルなスクリーンショットページがオフの場合はスクリーンショットタブを非表示にすることができません。"
   },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "ワールドタブを表示"
-  },
   "instance.settings.tabs.general": {
     "message": "一般"
   },
@@ -4474,12 +4462,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "このサーバーを他のインスタンスでは保持しますか？それとも削除しますか？"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "保持"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "削除"
   },
   "instance.worlds.desync-server.title": {
     "message": "サーバーの同期を解除"

@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Mostrar selector de skin en la barra lateral"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Mostrar pestaña de mundos en instancias"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Barra lateral"
   },
@@ -916,9 +913,6 @@
   },
   "app.instance.tab.share": {
     "message": "Compartir"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Mundos"
   },
   "app.instance.worlds.add-server": {
     "message": "Añadir servidor"
@@ -3641,9 +3635,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "ejemplo.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Selecciona una opción"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Versión {version} incompatible"
   },
@@ -3943,9 +3934,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "La pestaña de Screenshots no puede ser oculta mientras la Página de screenshots global está desactivada."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Mostrar pestaña de Mundos"
   },
   "instance.settings.tabs.general": {
     "message": "General"
@@ -4267,12 +4255,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "¿Quieres mantener este servidor en otras instancias sincronizadas o eliminarlo de ellas?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Mantener"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Eliminar"
   },
   "instance.worlds.desync-server.title": {
     "message": "Desincronizar server"

@@ -26,7 +26,7 @@
 				:autocapitalize="searchAutocapitalize"
 				:spellcheck="searchSpellcheck"
 				:inputmode="searchInputmode"
-				:input-attrs="searchInputAttrs"
+				:input-attrs="{ 'aria-labelledby': ariaLabelledby, ...searchInputAttrs }"
 				:appearance="searchInputVariant"
 				wrapper-class="w-full"
 				:input-class="resolvedSearchInputClass"
@@ -65,6 +65,7 @@
 		<!-- Standard mode: button trigger -->
 		<ButtonFrame
 			v-else
+			:id="triggerId"
 			ref="triggerRef"
 			as="button"
 			native-type="button"
@@ -80,6 +81,7 @@
 			:aria-expanded="isOpen"
 			:aria-haspopup="listbox ? 'listbox' : 'menu'"
 			:aria-disabled="disabled || undefined"
+			:aria-labelledby="ariaLabelledby ? `${ariaLabelledby} ${triggerId}` : undefined"
 			@click="handleTriggerClick($event)"
 			@keydown="handleTriggerKeydown"
 		>
@@ -223,6 +225,7 @@ import {
 	onUnmounted,
 	ref,
 	shallowRef,
+	useId,
 	useSlots,
 	watch,
 } from 'vue'
@@ -337,6 +340,7 @@ const props = withDefaults(
 		searchSpellcheck?: boolean
 		searchInputAttrs?: Record<string, string | number | boolean | undefined>
 		searchInputVariant?: ComboboxSearchInputVariant
+		ariaLabelledby?: string
 	}>(),
 	{
 		placeholder: 'Select an option',
@@ -382,6 +386,7 @@ const userHasTyped = ref(false)
 const focusedIndex = ref(-1)
 const containerRef = ref<HTMLElement>()
 const triggerRef = ref<ButtonElementHandle>()
+const triggerId = useId()
 const searchTriggerRef = ref<InstanceType<typeof Input>>()
 const dropdownRef = ref<HTMLElement>()
 const dropdownDocument = shallowRef<Document>()

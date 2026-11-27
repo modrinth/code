@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Afficher le sélecteur de skins dans la barre latérale"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Afficher l'onglet Monde dans les instances"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Barre latérale"
   },
@@ -916,9 +913,6 @@
   },
   "app.instance.tab.share": {
     "message": "Partager"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Mondes"
   },
   "app.instance.worlds.add-server": {
     "message": "Ajouter un serveur"
@@ -3671,9 +3665,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "exemple.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Sélectionner une option"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Version {version} incompatible"
   },
@@ -3961,9 +3952,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "L'onglet Captures d'écran ne peut pas être masqué lorsque la page globale des captures d'écran est désactivée."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Montrer l'onglet des Mondes"
   },
   "instance.settings.tabs.general": {
     "message": "Général"
@@ -4276,12 +4264,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "Souhaitez-vous conserver ce serveur sur les autres instances synchronisées, ou l'en supprimer ?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Garder"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Retirer"
   },
   "instance.worlds.desync-server.title": {
     "message": "Désynchroniser le serveur"

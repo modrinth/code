@@ -446,9 +446,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "إظهار محدد سكين في الشريط الجانبي"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "إظهار علامة التبويب لقطات الشاشة في النموذجات"
-  },
   "app.features-settings.sidebar.title": {
     "message": "الشريط الجانبي"
   },
@@ -847,9 +844,6 @@
   },
   "app.instance.tab.share": {
     "message": "مشاركة"
-  },
-  "app.instance.tab.worlds": {
-    "message": "عوالم"
   },
   "app.instance.worlds.add-server": {
     "message": "أضف خادم"
@@ -3446,9 +3440,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "(example.modrinth.gg)"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "حدد خيارا"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "إصدار غير مطابق ({version})"
   },
@@ -3731,9 +3722,6 @@
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "لا يمكن إخفاء تبويب لقطات الشاشة خلال إيقاف تشغيل صفحة لقطات الشاشة العامة."
   },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "إظهار تبويب العوالم"
-  },
   "instance.settings.tabs.general": {
     "message": "عام"
   },
@@ -4015,12 +4003,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "هل تريد الحفاظ على هذا الخادم في النسخ أخرى، أو إزالته منها؟"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "احتفظ"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "إزالة"
   },
   "instance.worlds.desync-server.title": {
     "message": "إلغاء مزامنة الخادم"

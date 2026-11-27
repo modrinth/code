@@ -434,9 +434,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Mostrar o seletor de temas na barra lateral"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Mostrar o separador «Mundos» nas instâncias"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Barra lateral"
   },
@@ -775,9 +772,6 @@
   },
   "app.instance.tab.share": {
     "message": "Partilhar"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Mundos"
   },
   "app.instance.worlds.add-server": {
     "message": "Adicionar servidor"
@@ -1396,9 +1390,6 @@
   },
   "app.world.server-modal.placeholder-address": {
     "message": "exemplo.modrinth.gg"
-  },
-  "app.world.server-modal.select-an-option": {
-    "message": "Seleciona uma opção"
   },
   "app.world.world-item.incompatible-version": {
     "message": "Versão incompatível {version}"

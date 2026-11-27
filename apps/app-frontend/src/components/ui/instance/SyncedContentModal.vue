@@ -13,7 +13,7 @@ import {
 import { computed, onBeforeUnmount, ref } from 'vue'
 
 import type { SyncedPackAction } from '@/helpers/synced-packs'
-import type { DesyncServerMode } from '@/helpers/worlds'
+import type { DesyncServerMode } from '@/platform/app-lib/worlds/types'
 
 type Choice = 'here' | 'all' | DesyncServerMode | null
 const { formatMessage } = useVIntl()

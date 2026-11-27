@@ -57,8 +57,8 @@ const messages = defineMessages({
 		defaultMessage: 'Instances',
 	},
 	showWorldsTabTitle: {
-		id: 'app.features-settings.show-worlds-tab.title',
-		defaultMessage: 'Show Worlds tab in instances',
+		id: 'app.features-settings.show-quickplay-tab.title',
+		defaultMessage: 'Show Quickplay tab in instances',
 	},
 	showFilesTabTitle: {
 		id: 'app.features-settings.show-files-tab.title',

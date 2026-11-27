@@ -12,7 +12,6 @@ import {
 import { loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
-import { refreshWorlds } from '@/helpers/worlds'
 import { getRecommendedJavaVersion } from '@/platform/app-lib/instances/commands'
 import { refreshSharedInstanceLock } from '@/platform/app-lib/shared-instances/commands'
 
@@ -38,7 +37,6 @@ export const instanceKeys = {
 	installedProjectIds: (instanceId: string, source: 'content' | 'worlds') =>
 		[...instanceKeys.detail(instanceId), 'installed-project-ids', source] as const,
 	linkedContent: (instanceId: string) => ['linkedModpackContent', instanceId] as const,
-	worlds: (instanceId: string) => ['worlds', instanceId] as const,
 	linkedProject: (projectId: string) => ['project', 'v3', projectId] as const,
 	sharedEligibility: (userId: string | null | undefined) =>
 		['shared-instance-eligibility', userId] as const,
@@ -178,14 +176,5 @@ export function instanceContentQueryOptions(
 		networkMode: 'always',
 		queryFn: () => loadInstanceContentData(instanceId, undefined, onError),
 		staleTime: 30_000,
-	})
-}
-
-export function instanceWorldsQueryOptions(instanceId: string) {
-	return queryOptions({
-		queryKey: instanceKeys.worlds(instanceId),
-		networkMode: 'always',
-		queryFn: () => refreshWorlds(instanceId),
-		staleTime: 0,
 	})
 }

@@ -113,7 +113,6 @@ import {
 	ClipboardCopyIcon,
 	EditIcon,
 	FolderOpenIcon,
-	GlobeIcon,
 	ImageIcon,
 	PlayIcon,
 	PlusIcon,
@@ -176,7 +175,7 @@ import {
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
-import { start_join_server } from '@/helpers/worlds'
+import { startJoinServer } from '@/platform/app-lib/worlds/commands'
 import { provideInstanceBackup } from '@/providers/instance-backup'
 import { injectServerInstall } from '@/providers/server-install'
 import { useRootBreadcrumb } from '@/shared/breadcrumbs'
@@ -228,7 +227,7 @@ const messages = defineMessages({
 	contentTab: { id: 'app.instance.tab.content', defaultMessage: 'Content' },
 	filesTab: { id: 'app.instance.tab.files', defaultMessage: 'Files' },
 	screenshotsTab: { id: 'app.instance.tab.screenshots', defaultMessage: 'Screenshots' },
-	worldsTab: { id: 'app.instance.tab.worlds', defaultMessage: 'Worlds' },
+	quickplayTab: { id: 'app.instance.tab.quickplay', defaultMessage: 'Quickplay' },
 	logsTab: { id: 'app.instance.tab.logs', defaultMessage: 'Logs' },
 	shareTab: { id: 'app.instance.tab.share', defaultMessage: 'Share' },
 	shortcutCreated: {
@@ -598,9 +597,9 @@ const tabs = computed(() => {
 
 	if (appSettings.showWorldsTabInInstances) {
 		instanceTabs.push({
-			label: formatMessage(messages.worldsTab),
+			label: formatMessage(messages.quickplayTab),
 			href: `${basePath.value}/worlds`,
-			icon: GlobeIcon,
+			icon: PlayIcon,
 		})
 	}
 
@@ -642,7 +641,7 @@ const launchInstance = async (context: string, address?: string) => {
 	loading.value = true
 	try {
 		await instanceLaunch.run(currentInstance.id, async () => {
-			if (address) await start_join_server(currentInstance.id, address)
+			if (address) await startJoinServer(currentInstance.id, address)
 			else await run(currentInstance.id)
 			queryClient.setQueryData(instanceKeys.processes(currentInstance.id), [true])
 		})

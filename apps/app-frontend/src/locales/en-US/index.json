@@ -473,6 +473,9 @@
   "app.features-settings.show-jump-in.title": {
     "message": "Show Jump in section"
   },
+  "app.features-settings.show-quickplay-tab.title": {
+    "message": "Show Quickplay tab in instances"
+  },
   "app.features-settings.show-screenshots-tab.title": {
     "message": "Show Screenshots tab in instances"
   },
@@ -481,9 +484,6 @@
   },
   "app.features-settings.show-skin-selector.title": {
     "message": "Show skin selector in sidebar"
-  },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Show Worlds tab in instances"
   },
   "app.features-settings.sidebar.title": {
     "message": "Sidebar"
@@ -920,14 +920,14 @@
   "app.instance.tab.logs": {
     "message": "Logs"
   },
+  "app.instance.tab.quickplay": {
+    "message": "Quickplay"
+  },
   "app.instance.tab.screenshots": {
     "message": "Screenshots"
   },
   "app.instance.tab.share": {
     "message": "Share"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Worlds"
   },
   "app.instance.worlds.add-server": {
     "message": "Add server"
@@ -959,11 +959,17 @@
   "app.instance.worlds.filter-vanilla": {
     "message": "Vanilla"
   },
+  "app.instance.worlds.no-servers-description": {
+    "message": "Add a server by its address or browse servers to get started."
+  },
+  "app.instance.worlds.no-servers-heading": {
+    "message": "No servers added"
+  },
   "app.instance.worlds.no-worlds-description": {
-    "message": "Add a server or browse to get started"
+    "message": "Singleplayer worlds you create in this instance will appear here."
   },
   "app.instance.worlds.no-worlds-heading": {
-    "message": "No servers or worlds added"
+    "message": "No worlds yet"
   },
   "app.instance.worlds.refreshing": {
     "message": "Refreshing..."
@@ -992,8 +998,26 @@
   "app.instance.worlds.remove-server-modal.warning-header": {
     "message": "Removing {name}"
   },
+  "app.instance.worlds.search-servers-label": {
+    "message": "Search servers"
+  },
+  "app.instance.worlds.search-servers-placeholder": {
+    "message": "Search {count, number} servers..."
+  },
+  "app.instance.worlds.search-worlds-label": {
+    "message": "Search worlds"
+  },
   "app.instance.worlds.search-worlds-placeholder": {
-    "message": "Search {count} worlds..."
+    "message": "Search {count, number} worlds..."
+  },
+  "app.instance.worlds.tab.servers": {
+    "message": "Servers"
+  },
+  "app.instance.worlds.tab.worlds": {
+    "message": "Worlds"
+  },
+  "app.instance.worlds.tabs-label": {
+    "message": "Quickplay types"
   },
   "app.java-detection.cancel": {
     "message": "Cancel"
@@ -3779,9 +3803,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Select an option"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Incompatible version {version}"
   },
@@ -4148,14 +4169,14 @@
   "instance.settings.tabs.behavior.files": {
     "message": "Show Files tab"
   },
+  "instance.settings.tabs.behavior.quickplay": {
+    "message": "Show Quickplay tab"
+  },
   "instance.settings.tabs.behavior.screenshots": {
     "message": "Show Screenshots tab"
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "The Screenshots tab cannot be hidden while the global Screenshots page is turned off."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Show Worlds tab"
   },
   "instance.settings.tabs.general": {
     "message": "General"
@@ -4550,11 +4571,11 @@
   "instance.worlds.desync-server.description": {
     "message": "Do you want to keep this server in other synced instances, or remove it from them?"
   },
-  "instance.worlds.desync-server.keep": {
-    "message": "Keep"
+  "instance.worlds.desync-server.keep-elsewhere": {
+    "message": "Keep in other instances"
   },
-  "instance.worlds.desync-server.remove": {
-    "message": "Remove"
+  "instance.worlds.desync-server.remove-elsewhere": {
+    "message": "Remove from other instances"
   },
   "instance.worlds.desync-server.title": {
     "message": "Desync server"

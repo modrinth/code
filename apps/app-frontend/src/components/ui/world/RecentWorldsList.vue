@@ -4,45 +4,48 @@ import {
 	Accordion,
 	defineMessages,
 	GAME_MODES,
-	type GameVersion,
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
 import { autoToHTML } from '@sfirew/minecraft-motd-parser'
-import { useQueries, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useResizeObserver } from '@vueuse/core'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
 import InstanceItem from '@/components/ui/world/InstanceItem.vue'
-import {
-	instanceProtocolQueryOptions,
-	recentWorldsKey,
-	recentWorldsQueryOptions,
-} from '@/components/ui/world/queries'
-import WorldItem from '@/components/ui/world/WorldItem.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
 import { serverStatusQueryOptions } from '@/features/servers/queries'
-import { trackEvent } from '@/helpers/analytics'
-import { kill, run } from '@/helpers/instance'
-import { get_all } from '@/helpers/process'
-import { traceStartupStep } from '@/helpers/startup-debug'
-import { get_game_versions } from '@/helpers/tags'
-import type { GameInstance } from '@/helpers/types'
+import type { ServerData } from '@/features/servers/server-pings'
+import {
+	gameVersionsQueryOptions,
+	instanceProtocolQueryOptions,
+	recentWorldsQueryOptions,
+	worldKeys,
+} from '@/features/worlds/queries'
 import {
 	getWorldIdentifier,
 	hasServerQuickPlaySupport,
 	hasWorldQuickPlaySupport,
-	type ProtocolVersion,
-	type ServerData,
-	type ServerStatus,
-	start_join_server,
-	start_join_singleplayer_world,
-	type WorldWithInstance,
-} from '@/helpers/worlds.ts'
+} from '@/features/worlds/world-utils'
+import WorldItem from '@/features/worlds/WorldItem.vue'
+import { trackEvent } from '@/helpers/analytics'
+import { kill, run } from '@/helpers/instance'
+import { get_all } from '@/helpers/process'
+import type { GameInstance } from '@/helpers/types'
+import {
+	setWorldDisplayStatus,
+	startJoinServer,
+	startJoinSingleplayerWorld,
+} from '@/platform/app-lib/worlds/commands'
+import type {
+	ProtocolVersion,
+	ServerStatus,
+	WorldWithInstance,
+} from '@/platform/app-lib/worlds/types'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -59,13 +62,7 @@ const appSettings = useAppSettings()
 
 const queryClient = useQueryClient()
 const locallyPlayedInstances = ref<Record<string, Dayjs>>({})
-const gameVersionsQuery = useQuery({
-	queryKey: ['tags', 'game-versions'],
-	networkMode: 'always',
-	queryFn: (): Promise<GameVersion[]> =>
-		traceStartupStep('Load jump-in game versions', () => get_game_versions()),
-	staleTime: Infinity,
-})
+const gameVersionsQuery = useQuery(gameVersionsQueryOptions())
 const gameVersions = computed(() => gameVersionsQuery.data.value ?? [])
 
 const MAX_JUMP_BACK_IN = 5
@@ -208,6 +205,35 @@ const recentWorldsQuery = useQuery({
 	enabled: showWorlds,
 })
 const loading = computed(() => showWorlds.value && recentWorldsQuery.isLoading.value)
+
+function isSameRecentWorld(world: WorldWithInstance, other: WorldWithInstance) {
+	return (
+		world.instance_id === other.instance_id &&
+		world.type === other.type &&
+		getWorldIdentifier(world) === getWorldIdentifier(other)
+	)
+}
+
+const hideFromHomeMutation = useMutation({
+	mutationFn: (world: WorldWithInstance) =>
+		setWorldDisplayStatus(world.instance_id, world.type, getWorldIdentifier(world), 'hidden'),
+	networkMode: 'always',
+	onMutate: async (world) => {
+		await queryClient.cancelQueries({ queryKey: worldKeys.recent() })
+		const previous = queryClient.getQueriesData<WorldWithInstance[]>({
+			queryKey: worldKeys.recent(),
+		})
+		queryClient.setQueriesData<WorldWithInstance[]>({ queryKey: worldKeys.recent() }, (worlds) =>
+			worlds?.filter((existing) => !isSameRecentWorld(existing, world)),
+		)
+		return { previous }
+	},
+	onError: (error, _world, context) => {
+		for (const [key, data] of context?.previous ?? []) queryClient.setQueryData(key, data)
+		handleError(error)
+	},
+	onSettled: () => queryClient.invalidateQueries({ queryKey: worldKeys.recent() }),
+})
 const worldItems = computed<WorldJumpBackInItem[]>(() => {
 	if (!showWorlds.value) return []
 	return (recentWorldsQuery.data.value ?? []).flatMap<WorldJumpBackInItem>((world) => {
@@ -362,7 +388,7 @@ async function refreshWorlds() {
 	refreshRequested = false
 	refreshingWorlds = true
 	try {
-		await queryClient.invalidateQueries({ queryKey: recentWorldsKey }, { cancelRefetch: false })
+		await queryClient.invalidateQueries({ queryKey: worldKeys.recent() }, { cancelRefetch: false })
 	} finally {
 		refreshingWorlds = false
 		if (refreshRequested) scheduleWorldsRefresh()
@@ -377,7 +403,7 @@ async function joinWorld(world: WorldWithInstance, instance?: GameInstance) {
 	if (instance?.launch_blocked) return
 	console.log(`Joining world ${getWorldIdentifier(world)}`)
 	if (world.type === 'server') {
-		await start_join_server(world.instance_id, world.address).catch(handleError)
+		await startJoinServer(world.instance_id, world.address).catch(handleError)
 		if (instance) {
 			trackEvent('InstanceStart', {
 				loader: instance.loader,
@@ -386,7 +412,7 @@ async function joinWorld(world: WorldWithInstance, instance?: GameInstance) {
 			})
 		}
 	} else if (world.type === 'singleplayer') {
-		await start_join_singleplayer_world(world.instance_id, world.path).catch(handleError)
+		await startJoinSingleplayerWorld(world.instance_id, world.path).catch(handleError)
 	}
 }
 
@@ -513,7 +539,7 @@ onUnmounted(() => {
 						:instance-name="item.instance.name"
 						:instance-icon="item.instance.icon_path"
 						@refresh="() => (item.world.type === 'server' ? refreshServer(item.world.address) : {})"
-						@update="scheduleWorldsRefresh"
+						@hide-from-home="hideFromHomeMutation.mutate(item.world)"
 						@play="
 							() => {
 								currentInstance = item.instance.id

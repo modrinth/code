@@ -24,8 +24,8 @@ const messages = defineMessages({
 		defaultMessage: 'Show Files tab',
 	},
 	worlds: {
-		id: 'instance.settings.tabs.behavior.worlds',
-		defaultMessage: 'Show Worlds tab',
+		id: 'instance.settings.tabs.behavior.quickplay',
+		defaultMessage: 'Show Quickplay tab',
 	},
 	screenshots: {
 		id: 'instance.settings.tabs.behavior.screenshots',

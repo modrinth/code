@@ -461,9 +461,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Näytä ulkoasumuokkaaja sivupaneelissa"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Näytä Maailmat -välilehti instansseissa"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Sivupaneeli"
   },
@@ -817,9 +814,6 @@
   },
   "app.instance.tab.share": {
     "message": "Jaa"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Maailmat"
   },
   "app.instance.worlds.add-server": {
     "message": "Lisää palvelin"
@@ -1177,9 +1171,6 @@
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
-  },
-  "app.world.server-modal.select-an-option": {
-    "message": "Valitse vaihtoehto"
   },
   "app.world.world-item.incompatible-version": {
     "message": "Yhteensopimaton versio {version}"
