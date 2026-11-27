@@ -8,19 +8,20 @@
 			<div
 				class="flex w-full flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0"
 			>
-				<span class="text-md flex flex-col flex-wrap gap-1 sm:flex-row sm:items-center">
+				<div class="text-md flex flex-col flex-wrap gap-1 sm:flex-row sm:items-center">
 					<span class="flex items-center gap-1">
 						<span class="text-secondary">Reported for</span>
 						<span class="font-semibold text-contrast">
 							{{ formattedReportType }}
 						</span>
 					</span>
-					<span class="flex items-center gap-1">
+					<div class="flex flex-wrap items-center gap-1">
 						<span class="hidden text-secondary sm:inline">by</span>
 						<span class="text-secondary sm:hidden">Reporter:</span>
 						<ModerationOwnerLink :owner="reporter" />
-					</span>
-				</span>
+						<CreatorStatusStats v-if="cardRequested" :id="reporter.id" kind="user" class="!mt-0" />
+					</div>
+				</div>
 
 				<div class="flex flex-row items-center gap-2 self-end sm:self-auto">
 					<span
@@ -271,6 +272,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useIntersectionObserver } from '@vueuse/core'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
+import CreatorStatusStats from '~/components/CreatorStatusStats.vue'
 import { sharedInstanceQueryOptions } from '~/composables/queries/shared-instance'
 import { getRequestErrorMessage } from '~/helpers/shared-instance-moderation'
 import { isStaff } from '~/helpers/users.js'
@@ -289,7 +291,7 @@ const auth = useAuthState()
 
 const DISMISS_DELAY_MS = 3000
 const SWIPE_DURATION_MS = 400
-const SHARED_INSTANCE_PRELOAD_MARGIN = '400px'
+const CARD_PRELOAD_MARGIN = '400px'
 
 const props = defineProps<{
 	report: ExtendedReport
@@ -309,16 +311,16 @@ const reportThread = ref<{
 const isThreadCollapsed = ref(props.collapsed)
 const sharedInstanceInspector = ref<InstanceType<typeof SharedInstanceInspectorModal> | null>(null)
 const cardElement = ref<HTMLElement | null>(null)
-const sharedInstanceRequested = ref(false)
+const cardRequested = ref(false)
 
 const { stop: stopObservingCard } = useIntersectionObserver(
-	() => (props.report.item_type === 'shared-instance' ? cardElement.value : null),
+	cardElement,
 	([entry]) => {
 		if (!entry?.isIntersecting) return
-		sharedInstanceRequested.value = true
+		cardRequested.value = true
 		stopObservingCard()
 	},
-	{ rootMargin: SHARED_INSTANCE_PRELOAD_MARGIN },
+	{ rootMargin: CARD_PRELOAD_MARGIN },
 )
 
 const {
@@ -329,7 +331,7 @@ const {
 } = useQuery(
 	computed(() => ({
 		...sharedInstanceQueryOptions.moderationContext(props.report.item_id, client, queryClient),
-		enabled: props.report.item_type === 'shared-instance' && sharedInstanceRequested.value,
+		enabled: props.report.item_type === 'shared-instance' && cardRequested.value,
 	})),
 )
 const sharedInstanceLoading = computed(
