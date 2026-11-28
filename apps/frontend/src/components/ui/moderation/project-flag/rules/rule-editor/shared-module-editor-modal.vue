@@ -4,7 +4,7 @@
 		:header="original ? 'Edit shared module' : 'New shared module'"
 		width="52rem"
 		scrollable
-		:close-on-click-outside="false"
+		:close-on-click-outside="!isDirty"
 		:disable-close="isBusy"
 		:before-hide="allowEditorClose"
 		:on-hide="() => (isOpen = false)"
