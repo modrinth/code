@@ -29,12 +29,12 @@
 			<Button
 				v-if="!data && !needsAllResults"
 				:disabled="loadFilterOptions && fullResults.isFetching.value"
-				@click="loadRuleFilters"
+				@click="loadResultFilters"
 			>
 				{{
 					loadFilterOptions && fullResults.isFetching.value
-						? 'Loading rule filters…'
-						: 'Load rule filters'
+						? 'Loading rule and flag filters…'
+						: 'Load rule and flag filters'
 				}}
 			</Button>
 			<DropdownFilterBar
@@ -44,12 +44,15 @@
 				add-label="Filters"
 			>
 				<template #search-actions="{ category, selectedValues }">
-					<div v-if="category.key === 'rule'" class="mr-2 flex shrink-0 items-center">
+					<div
+						v-if="category.key === 'rule' || category.key === 'flagKey'"
+						class="mr-2 flex shrink-0 items-center"
+					>
 						<SegmentedControl
-							v-model="ruleMatchMode"
-							:items="ruleMatchModes"
+							v-model="matchMode[category.key]"
+							:items="matchModes"
 							:disabled="selectedValues.length < 2"
-							aria-label="Rule match mode"
+							:aria-label="`${category.label} match mode`"
 						/>
 					</div>
 				</template>
@@ -165,11 +168,21 @@ const pageOffset = ref(0)
 const locateProject = ref(Boolean(props.projectId))
 const selectedFilters = ref<Record<string, string[]>>({})
 const selectedRules = computed(() => selectedFilters.value.rule ?? [])
-const ruleMatchModes: ('Match any' | 'Match all')[] = ['Match any', 'Match all']
-const ruleMatchMode = ref<(typeof ruleMatchModes)[number]>('Match any')
+const selectedFlagKeys = computed(() => selectedFilters.value.flagKey ?? [])
+type MatchMode = 'Match any' | 'Match all'
+const matchModes: MatchMode[] = ['Match any', 'Match all']
+const matchMode = ref<Record<'rule' | 'flagKey', MatchMode>>({
+	rule: 'Match any',
+	flagKey: 'Match any',
+})
 const selectedProjectTypes = computed(() => selectedFilters.value.projectType ?? [])
 const projectTypeFilterActive = computed(() => selectedProjectTypes.value.length > 0)
-const hasFilters = computed(() => selectedRules.value.length > 0 || projectTypeFilterActive.value)
+const hasFilters = computed(
+	() =>
+		selectedRules.value.length > 0 ||
+		selectedFlagKeys.value.length > 0 ||
+		projectTypeFilterActive.value,
+)
 const needsAllResults = computed(
 	() =>
 		props.category !== 'all' ||
@@ -199,7 +212,7 @@ const error = computed(() => activeResults.value.error.value)
 const isFetching = computed(() => activeResults.value.isFetching.value)
 const refetch = () => activeResults.value.refetch()
 
-function loadRuleFilters() {
+function loadResultFilters() {
 	if (loadFilterOptions.value) void fullResults.refetch()
 	else loadFilterOptions.value = true
 }
@@ -262,6 +275,18 @@ const ruleOptions = computed(() => {
 			label: `${name} (${count.toLocaleString('en-US')})`,
 		}))
 })
+const flagKeyOptions = computed(() => {
+	const counts = new Map<string, number>()
+	for (const row of resultRows.value) {
+		const inCategory = props.category === 'all' || row.category === props.category
+		for (const { key } of row.effective_flags) {
+			counts.set(key, (counts.get(key) ?? 0) + (inCategory ? 1 : 0))
+		}
+	}
+	return [...counts]
+		.sort(([a], [b]) => a.localeCompare(b, 'en'))
+		.map(([value, count]) => ({ value, label: `${value} (${count.toLocaleString('en-US')})` }))
+})
 const projectTypeOptions = computed(() => {
 	const counts = new Map<string, number>()
 	for (const project of filterProjects.value ?? []) {
@@ -294,6 +319,14 @@ const filterCategories = computed(() =>
 				submenuClass: 'w-[500px]',
 			},
 			{
+				key: 'flagKey',
+				label: 'Flag keys',
+				options: flagKeyOptions.value,
+				searchable: true,
+				searchPlaceholder: 'Search flag keys…',
+				submenuClass: 'w-[500px]',
+			},
+			{
 				key: 'projectType',
 				label: 'Project types',
 				options: projectTypeOptions.value,
@@ -310,18 +343,26 @@ const projectSearch = computed(
 			ignoreLocation: true,
 		}),
 )
-const ruleFilteredRows = computed(() => {
+function matchesSelection(values: string[], mode: MatchMode, matches: (value: string) => boolean) {
+	return values.length === 0 || (mode === 'Match all' ? values.every(matches) : values.some(matches))
+}
+
+const flagFilteredRows = computed(() => {
 	const term = searchTerm.value
 	const candidates = term
 		? projectSearch.value.search(term).map(({ item }) => item)
 		: groupedRows.value[props.category]
 	const rules = selectedRules.value
-	if (rules.length === 0) return candidates
-	const matchAll = ruleMatchMode.value === 'Match all'
-	return candidates.filter((row) => {
-		const flaggedBy = (id: string) => (row.rules[id]?.flags.length ?? 0) > 0
-		return matchAll ? rules.every(flaggedBy) : rules.some(flaggedBy)
-	})
+	const keys = selectedFlagKeys.value
+	if (rules.length === 0 && keys.length === 0) return candidates
+	const { rule: ruleMode, flagKey: flagKeyMode } = matchMode.value
+	return candidates.filter(
+		(row) =>
+			matchesSelection(rules, ruleMode, (id) => (row.rules[id]?.flags.length ?? 0) > 0) &&
+			matchesSelection(keys, flagKeyMode, (key) =>
+				row.effective_flags.some((flag) => flag.key === key),
+			),
+	)
 })
 const {
 	filterProjects,
@@ -334,8 +375,8 @@ const {
 	() => projectTypeFilterActive.value,
 )
 const categoryRows = computed(() => {
-	if (!projectTypeFilterActive.value) return ruleFilteredRows.value
-	return ruleFilteredRows.value.filter((row) =>
+	if (!projectTypeFilterActive.value) return flagFilteredRows.value
+	return flagFilteredRows.value.filter((row) =>
 		filterProjectsById.value
 			.get(row.project.id)
 			?.project_types.some((type) => selectedProjectTypes.value.includes(type)),
@@ -426,6 +467,7 @@ function showCategory(value: TabsValue) {
 	const nextTab = filters.find((filter) => filter.category === value)
 	if (!nextTab || nextTab.category === props.category) return
 	selectedFilters.value.rule = []
+	selectedFilters.value.flagKey = []
 	emit('changeCategory', nextTab.category)
 }
 
@@ -465,7 +507,7 @@ const emptyMessage = computed(() => {
 useFlagErrorNotification(error, 'Could not load project results')
 useFlagErrorNotification(
 	() => (!needsAllResults.value && loadFilterOptions.value ? fullResults.error.value : null),
-	'Could not load rule filters',
+	'Could not load rule and flag filters',
 )
 useFlagErrorNotification(projectTypeError, 'Could not load project types')
 </script>

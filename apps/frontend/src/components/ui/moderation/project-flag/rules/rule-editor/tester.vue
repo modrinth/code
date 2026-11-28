@@ -119,60 +119,14 @@
 					</h3>
 					<code v-if="projects.has(activeId)" class="text-xs text-secondary">{{ activeId }}</code>
 				</div>
-				<Tabs
+				<RuleResultTabs
 					v-model:value="activeView"
-					:tabs="outputTabs"
-					wrap
-					color="gray"
-					aria-label="Test result views"
-					class="!h-auto !w-full !rounded-none !border-x-0 !border-t-0 !border-b-surface-4 !px-2 !py-0 !shadow-none [&_[role=tab][aria-selected=true]]:!border-b-green [&_[role=tab]]:!rounded-none [&_[role=tab]]:!border-0 [&_[role=tab]]:!border-b-2 [&_[role=tab]]:!border-transparent [&_[role=tab]]:!bg-transparent [&_[role=tab]]:py-2"
+					:result="result"
+					:error="activeError"
+					:running="isProjectRunning(activeId)"
+					class="flex-1"
+					panel-class="flex-1 overflow-auto p-3"
 				/>
-				<div class="min-h-0 flex-1 overflow-auto p-3" :aria-busy="isProjectRunning(activeId)">
-					<p v-if="isProjectRunning(activeId)" role="status" class="m-0 text-sm text-secondary">
-						Running tests…
-					</p>
-					<pre
-						v-else-if="activeView === 'error' && activeError"
-						role="alert"
-						class="m-0 whitespace-pre-wrap break-words font-mono text-sm text-red"
-						v-text="activeError"
-					/>
-					<p v-else-if="!result" class="m-0 text-sm text-secondary">
-						{{ activeError ? 'Test failed.' : 'Run all to see this project’s results.' }}
-					</p>
-					<pre
-						v-else-if="activeView === 'raw'"
-						class="m-0 whitespace-pre-wrap break-words font-mono text-xs"
-						v-text="JSON.stringify(result, null, 2)"
-					/>
-					<pre
-						v-else-if="activeView === 'log' && result.log.length"
-						class="m-0 whitespace-pre-wrap break-words font-mono text-sm"
-						v-text="result.log.join('\n')"
-					/>
-					<p v-else-if="activeView === 'log'" class="m-0 text-sm text-secondary">
-						No print output.
-					</p>
-					<p v-else-if="result.error" class="m-0 text-sm text-secondary">Test failed.</p>
-					<p v-else-if="!result.flags.length" class="m-0 text-sm text-secondary">
-						No issues found.
-					</p>
-					<ul v-else class="m-0 flex list-none flex-col gap-2 p-0">
-						<li
-							v-for="(flag, index) in result.flags"
-							:key="index"
-							class="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1 text-sm"
-						>
-							<code
-								class="bg-red-highlight max-w-full break-all rounded-md px-2 py-0.5 font-mono text-red"
-								>{{ flag.key }}</code
-							>
-							<span v-if="flag.reason" class="min-w-0 whitespace-pre-wrap break-words">{{
-								flag.reason
-							}}</span>
-						</li>
-					</ul>
-				</div>
 			</section>
 			<p v-else class="m-0 p-3 text-sm text-secondary">Add projects to test this rule.</p>
 		</div>
@@ -334,7 +288,6 @@ import {
 	Input,
 	injectModrinthClient,
 	NewModal,
-	Tabs,
 	type TabsValue,
 	Textarea,
 } from '@modrinth/ui'
@@ -344,6 +297,8 @@ import { computed, onMounted, ref, useId, useTemplateRef, watch } from 'vue'
 
 import PanelDivider from '~/components/project-review/tech-review/panel-divider.vue'
 import { projectFlagProjectContextQueryKey } from '~/composables/queries/project-flag'
+
+import RuleResultTabs from '../../rule-result-tabs.vue'
 
 const projectIdPattern = /^[A-Za-z0-9]{1,11}$/
 const base62Digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
@@ -661,12 +616,6 @@ watch([activeId, activeError], ([id, failure], [previousId]) => {
 		activeView.value = 'issues'
 	}
 })
-const outputTabs = computed(() => [
-	{ value: 'issues', label: result.value ? `Issues (${result.value.flags.length})` : 'Issues' },
-	{ value: 'log', label: result.value ? `Log (${result.value.log.length})` : 'Log' },
-	...(activeError.value ? [{ value: 'error', label: 'Error' }] : []),
-	{ value: 'raw', label: 'Raw JSON' },
-])
 
 function isProjectRunning(id: string) {
 	return isPending.value && requestedProjects.value.has(id)
