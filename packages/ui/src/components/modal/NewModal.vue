@@ -206,6 +206,8 @@ const props = withDefaults(
 		danger?: boolean
 		fade?: 'standard' | 'warning' | 'danger'
 		closeOnEsc?: boolean
+		/** Handles Escape in place of the default close action. */
+		onEscape?: () => void
 		closeOnClickOutside?: boolean
 		warnOnClose?: boolean
 		header?: string
@@ -784,7 +786,17 @@ function handleWindowKeyDown(event: KeyboardEvent) {
 	}
 
 	if (props.closeOnEsc && event.key === 'Escape' && props.closable) {
-		hide()
+		if (!props.onEscape) {
+			hide()
+		} else if (
+			!props.disableClose &&
+			!contentTransitioning.value &&
+			!event.repeat &&
+			!event.isComposing
+		) {
+			event.preventDefault()
+			props.onEscape()
+		}
 	}
 }
 

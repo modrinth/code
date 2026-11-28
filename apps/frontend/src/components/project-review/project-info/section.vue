@@ -12,10 +12,11 @@
 				<slot name="heading-after" />
 			</div>
 			<div
-				v-if="$slots.right || selectedFindingCount > 0 || reReviewFindingCount > 0"
+				v-if="$slots.right || flagCount > 0 || selectedFindingCount > 0 || reReviewFindingCount > 0"
 				class="flex shrink-0 items-center gap-2"
 			>
 				<slot name="right" />
+				<FlagsCountBadge :panel-key="target ? panels.resolve(target)?.key : undefined" />
 				<ReReviewFindingsCountBadge :count="reReviewFindingCount" />
 				<FindingsCountBadge :count="selectedFindingCount" />
 			</div>
@@ -28,10 +29,12 @@
 import { computed } from 'vue'
 
 import type { ReviewTarget } from '~/providers/project-review/review'
+import { injectReviewFlags } from '~/providers/project-review/review-flags'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
 
 import FindingsCountBadge from '../review-panel/findings-count-badge.vue'
+import FlagsCountBadge from '../review-panel/flags-count-badge.vue'
 import ReviewPanel from '../review-panel/index.vue'
 import ReReviewFindingsCountBadge from '../review-panel/re-review-findings-count-badge.vue'
 
@@ -41,6 +44,11 @@ const props = defineProps<{
 }>()
 const panels = injectReviewPanels()
 const previousIssues = injectReviewPreviousIssues()
+const reviewFlags = injectReviewFlags(null)
+const flagCount = computed(() => {
+	const binding = props.target ? panels.resolve(props.target) : undefined
+	return binding ? (reviewFlags?.forPanel(binding.key).length ?? 0) : 0
+})
 const reReviewFindingCount = computed(() => {
 	const binding = props.target ? panels.resolve(props.target) : undefined
 	return binding ? previousIssues.reReviewFindingCount(binding) : 0

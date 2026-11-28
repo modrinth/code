@@ -162,7 +162,7 @@ defineExpose({
 					:style="
 						splitView && $slots.conversation
 							? {
-									height: tracesHeight === null ? 'calc(50% - 0.5rem)' : `${tracesHeight}px`,
+								height: `var(--traces-drag-height, ${tracesHeight === null ? 'calc(50% - 0.5rem)' : `${tracesHeight}px`})`,
 									maxHeight: 'calc(50% - 0.5rem)',
 									flexShrink: 0,
 								}
@@ -183,7 +183,11 @@ defineExpose({
 						</template>
 					</TraceList>
 				</div>
-				<HeightDivider v-if="$slots.conversation" v-model="tracesHeight" />
+				<HeightDivider
+					v-if="$slots.conversation"
+					v-model="tracesHeight"
+					height-property="--traces-drag-height"
+				/>
 				<div v-if="$slots.conversation" class="flex min-h-0 flex-1 flex-col gap-2.5">
 					<slot name="conversation" />
 				</div>
@@ -227,7 +231,9 @@ defineExpose({
 
 .file-review-panes {
 	grid-template-rows: auto minmax(0, 1fr);
-	grid-template-columns: minmax(0, 1fr) 8px min(var(--traces-width), max(220px, calc(100% - 208px)));
+	grid-template-columns:
+		minmax(0, 1fr) 8px
+		min(var(--traces-width-drag, var(--traces-width)), max(220px, calc(100% - 208px)));
 }
 
 .fade-enter-active {

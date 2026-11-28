@@ -88,7 +88,9 @@ export interface ProjectFlag {
 	flag_outcome: FlagOutcome
 	reason: string | null
 	retain_when_resolved: boolean
-	[field: string]: ProjectFlagValue
+	name?: string
+	location?: { review_panel_key: string }
+	[field: string]: ProjectFlagValue | undefined
 }
 
 export interface PersistedProjectFlag extends ProjectFlag {

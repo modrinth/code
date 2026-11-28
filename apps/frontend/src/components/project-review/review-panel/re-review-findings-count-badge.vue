@@ -1,9 +1,9 @@
 <template>
 	<span
 		v-if="count > 0"
-		class="pointer-events-none flex h-[19px] min-w-[18px] shrink-0 items-center justify-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-3 px-1.5 text-xs font-medium leading-none text-primary"
+		class="pointer-events-none flex shrink-0 items-center gap-0.5 text-xs font-medium leading-none text-orange"
 	>
-		<TagCategoryRefreshCcwIcon class="size-3 shrink-0 text-orange" aria-hidden="true" />
+		<TagCategoryRefreshCcwIcon class="size-3.5 shrink-0 text-orange" aria-hidden="true" />
 		<span aria-hidden="true">{{ count }}</span>
 		<span class="sr-only">{{
 			count === 1 ? `${count} re-review item` : `${count} re-review items`

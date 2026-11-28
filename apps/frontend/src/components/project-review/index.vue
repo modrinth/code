@@ -20,8 +20,8 @@
 						<IssuePicker ref="issuePicker" @selected="activeReviewTab = 'issues'" />
 					</div>
 				</div>
-				<ProjectFlags v-if="projectId" :project-id="projectId" />
 				<IssueList v-show="activeReviewTab === 'issues'" />
+				<FlagList v-show="activeReviewTab === 'flags'" />
 				<IssueList v-show="activeReviewTab === 're-review'" re-review />
 				<MessageThread v-show="activeReviewTab === 'thread'" ref="messageThread" />
 			</section>
@@ -128,6 +128,7 @@ import {
 import { isStaff } from '~/helpers/users.js'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { previousReviewLinkUrls } from '~/providers/project-review/project-links'
+import { createReviewFlags, provideReviewFlags } from '~/providers/project-review/review-flags'
 import {
 	createReviewMessages,
 	provideReviewMessages,
@@ -149,6 +150,7 @@ import {
 
 import Description from './description/index.vue'
 import Disclosures from './disclosures/index.vue'
+import FlagList from './flag-list/index.vue'
 import Gallery from './gallery/index.vue'
 import IssueList from './issue-list/index.vue'
 import IssuePicker from './issue-list/issue-picker.vue'
@@ -157,7 +159,6 @@ import ProjectReviewLayout from './layout/index.client.vue'
 import { type ProjectReviewTab, projectReviewTabs } from './layout/types'
 import MessageThread from './message-thread/index.vue'
 import Permissions from './permissions/index.vue'
-import ProjectFlags from './project-flags.vue'
 import ProjectInfo from './project-info/index.vue'
 import ProjectWideChecks from './project-wide-checks.vue'
 import QueueBar from './queue-bar.vue'
@@ -205,6 +206,7 @@ const visibleTabs = computed<readonly ProjectReviewTab[]>((previousTabs) => {
 	)
 })
 const reviewProjectId = computed(() => project.value?.id)
+const reviewFlags = provideReviewFlags(createReviewFlags(reviewProjectId))
 const session = provideReviewSession(createReviewSession())
 const settings = useModerationSettings()
 const panels = provideReviewPanels(
@@ -381,6 +383,7 @@ const rightPanelTabs = computed(() => [
 		value: 'issues',
 		label: `Issues (${issueCount.value})`,
 	},
+	{ value: 'flags', label: `Flags (${reviewFlags.flags.value.length})` },
 ])
 
 watch(
@@ -396,7 +399,12 @@ watch(projectId, () => {
 })
 
 useShortcut('cycle-conversation', () => {
-	const tabs = ['issues', 'thread', ...(hasPreviousStructuredIssues.value ? ['re-review'] : [])]
+	const tabs = [
+		'issues',
+		'flags',
+		'thread',
+		...(hasPreviousStructuredIssues.value ? ['re-review'] : []),
+	]
 	activeReviewTab.value = tabs[(tabs.indexOf(activeReviewTab.value) + 1) % tabs.length]
 	shortcuts.run('reveal-conversation')
 })

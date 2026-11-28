@@ -163,15 +163,6 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 		)
 	}
 
-	public async deployStaging(): Promise<ProjectFlagDeployment> {
-		return this.client.request<ProjectFlagDeployment>('/moderation/project-flag/deployment', {
-			api: 'labrinth',
-			version: 'internal',
-			method: 'POST',
-			retry: false,
-		})
-	}
-
 	public async deployRun(id: string): Promise<ProjectFlagDeployment> {
 		return this.client.request<ProjectFlagDeployment>(
 			`/moderation/project-flag/rules/run/${encodeURIComponent(id)}/deploy`,
@@ -215,6 +206,7 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 			version: 'internal',
 			method: 'POST',
 			body: data,
+			retry: false,
 		})
 	}
 
@@ -224,6 +216,7 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 			version: 'internal',
 			method: 'PUT',
 			body: data,
+			retry: false,
 		})
 	}
 
@@ -235,6 +228,8 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 				version: 'internal',
 				method: 'POST',
 				body: data,
+				timeout: 60_000,
+				retry: false,
 			},
 		)
 	}

@@ -1,4 +1,5 @@
 import type { StoryObj } from '@storybook/vue3-vite'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { ref } from 'vue'
 
 import { Button } from '../../components/base/buttons'
@@ -30,6 +31,44 @@ export const Default: Story = {
 			</div>
 		`,
 	}),
+}
+
+export const CustomEscape: Story = {
+	render: () => ({
+		components: { NewModal, Button },
+		setup() {
+			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
+			const closeRequested = ref(false)
+			return { modalRef, closeRequested }
+		},
+		template: `
+			<div>
+				<Button @click="modalRef?.show()">Open Editor</Button>
+				<NewModal ref="modalRef" header="Editor" :on-escape="() => (closeRequested = true)">
+					<div v-if="closeRequested">
+						<p>Close the editor?</p>
+						<Button @click="closeRequested = false">Stay</Button>
+						<Button @click="modalRef?.hide()">Leave</Button>
+					</div>
+				</NewModal>
+			</div>
+		`,
+	}),
+	play: async ({ canvasElement }) => {
+		const canvas = within(canvasElement)
+		const body = within(canvasElement.ownerDocument.body)
+		const trigger = canvas.getByRole('button', { name: 'Open Editor' })
+
+		await userEvent.click(trigger)
+		const dialog = within(await body.findByRole('dialog', { name: 'Editor' }))
+		await userEvent.keyboard('{Escape}')
+		await userEvent.click(await dialog.findByRole('button', { name: 'Stay' }))
+		await expect(body.getByRole('dialog', { name: 'Editor' })).toBeVisible()
+
+		await userEvent.keyboard('{Escape}')
+		await userEvent.click(await dialog.findByRole('button', { name: 'Leave' }))
+		await waitFor(() => expect(body.queryByRole('dialog', { name: 'Editor' })).toBeNull())
+	},
 }
 
 export const WithActions: Story = {
