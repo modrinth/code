@@ -142,15 +142,9 @@ const pageOffset = ref(0)
 const locateProject = ref(Boolean(props.projectId))
 const selectedFilters = ref<Record<string, string[]>>({})
 const selectedRules = computed(() => selectedFilters.value.rule ?? [])
-const selectedFlaggedRules = computed(() => selectedFilters.value.flaggedRule ?? [])
 const selectedProjectTypes = computed(() => selectedFilters.value.projectType ?? [])
 const projectTypeFilterActive = computed(() => selectedProjectTypes.value.length > 0)
-const hasFilters = computed(
-	() =>
-		selectedRules.value.length > 0 ||
-		selectedFlaggedRules.value.length > 0 ||
-		projectTypeFilterActive.value,
-)
+const hasFilters = computed(() => selectedRules.value.length > 0 || projectTypeFilterActive.value)
 const needsAllResults = computed(
 	() =>
 		props.category !== 'all' ||
@@ -227,15 +221,21 @@ const resultTabs = computed(() =>
 		})),
 )
 const ruleOptions = computed(() => {
-	const rules = new Map<string, string>()
+	const rules = new Map<string, { name: string; count: number }>()
 	for (const row of resultRows.value) {
+		const inCategory = props.category === 'all' || row.category === props.category
 		for (const [id, rule] of Object.entries(row.rules)) {
-			rules.set(id, rule.name ?? `Deleted rule (${id})`)
+			const entry = rules.get(id) ?? { name: rule.name ?? `Deleted rule (${id})`, count: 0 }
+			if (inCategory && rule.flags.length > 0) entry.count++
+			rules.set(id, entry)
 		}
 	}
 	return [...rules]
-		.map(([value, label]) => ({ value, label }))
-		.sort((a, b) => a.label.localeCompare(b.label, 'en'))
+		.sort(([, a], [, b]) => a.name.localeCompare(b.name, 'en'))
+		.map(([value, { name, count }]) => ({
+			value,
+			label: `${name} (${count.toLocaleString('en-US')})`,
+		}))
 })
 const projectTypeOptions = computed(() => {
 	const counts = new Map<string, number>()
@@ -257,23 +257,6 @@ const projectTypeOptions = computed(() => {
 			}
 		})
 })
-const flaggedRuleOptions = computed(() => {
-	const rules = new Map<string, { name: string; count: number }>()
-	for (const row of groupedRows.value[props.category]) {
-		for (const [id, rule] of Object.entries(row.rules)) {
-			if (!rule.flags.length) continue
-			const entry = rules.get(id)
-			if (entry) entry.count++
-			else rules.set(id, { name: rule.name ?? `Deleted rule (${id})`, count: 1 })
-		}
-	}
-	return [...rules]
-		.sort(([, a], [, b]) => a.name.localeCompare(b.name, 'en'))
-		.map(([value, { name, count }]) => ({
-			value,
-			label: `${name} (${count.toLocaleString('en-US')})`,
-		}))
-})
 const filterCategories = computed(() =>
 	(
 		[
@@ -283,14 +266,6 @@ const filterCategories = computed(() =>
 				options: ruleOptions.value,
 				searchable: true,
 				searchPlaceholder: 'Search rules…',
-				submenuClass: 'w-[500px]',
-			},
-			{
-				key: 'flaggedRule',
-				label: 'Flagged rules',
-				options: flaggedRuleOptions.value,
-				searchable: true,
-				searchPlaceholder: 'Search flagged rules…',
 				submenuClass: 'w-[500px]',
 			},
 			{
@@ -315,18 +290,10 @@ const ruleFilteredRows = computed(() => {
 	const candidates = term
 		? projectSearch.value.search(term).map(({ item }) => item)
 		: groupedRows.value[props.category]
-	return candidates.filter((row) => {
-		if (
-			selectedFlaggedRules.value.length &&
-			!selectedFlaggedRules.value.some((id) => (row.rules[id]?.flags.length ?? 0) > 0)
-		) {
-			return false
-		}
-		return (
-			selectedRules.value.length === 0 ||
-			selectedRules.value.some((id) => Object.hasOwn(row.rules, id))
-		)
-	})
+	if (selectedRules.value.length === 0) return candidates
+	return candidates.filter((row) =>
+		selectedRules.value.some((id) => (row.rules[id]?.flags.length ?? 0) > 0),
+	)
 })
 const {
 	filterProjects,
@@ -375,7 +342,7 @@ const { projectsById, ownersByProject } = useResultProjectOwners(
 function showCategory(value: TabsValue) {
 	const nextTab = filters.find((filter) => filter.category === value)
 	if (!nextTab || nextTab.category === props.category) return
-	selectedFilters.value.flaggedRule = []
+	selectedFilters.value.rule = []
 	emit('changeCategory', nextTab.category)
 }
 
