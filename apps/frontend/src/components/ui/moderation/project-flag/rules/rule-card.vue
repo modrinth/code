@@ -4,7 +4,7 @@
 		:class="{ 'cursor-pointer transition-[filter] hover:brightness-125': !editDisabled }"
 		@click="openEditor"
 	>
-		<header class="flex min-w-0 items-center gap-3 p-4 pb-1">
+		<header class="flex min-w-0 items-center gap-3 p-4 pb-1 pt-2.5">
 			<h2 class="m-0 mr-auto min-w-0 break-words text-lg font-bold text-contrast">
 				<NuxtLink
 					v-if="!editDisabled"
