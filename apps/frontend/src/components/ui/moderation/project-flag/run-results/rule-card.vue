@@ -11,7 +11,7 @@
 			/>
 			<div class="mr-auto flex min-w-0 items-start gap-1.5">
 				<TagCategoryScrollTextIcon
-					class="mt-1 size-4 shrink-0 text-primary transition-opacity motion-reduce:transition-none"
+					class="mt-0.5 size-[18px] shrink-0 text-primary transition-opacity motion-reduce:transition-none"
 					:class="expanded ? 'opacity-100' : 'opacity-70 group-hover/header:opacity-100'"
 					aria-hidden="true"
 				/>
