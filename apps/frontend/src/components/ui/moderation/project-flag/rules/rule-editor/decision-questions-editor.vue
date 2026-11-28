@@ -28,12 +28,30 @@
 				Add
 			</Button>
 		</div>
+		<Input
+			v-if="showSearch"
+			v-model="search"
+			:icon="SearchIcon"
+			type="search"
+			size="small"
+			input-class="[&::-webkit-search-cancel-button]:hidden"
+			aria-label="Search questions"
+			placeholder="Search questions…"
+			autocomplete="off"
+			clearable
+			@keydown.enter.prevent
+		/>
 		<p v-if="!entries.length" class="m-0 text-sm text-secondary">No questions.</p>
+		<p v-else-if="!visibleRows.length" role="status" class="m-0 mt-2 text-sm text-secondary">
+			No questions match your search.
+		</p>
 		<ul v-else class="m-0 flex list-none flex-col gap-2 p-0">
 			<li
-				v-for="(entry, index) in entries"
+				v-for="{ entry, index } in visibleRows"
 				:key="rowId(entry)"
 				class="overflow-hidden rounded-xl border border-solid border-surface-4 bg-surface-3"
+				@focusin="focusedEntry = entry"
+				@focusout="onRowFocusOut"
 			>
 				<Accordion
 					:open-by-default="expandedQuestions.has(entry)"
@@ -121,7 +139,7 @@
 
 <script setup lang="ts">
 import type { ProjectFlagContextField, ProjectFlagDecisionQuestion } from '@modrinth/api-client'
-import { ChevronDownIcon, InfoIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
+import { ChevronDownIcon, InfoIcon, PlusIcon, SearchIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Accordion,
 	Button,
@@ -133,6 +151,7 @@ import {
 } from '@modrinth/ui'
 import { nextTick, reactive, useId, useTemplateRef } from 'vue'
 
+import { useDraftRowSearch } from './use-draft-row-search'
 import { useUndoableDraftRemoval } from './use-undoable-draft-removal'
 
 export interface DecisionQuestionEntry extends ProjectFlagDecisionQuestion {
@@ -162,6 +181,10 @@ const contextFields: MultiSelectOption<ProjectFlagContextField>[] = [
 
 const entries = defineModel<DecisionQuestionEntry[]>({ required: true })
 const props = defineProps<{ disabled?: boolean; errors: string[] }>()
+const { search, showSearch, visibleRows, focusedEntry, onRowFocusOut } = useDraftRowSearch(
+	entries,
+	['key', 'question'],
+)
 const removeQuestion = useUndoableDraftRemoval(
 	entries,
 	() => props.disabled,
@@ -189,6 +212,7 @@ function rowId(entry: DecisionQuestionEntry) {
 }
 
 async function addQuestion() {
+	search.value = ''
 	entries.value.push({
 		key: '',
 		question: '',

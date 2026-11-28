@@ -13,12 +13,30 @@
 				Add
 			</Button>
 		</div>
+		<Input
+			v-if="showSearch"
+			v-model="search"
+			:icon="SearchIcon"
+			type="search"
+			size="small"
+			input-class="[&::-webkit-search-cancel-button]:hidden"
+			aria-label="Search patterns"
+			placeholder="Search patterns…"
+			autocomplete="off"
+			clearable
+			@keydown.enter.prevent
+		/>
 		<p v-if="!patterns.length" class="m-0 text-sm text-secondary">No patterns.</p>
+		<p v-else-if="!visibleRows.length" role="status" class="m-0 mt-2 text-sm text-secondary">
+			No patterns match your search.
+		</p>
 		<ul v-else class="m-0 flex list-none flex-col gap-2 p-0">
 			<li
-				v-for="(entry, index) in patterns"
+				v-for="{ entry, index } in visibleRows"
 				:key="rowId(entry)"
 				class="overflow-hidden rounded-xl border border-solid border-surface-4 bg-surface-3"
+				@focusin="focusedEntry = entry"
+				@focusout="onRowFocusOut"
 			>
 				<Accordion
 					:open-by-default="expandedPatterns.has(entry)"
@@ -105,10 +123,11 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
+import { ChevronDownIcon, PlusIcon, SearchIcon, TrashIcon } from '@modrinth/assets'
 import { Accordion, Button, IconButton, Input, Textarea } from '@modrinth/ui'
 import { nextTick, reactive, useId, useTemplateRef } from 'vue'
 
+import { useDraftRowSearch } from './use-draft-row-search'
 import { useUndoableDraftRemoval } from './use-undoable-draft-removal'
 
 export interface FileScanPattern {
@@ -118,6 +137,10 @@ export interface FileScanPattern {
 
 const patterns = defineModel<FileScanPattern[]>({ required: true })
 const props = defineProps<{ disabled?: boolean; errors: FileScanPattern[] }>()
+const { search, showSearch, visibleRows, focusedEntry, onRowFocusOut } = useDraftRowSearch(
+	patterns,
+	['name'],
+)
 const removePattern = useUndoableDraftRemoval(
 	patterns,
 	() => props.disabled,
@@ -141,6 +164,7 @@ function rowId(entry: FileScanPattern) {
 }
 
 async function addPattern() {
+	search.value = ''
 	patterns.value.push({ name: '', pattern: '' })
 	const entry = patterns.value[patterns.value.length - 1]
 	expandedPatterns.add(entry)
