@@ -1,9 +1,5 @@
 <template>
-	<slot
-		:scan-error-count="scanErrorCount"
-		:approvable-count="run.num_no_flags ?? groupedRows.approvable.length"
-		:unique-flag-key-count="uniqueFlagKeyCount"
-	/>
+	<slot :unique-flag-key-count="uniqueFlagKeyCount" />
 	<section class="flex min-w-0 flex-col gap-3" aria-label="Project results">
 		<Tabs
 			:tabs="resultTabs"

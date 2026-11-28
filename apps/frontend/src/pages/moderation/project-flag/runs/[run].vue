@@ -26,7 +26,7 @@
 				@change-category="showCategory"
 				@select-project="selectProject"
 			>
-				<template #default="{ scanErrorCount, approvableCount, uniqueFlagKeyCount }">
+				<template #default="{ uniqueFlagKeyCount }">
 					<header v-if="run" class="universal-card !mb-4 flex min-w-0 flex-col gap-3">
 						<div class="flex flex-wrap items-center justify-between gap-3">
 							<div class="flex flex-wrap items-center gap-2">
@@ -38,29 +38,7 @@
 								<ProjectFlagScanBadge :run="run" :num-workers="activity?.num_workers" />
 							</div>
 							<div class="flex flex-wrap items-center gap-2">
-								<TagItem
-									v-if="scanErrorCount > 0"
-									v-tooltip="'Scan errors'"
-									style="--_color: var(--color-red)"
-								>
-									<XCircleIcon aria-hidden="true" /><span class="sr-only">Scan errors: </span>
-									{{ scanErrorCount.toLocaleString('en-US') }}
-								</TagItem>
-								<TagItem
-									v-tooltip="
-										uniqueFlagKeyCount === undefined
-											? 'Flagged projects'
-											: flagCountTooltip(run.num_flagged, uniqueFlagKeyCount)
-									"
-									style="--_color: var(--color-purple)"
-								>
-									<TagCategoryFlagIcon aria-hidden="true" /><span class="sr-only">Flagged: </span>
-									{{ run.num_flagged.toLocaleString('en-US') }}
-								</TagItem>
-								<TagItem v-tooltip="'Approvable'" style="--_color: var(--color-green)">
-									<BadgeCheckIcon aria-hidden="true" /><span class="sr-only">Approvable: </span>
-									{{ approvableCount?.toLocaleString('en-US') ?? '—' }}
-								</TagItem>
+								<ProjectFlagRunCountBadges :run="run" :unique-flag-key-count="uniqueFlagKeyCount" />
 								<TagItem
 									v-if="run.ruleset_id && deployment?.ruleset_id === run.ruleset_id"
 									v-tooltip="formatDate(deployment.deployed_at, true)"
@@ -118,20 +96,14 @@
 <script setup lang="ts">
 import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
 
-import {
-	BadgeCheckIcon,
-	ChevronLeftIcon,
-	LoaderCircleIcon,
-	MoreHorizontalIcon,
-	TagCategoryFlagIcon,
-	XCircleIcon,
-} from '@modrinth/assets'
+import { ChevronLeftIcon, LoaderCircleIcon, MoreHorizontalIcon } from '@modrinth/assets'
 import { Avatar, Button, injectModrinthClient, TagItem, TeleportOverflowMenu } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import ProjectFlagRuleEditor from '~/components/ui/moderation/project-flag/rules/rule-editor/overlay.vue'
 import ProjectFlagRunActions from '~/components/ui/moderation/project-flag/run-actions.vue'
-import { flagCountTooltip, formatDate } from '~/components/ui/moderation/project-flag/run-format'
+import ProjectFlagRunCountBadges from '~/components/ui/moderation/project-flag/run-count-badges.vue'
+import { formatDate } from '~/components/ui/moderation/project-flag/run-format'
 import ProjectFlagRunResults from '~/components/ui/moderation/project-flag/run-results/index.vue'
 import ProjectFlagScanBadge from '~/components/ui/moderation/project-flag/scan-badge.vue'
 import { projectFlagDeploymentQueryOptions } from '~/composables/queries/project-flag'

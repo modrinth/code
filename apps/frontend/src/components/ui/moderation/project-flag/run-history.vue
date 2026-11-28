@@ -83,14 +83,7 @@
 					</div>
 
 					<div class="flex flex-wrap items-center gap-2 sm:ml-auto">
-						<TagItem
-							v-if="run.num_errors > 0"
-							v-tooltip="'Scan errors'"
-							style="--_color: var(--color-red)"
-						>
-							<XCircleIcon aria-hidden="true" /><span class="sr-only">Scan errors: </span>
-							{{ run.num_errors.toLocaleString('en-US') }}
-						</TagItem>
+						<ProjectFlagRunCountBadges :run="run" />
 						<div class="shrink-0" @click.stop>
 							<TeleportOverflowMenu
 								type="quiet"
@@ -171,7 +164,6 @@ import {
 	MoreHorizontalIcon,
 	PlayIcon,
 	SearchIcon,
-	XCircleIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
@@ -181,7 +173,6 @@ import {
 	Input,
 	NewModal,
 	Pagination,
-	TagItem,
 	TeleportOverflowMenu,
 	TimeFramePicker,
 	type TimeFramePickerSelection,
@@ -199,6 +190,7 @@ import {
 } from '~/composables/queries/project-flag-run'
 
 import ProjectFlagRunActions from './run-actions.vue'
+import ProjectFlagRunCountBadges from './run-count-badges.vue'
 import { formatDate, formatRunStatus } from './run-format'
 import ProjectFlagScanBadge from './scan-badge.vue'
 
