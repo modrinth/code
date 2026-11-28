@@ -42,7 +42,26 @@
 				:categories="filterCategories"
 				:show-label="false"
 				add-label="Filters"
-			/>
+			>
+				<template #search-actions="{ category, selectedValues }">
+					<div v-if="category.key === 'rule'" class="mr-2 flex shrink-0 items-center">
+						<SegmentedControl
+							v-model="ruleMatchMode"
+							:items="ruleMatchModes"
+							:disabled="selectedValues.length < 2"
+							aria-label="Rule match mode"
+						/>
+					</div>
+				</template>
+			</DropdownFilterBar>
+		</div>
+
+		<div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+			<p role="status" class="m-0 text-sm text-secondary">{{ resultCountLabel }}</p>
+			<Button type="quiet" size="sm" :disabled="!canCopyProjectIds" @click="copyProjectIds">
+				<CopyIcon aria-hidden="true" />
+				{{ copyingProjectIds ? 'Copying…' : 'Copy IDs' }}
+			</Button>
 		</div>
 
 		<div class="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
@@ -87,20 +106,22 @@
 import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
 
 import type { ProjectFlagRun, ProjectFlagRunResult } from '@modrinth/api-client'
-import { LoaderCircleIcon, SearchIcon } from '@modrinth/assets'
+import { CopyIcon, LoaderCircleIcon, SearchIcon } from '@modrinth/assets'
 import {
 	Button,
 	DropdownFilterBar,
 	type DropdownFilterBarCategory,
 	injectModrinthClient,
+	injectNotificationManager,
 	Input,
 	PROJECT_TYPE_ICONS,
+	SegmentedControl,
 	Tabs,
 	type TabsValue,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import { useDebounceFn } from '@vueuse/core'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import Fuse from 'fuse.js'
 
 import {
@@ -130,6 +151,8 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ changeCategory: [category: Category]; selectProject: [id: string] }>()
 const client = injectModrinthClient()
+const queryClient = useQueryClient()
+const { addNotification } = injectNotificationManager()
 
 const search = ref('')
 const searchTerm = ref('')
@@ -142,6 +165,8 @@ const pageOffset = ref(0)
 const locateProject = ref(Boolean(props.projectId))
 const selectedFilters = ref<Record<string, string[]>>({})
 const selectedRules = computed(() => selectedFilters.value.rule ?? [])
+const ruleMatchModes: ('Match any' | 'Match all')[] = ['Match any', 'Match all']
+const ruleMatchMode = ref<(typeof ruleMatchModes)[number]>('Match any')
 const selectedProjectTypes = computed(() => selectedFilters.value.projectType ?? [])
 const projectTypeFilterActive = computed(() => selectedProjectTypes.value.length > 0)
 const hasFilters = computed(() => selectedRules.value.length > 0 || projectTypeFilterActive.value)
@@ -290,10 +315,13 @@ const ruleFilteredRows = computed(() => {
 	const candidates = term
 		? projectSearch.value.search(term).map(({ item }) => item)
 		: groupedRows.value[props.category]
-	if (selectedRules.value.length === 0) return candidates
-	return candidates.filter((row) =>
-		selectedRules.value.some((id) => (row.rules[id]?.flags.length ?? 0) > 0),
-	)
+	const rules = selectedRules.value
+	if (rules.length === 0) return candidates
+	const matchAll = ruleMatchMode.value === 'Match all'
+	return candidates.filter((row) => {
+		const flaggedBy = (id: string) => (row.rules[id]?.flags.length ?? 0) > 0
+		return matchAll ? rules.every(flaggedBy) : rules.some(flaggedBy)
+	})
 })
 const {
 	filterProjects,
@@ -316,6 +344,61 @@ const categoryRows = computed(() => {
 const categoryTotal = computed(() =>
 	needsAllResults.value ? categoryRows.value.length : (resultPage.value?.total ?? 0),
 )
+const copyingProjectIds = ref(false)
+const resultsReady = computed(
+	() =>
+		!isPending.value &&
+		!isError.value &&
+		search.value.trim() === searchTerm.value &&
+		!(projectTypeFilterActive.value && (loadingProjectTypes.value || projectTypeError.value)),
+)
+const resultCountLabel = computed(() => {
+	if (!resultsReady.value) return ''
+	const count = categoryTotal.value
+	const noun = count === 1 ? 'project' : 'projects'
+	const matching = hasFilters.value || searchTerm.value ? ' matching' : ''
+	return `${count.toLocaleString('en-US')}${matching} ${noun}`
+})
+const canCopyProjectIds = computed(
+	() => resultsReady.value && categoryTotal.value > 0 && !copyingProjectIds.value,
+)
+
+function formatProjectIdCount(count: number) {
+	return `${count.toLocaleString('en-US')} project ${count === 1 ? 'ID' : 'IDs'}`
+}
+
+async function copyProjectIds(event: MouseEvent) {
+	if (!canCopyProjectIds.value) return
+	const view = (event.currentTarget as HTMLElement | null)?.ownerDocument.defaultView
+	const clipboard = view?.navigator.clipboard
+	copyingProjectIds.value = true
+	try {
+		if (!view || !clipboard) throw new Error('Clipboard unavailable')
+		let count: number
+		if (needsAllResults.value || data.value?.length === categoryTotal.value) {
+			const ids = categoryRows.value.map((row) => row.project.id)
+			await clipboard.writeText(ids.join(', '))
+			count = ids.length
+		} else {
+			const ids = queryClient
+				.fetchQuery(projectFlagRunResultsOptions(client, props.run))
+				.then((results) => results.map((result) => result.project.id))
+			if (view.ClipboardItem && clipboard.write) {
+				const text = ids.then((values) => new Blob([values.join(', ')], { type: 'text/plain' }))
+				await Promise.all([text, clipboard.write([new view.ClipboardItem({ 'text/plain': text })])])
+			} else {
+				await clipboard.writeText((await ids).join(', '))
+			}
+			count = (await ids).length
+		}
+		addNotification({ title: `Copied ${formatProjectIdCount(count)}`, type: 'success' })
+	} catch {
+		addNotification({ title: 'Could not copy project IDs', type: 'error' })
+	} finally {
+		copyingProjectIds.value = false
+	}
+}
+
 const selectedProjectIndex = computed(() =>
 	categoryRows.value.findIndex((row) => row.project.id === props.projectId),
 )

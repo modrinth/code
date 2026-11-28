@@ -1,9 +1,6 @@
 <template>
-	<div class="min-w-0 self-start lg:sticky lg:top-4">
-		<section
-			class="flex min-w-0 flex-col gap-4 lg:max-h-[calc(100dvh-2rem)] lg:overflow-y-auto"
-			aria-label="Project scan results"
-		>
+	<div class="min-w-0 self-start">
+		<section class="flex min-w-0 flex-col gap-4" aria-label="Project scan results">
 			<template v-if="result">
 				<p class="m-0 text-sm text-secondary">
 					Preview:
