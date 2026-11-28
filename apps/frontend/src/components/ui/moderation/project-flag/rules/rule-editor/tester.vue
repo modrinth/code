@@ -108,7 +108,14 @@
 				<div class="flex flex-wrap items-center gap-2 px-3 pt-2">
 					<Avatar :src="projects.get(activeId)?.icon_url ?? undefined" size="1.75rem" no-shadow />
 					<h3 class="m-0 min-w-0 truncate text-sm font-semibold text-contrast">
-						{{ projectName(activeId) }}
+						<NuxtLink
+							:to="`/project/${encodeURIComponent(projects.get(activeId)?.slug ?? activeId)}`"
+							target="_blank"
+							rel="noopener"
+							class="text-inherit hover:underline focus-visible:underline"
+						>
+							{{ projectName(activeId) }}
+						</NuxtLink>
 					</h3>
 					<code v-if="projects.has(activeId)" class="text-xs text-secondary">{{ activeId }}</code>
 				</div>
